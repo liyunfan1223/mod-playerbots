@@ -91,12 +91,10 @@ float IccAddsDbsMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("rune of blood", bot);
         if (aura)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
-            {
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
-            }
         }
     }
 
@@ -118,12 +116,10 @@ float IccDogsMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("mortal wound", bot, false, true);
         if (aura && aura->GetStackAmount() >= 8)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
-            {
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
-            }
         }
     }
     return 1.0f;
@@ -147,12 +143,10 @@ float IccFestergutMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("gastric bloat", bot, false, true);
         if (aura && aura->GetStackAmount() >= 6)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
-            {
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
-            }
         }
     }
 
@@ -262,12 +256,10 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("mutated plague", bot, false, true);
         if (aura && aura->GetStackAmount() >= 4)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
-            {
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
-            }
         }
     }
 
@@ -619,9 +611,9 @@ float IccSindragosaMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("mystic buffet", bot, false, true);
         if (aura && aura->GetStackAmount() >= 6)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
         }
     }

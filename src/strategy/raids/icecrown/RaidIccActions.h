@@ -442,7 +442,7 @@ public:
         : MovementAction(botAI, "icc bql pact of darkfallen") {}
     bool Execute(Event event) override;
 
-    void CalculateCenterPosition(Position& targetPos, Player* otherPlayer);
+    void CalculateCenterPosition(Position& targetPos, const std::vector<Player*>& playersWithAura);
     bool MoveToTargetPosition(const Position& targetPos, int auraCount);
 };
 
