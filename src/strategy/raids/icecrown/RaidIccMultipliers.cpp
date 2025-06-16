@@ -91,12 +91,10 @@ float IccAddsDbsMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("rune of blood", bot);
         if (aura)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
-            {
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
-            }
         }
     }
 
@@ -118,12 +116,10 @@ float IccDogsMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("mortal wound", bot, false, true);
         if (aura && aura->GetStackAmount() >= 8)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
-            {
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
-            }
         }
     }
     return 1.0f;
@@ -147,12 +143,10 @@ float IccFestergutMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("gastric bloat", bot, false, true);
         if (aura && aura->GetStackAmount() >= 6)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
-            {
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
-            }
         }
     }
 
@@ -262,12 +256,10 @@ float IccAddsPutricideMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("mutated plague", bot, false, true);
         if (aura && aura->GetStackAmount() >= 4)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
-            {
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
-            }
         }
     }
 
@@ -619,9 +611,9 @@ float IccSindragosaMultiplier::GetValue(Action* action)
         Aura* aura = botAI->GetAura("mystic buffet", bot, false, true);
         if (aura && aura->GetStackAmount() >= 6)
         {
-            if (dynamic_cast<CastTauntAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                dynamic_cast<CastHandOfReckoningAction*>(action) || dynamic_cast<CastGrowlAction*>(action) ||
-                dynamic_cast<DpsAssistAction*>(action) || dynamic_cast<TankAssistAction*>(action))
+            if (dynamic_cast<MovementAction*>(action))
+                return 1.0f;
+            else
                 return 0.0f;
         }
     }
@@ -793,13 +785,30 @@ float IccLichKingAddsMultiplier::GetValue(Action* action)
 
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
 
-    bool hasWinterAura = boss && (boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) || boss->HasAura(SPELL_REMORSELESS_WINTER3) || boss->HasAura(SPELL_REMORSELESS_WINTER4));
-    bool hasWinter2Aura = boss && (boss->HasAura(SPELL_REMORSELESS_WINTER5) || boss->HasAura(SPELL_REMORSELESS_WINTER6) || boss->HasAura(SPELL_REMORSELESS_WINTER7) || boss->HasAura(SPELL_REMORSELESS_WINTER8));
-    bool isCasting = boss && boss->HasUnitState(UNIT_STATE_CASTING);
-    bool isWinter = boss && (boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER1) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER2) ||
-                    boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER5) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER6) ||
-                    boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER3) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER4) ||
-                    boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER7) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER8));
+    bool hasWinterAura = false;
+    if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) ||
+                 boss->HasAura(SPELL_REMORSELESS_WINTER3) || boss->HasAura(SPELL_REMORSELESS_WINTER4)))
+        hasWinterAura = true;
+
+    bool hasWinter2Aura = false;
+    if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER5) || boss->HasAura(SPELL_REMORSELESS_WINTER6) ||
+                 boss->HasAura(SPELL_REMORSELESS_WINTER7) || boss->HasAura(SPELL_REMORSELESS_WINTER8)))
+        hasWinter2Aura = true;
+
+    bool isCasting = false;
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING))
+        isCasting = true;
+
+    bool isWinter = false;
+    if (boss && (boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER1) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER2) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER5) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER6) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER3) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER4) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER7) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER8)))
+        isWinter = true;
 
     if (hasWinterAura || hasWinter2Aura || (isCasting && isWinter))
     {

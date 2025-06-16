@@ -897,11 +897,16 @@ bool IccSindragosaBlisteringColdTrigger::IsActive()
     if (dist >= 33.0f)
         return false;
 
-    bool isCasting = boss && boss->HasUnitState(UNIT_STATE_CASTING);
-    bool isBlisteringCold = boss && (boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD1) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD2) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD3) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD4));
+    bool isCasting = false;
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING))
+        isCasting = true;
+
+    bool isBlisteringCold = false;
+    if (boss && (boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD1) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD2) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD3) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD4)))
+        isBlisteringCold = true;
     
     return isCasting && isBlisteringCold;
 }
@@ -916,10 +921,12 @@ bool IccSindragosaUnchainedMagicTrigger::IsActive()
     if (!aura)
         return false;
 
-    bool isBlisteringCold = boss && (boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD1) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD2) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD3) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD4));
+    bool isBlisteringCold = false;
+    if (boss && (boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD1) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD2) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD3) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD4)))
+        isBlisteringCold = true;
 
     if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && isBlisteringCold)
         return false;
@@ -937,10 +944,12 @@ bool IccSindragosaChilledToTheBoneTrigger::IsActive()
     if (!aura)
         return false;
 
-    bool isBlisteringCold = boss && (boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD1) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD2) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD3) ||
-                                     boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD4));
+    bool isBlisteringCold = false;
+    if (boss && (boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD1) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD2) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD3) ||
+                 boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD4)))
+        isBlisteringCold = true;
 
     if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && isBlisteringCold)
         return false;
@@ -1121,11 +1130,30 @@ bool IccLichKingWinterTrigger::IsActive()
         return false;
     
     // Check for either Remorseless Winter
-    bool hasWinterAura = boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) || boss->HasAura(SPELL_REMORSELESS_WINTER3) || boss->HasAura(SPELL_REMORSELESS_WINTER4);
-    bool hasWinter2Aura = boss->HasAura(SPELL_REMORSELESS_WINTER5) || boss->HasAura(SPELL_REMORSELESS_WINTER6) || boss->HasAura(SPELL_REMORSELESS_WINTER7) || boss->HasAura(SPELL_REMORSELESS_WINTER8);
-    bool isCasting = boss->HasUnitState(UNIT_STATE_CASTING);
-    bool isWinter = boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER1) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER2) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER5) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER6) ||
-                    boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER3) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER4) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER7) || boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER8);
+    bool hasWinterAura = false;
+    if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) ||
+        boss->HasAura(SPELL_REMORSELESS_WINTER3) || boss->HasAura(SPELL_REMORSELESS_WINTER4)))
+        hasWinterAura = true;
+
+    bool hasWinter2Aura = false;
+    if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER5) || boss->HasAura(SPELL_REMORSELESS_WINTER6) ||
+        boss->HasAura(SPELL_REMORSELESS_WINTER7) || boss->HasAura(SPELL_REMORSELESS_WINTER8)))
+        hasWinter2Aura = true;
+
+    bool isCasting = false;
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING))
+        isCasting = true;
+
+    bool isWinter = false;
+    if (boss && boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER1) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER2) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER5) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER6) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER3) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER4) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER7) ||
+        boss->FindCurrentSpellBySpellId(SPELL_REMORSELESS_WINTER8))
+        isWinter = true;
 
     if (hasWinterAura || hasWinter2Aura)
         return true;   
