@@ -10,6 +10,7 @@
 #include "RaidEoEStrategy.h"
 #include "RaidMcStrategy.h"
 #include "RaidAq20Strategy.h"
+#include "RaidAq40Strategy.h"
 #include "RaidIccStrategy.h"
 #include "RaidVoAStrategy.h"
 
@@ -24,6 +25,7 @@ public:
         creators["mc"] = &RaidStrategyContext::mc;
         creators["bwl"] = &RaidStrategyContext::bwl;
         creators["aq20"] = &RaidStrategyContext::aq20;
+        creators["aq40"] = &RaidStrategyContext::aq40;
         creators["naxx"] = &RaidStrategyContext::naxx;
         creators["wotlk-os"] = &RaidStrategyContext::wotlk_os;
         creators["wotlk-eoe"] = &RaidStrategyContext::wotlk_eoe;
@@ -37,6 +39,7 @@ private:
     static Strategy* mc(PlayerbotAI* botAI) { return new RaidMcStrategy(botAI); }
     static Strategy* bwl(PlayerbotAI* botAI) { return new RaidBwlStrategy(botAI); }
     static Strategy* aq20(PlayerbotAI* botAI) { return new RaidAq20Strategy(botAI); }
+    static Strategy* aq40(PlayerbotAI* botAI) { return new RaidAq40Strategy(botAI); }
     static Strategy* naxx(PlayerbotAI* botAI) { return new RaidNaxxStrategy(botAI); }
     static Strategy* wotlk_os(PlayerbotAI* botAI) { return new RaidOsStrategy(botAI); }
     static Strategy* wotlk_eoe(PlayerbotAI* botAI) { return new RaidEoEStrategy(botAI); }
