@@ -17,12 +17,15 @@
 
 #include "Playerbots.h"
 
+#include "AccountScript.h"
 #include "Channel.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "GuildTaskMgr.h"
 #include "Metric.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
 #include "PlayerScript.h"
 #include "PlayerbotAIConfig.h"
 #include "RandomPlayerbotMgr.h"
@@ -93,6 +96,12 @@ public:
     {
         if (!player->GetSession()->IsBot())
         {
+            // If this character is currently online as a bot, log out the bot first
+            if (Player* bot = ObjectAccessor::FindPlayer(player->GetGUID()))
+            {
+                LogoutAltBot(player->GetGUID());
+            }
+
             sPlayerbotsMgr->AddPlayerbotData(player, false);
             sRandomPlayerbotMgr->OnPlayerLogin(player);
 
@@ -114,7 +123,7 @@ public:
                 roundedTime = roundedTime.substr(0, roundedTime.find('.') + 2);
 
                 ChatHandler(player->GetSession()).SendSysMessage(
-                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '" 
+                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '"
                     + roundedTime + "' minutes.");
             }
         }
@@ -218,7 +227,7 @@ public:
     {
         if (!player->GetSession()->IsBot())
             return;
-        
+
         if (!sRandomPlayerbotMgr->IsRandomBot(player))
             return;
 
@@ -288,7 +297,7 @@ public:
         LOG_INFO("server.loading", "╚══════════════════════════════════════════════════════════╝");
 
         uint32 oldMSTime = getMSTime();
-        
+
         LOG_INFO("server.loading", " ");
         LOG_INFO("server.loading", "Load Playerbots Config...");
 
@@ -388,6 +397,7 @@ public:
         sRandomPlayerbotMgr->LogoutAllBots();
     }
 };
+
 
 void AddPlayerbotsScripts()
 {
