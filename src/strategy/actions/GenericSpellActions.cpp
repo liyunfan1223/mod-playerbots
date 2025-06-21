@@ -339,7 +339,7 @@ bool UseTrinketAction::UseTrinket(Item* item)
             // e.g. on Item https://www.wowhead.com/wotlk/item=44074/oracle-talisman-of-ablution leading to
             // constant casting of the proc spell onto themselfes https://www.wowhead.com/wotlk/spell=59787/oracle-ablutions
             // This will lead to multiple hundreds of entries in m_appliedAuras -> Once killing an enemy -> Big diff time spikes
-            if (spellProcFlag == 2) return false;
+            if (spellProcFlag != 0) return false;
 
             if (!botAI->CanCastSpell(spellId, bot, false))
             {
