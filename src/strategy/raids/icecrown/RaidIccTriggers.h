@@ -128,7 +128,7 @@ enum CreatureIdsICC
 enum SpellIdsICC
 {
     // ICC cheat spells
-    SPELL_EMPOWERED_BLOOD               = 70304, //70304 -->50%, 70227 /*100% more dmg, 100% more att speed*/
+    SPELL_EMPOWERED_BLOOD               = 70227, //70304 -->50%, 70227 /*100% more dmg, 100% more att speed*/
     SPELL_EXPERIENCED                   = 71188, //dmg 30% 20% att speed
     SPELL_NO_THREAT                     = 70115, //reduce threat
     SPELL_SPITEFULL_FURY                = 36886, //500% more threat

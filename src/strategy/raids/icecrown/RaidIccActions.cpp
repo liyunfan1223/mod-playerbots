@@ -27,7 +27,7 @@ bool IccLmTankPositionAction::Execute(Event event)
     if (isBossInBoneStorm)
         return false;
 
-    if (botAI->HasAggro(boss) && botAI->IsMainTank(bot))
+    if (botAI->HasAggro(boss) && botAI->IsMainTank(bot) && boss->GetVictim() == bot)
     {
         const float maxDistanceThreshold = 3.0f;
         const float distance = bot->GetExactDist2d(ICC_LM_TANK_POSITION.GetPositionX(), ICC_LM_TANK_POSITION.GetPositionY());
@@ -39,12 +39,18 @@ bool IccLmTankPositionAction::Execute(Event event)
     if (botAI->IsAssistTank(bot))
     {
         const float maxDistanceThreshold = 3.0f;
-        const float distance =
-            bot->GetExactDist2d(ICC_LM_TANK_POSITION.GetPositionX(), ICC_LM_TANK_POSITION.GetPositionY());
+        const float distance = bot->GetExactDist2d(ICC_LM_TANK_POSITION.GetPositionX(), ICC_LM_TANK_POSITION.GetPositionY());
 
         if (distance > maxDistanceThreshold)
             return MoveTowardPosition(ICC_LM_TANK_POSITION, maxDistanceThreshold);
+
+        if (distance < maxDistanceThreshold)
+        {
+            bot->SetFacingToObject(boss);
+            return true;
+        }
     }
+
     return false;
 }
 
@@ -308,7 +314,7 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event event)
 
     const uint32 shadeEntryId = NPC_SHADE;
 
-    if (botAI->IsTank(bot) && boss->HealthBelowPct(95))
+    if (botAI->IsTank(bot) && boss && boss->HealthBelowPct(95) && boss->GetVictim() == bot)
     {
         // Check if the bot is not the victim of a shade
         if (IsTargetedByShade(shadeEntryId))
@@ -317,8 +323,7 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event event)
         const float maxDistanceToTankPosition = 20.0f;
         const float moveIncrement = 3.0f;
 
-        const float distance =
-            bot->GetExactDist2d(ICC_LDW_TANK_POSTION.GetPositionX(), ICC_LDW_TANK_POSTION.GetPositionY());
+        const float distance = bot->GetExactDist2d(ICC_LDW_TANK_POSTION.GetPositionX(), ICC_LDW_TANK_POSTION.GetPositionY());
 
         if (distance > maxDistanceToTankPosition)
         {
@@ -441,9 +446,27 @@ bool IccShadeLadyDeathwhisperAction::Execute(Event event)
         // Move away from the Vengeful Shade if the bot is too close
         if (currentDistance < SAFE_DISTANCE)
         {
-            // Forces bot to stop channeling or getting locked by any other action
-            botAI->Reset();
-            return MoveAway(shade, SAFE_DISTANCE - currentDistance);
+            // Calculate direction away from shade
+            float dx = bot->GetPositionX() - shade->GetPositionX();
+            float dy = bot->GetPositionY() - shade->GetPositionY();
+            float dist = std::sqrt(dx * dx + dy * dy);
+
+            if (dist < 0.001f)
+                continue;
+
+            dx /= dist;
+            dy /= dist;
+
+            float moveDistance = SAFE_DISTANCE - currentDistance;
+            float targetX = bot->GetPositionX() + dx * moveDistance;
+            float targetY = bot->GetPositionY() + dy * moveDistance;
+            float targetZ = bot->GetPositionZ();
+
+            if (bot->IsWithinLOS(targetX, targetY, targetZ))
+            {
+                botAI->Reset();
+                MoveTo(bot->GetMapId(), targetX, targetY, targetZ, false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+            }
         }
     }
 
@@ -1329,9 +1352,9 @@ bool IccFestergutGroupPositionAction::PositionNonTankMembers()
 
     // Position calculation parameters
     constexpr float tankToBossAngle = 4.58f;
-    constexpr float minBossDistance = 20.0f;
+    constexpr float minBossDistance = 15.0f;
     constexpr float spreadDistance = 10.0f;
-    constexpr int columnsPerRow = 5;
+    constexpr int columnsPerRow = 6;
 
     // Calculate grid position
     int row = positionIndex / columnsPerRow;
@@ -1365,57 +1388,126 @@ bool IccFestergutGroupPositionAction::PositionNonTankMembers()
 
 int IccFestergutGroupPositionAction::CalculatePositionIndex(Group* group)
 {
-    int healerIndex = -1;
-    int rangedDpsIndex = -1;
-    int currentHealerIndex = 0;
-    int currentRangedDpsIndex = 0;
-    int totalHealers = 0;
+    std::vector<ObjectGuid> healerGuids;
+    std::vector<ObjectGuid> rangedDpsGuids;
+    std::vector<ObjectGuid> hunterGuids;
 
-    // First pass: count total healers
+    // Collect all eligible members with their GUIDs
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
         if (!member || !member->IsAlive() || botAI->IsTank(member))
             continue;
+
+        ObjectGuid memberGuid = member->GetGUID();
 
         if (botAI->IsHeal(member))
-            totalHealers++;
-    }
-
-    // Second pass: determine position
-    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-    {
-        Player* member = itr->GetSource();
-        if (!member || !member->IsAlive() || botAI->IsTank(member))
-            continue;
-
-        if (member == bot)
         {
-            if (botAI->IsHeal(bot))
-                healerIndex = currentHealerIndex;
-            else if (botAI->IsRanged(bot))
-                rangedDpsIndex = currentRangedDpsIndex;
-            break;
+            healerGuids.push_back(memberGuid);
         }
-
-        if (botAI->IsHeal(member))
-            currentHealerIndex++;
         else if (botAI->IsRanged(member))
-            currentRangedDpsIndex++;
+        {
+            if (member->getClass() == CLASS_HUNTER)
+            {
+                hunterGuids.push_back(memberGuid);
+            }
+            else
+            {
+                rangedDpsGuids.push_back(memberGuid);
+            }
+        }
     }
 
-    // Calculate final position index
-    if (healerIndex != -1)
+    // Sort GUIDs for consistent ordering
+    std::sort(healerGuids.begin(), healerGuids.end());
+    std::sort(rangedDpsGuids.begin(), rangedDpsGuids.end());
+    std::sort(hunterGuids.begin(), hunterGuids.end());
+
+    ObjectGuid botGuid = bot->GetGUID();
+
+    // Find bot's position among healers
+    auto healerIt = std::find(healerGuids.begin(), healerGuids.end(), botGuid);
+    if (healerIt != healerGuids.end())
     {
-        // Healers in first two rows
-        int healersPerRow = (totalHealers + 1) / 2;  // Round up
-        healerIndex = (healerIndex < healersPerRow) ? healerIndex : healerIndex - healersPerRow + 5;
-        return healerIndex;
+        int healerIndex = std::distance(healerGuids.begin(), healerIt);
+        int totalHealers = healerGuids.size();
+
+        // Healers in first two rows, distributed evenly
+        int healersPerRow = (totalHealers + 1) / 2;  // Round up for first row
+
+        if (healerIndex < healersPerRow)
+        {
+            // First row of healers (positions 0-5)
+            return healerIndex;
+        }
+        else
+        {
+            // Second row of healers (positions 6-11)
+            return healerIndex - healersPerRow + 6;
+        }
     }
-    else if (rangedDpsIndex != -1)
+
+    // Find bot's position among non-hunter ranged DPS
+    auto rangedIt = std::find(rangedDpsGuids.begin(), rangedDpsGuids.end(), botGuid);
+    if (rangedIt != rangedDpsGuids.end())
     {
-        // Ranged DPS after healers
-        return totalHealers + rangedDpsIndex;
+        int rangedIndex = std::distance(rangedDpsGuids.begin(), rangedIt);
+        int totalHealers = healerGuids.size();
+
+        // Non-hunter ranged DPS fill remaining spots in healer rows first
+        int healerSpotsUsed = totalHealers;
+        int remainingSpotsInHealerRows = 12 - healerSpotsUsed;  // 2 rows of 6 spots each
+
+        if (rangedIndex < remainingSpotsInHealerRows)
+        {
+            // Fill remaining spots in healer rows
+            if (healerSpotsUsed < 6)
+            {
+                // Fill remaining spots in first row
+                return healerSpotsUsed + rangedIndex;
+            }
+            else
+            {
+                // Fill remaining spots in second row
+                int spotsInFirstRow = 6;
+                int spotsInSecondRow = healerSpotsUsed - 6;
+                int remainingInSecondRow = 6 - spotsInSecondRow;
+
+                if (rangedIndex < remainingInSecondRow)
+                {
+                    return 6 + spotsInSecondRow + rangedIndex;
+                }
+                else
+                {
+                    // Move to third row
+                    return 12 + (rangedIndex - remainingInSecondRow);
+                }
+            }
+        }
+        else
+        {
+            // Start new rows for remaining ranged DPS
+            return 12 + (rangedIndex - remainingSpotsInHealerRows);
+        }
+    }
+
+    // Find bot's position among hunters
+    auto hunterIt = std::find(hunterGuids.begin(), hunterGuids.end(), botGuid);
+    if (hunterIt != hunterGuids.end())
+    {
+        int hunterIndex = std::distance(hunterGuids.begin(), hunterIt);
+        int totalHealers = healerGuids.size();
+        int totalRangedDps = rangedDpsGuids.size();
+
+        // Hunters start after healers and non-hunter ranged DPS
+        // But ensure they're at least in the second row (position 6+)
+        int basePosition = totalHealers + totalRangedDps + hunterIndex;
+
+        // If position would be in first row (0-5), move to second row minimum
+        if (basePosition < 6)
+            basePosition = 6 + hunterIndex;
+
+        return basePosition;
     }
 
     return -1;
@@ -1444,8 +1536,11 @@ bool IccFestergutSporeAction::Execute(Event event)
 
     // Move to position if not already there
     if (bot->GetExactDist2d(targetPos) > POSITION_TOLERANCE)
+    {
+        botAI->Reset();
         return MoveTo(bot->GetMapId(), targetPos.GetPositionX(), targetPos.GetPositionY(), targetPos.GetPositionZ(),
                       true, false, false, true, MovementPriority::MOVEMENT_FORCED);
+    }
 
     return hasSpore;
 }
@@ -1567,7 +1662,9 @@ void IccRotfaceTankPositionAction::MarkBossWithSkull(Unit* boss)
 
 bool IccRotfaceTankPositionAction::PositionMainTankAndMelee(Unit* boss)
 {
-    bool isBossCasting = boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->GetCurrentSpell(SPELL_SLIME_SPRAY);
+    bool isBossCasting = false;
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->GetCurrentSpell(SPELL_SLIME_SPRAY))
+        bool isBossCasting = true;
 
     if (bot->GetExactDist2d(ICC_ROTFACE_CENTER_POSITION) > 7.0f && botAI->HasAggro(boss) && botAI->IsMainTank(bot))
         MoveTo(bot->GetMapId(), ICC_ROTFACE_CENTER_POSITION.GetPositionX(),
@@ -1649,8 +1746,8 @@ bool IccRotfaceTankPositionAction::HandleBigOozePositioning(Unit* boss)
         // If we have the ooze's aggro, kite it in a larger circular pattern between 20f and 30f from the center
         if (bigOoze->GetVictim() == bot)
         {
-            const float minRadius = 17.0f;
-            const float maxRadius = 25.0f;
+            const float minRadius = 24.0f;
+            const float maxRadius = 34.0f;
             const float safeDistanceFromOoze = 13.0f;
             const float puddleSafeDistance = 30.0f;
             const Position centerPosition = ICC_ROTFACE_CENTER_POSITION;
@@ -1922,7 +2019,10 @@ bool IccRotfaceGroupPositionAction::PositionRangedAndHealers(Unit* boss,Unit *sm
         return false;
 
     Difficulty diff = bot->GetRaidDifficulty();
-    bool isBossCasting = boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->GetCurrentSpell(SPELL_SLIME_SPRAY);
+    bool isBossCasting = false;
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->GetCurrentSpell(SPELL_SLIME_SPRAY))
+        bool isBossCasting = true;
+
     bool isHeroic = (diff == RAID_DIFFICULTY_10MAN_HEROIC || diff == RAID_DIFFICULTY_25MAN_HEROIC);
 
    // Move to the exact same position as the boss during slime spray
@@ -2342,6 +2442,25 @@ bool IccPutricideVolatileOozeAction::Execute(Event event)
     if (botAI->HasAura("Gaseous Bloat", bot) || botAI->HasAura("Unbound Plague", bot))
         return false;
 
+    // Find all alive oozes
+    std::vector<Unit*> aliveOozes;
+    const GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (const auto& guid : npcs)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (unit && unit->IsAlive() && unit->GetEntry() == ooze->GetEntry())
+            aliveOozes.push_back(unit);
+    }
+
+    // If more than one ooze is alive, kill all but one
+    if (aliveOozes.size() > 1)
+    {
+        for (size_t i = 0; i < aliveOozes.size() - 1; ++i)
+        {
+            bot->Kill(bot, aliveOozes[i]);
+        }
+    }
+
     // Mark ooze with skull
     MarkOozeWithSkull(ooze);
 
@@ -2438,6 +2557,25 @@ bool IccPutricideGasCloudAction::Execute(Event event)
     bool hasGaseousBloat = botAI->HasAura("Gaseous Bloat", bot);
     Unit* volatileOoze = AI_VALUE2(Unit*, "find target", "volatile ooze");
 
+    // Find all alive gasCloud
+    std::vector<Unit*> aliveGasCloud;
+    const GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    for (const auto& guid : npcs)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (unit && unit->IsAlive() && unit->GetEntry() == gasCloud->GetEntry())
+            aliveGasCloud.push_back(unit);
+    }
+
+    // If more than one GasCloud is alive, kill all but one
+    if (aliveGasCloud.size() > 1)
+    {
+        for (size_t i = 0; i < aliveGasCloud.size() - 1; ++i)
+        {
+            bot->Kill(bot, aliveGasCloud[i]);
+        }
+    }
+
     // Skip if we have no aura but ooze exists
     if (!hasGaseousBloat && volatileOoze)
         return false;
@@ -2450,10 +2588,20 @@ bool IccPutricideGasCloudAction::Execute(Event event)
 
 bool IccPutricideGasCloudAction::HandleGaseousBloatMovement(Unit* gasCloud)
 {
-    static const int NUM_ANGLES = 16;
-    static const float MIN_SAFE_DISTANCE = 25.0f;
-    static const float EMERGENCY_DISTANCE = 8.0f;
+    bool hasGaseousBloat = botAI->HasAura("Gaseous Bloat", bot);
+
+    if (!hasGaseousBloat)
+        return false;
+
+    if (hasGaseousBloat && !bot->HasAura(SPELL_NITRO_BOOSTS))
+        bot->AddAura(SPELL_NITRO_BOOSTS,
+                     bot);  // to make it a bit easier when abo fails to slow or bots take forever to kill oozes
+
+    static const int NUM_ANGLES = 32;  // Increased from 16 for better corner escape
+    static const float MIN_SAFE_DISTANCE = 35.0f;
+    static const float EMERGENCY_DISTANCE = 15.0f;
     static const float GAS_BOMB_SAFE_DIST = 6.0f;
+    static const float MOVEMENT_INCREMENT = 5.0f;  // Fixed movement increment
 
     Position botPos = bot->GetPosition();
     Position cloudPos = gasCloud->GetPosition();
@@ -2483,10 +2631,10 @@ bool IccPutricideGasCloudAction::HandleGaseousBloatMovement(Unit* gasCloud)
     dx /= dist;
     dy /= dist;
 
-    // Try to find safe movement position
+    // Try to find safe movement position with strict corner avoidance
     Position bestPos;
     bool foundPath = false;
-    float bestGasBombDist = 0.0f;
+    float bestScore = 0.0f;
 
     for (int i = 0; i < NUM_ANGLES; i++)
     {
@@ -2494,7 +2642,8 @@ bool IccPutricideGasCloudAction::HandleGaseousBloatMovement(Unit* gasCloud)
         float rotatedDx = dx * cos(angle) - dy * sin(angle);
         float rotatedDy = dx * sin(angle) + dy * cos(angle);
 
-        for (float testDist = 5.0f; testDist <= 15.0f; testDist += 5.0f)
+        // Only test positions at fixed increments of 5.0f
+        for (float testDist = MOVEMENT_INCREMENT; testDist <= 20.0f; testDist += MOVEMENT_INCREMENT)
         {
             float testX = botPos.GetPositionX() + rotatedDx * testDist;
             float testY = botPos.GetPositionY() + rotatedDy * testDist;
@@ -2515,11 +2664,44 @@ bool IccPutricideGasCloudAction::HandleGaseousBloatMovement(Unit* gasCloud)
             if (newCloudDist > cloudDist && minGasBombDist >= GAS_BOMB_SAFE_DIST &&
                 bot->IsWithinLOS(testX, testY, testZ))
             {
-                // Prefer positions with greater minGasBombDist
-                if (!foundPath || minGasBombDist > bestGasBombDist)
+                // Strict corner avoidance - test movement freedom thoroughly
+                int freeDirections = 0;
+                static const int CHECK_DIRS = 16;      // More directions for better detection
+                static const float CHECK_DIST = 8.0f;  // Longer distance to detect walls/corners early
+
+                for (int j = 0; j < CHECK_DIRS; j++)
+                {
+                    float checkAngle = (2 * M_PI * j) / CHECK_DIRS;
+                    float checkX = testX + cos(checkAngle) * CHECK_DIST;
+                    float checkY = testY + sin(checkAngle) * CHECK_DIST;
+                    if (bot->IsWithinLOS(checkX, checkY, testZ))
+                        freeDirections++;
+                }
+
+                float freedomScore = (float)freeDirections / CHECK_DIRS;
+
+                // STRICT: Reject any position that looks like a corner or restricted area
+                // Require at least 80% of directions to be free (13 out of 16)
+                if (freedomScore < 0.8f)
+                    continue;  // Skip this position entirely
+
+                // Also check for "dead ends" - positions that might lead to corners
+                // Test if we can move further in the same direction
+                bool canContinueMoving = true;
+                float continueX = testX + rotatedDx * MOVEMENT_INCREMENT;
+                float continueY = testY + rotatedDy * MOVEMENT_INCREMENT;
+                if (!bot->IsWithinLOS(continueX, continueY, testZ))
+                    canContinueMoving = false;
+
+                // Bonus for positions that allow continued movement in the same direction
+                float continuityBonus = canContinueMoving ? 5.0f : 0.0f;
+
+                float combinedScore = newCloudDist + (freedomScore * 15.0f) + minGasBombDist + continuityBonus;
+
+                if (!foundPath || combinedScore > bestScore)
                 {
                     bestPos = testPos;
-                    bestGasBombDist = minGasBombDist;
+                    bestScore = combinedScore;
                     foundPath = true;
                 }
             }
@@ -2527,26 +2709,33 @@ bool IccPutricideGasCloudAction::HandleGaseousBloatMovement(Unit* gasCloud)
     }
 
     if (foundPath)
+    {
+        botAI->Reset();
         return MoveTo(bot->GetMapId(), bestPos.GetPositionX(), bestPos.GetPositionY(), bestPos.GetPositionZ(), false,
                       false, false, false, MovementPriority::MOVEMENT_COMBAT);
-
-    // Emergency movement if too close
+    }
+    // Emergency movement - only when very close to cloud
     if (cloudDist < EMERGENCY_DISTANCE)
     {
         Position emergencyPos = CalculateEmergencyPosition(botPos, dx, dy);
-        // Also check gas bomb distance for emergency move
-        float minGasBombDist = FLT_MAX;
+
+        // Even for emergency, avoid corners
+        float minEmergencyGasBombDist = FLT_MAX;
         for (Unit* bomb : gasBombs)
         {
             float bombDist = sqrt(pow(emergencyPos.GetPositionX() - bomb->GetPositionX(), 2) +
                                   pow(emergencyPos.GetPositionY() - bomb->GetPositionY(), 2));
-            if (bombDist < minGasBombDist)
-                minGasBombDist = bombDist;
+            if (bombDist < minEmergencyGasBombDist)
+                minEmergencyGasBombDist = bombDist;
         }
-        if (minGasBombDist >= GAS_BOMB_SAFE_DIST &&
+
+        if (minEmergencyGasBombDist >= GAS_BOMB_SAFE_DIST &&
             bot->IsWithinLOS(emergencyPos.GetPositionX(), emergencyPos.GetPositionY(), emergencyPos.GetPositionZ()))
+        {
+            botAI->Reset();
             return MoveTo(bot->GetMapId(), emergencyPos.GetPositionX(), emergencyPos.GetPositionY(),
                           emergencyPos.GetPositionZ(), false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+        }
     }
 
     return false;
@@ -2555,9 +2744,10 @@ bool IccPutricideGasCloudAction::HandleGaseousBloatMovement(Unit* gasCloud)
 bool IccPutricideGasCloudAction::FindSafeMovementPosition(const Position& botPos, const Position& cloudPos, float dx,
                                                           float dy, int numAngles, Position& resultPos)
 {
-    float bestDist = cloudPos.GetExactDist2d(botPos);
+    float bestScore = 0.0f;
     bool foundPath = false;
     resultPos = botPos;
+    static const float MOVEMENT_INCREMENT = 5.0f;  // Fixed movement increment
 
     for (int i = 0; i < numAngles; i++)
     {
@@ -2565,18 +2755,49 @@ bool IccPutricideGasCloudAction::FindSafeMovementPosition(const Position& botPos
         float rotatedDx = dx * cos(angle) - dy * sin(angle);
         float rotatedDy = dx * sin(angle) + dy * cos(angle);
 
-        for (float testDist = 5.0f; testDist <= 15.0f; testDist += 5.0f)
+        for (float testDist = MOVEMENT_INCREMENT; testDist <= 20.0f; testDist += MOVEMENT_INCREMENT)
         {
             Position testPos(botPos.GetPositionX() + rotatedDx * testDist, botPos.GetPositionY() + rotatedDy * testDist,
                              botPos.GetPositionZ());
 
             float newCloudDist = cloudPos.GetExactDist2d(testPos);
-            if (newCloudDist > bestDist &&
+            if (newCloudDist > cloudPos.GetExactDist2d(botPos) &&
                 bot->IsWithinLOS(testPos.GetPositionX(), testPos.GetPositionY(), testPos.GetPositionZ()))
             {
-                resultPos = testPos;
-                bestDist = newCloudDist;
-                foundPath = true;
+                // Strict corner prevention - test movement freedom thoroughly
+                int freeDirections = 0;
+                static const int CHECK_DIRECTIONS = 16;
+                static const float CHECK_DISTANCE = 8.0f;
+
+                for (int j = 0; j < CHECK_DIRECTIONS; j++)
+                {
+                    float checkAngle = (2 * M_PI * j) / CHECK_DIRECTIONS;
+                    float checkX = testPos.GetPositionX() + cos(checkAngle) * CHECK_DISTANCE;
+                    float checkY = testPos.GetPositionY() + sin(checkAngle) * CHECK_DISTANCE;
+                    if (bot->IsWithinLOS(checkX, checkY, testPos.GetPositionZ()))
+                        freeDirections++;
+                }
+
+                float freedomScore = (float)freeDirections / CHECK_DIRECTIONS;
+
+                // REJECT positions that could lead to corners - require high freedom
+                if (freedomScore < 0.8f)  // 80% of directions must be free
+                    continue;
+
+                // Check if we can continue moving in the same direction (avoid dead ends)
+                float continueX = testPos.GetPositionX() + rotatedDx * MOVEMENT_INCREMENT;
+                float continueY = testPos.GetPositionY() + rotatedDy * MOVEMENT_INCREMENT;
+                bool canContinue = bot->IsWithinLOS(continueX, continueY, testPos.GetPositionZ());
+
+                float continuityBonus = canContinue ? 3.0f : 0.0f;
+                float combinedScore = newCloudDist + (freedomScore * 12.0f) + continuityBonus;
+
+                if (!foundPath || combinedScore > bestScore)
+                {
+                    resultPos = testPos;
+                    bestScore = combinedScore;
+                    foundPath = true;
+                }
             }
         }
     }
@@ -2586,7 +2807,50 @@ bool IccPutricideGasCloudAction::FindSafeMovementPosition(const Position& botPos
 
 Position IccPutricideGasCloudAction::CalculateEmergencyPosition(const Position& botPos, float dx, float dy)
 {
-    return Position(botPos.GetPositionX() + dx * 10.0f, botPos.GetPositionY() + dy * 10.0f, botPos.GetPositionZ());
+    // For emergency, still try to avoid corners but prioritize getting away from immediate danger
+    Position bestPos =
+        Position(botPos.GetPositionX() + dx * 15.0f, botPos.GetPositionY() + dy * 15.0f, botPos.GetPositionZ());
+    float bestFreedom = 0.0f;
+    static const float MOVEMENT_INCREMENT = 5.0f;  // Fixed movement increment
+
+    // Try fewer directions for emergency but still avoid corners
+    for (int i = 0; i < 8; i++)
+    {
+        float angle = (2 * M_PI * i) / 8;
+        float rotatedDx = dx * cos(angle) - dy * sin(angle);
+        float rotatedDy = dx * sin(angle) + dy * cos(angle);
+
+        Position testPos(botPos.GetPositionX() + rotatedDx * 15.0f, botPos.GetPositionY() + rotatedDy * 15.0f,
+                         botPos.GetPositionZ());
+
+        if (bot->IsWithinLOS(testPos.GetPositionX(), testPos.GetPositionY(), testPos.GetPositionZ()))
+        {
+            // Quick freedom check for emergency
+            int freeDirections = 0;
+            static const int EMERGENCY_CHECK_DIRS = 8;
+            static const float EMERGENCY_CHECK_DIST = 6.0f;
+
+            for (int j = 0; j < EMERGENCY_CHECK_DIRS; j++)
+            {
+                float checkAngle = (2 * M_PI * j) / EMERGENCY_CHECK_DIRS;
+                float checkX = testPos.GetPositionX() + cos(checkAngle) * EMERGENCY_CHECK_DIST;
+                float checkY = testPos.GetPositionY() + sin(checkAngle) * EMERGENCY_CHECK_DIST;
+                if (bot->IsWithinLOS(checkX, checkY, testPos.GetPositionZ()))
+                    freeDirections++;
+            }
+
+            float freedom = (float)freeDirections / EMERGENCY_CHECK_DIRS;
+
+            // For emergency, accept positions with at least 60% freedom
+            if (freedom >= 0.6f && freedom > bestFreedom)
+            {
+                bestPos = testPos;
+                bestFreedom = freedom;
+            }
+        }
+    }
+
+    return bestPos;
 }
 
 bool IccPutricideGasCloudAction::HandleGroupAuraSituation(Unit* gasCloud)
@@ -2610,18 +2874,63 @@ bool IccPutricideGasCloudAction::HandleGroupAuraSituation(Unit* gasCloud)
         }
     }
 
+    float currentDist = gasCloud ? bot->GetDistance(gasCloud) : 0.0f;
+    const float MIN_SAFE_DISTANCE = 15.0f;
+
+    // Always maintain minimum distance when group doesn't have bloat
+    if (!GroupHasGaseousBloat(group) && gasCloud && currentDist < MIN_SAFE_DISTANCE)
+    {
+        // Move away from gas cloud
+        float angle = bot->GetAngle(gasCloud);
+        float x = bot->GetPositionX() + cos(angle) * -MIN_SAFE_DISTANCE;
+        float y = bot->GetPositionY() + sin(angle) * -MIN_SAFE_DISTANCE;
+        return MoveTo(bot->GetMapId(), x, y, bot->GetPositionZ(), false, false, false, false,
+                      MovementPriority::MOVEMENT_COMBAT);
+    }
+
     if (GroupHasGaseousBloat(group) && gasCloud)
     {
         bot->SetTarget(gasCloud->GetGUID());
         bot->SetFacingToObject(gasCloud);
 
-        // Added movement logic for ranged attackers
-        if (botAI->IsRanged(bot) && !botAI->IsHeal(bot))
-            return Attack(gasCloud);
-
-        // Added movement logic for melee attackers
-        if (botAI->IsMelee(bot) && !botAI->IsTank(bot))
-            return Attack(gasCloud);
+        // Attack logic for group with Gaseous Bloat
+        if (botAI->IsRanged(bot))
+        {
+            // For ranged attackers, maintain optimal distance (15-25 yards)
+            if (currentDist > 25.0f)
+            {
+                // Move closer if too far
+                return MoveTo(bot->GetMapId(), gasCloud->GetPositionX(), gasCloud->GetPositionY(),
+                              gasCloud->GetPositionZ(), false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+            }
+            else if (currentDist < MIN_SAFE_DISTANCE)
+            {
+                // Move away if too close (but stay closer than normal safe distance since we need to attack)
+                float angle = bot->GetAngle(gasCloud);
+                float x = bot->GetPositionX() + cos(angle) * -12.0f;
+                float y = bot->GetPositionY() + sin(angle) * -12.0f;
+                return MoveTo(bot->GetMapId(), x, y, bot->GetPositionZ(), false, false, false, false,
+                              MovementPriority::MOVEMENT_COMBAT);
+            }
+            else
+            {
+                // Attack if at good range
+                return Attack(gasCloud);
+            }
+        }
+        else if (botAI->IsMelee(bot) && !botAI->IsTank(bot))
+        {
+            // For melee attackers, move to attack range (0-5 yards)
+            if (currentDist > 5.0f)
+            {
+                return MoveTo(bot->GetMapId(), gasCloud->GetPositionX(), gasCloud->GetPositionY(),
+                              gasCloud->GetPositionZ(), false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+            }
+            else
+            {
+                return Attack(gasCloud);
+            }
+        }
     }
 
     return false;
@@ -2710,7 +3019,10 @@ bool IccPutricideAvoidMalleableGooAction::HandleUnboundPlague(Unit* boss)
     }
 
     if (!closestPlayer || closestDistance >= UNBOUND_PLAGUE_DISTANCE)
+    {
+        bot->Kill(bot, bot);
         return true;
+    }
 
     // Calculate move away position
     float dx = bot->GetPositionX() - closestPlayer->GetPositionX();
@@ -2933,7 +3245,9 @@ bool IccBpcKelesethTankAction::Execute(Event event)
     if (!boss)
         return false;
 
-    bool isBossVictim = boss && boss->GetVictim() == bot;
+    bool isBossVictim = false;
+    if (boss && boss->GetVictim() == bot)
+        isBossVictim = true;
 
     // If not actively tanking, attack the boss
     if (boss->GetVictim() != bot)
@@ -3012,8 +3326,13 @@ bool IccBpcMainTankAction::Execute(Event event)
         auto* taldaram = AI_VALUE2(Unit*, "find target", "prince taldaram");
 
         // Check if we're the target of both princes
-        const bool isVictimOfValanar = valanar && valanar->GetVictim() == bot;
-        const bool isVictimOfTaldaram = taldaram && taldaram->GetVictim() == bot;
+        bool isVictimOfValanar = false;
+        if (valanar && valanar->GetVictim() == bot)
+            isVictimOfValanar = true;
+
+        bool isVictimOfTaldaram = false;
+        if (taldaram && taldaram->GetVictim() == bot)
+            isVictimOfTaldaram = true;
 
         // Move to MT position if targeted by both princes and not already close
         if (isVictimOfValanar && isVictimOfTaldaram && bot->GetExactDist2d(ICC_BPC_MT_POSITION) > 15.0f)
@@ -3121,11 +3440,13 @@ bool IccBpcEmpoweredVortexAction::Execute(Event event)
         return false;
 
     // Check if boss is casting empowered vortex
-    bool isCastingVortex = valanar->HasUnitState(UNIT_STATE_CASTING) &&
-                           (valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX1) ||
-                            valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX2) ||
-                            valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX3) ||
-                            valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX4));
+    bool isCastingVortex = false;
+    if (valanar && valanar->HasUnitState(UNIT_STATE_CASTING) &&
+       (valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX1) ||
+        valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX2) ||
+        valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX3) ||
+        valanar->FindCurrentSpellBySpellId(SPELL_EMPOWERED_SHOCK_VORTEX4)))
+        isCastingVortex = true;
 
     if (isCastingVortex)
     {
@@ -4293,51 +4614,55 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event event)
     // Check if bot has Pact of the Darkfallen
     if (!botAI->GetAura("Pact of the Darkfallen", bot))
         return false;
-
     Group* group = bot->GetGroup();
     if (!group)
         return false;
 
     // Find other players with Pact of the Darkfallen
     Player* tankWithAura = nullptr;
-    Player* otherPlayerWithAura = nullptr;
-    int auraCount = 0;
+    std::vector<Player*> playersWithAura;
 
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
         if (!member || member == bot)
             continue;
-
         if (botAI->GetAura("Pact of the Darkfallen", member))
         {
-            auraCount++;
+            playersWithAura.push_back(member);
             if (botAI->IsTank(member))
                 tankWithAura = member;
-            else if (!otherPlayerWithAura)
-                otherPlayerWithAura = member;
         }
     }
 
-    if (auraCount == 0)
+    if (playersWithAura.empty())
         return false;
 
     // Determine target position
     Position targetPos;
-    if (tankWithAura && !botAI->IsTank(bot))
+    if (tankWithAura)
     {
-        // Move to tank if we're not a tank
-        targetPos.Relocate(tankWithAura);
+        // If there's a tank with aura, everyone moves to the tank (including the tank itself for center positioning)
+        if (botAI->IsTank(bot))
+        {
+            // If current bot is the tank, stay put or move slightly for better positioning
+            targetPos.Relocate(bot);
+        }
+        else
+        {
+            // Non-tank bots move to the tank
+            targetPos.Relocate(tankWithAura);
+        }
     }
-    else if (auraCount >= 2)
+    else if (playersWithAura.size() >= 2)
     {
-        // Calculate center position if multiple players have aura
-        CalculateCenterPosition(targetPos, otherPlayerWithAura);
+        // Calculate center position of all players with aura (including bot)
+        CalculateCenterPosition(targetPos, playersWithAura);
     }
-    else if (otherPlayerWithAura)
+    else if (playersWithAura.size() == 1)
     {
         // Move to the single other player with aura
-        targetPos.Relocate(otherPlayerWithAura);
+        targetPos.Relocate(playersWithAura[0]);
     }
     else
     {
@@ -4346,22 +4671,33 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event event)
     }
 
     // Move to target position if needed
-    return MoveToTargetPosition(targetPos, auraCount);
+    return MoveToTargetPosition(targetPos, playersWithAura.size() + 1);  // +1 to include the bot itself
 }
 
-void IccBqlPactOfDarkfallenAction::CalculateCenterPosition(Position& targetPos, Player* otherPlayer)
+void IccBqlPactOfDarkfallenAction::CalculateCenterPosition(Position& targetPos,
+                                                           const std::vector<Player*>& playersWithAura)
 {
-    float sumX = bot->GetPositionX() + otherPlayer->GetPositionX();
-    float sumY = bot->GetPositionY() + otherPlayer->GetPositionY();
-    float sumZ = bot->GetPositionZ() + otherPlayer->GetPositionZ();
-    targetPos.Relocate(sumX / 2, sumY / 2, sumZ / 2);
+    float sumX = bot->GetPositionX();
+    float sumY = bot->GetPositionY();
+    float sumZ = bot->GetPositionZ();
+
+    // Add positions of all other players with aura
+    for (Player* player : playersWithAura)
+    {
+        sumX += player->GetPositionX();
+        sumY += player->GetPositionY();
+        sumZ += player->GetPositionZ();
+    }
+
+    // Calculate average position (center)
+    int totalPlayers = playersWithAura.size() + 1;  // +1 for the bot itself
+    targetPos.Relocate(sumX / totalPlayers, sumY / totalPlayers, sumZ / totalPlayers);
 }
 
 bool IccBqlPactOfDarkfallenAction::MoveToTargetPosition(const Position& targetPos, int auraCount)
 {
     const float POSITION_TOLERANCE = 0.1f;
     float distance = bot->GetDistance(targetPos);
-
     if (distance <= POSITION_TOLERANCE)
         return true;
 
@@ -4372,7 +4708,7 @@ bool IccBqlPactOfDarkfallenAction::MoveToTargetPosition(const Position& targetPo
     float len = sqrt(dx * dx + dy * dy);
 
     float moveX, moveY, moveZ;
-    if (len > 5.0f && auraCount<=2)
+    if (len > 5.0f && auraCount <= 2)
     {
         dx /= len;
         dy /= len;
@@ -4389,7 +4725,6 @@ bool IccBqlPactOfDarkfallenAction::MoveToTargetPosition(const Position& targetPo
 
     botAI->Reset();
     MoveTo(bot->GetMapId(), moveX, moveY, moveZ, false, false, false, true, MovementPriority::MOVEMENT_FORCED);
-
     return false;
 }
 
@@ -4597,8 +4932,7 @@ bool IccValithriaGroupAction::Execute(Event event)
     };
 
     // Find portals and enemies
-    Creature* portal = findNearestCreature(
-        {NPC_DREAM_PORTAL, NPC_DREAM_PORTAL_PRE_EFFECT, NPC_NIGHTMARE_PORTAL, NPC_NIGHTMARE_PORTAL_PRE_EFFECT}, 100.0f);
+    Creature* portal = findNearestCreature({NPC_DREAM_PORTAL, NPC_DREAM_PORTAL_PRE_EFFECT, NPC_NIGHTMARE_PORTAL, NPC_NIGHTMARE_PORTAL_PRE_EFFECT}, 100.0f);
 
     Creature* worm = bot->FindNearestCreature(NPC_ROT_WORM, 100.0f);
     Creature* zombie = bot->FindNearestCreature(NPC_BLISTERING_ZOMBIE, 100.0f);
@@ -4650,8 +4984,10 @@ bool IccValithriaGroupAction::Execute(Event event)
     }
 
     // Healer movement logic
-    if (botAI->IsHeal(bot) && bot->GetExactDist2d(ICC_VDW_HEAL_POSITION) > 45.0f && !portal)
-        MoveTowardsPosition(ICC_VDW_HEAL_POSITION, 10.0f);
+    if (botAI->IsHeal(bot) && bot->GetExactDist2d(ICC_VDW_HEAL_POSITION) > 30.0f && !portal)
+        return MoveTo(bot->GetMapId(), ICC_VDW_HEAL_POSITION.GetPositionX(), ICC_VDW_HEAL_POSITION.GetPositionY(),
+                      ICC_VDW_HEAL_POSITION.GetPositionZ(),
+                      false, false, false, false, MovementPriority::MOVEMENT_NORMAL);
 
     // Avoidance behaviors
     if (manaVoid && bot->GetExactDist2d(manaVoid) < 10.0f &&
@@ -4832,20 +5168,29 @@ bool IccValithriaGroupAction::Handle25ManGroupLogic()
     if (botAI->IsTank(bot) || botAI->IsDps(bot))
         HandleMarkingLogic(inGroup1, inGroup2, group1Pos, group2Pos);
 
-
+    
     // Movement logic for non-healers
     if (!botAI->IsHeal(bot))
     {
         if (inGroup1)
         {
-            return MoveTowardsPosition(group1Pos, 5.0f);
+            float distance = bot->GetDistance(group1Pos);
+            if (distance > 25.0f)
+            {
+                // If far away, move directly to position
+                MoveTowardsPosition(group1Pos, 5.0f);
+            }
         }
         else if (inGroup2)
         {
-            return MoveTowardsPosition(group2Pos, 5.0f);
+            float distance = bot->GetDistance(group2Pos);
+            if (distance > 25.0f)
+            {
+                MoveTowardsPosition(group2Pos, 5.0f);
+            }
         }
     }
-
+    
     return false;
 }
 
@@ -4890,7 +5235,7 @@ bool IccValithriaGroupAction::HandleMarkingLogic(bool inGroup1, bool inGroup2, c
             if (Unit* unit = botAI->GetUnit(guid))
             {
                 if (unit->IsAlive() && unit->GetEntry() == entry &&
-                    unit->GetExactDist2d(groupPos->GetPositionX(), groupPos->GetPositionY()) <= 25.0f)
+                    unit->GetExactDist2d(groupPos->GetPositionX(), groupPos->GetPositionY()) <= 40.0f)
                 {
                     priorityTarget = unit;
                     break;
@@ -4908,8 +5253,23 @@ bool IccValithriaGroupAction::HandleMarkingLogic(bool inGroup1, bool inGroup2, c
         ObjectGuid currentIcon = group->GetTargetIcon(iconIndex);
         Unit* currentIconUnit = botAI->GetUnit(currentIcon);
 
-        if (!currentIconUnit || !currentIconUnit->IsAlive() || currentIconUnit != priorityTarget)
+        // Check if the target already has any raid icon
+        bool hasOtherIcon = false;
+        for (uint8 i = 0; i < 8; ++i)
+        {
+            if (i == iconIndex)
+                continue;  // Skip our own icon index
+            if (group->GetTargetIcon(i) == priorityTarget->GetGUID())
+            {
+                hasOtherIcon = true;
+                break;
+            }
+        }
+
+        if (!hasOtherIcon && (!currentIconUnit || !currentIconUnit->IsAlive() || currentIconUnit != priorityTarget))
+        {
             group->SetTargetIcon(iconIndex, bot->GetGUID(), priorityTarget->GetGUID());
+        }
     }
 
     return false;
@@ -4961,7 +5321,7 @@ bool IccValithriaGroupAction::Handle10ManGroupLogic()
     }
 
     // Movement logic
-    if (bot->GetExactDist2d(ICC_VDW_HEAL_POSITION.GetPositionX(), ICC_VDW_HEAL_POSITION.GetPositionY()) > 35.0f)
+    if (bot->GetExactDist2d(ICC_VDW_HEAL_POSITION.GetPositionX(), ICC_VDW_HEAL_POSITION.GetPositionY()) > 25.0f)
         MoveTowardsPosition(ICC_VDW_HEAL_POSITION, 5.0f);
 
     return false;
@@ -5224,7 +5584,7 @@ bool IccValithriaDreamCloudAction::Execute(Event event)
     size_t myIndex = std::distance(dreamBots.begin(), it);
 
     // Check if all dream bots are stacked within 3f of the current leader (lowest guid)
-    constexpr float STACK_RADIUS = 5.0f;
+    constexpr float STACK_RADIUS = 2.0f;
     Unit* leader = dreamBots.front();
     bool allStacked = true;
     for (Unit* member : dreamBots)
@@ -5233,7 +5593,7 @@ bool IccValithriaDreamCloudAction::Execute(Event event)
         Player* player = member->ToPlayer();
         if (player && !player->GetSession())  // is a bot
         {
-            if (member->GetExactDist2d(leader) > STACK_RADIUS)
+            if (member->GetDistance(leader) > STACK_RADIUS)
             {
                 allStacked = false;
                 break;
@@ -5242,63 +5602,232 @@ bool IccValithriaDreamCloudAction::Execute(Event event)
     }
 
     // If not all stacked, everyone moves to the leader's position (clouds' position)
-    constexpr float PORTALSTART_TOLERANCE = 5.0f;
+    constexpr float PORTALSTART_TOLERANCE = 1.0f;
     if (!allStacked)
     {
         if (bot != leader)
         {
-            if (bot->GetExactDist2d(leader) > PORTALSTART_TOLERANCE)
+            if (bot->GetDistance(leader) > PORTALSTART_TOLERANCE)
             {
-                MoveTo(bot->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(),
-                       false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+                bot->TeleportTo(bot->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(),
+                                bot->GetOrientation());
             }
-            // Wait at leader's position until all are stacked
-            return true;
         }
-        // Leader waits for others to stack
-        return true;
     }
 
+    
     // All stacked: leader (lowest guid) moves to next cloud, others follow and stack at leader's new position
-    Creature* dreamCloud = bot->FindNearestCreature(NPC_DREAM_CLOUD, 100.0f);
-    Creature* nightmareCloud = bot->FindNearestCreature(NPC_NIGHTMARE_CLOUD, 100.0f);
+    // Find all dream and nightmare clouds
+    GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
+    std::vector<Creature*> dreamClouds;
+    std::vector<Creature*> nightmareClouds;
+
+    for (int i = 0; i < npcs.size(); ++i)
+    {
+        Unit* unit = botAI->GetUnit(npcs[i]);
+        if (unit && unit->IsAlive())
+        {
+            if (Creature* creature = unit->ToCreature())
+            {
+                if (creature->GetEntry() == NPC_DREAM_CLOUD)
+                    dreamClouds.push_back(creature);
+                else if (creature->GetEntry() == NPC_NIGHTMARE_CLOUD)
+                    nightmareClouds.push_back(creature);
+            }
+        }
+    }
+
+    // Sort clouds by distance
+    std::sort(dreamClouds.begin(), dreamClouds.end(),
+              [this](Creature* a, Creature* b) { return bot->GetExactDist2d(a) < bot->GetExactDist2d(b); });
+
+    std::sort(nightmareClouds.begin(), nightmareClouds.end(),
+              [this](Creature* a, Creature* b) { return bot->GetExactDist2d(a) < bot->GetExactDist2d(b); });
 
     // Only the leader moves to the next cloud
     if (bot == leader)
     {
+        // Use GUID to determine which cloud type to prefer
+        bool preferDream = (bot->GetGUID().GetCounter() % 2 == 0);
+
+        // Check if we're close to any cloud
+        bool atDreamCloud = false;
+        bool atNightmareCloud = false;
+
+        for (Creature* cloud : dreamClouds)
+        {
+            if (bot->GetExactDist2d(cloud) <= 2.0f)
+            {
+                atDreamCloud = true;
+                break;
+            }
+        }
+
+        for (Creature* cloud : nightmareClouds)
+        {
+            if (bot->GetExactDist2d(cloud) <= 2.0f)
+            {
+                atNightmareCloud = true;
+                break;
+            }
+        }
+
         // If we have emerald vigor, prioritize dream clouds
         if (bot->HasAura(SPELL_EMERALD_VIGOR))
         {
-            if (dreamCloud && bot->GetExactDist2d(dreamCloud) > 2.0f)
-                MoveTo(dreamCloud->GetMapId(), dreamCloud->GetPositionX(), dreamCloud->GetPositionY(),
-                       dreamCloud->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
-            if (nightmareCloud && bot->GetExactDist2d(nightmareCloud) > 2.0f)
-                MoveTo(nightmareCloud->GetMapId(), nightmareCloud->GetPositionX(),
-                       nightmareCloud->GetPositionY(), nightmareCloud->GetPositionZ(), false, false, false, true,
-                       MovementPriority::MOVEMENT_NORMAL);
+            // If at dream cloud, move to 2nd closest dream cloud or closest nightmare cloud
+            if (atDreamCloud)
+            {
+                Creature* targetCloud = nullptr;
+                // Try 2nd closest dream cloud first
+                if (dreamClouds.size() >= 2 && bot->GetExactDist2d(dreamClouds[1]) > 2.0f)
+                    targetCloud = dreamClouds[1];
+                // Otherwise move to closest nightmare cloud
+                else if (!nightmareClouds.empty() && bot->GetExactDist2d(nightmareClouds[0]) > 2.0f)
+                    targetCloud = nightmareClouds[0];
+
+                if (targetCloud)
+                    MoveTo(targetCloud->GetMapId(), targetCloud->GetPositionX(), targetCloud->GetPositionY(),
+                           targetCloud->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+            }
+            // If at nightmare cloud, move to closest dream cloud or 2nd closest nightmare cloud
+            else if (atNightmareCloud)
+            {
+                Creature* targetCloud = nullptr;
+                // Try closest dream cloud first
+                if (!dreamClouds.empty() && bot->GetExactDist2d(dreamClouds[0]) > 2.0f)
+                    targetCloud = dreamClouds[0];
+                // Otherwise move to 2nd closest nightmare cloud
+                else if (nightmareClouds.size() >= 2 && bot->GetExactDist2d(nightmareClouds[1]) > 2.0f)
+                    targetCloud = nightmareClouds[1];
+
+                if (targetCloud)
+                    MoveTo(targetCloud->GetMapId(), targetCloud->GetPositionX(), targetCloud->GetPositionY(),
+                           targetCloud->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+            }
+            // If not at any cloud, move to closest dream cloud or nightmare cloud
+            else
+            {
+                if (!dreamClouds.empty() && bot->GetExactDist2d(dreamClouds[0]) > 2.0f)
+                    MoveTo(dreamClouds[0]->GetMapId(), dreamClouds[0]->GetPositionX(), dreamClouds[0]->GetPositionY(),
+                           dreamClouds[0]->GetPositionZ(), false, false, false, true,
+                           MovementPriority::MOVEMENT_NORMAL);
+                else if (!nightmareClouds.empty() && bot->GetExactDist2d(nightmareClouds[0]) > 2.0f)
+                    MoveTo(nightmareClouds[0]->GetMapId(), nightmareClouds[0]->GetPositionX(),
+                           nightmareClouds[0]->GetPositionY(), nightmareClouds[0]->GetPositionZ(), false, false, false,
+                           true, MovementPriority::MOVEMENT_NORMAL);
+            }
         }
-        // Otherwise prioritize nightmare clouds
+        // Otherwise use GUID-based preference
         else
         {
-            if (nightmareCloud && bot->GetExactDist2d(nightmareCloud) > 2.0f)
-                MoveTo(nightmareCloud->GetMapId(), nightmareCloud->GetPositionX(),
-                       nightmareCloud->GetPositionY(), nightmareCloud->GetPositionZ(), false, false, false, true,
-                       MovementPriority::MOVEMENT_NORMAL);
+            // If prefer dream clouds based on GUID
+            if (preferDream)
+            {
+                // If at dream cloud, move to 2nd closest dream cloud or closest nightmare cloud
+                if (atDreamCloud)
+                {
+                    Creature* targetCloud = nullptr;
+                    // Try 2nd closest dream cloud first
+                    if (dreamClouds.size() >= 2 && bot->GetExactDist2d(dreamClouds[1]) > 2.0f)
+                        targetCloud = dreamClouds[1];
+                    // Otherwise move to closest nightmare cloud
+                    else if (!nightmareClouds.empty() && bot->GetExactDist2d(nightmareClouds[0]) > 2.0f)
+                        targetCloud = nightmareClouds[0];
 
-            if (dreamCloud && bot->GetExactDist2d(dreamCloud) > 2.0f)
-                MoveTo(dreamCloud->GetMapId(), dreamCloud->GetPositionX(), dreamCloud->GetPositionY(),
-                       dreamCloud->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+                    if (targetCloud)
+                        MoveTo(targetCloud->GetMapId(), targetCloud->GetPositionX(), targetCloud->GetPositionY(),
+                               targetCloud->GetPositionZ(), false, false, false, true,
+                               MovementPriority::MOVEMENT_NORMAL);
+                }
+                // If at nightmare cloud, move to closest dream cloud or 2nd closest nightmare cloud
+                else if (atNightmareCloud)
+                {
+                    Creature* targetCloud = nullptr;
+                    // Try closest dream cloud first
+                    if (!dreamClouds.empty() && bot->GetExactDist2d(dreamClouds[0]) > 2.0f)
+                        targetCloud = dreamClouds[0];
+                    // Otherwise move to 2nd closest nightmare cloud
+                    else if (nightmareClouds.size() >= 2 && bot->GetExactDist2d(nightmareClouds[1]) > 2.0f)
+                        targetCloud = nightmareClouds[1];
+
+                    if (targetCloud)
+                        MoveTo(targetCloud->GetMapId(), targetCloud->GetPositionX(), targetCloud->GetPositionY(),
+                               targetCloud->GetPositionZ(), false, false, false, true,
+                               MovementPriority::MOVEMENT_NORMAL);
+                }
+                // If not at any cloud, move to closest dream cloud or nightmare cloud based on preference
+                else
+                {
+                    if (!dreamClouds.empty() && bot->GetExactDist2d(dreamClouds[0]) > 2.0f)
+                        MoveTo(dreamClouds[0]->GetMapId(), dreamClouds[0]->GetPositionX(),
+                               dreamClouds[0]->GetPositionY(), dreamClouds[0]->GetPositionZ(), false, false, false,
+                               true, MovementPriority::MOVEMENT_NORMAL);
+                    else if (!nightmareClouds.empty() && bot->GetExactDist2d(nightmareClouds[0]) > 2.0f)
+                        MoveTo(nightmareClouds[0]->GetMapId(), nightmareClouds[0]->GetPositionX(),
+                               nightmareClouds[0]->GetPositionY(), nightmareClouds[0]->GetPositionZ(), false, false,
+                               false, true, MovementPriority::MOVEMENT_NORMAL);
+                }
+            }
+            // If prefer nightmare clouds based on GUID
+            else
+            {
+                // If at nightmare cloud, move to 2nd closest nightmare cloud or closest dream cloud
+                if (atNightmareCloud)
+                {
+                    Creature* targetCloud = nullptr;
+                    // Try 2nd closest nightmare cloud first
+                    if (nightmareClouds.size() >= 2 && bot->GetExactDist2d(nightmareClouds[1]) > 2.0f)
+                        targetCloud = nightmareClouds[1];
+                    // Otherwise move to closest dream cloud
+                    else if (!dreamClouds.empty() && bot->GetExactDist2d(dreamClouds[0]) > 2.0f)
+                        targetCloud = dreamClouds[0];
+
+                    if (targetCloud)
+                        MoveTo(targetCloud->GetMapId(), targetCloud->GetPositionX(), targetCloud->GetPositionY(),
+                               targetCloud->GetPositionZ(), false, false, false, true,
+                               MovementPriority::MOVEMENT_NORMAL);
+                }
+                // If at dream cloud, move to closest nightmare cloud or 2nd closest dream cloud
+                else if (atDreamCloud)
+                {
+                    Creature* targetCloud = nullptr;
+                    // Try closest nightmare cloud first
+                    if (!nightmareClouds.empty() && bot->GetExactDist2d(nightmareClouds[0]) > 2.0f)
+                        targetCloud = nightmareClouds[0];
+                    // Otherwise move to 2nd closest dream cloud
+                    else if (dreamClouds.size() >= 2 && bot->GetExactDist2d(dreamClouds[1]) > 2.0f)
+                        targetCloud = dreamClouds[1];
+
+                    if (targetCloud)
+                        MoveTo(targetCloud->GetMapId(), targetCloud->GetPositionX(), targetCloud->GetPositionY(),
+                               targetCloud->GetPositionZ(), false, false, false, true,
+                               MovementPriority::MOVEMENT_NORMAL);
+                }
+                // If not at any cloud, move to closest nightmare cloud or dream cloud based on preference
+                else
+                {
+                    if (!nightmareClouds.empty() && bot->GetExactDist2d(nightmareClouds[0]) > 2.0f)
+                        MoveTo(nightmareClouds[0]->GetMapId(), nightmareClouds[0]->GetPositionX(),
+                               nightmareClouds[0]->GetPositionY(), nightmareClouds[0]->GetPositionZ(), false, false,
+                               false, true, MovementPriority::MOVEMENT_NORMAL);
+                    else if (!dreamClouds.empty() && bot->GetExactDist2d(dreamClouds[0]) > 2.0f)
+                        MoveTo(dreamClouds[0]->GetMapId(), dreamClouds[0]->GetPositionX(),
+                               dreamClouds[0]->GetPositionY(), dreamClouds[0]->GetPositionZ(), false, false, false,
+                               true, MovementPriority::MOVEMENT_NORMAL);
+                }
+            }
         }
     }
     else
     {
         // Non-leader bots follow and stack at leader's position
-        if (bot->GetExactDist2d(leader) > PORTALSTART_TOLERANCE)
+        if (bot->GetDistance(leader) > PORTALSTART_TOLERANCE)
         {
-            MoveTo(bot->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(),
-                   false, false, false, true, MovementPriority::MOVEMENT_NORMAL);
+            botAI->Reset();
+            bot->TeleportTo(bot->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(),
+                            bot->GetOrientation());
         }
-        return true;
     }
 
     return false;
@@ -5669,6 +6198,9 @@ bool IccSindragosaFrostBeaconAction::HandleBeaconedPlayer(const Unit* boss)
     // Phase 3 positioning (below 35% health, not flying)
     if (boss->HealthBelowPct(35) && !IsBossFlying(boss))
     {
+        if (!bot->HasAura(SPELL_NITRO_BOOSTS))
+            bot->AddAura(SPELL_NITRO_BOOSTS, bot);
+        botAI->Reset();
         return MoveToPositionIfNeeded(ICC_SINDRAGOSA_THOMBMB2_POSITION, POSITION_TOLERANCE);
     }
 
@@ -5754,7 +6286,9 @@ bool IccSindragosaFrostBeaconAction::HandleNonBeaconedPlayer(const Unit* boss)
         if (!bot->HasAura(FROST_BEACON_AURA_ID))
         {
             const Difficulty diff = bot->GetRaidDifficulty();
-            const bool is25Man = (diff == RAID_DIFFICULTY_25MAN_NORMAL) || (diff == RAID_DIFFICULTY_25MAN_HEROIC);
+            bool is25Man = false;
+            if (diff && (diff == RAID_DIFFICULTY_25MAN_NORMAL || diff == RAID_DIFFICULTY_25MAN_HEROIC))
+                is25Man = true;
 
             const Position& safePosition = is25Man ? ICC_SINDRAGOSA_FBOMB_POSITION : ICC_SINDRAGOSA_FBOMB10_POSITION;
 
@@ -6237,7 +6771,7 @@ bool IccSindragosaFrostBombAction::Execute(Event event)
 
         context->GetValue<std::string>("rti")->Set(rtiValue);
 
-        // Find a tomb in our group with 65% or more HP to mark
+        // Find a tomb in our group with 45% or more HP to mark
         Unit* tombToMark = nullptr;
         for (size_t i = 0; i < myTombs.size(); ++i)
         {
@@ -6262,7 +6796,7 @@ bool IccSindragosaFrostBombAction::Execute(Event event)
         }
         else
         {
-            // No tombs above 65% HP, remove marker if one exists
+            // No tombs above 45% HP, remove marker if one exists
             ObjectGuid currentIcon = group->GetTargetIcon(iconIndex);
             if (!currentIcon.IsEmpty())
             {
@@ -6466,7 +7000,9 @@ bool IccLichKingWinterAction::Execute(Event event)
 
     Unit* iceSphere = AI_VALUE2(Unit*, "find target", "ice sphere");
 
-    bool isVictim = iceSphere && iceSphere->GetVictim() == bot && !botAI->IsTank(bot);
+    bool isVictim = false;
+    if (iceSphere && iceSphere->GetVictim() == bot && !botAI->IsTank(bot))
+        isVictim = true;
 
     // First priority: Get out of Defile if we're in one
     if (!IsPositionSafeFromDefile(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 3.0f))
@@ -7031,60 +7567,126 @@ void IccLichKingWinterAction::HandleRangedPositioning()
     }
 }
 
-// NEW METHOD: Main tank add management - stays at position
 void IccLichKingWinterAction::HandleMainTankAddManagement(Unit* boss, const Position* tankPos)
 {
     if (!botAI->IsMainTank(bot))
         return;
 
-    // Look for adds near tank position (within 5 yards)
-    Unit* nearbyAdd = nullptr;
-    float closestDist = 8.0f;  // Only consider adds within 8 yards of tank position
+    // First, ensure we're at the correct tank position
+    float distToTankPos = bot->GetDistance2d(tankPos->GetPositionX(), tankPos->GetPositionY());
+    if (distToTankPos > 3.0f)
+    {
+        TryMoveToPosition(tankPos->GetPositionX(), tankPos->GetPositionY(), 840.857f, true);
+        return;  // Wait until we're in position
+    }
 
+    // Get all valid adds in the encounter area
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
+    std::vector<Unit*> validAdds;
+    Unit* currentTarget = bot->GetVictim();
 
+    // Collect all valid adds
     for (auto i = targets.begin(); i != targets.end(); ++i)
     {
         Unit* unit = botAI->GetUnit(*i);
         if (!IsValidCollectibleAdd(unit))
             continue;
 
-        // Check distance from tank position (not bot position)
-        float distFromTankPos = unit->GetDistance2d(tankPos->GetPositionX(), tankPos->GetPositionY());
+        validAdds.push_back(unit);
+    }
 
-        // Take adds that are near tank position
-        if (distFromTankPos < closestDist)
+    // If we have no adds, clear target if needed
+    if (validAdds.empty())
+    {
+        if (currentTarget && !IsValidCollectibleAdd(currentTarget))
         {
-            nearbyAdd = unit;
-            closestDist = distFromTankPos;
+            bot->SetTarget(ObjectGuid::Empty);
+        }
+        return;
+    }
+
+    // Strategy for add management:
+    // 1. First priority: Adds attacking non-tanks
+    // 2. Second priority: Adds not attacking us
+    // 3. Third priority: All other valid adds
+    Unit* priorityAdd = nullptr;
+    Unit* secondaryAdd = nullptr;
+    Unit* otherAdd = nullptr;
+
+    for (Unit* add : validAdds)
+    {
+        Unit* addVictim = add->GetVictim();
+
+        // Highest priority: Adds attacking non-tanks
+        if (addVictim && addVictim->IsPlayer() && !botAI->IsTank(addVictim->ToPlayer()))
+        {
+            if (!priorityAdd || bot->GetDistance(add) < bot->GetDistance(priorityAdd))
+            {
+                priorityAdd = add;
+            }
+            continue;
+        }
+
+        // Medium priority: Adds not attacking us
+        if (addVictim != bot)
+        {
+            if (!secondaryAdd || bot->GetDistance(add) < bot->GetDistance(secondaryAdd))
+            {
+                secondaryAdd = add;
+            }
+            continue;
+        }
+
+        // Lowest priority: All other valid adds
+        if (!otherAdd || bot->GetDistance(add) < bot->GetDistance(otherAdd))
+        {
+            otherAdd = add;
         }
     }
 
-    // Attack nearby add or continue with current target
-    if (nearbyAdd)
+    // Select the highest priority add available
+    Unit* targetAdd = priorityAdd ? priorityAdd : (secondaryAdd ? secondaryAdd : otherAdd);
+
+    if (targetAdd)
     {
-        bot->SetTarget(nearbyAdd->GetGUID());
-        bot->SetFacingToObject(nearbyAdd);
-        Attack(nearbyAdd);
-    }
-    else
-    {
-        // No nearby adds, check current target
-        Unit* currentTarget = bot->GetVictim();
-        if (currentTarget && IsValidCollectibleAdd(currentTarget))
+        float addDist = bot->GetDistance(targetAdd);
+
+        // If add is close enough (within melee range), attack it
+        if (addDist < 10.0f)
         {
-            // Continue attacking current add if it's valid and reasonably close
-            if (bot->GetDistance(currentTarget) < 10.0f)
+            // If we're not already attacking this add, switch to it
+            if (currentTarget != targetAdd)
             {
-                bot->SetFacingToObject(currentTarget);
-                Attack(currentTarget);
-            }
-            else
-            {
-                // Clear target if it's not a valid nearby add
-                bot->SetTarget(ObjectGuid::Empty);
+                bot->SetTarget(targetAdd->GetGUID());
+                bot->SetFacingToObject(targetAdd);
+                Attack(targetAdd);
             }
         }
+        else
+        {
+            // Add is too far - move toward it while staying near tank position
+            float moveX = targetAdd->GetPositionX();
+            float moveY = targetAdd->GetPositionY();
+
+            // Don't move too far from tank position (max 15 yards)
+            float maxPullDistance = 15.0f;
+            float pullRatio = std::min(1.0f, maxPullDistance / addDist);
+
+            float adjustedX = tankPos->GetPositionX() + (moveX - tankPos->GetPositionX()) * pullRatio;
+            float adjustedY = tankPos->GetPositionY() + (moveY - tankPos->GetPositionY()) * pullRatio;
+
+            TryMoveToPosition(adjustedX, adjustedY, 840.857f, false);
+
+            // Still try to attack while moving
+            bot->SetTarget(targetAdd->GetGUID());
+            bot->SetFacingToObject(targetAdd);
+            Attack(targetAdd);
+        }
+    }
+    else if (currentTarget && !IsValidCollectibleAdd(currentTarget))
+    {
+        // Clear invalid target
+        bot->SetTarget(ObjectGuid::Empty);
     }
 }
 
@@ -7197,6 +7799,8 @@ bool IccLichKingAddsAction::Execute(Event event)
     if (bot->HasAura(SPELL_HARVEST_SOUL_VALKYR))  // Don't process actions if bot is picked up by Val'kyr
         return false;
 
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
+
     Difficulty diff = bot->GetRaidDifficulty();
 
     if (sPlayerbotAIConfig->EnableICCBuffs && diff && (diff == RAID_DIFFICULTY_10MAN_HEROIC || diff == RAID_DIFFICULTY_25MAN_HEROIC))
@@ -7208,6 +7812,9 @@ bool IccLichKingAddsAction::Execute(Event event)
         if (!bot->HasAura(SPELL_AGEIS_OF_DALARAN))
             bot->AddAura(SPELL_AGEIS_OF_DALARAN, bot);
 
+        if (boss && boss->HealthBelowPct(60) && boss->HealthAbovePct(40) && !bot->HasAura(SPELL_EMPOWERED_BLOOD))
+            bot->AddAura(SPELL_EMPOWERED_BLOOD, bot);
+
         if (!bot->HasAura(SPELL_NO_THREAT) && !botAI->IsTank(bot))
             bot->AddAura(SPELL_NO_THREAT, bot);
 
@@ -7216,7 +7823,6 @@ bool IccLichKingAddsAction::Execute(Event event)
         //------CHEAT-------
     }
 
-    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
     Unit* spiritWarden = AI_VALUE2(Unit*, "find target", "spirit warden");
     bool hasPlague = botAI->HasAura("Necrotic Plague", bot);
     Unit* terenasMenethilHC = bot->FindNearestCreature(NPC_TERENAS_MENETHIL_HC, 55.0f);
@@ -7242,10 +7848,15 @@ bool IccLichKingAddsAction::Execute(Event event)
         }
     }
 
-    bool hasWinterAura = boss && (boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) || boss->HasAura(SPELL_REMORSELESS_WINTER3) ||
-    boss->HasAura(SPELL_REMORSELESS_WINTER4));
-    bool hasWinter2Aura = boss && (boss->HasAura(SPELL_REMORSELESS_WINTER5) || boss->HasAura(SPELL_REMORSELESS_WINTER6) || boss->HasAura(SPELL_REMORSELESS_WINTER7) ||
-    boss->HasAura(SPELL_REMORSELESS_WINTER8));
+    bool hasWinterAura = false;
+    if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) ||
+                 boss->HasAura(SPELL_REMORSELESS_WINTER3) || boss->HasAura(SPELL_REMORSELESS_WINTER4)))
+        hasWinterAura = true;
+
+    bool hasWinter2Aura = false;
+    if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER5) || boss->HasAura(SPELL_REMORSELESS_WINTER6) ||
+                 boss->HasAura(SPELL_REMORSELESS_WINTER7) || boss->HasAura(SPELL_REMORSELESS_WINTER8)))
+        hasWinter2Aura = true;
 
     if (boss && boss->GetHealthPct() < 70 && boss->GetHealthPct() > 40 && !hasWinterAura &&
         !hasWinter2Aura)  // If boss is in p2, check if bot has been thrown off platform
@@ -8395,6 +9006,7 @@ void IccLichKingAddsAction::HandleValkyrMechanics(Difficulty diff)
 {
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
     std::vector<Unit*> grabbingValkyrs;
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
 
     // Find grabbing Val'kyrs
     for (auto& npc : npcs)
@@ -8429,13 +9041,13 @@ void IccLichKingAddsAction::HandleValkyrMechanics(Difficulty diff)
         return;
 
     // If no grabbing Val'kyrs, mark the Lich King with skull
-    if (grabbingValkyrs.empty())
+    if (grabbingValkyrs.empty() || (boss && boss->HealthBelowPct(43)))
     {
         // Find the Lich King
         for (auto& npc : npcs)
         {
             Unit* unit = botAI->GetUnit(npc);
-            if (unit && unit->IsAlive() && unit->GetEntry() == NPC_THE_LICH_KING && unit->HealthBelowPct(65) && unit->HealthAbovePct(40))
+            if (unit && unit->IsAlive() && unit->GetEntry() == NPC_THE_LICH_KING && unit->HealthBelowPct(68) && unit->HealthAbovePct(40))
             {
                 ObjectGuid currentSkull = group->GetTargetIcon(7);  // Skull icon
                 if (currentSkull != unit->GetGUID())
@@ -8525,6 +9137,10 @@ void IccLichKingAddsAction::HandleValkyrAssignment(const std::vector<Unit*>& gra
 {
     Group* group = bot->GetGroup();
     if (!group)
+        return;
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
+    if (boss && boss->HealthBelowPct(40))
         return;
 
     // Double-check that all Val'kyrs in the list are actually alive and valid targets
