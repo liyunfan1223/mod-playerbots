@@ -3154,22 +3154,41 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (pet && pet->HasSpell(spellId))
     {
-        bool autocast = false;
-        for (unsigned int& m_autospell : pet->m_autospells)
+        // List of spell IDs for which we do NOT want to toggle auto-cast or send message
+        // We are excluding Spell Lock and Devour Magic because they are casted in the GenericWarlockStrategy
+        // Without this exclusion, the skill would be togged for auto-cast and the player would
+        // be spammed with messages about enabling/disabling auto-cast
+        switch (spellId)
         {
-            if (m_autospell == spellId)
-            {
-                autocast = true;
+            case 19244:  // Spell Lock rank 1
+            case 19647:  // Spell Lock rank 2
+            case 19505:  // Devour Magic rank 1
+            case 19731:  // Devour Magic rank 2
+            case 19734:  // Devour Magic rank 3
+            case 19736:  // Devour Magic rank 4
+            case 27276:  // Devour Magic rank 5
+            case 27277:  // Devour Magic rank 6
+            case 48011:  // Devour Magic rank 7
+                // No message - just break out of the switch and let normal cast logic continue
                 break;
-            }
-        }
+            default:
+                bool autocast = false;
+                for (unsigned int& m_autospell : pet->m_autospells)
+                {
+                    if (m_autospell == spellId)
+                    {
+                        autocast = true;
+                        break;
+                    }
+                }
 
-        pet->ToggleAutocast(spellInfo, !autocast);
-        std::ostringstream out;
-        out << (autocast ? "|cffff0000|Disabling" : "|cFF00ff00|Enabling") << " pet auto-cast for ";
-        out << chatHelper.FormatSpell(spellInfo);
-        TellMaster(out);
-        return true;
+                pet->ToggleAutocast(spellInfo, !autocast);
+                std::ostringstream out;
+                out << (autocast ? "|cffff0000|Disabling" : "|cFF00ff00|Enabling") << " pet auto-cast for ";
+                out << chatHelper.FormatSpell(spellInfo);
+                TellMaster(out);
+                return true;
+        }
     }
 
     // aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(nullptr);
