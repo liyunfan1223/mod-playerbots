@@ -227,7 +227,7 @@ bool AutoGearAction::Execute(Event event)
                     : PlayerbotFactory::CalcMixedGearScore(sPlayerbotAIConfig->autoGearScoreLimit,
                                                            sPlayerbotAIConfig->autoGearQualityLimit);
     PlayerbotFactory factory(bot, bot->GetLevel(), sPlayerbotAIConfig->autoGearQualityLimit, gs);
-    factory.InitEquipment(true);
+    factory.InitEquipment(true, true);
     factory.InitAmmo();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
     {
