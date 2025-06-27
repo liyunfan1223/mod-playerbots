@@ -25,6 +25,8 @@ void DeadStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("falling far", NextAction::array(0, new NextAction("repop", relevance + 1.f), nullptr)));
     triggers.push_back(
         new TriggerNode("location stuck", NextAction::array(0, new NextAction("repop", relevance + 1), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "can self resurrect", NextAction::array(0, new NextAction("self resurrect", relevance + 2.0f), nullptr)));
 }
 
 DeadStrategy::DeadStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI) {}
