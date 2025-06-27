@@ -224,6 +224,7 @@ public:
 
     std::string commandPrefix, commandSeparator;
     std::string randomBotAccountPrefix;
+    std::string tradeActionExcludedPrefixes;
     uint32 randomBotAccountCount;
     bool randomBotRandomPassword;
     bool deleteRandomBotAccounts;
@@ -374,6 +375,8 @@ public:
     }
     void log(std::string const fileName, const char* str, ...);
 
+    template <class T>
+    void LoadListString(std::string const value, T& list);
     void loadWorldBuff(uint32 factionId, uint32 classId, uint32 specId, uint32 minLevel, uint32 maxLevel);
     static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
     static std::vector<std::vector<uint32>> ParseTempPetTalentsOrder(uint32 spec, std::string temp_talents_order);
