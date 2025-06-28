@@ -4,7 +4,6 @@
  */
 
 #include "TradeAction.h"
-
 #include "ChatHelper.h"
 #include "Event.h"
 #include "ItemCountValue.h"
@@ -15,11 +14,8 @@ bool TradeAction::Execute(Event event)
 {
     std::string const text = event.getParam();
 
-    // Table with prefixes to be excluded from analysis
-    static const std::vector<std::string> excludedPrefixes = {"RPLL_H_"};
-
     // If text starts with any excluded prefix, don't process it further.
-    for (const auto& prefix : excludedPrefixes)
+    for (const auto& prefix : sPlayerbotAIConfig->tradeActionExcludedPrefixes)
     {
         if (text.find(prefix) == 0)
             return false;
