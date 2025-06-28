@@ -16,6 +16,8 @@
 #include "ServerFacade.h"
 #include "Unit.h"
 #include "Timer.h"
+#include <unordered_map>
+#include <mutex>
 
 // Checks if the bot has less than 32 soul shards, and if so, allows casting Drain Soul
 bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 32; }
@@ -137,11 +139,13 @@ bool UseSoulstoneSelfAction::Execute(Event event)
 
 // Reservation map for soulstone targets (GUID -> reservation expiry in ms)
 static std::unordered_map<ObjectGuid, uint32> soulstoneReservations;
+static std::mutex soulstoneReservationsMutex;
 
 // Helper to clean up expired reservations
 void CleanupSoulstoneReservations()
 {
     uint32 now = getMSTime();
+    std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
     for (auto it = soulstoneReservations.begin(); it != soulstoneReservations.end();)
     {
         if (it->second <= now)
@@ -165,8 +169,14 @@ bool UseSoulstoneMasterAction::Execute(Event event)
         return false;
 
     uint32 now = getMSTime();
-    if (soulstoneReservations.count(master->GetGUID()) && soulstoneReservations[master->GetGUID()] > now)
-        return false;  // Already being soulstoned
+
+    {
+        std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
+        if (soulstoneReservations.count(master->GetGUID()) && soulstoneReservations[master->GetGUID()] > now)
+            return false;  // Already being soulstoned
+
+        soulstoneReservations[master->GetGUID()] = now + 2500;  // Reserve for 2.5 seconds
+    }
 
     float distance = sServerFacade->GetDistance2d(bot, master);
     if (distance >= 30.0f)
@@ -174,8 +184,6 @@ bool UseSoulstoneMasterAction::Execute(Event event)
 
     if (!bot->IsWithinLOSInMap(master))
         return false;
-
-    soulstoneReservations[master->GetGUID()] = now + 2500;  // Reserve for 2.5 seconds
 
     bot->SetSelection(master->GetGUID());
     return UseItem(items[0], ObjectGuid::Empty, nullptr, master);
@@ -190,35 +198,63 @@ bool UseSoulstoneTankAction::Execute(Event event)
     if (items.empty())
         return false;
 
-    Player* tank = nullptr;
+    Player* chosenTank = nullptr;
     Group* group = bot->GetGroup();
     uint32 now = getMSTime();
+
+    // First: Try to soulstone the main tank
     if (group)
     {
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (member && member->IsAlive() && botAI->IsTank(member) && !HasSoulstoneAura(member))
+            if (member && member->IsAlive() && botAI->IsTank(member) && botAI->IsMainTank(member) &&
+                !HasSoulstoneAura(member))
             {
+                std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
                 if (soulstoneReservations.count(member->GetGUID()) && soulstoneReservations[member->GetGUID()] > now)
                     continue;  // Already being soulstoned
 
                 float distance = sServerFacade->GetDistance2d(bot, member);
                 if (distance < 30.0f && bot->IsWithinLOSInMap(member))
                 {
-                    tank = member;
-                    soulstoneReservations[tank->GetGUID()] = now + 2500;  // Reserve for 2.5 seconds
-                    break;
+                    chosenTank = member;
+                    soulstoneReservations[chosenTank->GetGUID()] = now + 2500;  // Reserve for 2.5 seconds
+                    break;                                                      
+                }
+            }
+        }
+
+        // If no main tank found, soulstone another tank
+        if (!chosenTank)
+        {
+            for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+            {
+                Player* member = gref->GetSource();
+                if (member && member->IsAlive() && botAI->IsTank(member) && !HasSoulstoneAura(member))
+                {
+                    std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
+                    if (soulstoneReservations.count(member->GetGUID()) &&
+                        soulstoneReservations[member->GetGUID()] > now)
+                        continue;  // Already being soulstoned
+
+                    float distance = sServerFacade->GetDistance2d(bot, member);
+                    if (distance < 30.0f && bot->IsWithinLOSInMap(member))
+                    {
+                        chosenTank = member;
+                        soulstoneReservations[chosenTank->GetGUID()] = now + 2500;  // Reserve for 2.5 seconds
+                        break;
+                    }
                 }
             }
         }
     }
 
-    if (!tank)
+    if (!chosenTank)
         return false;
 
-    bot->SetSelection(tank->GetGUID());
-    return UseItem(items[0], ObjectGuid::Empty, nullptr, tank);
+    bot->SetSelection(chosenTank->GetGUID());
+    return UseItem(items[0], ObjectGuid::Empty, nullptr, chosenTank);
 }
 
 // Use the soulstone item on a healer in the group with nc strategy "ss healer"
@@ -240,15 +276,19 @@ bool UseSoulstoneHealerAction::Execute(Event event)
             Player* member = gref->GetSource();
             if (member && member->IsAlive() && botAI->IsHeal(member) && !HasSoulstoneAura(member))
             {
-                if (soulstoneReservations.count(member->GetGUID()) && soulstoneReservations[member->GetGUID()] > now)
-                    continue;  // Already being soulstoned
-
-                float distance = sServerFacade->GetDistance2d(bot, member);
-                if (distance < 30.0f && bot->IsWithinLOSInMap(member))
                 {
-                    healer = member;
-                    soulstoneReservations[healer->GetGUID()] = now + 2500;  // Reserve for 2.5 seconds
-                    break;
+                    std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
+                    if (soulstoneReservations.count(member->GetGUID()) &&
+                        soulstoneReservations[member->GetGUID()] > now)
+                        continue;  // Already being soulstoned
+
+                    float distance = sServerFacade->GetDistance2d(bot, member);
+                    if (distance < 30.0f && bot->IsWithinLOSInMap(member))
+                    {
+                        healer = member;
+                        soulstoneReservations[healer->GetGUID()] = now + 2500;  // Reserve for 2.5 seconds
+                        break;
+                    }
                 }
             }
         }
