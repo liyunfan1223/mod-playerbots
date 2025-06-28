@@ -594,18 +594,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 nonCombatEngine->addStrategy("dps assist", false);
             break;
         case CLASS_WARLOCK:
-            if (tab == WARLOCK_TAB_AFFLICATION)
-            {
-                nonCombatEngine->addStrategiesNoInit("felhunter", nullptr);
-            }
-            else if (tab == WARLOCK_TAB_DEMONOLOGY)
-            {
-                nonCombatEngine->addStrategiesNoInit("felguard", nullptr);
-            }
-            else if (tab == WARLOCK_TAB_DESTRUCTION)
-            {
-                nonCombatEngine->addStrategiesNoInit("imp", nullptr);
-            }
+            // Pet selection is now handled in GenericWarlockNonCombatStrategy triggers
             nonCombatEngine->addStrategiesNoInit("dps assist", nullptr);
             break;
         case CLASS_DEATH_KNIGHT:

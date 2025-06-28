@@ -76,11 +76,6 @@ class NonCombatBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
 public:
     NonCombatBuffStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
     {
-        creators["imp"] = &NonCombatBuffStrategyFactoryInternal::imp;
-        creators["voidwalker"] = &NonCombatBuffStrategyFactoryInternal::voidwalker;
-        creators["succubus"] = &NonCombatBuffStrategyFactoryInternal::succubus;
-        creators["felhunter"] = &NonCombatBuffStrategyFactoryInternal::felhunter;
-        creators["felguard"] = &NonCombatBuffStrategyFactoryInternal::felguard;
         creators["ss self"] = &NonCombatBuffStrategyFactoryInternal::soulstone_self;
         creators["ss master"] = &NonCombatBuffStrategyFactoryInternal::soulstone_master;
         creators["ss tank"] = &NonCombatBuffStrategyFactoryInternal::soulstone_tank;
@@ -88,11 +83,6 @@ public:
     }
 
 private:
-    static Strategy* imp(PlayerbotAI* ai) { return new SummonImpStrategy(ai); }
-    static Strategy* voidwalker(PlayerbotAI* ai) { return new SummonVoidwalkerStrategy(ai); }
-    static Strategy* succubus(PlayerbotAI* ai) { return new SummonSuccubusStrategy(ai); }
-    static Strategy* felhunter(PlayerbotAI* ai) { return new SummonFelhunterStrategy(ai); }
-    static Strategy* felguard(PlayerbotAI* ai) { return new SummonFelguardStrategy(ai); }
     static Strategy* soulstone_self(PlayerbotAI* ai) { return new SoulstoneSelfStrategy(ai); }
     static Strategy* soulstone_master(PlayerbotAI* ai) { return new SoulstoneMasterStrategy(ai); }
     static Strategy* soulstone_tank(PlayerbotAI* ai) { return new SoulstoneTankStrategy(ai); }
