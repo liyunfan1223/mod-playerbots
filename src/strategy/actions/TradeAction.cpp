@@ -9,18 +9,13 @@
 #include "ItemCountValue.h"
 #include "ItemVisitors.h"
 #include "Playerbots.h"
-#include "PlayerbotAIConfig.h"
 
 bool TradeAction::Execute(Event event)
 {
     std::string const text = event.getParam();
 
-    std::vector<std::string> excludedPrefixes;
-    sPlayerbotAIConfig->LoadListString<std::vector<std::string>>(sPlayerbotAIConfig->tradeActionExcludedPrefixes,
-                                                                 excludedPrefixes);
-
     // If text starts with any excluded prefix, don't process it further.
-    for (const auto& prefix : excludedPrefixes)
+    for (const auto& prefix : sPlayerbotAIConfig->tradeActionExcludedPrefixes)
     {
         if (text.find(prefix) == 0)
             return false;

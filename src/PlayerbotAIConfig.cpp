@@ -4,9 +4,7 @@
  */
 
 #include "PlayerbotAIConfig.h"
-
 #include <iostream>
-
 #include "Config.h"
 #include "PlayerbotDungeonSuggestionMgr.h"
 #include "PlayerbotFactory.h"
@@ -43,7 +41,7 @@ void LoadSet(std::string const value, T& set)
 }
 
 template <class T>
-void PlayerbotAIConfig::LoadListString(std::string const value, T& list)
+void LoadListString(std::string const value, T& list)
 {
     std::vector<std::string> strings = split(value, ',');
     for (std::vector<std::string>::iterator i = strings.begin(); i != strings.end(); i++)
@@ -465,6 +463,8 @@ bool PlayerbotAIConfig::Initialize()
 
     LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AllowedLogFiles", ""),
                                              allowedLogFiles);
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.TradeActionExcludedPrefixes", ""),
+                                             tradeActionExcludedPrefixes);
 
     worldBuffs.clear();
 
@@ -488,7 +488,6 @@ bool PlayerbotAIConfig::Initialize()
     }
 
     randomBotAccountPrefix = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAccountPrefix", "rndbot");
-    tradeActionExcludedPrefixes = sConfigMgr->GetOption<std::string>("AiPlayerbot.TradeActionExcludedPrefixes", "RPLL_H_,DBMv4,{звезда} Questie,{rt1} Questie");
     randomBotAccountCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotAccountCount", 0);
     deleteRandomBotAccounts = sConfigMgr->GetOption<bool>("AiPlayerbot.DeleteRandomBotAccounts", false);
     randomBotGuildCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotGuildCount", 20);
