@@ -56,4 +56,13 @@ private:
     void PerformGraveyardTeleport(const GraveyardStruct* graveyard) const;
 };
 
+// SelfResurrectAction action registration
+class SelfResurrectAction : public Action
+{
+public:
+    SelfResurrectAction(PlayerbotAI* ai) : Action(ai, "self resurrect") {}
+    virtual bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 #endif

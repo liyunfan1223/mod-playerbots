@@ -223,6 +223,7 @@ public:
         creators["near random status"] = &TriggerContext::near_random_status;
         creators["near npc status"] = &TriggerContext::near_npc_status;
         creators["do quest status"] = &TriggerContext::do_quest_status;
+        creators["can self resurrect"] = &TriggerContext::can_self_resurrect;
     }
 
 private:
@@ -420,6 +421,7 @@ private:
     static Trigger* near_random_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_NEAR_RANDOM); }
     static Trigger* near_npc_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_NEAR_NPC); }
     static Trigger* do_quest_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_DO_QUEST); }
+    static Trigger* can_self_resurrect(PlayerbotAI* ai) { return new SelfResurrectTrigger(ai); }
 };
 
 #endif

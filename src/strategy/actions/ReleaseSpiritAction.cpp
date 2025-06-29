@@ -4,7 +4,7 @@
  */
 
 #include "ReleaseSpiritAction.h"
-
+#include "ServerFacade.h"
 #include "Event.h"
 #include "GameGraveyard.h"
 #include "NearestNpcsValue.h"
@@ -13,6 +13,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "Corpse.h"
+#include "Log.h"
 
 // ReleaseSpiritAction implementation
 bool ReleaseSpiritAction::Execute(Event event)
@@ -246,4 +247,20 @@ void RepopAction::PerformGraveyardTeleport(const GraveyardStruct* graveyard) con
     bot->TeleportTo(graveyard->Map, graveyard->x, graveyard->y, graveyard->z, 0.f);
     RESET_AI_VALUE(bool, "combat::self target");
     RESET_AI_VALUE(WorldPosition, "current position");
+}
+
+// SelfResurrectAction implementation for Warlock's Soulstone Resurrection/Shaman's Reincarnation
+bool SelfResurrectAction::Execute(Event event)
+{
+    if (!bot->IsAlive() && bot->GetUInt32Value(PLAYER_SELF_RES_SPELL))
+    {
+        WorldPacket packet(CMSG_SELF_RES);
+        bot->GetSession()->HandleSelfResOpcode(packet);
+        return true;
+    }
+    return false;
+}
+bool SelfResurrectAction::isUseful()
+{
+    return !bot->IsAlive() && bot->GetUInt32Value(PLAYER_SELF_RES_SPELL);
 }

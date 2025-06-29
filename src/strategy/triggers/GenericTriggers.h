@@ -11,6 +11,7 @@
 #include "HealthTriggers.h"
 #include "RangeTriggers.h"
 #include "Trigger.h"
+#include "Player.h"
 
 class PlayerbotAI;
 class Unit;
@@ -922,4 +923,13 @@ public:
 public:
     virtual Value<Unit*>* GetTargetValue();
 };
+
+class SelfResurrectTrigger : public Trigger
+{
+public:
+    SelfResurrectTrigger(PlayerbotAI* ai) : Trigger(ai, "can self resurrect") {}
+
+    bool IsActive() override { return !bot->IsAlive() && bot->GetUInt32Value(PLAYER_SELF_RES_SPELL); }
+};
+
 #endif

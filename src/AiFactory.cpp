@@ -385,8 +385,16 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             }
             break;
         case CLASS_WARLOCK:
-            engine->addStrategiesNoInit("dps assist", "dps", "dps debuff", "aoe", nullptr);
+            if (tab == 0)  // Affliction
+                engine->addStrategiesNoInit("affli", "affli aoe", nullptr);
+            else if (tab == 1)  // Demonology
+                engine->addStrategiesNoInit("demo", "demo aoe", "meta melee", nullptr);
+            else if (tab == 2)  // Destruction
+                engine->addStrategiesNoInit("destro", "destro aoe", "curse of elements", nullptr);
+
+            engine->addStrategiesNoInit("cc", "dps assist", nullptr);
             break;
+
         case CLASS_DEATH_KNIGHT:
             if (tab == 0)
                 engine->addStrategiesNoInit("blood", "tank assist", nullptr);
@@ -588,15 +596,15 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
         case CLASS_WARLOCK:
             if (tab == WARLOCK_TAB_AFFLICATION)
             {
-                nonCombatEngine->addStrategiesNoInit("bmana", nullptr);
+                nonCombatEngine->addStrategiesNoInit("felhunter", nullptr);
             }
             else if (tab == WARLOCK_TAB_DEMONOLOGY)
             {
-                nonCombatEngine->addStrategiesNoInit("bdps", nullptr);
+                nonCombatEngine->addStrategiesNoInit("felguard", nullptr);
             }
             else if (tab == WARLOCK_TAB_DESTRUCTION)
             {
-                nonCombatEngine->addStrategiesNoInit("bhealth", nullptr);
+                nonCombatEngine->addStrategiesNoInit("imp", nullptr);
             }
             nonCombatEngine->addStrategiesNoInit("dps assist", nullptr);
             break;
