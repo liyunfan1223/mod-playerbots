@@ -73,6 +73,7 @@
 #include "UseItemAction.h"
 #include "UseMeetingStoneAction.h"
 #include "WhoAction.h"
+#include "WipeAction.h"
 #include "WtsAction.h"
 #include "OpenItemAction.h"
 #include "UnlockItemAction.h"
@@ -185,6 +186,7 @@ public:
         creators["join"] = &ChatActionContext::join;
         creators["lfg"] = &ChatActionContext::lfg;
         creators["calc"] = &ChatActionContext::calc;
+        creators["wipe"] = &ChatActionContext::wipe;
     }
 
 private:
@@ -290,6 +292,7 @@ private:
     static Action* tell_estimated_dps(PlayerbotAI* ai) { return new TellEstimatedDpsAction(ai); }
     static Action* join(PlayerbotAI* ai) { return new JoinGroupAction(ai); }
     static Action* calc(PlayerbotAI* ai) { return new TellCalculateItemAction(ai); }
+    static Action* wipe(PlayerbotAI* ai) { return new WipeAction(ai); }
 };
 
 #endif
