@@ -19,6 +19,7 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override { return "affli"; }
     NextAction** getDefaultActions() override;
+    uint32 GetType() const override { return GenericWarlockStrategy::GetType() | STRATEGY_TYPE_DPS; }
 };
 
 class AfflictionWarlockAoeStrategy : public CombatStrategy
