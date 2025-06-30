@@ -483,7 +483,7 @@ AiPlayerbot.AutoGearQualityLimit = 3
 
 # Equipment item level (not gearscore) limitation for autogear command (0 = no limit)
 # Classic
-# Max iLVL Tier 1 = 66 | Tier 2 = 76 | Tier 2.5 = 81 | Tier 3 = 92
+# Max iLVL Tier 1 = 66 | Tier 2 = 76 | Tier 2.5 = 88 | Tier 3 = 92
 # Max iLVL Phase 1(MC, Ony, ZG) = 78 | Phase 2(BWL) = 83 | Phase 2.5(AQ40) = 88 | Phase 3(Naxx40) = 92
 # TBC
 # Max iLVL Tier 4 = 120 | Tier 5 = 133 | Tier 6 = 164
@@ -642,7 +642,7 @@ AiPlayerbot.RandomGearQualityLimit = 3
 
 # Equipment item level (not gearscore) limitation for randombots (0 = no limit)
 # Classic
-# Max iLVL Tier 1 = 66 | Tier 2 = 76 | Tier 2.5 = 81 | Tier 3 = 92
+# Max iLVL Tier 1 = 66 | Tier 2 = 76 | Tier 2.5 = 88 | Tier 3 = 92
 # Max iLVL Phase 1(MC, Ony, ZG) = 78 | Phase 2(BWL) = 83 | Phase 2.5(AQ40) = 88 | Phase 3(Naxx40) = 92
 # TBC
 # Max iLVL Tier 4 = 120 | Tier 5 = 133 | Tier 6 = 164
