@@ -184,7 +184,7 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitReputation();
     factory.InitSpecialSpells();
     factory.InitMounts();
-    factory.InitGlyphs(true);
+    factory.InitGlyphs(false);
     factory.InitKeyring();
     factory.InitPotions();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)

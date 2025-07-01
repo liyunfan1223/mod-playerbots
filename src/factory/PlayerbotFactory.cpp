@@ -3336,8 +3336,157 @@ void PlayerbotFactory::InitGlyphs(bool increment)
     uint8 cls = bot->getClass();
     uint8 tab = AiFactory::GetPlayerSpecTab(bot);
     /// @todo: fix cat druid hardcode
-    if (bot->getClass() == CLASS_DRUID && tab == DRUID_TAB_FERAL && bot->GetLevel() >= 20 && !bot->HasAura(16931))
-        tab = 3;
+
+    // Warrior PVP exceptions
+    if (bot->getClass() == CLASS_WARRIOR)
+    {
+        // Arms PvP (spec index 3): If the bot has the Second Wind talent
+        if (bot->HasAura(29838))
+            tab = 3;
+        // Fury PvP (spec index 4): If the bot has the Blood Craze talent
+        else if (bot->HasAura(16492))
+            tab = 4;
+        // Protection PvP (spec index 5): If the bot has the Gag Order talent
+        else if (bot->HasAura(12958))
+            tab = 5;
+    }
+
+    // Paladin PvP exceptions
+    if (bot->getClass() == CLASS_PALADIN)
+    {
+        // Holy PvP (spec index 3): If the bot has the Sacred Cleansing talent
+        if (bot->HasAura(53553))
+            tab = 3;
+        // Protection PvP (spec index 4): If the bot has the Reckoning talent
+        else if (bot->HasAura(20179))
+            tab = 4;
+        // Retribution PvP (spec index 5): If the bot has the Divine Purpose talent
+        else if (bot->HasAura(31872))
+            tab = 5;
+    }
+
+    // Hunter PvP exceptions
+    if (bot->getClass() == CLASS_HUNTER)
+    {
+        // Beast Mastery PvP (spec index 3): If the bot has the Thick Hide talent
+        if (bot->HasAura(19612))
+            tab = 3;
+        // Marksmanship PvP (spec index 4): If the bot has the Concussive Barrage talent
+        else if (bot->HasAura(35102))
+            tab = 4;
+        // Survival PvP (spec index 5): If the bot has the Entrapment talent and does NOT have the Concussive Barrage talent
+        else if (bot->HasAura(19388) && !bot->HasAura(35102))
+            tab = 5;
+    }
+
+    // Rogue PvP exceptions
+    if (bot->getClass() == CLASS_ROGUE)
+    {
+        // Assassination PvP (spec index 3): If the bot has the Deadly Brew talent
+        if (bot->HasAura(51626))
+            tab = 3;
+        // Combat PvP (spec index 4): If the bot has the Throwing Specialization talent
+        else if (bot->HasAura(51679))
+            tab = 4;
+        // Subtlety PvP (spec index 5): If the bot has the Waylay talent
+        else if (bot->HasAura(51696))
+            tab = 5;
+    }
+
+    // Priest PvP exceptions
+    if (bot->getClass() == CLASS_PRIEST)
+    {
+        // Discipline PvP (spec index 3): If the bot has the Improved Mana Burn talent
+        if (bot->HasAura(14772))
+            tab = 3;
+        // Holy PvP (spec index 4): If the bot has the Body and Soul talent
+        else if (bot->HasAura(64129))
+            tab = 4;
+        // Shadow PvP (spec index 5): If the bot has the Improved Vampiric Embrace talent
+        else if (bot->HasAura(27840))
+            tab = 5;
+    }
+
+    // Death Knight PvE/PvP exceptions
+    if (bot->getClass() == CLASS_DEATH_KNIGHT)
+    {
+        // Double Aura Blood PvE (spec index 3): If the bot has both the Abomination's Might and Improved Icy Talons
+        // talents
+        if (bot->HasAura(53138) && bot->HasAura(55610))
+            tab = 3;
+        // Blood PvP (spec index 4): If the bot has the Sudden Doom talent
+        else if (bot->HasAura(49529))
+            tab = 4;
+        // Frost PvP (spec index 5): If the bot has the Acclimation talent
+        else if (bot->HasAura(50152))
+            tab = 5;
+        // Unholy PvP (spec index 6): If the bot has the Magic Suppression talent
+        else if (bot->HasAura(49611))
+            tab = 6;
+    }
+
+    // Shaman PvP exceptions
+    if (bot->getClass() == CLASS_SHAMAN)
+    {
+        // Elemental PvP (spec index 3): If the bot has the Astral Shift talent
+        if (bot->HasAura(51479))
+            tab = 3;
+        // Enhancement PvP (spec index 4): If the bot has the Earthen Power talent
+        else if (bot->HasAura(51524))
+            tab = 4;
+        // Restoration PvP (spec index 5): If the bot has the Focused Mind talent
+        else if (bot->HasAura(30866))
+            tab = 5;
+    }
+
+    // Mage PvE/PvP exceptions
+    if (bot->getClass() == CLASS_MAGE)
+    {
+        // Frostfire PvE (spec index 3): If the bot has both the Burnout talent and the Ice Shards talent
+        if (bot->HasAura(44472) && bot->HasAura(15047))
+            tab = 3;
+        // Arcane PvP (spec index 4): If the bot has the Improved Blink talent
+        else if (bot->HasAura(31570))
+            tab = 4;
+        // Fire PvP (spec index 5): If the bot has the Fiery Payback talent
+        else if (bot->HasAura(64357))
+            tab = 5;
+        // Frost PvP (spec index 6): If the bot has the Shattered Barrier talent
+        else if (bot->HasAura(54787))
+            tab = 6;
+    }
+
+    // Warlock PvP exceptions
+    if (bot->getClass() == CLASS_WARLOCK)
+    {
+        // Affliction PvP (spec index 3): If the bot has the Improved Howl of Terror talent
+        if (bot->HasAura(30057))
+            tab = 3;
+        // Demonology PvP (spec index 4): If the bot has both the Nemesis talent and the Intensity talent
+        else if (bot->HasAura(63123) && bot->HasAura(18136))
+            tab = 4;
+        // Destruction PvP (spec index 5): If the bot has the Nether Protection talent
+        else if (bot->HasAura(30302))
+            tab = 5;
+    }
+
+    // Druid PvE/PvP exceptions
+    if (bot->getClass() == CLASS_DRUID)
+    {
+        // Cat PvE (spec index 3): If the bot is Feral spec, level 20 or higher, and does NOT have the Thick Hide talent
+        if (tab == DRUID_TAB_FERAL && bot->GetLevel() >= 20 && !bot->HasAura(16931))
+            tab = 3;
+        // Balance PvP (spec index 4): If the bot has the Owlkin Frenzy talent
+        else if (bot->HasAura(48393))
+            tab = 4;
+        // Feral PvP (spec index 5): If the bot has the Primal Tenacity talent
+        else if (bot->HasAura(33957))
+            tab = 5;
+        // Resto PvP (spec index 6): If the bot has the Improved Barkskin talent
+        else if (bot->HasAura(63411))
+            tab = 6;
+    }
+
     std::list<uint32> glyphs;
     ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator i = itemTemplates->begin(); i != itemTemplates->end(); ++i)
