@@ -4430,9 +4430,49 @@ void PlayerbotAI::RemoveShapeshift()
     // RemoveAura("tree of life");
 }
 
+// NOTE : function rewritten – we ignore Body & Tabard, and we do **not**
+// double–count the main-hand when the character is using a 2-hand weapon
+// (unless they have Titan Grip).
+
+uint32 PlayerbotAI::GetEquipGearScore(Player* player)
+{
+    uint32 sum   = 0;      // total of all considered item-levels
+    uint8  count = 0;      // number of slots that really contributed
+    bool   twoHandMain = false;
+
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (slot == EQUIPMENT_SLOT_BODY || slot == EQUIPMENT_SLOT_TABARD)
+            continue;                                   // these slots never count
+
+        Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (!item)
+            continue;
+
+        ItemTemplate const* proto = item->GetTemplate();
+        if (!proto)
+            continue;
+
+        if (slot == EQUIPMENT_SLOT_MAINHAND)
+            twoHandMain = (proto->InventoryType == INVTYPE_2HWEAPON);
+
+        // If a genuine 2-H weapon is equipped in main-hand **and**
+        // the character does *not* have Titan Grip, we skip the off-hand slot.
+        if (slot == EQUIPMENT_SLOT_OFFHAND &&
+            twoHandMain &&
+            !player->HasAura(SPELL_TITAN_GRIP))
+            continue;
+
+        sum   += proto->ItemLevel;
+        ++count;
+    }
+
+    return count ? sum / count : 0;
+}
+
 // NOTE : function rewritten as flags "withBags" and "withBank" not used, and _fillGearScoreData sometimes attribute
 // one-hand/2H Weapon in wrong slots 
-uint32 PlayerbotAI::GetEquipGearScore(Player* player)
+/*uint32 PlayerbotAI::GetEquipGearScore(Player* player)
 {
     // This function aims to calculate the equipped gear score
  
@@ -4458,7 +4498,7 @@ uint32 PlayerbotAI::GetEquipGearScore(Player* player)
 
     uint32 gs = uint32(sum / count);
     return gs;
-}
+}*/
 
 /*uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBank)
 {
