@@ -68,7 +68,7 @@ bool Aq40MoveFromOtherEmperorAction::Execute(Event event)
     if (Unit* boss2 = AI_VALUE2(Unit*, "find target", "emperor vek'nilash"))
     {
         ObjectGuid botguid = bot->GetGUID();
-        ObjectGuid petguid = (ObjectGuid)0UL;
+        ObjectGuid petguid = (ObjectGuid)(uint64)0UL;
         if (Pet* pet = bot->GetPet())
         {
             petguid = pet->GetGUID();
@@ -146,10 +146,8 @@ bool Aq40AttackTargetByNameAction::Execute(Event event)
             return result;
         }
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 bool Aq40AttackEmperorPestsAction::Execute(Event event)

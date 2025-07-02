@@ -9,7 +9,7 @@ bool Aq40HasEmperorAggroTrigger::IsActive()
     const int NPC_VEKNILASH           = 15275;
 
     ObjectGuid botguid = bot->GetGUID();
-    ObjectGuid petguid = (ObjectGuid)0UL;
+    ObjectGuid petguid = (ObjectGuid)(uint64)0UL;
     if (Unit* pet = bot->GetPet())
     {
         petguid = pet->GetGUID();
@@ -171,13 +171,13 @@ bool Aq40EmperorTrigger::IsActive()
 
         int sametypecount = memberlists[selftype].size();
 
-        float dist1[sametypecount];
-        ObjectGuid dist1who[sametypecount];
-        Unit* dist1unit[sametypecount];
+        std::vector<float> dist1(sametypecount);
+        std::vector<ObjectGuid> dist1who(sametypecount);
+        std::vector<Unit*> dist1unit(sametypecount);
 
-        float dist2[sametypecount];
-        ObjectGuid dist2who[sametypecount];
-        Unit* dist2unit[sametypecount];
+        std::vector<float> dist2(sametypecount);
+        std::vector<ObjectGuid> dist2who(sametypecount);
+        std::vector<Unit*> dist2unit(sametypecount);
 
         for (int n = 0; n < sametypecount; n++)
         {
@@ -227,10 +227,10 @@ bool Aq40EmperorTrigger::IsActive()
             }
         }
 
-        ObjectGuid boss1assigned[sametypecount];
-        int boss1assignedindex=0;
-        ObjectGuid boss2assigned[sametypecount];
-        int boss2assignedindex=0;
+        std::vector<ObjectGuid> boss1assigned;
+        int boss1assignedindex = 0;
+        std::vector<ObjectGuid> boss2assigned;
+        int boss2assignedindex = 0;
 
         if (selftype == 3)
         {
@@ -271,11 +271,11 @@ bool Aq40EmperorTrigger::IsActive()
                         {
                             if (dist2who[subn] == dist1who[n])
                             {
-                                dist2who[subn] = (ObjectGuid)0UL;
+                                dist2who[subn] = (ObjectGuid)(uint64)0UL;
                                 break;
                             }
                         }
-                        dist1who[n] = (ObjectGuid)0UL;
+                        dist1who[n] = (ObjectGuid)(uint64)0UL;
                     }
                 }
 
@@ -295,11 +295,11 @@ bool Aq40EmperorTrigger::IsActive()
                         {
                             if (dist1who[subn] == dist2who[n])
                             {
-                                dist1who[subn] = (ObjectGuid)0UL;
+                                dist1who[subn] = (ObjectGuid)(uint64)0UL;
                                 break;
                             }
                         }
-                        dist2who[n] = (ObjectGuid)0UL;
+                        dist2who[n] = (ObjectGuid)(uint64)0UL;
                     }
                 }
             }

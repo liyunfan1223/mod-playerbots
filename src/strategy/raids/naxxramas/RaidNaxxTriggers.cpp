@@ -20,7 +20,9 @@ bool AuraRemovedTrigger::IsActive()
 bool MutatingInjectionRemovedTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "grobbulus");
-    if (!boss)
+    // || (boss->GetEntry() != 15931 // Default Azerothcore
+    //     && boss->GetEntry() != 351003)) // mod-individual-progression
+    if (!boss || boss->isDead())
     {
         return false;
     }
@@ -31,11 +33,17 @@ template <class T>
 bool BossEventTrigger<T>::IsActive()
 {
     Unit* boss = AI_VALUE(Unit*, "boss target");
-    if (!boss || boss->GetEntry() != boss_entry)
+    if (!boss 
+        || (boss->GetEntry() != boss_entry // Default Azerothcore from BossEventTrigger instanciation
+            && (boss_entry_secondary == 0 || boss->GetEntry() != boss_entry_secondary))) // If an other boss version exists from an external module
     {
         return false;
     }
     T* ai = dynamic_cast<T*>(boss->GetAI());
+    if(!ai)
+    {
+        return false;
+    }
     EventMap* eventMap = &ai->events;
     if (!eventMap)
     {
@@ -53,7 +61,9 @@ bool BossEventTrigger<T>::IsActive()
 bool GrobbulusCloudTrigger::IsActive()
 {
     Unit* boss = AI_VALUE(Unit*, "boss target");
-    if (!boss || boss->GetEntry() != boss_entry)
+    if (!boss 
+        || (boss->GetEntry() != boss_entry // Default Azerothcore 15931 Grobbulus
+            && boss->GetEntry() != boss_entry_secondary)) // mod-individual-progression 351003 Grobbulus
     {
         return false;
     }
@@ -69,7 +79,7 @@ bool GrobbulusCloudTrigger::IsActive()
 bool HeiganMeleeTrigger::IsActive()
 {
     Unit* heigan = AI_VALUE2(Unit*, "find target", "heigan the unclean");
-    if (!heigan)
+    if (!heigan || heigan->isDead())
     {
         return false;
     }
@@ -79,7 +89,7 @@ bool HeiganMeleeTrigger::IsActive()
 bool HeiganRangedTrigger::IsActive()
 {
     Unit* heigan = AI_VALUE2(Unit*, "find target", "heigan the unclean");
-    if (!heigan)
+    if (!heigan || heigan->isDead())
     {
         return false;
     }
@@ -171,7 +181,7 @@ bool KelthuzadTrigger::IsActive() { return helper.UpdateBossAI(); }
 
 bool AnubrekhanTrigger::IsActive() {
     Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
-    if (!boss)
+    if (!boss || boss->isDead())
     {
         return false;
     }
