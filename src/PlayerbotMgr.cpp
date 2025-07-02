@@ -32,7 +32,7 @@
 #include "RandomPlayerbotMgr.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
-#include "ChannelMgr.h"
+// #include "ChannelMgr.h" Double include
 #include "BroadcastHelper.h"
 #include "PlayerbotDbStore.h"
 #include "WorldSessionMgr.h"
