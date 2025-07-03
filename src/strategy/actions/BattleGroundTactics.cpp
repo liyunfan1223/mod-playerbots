@@ -108,6 +108,8 @@ enum BattleBotWsgWaitSpot
     BB_WSG_WAIT_SPOT_RIGHT
 };
 
+std::unordered_map<uint32, BGStrategyData> bgStrategies;
+
 std::vector<uint32> const vFlagsAV = {
     BG_AV_OBJECTID_BANNER_H_B,      BG_AV_OBJECTID_BANNER_H,      BG_AV_OBJECTID_BANNER_A_B,
     BG_AV_OBJECTID_BANNER_A,        BG_AV_OBJECTID_BANNER_CONT_A, BG_AV_OBJECTID_BANNER_CONT_A_B,
@@ -1423,6 +1425,16 @@ std::string const BGTactics::HandleConsoleCommandPrivate(WorldSession* session, 
     return "usage: showpath(=[num]) / showcreature=[num] / showobject=[num]";
 }
 
+// Depends on OnBattlegroundStart in playerbots.cpp
+uint8 BGTactics::GetBotStrategyForTeam(Battleground* bg, TeamId teamId)
+{
+    auto itr = bgStrategies.find(bg->GetInstanceID());
+    if (itr == bgStrategies.end())
+        return 0;
+
+    return teamId == TEAM_ALLIANCE ? itr->second.allianceStrategy : itr->second.hordeStrategy;
+}
+
 bool BGTactics::wsJumpDown()
 {
     Battleground* bg = bot->GetBattleground();
@@ -1848,8 +1860,8 @@ bool BGTactics::selectObjective(bool reset)
             BattlegroundAV* av = static_cast<BattlegroundAV*>(bg);
             TeamId team = bot->GetTeamId();
             uint8 role = context->GetValue<uint32>("bg role")->Get();
-            AVBotStrategy strategyHorde = static_cast<AVBotStrategy>(bg->GetBotStrategyForTeam(TEAM_HORDE));
-            AVBotStrategy strategyAlliance = static_cast<AVBotStrategy>(bg->GetBotStrategyForTeam(TEAM_ALLIANCE));
+            AVBotStrategy strategyHorde = static_cast<AVBotStrategy>(GetBotStrategyForTeam(bg, TEAM_HORDE));
+            AVBotStrategy strategyAlliance = static_cast<AVBotStrategy>(GetBotStrategyForTeam(bg, TEAM_ALLIANCE));
             AVBotStrategy strategy = (team == TEAM_ALLIANCE) ? strategyAlliance : strategyHorde;
             AVBotStrategy enemyStrategy = (team == TEAM_ALLIANCE) ? strategyHorde : strategyAlliance;
 
@@ -2153,8 +2165,8 @@ bool BGTactics::selectObjective(bool reset)
 
             // Retrieve role
             uint8 role = context->GetValue<uint32>("bg role")->Get();
-            WSBotStrategy strategyHorde = static_cast<WSBotStrategy>(bg->GetBotStrategyForTeam(TEAM_HORDE));
-            WSBotStrategy strategyAlliance = static_cast<WSBotStrategy>(bg->GetBotStrategyForTeam(TEAM_ALLIANCE));
+            WSBotStrategy strategyHorde = static_cast<WSBotStrategy>(GetBotStrategyForTeam(bg, TEAM_HORDE));
+            WSBotStrategy strategyAlliance = static_cast<WSBotStrategy>(GetBotStrategyForTeam(bg, TEAM_ALLIANCE));
             WSBotStrategy strategy = (team == TEAM_ALLIANCE) ? strategyAlliance : strategyHorde;
             WSBotStrategy enemyStrategy = (team == TEAM_ALLIANCE) ? strategyHorde : strategyAlliance;
 
@@ -2302,8 +2314,8 @@ bool BGTactics::selectObjective(bool reset)
             TeamId team = bot->GetTeamId();
 
             uint8 role = context->GetValue<uint32>("bg role")->Get();
-            ABBotStrategy strategyHorde = static_cast<ABBotStrategy>(bg->GetBotStrategyForTeam(TEAM_HORDE));
-            ABBotStrategy strategyAlliance = static_cast<ABBotStrategy>(bg->GetBotStrategyForTeam(TEAM_ALLIANCE));
+            ABBotStrategy strategyHorde = static_cast<ABBotStrategy>(GetBotStrategyForTeam(bg, TEAM_HORDE));
+            ABBotStrategy strategyAlliance = static_cast<ABBotStrategy>(GetBotStrategyForTeam(bg, TEAM_ALLIANCE));
             ABBotStrategy strategy = (team == TEAM_ALLIANCE) ? strategyAlliance : strategyHorde;
             ABBotStrategy enemyStrategy = (team == TEAM_ALLIANCE) ? strategyHorde : strategyAlliance;
 
@@ -2477,8 +2489,8 @@ bool BGTactics::selectObjective(bool reset)
             TeamId team = bot->GetTeamId();
             uint8 role = context->GetValue<uint32>("bg role")->Get();
 
-            EYBotStrategy strategyHorde = static_cast<EYBotStrategy>(bg->GetBotStrategyForTeam(TEAM_HORDE));
-            EYBotStrategy strategyAlliance = static_cast<EYBotStrategy>(bg->GetBotStrategyForTeam(TEAM_ALLIANCE));
+            EYBotStrategy strategyHorde = static_cast<EYBotStrategy>(GetBotStrategyForTeam(bg, TEAM_HORDE));
+            EYBotStrategy strategyAlliance = static_cast<EYBotStrategy>(GetBotStrategyForTeam(bg, TEAM_ALLIANCE));
             EYBotStrategy strategy = (team == TEAM_ALLIANCE) ? strategyAlliance : strategyHorde;
             EYBotStrategy enemyStrategy = (team == TEAM_ALLIANCE) ? strategyHorde : strategyAlliance;
 
