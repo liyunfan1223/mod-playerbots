@@ -40,6 +40,7 @@
 #include "TradeStatusExtendedAction.h"
 #include "UseMeetingStoneAction.h"
 #include "NamedObjectContext.h"
+#include "ReleaseSpiritAction.h"
 
 class PlayerbotAI;
 
@@ -68,6 +69,7 @@ public:
         creators["accept trade"] = &WorldPacketActionContext::accept_trade;
         creators["trade status extended"] = &WorldPacketActionContext::trade_status_extended;
         creators["store loot"] = &WorldPacketActionContext::store_loot;
+        creators["self resurrect"] = &WorldPacketActionContext::self_resurrect;
 
         // quest
         creators["talk to quest giver"] = &WorldPacketActionContext::turn_in_quest;
@@ -136,6 +138,7 @@ private:
     static Action* tell_not_enough_money(PlayerbotAI* botAI) { return new TellMasterAction(botAI, "Not enough money"); }
     static Action* tell_not_enough_reputation(PlayerbotAI* botAI) { return new TellMasterAction(botAI, "Not enough reputation"); }
     static Action* tell_cannot_equip(PlayerbotAI* botAI) { return new InventoryChangeFailureAction(botAI); }
+    static Action* self_resurrect(PlayerbotAI* botAI) { return new SelfResurrectAction(botAI); }
 
     // quest
     static Action* quest_update_add_kill(PlayerbotAI* ai) { return new QuestUpdateAddKillAction(ai); }

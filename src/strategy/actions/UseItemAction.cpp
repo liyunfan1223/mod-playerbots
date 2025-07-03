@@ -238,9 +238,24 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     {
         targetFlag = TARGET_FLAG_NONE;
         packet << targetFlag;
-        packet << bot->GetPackGUID();
-        targetSelected = true;
-        out << " on self";
+
+        // Use the actual target if provided
+        if (unitTarget)
+        {
+            packet << unitTarget->GetGUID();
+            targetSelected = true;
+            // If the target is bot or is an enemy, say "on self"
+            if (unitTarget == bot || (unitTarget->IsHostileTo(bot)))
+                out << " on self";
+            else
+                out << " on " << unitTarget->GetName();
+        }
+        else
+        {
+            packet << bot->GetPackGUID();
+            targetSelected = true;
+            out << " on self";
+        }
     }
 
     ItemTemplate const* proto = item->GetTemplate();

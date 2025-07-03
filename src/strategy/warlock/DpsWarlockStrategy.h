@@ -30,14 +30,4 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override { return "aoe"; }
 };
-
-class DpsWarlockDebuffStrategy : public CombatStrategy
-{
-public:
-    DpsWarlockDebuffStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}
-
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName() override { return "dps debuff"; }
-};
-
 #endif

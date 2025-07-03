@@ -4,105 +4,85 @@
  */
 
 #include "DpsWarlockStrategy.h"
-
 #include "Playerbots.h"
 
+// This strategy is designed for low-level Warlocks without talents.
+// All of the important spells/cooldowns have been migrated to
+// their respective specs.
+
+// ===== Action Node Factory =====
 class DpsWarlockStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
     DpsWarlockStrategyActionNodeFactory()
     {
+        creators["corruption"] = &corruption;
+        creators["curse of agony"] = &curse_of_agony;
+        creators["immolate"] = &immolate;
         creators["shadow bolt"] = &shadow_bolt;
-        creators["unstable affliction"] = &unstable_affliction;
-        creators["unstable affliction on attacker"] = &unstable_affliction_on_attacker;
+        creators["life tap"] = &life_tap;
+        creators["shadowflame"] = &shadowflame;
+        creators["seed of corruption"] = &seed_of_corruption;
+        creators["rain of fire"] = &rain_of_fire;
+        creators["drain soul"] = &drain_soul;
     }
 
 private:
-    static ActionNode* shadow_bolt([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("shadow bolt",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("shoot"), nullptr),
-                              /*C*/ nullptr);
-    }
-    static ActionNode* unstable_affliction([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("unstable affliction",
-                              /*P*/ NULL,
-                              /*A*/ NextAction::array(0, new NextAction("immolate"), NULL),
-                              /*C*/ NULL);
-    }
-    static ActionNode* unstable_affliction_on_attacker([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("unstable affliction on attacker",
-                              /*P*/ NULL,
-                              /*A*/ NextAction::array(0, new NextAction("immolate on attacker"), NULL),
-                              /*C*/ NULL);
-    }
+    static ActionNode* corruption(PlayerbotAI*) { return new ActionNode("corruption", nullptr, nullptr, nullptr); }
+    static ActionNode* curse_of_agony(PlayerbotAI*){return new ActionNode("curse of agony", nullptr, nullptr, nullptr);}
+    static ActionNode* immolate(PlayerbotAI*) { return new ActionNode("immolate", nullptr, nullptr, nullptr); }
+    static ActionNode* shadow_bolt(PlayerbotAI*) { return new ActionNode("shadow bolt", nullptr, nullptr, nullptr); }
+    static ActionNode* life_tap(PlayerbotAI*) { return new ActionNode("life tap", nullptr, nullptr, nullptr); }
+    static ActionNode* shadowflame(PlayerbotAI*) { return new ActionNode("shadowflame", nullptr, nullptr, nullptr); }
+    static ActionNode* seed_of_corruption(PlayerbotAI*){return new ActionNode("seed of corruption", nullptr, nullptr, nullptr);}
+    static ActionNode* rain_of_fire(PlayerbotAI*) { return new ActionNode("rain of fire", nullptr, nullptr, nullptr); }
+    static ActionNode* drain_soul(PlayerbotAI*) { return new ActionNode("drain soul", nullptr, nullptr, nullptr); }
 };
 
+// ===== Single Target Strategy =====
 DpsWarlockStrategy::DpsWarlockStrategy(PlayerbotAI* botAI) : GenericWarlockStrategy(botAI)
 {
     actionNodeFactories.Add(new DpsWarlockStrategyActionNodeFactory());
 }
 
+// ===== Default Actions =====
 NextAction** DpsWarlockStrategy::getDefaultActions()
 {
-    return NextAction::array(
-        0, new NextAction("haunt", ACTION_DEFAULT + 0.4f), new NextAction("demonic empowerment", ACTION_DEFAULT + 0.3f),
-        new NextAction("shadow bolt", ACTION_DEFAULT + 0.2f), new NextAction("shoot", ACTION_DEFAULT), nullptr);
+    return NextAction::array(0,
+       new NextAction("immolate", 5.5f),
+       new NextAction("corruption", 5.4f),
+       new NextAction("curse of agony", 5.3f),
+       new NextAction("shadow bolt", 5.2f),
+       new NextAction("shoot", 5.0f), nullptr);
 }
 
+// ===== Trigger Initialization ===
 void DpsWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericWarlockStrategy::InitTriggers(triggers);
 
-    triggers.push_back(
-        new TriggerNode("backlash", NextAction::array(0, new NextAction("shadow bolt", 20.0f), nullptr)));
+    // Main DoT triggers for high uptime
+    triggers.push_back(new TriggerNode("corruption on attacker", NextAction::array(0, new NextAction("corruption on attacker", 20.0f), nullptr)));
+    triggers.push_back(new TriggerNode("curse of agony on attacker", NextAction::array(0, new NextAction("curse of agony on attacker", 19.5f), nullptr)));
+    triggers.push_back(new TriggerNode("immolate on attacker", NextAction::array(0, new NextAction("immolate on attacker", 19.0f), nullptr)));
+    triggers.push_back(new TriggerNode("corruption", NextAction::array(0, new NextAction("corruption", 18.5f), nullptr)));
+    triggers.push_back(new TriggerNode("curse of agony", NextAction::array(0, new NextAction("curse of agony", 18.0f), nullptr)));
+    triggers.push_back(new TriggerNode("immolate", NextAction::array(0, new NextAction("immolate", 17.5f), nullptr)));
 
-    triggers.push_back(new TriggerNode("haunt", NextAction::array(0, new NextAction("haunt", 26.0f), NULL)));
+    // Drain Soul as execute if target is low HP
+    triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("drain soul", 17.0f), nullptr)));
 
-    triggers.push_back(
-        new TriggerNode("shadow trance", NextAction::array(0, new NextAction("shadow bolt", 15.0f), NULL)));
-
-    triggers.push_back(new TriggerNode("backlash", NextAction::array(0, new NextAction("shadow bolt", 15.0f), NULL)));
-
-    triggers.push_back(new TriggerNode("molten core", NextAction::array(0, new NextAction("incinerate", 15.0f), NULL)));
-
-    triggers.push_back(new TriggerNode("decimation", NextAction::array(0, new NextAction("soul fire", 16.0f), NULL)));
-
-    // cast during movement
-    triggers.push_back(
-        new TriggerNode("high mana", NextAction::array(0, new NextAction("life tap", ACTION_DEFAULT + 0.1f), nullptr)));
-        
+    // Cast during movement or to activate glyph buff
+    triggers.push_back(new TriggerNode("life tap", NextAction::array(0, new NextAction("life tap", ACTION_DEFAULT + 0.1f), nullptr)));
     triggers.push_back(new TriggerNode("life tap glyph buff", NextAction::array(0, new NextAction("life tap", 28.0f), NULL)));
-
-    triggers.push_back(
-        new TriggerNode("metamorphosis", NextAction::array(0, new NextAction("metamorphosis", 20.0f), NULL)));
 }
 
+// ===== AoE Strategy, 3+ enemies =====
 void DpsAoeWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(
-        new TriggerNode("medium aoe", NextAction::array(0, new NextAction("seed of corruption", 33.0f),
-                                                        new NextAction("seed of corruption on attacker", 32.0f),
-                                                        new NextAction("rain of fire", 31.0f), nullptr)));
-    triggers.push_back(new TriggerNode("corruption on attacker",
-                                       NextAction::array(0, new NextAction("corruption on attacker", 27.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("unstable affliction on attacker",
-                        NextAction::array(0, new NextAction("unstable affliction on attacker", 26.0f), NULL)));
-    triggers.push_back(
-        new TriggerNode("curse of agony on attacker",
-                        NextAction::array(0, new NextAction("curse of agony on attacker", 25.0f), nullptr)));
-}
-
-void DpsWarlockDebuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
-{
-    triggers.push_back(
-        new TriggerNode("corruption", NextAction::array(0, new NextAction("corruption", 22.0f), nullptr)));
-    triggers.push_back(new TriggerNode("unstable affliction",
-                                       NextAction::array(0, new NextAction("unstable affliction", 21.0f), NULL)));
-    triggers.push_back(
-        new TriggerNode("curse of agony", NextAction::array(0, new NextAction("curse of agony", 20.0f), nullptr)));
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0,
+                       new NextAction("shadowflame", 22.5f),
+                       new NextAction("seed of corruption on attacker", 22.0f),
+                       new NextAction("seed of corruption", 21.5f),
+                       new NextAction("rain of fire", 21.0f), nullptr)));
 }

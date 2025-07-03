@@ -4,65 +4,41 @@
  */
 
 #include "TankWarlockStrategy.h"
-
 #include "Playerbots.h"
 
-class GenericWarlockStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
+// Combat strategy for a Warlock Tank, for certain bosses like Twin Emperors
+// Priority is set to spam Searing Pain and use Shadow Ward on CD
+// Disabled by default
+// To enable, type "co +tank"
+// To disable, type "co -tank"
+
+// ===== Action Node Factory =====
+class TankWarlockStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-    GenericWarlockStrategyActionNodeFactory()
+    TankWarlockStrategyActionNodeFactory()
     {
-        creators["summon voidwalker"] = &summon_voidwalker;
-        creators["summon felguard"] = &summon_felguard;
-        creators["summon succubus"] = &summon_succubus;
-        creators["summon felhunter"] = &summon_felhunter;
+        creators["shadow ward"] = &shadow_ward;
+        creators["searing pain"] = &searing_pain;
     }
 
 private:
-    static ActionNode* summon_voidwalker([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("summon voidwalker",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("summon imp"), nullptr),
-                              /*C*/ nullptr);
-    }
-
-    static ActionNode* summon_felguard([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("summon felguard",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("summon succubus"), nullptr),
-                              /*C*/ nullptr);
-    }
-
-    static ActionNode* summon_succubus([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("summon succubus",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("summon voidwalker"), nullptr),
-                              /*C*/ nullptr);
-    }
-
-    static ActionNode* summon_felhunter([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("summon felhunter",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("summon imp"), nullptr),
-                              /*C*/ nullptr);
-    }
+    static ActionNode* shadow_ward(PlayerbotAI*) { return new ActionNode("shadow ward", nullptr, nullptr, nullptr); }
+    static ActionNode* searing_pain(PlayerbotAI*) { return new ActionNode("searing pain", nullptr, nullptr, nullptr); }
 };
 
+// ===== Warlock Tank Combat Strategy =====
 TankWarlockStrategy::TankWarlockStrategy(PlayerbotAI* botAI) : GenericWarlockStrategy(botAI)
 {
-    actionNodeFactories.Add(new GenericWarlockStrategyActionNodeFactory());
+    actionNodeFactories.Add(new TankWarlockStrategyActionNodeFactory());
 }
 
 NextAction** TankWarlockStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("shoot", ACTION_DEFAULT), nullptr);
+    // Shadow Ward is the highest priority, Searing Pain next.
+    return NextAction::array(0, new NextAction("shadow ward", 27.5f), new NextAction("searing pain", 27.0f), nullptr);
 }
 
 void TankWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    GenericWarlockStrategy::InitTriggers(triggers);
 }

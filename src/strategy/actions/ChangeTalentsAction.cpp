@@ -135,6 +135,10 @@ std::string ChangeTalentsAction::SpecPick(std::string param)
         if (sPlayerbotAIConfig->premadeSpecName[cls][specNo] == param)
         {
             PlayerbotFactory::InitTalentsBySpecNo(bot, specNo, true);
+
+            PlayerbotFactory factory(bot, bot->GetLevel());
+            factory.InitGlyphs(false);
+
             std::ostringstream out;
             out << "Picking " << sPlayerbotAIConfig->premadeSpecName[cls][specNo];
             return out.str();

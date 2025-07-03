@@ -304,7 +304,6 @@ bool UseTrinketAction::Execute(Event event)
         return true;
 
     Item* trinket2 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2);
-    
     if (trinket2 && UseTrinket(trinket2))
         return true;
     
@@ -333,6 +332,15 @@ bool UseTrinketAction::UseTrinket(Item* item)
         if (item->GetTemplate()->Spells[i].SpellId > 0 && item->GetTemplate()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
         {
             spellId = item->GetTemplate()->Spells[i].SpellId;
+            uint32 spellProcFlag = sSpellMgr->GetSpellInfo(spellId)->ProcFlags;
+
+            // Handle items with procflag "if you kill a target that grants honor or experience"
+            // Bots will "learn" the trinket proc, so CanCastSpell() will be true
+            // e.g. on Item https://www.wowhead.com/wotlk/item=44074/oracle-talisman-of-ablution leading to
+            // constant casting of the proc spell onto themselfes https://www.wowhead.com/wotlk/spell=59787/oracle-ablutions
+            // This will lead to multiple hundreds of entries in m_appliedAuras -> Once killing an enemy -> Big diff time spikes
+            if (spellProcFlag != 0) return false;
+
             if (!botAI->CanCastSpell(spellId, bot, false))
             {
                 return false;

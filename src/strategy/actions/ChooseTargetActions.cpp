@@ -83,7 +83,14 @@ bool DropTargetAction::Execute(Event event)
     bot->SetTarget(ObjectGuid::Empty);
     bot->SetSelection(ObjectGuid());
     botAI->ChangeEngine(BOT_STATE_NON_COMBAT);
-    // botAI->InterruptSpell();
+    if (bot->getClass() == CLASS_HUNTER) // Check for Hunter Class
+    {
+        Spell const* spell = bot->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL); // Get the current spell being cast by the bot
+        if (spell && spell->m_spellInfo->Id == 75) //Check spell is not nullptr before accessing m_spellInfo 
+        {
+            bot->InterruptSpell(CURRENT_AUTOREPEAT_SPELL); // Interrupt Auto Shot
+        }
+    } 
     bot->AttackStop();
 
     // if (Pet* pet = bot->GetPet())
