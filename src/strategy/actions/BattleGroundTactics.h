@@ -16,6 +16,39 @@ struct Position;
 
 #define SPELL_CAPTURE_BANNER 21651
 
+enum WSBotStrategy : uint8
+{
+    WS_STRATEGY_BALANCED      = 0,
+    WS_STRATEGY_OFFENSIVE     = 1,
+    WS_STRATEGY_DEFENSIVE     = 2,
+    WS_STRATEGY_MAX           = 3,
+};
+
+enum ABBotStrategy : uint8
+{
+    AB_STRATEGY_BALANCED      = 0,
+    AB_STRATEGY_OFFENSIVE     = 1,
+    AB_STRATEGY_DEFENSIVE     = 2,
+    AB_STRATEGY_MAX           = 3,
+};
+
+enum AVBotStrategy : uint8
+{
+    AV_STRATEGY_BALANCED      = 0,
+    AV_STRATEGY_OFFENSIVE     = 1,
+    AV_STRATEGY_DEFENSIVE     = 2,
+    AV_STRATEGY_MAX           = 3,
+};
+
+enum EYBotStrategy : uint8
+{
+    EY_STRATEGY_BALANCED      = 0,
+    EY_STRATEGY_FRONT_FOCUS   = 1,
+    EY_STRATEGY_BACK_FOCUS    = 2,
+    EY_STRATEGY_FLAG_FOCUS    = 3,
+    EY_STRATEGY_MAX           = 4
+};
+
 typedef void (*BattleBotWaypointFunc)();
 
 struct BGStrategyData
