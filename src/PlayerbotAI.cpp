@@ -4430,9 +4430,54 @@ void PlayerbotAI::RemoveShapeshift()
     // RemoveAura("tree of life");
 }
 
+// Official‐style Average Item Level for display / Who command
+uint32 PlayerbotAI::GetEquipGearScore(Player* player)
+{
+    const uint8 kTotalSlots = 16;                      // default divisor
+    const bool  hasTitanGrip =
+        player->HasAura(SPELL_TITAN_GRIP);
+
+    uint32 sum = 0;
+    uint8  divisor = kTotalSlots;
+
+    bool mainHas2H = false;
+
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (slot == EQUIPMENT_SLOT_BODY || slot == EQUIPMENT_SLOT_TABARD)
+            continue;                                  // never counted in AIL
+
+        Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (!item)
+            continue;                                  // empty slot ⇒ contributes 0
+
+        ItemTemplate const* proto = item->GetTemplate();
+        if (!proto)
+            continue;
+
+        if (slot == EQUIPMENT_SLOT_MAINHAND)
+            mainHas2H = (proto->InventoryType == INVTYPE_2HWEAPON);
+
+        // Off-hand with real 2-H in main and no Titan Grip still counts as
+        // an *empty* slot, so we keep the divisor unchanged and add 0 here.
+        if (slot == EQUIPMENT_SLOT_OFFHAND &&
+            mainHas2H && !hasTitanGrip)
+            continue;
+
+        sum += proto->ItemLevel;
+    }
+
+    // If Titan Grip is active and two genuine 2-H weapons are equipped,
+    // we use 17 slots just like the client API.
+    if (hasTitanGrip && mainHas2H)
+        ++divisor;
+
+    return divisor ? sum / divisor : 0;
+}
+
 // NOTE : function rewritten as flags "withBags" and "withBank" not used, and _fillGearScoreData sometimes attribute
 // one-hand/2H Weapon in wrong slots 
-uint32 PlayerbotAI::GetEquipGearScore(Player* player)
+/*uint32 PlayerbotAI::GetEquipGearScore(Player* player)
 {
     // This function aims to calculate the equipped gear score
  
@@ -4454,11 +4499,11 @@ uint32 PlayerbotAI::GetEquipGearScore(Player* player)
             if (!player->HasAura(SPELL_TITAN_GRIP) && mh_type == INVTYPE_2HWEAPON && i == SLOT_MAIN_HAND)
                 sum += item->GetTemplate()->ItemLevel;
 	    }
-    }
+    } 
 
     uint32 gs = uint32(sum / count);
     return gs;
-}
+}*/
 
 /*uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBank)
 {
