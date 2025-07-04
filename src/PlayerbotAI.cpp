@@ -4430,49 +4430,39 @@ void PlayerbotAI::RemoveShapeshift()
     // RemoveAura("tree of life");
 }
 
-// Official‐style Average Item Level for display / Who command
+// Mirrors Blizzard’s GetAverageItemLevel rules :
+// https://wowpedia.fandom.com/wiki/API_GetAverageItemLevel
 uint32 PlayerbotAI::GetEquipGearScore(Player* player)
 {
-    const uint8 kTotalSlots = 16;                      // default divisor
-    const bool  hasTitanGrip =
-        player->HasAura(SPELL_TITAN_GRIP);
+    constexpr uint8 BASE_SLOTS = 17;          // everything except Body & Tabard
+    uint32  sumLevel   = 0;
+    uint8   divisor    = BASE_SLOTS;
 
-    uint32 sum = 0;
-    uint8  divisor = kTotalSlots;
+    Item* main  = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    Item* off   = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
 
-    bool mainHas2H = false;
+    bool twoHandMain = false;
+    if (main)
+        twoHandMain = (main->GetTemplate()->InventoryType == INVTYPE_2HWEAPON);
 
+    /* ---------- 1.  Add up item-levels ---------- */
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_BODY || slot == EQUIPMENT_SLOT_TABARD)
-            continue;                                  // never counted in AIL
-
-        Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-        if (!item)
-            continue;                                  // empty slot ⇒ contributes 0
-
-        ItemTemplate const* proto = item->GetTemplate();
-        if (!proto)
             continue;
 
-        if (slot == EQUIPMENT_SLOT_MAINHAND)
-            mainHas2H = (proto->InventoryType == INVTYPE_2HWEAPON);
-
-        // Off-hand with real 2-H in main and no Titan Grip still counts as
-        // an *empty* slot, so we keep the divisor unchanged and add 0 here.
-        if (slot == EQUIPMENT_SLOT_OFFHAND &&
-            mainHas2H && !hasTitanGrip)
-            continue;
-
-        sum += proto->ItemLevel;
+        if (Item* it = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            sumLevel += it->GetTemplate()->ItemLevel;
     }
 
-    // If Titan Grip is active and two genuine 2-H weapons are equipped,
-    // we use 17 slots just like the client API.
-    if (hasTitanGrip && mainHas2H)
-        ++divisor;
+    /* ---------- 2.  Adjust divisor -------------- */
+    if ((twoHandMain && !player->HasAura(SPELL_TITAN_GRIP)) ||  // real 2-H weapon
+        (!main && !off))                                        // both hands empty
+    {
+        divisor = BASE_SLOTS - 1;           // use 16
+    }
 
-    return divisor ? sum / divisor : 0;
+    return divisor ? sumLevel / divisor : 0;
 }
 
 // NOTE : function rewritten as flags "withBags" and "withBank" not used, and _fillGearScoreData sometimes attribute
