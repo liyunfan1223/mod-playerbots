@@ -122,6 +122,8 @@ public:
         creators["metamorphosis"] = &WarlockTriggerFactoryInternal::metamorphosis;
         creators["demonic empowerment"] = &WarlockTriggerFactoryInternal::demonic_empowerment;
         creators["immolation aura active"] = &WarlockTriggerFactoryInternal::immolation_aura_active;
+        creators["metamorphosis not active"] = &WarlockTriggerFactoryInternal::metamorphosis_not_active;
+        creators["meta melee flee check"] = &WarlockTriggerFactoryInternal::meta_melee_flee_check;
     }
 
 private:
@@ -158,6 +160,8 @@ private:
     static Trigger* metamorphosis(PlayerbotAI* ai) { return new MetamorphosisTrigger(ai); }
     static Trigger* demonic_empowerment(PlayerbotAI* ai) { return new DemonicEmpowermentTrigger(ai); }
     static Trigger* immolation_aura_active(PlayerbotAI* ai) { return new ImmolationAuraActiveTrigger(ai); }
+    static Trigger* metamorphosis_not_active(PlayerbotAI* ai) { return new MetamorphosisNotActiveTrigger(ai); }
+    static Trigger* meta_melee_flee_check(PlayerbotAI* ai) { return new MetaMeleeEnemyTooCloseForSpellTrigger(ai); }
 };
 
 class WarlockAiObjectContextInternal : public NamedObjectContext<Action>

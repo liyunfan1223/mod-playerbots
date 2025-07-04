@@ -91,6 +91,8 @@ void DestructionWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     // Life Tap glyph buff, and Life Tap as filler
     triggers.push_back(new TriggerNode("life tap glyph buff", NextAction::array(0, new NextAction("life tap", 29.0f), nullptr)));
     triggers.push_back(new TriggerNode("life tap", NextAction::array(0, new NextAction("life tap", 5.1f), nullptr)));
+
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", 39.0f), nullptr)));
 }
 
 // ===== AoE Strategy, 3+ enemies =====

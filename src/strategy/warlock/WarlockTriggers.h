@@ -271,4 +271,18 @@ class MoltenCoreTrigger : public HasAuraTrigger
 public:
     MoltenCoreTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "molten core") {}
 };
+
+class MetamorphosisNotActiveTrigger : public HasNoAuraTrigger
+{
+public:
+    MetamorphosisNotActiveTrigger(PlayerbotAI* ai) : HasNoAuraTrigger(ai, "metamorphosis") {}
+};
+
+class MetaMeleeEnemyTooCloseForSpellTrigger : public TwoTriggers
+{
+public:
+    MetaMeleeEnemyTooCloseForSpellTrigger(PlayerbotAI* ai)
+        : TwoTriggers(ai, "enemy too close for spell", "metamorphosis not active") {}
+};
+
 #endif
