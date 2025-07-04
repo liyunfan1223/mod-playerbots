@@ -132,6 +132,7 @@ public:
         creators["disperse"] = &ChatTriggerContext::disperse;
         creators["calc"] = &ChatTriggerContext::calc;
         creators["qi"] = &ChatTriggerContext::qi;
+        creators["wipe"] = &ChatTriggerContext::wipe;
     }
 
 private:
@@ -243,6 +244,7 @@ private:
     static Trigger* disperse(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "disperse"); }
     static Trigger* calc(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "calc"); }
     static Trigger* qi(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "qi"); }
+    static Trigger* wipe(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "wipe"); }
 };
 
 #endif
