@@ -4430,9 +4430,48 @@ void PlayerbotAI::RemoveShapeshift()
     // RemoveAura("tree of life");
 }
 
+// Mirrors Blizzard’s GetAverageItemLevel rules :
+// https://wowpedia.fandom.com/wiki/API_GetAverageItemLevel
+uint32 PlayerbotAI::GetEquipGearScore(Player* player)
+{
+    constexpr uint8 TOTAL_SLOTS = 17;                      // every slot except Body & Tabard
+    uint32 sumLevel = 0;
+
+    /* ---------- 0.  Detect “ignore off-hand” situations --------- */
+    Item* main = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    Item* off  = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+
+    bool ignoreOffhand = false;                           // true → divisor = 16
+    if (main)
+    {
+        bool twoHand = (main->GetTemplate()->InventoryType == INVTYPE_2HWEAPON);
+        if (twoHand && !player->HasAura(SPELL_TITAN_GRIP))
+            ignoreOffhand = true;                         // classic 2-hander
+    }
+    else if (!off)                                        // both hands empty
+        ignoreOffhand = true;
+
+    /* ---------- 1.  Sum up item-levels -------------------------- */
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (slot == EQUIPMENT_SLOT_BODY || slot == EQUIPMENT_SLOT_TABARD)
+            continue;                                     // Blizzard never counts these
+
+        if (ignoreOffhand && slot == EQUIPMENT_SLOT_OFFHAND)
+            continue;                                     // skip off-hand in 2-H case
+
+        if (Item* it = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            sumLevel += it->GetTemplate()->ItemLevel;     // missing items add 0
+    }
+
+    /* ---------- 2.  Divide by 17 or 16 -------------------------- */
+    const uint8 divisor = ignoreOffhand ? TOTAL_SLOTS - 1 : TOTAL_SLOTS; // 16 or 17
+    return sumLevel / divisor;
+}
+
 // NOTE : function rewritten as flags "withBags" and "withBank" not used, and _fillGearScoreData sometimes attribute
 // one-hand/2H Weapon in wrong slots 
-uint32 PlayerbotAI::GetEquipGearScore(Player* player)
+/*uint32 PlayerbotAI::GetEquipGearScore(Player* player)
 {
     // This function aims to calculate the equipped gear score
  
@@ -4454,11 +4493,11 @@ uint32 PlayerbotAI::GetEquipGearScore(Player* player)
             if (!player->HasAura(SPELL_TITAN_GRIP) && mh_type == INVTYPE_2HWEAPON && i == SLOT_MAIN_HAND)
                 sum += item->GetTemplate()->ItemLevel;
 	    }
-    }
+    } 
 
     uint32 gs = uint32(sum / count);
     return gs;
-}
+}*/
 
 /*uint32 PlayerbotAI::GetEquipGearScore(Player* player, bool withBags, bool withBank)
 {
