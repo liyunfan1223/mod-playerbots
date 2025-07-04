@@ -4434,35 +4434,39 @@ void PlayerbotAI::RemoveShapeshift()
 // https://wowpedia.fandom.com/wiki/API_GetAverageItemLevel
 uint32 PlayerbotAI::GetEquipGearScore(Player* player)
 {
-    constexpr uint8 BASE_SLOTS = 17;          // everything except Body & Tabard
-    uint32  sumLevel   = 0;
-    uint8   divisor    = BASE_SLOTS;
+    constexpr uint8 TOTAL_SLOTS = 17;                      // every slot except Body & Tabard
+    uint32 sumLevel = 0;
 
-    Item* main  = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-    Item* off   = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+    /* ---------- 0.  Detect “ignore off-hand” situations --------- */
+    Item* main = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    Item* off  = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
 
-    bool twoHandMain = false;
+    bool ignoreOffhand = false;                           // true → divisor = 16
     if (main)
-        twoHandMain = (main->GetTemplate()->InventoryType == INVTYPE_2HWEAPON);
+    {
+        bool twoHand = (main->GetTemplate()->InventoryType == INVTYPE_2HWEAPON);
+        if (twoHand && !player->HasAura(SPELL_TITAN_GRIP))
+            ignoreOffhand = true;                         // classic 2-hander
+    }
+    else if (!off)                                        // both hands empty
+        ignoreOffhand = true;
 
-    /* ---------- 1.  Add up item-levels ---------- */
+    /* ---------- 1.  Sum up item-levels -------------------------- */
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_BODY || slot == EQUIPMENT_SLOT_TABARD)
-            continue;
+            continue;                                     // Blizzard never counts these
+
+        if (ignoreOffhand && slot == EQUIPMENT_SLOT_OFFHAND)
+            continue;                                     // skip off-hand in 2-H case
 
         if (Item* it = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-            sumLevel += it->GetTemplate()->ItemLevel;
+            sumLevel += it->GetTemplate()->ItemLevel;     // missing items add 0
     }
 
-    /* ---------- 2.  Adjust divisor -------------- */
-    if ((twoHandMain && !player->HasAura(SPELL_TITAN_GRIP)) ||  // real 2-H weapon
-        (!main && !off))                                        // both hands empty
-    {
-        divisor = BASE_SLOTS - 1;           // use 16
-    }
-
-    return divisor ? sumLevel / divisor : 0;
+    /* ---------- 2.  Divide by 17 or 16 -------------------------- */
+    const uint8 divisor = ignoreOffhand ? TOTAL_SLOTS - 1 : TOTAL_SLOTS; // 16 or 17
+    return sumLevel / divisor;
 }
 
 // NOTE : function rewritten as flags "withBags" and "withBank" not used, and _fillGearScoreData sometimes attribute
