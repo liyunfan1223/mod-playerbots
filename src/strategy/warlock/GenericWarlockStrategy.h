@@ -18,6 +18,7 @@ public:
     std::string const getName() override { return "warlock"; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     NextAction** getDefaultActions() override;
+    uint32 GetType() const override { return CombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS; }
 };
 
 class WarlockBoostStrategy : public Strategy
