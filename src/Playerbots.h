@@ -17,6 +17,9 @@
 #include "Spell.h"
 #include "SpellMgr.h"
 #include "TravelNode.h"
+#include <atomic>
+#include <unordered_map>
+#include <mutex>
 
 std::vector<std::string> split(std::string const s, char delim);
 void split(std::vector<std::string>& dest, std::string const str, char const* delim);
@@ -48,5 +51,27 @@ int strcmpi(char const* s1, char const* s2);
     sPlayerbotsMgr->GetPlayerbotAI(player)->GetAiObjectContext()->GetValue<type>(name, param)->Get()
 #define GAI_VALUE(type, name) sSharedValueContext->getGlobalValue<type>(name)->Get()
 #define GAI_VALUE2(type, name, param) sSharedValueContext->getGlobalValue<type>(name, param)->Get()
+
+// Thread-safe player update tracking
+class PlayerbotsUpdateTracker
+{
+public:
+    static bool TryAcquireUpdateFlag(uint64 playerGuid)
+    {
+        std::lock_guard<std::mutex> lock(s_mapMutex);
+        auto& flag = s_playerUpdateFlags[playerGuid];
+        bool expected = false;
+        return flag.compare_exchange_strong(expected, true, std::memory_order_acquire);
+    }
+    
+    static void ReleaseUpdateFlag(uint64 playerGuid)
+    {
+        s_playerUpdateFlags[playerGuid].store(false, std::memory_order_release);
+    }
+    
+private:
+    static std::unordered_map<uint64, std::atomic<bool>> s_playerUpdateFlags;
+    static std::mutex s_mapMutex;
+};
 
 #endif
