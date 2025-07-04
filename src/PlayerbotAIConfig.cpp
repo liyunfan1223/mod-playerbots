@@ -4,9 +4,7 @@
  */
 
 #include "PlayerbotAIConfig.h"
-
 #include <iostream>
-
 #include "Config.h"
 #include "PlayerbotDungeonSuggestionMgr.h"
 #include "PlayerbotFactory.h"
@@ -465,6 +463,8 @@ bool PlayerbotAIConfig::Initialize()
 
     LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AllowedLogFiles", ""),
                                              allowedLogFiles);
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.TradeActionExcludedPrefixes", ""),
+                                             tradeActionExcludedPrefixes);
 
     worldBuffs.clear();
 
