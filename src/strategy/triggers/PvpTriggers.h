@@ -140,4 +140,12 @@ public:
     bool IsActive() override;
 };
 
+class AllianceNoSnowfallGY : public Trigger
+{
+public:
+    AllianceNoSnowfallGY(PlayerbotAI* botAI) : Trigger(botAI, "alliance no snowfall gy") {}
+
+    bool IsActive() override;
+};
+
 #endif
