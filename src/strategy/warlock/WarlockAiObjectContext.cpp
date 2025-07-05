@@ -33,6 +33,11 @@ public:
         creators["destro aoe"] = &WarlockStrategyFactoryInternal::destruction_aoe;
         creators["meta melee"] = &WarlockStrategyFactoryInternal::meta_melee_aoe;
         creators["curse of elements"] = &WarlockStrategyFactoryInternal::curse_of_elements;
+        creators["imp"] = &WarlockStrategyFactoryInternal::imp;
+        creators["voidwalker"] = &WarlockStrategyFactoryInternal::voidwalker;
+        creators["succubus"] = &WarlockStrategyFactoryInternal::succubus;
+        creators["felhunter"] = &WarlockStrategyFactoryInternal::felhunter;
+        creators["felguard"] = &WarlockStrategyFactoryInternal::felguard;
     }
 
 private:
@@ -46,6 +51,11 @@ private:
     static Strategy* destruction_aoe(PlayerbotAI* botAI) { return new DestructionWarlockAoeStrategy(botAI); }
     static Strategy* meta_melee_aoe(PlayerbotAI* botAI) { return new MetaMeleeAoeStrategy(botAI); }
     static Strategy* curse_of_elements(PlayerbotAI* botAI) { return new WarlockCurseOfTheElementsStrategy(botAI); }
+    static Strategy* imp(PlayerbotAI* ai) { return new SummonImpStrategy(ai); }
+    static Strategy* voidwalker(PlayerbotAI* ai) { return new SummonVoidwalkerStrategy(ai); }
+    static Strategy* succubus(PlayerbotAI* ai) { return new SummonSuccubusStrategy(ai); }
+    static Strategy* felhunter(PlayerbotAI* ai) { return new SummonFelhunterStrategy(ai); }
+    static Strategy* felguard(PlayerbotAI* ai) { return new SummonFelguardStrategy(ai); }
 };
 
 class WarlockCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>

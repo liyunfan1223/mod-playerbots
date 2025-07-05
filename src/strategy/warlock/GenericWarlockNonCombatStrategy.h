@@ -19,6 +19,56 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
+class SummonImpStrategy : public NonCombatStrategy
+{
+public:
+    SummonImpStrategy(PlayerbotAI* ai);
+    virtual std::string const getName() override { return "imp"; }
+
+public:
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class SummonVoidwalkerStrategy : public NonCombatStrategy
+{
+public:
+    SummonVoidwalkerStrategy(PlayerbotAI* ai);
+    virtual std::string const getName() override { return "voidwalker"; }
+
+public:
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class SummonSuccubusStrategy : public NonCombatStrategy
+{
+public:
+    SummonSuccubusStrategy(PlayerbotAI* ai);
+    virtual std::string const getName() override { return "succubus"; }
+
+public:
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class SummonFelhunterStrategy : public NonCombatStrategy
+{
+public:
+    SummonFelhunterStrategy(PlayerbotAI* ai);
+    virtual std::string const getName() override { return "felhunter"; }
+
+public:
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class SummonFelguardStrategy : public NonCombatStrategy
+{
+public:
+    SummonFelguardStrategy(PlayerbotAI* ai);
+    virtual std::string const getName() override { return "felguard"; }
+
+public:
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
 class SoulstoneSelfStrategy : public NonCombatStrategy
 {
 public:

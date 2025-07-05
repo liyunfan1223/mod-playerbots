@@ -101,19 +101,61 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
         triggers.push_back(new TriggerNode("spellstone", NextAction::array(0, new NextAction("spellstone", 24.0f), nullptr)));
     }
 
-    // Pet-summoning triggers based on spec
-    if (tab == 0)  // Affliction
-    {
-        triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felhunter", 29.0f), nullptr)));
-    }
-    else if (tab == 1)  // Demonology
-    {
-        triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felguard", 29.0f), nullptr)));
-    }
-    else if (tab == 2)  // Destruction
-    {
-        triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon imp", 29.0f), nullptr)));
-    }
+}
+
+// Non-combat strategy for summoning a Imp
+// Enabled by default for the Destruction spec
+// To enable, type "nc +imp"
+// To disable, type "nc -imp"
+SummonImpStrategy::SummonImpStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
+
+void SummonImpStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon imp", 29.0f), NULL)));
+}
+
+// Non-combat strategy for summoning a Voidwalker
+// Disabled by default
+// To enable, type "nc +voidwalker"
+// To disable, type "nc -voidwalker"
+SummonVoidwalkerStrategy::SummonVoidwalkerStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
+
+void SummonVoidwalkerStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon voidwalker", 29.0f), NULL)));
+}
+
+// Non-combat strategy for summoning a Succubus
+// Disabled by default
+// To enable, type "nc +succubus"
+// To disable, type "nc -succubus"
+SummonSuccubusStrategy::SummonSuccubusStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
+
+void SummonSuccubusStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon succubus", 29.0f), NULL)));
+}
+
+// Non-combat strategy for summoning a Felhunter
+// Enabled by default for the Affliction spec
+// To enable, type "nc +felhunter"
+// To disable, type "nc -felhunter"
+SummonFelhunterStrategy::SummonFelhunterStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
+
+void SummonFelhunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felhunter", 29.0f), NULL)));
+}
+
+// Non-combat strategy for summoning a Felguard
+// Enabled by default for the Demonology spec
+// To enable, type "nc +felguard"
+// To disable, type "nc -felguard"
+SummonFelguardStrategy::SummonFelguardStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
+
+void SummonFelguardStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felguard", 29.0f), NULL)));
 }
 
 // Non-combat strategy for selecting themselves to receive soulstone
