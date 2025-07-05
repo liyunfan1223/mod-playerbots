@@ -1801,7 +1801,6 @@ const Movement::PointsArray MovementAction::SearchForBestPath(float x, float y, 
 
 bool FleeAction::Execute(Event event)
 {
-    // return Flee(AI_VALUE(Unit*, "current target"));
     return MoveAway(AI_VALUE(Unit*, "current target"), sPlayerbotAIConfig->fleeDistance, true);
 }
 
@@ -1811,6 +1810,10 @@ bool FleeAction::isUseful()
     {
         return false;
     }
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target && target->IsInWorld() && !bot->IsWithinMeleeRange(target))
+        return false;
+
     return true;
 }
 
