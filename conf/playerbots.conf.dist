@@ -656,7 +656,6 @@ AiPlayerbot.RandomGearQualityLimit = 3
 # Default: 0 (no limit)
 AiPlayerbot.RandomGearScoreLimit = 0
 
-# Equipment quality limitation for randombots (0 = disabled, 1 = enabled)
 # If disabled, random bots can only upgrade equipment through looting and quests
 # Default: 1 (enabled)
 AiPlayerbot.IncrementalGearInit = 1
