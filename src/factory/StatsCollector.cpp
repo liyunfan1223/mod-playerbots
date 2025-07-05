@@ -29,12 +29,12 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
 {
     if (proto->IsRangedWeapon())
     {
-        uint32 val = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2 / proto->Delay;
+        float val = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2 / proto->Delay;
         stats[STATS_TYPE_RANGED_DPS] += val;
     }
     else if (proto->IsWeapon())
     {
-        uint32 val = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2 / proto->Delay;
+        float val = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2 / proto->Delay;
         stats[STATS_TYPE_MELEE_DPS] += val;
     }
     stats[STATS_TYPE_ARMOR] += proto->Armor;
@@ -436,10 +436,10 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
     switch (itemStatType)
     {
         case ITEM_MOD_MANA:
-            stats[STATS_TYPE_MANA_REGENERATION] += val / 10;
+            stats[STATS_TYPE_MANA_REGENERATION] += (float)val / 10;
             break;
         case ITEM_MOD_HEALTH:
-            stats[STATS_TYPE_STAMINA] += val / 15;
+            stats[STATS_TYPE_STAMINA] += (float)val / 15;
             break;
         case ITEM_MOD_AGILITY:
             stats[STATS_TYPE_AGILITY] += val;
@@ -747,11 +747,11 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
     }
 }
 
-int32 StatsCollector::AverageValue(const SpellEffectInfo& effectInfo)
+float StatsCollector::AverageValue(const SpellEffectInfo& effectInfo)
 {
     // float basePointsPerLevel = effectInfo.RealPointsPerLevel; //not used, line marked for removal.
-    int32 basePoints = effectInfo.BasePoints;
-    int32 randomPoints = int32(effectInfo.DieSides);
+    float basePoints = effectInfo.BasePoints;
+    int32 randomPoints = effectInfo.DieSides;
 
     switch (randomPoints)
     {
@@ -761,7 +761,7 @@ int32 StatsCollector::AverageValue(const SpellEffectInfo& effectInfo)
             basePoints += 1;
             break;
         default:
-            int32 randvalue = (1 + randomPoints) / 2;
+            float randvalue = (1 + randomPoints) / 2.0f;
             basePoints += randvalue;
             break;
     }

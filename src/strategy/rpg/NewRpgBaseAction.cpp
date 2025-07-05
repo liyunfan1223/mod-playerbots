@@ -37,13 +37,6 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
         botAI->rpgInfo.SetMoveFarTo(dest);
     }
 
-    float dis = bot->GetExactDist(dest);
-    if (dis < pathFinderDis)
-    {
-        return MoveTo(dest.getMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), false, false,
-                      false, true);
-    }
-
     // performance optimization
     if (IsWaitingForLastMove(MovementPriority::MOVEMENT_NORMAL))
     {
@@ -69,6 +62,13 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
             bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(),
             dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), dest.getMapId(), bot->GetZoneId(), zone_name);
         return bot->TeleportTo(dest);
+    }
+    
+    float dis = bot->GetExactDist(dest);
+    if (dis < pathFinderDis)
+    {
+        return MoveTo(dest.getMapId(), dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), false, false,
+                      false, true);
     }
 
     float minDelta = M_PI;
@@ -852,10 +852,18 @@ WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
     float loRange = 2500.0f;
     if (bot->GetLevel() < 5)
     {
-        hiRange /= 10;
-        loRange /= 10;
+        hiRange /= 3;
+        loRange /= 3;
     }
     std::vector<WorldLocation> lo_prepared_locs, hi_prepared_locs;
+
+    bool inCity = false;
+    if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetZoneId()))
+    {
+        if (zone->flags & AREA_FLAG_CAPITAL)
+            inCity = true;
+    }
+
     for (auto& loc : locs)
     {
         if (bot->GetMapId() != loc.GetMapId())
@@ -863,17 +871,17 @@ WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
 
         if (bot->GetExactDist(loc) > 2500.0f)
             continue;
-        
-        if (bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) !=
+
+        if (!inCity && bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) !=
             bot->GetZoneId())
             continue;
 
-        if (bot->GetExactDist(loc) < 500.0f)
+        if (bot->GetExactDist(loc) < hiRange)
         {
             hi_prepared_locs.push_back(loc);
         }
 
-        if (bot->GetExactDist(loc) < 2500.0f)
+        if (bot->GetExactDist(loc) < loRange)
         {
             lo_prepared_locs.push_back(loc);
         }
@@ -900,6 +908,15 @@ WorldPosition NewRpgBaseAction::SelectRandomInnKeeperPos(Player* bot)
     const std::vector<WorldLocation>& locs = IsAlliance(bot->getRace())
                                                  ? sRandomPlayerbotMgr->allianceStarterPerLevelCache[bot->GetLevel()]
                                                  : sRandomPlayerbotMgr->hordeStarterPerLevelCache[bot->GetLevel()];
+    
+    bool inCity = false;
+    
+    if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetZoneId()))
+    {
+        if (zone->flags & AREA_FLAG_CAPITAL)
+            inCity = true;
+    }
+    
     std::vector<WorldLocation> prepared_locs;
     for (auto& loc : locs)
     {
@@ -910,7 +927,7 @@ WorldPosition NewRpgBaseAction::SelectRandomInnKeeperPos(Player* bot)
         if (bot->GetExactDist(loc) > range)
             continue;
 
-        if (bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) !=
+        if (!inCity && bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()) !=
             bot->GetZoneId())
             continue;
         

@@ -57,6 +57,7 @@ private:
     CollectorType hitOverflowType_;
     std::unique_ptr<StatsCollector> collector_;
     uint8 cls;
+    uint8 lvl;
     int tab;
     bool enable_overflow_penalty_;
     bool enable_item_set_bonus_;

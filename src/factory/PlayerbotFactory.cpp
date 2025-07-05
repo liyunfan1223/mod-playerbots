@@ -224,24 +224,22 @@ void PlayerbotFactory::Randomize(bool incremental)
     {
         bot->resetTalents(true);
     }
-    // bot->SaveToDB(false, false);
-    ClearSkills();
-    // bot->SaveToDB(false, false);
-    ClearSpells();
-    // bot->SaveToDB(false, false);
     if (!incremental)
     {
+        ClearSkills();
+        ClearSpells();
         ResetQuests();
+        if (!sPlayerbotAIConfig->equipmentPersistence || level < sPlayerbotAIConfig->equipmentPersistenceLevel)
+        {
+            ClearAllItems();
+        }
     }
-    if (!sPlayerbotAIConfig->equipmentPersistence || level < sPlayerbotAIConfig->equipmentPersistenceLevel)
-    {
-        ClearAllItems();
-    }
+    ClearInventory();
     bot->RemoveAllSpellCooldown();
     UnbindInstance();
 
     bot->GiveLevel(level);
-    bot->InitStatsForLevel();
+    bot->InitStatsForLevel(true);
     CancelAuras();
     // bot->SaveToDB(false, false);
     if (pmo)
@@ -280,7 +278,6 @@ void PlayerbotFactory::Randomize(bool incremental)
     LOG_DEBUG("playerbots", "Initializing skills (step 1)...");
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills1");
     InitSkills();
-    // InitTradeSkills();
     if (pmo)
         pmo->finish();
 
@@ -337,7 +334,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (!incremental || !sPlayerbotAIConfig->equipmentPersistence ||
         bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
-        InitEquipment(incremental, incremental ? false : sPlayerbotAIConfig->twoRoundsGearInit);
+        if (sPlayerbotAIConfig->incrementalGearInit || !incremental)
+            InitEquipment(incremental, incremental ? false : sPlayerbotAIConfig->twoRoundsGearInit);
     }
     // bot->SaveToDB(false, false);
     if (pmo)
@@ -1024,9 +1022,21 @@ void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_templa
         /// @todo: match current talent with template
         specTab = AiFactory::GetPlayerSpecTab(bot);
         /// @todo: fix cat druid hardcode
-        if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20 &&
-            !bot->HasAura(16931))
-            specTab = 3;
+        if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20)
+        {
+            bool isCat = !bot->HasAura(16931);
+            if (!isCat && bot->GetLevel() == 20)
+            {
+                uint32 bearP = sPlayerbotAIConfig->randomClassSpecProb[cls][1];
+                uint32 catP = sPlayerbotAIConfig->randomClassSpecProb[cls][3];
+                if (urand(1, bearP + catP) <= catP)
+                    isCat = true;
+            }
+            if (isCat)
+            {
+                specTab = 3;
+            }
+        }
     }
     else
     {
@@ -1599,9 +1609,51 @@ void Shuffle(std::vector<uint32>& items)
 
 void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 {
+    if (incremental && !sPlayerbotAIConfig->incrementalGearInit)
+        return;
+    
+    if (level < 5) {
+        // original items
+        if (CharStartOutfitEntry const* oEntry = GetCharStartOutfitEntry(bot->getRace(), bot->getClass(), bot->getGender()))
+        {
+            for (int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
+            {
+                if (oEntry->ItemId[j] <= 0)
+                    continue;
+
+                uint32 itemId = oEntry->ItemId[j];
+                
+                // skip hearthstone
+                if (itemId == 6948)
+                    continue;
+                
+                // just skip, reported in ObjectMgr::LoadItemTemplates
+                ItemTemplate const* iProto = sObjectMgr->GetItemTemplate(itemId);
+                if (!iProto)
+                    continue;
+
+                // BuyCount by default
+                uint32 count = iProto->BuyCount;
+
+                // special amount for food/drink
+                if (iProto->Class == ITEM_CLASS_CONSUMABLE && iProto->SubClass == ITEM_SUBCLASS_FOOD)
+                {
+                    continue;
+                }
+
+                if (bot->HasItemCount(itemId, count)) {
+                    continue;
+                }
+
+                bot->StoreNewItemInBestSlots(itemId, count);
+            }
+        }
+        return;
+    }
+    
     std::unordered_map<uint8, std::vector<uint32>> items;
     // int tab = AiFactory::GetPlayerSpecTab(bot);
-
+    
     uint32 blevel = bot->GetLevel();
     int32 delta = std::min(blevel, 10u);
 

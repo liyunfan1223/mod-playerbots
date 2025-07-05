@@ -80,13 +80,13 @@ uint8 AiFactory::GetPlayerSpecTab(Player* bot)
         switch (bot->getClass())
         {
             case CLASS_MAGE:
-                tab = 1;
+                tab = MAGE_TAB_FROST;
                 break;
             case CLASS_PALADIN:
-                tab = 2;
+                tab = PALADIN_TAB_RETRIBUTION;
                 break;
             case CLASS_PRIEST:
-                tab = 1;
+                tab = PRIEST_TAB_HOLY;
                 break;
         }
 

@@ -60,7 +60,7 @@ ArcaneMageStrategy::ArcaneMageStrategy(PlayerbotAI* botAI) : GenericMageStrategy
 NextAction** ArcaneMageStrategy::getDefaultActions()
 {
     return NextAction::array(0, new NextAction("arcane blast", ACTION_DEFAULT + 0.3f),
-                             // new NextAction("arcane barrage", ACTION_DEFAULT + 0.2f), // cast during movement
+                             new NextAction("frostbolt", ACTION_DEFAULT + 0.2f), // arcane immune target
                              new NextAction("fire blast", ACTION_DEFAULT + 0.1f), // cast during movement
                              new NextAction("shoot", ACTION_DEFAULT), nullptr);
 }

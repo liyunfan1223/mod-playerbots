@@ -187,7 +187,8 @@ void EquipAction::EquipItem(Item* item)
             // Priority 1: Replace main hand if the new weapon is strictly better
             // and if conditions allow (e.g. no conflicting 2H logic)
             bool betterThanMH = (newItemScore > mainHandScore);
-            bool mhConditionOK = ((invType != INVTYPE_2HWEAPON && !have2HWeaponEquipped) ||
+            // If a one-handed weapon is better, we can still use it instead of a two-handed weapon
+            bool mhConditionOK = (invType != INVTYPE_2HWEAPON ||
                       (isTwoHander && !canTitanGrip) ||
                       (canTitanGrip && isValidTGWeapon));
 

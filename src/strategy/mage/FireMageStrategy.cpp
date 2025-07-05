@@ -10,7 +10,8 @@
 
 NextAction** FireMageStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("fireball", ACTION_DEFAULT + 0.2f),
+    return NextAction::array(0, new NextAction("fireball", ACTION_DEFAULT + 0.3f),
+                             new NextAction("frostbolt", ACTION_DEFAULT + 0.2f), // fire immune target
                              new NextAction("fire blast", ACTION_DEFAULT + 0.1f), // cast during movement
                              new NextAction("shoot", ACTION_DEFAULT), NULL);
 }

@@ -1699,7 +1699,8 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "position_y, "
         "position_z, "
         "orientation, "
-        "t.faction "
+        "t.faction, "
+        "t.entry "
         "FROM "
         "creature c "
         "INNER JOIN creature_template t on c.id1 = t.entry "
@@ -1721,6 +1722,11 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                 float z = fields[3].Get<float>();
                 float orient = fields[4].Get<float>();
                 uint32 faction = fields[5].Get<uint32>();
+                uint32 tEntry =  fields[6].Get<uint32>();
+
+                if (tEntry == 3838 || tEntry == 29480)
+                    continue;
+
                 const FactionTemplateEntry* entry = sFactionTemplateStore.LookupEntry(faction);
 
                 WorldLocation loc(mapId, x + cos(orient) * 5.0f, y + sin(orient) * 5.0f, z + 0.5f, orient + M_PI);
@@ -1788,13 +1794,8 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "AND t.npcflag != 135298 "
         "AND t.minlevel != 55 "
         "AND t.minlevel != 65 "
-        "AND t.faction != 35 "
-        "AND t.faction != 474 "
-        "AND t.faction != 69 "
-        "AND t.entry != 30606 "
-        "AND t.entry != 30608 "
-        "AND t.entry != 29282 "
-        "AND t.faction != 69 "
+        "AND t.faction not in (35, 474, 69, 57) "
+        "AND t.entry not in (30606, 30608, 29282) "
         "AND map IN ({}) "
         "ORDER BY "
         "t.minlevel;",
@@ -2757,14 +2758,19 @@ void RandomPlayerbotMgr::PrintStats()
 
     std::map<uint8, uint32> perRace;
     std::map<uint8, uint32> perClass;
+
+    std::map<uint8, uint32> lvlPerRace;
+    std::map<uint8, uint32> lvlPerClass;
     for (uint8 race = RACE_HUMAN; race < MAX_RACES; ++race)
     {
         perRace[race] = 0;
+        lvlPerRace[race] = 0;
     }
 
     for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES; ++cls)
     {
         perClass[cls] = 0;
+        lvlPerClass[cls] = 0;
     }
 
     uint32 dps = 0;
@@ -2801,6 +2807,9 @@ void RandomPlayerbotMgr::PrintStats()
 
         ++perRace[bot->getRace()];
         ++perClass[bot->getClass()];
+
+        lvlPerClass[bot->getClass()] += bot->GetLevel();
+        lvlPerRace[bot->getRace()] += bot->GetLevel();
 
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI->AllowActivity())
@@ -2894,15 +2903,21 @@ void RandomPlayerbotMgr::PrintStats()
     LOG_INFO("playerbots", "Bots race:");
     for (uint8 race = RACE_HUMAN; race < MAX_RACES; ++race)
     {
-        if (perRace[race])
-            LOG_INFO("playerbots", "    {}: {}", ChatHelper::FormatRace(race).c_str(), perRace[race]);
+        if (perRace[race]) {
+            uint32 lvl = lvlPerRace[race] * 10 / perRace[race];
+            float flvl = lvl / 10.0f;
+            LOG_INFO("playerbots", "    {}: {}, avg lvl: {}", ChatHelper::FormatRace(race).c_str(), perRace[race], flvl);
+        }
     }
 
     LOG_INFO("playerbots", "Bots class:");
     for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES; ++cls)
     {
-        if (perClass[cls])
-            LOG_INFO("playerbots", "    {}: {}", ChatHelper::FormatClass(cls).c_str(), perClass[cls]);
+        if (perClass[cls]) {
+            uint32 lvl = lvlPerClass[cls] * 10 / perClass[cls];
+            float flvl = lvl / 10.0f;
+            LOG_INFO("playerbots", "    {}: {}, avg lvl: {}", ChatHelper::FormatClass(cls).c_str(), perClass[cls], flvl);
+        }
     }
 
     LOG_INFO("playerbots", "Bots role:");
