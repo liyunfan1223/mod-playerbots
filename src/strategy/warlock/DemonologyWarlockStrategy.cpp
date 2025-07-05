@@ -30,7 +30,6 @@ public:
         creators["seed of corruption"] = &seed_of_corruption;
         creators["rain of fire"] = &rain_of_fire;
         creators["demon charge"] = &demon_charge;
-        creators["shadow cleave"] = &shadow_cleave;
     }
 
 private:
@@ -52,7 +51,6 @@ private:
     static ActionNode* seed_of_corruption(PlayerbotAI*) { return new ActionNode("seed of corruption", nullptr, nullptr, nullptr); }
     static ActionNode* rain_of_fire(PlayerbotAI*) { return new ActionNode("rain of fire", nullptr, nullptr, nullptr); }
     static ActionNode* demon_charge(PlayerbotAI*) { return new ActionNode("demon charge", nullptr, nullptr, nullptr); }
-    static ActionNode* shadow_cleave(PlayerbotAI*) { return new ActionNode("shadow cleave", nullptr, nullptr, nullptr); }
 };
 
 // ===== Single Target Strategy =====
@@ -97,6 +95,8 @@ void DemonologyWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
     // Life Tap glyph buff, and Life Tap as filler
     triggers.push_back(new TriggerNode("life tap glyph buff", NextAction::array(0, new NextAction("life tap", 29.0f), nullptr)));
     triggers.push_back(new TriggerNode("life tap", NextAction::array(0, new NextAction("life tap", 5.1f), nullptr)));
+
+    triggers.push_back(new TriggerNode("meta melee flee check", NextAction::array(0, new NextAction("flee", 39.0f), nullptr)));
 }
 
 // ===== AoE Strategy, 3+ enemies =====
@@ -122,6 +122,5 @@ void MetaMeleeAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("immolation aura active", NextAction::array(0,
                        new NextAction("reach melee", 25.5f),
-                       new NextAction("demon charge", 25.0f),
-                       new NextAction("shadow cleave", 24.5f), nullptr)));
+                       new NextAction("demon charge", 25.0f), nullptr)));
 }

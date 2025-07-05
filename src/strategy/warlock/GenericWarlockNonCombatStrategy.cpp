@@ -89,20 +89,18 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
     Player* bot = botAI->GetBot();
     int tab = AiFactory::GetPlayerSpecTab(bot);
 
+    // Firestone/Spellstone triggers
     if (tab == 2)  // Destruction uses Firestone
     {
-        triggers.push_back(
-            new TriggerNode("no firestone", NextAction::array(0, new NextAction("create firestone", 24.0f), nullptr)));
-        triggers.push_back(
-            new TriggerNode("firestone", NextAction::array(0, new NextAction("firestone", 24.0f), nullptr)));
+        triggers.push_back(new TriggerNode("no firestone", NextAction::array(0, new NextAction("create firestone", 24.0f), nullptr)));
+        triggers.push_back(new TriggerNode("firestone", NextAction::array(0, new NextAction("firestone", 24.0f), nullptr)));
     }
     else  // Affliction and Demonology use Spellstone
     {
-        triggers.push_back(new TriggerNode("no spellstone",
-                                           NextAction::array(0, new NextAction("create spellstone", 24.0f), nullptr)));
-        triggers.push_back(
-            new TriggerNode("spellstone", NextAction::array(0, new NextAction("spellstone", 24.0f), nullptr)));
+        triggers.push_back(new TriggerNode("no spellstone", NextAction::array(0, new NextAction("create spellstone", 24.0f), nullptr)));
+        triggers.push_back(new TriggerNode("spellstone", NextAction::array(0, new NextAction("spellstone", 24.0f), nullptr)));
     }
+
 }
 
 // Non-combat strategy for summoning a Imp
@@ -124,8 +122,7 @@ SummonVoidwalkerStrategy::SummonVoidwalkerStrategy(PlayerbotAI* ai) : NonCombatS
 
 void SummonVoidwalkerStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(
-        new TriggerNode("no pet", NextAction::array(0, new NextAction("summon voidwalker", 29.0f), NULL)));
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon voidwalker", 29.0f), NULL)));
 }
 
 // Non-combat strategy for summoning a Succubus
@@ -147,8 +144,7 @@ SummonFelhunterStrategy::SummonFelhunterStrategy(PlayerbotAI* ai) : NonCombatStr
 
 void SummonFelhunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(
-        new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felhunter", 29.0f), NULL)));
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felhunter", 29.0f), NULL)));
 }
 
 // Non-combat strategy for summoning a Felguard
