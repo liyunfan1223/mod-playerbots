@@ -656,6 +656,10 @@ AiPlayerbot.RandomGearQualityLimit = 3
 # Default: 0 (no limit)
 AiPlayerbot.RandomGearScoreLimit = 0
 
+# If disabled, random bots can only upgrade equipment through looting and quests
+# Default: 1 (enabled)
+AiPlayerbot.IncrementalGearInit = 1
+
 # Set minimum level of bots that will enchant their equipment (Maxlevel + 1 to disable)
 # Default: 60
 AiPlayerbot.MinEnchantingBotLevel = 60
