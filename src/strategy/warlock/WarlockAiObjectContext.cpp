@@ -8,7 +8,6 @@
 #include "DemonologyWarlockStrategy.h"
 #include "DestructionWarlockStrategy.h"
 #include "TankWarlockStrategy.h"
-#include "DpsWarlockStrategy.h"
 #include "GenericTriggers.h"
 #include "GenericWarlockNonCombatStrategy.h"
 #include "NamedObjectContext.h"
@@ -29,16 +28,16 @@ public:
         creators["boost"] = &WarlockStrategyFactoryInternal::boost;
         creators["cc"] = &WarlockStrategyFactoryInternal::cc;
         creators["pet"] = &WarlockStrategyFactoryInternal::pet;
-        creators["affli"] = &WarlockStrategyFactoryInternal::affliction;
         creators["affli aoe"] = &WarlockStrategyFactoryInternal::affliction_aoe;
-        creators["demo"] = &WarlockStrategyFactoryInternal::demonology;
         creators["demo aoe"] = &WarlockStrategyFactoryInternal::demonology_aoe;
-        creators["destro"] = &WarlockStrategyFactoryInternal::destruction;
         creators["destro aoe"] = &WarlockStrategyFactoryInternal::destruction_aoe;
         creators["meta melee"] = &WarlockStrategyFactoryInternal::meta_melee_aoe;
-        creators["dps"] = &WarlockStrategyFactoryInternal::dps;
-        creators["aoe"] = &WarlockStrategyFactoryInternal::aoe;
         creators["curse of elements"] = &WarlockStrategyFactoryInternal::curse_of_elements;
+        creators["imp"] = &WarlockStrategyFactoryInternal::imp;
+        creators["voidwalker"] = &WarlockStrategyFactoryInternal::voidwalker;
+        creators["succubus"] = &WarlockStrategyFactoryInternal::succubus;
+        creators["felhunter"] = &WarlockStrategyFactoryInternal::felhunter;
+        creators["felguard"] = &WarlockStrategyFactoryInternal::felguard;
     }
 
 private:
@@ -47,16 +46,16 @@ private:
     static Strategy* pull(PlayerbotAI* botAI) { return new PullStrategy(botAI, "shoot"); }
     static Strategy* boost(PlayerbotAI* botAI) { return new WarlockBoostStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new WarlockCcStrategy(botAI); }
-    static Strategy* affliction(PlayerbotAI* botAI) { return new AfflictionWarlockStrategy(botAI); }
     static Strategy* affliction_aoe(PlayerbotAI* botAI) { return new AfflictionWarlockAoeStrategy(botAI); }
-    static Strategy* demonology(PlayerbotAI* botAI) { return new DemonologyWarlockStrategy(botAI); }
     static Strategy* demonology_aoe(PlayerbotAI* botAI) { return new DemonologyWarlockAoeStrategy(botAI); }
-    static Strategy* destruction(PlayerbotAI* botAI) { return new DestructionWarlockStrategy(botAI); }
     static Strategy* destruction_aoe(PlayerbotAI* botAI) { return new DestructionWarlockAoeStrategy(botAI); }
     static Strategy* meta_melee_aoe(PlayerbotAI* botAI) { return new MetaMeleeAoeStrategy(botAI); }
-    static Strategy* dps(PlayerbotAI* botAI) { return new DpsWarlockStrategy(botAI); }
-    static Strategy* aoe(PlayerbotAI* botAI) { return new DpsAoeWarlockStrategy(botAI); }
     static Strategy* curse_of_elements(PlayerbotAI* botAI) { return new WarlockCurseOfTheElementsStrategy(botAI); }
+    static Strategy* imp(PlayerbotAI* ai) { return new SummonImpStrategy(ai); }
+    static Strategy* voidwalker(PlayerbotAI* ai) { return new SummonVoidwalkerStrategy(ai); }
+    static Strategy* succubus(PlayerbotAI* ai) { return new SummonSuccubusStrategy(ai); }
+    static Strategy* felhunter(PlayerbotAI* ai) { return new SummonFelhunterStrategy(ai); }
+    static Strategy* felguard(PlayerbotAI* ai) { return new SummonFelguardStrategy(ai); }
 };
 
 class WarlockCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -65,10 +64,16 @@ public:
     WarlockCombatStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
     {
         creators["tank"] = &WarlockCombatStrategyFactoryInternal::tank;
+        creators["affli"] = &WarlockCombatStrategyFactoryInternal::affliction;
+        creators["demo"] = &WarlockCombatStrategyFactoryInternal::demonology;
+        creators["destro"] = &WarlockCombatStrategyFactoryInternal::destruction;
     }
 
 private:
     static Strategy* tank(PlayerbotAI* botAI) { return new TankWarlockStrategy(botAI); }
+    static Strategy* affliction(PlayerbotAI* botAI) { return new AfflictionWarlockStrategy(botAI); }
+    static Strategy* demonology(PlayerbotAI* botAI) { return new DemonologyWarlockStrategy(botAI); }
+    static Strategy* destruction(PlayerbotAI* botAI) { return new DestructionWarlockStrategy(botAI); }
 };
 
 class NonCombatBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -76,11 +81,6 @@ class NonCombatBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
 public:
     NonCombatBuffStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
     {
-        creators["imp"] = &NonCombatBuffStrategyFactoryInternal::imp;
-        creators["voidwalker"] = &NonCombatBuffStrategyFactoryInternal::voidwalker;
-        creators["succubus"] = &NonCombatBuffStrategyFactoryInternal::succubus;
-        creators["felhunter"] = &NonCombatBuffStrategyFactoryInternal::felhunter;
-        creators["felguard"] = &NonCombatBuffStrategyFactoryInternal::felguard;
         creators["ss self"] = &NonCombatBuffStrategyFactoryInternal::soulstone_self;
         creators["ss master"] = &NonCombatBuffStrategyFactoryInternal::soulstone_master;
         creators["ss tank"] = &NonCombatBuffStrategyFactoryInternal::soulstone_tank;
@@ -88,11 +88,6 @@ public:
     }
 
 private:
-    static Strategy* imp(PlayerbotAI* ai) { return new SummonImpStrategy(ai); }
-    static Strategy* voidwalker(PlayerbotAI* ai) { return new SummonVoidwalkerStrategy(ai); }
-    static Strategy* succubus(PlayerbotAI* ai) { return new SummonSuccubusStrategy(ai); }
-    static Strategy* felhunter(PlayerbotAI* ai) { return new SummonFelhunterStrategy(ai); }
-    static Strategy* felguard(PlayerbotAI* ai) { return new SummonFelguardStrategy(ai); }
     static Strategy* soulstone_self(PlayerbotAI* ai) { return new SoulstoneSelfStrategy(ai); }
     static Strategy* soulstone_master(PlayerbotAI* ai) { return new SoulstoneMasterStrategy(ai); }
     static Strategy* soulstone_tank(PlayerbotAI* ai) { return new SoulstoneTankStrategy(ai); }
@@ -137,6 +132,8 @@ public:
         creators["metamorphosis"] = &WarlockTriggerFactoryInternal::metamorphosis;
         creators["demonic empowerment"] = &WarlockTriggerFactoryInternal::demonic_empowerment;
         creators["immolation aura active"] = &WarlockTriggerFactoryInternal::immolation_aura_active;
+        creators["metamorphosis not active"] = &WarlockTriggerFactoryInternal::metamorphosis_not_active;
+        creators["meta melee flee check"] = &WarlockTriggerFactoryInternal::meta_melee_flee_check;
     }
 
 private:
@@ -173,6 +170,8 @@ private:
     static Trigger* metamorphosis(PlayerbotAI* ai) { return new MetamorphosisTrigger(ai); }
     static Trigger* demonic_empowerment(PlayerbotAI* ai) { return new DemonicEmpowermentTrigger(ai); }
     static Trigger* immolation_aura_active(PlayerbotAI* ai) { return new ImmolationAuraActiveTrigger(ai); }
+    static Trigger* metamorphosis_not_active(PlayerbotAI* ai) { return new MetamorphosisNotActiveTrigger(ai); }
+    static Trigger* meta_melee_flee_check(PlayerbotAI* ai) { return new MetaMeleeEnemyTooCloseForSpellTrigger(ai); }
 };
 
 class WarlockAiObjectContextInternal : public NamedObjectContext<Action>
