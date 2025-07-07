@@ -63,7 +63,7 @@ public:
     }
 
     bool Execute(Event event) override;
-    bool isUseful() { return bot->GetGuildId() && InviteNearbyToGroupAction::isUseful(); };
+    bool isUseful() override { return bot->GetGuildId() && InviteNearbyToGroupAction::isUseful(); };
 
 private:
     std::vector<Player*> getGuildMembers();
