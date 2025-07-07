@@ -29,6 +29,7 @@
 #include "ScriptMgr.h"
 #include "cs_playerbots.h"
 #include "cmath"
+#include "BattleGroundTactics.h"
 
 class PlayerbotsDatabaseScript : public DatabaseScript
 {
@@ -389,6 +390,43 @@ public:
     }
 };
 
+class PlayerBotsBGScript : public BGScript
+{
+public:
+    PlayerBotsBGScript() : BGScript("PlayerBotsBGScript") {}
+
+    void OnBattlegroundStart(Battleground* bg) override
+    {
+        BGStrategyData data;
+
+        switch (bg->GetBgTypeID())
+        {
+            case BATTLEGROUND_WS:
+                data.allianceStrategy = urand(0, WS_STRATEGY_MAX - 1);
+                data.hordeStrategy = urand(0, WS_STRATEGY_MAX - 1);
+                break;
+            case BATTLEGROUND_AB:
+                data.allianceStrategy = urand(0, AB_STRATEGY_MAX - 1);
+                data.hordeStrategy = urand(0, AB_STRATEGY_MAX - 1);
+                break;
+            case BATTLEGROUND_AV:
+                data.allianceStrategy = urand(0, AV_STRATEGY_MAX - 1);
+                data.hordeStrategy = urand(0, AV_STRATEGY_MAX - 1);
+                break;
+            case BATTLEGROUND_EY:
+                data.allianceStrategy = urand(0, EY_STRATEGY_MAX - 1);
+                data.hordeStrategy = urand(0, EY_STRATEGY_MAX - 1);
+                break;
+            default:
+                break;
+        }
+
+        bgStrategies[bg->GetInstanceID()] = data;
+    }
+
+    void OnBattlegroundEnd(Battleground* bg, TeamId /*winnerTeam*/) override { bgStrategies.erase(bg->GetInstanceID()); }
+};
+
 void AddPlayerbotsScripts()
 {
     new PlayerbotsDatabaseScript();
@@ -397,6 +435,7 @@ void AddPlayerbotsScripts()
     new PlayerbotsServerScript();
     new PlayerbotsWorldScript();
     new PlayerbotsScript();
+    new PlayerBotsBGScript();
 
     AddSC_playerbots_commandscript();
 }
