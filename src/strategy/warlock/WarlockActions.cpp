@@ -127,7 +127,7 @@ bool CreateSoulShardAction::Execute(Event event)
     if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, soulShardId, count) == EQUIP_ERR_OK)
     {
         bot->StoreNewItem(dest, soulShardId, true, Item::GenerateItemRandomPropertyId(soulShardId));
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        SQLTransaction<CharacterDatabaseConnection> trans = CharacterDatabase.BeginTransaction();
         bot->SaveInventoryAndGoldToDB(trans);
         CharacterDatabase.CommitTransaction(trans);
         return true;
