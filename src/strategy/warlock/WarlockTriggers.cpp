@@ -107,3 +107,29 @@ bool CurseOfTheElementsTrigger::IsActive()
     // Use default BuffTrigger logic for the rest (only trigger if debuff is missing or expiring)
     return BuffTrigger::IsActive();
 }
+
+// Checks if the target has a conflicting debuff that is equal to Curse of Weakness
+bool CurseOfWeaknessTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    if (!target || !target->IsAlive() || !target->IsInWorld())
+        return false;
+    // List of all spell IDs for Curse of Weakness, Demoralizing Roar, Demoralizing Shout, and Vindication
+    static const uint32 CurseOfWeaknessExclusiveDebuffs[] = {// Curse of Weakness
+                                                             702, 1108, 6205, 7646, 11707, 11708, 27224, 30909, 50511,
+                                                             // Demoralizing Roar
+                                                             99, 1735, 9490, 9747, 9898, 26998, 48559, 48560,
+                                                             // Demoralizing Shout
+                                                             1160, 6190, 11554, 11555, 11556, 25202, 25203, 47437,
+                                                             // Vindication
+                                                             67, 26017};
+
+    // Check if target has any of the exclusive debuffs
+    for (uint32 spellId : CurseOfWeaknessExclusiveDebuffs)
+    {
+        if (target->HasAura(spellId))
+            return false;
+    }
+    // Use default BuffTrigger logic for the rest (only trigger if debuff is missing or expiring)
+    return BuffTrigger::IsActive();
+}

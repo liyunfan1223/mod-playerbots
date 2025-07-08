@@ -40,6 +40,13 @@ public:
     std::string const GetTargetName() override { return "pet target"; }
 };
 
+class CreateSoulShardAction : public Action
+{
+public:
+    CreateSoulShardAction(PlayerbotAI* botAI) : Action(botAI, "create soul shard") {}
+    bool Execute(Event event) override;
+};
+
 class CastCreateHealthstoneAction : public CastBuffSpellAction
 {
 public:
@@ -190,23 +197,6 @@ public:
     bool isUseful() override;
 };
 
-class CastCurseOfWeaknessAction : public CastDebuffSpellAction
-{
-public:
-    CastCurseOfWeaknessAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "curse of weakness") {}
-};
-
-class CastCurseOfTheElementsAction : public CastDebuffSpellAction
-{
-public:
-    CastCurseOfTheElementsAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "curse of the elements", true) {}
-    bool isUseful() override
-    {
-        // Bypass TTL check
-        return CastAuraSpellAction::isUseful();
-    }
-};
-
 class DemonChargeAction : public CastSpellAction
 {
 public:
@@ -228,38 +218,7 @@ public:
     std::string const GetTargetName() override { return "pet target"; }
 };
 
-// DoT Spells
-
-class CastCurseOfAgonyAction : public CastDebuffSpellAction
-{
-public:
-    CastCurseOfAgonyAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "curse of agony", true) {}
-    bool isUseful() override
-    {
-        if (botAI->HasStrategy(
-                "curse of elements", BOT_STATE_COMBAT))  // If Curse of the Elements strategy is active, do not cast Curse of Agony
-            return false;
-        // Bypass TTL check
-        return CastAuraSpellAction::isUseful();
-    }
-};
-
-class CastCurseOfAgonyOnAttackerAction : public CastDebuffSpellOnAttackerAction
-{
-public:
-    CastCurseOfAgonyOnAttackerAction(PlayerbotAI* botAI)
-        : CastDebuffSpellOnAttackerAction(botAI, "curse of agony", true)
-    {
-    }
-    bool isUseful() override
-    {
-        if (botAI->HasStrategy(
-                "curse of elements", BOT_STATE_COMBAT))  // If Curse of the Elements strategy is active, do not cast Curse of Agony
-            return false;
-        // Bypass TTL check
-        return CastAuraSpellAction::isUseful();
-    }
-};
+// DoT/Curse Spells
 
 class CastCorruptionAction : public CastDebuffSpellAction
 {
@@ -323,6 +282,86 @@ public:
         : CastDebuffSpellOnAttackerAction(ai, "unstable affliction", true)
     {
     }
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
+};
+
+class CastCurseOfAgonyAction : public CastDebuffSpellAction
+{
+public:
+    CastCurseOfAgonyAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "curse of agony", true) {}
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
+};
+
+class CastCurseOfAgonyOnAttackerAction : public CastDebuffSpellOnAttackerAction
+{
+public:
+    CastCurseOfAgonyOnAttackerAction(PlayerbotAI* botAI)
+        : CastDebuffSpellOnAttackerAction(botAI, "curse of agony", true)
+    {
+    }
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
+};
+
+class CastCurseOfTheElementsAction : public CastDebuffSpellAction
+{
+public:
+    CastCurseOfTheElementsAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "curse of the elements", true) {}
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
+};
+
+class CastCurseOfDoomAction : public CastDebuffSpellAction
+{
+public:
+    CastCurseOfDoomAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "curse of doom", true, 0) {}
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
+};
+
+class CastCurseOfExhaustionAction : public CastDebuffSpellAction
+{
+public:
+    CastCurseOfExhaustionAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "curse of exhaustion") {}
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
+};
+
+class CastCurseOfTonguesAction : public CastDebuffSpellAction
+{
+public:
+    CastCurseOfTonguesAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "curse of tongues") {}
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
+};
+
+class CastCurseOfWeaknessAction : public CastDebuffSpellAction
+{
+public:
+    CastCurseOfWeaknessAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "curse of weakness") {}
     bool isUseful() override
     {
         // Bypass TTL check
