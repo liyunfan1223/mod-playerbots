@@ -113,6 +113,28 @@ bool CastSoulshatterAction::isUseful()
     return true;
 }
 
+// Checks if the bot has enough bag space to create a soul shard, then does so
+bool CreateSoulShardAction::Execute(Event event)
+{
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+
+    // Soul Shard item ID is 6265
+    uint32 soulShardId = 6265;
+    ItemPosCountVec dest;
+    uint32 count = 1;
+    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, soulShardId, count) == EQUIP_ERR_OK)
+    {
+        bot->StoreNewItem(dest, soulShardId, true, Item::GenerateItemRandomPropertyId(soulShardId));
+        SQLTransaction<CharacterDatabaseConnection> trans = CharacterDatabase.BeginTransaction();
+        bot->SaveInventoryAndGoldToDB(trans);
+        CharacterDatabase.CommitTransaction(trans);
+        return true;
+    }
+    return false;
+}
+
 // Checks if the target has a soulstone aura
 static bool HasSoulstoneAura(Unit* unit)
 {

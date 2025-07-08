@@ -48,12 +48,57 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
+class WarlockCurseOfAgonyStrategy : public Strategy
+{
+public:
+    WarlockCurseOfAgonyStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+
+    std::string const getName() override { return "curse of agony"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
 class WarlockCurseOfTheElementsStrategy : public Strategy
 {
 public:
     WarlockCurseOfTheElementsStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
     std::string const getName() override { return "curse of elements"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class WarlockCurseOfDoomStrategy : public Strategy
+{
+public:
+    WarlockCurseOfDoomStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+
+    std::string const getName() override { return "curse of doom"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class WarlockCurseOfExhaustionStrategy : public Strategy
+{
+public:
+    WarlockCurseOfExhaustionStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+
+    std::string const getName() override { return "curse of exhaustion"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class WarlockCurseOfTonguesStrategy : public Strategy
+{
+public:
+    WarlockCurseOfTonguesStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+
+    std::string const getName() override { return "curse of tongues"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class WarlockCurseOfWeaknessStrategy : public Strategy
+{
+public:
+    WarlockCurseOfWeaknessStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+
+    std::string const getName() override { return "curse of weakness"; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 

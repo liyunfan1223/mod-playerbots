@@ -22,7 +22,7 @@ public:
 
     // Pet skills are setup in pass-through fashion, so if one fails, it attempts to cast the next one
     // The order goes Felguard -> Felhunter -> Succubus -> Voidwalker -> Imp
-    // Pets are summoned based on the non-combat strategy you have active, the warlock's level, and if they have a soulstone available
+    // Pets are summoned based on the non-combat strategy you have active, the warlock's level, and if they have a soul shard available
 
 private:
     static ActionNode* fel_armor([[maybe_unused]] PlayerbotAI* botAI)
@@ -80,27 +80,12 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
     NonCombatStrategy::InitTriggers(triggers);
     triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("fel domination", 30.0f), nullptr)));
+    triggers.push_back(new TriggerNode("no soul shard", NextAction::array(0, new NextAction("create soul shard", 29.5f), nullptr)));
     triggers.push_back(new TriggerNode("soul link", NextAction::array(0, new NextAction("soul link", 28.0f), nullptr)));
     triggers.push_back(new TriggerNode("demon armor", NextAction::array(0, new NextAction("fel armor", 27.0f), nullptr)));
     triggers.push_back(new TriggerNode("no healthstone", NextAction::array(0, new NextAction("create healthstone", 26.0f), nullptr)));
     triggers.push_back(new TriggerNode("no soulstone", NextAction::array(0, new NextAction("create soulstone", 25.0f), nullptr)));
     triggers.push_back(new TriggerNode("life tap", NextAction::array(0, new NextAction("life tap", 23.0f), nullptr)));
-
-    Player* bot = botAI->GetBot();
-    int tab = AiFactory::GetPlayerSpecTab(bot);
-
-    // Firestone/Spellstone triggers
-    if (tab == 2)  // Destruction uses Firestone
-    {
-        triggers.push_back(new TriggerNode("no firestone", NextAction::array(0, new NextAction("create firestone", 24.0f), nullptr)));
-        triggers.push_back(new TriggerNode("firestone", NextAction::array(0, new NextAction("firestone", 24.0f), nullptr)));
-    }
-    else  // Affliction and Demonology use Spellstone
-    {
-        triggers.push_back(new TriggerNode("no spellstone", NextAction::array(0, new NextAction("create spellstone", 24.0f), nullptr)));
-        triggers.push_back(new TriggerNode("spellstone", NextAction::array(0, new NextAction("spellstone", 24.0f), nullptr)));
-    }
-
 }
 
 // Non-combat strategy for summoning a Imp
@@ -177,8 +162,7 @@ SoulstoneMasterStrategy::SoulstoneMasterStrategy(PlayerbotAI* ai) : NonCombatStr
 
 void SoulstoneMasterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(
-        new TriggerNode("soulstone", NextAction::array(0, new NextAction("soulstone master", 24.0f), NULL)));
+    triggers.push_back(new TriggerNode("soulstone", NextAction::array(0, new NextAction("soulstone master", 24.0f), NULL)));
 }
 
 // Non-combat strategy for selecting tanks to receive soulstone
@@ -189,8 +173,7 @@ SoulstoneTankStrategy::SoulstoneTankStrategy(PlayerbotAI* ai) : NonCombatStrateg
 
 void SoulstoneTankStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(
-        new TriggerNode("soulstone", NextAction::array(0, new NextAction("soulstone tank", 24.0f), NULL)));
+    triggers.push_back(new TriggerNode("soulstone", NextAction::array(0, new NextAction("soulstone tank", 24.0f), NULL)));
 }
 
 // Non-combat strategy for selecting healers to receive soulstone
@@ -201,6 +184,29 @@ SoulstoneHealerStrategy::SoulstoneHealerStrategy(PlayerbotAI* ai) : NonCombatStr
 
 void SoulstoneHealerStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(
-        new TriggerNode("soulstone", NextAction::array(0, new NextAction("soulstone healer", 24.0f), NULL)));
+    triggers.push_back(new TriggerNode("soulstone", NextAction::array(0, new NextAction("soulstone healer", 24.0f), NULL)));
+}
+
+// Non-combat strategy for using Spellstone
+// Enabled by default for Affliction and Demonology specs
+// To enable, type "nc +spellstone"
+// To disable, type "nc -spellstone"
+UseSpellstoneStrategy::UseSpellstoneStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
+
+void UseSpellstoneStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("no spellstone", NextAction::array(0, new NextAction("create spellstone", 24.0f), nullptr)));
+    triggers.push_back(new TriggerNode("spellstone", NextAction::array(0, new NextAction("spellstone", 24.0f), nullptr)));
+}
+
+// Non-combat strategy for using Firestone
+// Enabled by default for the Destruction spec
+// To enable, type "nc +firestone"
+// To disable, type "nc -firestone"
+UseFirestoneStrategy::UseFirestoneStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
+
+void UseFirestoneStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("no firestone", NextAction::array(0, new NextAction("create firestone", 24.0f), nullptr)));
+    triggers.push_back(new TriggerNode("firestone", NextAction::array(0, new NextAction("firestone", 24.0f), nullptr)));
 }
