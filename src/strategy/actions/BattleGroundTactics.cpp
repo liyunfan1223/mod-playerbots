@@ -2398,8 +2398,8 @@ bool BGTactics::selectObjective(bool reset)
                 {
                     uint8 state = ab->GetCapturePointInfo(nodeId)._state;
 
-                    bool isContested = (team == TEAM_ALLIANCE && state == BG_AB_NODE_STATE_ALLY_CONTESTED) ||
-                                       (team == TEAM_HORDE && state == BG_AB_NODE_STATE_HORDE_CONTESTED);
+                    bool isContested = (team == TEAM_ALLIANCE && state == BG_AB_NODE_STATE_HORDE_CONTESTED) ||
+                                       (team == TEAM_HORDE && state == BG_AB_NODE_STATE_ALLY_CONTESTED);
                     bool isOwned = (team == TEAM_ALLIANCE && state == BG_AB_NODE_STATE_ALLY_OCCUPIED) ||
                                    (team == TEAM_HORDE && state == BG_AB_NODE_STATE_HORDE_OCCUPIED);
 
