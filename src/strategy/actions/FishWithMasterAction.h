@@ -6,7 +6,7 @@
 #ifndef _PLAYERBOT_FISHWITHMASTERACTION_H
 #define _PLAYERBOT_FISHWITHMASTERACTION_H
 
-#include "Action.h"
+#include "FishingAction.h"
 
 class PlayerbotAI;
 

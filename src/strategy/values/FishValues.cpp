@@ -1,0 +1,84 @@
+/*
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
+ * and/or modify it under version 2 of the License, or (at your option), any later version.
+ */
+
+#include "FishValues.h"
+#include "PlayerbotAI.h"
+#include "RandomPlayerbotMgr.h"
+#include "Map.h"
+
+bool CanFishValue::Calculate()
+{
+    int SkillFishing = bot->GetSkillValue(SKILL_FISHING);
+  
+    int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
+    if (!zone_skill)
+        zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetZoneId());
+    if (SkillFishing < zone_skill)
+		return false;
+
+	auto isFishingPole = [](Item* item) -> bool
+    {
+        if (!item)
+            return false;
+        ItemTemplate const* proto = item->GetTemplate();
+        return proto && proto->Class == ITEM_CLASS_WEAPON && proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE;
+    };
+    Item* pole = nullptr;
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END && !pole; ++slot)
+    {
+        pole = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (!isFishingPole(pole))
+            pole = nullptr;
+    }
+    if (!pole)
+    {
+        for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END && !pole; ++slot)
+        {
+            Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            if (isFishingPole(item))
+                pole = item;
+        }
+        for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END && !pole; ++bag)
+        {
+            Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
+            if (!pBag)
+                continue;
+            for (uint32 j = 0; j < pBag->GetBagSize() && !pole; ++j)
+            {
+                Item* item = pBag->GetItemByPos(j);
+                if (isFishingPole(item))
+                    pole = item;
+            }
+        }
+    }
+
+    if (!pole)
+    {
+        if (sRandomPlayerbotMgr->IsRandomBot(bot))
+        {
+            bot->StoreNewItemInBestSlots(6256, 1); // Try to get a fishing pole
+            return true;
+        }
+        else
+        {
+            botAI->TellError("I don't have a fishing pole");
+            return false;
+        }
+    }
+	return true;
+}
+
+bool CanOpenBobberValue::Calculate()
+{
+
+   /* Player* bot = AI_VALUE(Player*, "self target");
+    for (auto obj : bot->GetGameObjectList())
+    {
+        if (obj->GetGoType() == GAMEOBJECT_TYPE_FISHING_BOBBER && obj->GetOwnerGUID() == bot->GetGUID())
+            return true;
+    }
+    return false;
+    */
+}
