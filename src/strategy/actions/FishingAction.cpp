@@ -21,10 +21,10 @@ WorldPosition FishingAction::FindWater(Player* bot, float distance)
     {
         for (float checkY = y - distance; checkY <= y + distance; checkY += 5.0f)
         {
-            if (mapId, checkX, checkY, z, DEFAULT_COLLISION_HEIGHT)
+            if (bot->GetMap()->IsInWater(mapId, checkX, checkY, z, DEFAULT_COLLISION_HEIGHT))
                 {
-                WorldPosition FishSpot = WorldPosition(checkX, checkY, z);   
-                return FishSpot;
+                return WorldPosition(checkX, checkY, z);   
+                
                 }
         }
     }
@@ -55,13 +55,6 @@ bool FishingAction::Execute(Event event)
         bot->SetFacingTo(FindWater(bot, 100.0f));
     }
 
-    Item* pole = nullptr;
-    if (pole->GetSlot() != EQUIPMENT_SLOT_MAINHAND)
-    {
-        WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
-        eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
-        bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
-    }
 
     return botAI->CastSpell(FISHING_SPELL, bot);
 };

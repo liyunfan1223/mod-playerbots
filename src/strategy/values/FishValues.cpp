@@ -10,13 +10,25 @@
 
 bool CanFishValue::Calculate()
 {
-    int SkillFishing = bot->GetSkillValue(SKILL_FISHING);
-  
-    int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
+  if (!bot)
+    return false;
+
+  uint32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
+
+  if (SkillFishing = 0)
+    {
+        botAI->TellError("I don't know how to fish");
+        return false;
+    }
+
+  int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
     if (!zone_skill)
         zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetZoneId());
     if (SkillFishing < zone_skill)
-		return false;
+        {
+        botAI->TellError("I don't have enough skill to fish here");
+        return false;
+        }
 
 	auto isFishingPole = [](Item* item) -> bool
     {
@@ -59,13 +71,19 @@ bool CanFishValue::Calculate()
         if (sRandomPlayerbotMgr->IsRandomBot(bot))
         {
             bot->StoreNewItemInBestSlots(6256, 1); // Try to get a fishing pole
-            return true;
         }
         else
         {
             botAI->TellError("I don't have a fishing pole");
             return false;
         }
+    }
+    if (pole->GetSlot() != EQUIPMENT_SLOT_MAINHAND)
+    {
+
+        WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
+        eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
+        bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
     }
 	return true;
 }
@@ -79,6 +97,7 @@ bool CanOpenBobberValue::Calculate()
         if (obj->GetGoType() == GAMEOBJECT_TYPE_FISHING_BOBBER && obj->GetOwnerGUID() == bot->GetGUID())
             return true;
     }
-    return false;
     */
+    return false;
+    
 }
