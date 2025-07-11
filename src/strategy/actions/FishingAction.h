@@ -23,11 +23,5 @@ private:
     WorldPosition FindWater(Player* bot, float distance = 5.0f);
 };
 
-class UseFishingBobberAction : public Action
-{
-public:
-    UseFishingBobberAction(PlayerbotAI* botAI) : Action(botAI, "use fishing bobber") {}
-    bool Execute(Event event) override;
-};
 
 #endif

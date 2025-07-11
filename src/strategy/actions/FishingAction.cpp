@@ -58,45 +58,6 @@ bool FishingAction::Execute(Event event)
     return botAI->CastSpell(FISHING_SPELL, bot);
 };
 
-bool UseFishingBobberAction::Execute(Event event)
-{
-    // Find the fishing bobber (fishing node) owned by the bot
-    GameObject* bobber = nullptr;
-    std::list<GameObject*> objects;
-    GuidVector gos = AI_VALUE(GuidVector, "nearest game objects");
-    for (ObjectGuid const guid : gos)
-    {
-        if (GameObject* go = botAI->GetGameObject(guid))
-            objects.push_back(go);
-    }
-
-    for (auto& obj : objects)
-    {
-        if (obj->GetEntry() != 35591)
-            continue;
-
-        if (obj->GetOwnerGUID() != bot->GetGUID())
-            continue;
-
-        if (obj->getLootState() != GO_READY)
-        {
-            time_t bobberActiveTime = obj->GetRespawnTime() - FISHING_BOBBER_READY_TIME;
-            if (bobberActiveTime > time(0))
-                botAI->SetNextCheckDelay((bobberActiveTime - time(0)) * IN_MILLISECONDS + 500);
-            else
-                botAI->SetNextCheckDelay(1000);
-            return true;
-        }
-
-        std::unique_ptr<WorldPacket> packet(new WorldPacket(CMSG_GAMEOBJ_USE));
-        *packet << obj->GetGUID();
-        bot->GetSession()->QueuePacket(packet.get());
-
-        return true;
-    }
-
-    return false;
-};
 
 bool FishingAction::isUseful()
 {

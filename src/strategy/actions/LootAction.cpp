@@ -153,6 +153,17 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     if (lootObject.skillId == SKILL_HERBALISM)
         return botAI->HasSkill(SKILL_HERBALISM) ? botAI->CastSpell(HERB_GATHERING, bot) : false;
 
+    if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE)
+    {
+        if (go->GetOwnerGUID() != bot->GetGUID() && go->getLootState() == GO_READY)
+        {
+            std::unique_ptr<WorldPacket> packet(new WorldPacket(CMSG_GAMEOBJ_USE));
+            *packet << go->GetGUID();
+            bot->GetSession()->QueuePacket(packet.get());
+            return false;
+        }
+    }
+
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
         return false;
