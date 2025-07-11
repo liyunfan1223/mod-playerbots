@@ -10,16 +10,29 @@
 
 bool CanFishValue::Calculate()
 {
+    LOG_ERROR("playerbots","Entering CanFishValue::Calculate");
+
   if (!bot)
-    return false;
+  {
+      LOG_ERROR( "playerbots","Failed at bot null check");
+      return false;
+  }
 
+  if (!botAI)
+        {
+        LOG_ERROR("playerbots","Failed at botAI null check");
+        return false;
+    }
   uint32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
-
-  if (SkillFishing = 0)
+    LOG_ERROR("playerbots","passed GetSKillValue at botAI null check");
+    
+  if (SkillFishing == 0)
     {
+        LOG_ERROR("playerbots","Inside skill check");
         botAI->TellError("I don't know how to fish");
         return false;
     }
+    
 
   int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
     if (!zone_skill)
@@ -78,9 +91,14 @@ bool CanFishValue::Calculate()
             return false;
         }
     }
+    if (!pole)
+        return false;
+    
+   if (!bot->GetSession())
+       return false;
+   
     if (pole->GetSlot() != EQUIPMENT_SLOT_MAINHAND)
     {
-
         WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
         eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
         bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);

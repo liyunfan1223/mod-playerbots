@@ -16,5 +16,6 @@ bool FishWithMasterAction::Execute(Event event)
     uint8 castCount = 0, castFlags = 0;
     uint32 spellId = 0;
     p >> castCount >> spellId >> castFlags;
+    LOG_ERROR("playerbots","end of fishing with master");
     return FishingAction(botAI).Execute(event);
 }

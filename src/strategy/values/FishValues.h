@@ -15,7 +15,7 @@ class PlayerbotAI;
 class CanFishValue : public BoolCalculatedValue
 {
     public:
-        CanFishValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "can fish", 1) {};
+        CanFishValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "can fish") {};
         bool Calculate() override;
 };
 class CanOpenBobberValue : public BoolCalculatedValue

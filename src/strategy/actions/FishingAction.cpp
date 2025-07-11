@@ -33,9 +33,9 @@ WorldPosition FishingAction::FindWater(Player* bot, float distance)
 
 bool FishingAction::Execute(Event event)
 {
-    if (!AI_VALUE(bool, "can fish"))  // verify spell and fishing pole. Adds pole to Rndbot if missing.
+     LOG_ERROR("playerbots","Entering FishingAction");
+    if (!FishingAction.isUseful())
         return false;
-
     if (qualifier == "travel")
     {
         TravelTarget* target = AI_VALUE(TravelTarget*, "travel target");
@@ -97,4 +97,10 @@ bool UseFishingBobberAction::Execute(Event event)
     }
 
     return false;
+};
+
+bool FishingAction::isUseful()
+{
+    if (!AI_VALUE(bool, "can fish"))  // verify spell and fishing pole. Adds pole to Rndbot if missing.
+        return false;
 };

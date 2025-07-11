@@ -17,6 +17,7 @@ class FishingAction : public Action, public Qualified
 public:
     FishingAction(PlayerbotAI* botAI) : Action(botAI, "fishing action"){}
     bool Execute(Event event) override;
+    bool isUseful() override;
 
 private:
     WorldPosition FindWater(Player* bot, float distance = 5.0f);
