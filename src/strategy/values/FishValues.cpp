@@ -15,7 +15,7 @@ bool CanFishValue::Calculate()
   if (!bot)
   {
       LOG_ERROR( "playerbots","Failed at bot null check");
-      return false;
+    return false;
   }
 
   if (!botAI)
@@ -25,14 +25,13 @@ bool CanFishValue::Calculate()
     }
   uint32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
     LOG_ERROR("playerbots","passed GetSKillValue at botAI null check");
-    
+
   if (SkillFishing == 0)
     {
         LOG_ERROR("playerbots","Inside skill check");
         botAI->TellError("I don't know how to fish");
         return false;
     }
-    
 
   int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
     if (!zone_skill)
