@@ -8,6 +8,7 @@
 
 #include "GenericSpellActions.h"
 #include "UseItemAction.h"
+#include "InventoryAction.h"
 #include "Action.h"
 
 class PlayerbotAI;
@@ -47,6 +48,14 @@ public:
     bool Execute(Event event) override;
 };
 
+class DestroySoulShardAction : public InventoryAction
+{
+public:
+    DestroySoulShardAction(PlayerbotAI* botAI) : InventoryAction(botAI, "destroy soul shard") {}
+
+    bool Execute(Event event) override;
+};
+
 class CastCreateHealthstoneAction : public CastBuffSpellAction
 {
 public:
@@ -56,7 +65,12 @@ public:
 class CastCreateFirestoneAction : public CastBuffSpellAction
 {
 public:
-    CastCreateFirestoneAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "create firestone") {}
+    CastCreateFirestoneAction(PlayerbotAI* botAI);
+    bool Execute(Event event) override;
+    bool isUseful() override;
+
+private:
+    static const std::vector<uint32> firestoneSpellIds;
 };
 
 class CastCreateSpellstoneAction : public CastBuffSpellAction
