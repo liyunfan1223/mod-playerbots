@@ -37,6 +37,13 @@ public:
     bool IsActive() override { return AI_VALUE2(uint32, "item count", "soul shard") == 0; }
 };
 
+class TooManySoulShardsTrigger : public Trigger
+{
+public:
+    TooManySoulShardsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "too many soul shards") {}
+    bool IsActive() override { return AI_VALUE2(uint32, "item count", "soul shard") >= 6; }
+};
+
 class FirestoneTrigger : public BuffTrigger
 {
 public:

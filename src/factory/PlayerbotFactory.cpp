@@ -3255,7 +3255,7 @@ void PlayerbotFactory::InitReagents()
                 items.push_back({17030, 40});  // Ankh
             break;
         case CLASS_WARLOCK:
-            items.push_back({6265, 20});  // shard
+            items.push_back({6265, 5});  // shard
             break;
         case CLASS_PRIEST:
             if (level >= 48 && level < 60)

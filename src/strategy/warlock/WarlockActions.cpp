@@ -135,6 +135,43 @@ bool CreateSoulShardAction::Execute(Event event)
     return false;
 }
 
+
+bool DestroySoulShardAction::Execute(Event event)
+{
+    static const uint32 SOUL_SHARD_ID = 6265;
+    // Look for the first soul shard in any bag and destroy it
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (Item* pItem = pBag->GetItemByPos(j))
+                {
+                    if (pItem->GetTemplate()->ItemId == SOUL_SHARD_ID)
+                    {
+                        bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
+                        return true;  // Only destroy one!
+                    }
+                }
+            }
+        }
+    }
+    // Also check main inventory slots (not in bags)
+    for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pItem->GetTemplate()->ItemId == SOUL_SHARD_ID)
+            {
+                bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 // Checks if the target has a soulstone aura
 static bool HasSoulstoneAura(Unit* unit)
 {
@@ -321,4 +358,38 @@ bool UseSoulstoneHealerAction::Execute(Event event)
 
     bot->SetSelection(healer->GetGUID());
     return UseItem(items[0], ObjectGuid::Empty, nullptr, healer);
+}
+
+const std::vector<uint32> CastCreateFirestoneAction::firestoneSpellIds = {
+    60220,  // Create Firestone (Rank 7)
+    27250,  // Rank 5
+    17953,  // Rank 4
+    17952,  // Rank 3
+    17951,  // Rank 2
+    6366    // Rank 1
+};
+
+CastCreateFirestoneAction::CastCreateFirestoneAction(PlayerbotAI* botAI)
+    : CastBuffSpellAction(botAI, "create firestone")
+{
+}
+
+bool CastCreateFirestoneAction::Execute(Event event)
+{
+    for (uint32 spellId : firestoneSpellIds)
+    {
+        if (bot->HasSpell(spellId))
+            return botAI->CastSpell(spellId, bot);
+    }
+    return false;
+}
+
+bool CastCreateFirestoneAction::isUseful()
+{
+    for (uint32 spellId : firestoneSpellIds)
+    {
+        if (bot->HasSpell(spellId))
+            return true;
+    }
+    return false;
 }

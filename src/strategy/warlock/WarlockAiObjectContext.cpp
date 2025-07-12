@@ -138,6 +138,7 @@ public:
         creators["demon armor"] = &WarlockTriggerFactoryInternal::demon_armor;
         creators["soul link"] = &WarlockTriggerFactoryInternal::soul_link;
         creators["no soul shard"] = &WarlockTriggerFactoryInternal::no_soul_shard;
+        creators["too many soul shards"] = &WarlockTriggerFactoryInternal::too_many_soul_shards;
         creators["no healthstone"] = &WarlockTriggerFactoryInternal::HasHealthstone;
         creators["no firestone"] = &WarlockTriggerFactoryInternal::HasFirestone;
         creators["no spellstone"] = &WarlockTriggerFactoryInternal::HasSpellstone;
@@ -181,6 +182,7 @@ private:
     static Trigger* demon_armor(PlayerbotAI* botAI) { return new DemonArmorTrigger(botAI); }
     static Trigger* soul_link(PlayerbotAI* botAI) { return new SoulLinkTrigger(botAI); }
     static Trigger* no_soul_shard(PlayerbotAI* botAI) { return new OutOfSoulShardsTrigger(botAI); }
+    static Trigger* too_many_soul_shards(PlayerbotAI* botAI) { return new TooManySoulShardsTrigger(botAI); }
     static Trigger* HasHealthstone(PlayerbotAI* botAI) { return new HasHealthstoneTrigger(botAI); }
     static Trigger* HasFirestone(PlayerbotAI* botAI) { return new HasFirestoneTrigger(botAI); }
     static Trigger* HasSpellstone(PlayerbotAI* botAI) { return new HasSpellstoneTrigger(botAI); }
@@ -229,6 +231,7 @@ public:
         creators["demon skin"] = &WarlockAiObjectContextInternal::demon_skin;
         creators["soul link"] = &WarlockAiObjectContextInternal::soul_link;
         creators["create soul shard"] = &WarlockAiObjectContextInternal::create_soul_shard;
+        creators["destroy soul shard"] = &WarlockAiObjectContextInternal::destroy_soul_shard;
         creators["create healthstone"] = &WarlockAiObjectContextInternal::create_healthstone;
         creators["create firestone"] = &WarlockAiObjectContextInternal::create_firestone;
         creators["create spellstone"] = &WarlockAiObjectContextInternal::create_spellstone;
@@ -301,6 +304,7 @@ private:
     static Action* demon_skin(PlayerbotAI* botAI) { return new CastDemonSkinAction(botAI); }
     static Action* soul_link(PlayerbotAI* botAI) { return new CastSoulLinkAction(botAI); }
     static Action* create_soul_shard(PlayerbotAI* botAI) { return new CreateSoulShardAction(botAI); }
+    static Action* destroy_soul_shard(PlayerbotAI* botAI) { return new DestroySoulShardAction(botAI); }
     static Action* create_healthstone(PlayerbotAI* botAI) { return new CastCreateHealthstoneAction(botAI); }
     static Action* create_firestone(PlayerbotAI* botAI) { return new CastCreateFirestoneAction(botAI); }
     static Action* create_spellstone(PlayerbotAI* botAI) { return new CastCreateSpellstoneAction(botAI); }
