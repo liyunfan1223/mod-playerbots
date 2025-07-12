@@ -1203,15 +1203,16 @@ AiPlayerbot.PremadeSpecLink.2.5.80 = -1532013022-05230250203331322133201321
 #
 
 AiPlayerbot.PremadeSpecName.3.0 = bm pve
-AiPlayerbot.PremadeSpecGlyph.3.0 = 42912,43350,42902,43351,43338,45732
-AiPlayerbot.PremadeSpecLink.3.0.60 = 51200201505112243110531051
-AiPlayerbot.PremadeSpecLink.3.0.80 = 51200201505112243120531251-025305101
+AiPlayerbot.PremadeSpecGlyph.3.0 = 42912,43350,42902,43351,43338,42914
+AiPlayerbot.PremadeSpecLink.3.0.40 = 512002015051122301
+AiPlayerbot.PremadeSpecLink.3.0.60 = 51200201505112233110531151
+AiPlayerbot.PremadeSpecLink.3.0.80 = 51200201505112243130531351-005305101
 AiPlayerbot.PremadeSpecName.3.1 = mm pve
-AiPlayerbot.PremadeSpecGlyph.3.1 = 42912,43350,42914,43351,43338,45732
-AiPlayerbot.PremadeSpecLink.3.1.60 = -025315101030013233125031051
-AiPlayerbot.PremadeSpecLink.3.1.80 = 502-025335101030013233135031351-5000002
+AiPlayerbot.PremadeSpecGlyph.3.1 = 42912,43350,45625,43351,43338,42914
+AiPlayerbot.PremadeSpecLink.3.1.60 = -035305101030013233115031151
+AiPlayerbot.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
 AiPlayerbot.PremadeSpecName.3.2 = surv pve
-AiPlayerbot.PremadeSpecGlyph.3.2 = 42912,43350,45731,43351,43338,45732
+AiPlayerbot.PremadeSpecGlyph.3.2 = 45733,43350,45731,43351,43338,45732
 AiPlayerbot.PremadeSpecLink.3.2.60 = --5000032500033330502135201311
 AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330532135301321
 AiPlayerbot.PremadeSpecName.3.3 = bm pvp

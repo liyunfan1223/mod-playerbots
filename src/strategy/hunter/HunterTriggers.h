@@ -9,23 +9,11 @@
 #include "CureTriggers.h"
 #include "GenericTriggers.h"
 #include "Trigger.h"
+#include "PlayerbotAI.h"
 
 class PlayerbotAI;
 
-class HunterNoStingsActiveTrigger : public DebuffTrigger
-{
-public:
-    HunterNoStingsActiveTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "no stings") {}
-    bool IsActive() override;
-};
-
-class AutoShotTrigger : public Trigger
-{
-public:
-    AutoShotTrigger(PlayerbotAI* botAI) : Trigger(botAI, "auto shot") {}
-
-    bool IsActive() override;
-};
+// Buff and Out of Combat Triggers
 
 class HunterAspectOfTheMonkeyTrigger : public BuffTrigger
 {
@@ -50,7 +38,6 @@ class HunterAspectOfTheViperTrigger : public BuffTrigger
 {
 public:
     HunterAspectOfTheViperTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "aspect of the viper") {}
-
     bool IsActive() override;
 };
 
@@ -58,42 +45,7 @@ class HunterAspectOfThePackTrigger : public BuffTrigger
 {
 public:
     HunterAspectOfThePackTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "aspect of the pack") {}
-
     bool IsActive() override;
-};
-
-BEGIN_TRIGGER(HuntersPetDeadTrigger, Trigger)
-END_TRIGGER()
-
-BEGIN_TRIGGER(HuntersPetLowHealthTrigger, Trigger)
-END_TRIGGER()
-
-BEGIN_TRIGGER(HuntersPetMediumHealthTrigger, Trigger)
-END_TRIGGER()
-
-class BlackArrowTrigger : public DebuffTrigger
-{
-public:
-    BlackArrowTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "black arrow", 1, true) {}
-    bool IsActive() override;
-};
-
-class HuntersMarkTrigger : public DebuffTrigger
-{
-public:
-    HuntersMarkTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "hunter's mark", 1, false, 25.0f) {}
-};
-
-class FreezingTrapTrigger : public HasCcTargetTrigger
-{
-public:
-    FreezingTrapTrigger(PlayerbotAI* botAI) : HasCcTargetTrigger(botAI, "freezing trap") {}
-};
-
-class RapidFireTrigger : public BoostTrigger
-{
-public:
-    RapidFireTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "rapid fire") {}
 };
 
 class TrueshotAuraTrigger : public BuffTrigger
@@ -107,28 +59,6 @@ class NoTrackTrigger : public BuffTrigger
 public:
     NoTrackTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "no track") {}
     bool IsActive() override;
-};
-
-class SerpentStingOnAttackerTrigger : public DebuffOnAttackerTrigger
-{
-public:
-    SerpentStingOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "serpent sting", true) {}
-    bool IsActive() override;
-};
-
-BEGIN_TRIGGER(HunterPetNotHappy, Trigger)
-END_TRIGGER()
-
-class ConsussiveShotSnareTrigger : public SnareTargetTrigger
-{
-public:
-    ConsussiveShotSnareTrigger(PlayerbotAI* botAI) : SnareTargetTrigger(botAI, "concussive shot") {}
-};
-
-class ScareBeastTrigger : public HasCcTargetTrigger
-{
-public:
-    ScareBeastTrigger(PlayerbotAI* botAI) : HasCcTargetTrigger(botAI, "scare beast") {}
 };
 
 class HunterLowAmmoTrigger : public AmmoCountTrigger
@@ -151,6 +81,115 @@ public:
     HunterHasAmmoTrigger(PlayerbotAI* botAI) : AmmoCountTrigger(botAI, "ammo", 1, 10) {}
 
     bool IsActive() override;
+};
+
+// Cooldown Triggers
+
+class RapidFireTrigger : public BoostTrigger
+{
+public:
+    RapidFireTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "rapid fire") {}
+};
+
+class BestialWrathTrigger : public BuffTrigger
+{
+public:
+    BestialWrathTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "bestial wrath") {}
+};
+
+class IntimidationTrigger : public BuffTrigger
+{
+public:
+    IntimidationTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "intimidation") {}
+};
+
+class KillCommandTrigger : public BuffTrigger
+{
+public:
+    KillCommandTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "kill command") {}
+    bool IsActive() override;
+};
+
+class LockAndLoadTrigger : public BuffTrigger
+{
+public:
+    LockAndLoadTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "lock and load") {}
+
+    bool IsActive() override
+    {
+        return botAI->HasAura("lock and load", botAI->GetBot());
+    }
+};
+
+// CC Triggers
+
+class FreezingTrapTrigger : public HasCcTargetTrigger
+{
+public:
+    FreezingTrapTrigger(PlayerbotAI* botAI) : HasCcTargetTrigger(botAI, "freezing trap") {}
+};
+
+class ConsussiveShotSnareTrigger : public SnareTargetTrigger
+{
+public:
+    ConsussiveShotSnareTrigger(PlayerbotAI* botAI) : SnareTargetTrigger(botAI, "concussive shot") {}
+};
+
+class ScareBeastTrigger : public HasCcTargetTrigger
+{
+public:
+    ScareBeastTrigger(PlayerbotAI* botAI) : HasCcTargetTrigger(botAI, "scare beast") {}
+};
+
+class SilencingShotTrigger : public InterruptSpellTrigger
+{
+public:
+    SilencingShotTrigger(PlayerbotAI* botAI) : InterruptSpellTrigger(botAI, "silencing shot") {}
+};
+
+// DoT/Debuff Triggers
+
+class HuntersMarkTrigger : public DebuffTrigger
+{
+public:
+    HuntersMarkTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "hunter's mark", 1, true, 0.5f) {}
+    bool IsActive() override { return BuffTrigger::IsActive(); }
+};
+
+class ExplosiveShotTrigger : public DebuffTrigger
+{
+public:
+    ExplosiveShotTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "explosive shot", 1, true) {}
+    bool IsActive() override { return BuffTrigger::IsActive(); }
+};
+
+class BlackArrowTrigger : public DebuffTrigger
+{
+public:
+    BlackArrowTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "black arrow", 1, true) {}
+    bool IsActive() override;
+};
+
+class HunterNoStingsActiveTrigger : public DebuffTrigger
+{
+public:
+    HunterNoStingsActiveTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "no stings") {}
+    bool IsActive() override;
+};
+
+class SerpentStingOnAttackerTrigger : public DebuffOnAttackerTrigger
+{
+public:
+    SerpentStingOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "serpent sting", true) {}
+    bool IsActive() override;
+};
+
+// Damage/Combat Triggers
+
+class AutoShotTrigger : public Trigger
+{
+public:
+    AutoShotTrigger(PlayerbotAI* botAI) : Trigger(botAI, "auto shot") {}
 };
 
 class SwitchToRangedTrigger : public Trigger
@@ -192,5 +231,17 @@ class ImmolationTrapNoCdTrigger : public SpellNoCooldownTrigger
 public:
     ImmolationTrapNoCdTrigger(PlayerbotAI* ai) : SpellNoCooldownTrigger(ai, "immolation trap") {}
 };
+
+BEGIN_TRIGGER(HuntersPetDeadTrigger, Trigger)
+END_TRIGGER()
+
+BEGIN_TRIGGER(HuntersPetLowHealthTrigger, Trigger)
+END_TRIGGER()
+
+BEGIN_TRIGGER(HuntersPetMediumHealthTrigger, Trigger)
+END_TRIGGER()
+
+BEGIN_TRIGGER(HunterPetNotHappy, Trigger)
+END_TRIGGER()
 
 #endif

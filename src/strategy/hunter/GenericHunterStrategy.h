@@ -27,7 +27,6 @@ public:
     HunterBoostStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
     std::string const getName() override { return "boost"; }
-    NextAction** getDefaultActions() override;
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
