@@ -11,11 +11,21 @@
 
 bool LootAvailableTrigger::IsActive()
 {
+    bool distanceCheck = false;
+    if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
+    {
+        distanceCheck =
+            sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"), CONTACT_DISTANCE);
+    }
+    else
+    {
+        distanceCheck = sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"),
+                                                                 INTERACTION_DISTANCE - 2.0f);
+    }
+
+    // if loot target if empty, always pass distance check
     return AI_VALUE(bool, "has available loot") &&
-            // if loot target if empty, always pass distance check
-           (sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"),
-                                                     INTERACTION_DISTANCE - 2.0f) ||
-            AI_VALUE(GuidVector, "all targets").empty());
+        (distanceCheck || AI_VALUE(GuidVector, "all targets").empty());
 }
 
 bool FarFromCurrentLootTrigger::IsActive()
