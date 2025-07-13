@@ -367,12 +367,14 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             }
             break;
         case CLASS_HUNTER:
-            engine->addStrategiesNoInit("dps", "aoe", "bdps", "dps assist", nullptr);
-            engine->addStrategy("dps debuff", false);
-            // if (tab == HUNTER_TAB_SURVIVAL)
-            // {
-            //     engine->addStrategy("trap weave", false);
-            // }
+            if (tab == 0)  // Beast Mastery
+                engine->addStrategiesNoInit("bm", "bm aoe", nullptr);
+            else if (tab == 1)  // Marksmanship
+                engine->addStrategiesNoInit("mm", "mm aoe", nullptr);
+            else if (tab == 2)  // Survival
+                engine->addStrategiesNoInit("surv", "surv aoe", "trap weave", nullptr);
+
+            engine->addStrategiesNoInit("cc", "dps assist", nullptr);
             break;
         case CLASS_ROGUE:
             if (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY)
