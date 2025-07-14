@@ -17,6 +17,7 @@
 #include "ServerFacade.h"
 #include "GuildMgr.h"
 #include "BroadcastHelper.h"
+#include "UseItemAction.h"
 
 bool LootAction::Execute(Event /*event*/)
 {   
@@ -155,12 +156,16 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
 
     if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE)
     {
-        if (go->GetOwnerGUID() != bot->GetGUID() && go->getLootState() == GO_READY)
+        LOG_ERROR("playerbots", "Found Fishing Node");
+        if (go->GetOwnerGUID() != bot->GetGUID())
         {
-            std::unique_ptr<WorldPacket> packet(new WorldPacket(CMSG_GAMEOBJ_USE));
-            *packet << go->GetGUID();
-            bot->GetSession()->QueuePacket(packet.get());
-            return false;
+            LOG_ERROR("playerbots", "Fishing Node owned by bot");
+            if (go->getLootState() == GO_READY)
+            {
+                LOG_ERROR("playerbots", "Trying to use object");
+                go->Use(bot);
+                return false;
+            }
         }
     }
 

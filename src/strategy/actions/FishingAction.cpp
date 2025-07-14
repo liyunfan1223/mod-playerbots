@@ -11,15 +11,15 @@
 
 static constexpr uint32 FISHING_SPELL = 7620;
 
-WorldPosition FishingAction::FindWater(Player* bot, float distance)
+WorldPosition FishingAction::FindWater(Player* bot, float distance, float increment)
 {
     float x = bot->GetPositionX();
     float y = bot->GetPositionY();
     float z = bot->GetPositionZ();
     uint32 mapId = bot->GetMapId();
-    for (float checkX = x - distance; checkX <= x + distance; checkX += 5.0f)
+    for (float checkX = x - distance; checkX <= x + distance; checkX += increment)
     {
-        for (float checkY = y - distance; checkY <= y + distance; checkY += 5.0f)
+        for (float checkY = y - distance; checkY <= y + distance; checkY += increment)
         {
             if (bot->GetMap()->IsInWater(mapId, checkX, checkY, z, DEFAULT_COLLISION_HEIGHT))
                 {
@@ -42,7 +42,7 @@ bool FishingAction::Execute(Event event)
         if (target->getStatus() != TravelStatus::TRAVEL_STATUS_TRAVEL)
             return false;
     }
-    WorldPosition FishSpot = FindWater(bot, 5.0f);
+    WorldPosition FishSpot = FindWater(bot, 5.0f, 0.2f);
     if (FishSpot)
     {
         bot->SetFacingTo(FishSpot);
@@ -51,7 +51,7 @@ bool FishingAction::Execute(Event event)
     else
     {
    //     botAI->RpgTaxiAction(FindWater(bot, 100.0f));
-        bot->SetFacingTo(FindWater(bot, 100.0f));
+        bot->SetFacingTo(FindWater(bot, 100.0f, 5.0f));
     }
 
 

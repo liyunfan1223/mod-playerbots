@@ -20,7 +20,7 @@ public:
     bool isUseful() override;
 
 private:
-    WorldPosition FindWater(Player* bot, float distance = 5.0f);
+    WorldPosition FindWater(Player* bot, float distance = 5.0f, float increment = 0.2f);
 };
 
 
