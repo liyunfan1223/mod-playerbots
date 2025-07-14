@@ -80,15 +80,3 @@ void AfflictionWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
 
     triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", 39.0f), nullptr)));
 }
-
-// ===== AoE Strategy, 3+ enemies =====
-AfflictionWarlockAoeStrategy::AfflictionWarlockAoeStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}
-
-void AfflictionWarlockAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
-{
-    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0,
-                       new NextAction("shadowflame", 22.5f),
-                       new NextAction("seed of corruption on attacker", 22.0f),
-                       new NextAction("seed of corruption", 21.5f),
-                       new NextAction("rain of fire", 21.0f), nullptr)));
-}

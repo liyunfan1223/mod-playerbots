@@ -21,12 +21,4 @@ public:
     NextAction** getDefaultActions() override;
 };
 
-class SurvivalHunterAoeStrategy : public CombatStrategy
-{
-public:
-    SurvivalHunterAoeStrategy(PlayerbotAI* botAI);
-
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName() override { return "surv aoe"; }
-};
 #endif

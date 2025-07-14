@@ -47,6 +47,19 @@ void GenericWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("devour magic cleanse", NextAction::array(0, new NextAction("devour magic cleanse", 50.0f), nullptr)));
 }
 
+// ===== AoE Strategy, 3+ enemies =====
+
+void AoEWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0,
+                                                 new NextAction("immolation aura", 26.0f),
+                                                 new NextAction("shadowfury", 23.0f),
+                                                 new NextAction("shadowflame", 22.5f),
+                                                 new NextAction("seed of corruption on attacker", 22.0f),
+                                                 new NextAction("seed of corruption", 21.5f),
+                                                 new NextAction("rain of fire", 21.0f), nullptr)));
+}
+
 void WarlockBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Placeholder for future boost triggers

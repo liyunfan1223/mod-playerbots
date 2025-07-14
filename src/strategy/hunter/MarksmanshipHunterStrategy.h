@@ -21,12 +21,4 @@ public:
     NextAction** getDefaultActions() override;
 };
 
-class MarksmanshipHunterAoeStrategy : public CombatStrategy
-{
-public:
-    MarksmanshipHunterAoeStrategy(PlayerbotAI* botAI);
-
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName() override { return "mm aoe"; }
-};
 #endif
