@@ -131,6 +131,16 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                                                     new NextAction("flee", 34.0f), nullptr)));
 }
 
+// ===== AoE Strategy, 2/3+ enemies =====
+AoEHunterStrategy::AoEHunterStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}
+
+void AoEHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("volley", 22.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("light aoe", NextAction::array(0, new NextAction("multi-shot", 21.0f), nullptr)));
+}
+
 void HunterBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
 }

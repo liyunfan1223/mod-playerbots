@@ -30,12 +30,9 @@ public:
         creators["pet"] = &WarlockStrategyFactoryInternal::pet;
         creators["spellstone"] = &WarlockStrategyFactoryInternal::spellstone;
         creators["firestone"] = &WarlockStrategyFactoryInternal::firestone; 
-        creators["affli aoe"] = &WarlockStrategyFactoryInternal::affliction_aoe;
-        creators["demo aoe"] = &WarlockStrategyFactoryInternal::demonology_aoe;
-        creators["destro aoe"] = &WarlockStrategyFactoryInternal::destruction_aoe;
         creators["meta melee"] = &WarlockStrategyFactoryInternal::meta_melee_aoe;
         creators["tank"] = &WarlockStrategyFactoryInternal::tank;
-
+        creators["aoe"] = &WarlockStrategyFactoryInternal::aoe;
     }
 
 private:
@@ -46,11 +43,9 @@ private:
     static Strategy* pet(PlayerbotAI* botAI) { return new WarlockPetStrategy(botAI); }
     static Strategy* spellstone(PlayerbotAI* botAI) { return new UseSpellstoneStrategy(botAI); }
     static Strategy* firestone(PlayerbotAI* botAI) { return new UseFirestoneStrategy(botAI); }
-    static Strategy* affliction_aoe(PlayerbotAI* botAI) { return new AfflictionWarlockAoeStrategy(botAI); }
-    static Strategy* demonology_aoe(PlayerbotAI* botAI) { return new DemonologyWarlockAoeStrategy(botAI); }
-    static Strategy* destruction_aoe(PlayerbotAI* botAI) { return new DestructionWarlockAoeStrategy(botAI); }
     static Strategy* meta_melee_aoe(PlayerbotAI* botAI) { return new MetaMeleeAoeStrategy(botAI); }
     static Strategy* tank(PlayerbotAI* botAI) { return new TankWarlockStrategy(botAI); }
+    static Strategy* aoe(PlayerbotAI* botAI) { return new AoEWarlockStrategy(botAI); }
 };
 
 class WarlockCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>

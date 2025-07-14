@@ -21,13 +21,4 @@ public:
     NextAction** getDefaultActions() override;
 };
 
-class DestructionWarlockAoeStrategy : public CombatStrategy
-{
-public:
-    DestructionWarlockAoeStrategy(PlayerbotAI* botAI);
-
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName() override { return "destro aoe"; }
-};
-
 #endif

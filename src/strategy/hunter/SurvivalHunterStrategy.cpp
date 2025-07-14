@@ -80,12 +80,3 @@ void SurvivalHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("no stings", NextAction::array(0, new NextAction("serpent sting", 15.5f), nullptr)));
     triggers.push_back(new TriggerNode("serpent sting on attacker", NextAction::array(0, new NextAction("serpent sting on attacker", 15.0f), nullptr)));
 }
-
-// ===== AoE Strategy, 2/3+ enemies =====
-SurvivalHunterAoeStrategy::SurvivalHunterAoeStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}
-
-void SurvivalHunterAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
-{
-    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("volley", 22.0f), nullptr)));
-    triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("multi-shot", 21.0f), nullptr)));
-}

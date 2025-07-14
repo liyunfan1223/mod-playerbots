@@ -28,9 +28,7 @@ public:
         creators["bm"] = &HunterStrategyFactoryInternal::beast_mastery;
         creators["mm"] = &HunterStrategyFactoryInternal::marksmanship;
         creators["surv"] = &HunterStrategyFactoryInternal::survival;
-        creators["bm aoe"] = &HunterStrategyFactoryInternal::beast_mastery_aoe;
-        creators["mm aoe"] = &HunterStrategyFactoryInternal::marksmanship_aoe;
-        creators["surv aoe"] = &HunterStrategyFactoryInternal::survival_aoe;
+        creators["aoe"] = &HunterStrategyFactoryInternal::aoe;
     }
 
 private:
@@ -42,9 +40,7 @@ private:
     static Strategy* beast_mastery(PlayerbotAI* botAI) { return new BeastMasteryHunterStrategy(botAI); }
     static Strategy* marksmanship(PlayerbotAI* botAI) { return new MarksmanshipHunterStrategy(botAI); }
     static Strategy* survival(PlayerbotAI* botAI) { return new SurvivalHunterStrategy(botAI); }
-    static Strategy* beast_mastery_aoe(PlayerbotAI* botAI) { return new BeastMasteryHunterAoeStrategy(botAI); }
-    static Strategy* marksmanship_aoe(PlayerbotAI* botAI) { return new MarksmanshipHunterAoeStrategy(botAI); }
-    static Strategy* survival_aoe(PlayerbotAI* botAI) { return new SurvivalHunterAoeStrategy(botAI); }
+    static Strategy* aoe(PlayerbotAI* botAI) { return new AoEHunterStrategy(botAI); }
 };
 
 class HunterBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>

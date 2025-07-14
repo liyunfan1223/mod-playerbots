@@ -21,6 +21,15 @@ public:
     uint32 GetType() const override { return CombatStrategy::GetType() | STRATEGY_TYPE_RANGED | STRATEGY_TYPE_DPS; }
 };
 
+class AoEWarlockStrategy : public CombatStrategy
+{
+public:
+    AoEWarlockStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}
+
+    std::string const getName() override { return "aoe"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
 class WarlockBoostStrategy : public Strategy
 {
 public:

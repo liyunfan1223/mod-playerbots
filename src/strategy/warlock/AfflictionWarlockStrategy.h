@@ -21,12 +21,4 @@ public:
     NextAction** getDefaultActions() override;
 };
 
-class AfflictionWarlockAoeStrategy : public CombatStrategy
-{
-public:
-    AfflictionWarlockAoeStrategy(PlayerbotAI* botAI);
-
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName() override { return "affli aoe"; }
-};
 #endif
