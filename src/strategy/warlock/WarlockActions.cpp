@@ -19,8 +19,8 @@
 #include <unordered_map>
 #include <mutex>
 
-// Checks if the bot has less than 32 soul shards, and if so, allows casting Drain Soul
-bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 32; }
+// Checks if the bot has less than 20 soul shards, and if so, allows casting Drain Soul
+bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 20; }
 
 // Checks if the bot's health is above a certain threshold, and if so, allows casting Life Tap
 bool CastLifeTapAction::isUseful() { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->lowHealth; }
@@ -133,6 +133,20 @@ bool CreateSoulShardAction::Execute(Event event)
         return true;
     }
     return false;
+}
+
+// Checks if the bot has less than 6 soul shards, allowing the creation of a new one
+bool CreateSoulShardAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+
+    uint32 soulShardId = 6265;
+    uint32 currentShards = bot->GetItemCount(soulShardId, false);  // false = only bags
+    const uint32 SHARD_CAP = 6;                                    // adjust as needed
+
+    return currentShards < SHARD_CAP;
 }
 
 
