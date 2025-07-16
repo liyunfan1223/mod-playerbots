@@ -471,23 +471,16 @@ bool PlayerbotAIConfig::Initialize()
     worldBuffs.clear();
 
     LOG_INFO("playerbots", "Loading Worldbuff...");
-    for (uint32 factionId = 0; factionId < 3; factionId++)
-    {
         for (uint32 classId = 0; classId < MAX_CLASSES; classId++)
         {
             for (uint32 specId = 0; specId <= MAX_WORLDBUFF_SPECNO; specId++)
             {
-                for (uint32 minLevel = 0; minLevel <= randomBotMaxLevel; minLevel++)
-                {
-                    for (uint32 maxLevel = minLevel; maxLevel <= randomBotMaxLevel; maxLevel++)
-                    {
-                        loadWorldBuff(factionId, classId, specId, minLevel, maxLevel);
-                    }
-                    loadWorldBuff(factionId, classId, specId, minLevel, 0);
-                }
+                loadWorldBuff(classId, specId);
             }
         }
-    }
+
+    WorldBuffMinLevel = sConfigMgr->GetOption<uint32>("AiPlayerbot.WorldBuffMinLevel", 80);
+    WorldBuffMaxLevel = sConfigMgr->GetOption<uint32>("AiPlayerbot.WorldBuffMaxLevel", 80);
 
     randomBotAccountPrefix = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAccountPrefix", "rndbot");
     randomBotAccountCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotAccountCount", 0);
@@ -733,78 +726,36 @@ void PlayerbotAIConfig::log(std::string const fileName, char const* str, ...)
     fflush(stdout);
 }
 
-void PlayerbotAIConfig::loadWorldBuff(uint32 factionId1, uint32 classId1, uint32 specId1, uint32 minLevel1, uint32 maxLevel1)
+void PlayerbotAIConfig::loadWorldBuff(uint32 classId, uint32 specId)
 {
     std::vector<uint32> buffs;
 
     std::ostringstream os;
-    os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1 << "." << maxLevel1;
+    os << "AiPlayerbot.WorldBuff." << classId << "." << specId;
 
     LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
 
     for (auto buff : buffs)
     {
-        worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
+        worldBuff wb = {buff, classId, specId};
         worldBuffs.push_back(wb);
     }
 
-    if (maxLevel1 == 0)
+    if (specId == 0)
     {
         std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1;
+        os << "AiPlayerbot.WorldBuff." << classId;
 
         LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
 
         for (auto buff : buffs)
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
+            worldBuff wb = {buff, classId, specId};
             worldBuffs.push_back(wb);
         }
     }
 
-    if (maxLevel1 == 0 && minLevel1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1 << "." << specId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (factionId1 == 0 && classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
+    if (classId == 0 && specId == 0)
     {
         std::ostringstream os;
         os << "AiPlayerbot.WorldBuff";
@@ -813,7 +764,7 @@ void PlayerbotAIConfig::loadWorldBuff(uint32 factionId1, uint32 classId1, uint32
 
         for (auto buff : buffs)
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
+            worldBuff wb = {buff, classId, specId};
             worldBuffs.push_back(wb);
         }
     }

@@ -11,34 +11,36 @@
 
 bool WorldBuffAction::Execute(Event event)
 {
+    auto* player = bot->ToPlayer();
+    if (!player)
+        return false;
+
+    uint8 lvl = player->GetLevel();
+    if (sPlayerbotAIConfig->WorldBuffMinLevel && lvl < sPlayerbotAIConfig->WorldBuffMinLevel)
+        return false;
+    if (sPlayerbotAIConfig->WorldBuffMaxLevel && lvl > sPlayerbotAIConfig->WorldBuffMaxLevel)
+        return false;
+
     std::string const text = event.getParam();
 
+    bool applied = false;
     for (auto& wb : NeedWorldBuffs(bot))
     {
         bot->AddAura(wb, bot);
+        applied = true;
     }
-
-    return false;
+    return applied;
 }
 
 std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
 {
     std::vector<uint32> retVec;
 
-    if (sPlayerbotAIConfig->worldBuffs.empty())
-        return retVec;
-
-    FactionTemplateEntry const* humanFaction = sFactionTemplateStore.LookupEntry(1);
-    uint32 factionId =
-        (Unit::GetFactionReactionTo(unit->GetFactionTemplateEntry(), humanFaction) >= REP_NEUTRAL) ? 1 : 2;
-
     Player* bot = unit->ToPlayer();
     if (!bot)
         return retVec;
 
     uint8 botClass = bot->getClass();
-    uint8 botLevel = bot->GetLevel();
-
     uint8 tab = AiFactory::GetPlayerSpecTab(bot);
 
     // We'll store the final "effective" spec ID here.
@@ -70,21 +72,11 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
         // If tank, effectiveSpec remains unchanged
     }
 
-
     for (auto const& wb : sPlayerbotAIConfig->worldBuffs)
     {
-        // Faction check
-        if (wb.factionId != 0 && wb.factionId != factionId)
-            continue;
 
         // Class check
         if (wb.classId != 0 && wb.classId != botClass)
-            continue;
-
-        // Level check
-        if (wb.minLevel != 0 && wb.minLevel > botLevel)
-            continue;
-        if (wb.maxLevel != 0 && wb.maxLevel < botLevel)
             continue;
 
         // Already has aura?
