@@ -27,6 +27,7 @@
 #include "EnemyHealerTargetValue.h"
 #include "EnemyPlayerValue.h"
 #include "EstimatedLifetimeValue.h"
+#include "FishValues.h"
 #include "Formations.h"
 #include "GrindTargetValue.h"
 #include "GroupValues.h"
@@ -311,6 +312,9 @@ public:
         creators["last flee angle"] = &ValueContext::last_flee_angle;
         creators["last flee timestamp"] = &ValueContext::last_flee_timestamp;
         creators["recently flee info"] = &ValueContext::recently_flee_info;
+
+        creators["can fish"] = &ValueContext::can_fish;
+        creators["can use fishing bobber"] = &ValueContext::can_use_fishing_bobber;
     }
 
 private:
@@ -554,6 +558,9 @@ private:
     static UntypedValue* last_flee_angle(PlayerbotAI* ai) { return new LastFleeAngleValue(ai); }
     static UntypedValue* last_flee_timestamp(PlayerbotAI* ai) { return new LastFleeTimestampValue(ai); }
     static UntypedValue* recently_flee_info(PlayerbotAI* ai) { return new RecentlyFleeInfo(ai); }
+
+    static UntypedValue* can_fish(PlayerbotAI* ai) {return new CanFishValue(ai); }
+    static UntypedValue* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenBobberValue(ai); }
 };
 
 #endif

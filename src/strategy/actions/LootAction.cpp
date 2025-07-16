@@ -154,21 +154,6 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     if (lootObject.skillId == SKILL_HERBALISM)
         return botAI->HasSkill(SKILL_HERBALISM) ? botAI->CastSpell(HERB_GATHERING, bot) : false;
 
-    if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE)
-    {
-        LOG_ERROR("playerbots", "Found Fishing Node");
-        if (go->GetOwnerGUID() != bot->GetGUID())
-        {
-            LOG_ERROR("playerbots", "Fishing Node owned by bot");
-            if (go->getLootState() == GO_READY)
-            {
-                LOG_ERROR("playerbots", "Trying to use object");
-                go->Use(bot);
-                return false;
-            }
-        }
-    }
-
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
         return false;

@@ -7,8 +7,6 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-static constexpr uint32 FISHING_SPELL = 7620;
-
 bool FishWithMasterAction::Execute(Event event)
 {
     WorldPacket p(event.getPacket());
@@ -16,10 +14,9 @@ bool FishWithMasterAction::Execute(Event event)
     uint8 castCount = 0, castFlags = 0;
     uint32 spellId = 0;
     p >> castCount >> spellId >> castFlags;
-    LOG_ERROR("playerbots","end of fishing with master");
 
     if (!botAI)
         return false;
-
+   
     return FishingAction(botAI).Execute(event);
 }

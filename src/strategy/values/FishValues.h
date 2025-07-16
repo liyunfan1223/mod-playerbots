@@ -9,7 +9,6 @@
 #include "Value.h"
 #include "NamedObjectContext.h"
 
-
 class PlayerbotAI;
 
 class CanFishValue : public BoolCalculatedValue
@@ -21,7 +20,7 @@ class CanFishValue : public BoolCalculatedValue
 class CanOpenBobberValue : public BoolCalculatedValue
     {
     public:
-        CanOpenBobberValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "can open bobber") {};
+        CanOpenBobberValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "can use fishing bobber") {};
             bool Calculate() override;
     };
 

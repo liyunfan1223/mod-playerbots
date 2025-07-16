@@ -7,6 +7,7 @@
 #define _PLAYERBOT_TRIGGERCONTEXT_H
 
 #include "CureTriggers.h"
+#include "FishingTriggers.h"
 #include "GenericTriggers.h"
 #include "GuildTriggers.h"
 #include "LfgTriggers.h"
@@ -224,6 +225,7 @@ public:
         creators["near npc status"] = &TriggerContext::near_npc_status;
         creators["do quest status"] = &TriggerContext::do_quest_status;
         creators["can self resurrect"] = &TriggerContext::can_self_resurrect;
+        creators["can use fishing bobber"] = &TriggerContext::can_use_fishing_bobber;
     }
 
 private:
@@ -422,6 +424,7 @@ private:
     static Trigger* near_npc_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_NEAR_NPC); }
     static Trigger* do_quest_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_DO_QUEST); }
     static Trigger* can_self_resurrect(PlayerbotAI* ai) { return new SelfResurrectTrigger(ai); }
+    static Trigger* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenFishingBobberTrigger(ai); }
 };
 
 #endif

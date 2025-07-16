@@ -14,7 +14,6 @@ class FishWithMasterAction : public Action
 {
 public:
     FishWithMasterAction(PlayerbotAI* botAI) : Action(botAI, "fish with master") {}
-
     bool Execute(Event event) override;
 };
 

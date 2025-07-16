@@ -190,7 +190,8 @@ public:
         creators["buy tabard"] = &ActionContext::buy_tabard;
         creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
         creators["clean quest log"] = &ActionContext::clean_quest_log;
-        creators["fishing action"] = &ActionContext::fishing_action;    
+        creators["go fishing"] = &ActionContext::fishing_action;
+        creators["use fishing bobber"] = &ActionContext::use_fishing_bobber;
 
         // BG Tactics
         creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -374,7 +375,8 @@ private:
     static Action* buy_tabard(PlayerbotAI* botAI) { return new BuyTabardAction(botAI); }
     static Action* guild_manage_nearby(PlayerbotAI* botAI) { return new GuildManageNearbyAction(botAI); }
     static Action* clean_quest_log(PlayerbotAI* botAI) { return new CleanQuestLogAction(botAI); }
-    static Action* fishing_action(PlayerbotAI* botAI) { return new FishingAction(botAI); }
+    static Action* fishing_action(PlayerbotAI* botAI) { return new FishingAction(botAI);}
+    static Action* use_fishing_bobber(PlayerbotAI* botAI) { return new UseBobber(botAI);}
 
     // BG Tactics
     static Action* bg_tactics(PlayerbotAI* botAI) { return new BGTactics(botAI); }
