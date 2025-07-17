@@ -5,11 +5,14 @@
 
 #include "PvpTriggers.h"
 
+#include "BattleGroundTactics.h"
 #include "BattlegroundEY.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "BattlegroundAV.h"
+#include "BattlegroundEY.h"
 
 bool EnemyPlayerNear::IsActive() { return AI_VALUE(Unit*, "enemy player target"); }
 
@@ -161,10 +164,26 @@ bool PlayerHasFlag::IsCapturingFlag(Player* bot)
 
         if (bot->GetBattlegroundTypeId() == BATTLEGROUND_EY)
         {
-            // TODO we should probably add similiar logic as WSG to allow combat
-            // when bot has flag but no bases are available to take it to
             BattlegroundEY* bg = (BattlegroundEY*)bot->GetBattleground();
-            return bot->GetGUID() == bg->GetFlagPickerGUID();
+
+            // Check if bot has the flag
+            if (bot->GetGUID() == bg->GetFlagPickerGUID())
+            {
+                // Count how many bases the bot's team owns
+                uint32 controlledBases = 0;
+                for (uint8 point = 0; point < EY_POINTS_MAX; ++point)
+                {
+                    if (bg->GetCapturePointInfo(point)._ownerTeamId == bot->GetTeamId())
+                        controlledBases++;
+                }
+
+                // If no bases are controlled, bot should go aggressive
+                if (controlledBases == 0)
+                    return false; // bot has flag but no place to take it
+
+                // Otherwise, return false and stay defensive / move to base
+                return bot->GetGUID() == bg->GetFlagPickerGUID();
+            }
         }
 
         return false;
@@ -175,27 +194,29 @@ bool PlayerHasFlag::IsCapturingFlag(Player* bot)
 
 bool TeamHasFlag::IsActive()
 {
-    if (botAI->GetBot()->InBattleground())
-    {
-        if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
-        {
-            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
-
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
-            {
-                return false;
-            }
-
-            if (bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER)
-                return true;
-        }
-
+    if (!botAI->GetBot()->InBattleground())
         return false;
-    }
 
-    return false;
+    if (botAI->GetBot()->GetBattlegroundTypeId() != BattlegroundTypeId::BATTLEGROUND_WS)
+        return false;
+
+    BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+
+    ObjectGuid botGuid = bot->GetGUID();
+    TeamId teamId = bot->GetTeamId();
+    TeamId enemyTeamId = bg->GetOtherTeamId(teamId);
+
+    // If the bot is carrying any flag, don't activate
+    if (botGuid == bg->GetFlagPickerGUID(TEAM_ALLIANCE) || botGuid == bg->GetFlagPickerGUID(TEAM_HORDE))
+        return false;
+
+    // Check: Own team has enemy flag, enemy team does NOT have your flag
+    bool ownTeamHasFlag = bg->GetFlagState(enemyTeamId) == BG_WS_FLAG_STATE_ON_PLAYER;
+    bool enemyTeamHasFlag = bg->GetFlagState(teamId) == BG_WS_FLAG_STATE_ON_PLAYER;
+
+    return ownTeamHasFlag && !enemyTeamHasFlag;
 }
+
 
 bool EnemyTeamHasFlag::IsActive()
 {
@@ -226,11 +247,42 @@ bool EnemyTeamHasFlag::IsActive()
 bool EnemyFlagCarrierNear::IsActive()
 {
     Unit* carrier = AI_VALUE(Unit*, "enemy flag carrier");
-    return carrier && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, carrier), 200.f);
+
+    if (!carrier || !sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, carrier), 100.f))
+        return false;
+
+    // Check if there is another enemy player target closer than the FC
+    Unit* nearbyEnemy = AI_VALUE(Unit*, "enemy player target");
+
+    if (nearbyEnemy)
+    {
+        float distToFC = sServerFacade->GetDistance2d(bot, carrier);
+        float distToEnemy = sServerFacade->GetDistance2d(bot, nearbyEnemy);
+
+        // If the other enemy is significantly closer, don't pursue FC
+        if (distToEnemy + 15.0f < distToFC) // Add small buffer
+            return false;
+    }
+
+    return true;
 }
 
 bool TeamFlagCarrierNear::IsActive()
 {
+    if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
+    {
+        BattlegroundWS* bg = dynamic_cast<BattlegroundWS*>(bot->GetBattleground());
+        if (bg)
+        {
+            bool bothFlagsNotAtBase =
+                bg->GetFlagState(TEAM_ALLIANCE) != BG_WS_FLAG_STATE_ON_BASE &&
+                bg->GetFlagState(TEAM_HORDE) != BG_WS_FLAG_STATE_ON_BASE;
+
+            if (bothFlagsNotAtBase)
+                return false;
+        }
+    }
+
     Unit* carrier = AI_VALUE(Unit*, "team flag carrier");
     return carrier && sServerFacade->IsDistanceLessOrEqualThan(sServerFacade->GetDistance2d(bot, carrier), 200.f);
 }
@@ -259,3 +311,28 @@ bool VehicleNearTrigger::IsActive()
 }
 
 bool InVehicleTrigger::IsActive() { return botAI->IsInVehicle(); }
+
+bool AllianceNoSnowfallGY::IsActive()
+{
+    if (!bot || bot->GetTeamId() != TEAM_ALLIANCE)
+        return false;
+
+    Battleground* bg = bot->GetBattleground();
+    if (bg && BGTactics::GetBotStrategyForTeam(bg, TEAM_ALLIANCE) != AV_STRATEGY_BALANCED)
+        return false;
+
+    float botX = bot->GetPositionX();
+    if (botX <= -562.0f)
+        return false;
+
+    if (bot->GetBattlegroundTypeId() != BATTLEGROUND_AV)
+        return false;
+
+    if (BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg))
+    {
+        const BG_AV_NodeInfo& snowfall = av->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE);
+        return snowfall.OwnerId != TEAM_ALLIANCE; // Active if the Snowfall Graveyard is NOT fully controlled by the Alliance
+    }
+
+    return false;
+}

@@ -482,6 +482,19 @@ bool TimerTrigger::IsActive()
     return false;
 }
 
+bool TimerBGTrigger::IsActive()
+{
+    time_t now = time(nullptr);
+
+    if (now - lastCheck >= 60)
+    {
+        lastCheck = now;
+        return true;
+    }
+
+    return false;
+}
+
 bool HasNoAuraTrigger::IsActive() { return !botAI->HasAura(getName(), GetTarget()); }
 
 bool TankAssistTrigger::IsActive()

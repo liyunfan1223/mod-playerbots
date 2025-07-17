@@ -10,16 +10,51 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 
-bool CastHuntersMarkAction::isUseful() { return CastDebuffSpellAction::isUseful(); }
-
 bool CastViperStingAction::isUseful()
 {
-    return AI_VALUE2(uint8, "mana", "self target") < 50 && AI_VALUE2(uint8, "mana", "current target") >= 30;
+    return CastAuraSpellAction::isUseful() && AI_VALUE2(uint8, "mana", "self target") < 50 &&
+           AI_VALUE2(uint8, "mana", "current target") >= 30;
 }
 
 bool CastAspectOfTheCheetahAction::isUseful()
 {
     return !botAI->HasAnyAuraOf(GetTarget(), "aspect of the cheetah", "aspect of the pack", nullptr);
+}
+
+bool CastAspectOfTheHawkAction::isUseful()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+    if (bot->HasSpell(61846) || bot->HasSpell(61847))  // Aspect of the Dragonhawk spell IDs
+        return false;
+    return true;
+}
+
+bool CastArcaneShotAction::isUseful()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+    if (bot->HasSpell(53301) || bot->HasSpell(60051) || bot->HasSpell(60052) || bot->HasSpell(60053))  // Explosive Shot spell IDs
+        return false;
+
+    // Armor Penetration rating check - will not cast Arcane Shot above 435 ArP
+    int32 armorPenRating = bot->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_ARMOR_PENETRATION);
+    if (armorPenRating > 435)
+        return false;
+
+    return true;
+}
+
+bool CastImmolationTrapAction::isUseful()
+{
+    Unit* target = GetTarget();
+    if (!target)
+        return false;
+    if (bot->HasSpell(13813) || bot->HasSpell(14316) || bot->HasSpell(14317) || bot->HasSpell(27025) || bot->HasSpell(49066) || bot->HasSpell(49067)) // Explosive Trap spell IDs
+        return false;
+    return true;
 }
 
 Value<Unit*>* CastFreezingTrap::GetTargetValue() { return context->GetValue<Unit*>("cc target", "freezing trap"); }
@@ -61,7 +96,6 @@ bool CastDisengageAction::isUseful()
 {
     return !botAI->HasStrategy("trap weave", BOT_STATE_COMBAT);
 }
-
 
 Value<Unit*>* CastScareBeastCcAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", "scare beast"); }
 
