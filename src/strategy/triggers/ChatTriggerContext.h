@@ -133,6 +133,7 @@ public:
         creators["calc"] = &ChatTriggerContext::calc;
         creators["qi"] = &ChatTriggerContext::qi;
         creators["wipe"] = &ChatTriggerContext::wipe;
+        creators["pet"] = &ChatTriggerContext::pet;
     }
 
 private:
@@ -245,6 +246,7 @@ private:
     static Trigger* calc(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "calc"); }
     static Trigger* qi(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "qi"); }
     static Trigger* wipe(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "wipe"); }
+    static Trigger* pet(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "pet"); }
 };
 
 #endif
