@@ -116,6 +116,12 @@ bool CastSoulshatterAction::isUseful()
 // Checks if the bot has enough bag space to create a soul shard, then does so
 bool CreateSoulShardAction::Execute(Event event)
 {
+    uint32 now = getMSTime();
+
+    // 1000 ms = 1 second cooldown
+    if (now < lastCreateSoulShardTime + 1000)
+        return false;
+
     Player* bot = botAI->GetBot();
     if (!bot)
         return false;
@@ -130,6 +136,7 @@ bool CreateSoulShardAction::Execute(Event event)
         SQLTransaction<CharacterDatabaseConnection> trans = CharacterDatabase.BeginTransaction();
         bot->SaveInventoryAndGoldToDB(trans);
         CharacterDatabase.CommitTransaction(trans);
+        lastCreateSoulShardTime = now;  // update timer on successful creation
         return true;
     }
     return false;
