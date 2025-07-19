@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <mutex>
 
+const int ITEM_SOUL_SHARD = 6265;
+
 // Checks if the bot has less than 20 soul shards, and if so, allows casting Drain Soul
 bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 20; }
 
@@ -116,27 +118,18 @@ bool CastSoulshatterAction::isUseful()
 // Checks if the bot has enough bag space to create a soul shard, then does so
 bool CreateSoulShardAction::Execute(Event event)
 {
-    uint32 now = getMSTime();
-
-    // 1000 ms = 1 second cooldown
-    if (now < lastCreateSoulShardTime + 1000)
-        return false;
-
     Player* bot = botAI->GetBot();
     if (!bot)
         return false;
 
-    // Soul Shard item ID is 6265
-    uint32 soulShardId = 6265;
     ItemPosCountVec dest;
     uint32 count = 1;
-    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, soulShardId, count) == EQUIP_ERR_OK)
+    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SOUL_SHARD, count) == EQUIP_ERR_OK)
     {
-        bot->StoreNewItem(dest, soulShardId, true, Item::GenerateItemRandomPropertyId(soulShardId));
+        bot->StoreNewItem(dest, ITEM_SOUL_SHARD, true, Item::GenerateItemRandomPropertyId(ITEM_SOUL_SHARD));
         SQLTransaction<CharacterDatabaseConnection> trans = CharacterDatabase.BeginTransaction();
         bot->SaveInventoryAndGoldToDB(trans);
         CharacterDatabase.CommitTransaction(trans);
-        lastCreateSoulShardTime = now;  // update timer on successful creation
         return true;
     }
     return false;
@@ -149,8 +142,7 @@ bool CreateSoulShardAction::isUseful()
     if (!bot)
         return false;
 
-    uint32 soulShardId = 6265;
-    uint32 currentShards = bot->GetItemCount(soulShardId, false);  // false = only bags
+    uint32 currentShards = bot->GetItemCount(ITEM_SOUL_SHARD, false);  // false = only bags
     const uint32 SHARD_CAP = 6;                                    // adjust as needed
 
     return currentShards < SHARD_CAP;
@@ -159,7 +151,6 @@ bool CreateSoulShardAction::isUseful()
 
 bool DestroySoulShardAction::Execute(Event event)
 {
-    static const uint32 SOUL_SHARD_ID = 6265;
     // Look for the first soul shard in any bag and destroy it
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
     {
@@ -169,7 +160,7 @@ bool DestroySoulShardAction::Execute(Event event)
             {
                 if (Item* pItem = pBag->GetItemByPos(j))
                 {
-                    if (pItem->GetTemplate()->ItemId == SOUL_SHARD_ID)
+                    if (pItem->GetTemplate()->ItemId == ITEM_SOUL_SHARD)
                     {
                         bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                         return true;  // Only destroy one!
@@ -183,7 +174,7 @@ bool DestroySoulShardAction::Execute(Event event)
     {
         if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
-            if (pItem->GetTemplate()->ItemId == SOUL_SHARD_ID)
+            if (pItem->GetTemplate()->ItemId == ITEM_SOUL_SHARD)
             {
                 bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                 return true;
