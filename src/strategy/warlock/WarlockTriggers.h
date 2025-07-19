@@ -72,8 +72,18 @@ public:
 
     bool IsActive() override
     {
-        // Just check if we have a soulstone item available
-        return AI_VALUE2(uint32, "item count", "soulstone") > 0;
+        static const std::vector<uint32> soulstoneSpellIds = {20707, 20762, 20763, 20764, 20765, 27239, 47883};
+
+        if (AI_VALUE2(uint32, "item count", "soulstone") == 0)
+            return false;
+
+        for (uint32 spellId : soulstoneSpellIds)
+        {
+            if (!bot->HasSpellCooldown(spellId))
+                return true;  // Ready to use
+        }
+
+        return false;  // All are on cooldown
     }
 };
 
