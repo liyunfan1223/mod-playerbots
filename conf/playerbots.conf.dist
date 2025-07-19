@@ -32,6 +32,7 @@
 #        ACTIVITIES
 #        SPELLS
 #        STRATEGIES
+#        RPG STRATEGY
 #        TELEPORTS
 #        BATTLEGROUND & ARENA & PVP
 #        INTERVALS
@@ -756,11 +757,6 @@ AiPlayerbot.RandomBotGroupNearby = 0
 # Default: 1 (enabled)
 AiPlayerbot.AutoDoQuests = 1
 
-# Randombots will behave more like real players (experimental)
-# This option will override AiPlayerbot.AutoDoQuests, RandomBotTeleLowerLevel, and RandomBotTeleHigherLevel
-# Default: 1 (enabled)
-AiPlayerbot.EnableNewRpgStrategy = 1
-
 # Quest items to keep in bots' inventories (do not destroy)
 AiPlayerbot.RandomBotQuestItems = "5175,5176,5177,5178,6948,11000,12382,13704,16309"
 
@@ -818,36 +814,34 @@ AiPlayerbot.NonCombatStrategies = ""
 ####################################################################################################
 
 ####################################################################################################
-# TELEPORTS
+# RPG STRATEGY
 #
 #
 
-# Maps where bots can be teleported to
-AiPlayerbot.RandomBotMaps = 0,1,530,571
-
-# Probabilty bots teleport to banker (city)
-# Default: 0.25
-AiPlayerbot.ProbTeleToBankers = 0.25
-
-# How far randombots are teleported after death
-AiPlayerbot.RandomBotTeleportDistance = 100
-
-# How many levels below the lowest-level creature in a zone, can a bot be
-# This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
-# Default: 1 (randombot will leave if they are more than 1 level lower)
-AiPlayerbot.RandomBotTeleLowerLevel = 1
-
-# How many levels above the highest-level creature in a zone, can a bot be
-# This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
-# Default: 3 (randombot will leave if they are more than 3 levels higher)
-AiPlayerbot.RandomBotTeleHigherLevel = 3
-
-# Bots automatically teleport to another place for leveling on levelup
+# Randombots will behave more like real players (experimental)
+# This option will override AiPlayerbot.AutoDoQuests, RandomBotTeleLowerLevel, and RandomBotTeleHigherLevel
 # Default: 1 (enabled)
-AiPlayerbot.AutoTeleportForLevel = 1
+AiPlayerbot.EnableNewRpgStrategy = 1
+
+# Control probability weights for RPG status of bots. Takes effect only when the status meets its premise.​
+# Sum of weights need not be 100. Set to 0 to disable the status.
+#
+# WanderRandom  (Default: 15  Move randomly nearby to find and kill mobs)
+# WanderNpc     (Default: 20  Randomly interact with nearby NPCs​)
+# GoGrind       (Default: 15  Go to nearby level-appropriate locations to grind for killing mobs)
+# GoCamp        (Default: 10  Return to a nearby camp depending on innkeeper/flightmaster)​
+# DoQuest       (Default: 60  Select quest from the quest log and head to the location to attempt completion​)
+# TravelFlight  (Default: 15  Go to the nearest flightmaster and fly to a level-appropriate area)
+# Rest          (Default: 5   Take a break for a while and do nothing)
+AiPlayerbot.RpgStatusProbWeight.WanderRandom = 15
+AiPlayerbot.RpgStatusProbWeight.WanderNpc = 20
+AiPlayerbot.RpgStatusProbWeight.GoGrind = 15
+AiPlayerbot.RpgStatusProbWeight.GoCamp = 10
+AiPlayerbot.RpgStatusProbWeight.DoQuest = 60
+AiPlayerbot.RpgStatusProbWeight.TravelFlight = 15
+AiPlayerbot.RpgStatusProbWeight.Rest = 5
 
 # Bots' minimum and maximum level when teleporting in and out of a zone, according to the new RPG strategy
-# Requires EnableNewRpgStrategy enabled
 # Format: AiPlayerbot.ZoneBracket.zoneID = minLevel,maxLevel
 #
 # Classic WoW - Low-level zones:
@@ -988,6 +982,40 @@ AiPlayerbot.ZoneBracket.4197 = 79,80
 ####################################################################################################
 
 ####################################################################################################
+# TELEPORTS
+#
+#
+
+# Maps where bots can be teleported to
+AiPlayerbot.RandomBotMaps = 0,1,530,571
+
+# Probabilty bots teleport to banker (city)
+# Default: 0.25
+AiPlayerbot.ProbTeleToBankers = 0.25
+
+# How far randombots are teleported after death
+AiPlayerbot.RandomBotTeleportDistance = 100
+
+# How many levels below the lowest-level creature in a zone, can a bot be
+# This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
+# Default: 1 (randombot will leave if they are more than 1 level lower)
+AiPlayerbot.RandomBotTeleLowerLevel = 1
+
+# How many levels above the highest-level creature in a zone, can a bot be
+# This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
+# Default: 3 (randombot will leave if they are more than 3 levels higher)
+AiPlayerbot.RandomBotTeleHigherLevel = 3
+
+# Bots automatically teleport to another place for leveling on levelup
+# Default: 1 (enabled)
+AiPlayerbot.AutoTeleportForLevel = 1
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
 # BATTLEGROUNDS & ARENAS & PVP
 #
 #
@@ -1066,7 +1094,7 @@ AiPlayerbot.RandomBotArenaTeamMinRating = 1000
 AiPlayerbot.DeleteRandomBotArenaTeams = 0
 
 # PvP Restricted Zones (bots don't pvp)
-AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,139"
+AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,139,3951"
 
 # PvP Restricted Areas (bots don't pvp)
 AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080"
