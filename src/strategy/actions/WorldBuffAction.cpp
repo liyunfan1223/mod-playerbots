@@ -4,7 +4,6 @@
  */
 
 #include "WorldBuffAction.h"
-
 #include "AiFactory.h"
 #include "Event.h"
 #include "Playerbots.h"
@@ -13,11 +12,12 @@ bool WorldBuffAction::Execute(Event event)
 {
     std::string const text = event.getParam();
 
-    for (auto& wb : NeedWorldBuffs(bot))
+    std::vector<uint32> buffs = NeedWorldBuffs(bot);  // Get matching buffs
+
+    for (auto& wb : buffs)
     {
         bot->AddAura(wb, bot);
     }
-
     return false;
 }
 
@@ -69,7 +69,6 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
         }
         // If tank, effectiveSpec remains unchanged
     }
-
 
     for (auto const& wb : sPlayerbotAIConfig->worldBuffs)
     {
