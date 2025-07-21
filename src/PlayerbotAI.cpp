@@ -1048,6 +1048,9 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                     default:
                         return;
                 }
+                
+                if (chanName == "World")
+                    return;
 
                 // do not reply to self but always try to reply to real player
                 if (guid1 != bot->GetGUID())
