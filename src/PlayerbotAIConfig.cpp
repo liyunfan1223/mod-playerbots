@@ -617,6 +617,8 @@ bool PlayerbotAIConfig::Initialize()
     sPlayerbotTextMgr->LoadBotTextChance();
     PlayerbotFactory::Init();
 
+    AiObjectContext::BuildAllSharedContexts();
+    
     if (!sPlayerbotAIConfig->autoDoQuests)
     {
         LOG_INFO("server.loading", "Loading Quest Detail Data...");

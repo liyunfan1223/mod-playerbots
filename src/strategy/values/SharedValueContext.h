@@ -50,9 +50,12 @@ public:
     template <class T>
     Value<T>* getGlobalValue(std::string const name)
     {
-        NamedObjectContextList<UntypedValue> valueContexts;
-        valueContexts.Add(this);
+        // should never reach here
+        SharedNamedObjectContextList<UntypedValue> sValueContexts;
+        sValueContexts.Add(this);
+        NamedObjectContextList<UntypedValue> valueContexts(sValueContexts);
         PlayerbotAI* botAI = new PlayerbotAI();
+        
         UntypedValue* value = valueContexts.GetContextObject(name, botAI);
         delete botAI;
         return dynamic_cast<Value<T>*>(value);
