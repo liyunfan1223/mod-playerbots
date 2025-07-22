@@ -11,11 +11,22 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
+#include "AiObjectContext.h"
+#include "Log.h" 
 
 bool ChangeTalentsAction::Execute(Event event)
 {
-    std::string param = event.getParam();
 
+    auto* flag = botAI->GetAiObjectContext()->GetValue<bool>("custom_glyphs"); // Added for custom Glyphs
+
+    if (flag->Get()) // Added for custom Glyphs
+    {
+        flag->Set(false);
+        LOG_INFO("playerbots", "Custom Glyph Flag set to OFF");
+    }
+	
+    std::string param = event.getParam();
+	
     std::ostringstream out;
 
     if (!param.empty())

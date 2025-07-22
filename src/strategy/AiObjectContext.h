@@ -22,6 +22,7 @@ class PlayerbotAI;
 class AiObjectContext : public PlayerbotAIAware
 {
 public:
+    static BoolCalculatedValue* custom_glyphs(PlayerbotAI* ai); // Added for cutom glyphs
     AiObjectContext(PlayerbotAI* botAI);
     virtual ~AiObjectContext() {}
 
