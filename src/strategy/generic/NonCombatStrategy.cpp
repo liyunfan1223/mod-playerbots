@@ -38,11 +38,10 @@ void WorldBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("need world buff", NextAction::array(0, new NextAction("world buff", 1.0f), NULL)));
 }
 
-void FishStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void BobberStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    /* triggers.push_back(
-        new TriggerNode("val::can fish", NextAction::array(0, new NextAction("move to fish" + modifier, 5.0f),
-                                                           new NextAction("fish" + modifier, 10.0f), NULL)));*/
+    /*triggers.push_back(new TriggerNode("can fish", NextAction::array(0, new NextAction("move to fish" ,  5.0f),
+                                                           new NextAction("go fishing" , 10.0f), NULL)));*/
     triggers.push_back(new TriggerNode("can use fishing bobber",
                                        NextAction::array(0, new NextAction("use fishing bobber", 99.0f), NULL)));
     /*

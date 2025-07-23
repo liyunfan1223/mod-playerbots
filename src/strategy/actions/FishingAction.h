@@ -7,6 +7,7 @@
 #define _PLAYERBOT_FISHINGACTION_H
 
 #include "Action.h"
+#include "MovementActions.h"
 #include "Event.h"
 #include "Playerbots.h"
 
@@ -14,15 +15,22 @@ extern const uint32 FISHING_SPELL;
 
 class PlayerbotAI;
 
+static WorldPosition FindWater(Player* bot, float distance = 5.0f, float increment = 0.2f);
+
 class FishingAction : public Action, public Qualified
 {
 public:
     FishingAction(PlayerbotAI* botAI) : Action(botAI, "go fishing"){}
     bool Execute(Event event) override;
     bool isUseful() override;
+};
 
-private:
-    WorldPosition FindWater(Player* bot, float distance = 5.0f, float increment = 0.2f);
+class MovetoFish: public MovementAction, public Qualified
+{
+public:
+    MovetoFish(PlayerbotAI* botAI) : MovementAction(botAI, "move to fish") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class UseBobber : public Action

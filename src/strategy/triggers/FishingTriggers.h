@@ -9,6 +9,12 @@
 
 #include "GenericTriggers.h"    
 
+class CanFishTrigger : public Trigger
+{
+    public:
+    CanFishTrigger(PlayerbotAI* ai) : Trigger(ai, "can fish") {};
+        bool IsActive() override;
+};
 
 class CanOpenFishingBobberTrigger : public Trigger
 {

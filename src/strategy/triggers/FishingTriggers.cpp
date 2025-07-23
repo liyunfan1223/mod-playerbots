@@ -6,7 +6,6 @@
 #include "FishingTriggers.h"
 #include "Playerbots.h"
 
-bool CanOpenFishingBobberTrigger::IsActive()
-{
-return AI_VALUE(bool, "can use fishing bobber");
-};
+bool CanFishTrigger::IsActive() { return AI_VALUE(bool, "can fish"); }
+
+bool CanOpenFishingBobberTrigger::IsActive() { return AI_VALUE(bool, "can use fishing bobber");}

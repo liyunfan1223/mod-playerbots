@@ -7,11 +7,13 @@
 #include "Playerbots.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "MoveToTravelTargetAction.h"
+#include "PlayerbotAI.h"
 
 
 extern const uint32 FISHING_SPELL = 7620;
 
-WorldPosition FishingAction::FindWater(Player* bot, float distance, float increment)
+WorldPosition FindWater(Player* bot, float distance, float increment)
 {
     float x = bot->GetPositionX();
     float y = bot->GetPositionY();
@@ -29,6 +31,32 @@ WorldPosition FishingAction::FindWater(Player* bot, float distance, float increm
         }
     }
     return nullptr;
+};
+bool MovetoFish::Execute(Event event)
+{
+    if (qualifier == "travel")
+    {
+        TravelTarget* target = AI_VALUE(TravelTarget*, "travel target");
+
+        if (target->getStatus() != TravelStatus::TRAVEL_STATUS_TRAVEL)
+            return false;
+    }
+    WorldPosition nearwater = FindWater(bot, 5.0f, 0.2f);
+    if (nearwater)
+        return false;
+        
+    WorldPosition FishSpot = FindWater(bot, 200.0f, 2.5f);
+    if (FishSpot)
+    {
+        return MoveTo(FishSpot.GetMapId(), FishSpot.GetPositionX(), FishSpot.GetPositionY(), FishSpot.GetPositionZ());
+    }
+    return false;    
+}
+bool MovetoFish::isUseful()
+{
+    if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
+        return false;
+    return true;
 };
 
 bool FishingAction::Execute(Event event)
@@ -113,15 +141,16 @@ bool FishingAction::Execute(Event event)
     }
 
     botAI->CastSpell(FISHING_SPELL, bot);
+    botAI->ChangeStrategy("+usebobber", BOT_STATE_NON_COMBAT);
    
     return true;
 };
 
-
 bool FishingAction::isUseful()
 {
-    if (!AI_VALUE(bool, "can fish"))  // verify spell and fishing pole. Adds pole to Rndbot if missing.
+    if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
         return false;
+    return true;
 };
 
 bool UseBobber::Execute(Event event)
@@ -155,13 +184,9 @@ bool UseBobber::Execute(Event event)
                 return false;
             }
             
-            if (!bot->GetSession())
-            return false;
-
-            WorldPacket* packet = new WorldPacket(CMSG_GAMEOBJ_USE);
-            *packet << guid;
-            bot->GetSession()->SendPacket(packet);
-
+            botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
+            go->Use(bot);
+            return true;
 
         }
     }

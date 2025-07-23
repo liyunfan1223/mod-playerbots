@@ -190,6 +190,7 @@ public:
         creators["buy tabard"] = &ActionContext::buy_tabard;
         creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
         creators["clean quest log"] = &ActionContext::clean_quest_log;
+        creators["move to fish"] = &ActionContext::move_to_fish;
         creators["go fishing"] = &ActionContext::fishing_action;
         creators["use fishing bobber"] = &ActionContext::use_fishing_bobber;
 
@@ -376,6 +377,7 @@ private:
     static Action* buy_tabard(PlayerbotAI* botAI) { return new BuyTabardAction(botAI); }
     static Action* guild_manage_nearby(PlayerbotAI* botAI) { return new GuildManageNearbyAction(botAI); }
     static Action* clean_quest_log(PlayerbotAI* botAI) { return new CleanQuestLogAction(botAI); }
+    static Action* move_to_fish(PlayerbotAI* botAI) { return new MovetoFish(botAI); }
     static Action* fishing_action(PlayerbotAI* botAI) { return new FishingAction(botAI);}
     static Action* use_fishing_bobber(PlayerbotAI* botAI) { return new UseBobber(botAI);}
 

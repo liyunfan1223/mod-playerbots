@@ -12,8 +12,6 @@
 
 bool CanFishValue::Calculate()
 {
-    LOG_ERROR("playerbots","Entering CanFishValue::Calculate");
-
   if (!bot)
   {
     return false;
