@@ -1,4 +1,7 @@
 #include "NewRpgInfo.h"
+
+#include <cmath>
+
 #include "Timer.h"
 
 void NewRpgInfo::ChangeToGoGrind(WorldPosition pos)
@@ -9,26 +12,26 @@ void NewRpgInfo::ChangeToGoGrind(WorldPosition pos)
     go_grind.pos = pos;
 }
 
-void NewRpgInfo::ChangeToGoInnkeeper(WorldPosition pos)
+void NewRpgInfo::ChangeToGoCamp(WorldPosition pos)
 {
     Reset();
-    status = RPG_GO_INNKEEPER;
-    go_innkeeper = GoInnkeeper();
-    go_innkeeper.pos = pos;
+    status = RPG_GO_CAMP;
+    go_camp = GoCamp();
+    go_camp.pos = pos;
 }
 
-void NewRpgInfo::ChangeToNearNpc()
+void NewRpgInfo::ChangeToWanderNpc()
 {
     Reset();
-    status = RPG_NEAR_NPC;
-    near_npc = NearNpc();
+    status = RPG_WANDER_NPC;
+    wander_npc = WanderNpc();
 }
 
-void NewRpgInfo::ChangeToNearRandom()
+void NewRpgInfo::ChangeToWanderRandom()
 {
     Reset();
-    status = RPG_NEAR_RANDOM;
-    near_random = NearRandom();
+    status = RPG_WANDER_RANDOM;
+    WANDER_RANDOM = WanderRandom();
 }
 
 void NewRpgInfo::ChangeToDoQuest(uint32 questId, const Quest* quest)
@@ -38,6 +41,16 @@ void NewRpgInfo::ChangeToDoQuest(uint32 questId, const Quest* quest)
     do_quest = DoQuest();
     do_quest.questId = questId;
     do_quest.quest = quest;
+}
+
+void NewRpgInfo::ChangeToTravelFlight(ObjectGuid fromFlightMaster, uint32 fromNode, uint32 toNode)
+{
+    Reset();
+    status = RPG_TRAVEL_FLIGHT;
+    flight = TravelFlight();
+    flight.fromFlightMaster = fromFlightMaster;
+    flight.fromNode = fromNode;
+    flight.toNode = toNode;
 }
 
 void NewRpgInfo::ChangeToRest()
@@ -53,10 +66,7 @@ void NewRpgInfo::ChangeToIdle()
     status = RPG_IDLE;
 }
 
-bool NewRpgInfo::CanChangeTo(NewRpgStatus status)
-{
-    return true;
-}
+bool NewRpgInfo::CanChangeTo(NewRpgStatus status) { return true; }
 
 void NewRpgInfo::Reset()
 {
@@ -80,23 +90,25 @@ std::string NewRpgInfo::ToString()
     {
         case RPG_GO_GRIND:
             out << "GO_GRIND";
-            out << "\nGrindPos: " << go_grind.pos.GetMapId() << " " << go_grind.pos.GetPositionX() << " " << go_grind.pos.GetPositionY() << " " << go_grind.pos.GetPositionZ();
+            out << "\nGrindPos: " << go_grind.pos.GetMapId() << " " << go_grind.pos.GetPositionX() << " "
+                << go_grind.pos.GetPositionY() << " " << go_grind.pos.GetPositionZ();
             out << "\nlastGoGrind: " << startT;
             break;
-        case RPG_GO_INNKEEPER:
-            out << "GO_INNKEEPER";
-            out << "\nInnKeeperPos: " << go_innkeeper.pos.GetMapId() << " " << go_innkeeper.pos.GetPositionX() << " " << go_innkeeper.pos.GetPositionY() << " " << go_innkeeper.pos.GetPositionZ();
-            out << "\nlastGoInnKeeper: " << startT;
+        case RPG_GO_CAMP:
+            out << "GO_CAMP";
+            out << "\nCampPos: " << go_camp.pos.GetMapId() << " " << go_camp.pos.GetPositionX() << " "
+                << go_camp.pos.GetPositionY() << " " << go_camp.pos.GetPositionZ();
+            out << "\nlastGoCamp: " << startT;
             break;
-        case RPG_NEAR_NPC:
-            out << "NEAR_NPC";
-            out << "\nnpcOrGoEntry: " << near_npc.npcOrGo.GetCounter();
-            out << "\nlastNearNpc: " << startT;
-            out << "\nlastReachNpcOrGo: " << near_npc.lastReach;
+        case RPG_WANDER_NPC:
+            out << "WANDER_NPC";
+            out << "\nnpcOrGoEntry: " << wander_npc.npcOrGo.GetCounter();
+            out << "\nlastWanderNpc: " << startT;
+            out << "\nlastReachNpcOrGo: " << wander_npc.lastReach;
             break;
-        case RPG_NEAR_RANDOM:
-            out << "NEAR_RANDOM";
-            out << "\nlastNearRandom: " << startT;
+        case RPG_WANDER_RANDOM:
+            out << "WANDER_RANDOM";
+            out << "\nlastWanderRandom: " << startT;
             break;
         case RPG_IDLE:
             out << "IDLE";
@@ -109,8 +121,16 @@ std::string NewRpgInfo::ToString()
             out << "DO_QUEST";
             out << "\nquestId: " << do_quest.questId;
             out << "\nobjectiveIdx: " << do_quest.objectiveIdx;
-            out << "\npoiPos: " << do_quest.pos.GetMapId() << " " << do_quest.pos.GetPositionX() << " " << do_quest.pos.GetPositionY() << " " << do_quest.pos.GetPositionZ();
-            out << "\nlastReachPOI: " << do_quest.lastReachPOI;
+            out << "\npoiPos: " << do_quest.pos.GetMapId() << " " << do_quest.pos.GetPositionX() << " "
+                << do_quest.pos.GetPositionY() << " " << do_quest.pos.GetPositionZ();
+            out << "\nlastReachPOI: " << do_quest.lastReachPOI ? GetMSTimeDiffToNow(do_quest.lastReachPOI) : 0;
+            break;
+        case RPG_TRAVEL_FLIGHT:
+            out << "TRAVEL_FLIGHT";
+            out << "\nfromFlightMaster: " << flight.fromFlightMaster.GetEntry();
+            out << "\nfromNode: " << flight.fromNode;
+            out << "\ntoNode: " << flight.toNode;
+            out << "\ninFlight: " << flight.inFlight;
             break;
         default:
             out << "UNKNOWN";
