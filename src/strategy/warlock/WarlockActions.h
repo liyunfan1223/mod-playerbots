@@ -84,6 +84,7 @@ class CastCreateSoulstoneAction : public CastBuffSpellAction
 {
 public:
     CastCreateSoulstoneAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "create soulstone") {}
+    bool isUseful() override;
 };
 
 class UseSoulstoneSelfAction : public UseSpellItemAction

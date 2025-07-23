@@ -145,9 +145,51 @@ bool CreateSoulShardAction::isUseful()
     uint32 currentShards = bot->GetItemCount(ITEM_SOUL_SHARD, false);  // false = only bags
     const uint32 SHARD_CAP = 6;                                    // adjust as needed
 
-    return currentShards < SHARD_CAP;
+    // Only allow if under cap AND there is space for a new shard
+    ItemPosCountVec dest;
+    uint32 count = 1;
+    bool hasSpace = (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SOUL_SHARD, count) == EQUIP_ERR_OK);
+
+    return (currentShards < SHARD_CAP) && hasSpace;
 }
 
+bool CastCreateSoulstoneAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+
+    // List of all Soulstone item IDs
+    static const std::vector<uint32> soulstoneIds = {
+        5232,   // Minor Soulstone
+        16892,  // Lesser Soulstone
+        16893,  // Soulstone
+        16895,  // Greater Soulstone
+        16896,  // Major Soulstone
+        22116,  // Master Soulstone
+        36895   // Demonic Soulstone
+    };
+
+    // Check if the bot already has any soulstone
+    uint32 currentSoulstones = 0;
+    for (uint32 id : soulstoneIds)
+        currentSoulstones += bot->GetItemCount(id, false);  // false = only bags
+
+    // Allow only if the bot has no soulstone AND there is space for one
+    ItemPosCountVec dest;
+    uint32 count = 1;
+    bool hasSpace = false;
+    for (uint32 id : soulstoneIds)
+    {
+        if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count) == EQUIP_ERR_OK)
+        {
+            hasSpace = true;
+            break;
+        }
+    }
+
+    return (currentSoulstones == 0) && hasSpace;
+}
 
 bool DestroySoulShardAction::Execute(Event event)
 {
