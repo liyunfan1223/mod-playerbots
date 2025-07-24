@@ -618,13 +618,6 @@ bool PlayerbotAIConfig::Initialize()
     PlayerbotFactory::Init();
 
     AiObjectContext::BuildAllSharedContexts();
-    
-    if (!sPlayerbotAIConfig->autoDoQuests)
-    {
-        LOG_INFO("server.loading", "Loading Quest Detail Data...");
-        sTravelMgr->LoadQuestTravelTable();
-    }
-
 
     if (sPlayerbotAIConfig->randomBotSuggestDungeons)
     {
