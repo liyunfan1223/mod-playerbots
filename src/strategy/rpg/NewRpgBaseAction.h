@@ -4,15 +4,17 @@
 #include "Duration.h"
 #include "LastMovementValue.h"
 #include "MovementActions.h"
+#include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
+#include "PlayerbotAI.h"
 #include "QuestDef.h"
 #include "TravelMgr.h"
-#include "PlayerbotAI.h"
 
-struct POIInfo {
+struct POIInfo
+{
     G3D::Vector2 pos;
     int32 objectiveIdx;
 };
@@ -24,15 +26,15 @@ class NewRpgBaseAction : public MovementAction
 {
 public:
     NewRpgBaseAction(PlayerbotAI* botAI, std::string name) : MovementAction(botAI, name) {}
-    
+
 protected:
-    // MOVEMENT RELATED
+    /* MOVEMENT RELATED */
     bool MoveFarTo(WorldPosition dest);
     bool MoveWorldObjectTo(ObjectGuid guid, float distance = INTERACTION_DISTANCE);
     bool MoveRandomNear(float moveStep = 50.0f, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     bool ForceToWait(uint32 duration, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
 
-    // QUEST RELATED CHECK
+    /* QUEST RELATED CHECK */
     ObjectGuid ChooseNpcOrGameObjectToInteract(bool questgiverOnly = false, float distanceLimit = 0.0f);
     bool HasQuestToAcceptOrReward(WorldObject* object);
     bool InteractWithNpcOrGameObjectForQuest(ObjectGuid guid);
@@ -41,20 +43,24 @@ protected:
     uint32 BestRewardIndex(Quest const* quest);
     bool IsQuestWorthDoing(Quest const* quest);
     bool IsQuestCapableDoing(Quest const* quest);
-    // QUEST RELATED ACTION
+
+    /* QUEST RELATED ACTION */
     bool SearchQuestGiverAndAcceptOrReward();
     bool AcceptQuest(Quest const* quest, ObjectGuid guid);
     bool TurnInQuest(Quest const* quest, ObjectGuid guid);
     bool OrganizeQuestLog();
 
 protected:
-    bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo> &poiInfo, bool toComplete = false);
+    bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete = false);
     static WorldPosition SelectRandomGrindPos(Player* bot);
-    static WorldPosition SelectRandomInnKeeperPos(Player* bot);
+    static WorldPosition SelectRandomCampPos(Player* bot);
+    bool SelectRandomFlightTaxiNode(ObjectGuid& flightMaster, uint32& fromNode, uint32& toNode);
+    bool RandomChangeStatus(std::vector<NewRpgStatus> candidateStatus);
+    bool CheckRpgStatusAvailable(NewRpgStatus status);
 
 protected:
-    // WorldPosition dest;
-    const float pathFinderDis = 70.0f; // path finder
+    /* FOR MOVE FAR */
+    const float pathFinderDis = 70.0f;
     const uint32 stuckTime = 5 * 60 * 1000;
 };
 
