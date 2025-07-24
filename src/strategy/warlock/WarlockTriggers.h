@@ -33,7 +33,7 @@ public:
 class OutOfSoulShardsTrigger : public Trigger
 {
 public:
-    OutOfSoulShardsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soul shard") {}
+    OutOfSoulShardsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soul shard", 2) {}
     bool IsActive() override { return AI_VALUE2(uint32, "item count", "soul shard") == 0; }
 };
 
