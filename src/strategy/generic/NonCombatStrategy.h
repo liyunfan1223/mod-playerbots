@@ -58,13 +58,12 @@ public:
     std::string const getName() override { return "worldbuff"; }
 };
 
-class BobberStrategy : public Strategy
+class FishStrategy : public Strategy
 {
 public:
-    BobberStrategy(PlayerbotAI* botAI) : Strategy(botAI){}
+    FishStrategy(PlayerbotAI* botAI) : Strategy(botAI){}
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName(){return "usebobber";}
+    std::string const getName(){return "fish";}
 };
-
 #endif

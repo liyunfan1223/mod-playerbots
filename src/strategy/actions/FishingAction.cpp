@@ -13,12 +13,8 @@
 
 extern const uint32 FISHING_SPELL = 7620;
 
-WorldPosition FindWater(Player* bot, float distance, float increment)
+WorldPosition FindWater(Player* bot, float x, float y, float z, uint32 mapId, float distance, float increment, bool findLand)
 {
-    float x = bot->GetPositionX();
-    float y = bot->GetPositionY();
-    float z = bot->GetPositionZ();
-    uint32 mapId = bot->GetMapId();
     for (float checkX = x - distance; checkX <= x + distance; checkX += increment)
     {
         for (float checkY = y - distance; checkY <= y + distance; checkY += increment)
@@ -31,7 +27,8 @@ WorldPosition FindWater(Player* bot, float distance, float increment)
         }
     }
     return nullptr;
-};
+}
+
 bool MovetoFish::Execute(Event event)
 {
     if (qualifier == "travel")
@@ -41,23 +38,25 @@ bool MovetoFish::Execute(Event event)
         if (target->getStatus() != TravelStatus::TRAVEL_STATUS_TRAVEL)
             return false;
     }
-    WorldPosition nearwater = FindWater(bot, 5.0f, 0.2f);
+    WorldPosition nearwater = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 5.0f, 0.2f, false);
     if (nearwater)
         return false;
         
-    WorldPosition FishSpot = FindWater(bot, 200.0f, 2.5f);
+    WorldPosition FishSpot = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), sPlayerbotAIConfig->fishingDistance, 2.5f, false);
     if (FishSpot)
     {
-        return MoveTo(FishSpot.GetMapId(), FishSpot.GetPositionX(), FishSpot.GetPositionY(), FishSpot.GetPositionZ());
+        WorldPosition LandSpot = FindWater(bot, FishSpot.GetPositionX(), FishSpot.GetPositionY(), FishSpot.GetPositionZ(), FishSpot.GetMapId(), 3.0f, 0.2f, true);
+        if(LandSpot)
+            return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
     }
-    return false;    
+    return false;
 }
 bool MovetoFish::isUseful()
 {
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
         return false;
     return true;
-};
+}
 
 bool FishingAction::Execute(Event event)
 {
@@ -68,16 +67,15 @@ bool FishingAction::Execute(Event event)
         if (target->getStatus() != TravelStatus::TRAVEL_STATUS_TRAVEL)
             return false;
     }
-    WorldPosition FishSpot = FindWater(bot, 5.0f, 0.2f);
+    WorldPosition FishSpot = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 5.0f, 0.2f, false);
     if (FishSpot)
     {
-        bot->SetFacingTo(FishSpot);
+        bot->SetFacingTo(FishSpot.GetPositionX(), FishSpot.GetPositionY(), FishSpot.GetPositionZ());
     }
 
     else
     {
-   //     botAI->RpgTaxiAction(FindWater(bot, 100.0f));
-        bot->SetFacingTo(FindWater(bot, 100.0f, 5.0f));
+        return MovetoFish(botAI).Execute(event);
     }
     auto isFishingPole = [](Item* item) -> bool
     {
@@ -144,14 +142,14 @@ bool FishingAction::Execute(Event event)
     botAI->ChangeStrategy("+usebobber", BOT_STATE_NON_COMBAT);
    
     return true;
-};
+}
 
 bool FishingAction::isUseful()
 {
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
         return false;
     return true;
-};
+}
 
 bool UseBobber::Execute(Event event)
 {
@@ -192,4 +190,4 @@ bool UseBobber::Execute(Event event)
     }
 
     return false;
-};
+}
