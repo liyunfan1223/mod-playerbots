@@ -486,6 +486,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
         CharacterDatabase.Execute("DELETE FROM characters WHERE account IN (SELECT id FROM " + loginDBName + ".account WHERE username LIKE '{}%%')",
             sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
 
+        // Wait for the characters to be deleted before proceeding to dependent deletes
+        while (CharacterDatabase.QueueSize())
+        {
+            std::this_thread::sleep_for(1s);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));    // Extra 100ms fixed delay for safety.
+
         // Clean up orphaned entries in playerbots_guild_tasks
         PlayerbotsDatabase.Execute("DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM " + characterDBName + ".characters)");
 
@@ -500,11 +507,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
         CharacterDatabase.Execute("DELETE FROM character_achievement WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM character_achievement_progress WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM character_action WHERE guid NOT IN (SELECT guid FROM characters)");
+        CharacterDatabase.Execute("DELETE FROM character_arena_stats WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM character_aura WHERE guid NOT IN (SELECT guid FROM characters)");
+        CharacterDatabase.Execute("DELETE FROM character_entry_point WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM character_glyphs WHERE guid NOT IN (SELECT guid FROM characters)");
         CharacterDatabase.Execute("DELETE FROM character_homebind WHERE guid NOT IN (SELECT guid FROM characters)");
-        CharacterDatabase.Execute("DELETE FROM item_instance WHERE owner_guid NOT IN (SELECT guid FROM characters) AND owner_guid > 0");
         CharacterDatabase.Execute("DELETE FROM character_inventory WHERE guid NOT IN (SELECT guid FROM characters)");
+        CharacterDatabase.Execute("DELETE FROM item_instance WHERE owner_guid NOT IN (SELECT guid FROM characters) AND owner_guid > 0");
 
         // Clean up pet data
         CharacterDatabase.Execute("DELETE FROM character_pet WHERE owner NOT IN (SELECT guid FROM characters)");
@@ -559,11 +568,23 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
         uint32 timer = getMSTime();
 
+        // After ALL deletions, make sure data is commited to DB
+        LoginDatabase.Execute("COMMIT");
+        CharacterDatabase.Execute("COMMIT");
+        PlayerbotsDatabase.Execute("COMMIT");
+
         // Wait for all pending database operations to complete
         while (LoginDatabase.QueueSize() || CharacterDatabase.QueueSize() || PlayerbotsDatabase.QueueSize())
         {
             std::this_thread::sleep_for(1s);
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));    // Extra 100ms fixed delay for safety.
+
+        // Flush tables to ensure all data in memory are written to disk
+        LoginDatabase.Execute("FLUSH TABLES");
+        CharacterDatabase.Execute("FLUSH TABLES");
+        PlayerbotsDatabase.Execute("FLUSH TABLES");
+
         LOG_INFO("playerbots", ">> Random bot accounts and data deleted in {} ms", GetMSTimeDiffToNow(timer));
         LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
         World::StopNow(SHUTDOWN_EXIT_CODE);

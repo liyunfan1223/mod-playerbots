@@ -193,6 +193,7 @@ public:
         // BG Tactics
         creators["bg tactics"] = &ActionContext::bg_tactics;
         creators["bg move to start"] = &ActionContext::bg_move_to_start;
+        creators["bg reset objective force"] = &ActionContext::bg_reset_objective_force;
         creators["bg move to objective"] = &ActionContext::bg_move_to_objective;
         creators["bg select objective"] = &ActionContext::bg_select_objective;
         creators["bg check objective"] = &ActionContext::bg_check_objective;
@@ -245,10 +246,11 @@ public:
 
         creators["new rpg status update"] = &ActionContext::new_rpg_status_update;
         creators["new rpg go grind"] = &ActionContext::new_rpg_go_grind;
-        creators["new rpg go innkeeper"] = &ActionContext::new_rpg_go_innkeeper;
-        creators["new rpg move random"] = &ActionContext::new_rpg_move_random;
-        creators["new rpg move npc"] = &ActionContext::new_rpg_move_npc;
+        creators["new rpg go camp"] = &ActionContext::new_rpg_go_camp;
+        creators["new rpg wander random"] = &ActionContext::new_rpg_wander_random;
+        creators["new rpg wander npc"] = &ActionContext::new_rpg_wander_npc;
         creators["new rpg do quest"] = &ActionContext::new_rpg_do_quest;
+        creators["new rpg travel flight"] = &ActionContext::new_rpg_travel_flight;
     }
 
 private:
@@ -376,6 +378,7 @@ private:
     // BG Tactics
     static Action* bg_tactics(PlayerbotAI* botAI) { return new BGTactics(botAI); }
     static Action* bg_move_to_start(PlayerbotAI* botAI) { return new BGTactics(botAI, "move to start"); }
+    static Action* bg_reset_objective_force(PlayerbotAI* botAI) { return new BGTactics(botAI, "reset objective force"); }
     static Action* bg_move_to_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "move to objective"); }
     static Action* bg_select_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "select objective"); }
     static Action* bg_check_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "check objective"); }
@@ -428,10 +431,11 @@ private:
 
     static Action* new_rpg_status_update(PlayerbotAI* ai) { return new NewRpgStatusUpdateAction(ai); }
     static Action* new_rpg_go_grind(PlayerbotAI* ai) { return new NewRpgGoGrindAction(ai); }
-    static Action* new_rpg_go_innkeeper(PlayerbotAI* ai) { return new NewRpgGoInnKeeperAction(ai); }
-    static Action* new_rpg_move_random(PlayerbotAI* ai) { return new NewRpgMoveRandomAction(ai); }
-    static Action* new_rpg_move_npc(PlayerbotAI* ai) { return new NewRpgMoveNpcAction(ai); }
+    static Action* new_rpg_go_camp(PlayerbotAI* ai) { return new NewRpgGoCampAction(ai); }
+    static Action* new_rpg_wander_random(PlayerbotAI* ai) { return new NewRpgWanderRandomAction(ai); }
+    static Action* new_rpg_wander_npc(PlayerbotAI* ai) { return new NewRpgWanderNpcAction(ai); }
     static Action* new_rpg_do_quest(PlayerbotAI* ai) { return new NewRpgDoQuestAction(ai); }
+    static Action* new_rpg_travel_flight(PlayerbotAI* ai) { return new NewRpgTravelFlightAction(ai); }
 };
 
 #endif

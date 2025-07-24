@@ -73,7 +73,7 @@ bool TaxiAction::Execute(Event event)
                 {
                     if (Creature* npcPtr = ObjectAccessor::GetCreature(*bot, npcGuid))
                         if (!movement.taxiNodes.empty())
-                            bot->ActivateTaxiPathTo(movement.taxiNodes, npcPtr);
+                            bot->ActivateTaxiPathTo(movement.taxiNodes, npcPtr, 0);
                 },
                 delay);
             botAI->SetNextCheckDelay(delay + 50);
@@ -114,7 +114,7 @@ bool TaxiAction::Execute(Event event)
             return bot->ActivateTaxiPathTo({entry->from, entry->to}, npc, 0);
         }
 
-        if (!movement.taxiNodes.empty() && !bot->ActivateTaxiPathTo(movement.taxiNodes, npc))
+        if (!movement.taxiNodes.empty() && !bot->ActivateTaxiPathTo(movement.taxiNodes, npc, 0))
         {
             movement.taxiNodes.clear();
             movement.Set(nullptr);

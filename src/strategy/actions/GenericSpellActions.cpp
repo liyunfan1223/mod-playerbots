@@ -332,8 +332,26 @@ bool UseTrinketAction::UseTrinket(Item* item)
         if (item->GetTemplate()->Spells[i].SpellId > 0 && item->GetTemplate()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
         {
             spellId = item->GetTemplate()->Spells[i].SpellId;
-            uint32 spellProcFlag = sSpellMgr->GetSpellInfo(spellId)->ProcFlags;
+            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
+            if (!spellInfo || !spellInfo->IsPositive())
+                return false;
+            
+            bool applyAura = false;
+            for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
+            {
+                const SpellEffectInfo& effectInfo = spellInfo->Effects[i];
+                if (effectInfo.Effect == SPELL_EFFECT_APPLY_AURA) {
+                    applyAura = true;
+                    break;
+                }
+            }
+            
+            if (!applyAura)
+                return false;
+            
+            uint32 spellProcFlag = spellInfo->ProcFlags;
+            
             // Handle items with procflag "if you kill a target that grants honor or experience"
             // Bots will "learn" the trinket proc, so CanCastSpell() will be true
             // e.g. on Item https://www.wowhead.com/wotlk/item=44074/oracle-talisman-of-ablution leading to
@@ -353,17 +371,8 @@ bool UseTrinketAction::UseTrinket(Item* item)
     WorldPacket packet(CMSG_USE_ITEM);
     packet << bagIndex << slot << cast_count << spellId << item_guid << glyphIndex << castFlags;
 
-    Unit* target = AI_VALUE(Unit*, "current target");
-    if (target)
-    {
-        targetFlag = TARGET_FLAG_UNIT;
-        packet << targetFlag << target->GetGUID().WriteAsPacked();
-    }
-    else 
-    {
-        targetFlag = TARGET_FLAG_NONE;
-        packet << targetFlag << bot->GetPackGUID();
-    }
+    targetFlag = TARGET_FLAG_NONE;
+    packet << targetFlag << bot->GetPackGUID();
     bot->GetSession()->HandleUseItemOpcode(packet);
     return true;
 }

@@ -41,6 +41,7 @@ enum StrategyType : uint32
 // };
 
 static float ACTION_IDLE = 0.0f;
+static float ACTION_BG = 1.0f;
 static float ACTION_DEFAULT = 5.0f;
 static float ACTION_NORMAL = 10.0f;
 static float ACTION_HIGH = 20.0f;

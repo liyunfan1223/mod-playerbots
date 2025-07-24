@@ -7,6 +7,7 @@
 #define _PLAYERBOT_PLAYERbotAICONFIG_H
 
 #include <mutex>
+#include <unordered_map>
 
 #include "Common.h"
 #include "DBCEnums.h"
@@ -32,6 +33,26 @@ enum class HealingManaEfficiency : uint8
     HIGH = 8,
     VERY_HIGH = 16,
     SUPERIOR = 32
+};
+
+enum NewRpgStatus : int
+{
+    RPG_STATUS_START = 0,
+    // Going to far away place
+    RPG_GO_GRIND = 0,
+    RPG_GO_CAMP = 1,
+    // Exploring nearby
+    RPG_WANDER_RANDOM = 2,
+    RPG_WANDER_NPC = 3,
+    // Do Quest (based on quest status)
+    RPG_DO_QUEST = 4,
+    // Travel
+    RPG_TRAVEL_FLIGHT = 5,
+    // Taking a break
+    RPG_REST = 6,
+    // Initial status
+    RPG_IDLE = 7,
+    RPG_STATUS_END = 8
 };
 
 #define MAX_SPECNO 20
@@ -87,6 +108,7 @@ public:
     std::vector<uint32> randomBotQuestIds;
     uint32 randomBotTeleportDistance;
     float randomGearLoweringChance;
+    bool incrementalGearInit;
     int32 randomGearQualityLimit;
     int32 randomGearScoreLimit;
     float randomBotMinLevelChance, randomBotMaxLevelChance;
@@ -255,6 +277,7 @@ public:
     uint32 iterationsPerTick;
 
     std::mutex m_logMtx;
+    std::vector<std::string> tradeActionExcludedPrefixes;
     std::vector<std::string> allowedLogFiles;
     std::unordered_map<std::string, std::pair<FILE*, bool>> logFiles;
 
@@ -313,6 +336,7 @@ public:
     bool autoLearnTrainerSpells;
     bool autoDoQuests;
     bool enableNewRpgStrategy;
+    std::unordered_map<NewRpgStatus, uint32> RpgStatusProbWeight;
     bool syncLevelWithPlayers;
     bool freeFood;
     bool autoLearnQuestSpells;

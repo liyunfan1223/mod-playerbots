@@ -8,8 +8,8 @@
 #include "NewRpgInfo.h"
 #include "Playerbots.h"
 #include "ReputationMgr.h"
-#include "SharedDefines.h"
 #include "ServerFacade.h"
+#include "SharedDefines.h"
 
 Unit* GrindTargetValue::Calculate()
 {
@@ -34,7 +34,8 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
     Group* group = bot->GetGroup();
     Player* master = GetMaster();
 
-    if (master && (master == bot || master->GetMapId() != bot->GetMapId() || master->IsBeingTeleported() || !GET_PLAYERBOT_AI(master)))
+    if (master && (master == bot || master->GetMapId() != bot->GetMapId() || master->IsBeingTeleported() ||
+                   !GET_PLAYERBOT_AI(master)))
         master = nullptr;
 
     GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
@@ -89,16 +90,16 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
         // !sRandomPlayerbotMgr->IsRandomBot(bot)) continue;
 
         // Bots in bot-groups no have a more limited range to look for grind target
-        if (!bot->InBattleground() && master && botAI->HasStrategy("follow", BotState::BOT_STATE_NON_COMBAT)
-            && sServerFacade->GetDistance2d(master, unit) > sPlayerbotAIConfig->lootDistance)
+        if (!bot->InBattleground() && master && botAI->HasStrategy("follow", BotState::BOT_STATE_NON_COMBAT) &&
+            sServerFacade->GetDistance2d(master, unit) > sPlayerbotAIConfig->lootDistance)
         {
             if (botAI->HasStrategy("debug grind", BotState::BOT_STATE_NON_COMBAT))
                 botAI->TellMaster(chat->FormatWorldobject(unit) + " ignored (far from master).");
             continue;
         }
 
-		if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
-		    continue;
+        if (!bot->InBattleground() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetGUID().IsPlayer())
+            continue;
 
         if (Creature* creature = unit->ToCreature())
             if (CreatureTemplate const* CreatureTemplate = creature->GetCreatureTemplate())
@@ -110,18 +111,13 @@ Unit* GrindTargetValue::FindTargetForGrinding(uint32 assistCount)
             continue;
         }
 
-        bool inactiveGrindStatus = botAI->rpgInfo.status == RPG_GO_GRIND ||
-            botAI->rpgInfo.status == RPG_NEAR_NPC ||
-            botAI->rpgInfo.status == RPG_REST ||
-            botAI->rpgInfo.status == RPG_GO_INNKEEPER ||
-            botAI->rpgInfo.status == RPG_DO_QUEST;
+        bool inactiveGrindStatus = botAI->rpgInfo.status != RPG_WANDER_RANDOM && botAI->rpgInfo.status != RPG_IDLE;
 
-        bool notHostile = !bot->IsHostileTo(unit); /*|| (unit->ToCreature() && unit->ToCreature()->IsCivilian());*/
         float aggroRange = 30.0f;
         if (unit->ToCreature())
             aggroRange = std::min(30.0f, unit->ToCreature()->GetAggroRange(bot) + 10.0f);
         bool outOfAggro = unit->ToCreature() && bot->GetDistance(unit) > aggroRange;
-        if (inactiveGrindStatus && (outOfAggro || notHostile))
+        if (inactiveGrindStatus && outOfAggro)
         {
             if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
                 needForQuestMap[unit->GetEntry()] = needForQuest(unit);

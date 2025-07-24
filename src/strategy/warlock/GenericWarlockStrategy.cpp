@@ -38,11 +38,26 @@ void GenericWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("life tap", ACTION_EMERGENCY + 5), nullptr)));
+    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("life tap", 95.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium threat", NextAction::array(0, new NextAction("soulshatter", 55.0f), nullptr)));
-    triggers.push_back(new TriggerNode("spell lock", NextAction::array(0, new NextAction("spell lock", ACTION_INTERRUPT), nullptr)));
-    triggers.push_back(new TriggerNode("devour magic purge", NextAction::array(0, new NextAction("devour magic purge", ACTION_DISPEL), nullptr)));
-    triggers.push_back(new TriggerNode("devour magic cleanse", NextAction::array(0, new NextAction("devour magic cleanse", ACTION_DISPEL), nullptr)));
+    triggers.push_back(new TriggerNode("spell lock", NextAction::array(0, new NextAction("spell lock", 40.0f), nullptr)));
+    triggers.push_back(new TriggerNode("no soul shard", NextAction::array(0, new NextAction("create soul shard", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("too many soul shards", NextAction::array(0, new NextAction("destroy soul shard", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("devour magic purge", NextAction::array(0, new NextAction("devour magic purge", 50.0f), nullptr)));
+    triggers.push_back(new TriggerNode("devour magic cleanse", NextAction::array(0, new NextAction("devour magic cleanse", 50.0f), nullptr)));
+}
+
+// ===== AoE Strategy, 3+ enemies =====
+
+void AoEWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0,
+                                                 new NextAction("immolation aura", 26.0f),
+                                                 new NextAction("shadowfury", 23.0f),
+                                                 new NextAction("shadowflame", 22.5f),
+                                                 new NextAction("seed of corruption on attacker", 22.0f),
+                                                 new NextAction("seed of corruption", 21.5f),
+                                                 new NextAction("rain of fire", 21.0f), nullptr)));
 }
 
 void WarlockBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -61,13 +76,57 @@ void WarlockCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("fear", NextAction::array(0, new NextAction("fear on cc", 32.0f), nullptr)));
 }
 
+// Combat strategy for using Curse of Agony
+// Enabled by default for the Affliction spec
+// To enable, type "co +curse of agony"
+// To disable, type "co -curse of agony"
+void WarlockCurseOfAgonyStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("curse of agony on attacker", NextAction::array(0, new NextAction("curse of agony on attacker", 18.5f), nullptr)));
+    triggers.push_back(new TriggerNode("curse of agony", NextAction::array(0, new NextAction("curse of agony", 17.0f), nullptr)));
+}
+
 // Combat strategy for using Curse of the Elements
-// Enabling this will turn off their use of Curse of Agony
 // Enabled by default for the Destruction spec
 // To enable, type "co +curse of elements"
 // To disable, type "co -curse of elements"
-
 void WarlockCurseOfTheElementsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("curse of the elements", NextAction::array(0, new NextAction("curse of the elements", 30.0f), nullptr)));
+    triggers.push_back(new TriggerNode("curse of the elements", NextAction::array(0, new NextAction("curse of the elements", 29.0f), nullptr)));
+}
+
+// Combat strategy for using Curse of Doom
+// Disabled by default
+// To enable, type "co +curse of doom"
+// To disable, type "co -curse of doom"
+void WarlockCurseOfDoomStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("curse of doom", NextAction::array(0, new NextAction("curse of doom", 29.0f), nullptr)));
+}
+
+// Combat strategy for using Curse of Exhaustion
+// Disabled by default
+// To enable, type "co +curse of exhaustion"
+// To disable, type "co -curse of exhaustion"
+void WarlockCurseOfExhaustionStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("curse of exhaustion", NextAction::array(0, new NextAction("curse of exhaustion", 29.0f), nullptr)));
+}
+
+// Combat strategy for using Curse of Tongues
+// Disabled by default
+// To enable, type "co +curse of tongues"
+// To disable, type "co -curse of tongues"
+void WarlockCurseOfTonguesStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("curse of tongues", NextAction::array(0, new NextAction("curse of tongues", 29.0f), nullptr)));
+}
+
+// Combat strategy for using Curse of Weakness
+// Disabled by default
+// To enable, type "co +curse of weakness"
+// To disable, type "co -curse of weakness"
+void WarlockCurseOfWeaknessStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("curse of weakness", NextAction::array(0, new NextAction("curse of weakness", 29.0f), nullptr)));
 }

@@ -109,4 +109,24 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
+class UseSpellstoneStrategy : public NonCombatStrategy
+{
+public:
+    UseSpellstoneStrategy(PlayerbotAI* ai);
+    virtual std::string const getName() override { return "spellstone"; }
+
+public:
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
+class UseFirestoneStrategy : public NonCombatStrategy
+{
+public:
+    UseFirestoneStrategy(PlayerbotAI* ai);
+    virtual std::string const getName() override { return "firestone"; }
+
+public:
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
 #endif

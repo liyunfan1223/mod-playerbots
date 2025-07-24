@@ -655,6 +655,17 @@ private:
     time_t lastCheck;
 };
 
+class TimerBGTrigger : public Trigger
+{
+public:
+    TimerBGTrigger(PlayerbotAI* botAI) : Trigger(botAI, "timer bg"), lastCheck(0) {}
+
+    bool IsActive() override;
+
+private:
+    time_t lastCheck;
+};
+
 class TankAssistTrigger : public NoAttackersTrigger
 {
 public:

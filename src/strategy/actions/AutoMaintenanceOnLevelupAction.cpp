@@ -163,7 +163,8 @@ void AutoMaintenanceOnLevelupAction::AutoUpgradeEquip()
     PlayerbotFactory factory(bot, bot->GetLevel());
     if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
-        factory.InitEquipment(true);
+        if (sPlayerbotAIConfig->incrementalGearInit)
+            factory.InitEquipment(true);
     }
     factory.InitAmmo();
     return;
