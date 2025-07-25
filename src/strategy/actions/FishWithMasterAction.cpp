@@ -21,18 +21,16 @@ bool FishWithMasterAction::Execute(Event event)
 
     if (spellId == FISHING_SPELL)
     {
-        uint32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
+        int32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
 
         if (SkillFishing == 0)
             return false;
-
         int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
         
         if (!zone_skill)
             zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetZoneId());
-        if (SkillFishing < zone_skill)
+       if (SkillFishing < zone_skill)
             return false;
-
         return FishingAction(botAI).Execute(event);
     }
     return false;

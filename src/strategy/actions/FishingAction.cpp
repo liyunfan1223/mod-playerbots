@@ -68,15 +68,17 @@ bool FishingAction::Execute(Event event)
             return false;
     }
     WorldPosition FishSpot = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 5.0f, 0.2f, false);
+
     if (FishSpot)
     {
-        bot->SetFacingTo(FishSpot.GetPositionX(), FishSpot.GetPositionY(), FishSpot.GetPositionZ());
+        bot->SetFacingTo(FishSpot);
+        bot->SendMovementFlagUpdate();
     }
-
     else
     {
         return MovetoFish(botAI).Execute(event);
     }
+    
     auto isFishingPole = [](Item* item) -> bool
     {
         if (!item)
@@ -137,7 +139,7 @@ bool FishingAction::Execute(Event event)
         eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
         bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
     }
-
+    botAI->SetNextCheckDelay(100);
     botAI->CastSpell(FISHING_SPELL, bot);
     botAI->ChangeStrategy("+usebobber", BOT_STATE_NON_COMBAT);
    
