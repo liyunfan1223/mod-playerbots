@@ -34,14 +34,14 @@ class OutOfSoulShardsTrigger : public Trigger
 {
 public:
     OutOfSoulShardsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soul shard", 2) {}
-    bool IsActive() override { return AI_VALUE2(uint32, "item count", "soul shard") == 0; }
+    bool IsActive() override;
 };
 
 class TooManySoulShardsTrigger : public Trigger
 {
 public:
     TooManySoulShardsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "too many soul shards") {}
-    bool IsActive() override { return AI_VALUE2(uint32, "item count", "soul shard") >= 6; }
+    bool IsActive() override;
 };
 
 class FirestoneTrigger : public BuffTrigger
@@ -58,11 +58,11 @@ public:
     bool IsActive() override;
 };
 
-class HasSoulstoneTrigger : public Trigger
+class OutOfSoulstoneTrigger : public Trigger
 {
 public:
-    HasSoulstoneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soulstone") {}
-    bool IsActive() override { return AI_VALUE2(uint32, "item count", "soulstone") == 0; }
+    OutOfSoulstoneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soulstone") {}
+    bool IsActive() override;
 };
 
 class SoulstoneTrigger : public Trigger

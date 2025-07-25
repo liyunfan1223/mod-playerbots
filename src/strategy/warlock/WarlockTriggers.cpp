@@ -7,6 +7,32 @@
 #include "GenericTriggers.h"
 #include "Playerbots.h"
 
+static const uint32 SOUL_SHARD_ITEM_ID = 6265;
+
+uint32 GetSoulShardCount(Player* bot)
+{
+    return bot->GetItemCount(SOUL_SHARD_ITEM_ID, false);  // false = only bags
+}
+
+// List of all Soulstone item IDs
+static const std::vector<uint32> soulstoneItemIds = {
+    5232,   // Minor Soulstone
+    16892,  // Lesser Soulstone
+    16893,  // Soulstone
+    16895,  // Greater Soulstone
+    16896,  // Major Soulstone
+    22116,  // Master Soulstone
+    36895   // Demonic Soulstone
+};
+
+uint32 GetSoulstoneCount(Player* bot)
+{
+    uint32 count = 0;
+    for (uint32 id : soulstoneItemIds)
+        count += bot->GetItemCount(id, false);  // false = only bags
+    return count;
+}
+
 bool SpellstoneTrigger::IsActive() { return BuffTrigger::IsActive() && AI_VALUE2(uint32, "item count", getName()) > 0; }
 
 bool FirestoneTrigger::IsActive() { return BuffTrigger::IsActive() && AI_VALUE2(uint32, "item count", getName()) > 0; }
@@ -15,6 +41,12 @@ bool WarlockConjuredItemTrigger::IsActive()
 {
     return ItemCountTrigger::IsActive() && AI_VALUE2(uint32, "item count", "soul shard") > 0;
 }
+
+bool OutOfSoulShardsTrigger::IsActive() { return GetSoulShardCount(botAI->GetBot()) == 0; }
+
+bool TooManySoulShardsTrigger::IsActive() { return GetSoulShardCount(botAI->GetBot()) >= 6; }
+
+bool OutOfSoulstoneTrigger::IsActive() { return GetSoulstoneCount(botAI->GetBot()) == 0; }
 
 // Checks if the target marked with the moon icon can be banished
 bool BanishTrigger::IsActive()
