@@ -367,12 +367,14 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             }
             break;
         case CLASS_HUNTER:
-            engine->addStrategiesNoInit("dps", "aoe", "bdps", "dps assist", nullptr);
-            engine->addStrategy("dps debuff", false);
-            // if (tab == HUNTER_TAB_SURVIVAL)
-            // {
-            //     engine->addStrategy("trap weave", false);
-            // }
+            if (tab == 0)  // Beast Mastery
+                engine->addStrategiesNoInit("bm", nullptr);
+            else if (tab == 1)  // Marksmanship
+                engine->addStrategiesNoInit("mm", nullptr);
+            else if (tab == 2)  // Survival
+                engine->addStrategiesNoInit("surv", nullptr);
+
+            engine->addStrategiesNoInit("cc", "dps assist", "aoe", nullptr);
             break;
         case CLASS_ROGUE:
             if (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY)
@@ -386,13 +388,13 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_WARLOCK:
             if (tab == 0)  // Affliction
-                engine->addStrategiesNoInit("affli", "affli aoe", "curse of agony", nullptr);
+                engine->addStrategiesNoInit("affli", "curse of agony", nullptr);
             else if (tab == 1)  // Demonology
-                engine->addStrategiesNoInit("demo", "demo aoe", "curse of agony", "meta melee", nullptr);
+                engine->addStrategiesNoInit("demo", "curse of agony", "meta melee", nullptr);
             else if (tab == 2)  // Destruction
-                engine->addStrategiesNoInit("destro", "destro aoe", "curse of elements", nullptr);
+                engine->addStrategiesNoInit("destro", "curse of elements", nullptr);
 
-            engine->addStrategiesNoInit("cc", "dps assist", nullptr);
+            engine->addStrategiesNoInit("cc", "dps assist", "aoe", nullptr);
             break;
 
         case CLASS_DEATH_KNIGHT:

@@ -19,8 +19,10 @@
 #include <unordered_map>
 #include <mutex>
 
-// Checks if the bot has less than 32 soul shards, and if so, allows casting Drain Soul
-bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 32; }
+const int ITEM_SOUL_SHARD = 6265;
+
+// Checks if the bot has less than 20 soul shards, and if so, allows casting Drain Soul
+bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 20; }
 
 // Checks if the bot's health is above a certain threshold, and if so, allows casting Life Tap
 bool CastLifeTapAction::isUseful() { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->lowHealth; }
@@ -120,17 +122,64 @@ bool CreateSoulShardAction::Execute(Event event)
     if (!bot)
         return false;
 
-    // Soul Shard item ID is 6265
-    uint32 soulShardId = 6265;
     ItemPosCountVec dest;
     uint32 count = 1;
-    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, soulShardId, count) == EQUIP_ERR_OK)
+    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SOUL_SHARD, count) == EQUIP_ERR_OK)
     {
-        bot->StoreNewItem(dest, soulShardId, true, Item::GenerateItemRandomPropertyId(soulShardId));
+        bot->StoreNewItem(dest, ITEM_SOUL_SHARD, true, Item::GenerateItemRandomPropertyId(ITEM_SOUL_SHARD));
         SQLTransaction<CharacterDatabaseConnection> trans = CharacterDatabase.BeginTransaction();
         bot->SaveInventoryAndGoldToDB(trans);
         CharacterDatabase.CommitTransaction(trans);
         return true;
+    }
+    return false;
+}
+
+// Checks if the bot has less than 6 soul shards, allowing the creation of a new one
+bool CreateSoulShardAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+
+    uint32 currentShards = bot->GetItemCount(ITEM_SOUL_SHARD, false);  // false = only bags
+    const uint32 SHARD_CAP = 6;                                    // adjust as needed
+
+    return currentShards < SHARD_CAP;
+}
+
+
+bool DestroySoulShardAction::Execute(Event event)
+{
+    // Look for the first soul shard in any bag and destroy it
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        if (Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (Item* pItem = pBag->GetItemByPos(j))
+                {
+                    if (pItem->GetTemplate()->ItemId == ITEM_SOUL_SHARD)
+                    {
+                        bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
+                        return true;  // Only destroy one!
+                    }
+                }
+            }
+        }
+    }
+    // Also check main inventory slots (not in bags)
+    for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+    {
+        if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            if (pItem->GetTemplate()->ItemId == ITEM_SOUL_SHARD)
+            {
+                bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -321,4 +370,38 @@ bool UseSoulstoneHealerAction::Execute(Event event)
 
     bot->SetSelection(healer->GetGUID());
     return UseItem(items[0], ObjectGuid::Empty, nullptr, healer);
+}
+
+const std::vector<uint32> CastCreateFirestoneAction::firestoneSpellIds = {
+    60220,  // Create Firestone (Rank 7)
+    27250,  // Rank 5
+    17953,  // Rank 4
+    17952,  // Rank 3
+    17951,  // Rank 2
+    6366    // Rank 1
+};
+
+CastCreateFirestoneAction::CastCreateFirestoneAction(PlayerbotAI* botAI)
+    : CastBuffSpellAction(botAI, "create firestone")
+{
+}
+
+bool CastCreateFirestoneAction::Execute(Event event)
+{
+    for (uint32 spellId : firestoneSpellIds)
+    {
+        if (bot->HasSpell(spellId))
+            return botAI->CastSpell(spellId, bot);
+    }
+    return false;
+}
+
+bool CastCreateFirestoneAction::isUseful()
+{
+    for (uint32 spellId : firestoneSpellIds)
+    {
+        if (bot->HasSpell(spellId))
+            return true;
+    }
+    return false;
 }

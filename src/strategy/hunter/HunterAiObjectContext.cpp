@@ -5,38 +5,43 @@
 
 #include "HunterAiObjectContext.h"
 
-#include "DpsHunterStrategy.h"
+#include "BeastMasteryHunterStrategy.h"
 #include "GenericHunterNonCombatStrategy.h"
+#include "GenericHunterStrategy.h"
 #include "HunterActions.h"
 #include "HunterBuffStrategies.h"
 #include "HunterTriggers.h"
+#include "MarksmanshipHunterStrategy.h"
 #include "NamedObjectContext.h"
 #include "Playerbots.h"
+#include "SurvivalHunterStrategy.h"
 
 class HunterStrategyFactoryInternal : public NamedObjectContext<Strategy>
 {
 public:
     HunterStrategyFactoryInternal()
     {
-        creators["dps"] = &HunterStrategyFactoryInternal::dps;
         creators["nc"] = &HunterStrategyFactoryInternal::nc;
-        creators["aoe"] = &HunterStrategyFactoryInternal::aoe;
-        creators["dps debuff"] = &HunterStrategyFactoryInternal::dps_debuff;
         creators["boost"] = &HunterStrategyFactoryInternal::boost;
         creators["pet"] = &HunterStrategyFactoryInternal::pet;
         creators["cc"] = &HunterStrategyFactoryInternal::cc;
         creators["trap weave"] = &HunterStrategyFactoryInternal::trap_weave;
+        creators["bm"] = &HunterStrategyFactoryInternal::beast_mastery;
+        creators["mm"] = &HunterStrategyFactoryInternal::marksmanship;
+        creators["surv"] = &HunterStrategyFactoryInternal::survival;
+        creators["aoe"] = &HunterStrategyFactoryInternal::aoe;
     }
 
 private:
-    static Strategy* aoe(PlayerbotAI* botAI) { return new DpsAoeHunterStrategy(botAI); }
-    static Strategy* dps(PlayerbotAI* botAI) { return new DpsHunterStrategy(botAI); }
     static Strategy* nc(PlayerbotAI* botAI) { return new GenericHunterNonCombatStrategy(botAI); }
-    static Strategy* dps_debuff(PlayerbotAI* botAI) { return new DpsHunterDebuffStrategy(botAI); }
     static Strategy* boost(PlayerbotAI* botAI) { return new HunterBoostStrategy(botAI); }
     static Strategy* pet(PlayerbotAI* botAI) { return new HunterPetStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new HunterCcStrategy(botAI); }
     static Strategy* trap_weave(PlayerbotAI* botAI) { return new HunterTrapWeaveStrategy(botAI); }
+    static Strategy* beast_mastery(PlayerbotAI* botAI) { return new BeastMasteryHunterStrategy(botAI); }
+    static Strategy* marksmanship(PlayerbotAI* botAI) { return new MarksmanshipHunterStrategy(botAI); }
+    static Strategy* survival(PlayerbotAI* botAI) { return new SurvivalHunterStrategy(botAI); }
+    static Strategy* aoe(PlayerbotAI* botAI) { return new AoEHunterStrategy(botAI); }
 };
 
 class HunterBuffStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -91,6 +96,11 @@ public:
         creators["tranquilizing shot enrage"] = &HunterTriggerFactoryInternal::remove_enrage;
         creators["tranquilizing shot magic"] = &HunterTriggerFactoryInternal::remove_magic;
         creators["immolation trap no cd"] = &HunterTriggerFactoryInternal::immolation_trap_no_cd;
+        creators["kill command"] = &HunterTriggerFactoryInternal::kill_command;
+        creators["explosive shot"] = &HunterTriggerFactoryInternal::explosive_shot;
+        creators["lock and load"] = &HunterTriggerFactoryInternal::lock_and_load;
+        creators["silencing shot"] = &HunterTriggerFactoryInternal::silencing_shot;
+        creators["intimidation"] = &HunterTriggerFactoryInternal::intimidation;
     }
 
 private:
@@ -126,6 +136,11 @@ private:
     static Trigger* remove_enrage(PlayerbotAI* ai) { return new TargetRemoveEnrageTrigger(ai); }
     static Trigger* remove_magic(PlayerbotAI* ai) { return new TargetRemoveMagicTrigger(ai); }
     static Trigger* immolation_trap_no_cd(PlayerbotAI* ai) { return new ImmolationTrapNoCdTrigger(ai); }
+    static Trigger* kill_command(PlayerbotAI* botAI) { return new KillCommandTrigger(botAI); }
+    static Trigger* explosive_shot(PlayerbotAI* botAI) { return new ExplosiveShotTrigger(botAI); }
+    static Trigger* lock_and_load(PlayerbotAI* botAI) { return new LockAndLoadTrigger(botAI); }
+    static Trigger* silencing_shot(PlayerbotAI* botAI) { return new SilencingShotTrigger(botAI); }
+    static Trigger* intimidation(PlayerbotAI* botAI) { return new IntimidationTrigger(botAI); }
 };
 
 class HunterAiObjectContextInternal : public NamedObjectContext<Action>
@@ -183,6 +198,11 @@ public:
         creators["disengage"] = &HunterAiObjectContextInternal::disengage;
         creators["immolation trap"] = &HunterAiObjectContextInternal::immolation_trap;
         creators["explosive trap"] = &HunterAiObjectContextInternal::explosive_trap;
+        creators["explosive shot rank 4"] = &HunterAiObjectContextInternal::explosive_shot_rank_4;
+        creators["explosive shot rank 3"] = &HunterAiObjectContextInternal::explosive_shot_rank_3;
+        creators["explosive shot rank 2"] = &HunterAiObjectContextInternal::explosive_shot_rank_2;
+        creators["explosive shot rank 1"] = &HunterAiObjectContextInternal::explosive_shot_rank_1;
+        creators["intimidation"] = &HunterAiObjectContextInternal::intimidation;
     }
 
 private:
@@ -235,12 +255,51 @@ private:
     static Action* disengage(PlayerbotAI* ai) { return new CastDisengageAction(ai); }
     static Action* immolation_trap(PlayerbotAI* ai) { return new CastImmolationTrapAction(ai); }
     static Action* explosive_trap(PlayerbotAI* ai) { return new CastExplosiveTrapAction(ai); }
+    static Action* explosive_shot_rank_4(PlayerbotAI* ai) { return new CastExplosiveShotRank4Action(ai); }
+    static Action* explosive_shot_rank_3(PlayerbotAI* ai) { return new CastExplosiveShotRank3Action(ai); }
+    static Action* explosive_shot_rank_2(PlayerbotAI* ai) { return new CastExplosiveShotRank2Action(ai); }
+    static Action* explosive_shot_rank_1(PlayerbotAI* ai) { return new CastExplosiveShotRank1Action(ai); }
+    static Action* intimidation(PlayerbotAI* ai) { return new CastIntimidationAction(ai); }
 };
 
-HunterAiObjectContext::HunterAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> HunterAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> HunterAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> HunterAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> HunterAiObjectContext::sharedValueContexts;
+
+HunterAiObjectContext::HunterAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void HunterAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void HunterAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new HunterStrategyFactoryInternal());
     strategyContexts.Add(new HunterBuffStrategyFactoryInternal());
+}
+
+void HunterAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new HunterAiObjectContextInternal());
+}
+
+void HunterAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new HunterTriggerFactoryInternal());
+}
+
+void HunterAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }

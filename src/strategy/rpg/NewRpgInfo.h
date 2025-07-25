@@ -9,67 +9,61 @@
 #include "Timer.h"
 #include "TravelMgr.h"
 
-enum NewRpgStatus: int
-{
-    RPG_STATUS_START = 0,
-    // Going to far away place
-    RPG_GO_GRIND = 0,
-    RPG_GO_INNKEEPER = 1,
-    // Exploring nearby
-    RPG_NEAR_RANDOM = 2,
-    RPG_NEAR_NPC = 3,
-    // Do Quest (based on quest status)
-    RPG_DO_QUEST = 4,
-    // Taking a break
-    RPG_REST = 5,
-    // Initial status
-    RPG_IDLE = 6,
-    RPG_STATUS_END = 7
-};
-
 using NewRpgStatusTransitionProb = std::vector<std::vector<int>>;
 
 struct NewRpgInfo
 {
     NewRpgInfo() {}
-    
+
     // RPG_GO_GRIND
-    struct GoGrind {
-        GoGrind() = default;
+    struct GoGrind
+    {
         WorldPosition pos{};
     };
-    // RPG_GO_INNKEEPER
-    struct GoInnkeeper {
-        GoInnkeeper() = default;
+    // RPG_GO_CAMP
+    struct GoCamp
+    {
         WorldPosition pos{};
     };
-    // RPG_NEAR_NPC
-    struct NearNpc {
-        NearNpc() = default;
+    // RPG_WANDER_NPC
+    struct WanderNpc
+    {
         ObjectGuid npcOrGo{};
         uint32 lastReach{0};
     };
-    // RPG_NEAR_RANDOM
-    struct NearRandom {
-        NearRandom() = default;
+    // RPG_WANDER_RANDOM
+    struct WanderRandom
+    {
+        WanderRandom() = default;
     };
-    // NewRpgStatus::QUESTING
-    struct DoQuest {
+    // RPG_DO_QUEST
+    struct DoQuest
+    {
         const Quest* quest{nullptr};
         uint32 questId{0};
         int32 objectiveIdx{0};
         WorldPosition pos{};
         uint32 lastReachPOI{0};
     };
+    // RPG_TRAVEL_FLIGHT
+    struct TravelFlight
+    {
+        ObjectGuid fromFlightMaster{};
+        uint32 fromNode{0};
+        uint32 toNode{0};
+        bool inFlight{false};
+    };
     // RPG_REST
-    struct Rest {
+    struct Rest
+    {
         Rest() = default;
     };
-    struct Idle {
+    struct Idle
+    {
     };
     NewRpgStatus status{RPG_IDLE};
 
-    uint32 startT{0}; // start timestamp of the current status
+    uint32 startT{0};  // start timestamp of the current status
 
     // MOVE_FAR
     float nearestMoveFarDis{FLT_MAX};
@@ -78,22 +72,25 @@ struct NewRpgInfo
     WorldPosition moveFarPos;
     // END MOVE_FAR
 
-    union {
+    union
+    {
         GoGrind go_grind;
-        GoInnkeeper go_innkeeper;
-        NearNpc near_npc;
-        NearRandom near_random;
+        GoCamp go_camp;
+        WanderNpc wander_npc;
+        WanderRandom WANDER_RANDOM;
         DoQuest do_quest;
         Rest rest;
         DoQuest quest;
+        TravelFlight flight;
     };
 
     bool HasStatusPersisted(uint32 maxDuration) { return GetMSTimeDiffToNow(startT) > maxDuration; }
     void ChangeToGoGrind(WorldPosition pos);
-    void ChangeToGoInnkeeper(WorldPosition pos);
-    void ChangeToNearNpc();
-    void ChangeToNearRandom();
+    void ChangeToGoCamp(WorldPosition pos);
+    void ChangeToWanderNpc();
+    void ChangeToWanderRandom();
     void ChangeToDoQuest(uint32 questId, const Quest* quest);
+    void ChangeToTravelFlight(ObjectGuid fromFlightMaster, uint32 fromNode, uint32 toNode);
     void ChangeToRest();
     void ChangeToIdle();
     bool CanChangeTo(NewRpgStatus status);

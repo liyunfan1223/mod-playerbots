@@ -114,6 +114,7 @@ protected:
     float lastRelevance;
     std::string lastAction;
     uint32 strategyTypeMask;
+    NamedObjectFactoryList<ActionNode> actionNodeFactories;
 };
 
 #endif
