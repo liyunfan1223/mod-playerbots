@@ -24,7 +24,7 @@ public:
         creators["nc"] = &MageStrategyFactoryInternal::nc;
         creators["pull"] = &MageStrategyFactoryInternal::pull;
         creators["fire aoe"] = &MageStrategyFactoryInternal::fire_aoe;
-        creators["frostfire aoe"] = &MageStrategyFactoryInternal::frostfire_aoe; 
+        creators["frostfire aoe"] = &MageStrategyFactoryInternal::frostfire_aoe;
         creators["frost aoe"] = &MageStrategyFactoryInternal::frost_aoe;
         creators["arcane aoe"] = &MageStrategyFactoryInternal::arcane_aoe;
         creators["cure"] = &MageStrategyFactoryInternal::cure;
@@ -268,11 +268,45 @@ private:
     static Action* blink_back(PlayerbotAI* botAI) { return new CastBlinkBackAction(botAI); }
 };
 
-MageAiObjectContext::MageAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> MageAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> MageAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> MageAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> MageAiObjectContext::sharedValueContexts;
+
+MageAiObjectContext::MageAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void MageAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void MageAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new MageStrategyFactoryInternal());
     strategyContexts.Add(new MageCombatStrategyFactoryInternal());
     strategyContexts.Add(new MageBuffStrategyFactoryInternal());
+}
+
+void MageAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new MageAiObjectContextInternal());
+}
+
+void MageAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new MageTriggerFactoryInternal());
+}
+
+void MageAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }

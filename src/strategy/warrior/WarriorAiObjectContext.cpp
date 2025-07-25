@@ -318,10 +318,44 @@ private:
     static Action* enraged_regeneration(PlayerbotAI* botAI) { return new CastEnragedRegenerationAction(botAI); }
 };
 
-WarriorAiObjectContext::WarriorAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> WarriorAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> WarriorAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> WarriorAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> WarriorAiObjectContext::sharedValueContexts;
+
+WarriorAiObjectContext::WarriorAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void WarriorAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void WarriorAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new WarriorStrategyFactoryInternal());
     strategyContexts.Add(new WarriorCombatStrategyFactoryInternal());
+}
+
+void WarriorAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new WarriorAiObjectContextInternal());
+}
+
+void WarriorAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new WarriorTriggerFactoryInternal());
+}
+
+void WarriorAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }
