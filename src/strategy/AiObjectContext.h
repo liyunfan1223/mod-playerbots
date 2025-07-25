@@ -27,6 +27,7 @@ typedef UntypedValue* (*ValueCreator)(PlayerbotAI* botAI);
 class AiObjectContext : public PlayerbotAIAware
 {
 public:
+    static BoolCalculatedValue* custom_glyphs(PlayerbotAI* ai); // Added for cutom glyphs
     AiObjectContext(PlayerbotAI* botAI,
                     SharedNamedObjectContextList<Strategy>& sharedStrategyContext = sharedStrategyContexts,
                     SharedNamedObjectContextList<Action>& sharedActionContext = sharedActionContexts,
