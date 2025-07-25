@@ -6,7 +6,6 @@
 #include "PlayerbotAIConfig.h"
 #include <iostream>
 #include "Config.h"
-#include "NewRpgInfo.h"
 #include "PlayerbotDungeonSuggestionMgr.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
@@ -149,7 +148,7 @@ bool PlayerbotAIConfig::Initialize()
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.PvpProhibitedZoneIds",
                                            "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,"
-                                           "3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,139,3951"),
+                                           "3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395"),
         pvpProhibitedZoneIds);
     LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.PvpProhibitedAreaIds", "976,35"),
                                   pvpProhibitedAreaIds);
@@ -586,16 +585,7 @@ bool PlayerbotAIConfig::Initialize()
     autoLearnQuestSpells = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoLearnQuestSpells", false);
     autoTeleportForLevel = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoTeleportForLevel", false);
     autoDoQuests = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoDoQuests", true);
-    enableNewRpgStrategy = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableNewRpgStrategy", true);
-
-    RpgStatusProbWeight[RPG_WANDER_RANDOM] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.WanderRandom", 15);
-    RpgStatusProbWeight[RPG_WANDER_NPC] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.WanderNpc", 20);
-    RpgStatusProbWeight[RPG_GO_GRIND] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.GoGrind", 15);
-    RpgStatusProbWeight[RPG_GO_CAMP] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.GoCamp", 10);
-    RpgStatusProbWeight[RPG_DO_QUEST] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.DoQuest", 60);
-    RpgStatusProbWeight[RPG_TRAVEL_FLIGHT] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.TravelFlight", 15);
-    RpgStatusProbWeight[RPG_REST] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.Rest", 5);
-
+    enableNewRpgStrategy = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableNewRpgStrategy", false);
     syncLevelWithPlayers = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncLevelWithPlayers", false);
     freeFood = sConfigMgr->GetOption<bool>("AiPlayerbot.FreeFood", true);
     randomBotGroupNearby = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotGroupNearby", true);
@@ -627,7 +617,12 @@ bool PlayerbotAIConfig::Initialize()
     sPlayerbotTextMgr->LoadBotTextChance();
     PlayerbotFactory::Init();
 
-    AiObjectContext::BuildAllSharedContexts();
+    if (!sPlayerbotAIConfig->autoDoQuests)
+    {
+        LOG_INFO("server.loading", "Loading Quest Detail Data...");
+        sTravelMgr->LoadQuestTravelTable();
+    }
+
 
     if (sPlayerbotAIConfig->randomBotSuggestDungeons)
     {

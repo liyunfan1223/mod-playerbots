@@ -78,7 +78,7 @@ public:
     LootObject GetLoot(float maxDistance = 0);
 
 private:
-    LootObject GetNearest(float maxDistance = 0);
+    std::vector<LootObject> OrderByDistance(float maxDistance = 0);
 
     Player* bot;
     LootTargetList availableLoot;

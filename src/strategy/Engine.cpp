@@ -11,7 +11,6 @@
 #include "Playerbots.h"
 #include "Queue.h"
 #include "Strategy.h"
-#include "Timer.h"
 
 Engine::Engine(PlayerbotAI* botAI, AiObjectContext* factory) : PlayerbotAIAware(botAI), aiObjectContext(factory)
 {
@@ -109,8 +108,6 @@ void Engine::Reset()
     }
 
     multipliers.clear();
-
-    actionNodeFactories.creators.clear();
 }
 
 void Engine::Init()
@@ -123,10 +120,9 @@ void Engine::Init()
         strategyTypeMask |= strategy->GetType();
         strategy->InitMultipliers(multipliers);
         strategy->InitTriggers(triggers);
-        for (auto &iter : strategy->actionNodeFactories.creators)
-        {
-            actionNodeFactories.creators[iter.first] = iter.second;
-        }
+
+        Event emptyEvent;
+        MultiplyAndPush(strategy->getDefaultActions(), 0.0f, false, emptyEvent, "default");
     }
 
     if (testMode)
@@ -252,9 +248,11 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
 ActionNode* Engine::CreateActionNode(std::string const name)
 {
-    ActionNode* node = actionNodeFactories.GetContextObject(name, botAI);
-    if (node)
-        return node;
+    for (std::map<std::string, Strategy*>::iterator i = strategies.begin(); i != strategies.end(); i++)
+    {
+        if (ActionNode* node = i->second->GetAction(name))
+            return node;
+    }
 
     return new ActionNode(name,
                           /*P*/ nullptr,
@@ -434,7 +432,6 @@ bool Engine::HasStrategy(std::string const name) { return strategies.find(name) 
 void Engine::ProcessTriggers(bool minimal)
 {
     std::unordered_map<Trigger*, Event> fires;
-    uint32 now = getMSTime();
     for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
     {
         TriggerNode* node = *i;
@@ -454,7 +451,7 @@ void Engine::ProcessTriggers(bool minimal)
         if (fires.find(trigger) != fires.end())
             continue;
 
-        if (testMode || trigger->needCheck(now))
+        if (testMode || trigger->needCheck())
         {
             if (minimal && node->getFirstRelevance() < 100)
                 continue;

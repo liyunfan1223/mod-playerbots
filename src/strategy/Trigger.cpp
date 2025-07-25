@@ -32,11 +32,12 @@ Value<Unit*>* Trigger::GetTargetValue() { return context->GetValue<Unit*>(GetTar
 
 Unit* Trigger::GetTarget() { return GetTargetValue()->Get(); }
 
-bool Trigger::needCheck(uint32 now)
+bool Trigger::needCheck()
 {
     if (checkInterval < 2)
         return true;
 
+    uint32 now = getMSTime();
     if (!lastCheckTime || now - lastCheckTime >= checkInterval)
     {
         lastCheckTime = now;

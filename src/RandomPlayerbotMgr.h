@@ -180,8 +180,6 @@ public:
     std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
     std::map<uint8, std::vector<WorldLocation>> allianceStarterPerLevelCache;
     std::map<uint8, std::vector<WorldLocation>> hordeStarterPerLevelCache;
-    std::vector<uint32> allianceFlightMasterCache;
-    std::vector<uint32> hordeFlightMasterCache;
     struct LevelBracket {
         uint32 low;
         uint32 high;

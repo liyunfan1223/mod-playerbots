@@ -30,7 +30,7 @@ public:
     virtual Value<Unit*>* GetTargetValue();
     virtual std::string const GetTargetName() { return "self target"; }
 
-    bool needCheck(uint32 now);
+    bool needCheck();
 
 protected:
     int32 checkInterval;

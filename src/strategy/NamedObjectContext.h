@@ -29,8 +29,7 @@ public:
 
     std::string const getQualifier() { return qualifier; }
 
-    static std::string const MultiQualify(std::vector<std::string> qualifiers, const std::string& separator,
-                                          const std::string_view brackets = "{}");
+    static std::string const MultiQualify(std::vector<std::string> qualifiers, const std::string& separator, const std::string_view brackets = "{}");
     static std::vector<std::string> getMultiQualifiers(std::string const qualifier1);
     static int32 getMultiQualifier(std::string const qualifier1, uint32 pos);
 
@@ -41,9 +40,9 @@ protected:
 template <class T>
 class NamedObjectFactory
 {
-public:
-    typedef T* (*ObjectCreator)(PlayerbotAI* botAI);
-    std::unordered_map<std::string, ObjectCreator> creators;
+protected:
+    typedef T* (*ActionCreator)(PlayerbotAI* botAI);
+    std::unordered_map<std::string, ActionCreator> creators;
 
 public:
     T* create(std::string name, PlayerbotAI* botAI)
@@ -59,7 +58,7 @@ public:
         if (creators.find(name) == creators.end())
             return nullptr;
 
-        ObjectCreator creator = creators[name];
+        ActionCreator creator = creators[name];
         if (!creator)
             return nullptr;
 
@@ -74,7 +73,7 @@ public:
     std::set<std::string> supports()
     {
         std::set<std::string> keys;
-        for (typename std::unordered_map<std::string, ObjectCreator>::iterator it = creators.begin();
+        for (typename std::unordered_map<std::string, ActionCreator>::iterator it = creators.begin();
              it != creators.end(); it++)
             keys.insert(it->first);
 
@@ -112,6 +111,24 @@ public:
         created.clear();
     }
 
+    void Update()
+    {
+        for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+        {
+            if (i->second)
+                i->second->Update();
+        }
+    }
+
+    void Reset()
+    {
+        for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+        {
+            if (i->second)
+                i->second->Reset();
+        }
+    }
+
     bool IsShared() { return shared; }
     bool IsSupportsSiblings() { return supportsSiblings; }
 
@@ -131,92 +148,52 @@ protected:
 };
 
 template <class T>
-class SharedNamedObjectContextList
-{
-public:
-    typedef T* (*ObjectCreator)(PlayerbotAI* botAI);
-    std::unordered_map<std::string, ObjectCreator> creators;
-    std::vector<NamedObjectContext<T>*> contexts;
-
-    ~SharedNamedObjectContextList()
-    {
-        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
-            delete *i;
-    }
-
-    void Add(NamedObjectContext<T>* context)
-    {
-        contexts.push_back(context);
-        for (const auto& iter : context->creators)
-        {
-            creators[iter.first] = iter.second;
-        }
-    }
-};
-
-template <class T>
 class NamedObjectContextList
 {
 public:
-    typedef T* (*ObjectCreator)(PlayerbotAI* botAI);
-    const std::unordered_map<std::string, ObjectCreator>& creators;
-    const std::vector<NamedObjectContext<T>*>& contexts;
-    std::unordered_map<std::string, T*> created;
-
-    NamedObjectContextList(const SharedNamedObjectContextList<T>& shared)
-        : creators(shared.creators), contexts(shared.contexts)
+    virtual ~NamedObjectContextList()
     {
-    }
-
-    ~NamedObjectContextList()
-    {
-        for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
-            if (i->second)
-                delete i->second;
+            NamedObjectContext<T>* context = *i;
+            if (!context->IsShared())
+                delete context;
         }
-
-        created.clear();
     }
 
-    T* create(std::string name, PlayerbotAI* botAI)
-    {
-        size_t found = name.find("::");
-        std::string qualifier;
-        if (found != std::string::npos)
-        {
-            qualifier = name.substr(found + 2);
-            name = name.substr(0, found);
-        }
-
-        if (creators.find(name) == creators.end())
-            return nullptr;
-
-        ObjectCreator creator = creators.at(name);
-        if (!creator)
-            return nullptr;
-
-        T* object = (*creator)(botAI);
-        Qualified* q = dynamic_cast<Qualified*>(object);
-        if (q && found != std::string::npos)
-            q->Qualify(qualifier);
-
-        return object;
-    }
+    void Add(NamedObjectContext<T>* context) { contexts.push_back(context); }
 
     T* GetContextObject(std::string const name, PlayerbotAI* botAI)
     {
-        if (created.find(name) == created.end())
+        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
-            if (T* object = create(name, botAI))
-                return created[name] = object;
+            if (T* object = (*i)->create(name, botAI))
+                return object;
         }
-        return created[name];
+
+        return nullptr;
+    }
+
+    void Update()
+    {
+        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
+        {
+            if (!(*i)->IsShared())
+                (*i)->Update();
+        }
+    }
+
+    void Reset()
+    {
+        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
+        {
+            (*i)->Reset();
+        }
     }
 
     std::set<std::string> GetSiblings(std::string const name)
     {
-        for (auto i = contexts.begin(); i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             if (!(*i)->IsSupportsSiblings())
                 continue;
@@ -236,7 +213,7 @@ public:
     std::set<std::string> supports()
     {
         std::set<std::string> result;
-        for (auto i = contexts.begin(); i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
             std::set<std::string> supported = (*i)->supports();
 
@@ -250,69 +227,46 @@ public:
     std::set<std::string> GetCreated()
     {
         std::set<std::string> result;
-        for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
         {
-            result.insert(i->first);
+            std::set<std::string> createdKeys = (*i)->GetCreated();
+
+            for (std::set<std::string>::iterator j = createdKeys.begin(); j != createdKeys.end(); j++)
+                result.insert(*j);
         }
 
         return result;
     }
+
+private:
+    std::vector<NamedObjectContext<T>*> contexts;
 };
 
 template <class T>
 class NamedObjectFactoryList
 {
 public:
-    typedef T* (*ObjectCreator)(PlayerbotAI* botAI);
-    std::vector<NamedObjectFactory<T>*> factories;
-    std::unordered_map<std::string, ObjectCreator> creators;
-
     virtual ~NamedObjectFactoryList()
     {
-        for (typename std::vector<NamedObjectFactory<T>*>::iterator i = factories.begin(); i != factories.end(); i++)
+        for (typename std::list<NamedObjectFactory<T>*>::iterator i = factories.begin(); i != factories.end(); i++)
             delete *i;
     }
 
-    T* create(std::string name, PlayerbotAI* botAI)
+    void Add(NamedObjectFactory<T>* context) { factories.push_front(context); }
+
+    T* GetContextObject(std::string const& name, PlayerbotAI* botAI)
     {
-        size_t found = name.find("::");
-        std::string qualifier;
-        if (found != std::string::npos)
+        for (typename std::list<NamedObjectFactory<T>*>::iterator i = factories.begin(); i != factories.end(); i++)
         {
-            qualifier = name.substr(found + 2);
-            name = name.substr(0, found);
+            if (T* object = (*i)->create(name, botAI))
+                return object;
         }
 
-        if (creators.find(name) == creators.end())
-            return nullptr;
-
-        ObjectCreator creator = creators[name];
-        if (!creator)
-            return nullptr;
-
-        T* object = (*creator)(botAI);
-        Qualified* q = dynamic_cast<Qualified*>(object);
-        if (q && found != std::string::npos)
-            q->Qualify(qualifier);
-
-        return object;
-    }
-
-    void Add(NamedObjectFactory<T>* context)
-    {
-        factories.push_back(context);
-        for (const auto& iter : context->creators)
-        {
-            creators[iter.first] = iter.second;
-        }
-    }
-
-    T* GetContextObject(std::string const name, PlayerbotAI* botAI)
-    {
-        if (T* object = create(name, botAI))
-            return object;
         return nullptr;
     }
+
+private:
+    std::list<NamedObjectFactory<T>*> factories;
 };
 
 #endif

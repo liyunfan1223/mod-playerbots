@@ -8,6 +8,7 @@
 #include "BearTankDruidStrategy.h"
 #include "CasterDruidStrategy.h"
 #include "CatDpsDruidStrategy.h"
+#include "OffhealDruidCatStrategy.h"
 #include "DruidActions.h"
 #include "DruidBearActions.h"
 #include "DruidCatActions.h"
@@ -17,7 +18,6 @@
 #include "GenericDruidStrategy.h"
 #include "HealDruidStrategy.h"
 #include "MeleeDruidStrategy.h"
-#include "OffhealDruidCatStrategy.h"
 #include "Playerbots.h"
 
 class DruidStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -324,44 +324,10 @@ private:
     static Action* force_of_nature(PlayerbotAI* ai) { return new CastForceOfNatureAction(ai); }
 };
 
-SharedNamedObjectContextList<Strategy> DruidAiObjectContext::sharedStrategyContexts;
-SharedNamedObjectContextList<Action> DruidAiObjectContext::sharedActionContexts;
-SharedNamedObjectContextList<Trigger> DruidAiObjectContext::sharedTriggerContexts;
-SharedNamedObjectContextList<UntypedValue> DruidAiObjectContext::sharedValueContexts;
-
-DruidAiObjectContext::DruidAiObjectContext(PlayerbotAI* botAI)
-    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
+DruidAiObjectContext::DruidAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
 {
-}
-
-void DruidAiObjectContext::BuildSharedContexts()
-{
-    BuildSharedStrategyContexts(sharedStrategyContexts);
-    BuildSharedActionContexts(sharedActionContexts);
-    BuildSharedTriggerContexts(sharedTriggerContexts);
-    BuildSharedValueContexts(sharedValueContexts);
-}
-
-void DruidAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
-{
-    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new DruidStrategyFactoryInternal());
     strategyContexts.Add(new DruidDruidStrategyFactoryInternal());
-}
-
-void DruidAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
-{
-    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new DruidAiObjectContextInternal());
-}
-
-void DruidAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
-{
-    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new DruidTriggerFactoryInternal());
-}
-
-void DruidAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
-{
-    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }
