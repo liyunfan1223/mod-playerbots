@@ -8,8 +8,8 @@
 #include "DpsPaladinStrategy.h"
 #include "GenericPaladinNonCombatStrategy.h"
 #include "HealPaladinStrategy.h"
-#include "OffhealRetPaladinStrategy.h"
 #include "NamedObjectContext.h"
+#include "OffhealRetPaladinStrategy.h"
 #include "PaladinActions.h"
 #include "PaladinBuffStrategies.h"
 #include "PaladinTriggers.h"
@@ -207,9 +207,15 @@ private:
     static Trigger* sacred_shield_on_main_tank(PlayerbotAI* ai) { return new SacredShieldOnMainTankTrigger(ai); }
 
     static Trigger* blessing_of_kings_on_party(PlayerbotAI* botAI) { return new BlessingOfKingsOnPartyTrigger(botAI); }
-    static Trigger* blessing_of_wisdom_on_party(PlayerbotAI* botAI) { return new BlessingOfWisdomOnPartyTrigger(botAI); }
+    static Trigger* blessing_of_wisdom_on_party(PlayerbotAI* botAI)
+    {
+        return new BlessingOfWisdomOnPartyTrigger(botAI);
+    }
     static Trigger* blessing_of_might_on_party(PlayerbotAI* botAI) { return new BlessingOfMightOnPartyTrigger(botAI); }
-    static Trigger* blessing_of_sanctuary_on_party(PlayerbotAI* botAI) { return new BlessingOfSanctuaryOnPartyTrigger(botAI); }
+    static Trigger* blessing_of_sanctuary_on_party(PlayerbotAI* botAI)
+    {
+        return new BlessingOfSanctuaryOnPartyTrigger(botAI);
+    }
 
     static Trigger* avenging_wrath(PlayerbotAI* botAI) { return new AvengingWrathTrigger(botAI); }
 };
@@ -317,10 +323,22 @@ private:
     static Action* blessing_of_wisdom(PlayerbotAI* botAI) { return new CastBlessingOfWisdomAction(botAI); }
     static Action* blessing_of_kings(PlayerbotAI* botAI) { return new CastBlessingOfKingsAction(botAI); }
     static Action* divine_storm(PlayerbotAI* botAI) { return new CastDivineStormAction(botAI); }
-    static Action* blessing_of_kings_on_party(PlayerbotAI* botAI) { return new CastBlessingOfKingsOnPartyAction(botAI); }
-    static Action* blessing_of_might_on_party(PlayerbotAI* botAI) { return new CastBlessingOfMightOnPartyAction(botAI); }
-    static Action* blessing_of_wisdom_on_party(PlayerbotAI* botAI) { return new CastBlessingOfWisdomOnPartyAction(botAI); }
-    static Action* blessing_of_sanctuary_on_party(PlayerbotAI* botAI) { return new CastBlessingOfSanctuaryOnPartyAction(botAI); }
+    static Action* blessing_of_kings_on_party(PlayerbotAI* botAI)
+    {
+        return new CastBlessingOfKingsOnPartyAction(botAI);
+    }
+    static Action* blessing_of_might_on_party(PlayerbotAI* botAI)
+    {
+        return new CastBlessingOfMightOnPartyAction(botAI);
+    }
+    static Action* blessing_of_wisdom_on_party(PlayerbotAI* botAI)
+    {
+        return new CastBlessingOfWisdomOnPartyAction(botAI);
+    }
+    static Action* blessing_of_sanctuary_on_party(PlayerbotAI* botAI)
+    {
+        return new CastBlessingOfSanctuaryOnPartyAction(botAI);
+    }
     static Action* redemption(PlayerbotAI* botAI) { return new CastRedemptionAction(botAI); }
     static Action* crusader_strike(PlayerbotAI* botAI) { return new CastCrusaderStrikeAction(botAI); }
     static Action* crusader_aura(PlayerbotAI* botAI) { return new CastCrusaderAuraAction(botAI); }
@@ -394,12 +412,46 @@ private:
     static Action* cancel_divine_sacrifice(PlayerbotAI* ai) { return new CastCancelDivineSacrificeAction(ai); }
 };
 
-PaladinAiObjectContext::PaladinAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> PaladinAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> PaladinAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> PaladinAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> PaladinAiObjectContext::sharedValueContexts;
+
+PaladinAiObjectContext::PaladinAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void PaladinAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void PaladinAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new PaladinStrategyFactoryInternal());
     strategyContexts.Add(new PaladinCombatStrategyFactoryInternal());
     strategyContexts.Add(new PaladinBuffStrategyFactoryInternal());
     strategyContexts.Add(new PaladinResistanceStrategyFactoryInternal());
+}
+
+void PaladinAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new PaladinAiObjectContextInternal());
+}
+
+void PaladinAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new PaladinTriggerFactoryInternal());
+}
+
+void PaladinAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }
