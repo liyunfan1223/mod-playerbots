@@ -192,16 +192,16 @@ bool GrindTargetValue::needForQuest(Unit* target)
                         return true;
                 }
             }
+        }
+    }
 
-            if (CreatureTemplate const* data = sObjectMgr->GetCreatureTemplate(target->GetEntry()))
+    if (CreatureTemplate const* data = sObjectMgr->GetCreatureTemplate(target->GetEntry()))
+    {
+        if (uint32 lootId = data->lootid)
+        {
+            if (LootTemplates_Creature.HaveQuestLootForPlayer(lootId, bot))
             {
-                if (uint32 lootId = data->lootid)
-                {
-                    if (LootTemplates_Creature.HaveQuestLootForPlayer(lootId, bot))
-                    {
-                        return true;
-                    }
-                }
+                return true;
             }
         }
     }

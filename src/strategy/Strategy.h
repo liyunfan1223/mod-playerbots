@@ -69,7 +69,7 @@ public:
     void Update() {}
     void Reset() {}
 
-protected:
+public:
     NamedObjectFactoryList<ActionNode> actionNodeFactories;
 };
 

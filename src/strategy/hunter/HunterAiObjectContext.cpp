@@ -4,16 +4,17 @@
  */
 
 #include "HunterAiObjectContext.h"
+
 #include "BeastMasteryHunterStrategy.h"
-#include "MarksmanshipHunterStrategy.h"
-#include "SurvivalHunterStrategy.h"
 #include "GenericHunterNonCombatStrategy.h"
 #include "GenericHunterStrategy.h"
 #include "HunterActions.h"
 #include "HunterBuffStrategies.h"
 #include "HunterTriggers.h"
+#include "MarksmanshipHunterStrategy.h"
 #include "NamedObjectContext.h"
 #include "Playerbots.h"
+#include "SurvivalHunterStrategy.h"
 
 class HunterStrategyFactoryInternal : public NamedObjectContext<Strategy>
 {
@@ -105,7 +106,10 @@ public:
 private:
     static Trigger* auto_shot(PlayerbotAI* botAI) { return new AutoShotTrigger(botAI); }
     static Trigger* scare_beast(PlayerbotAI* botAI) { return new ScareBeastTrigger(botAI); }
-    static Trigger* concussive_shot_on_snare_target(PlayerbotAI* botAI) { return new ConsussiveShotSnareTrigger(botAI); }
+    static Trigger* concussive_shot_on_snare_target(PlayerbotAI* botAI)
+    {
+        return new ConsussiveShotSnareTrigger(botAI);
+    }
     static Trigger* pet_not_happy(PlayerbotAI* botAI) { return new HunterPetNotHappy(botAI); }
     static Trigger* serpent_sting_on_attacker(PlayerbotAI* botAI) { return new SerpentStingOnAttackerTrigger(botAI); }
     static Trigger* trueshot_aura(PlayerbotAI* botAI) { return new TrueshotAuraTrigger(botAI); }
@@ -258,10 +262,44 @@ private:
     static Action* intimidation(PlayerbotAI* ai) { return new CastIntimidationAction(ai); }
 };
 
-HunterAiObjectContext::HunterAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> HunterAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> HunterAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> HunterAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> HunterAiObjectContext::sharedValueContexts;
+
+HunterAiObjectContext::HunterAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void HunterAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void HunterAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new HunterStrategyFactoryInternal());
     strategyContexts.Add(new HunterBuffStrategyFactoryInternal());
+}
+
+void HunterAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new HunterAiObjectContextInternal());
+}
+
+void HunterAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new HunterTriggerFactoryInternal());
+}
+
+void HunterAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }
