@@ -648,10 +648,8 @@ void RandomPlayerbotMgr::AssignAccountTypes()
     // Populate filtered account lists with ALL accounts of each type
     for (const auto& [accountId, accountType] : currentAssignments)
     {
-        if (accountType == 1)
-            rndBotTypeAccounts.push_back(accountId);
-        else if (accountType == 2)
-            addClassTypeAccounts.push_back(accountId);
+        if (accountType == 1) rndBotTypeAccounts.push_back(accountId);
+        else if (accountType == 2) addClassTypeAccounts.push_back(accountId);
     }
 
     LOG_INFO("playerbots", "Account type assignment complete: {} RNDbot accounts, {} AddClass accounts, {} unassigned",
@@ -700,6 +698,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
         std::vector<uint32> accountsToUse;
         if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
         {
+
             // Calculate how many accounts can be used
             // With enablePeriodicOnlineOffline, don't use all of rndBotTypeAccounts right away. Fraction results are rounded up
             uint32 accountsToUseCount = (rndBotTypeAccounts.size() + sPlayerbotAIConfig->periodicOnlineOfflineRatio - 1)
@@ -720,7 +719,8 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
         }
 
         // Pre-map all characters from selected accounts
-        struct CharacterInfo {
+        struct CharacterInfo
+        {
             uint32 guid;
             uint8 rClass;
             uint8 rRace;
@@ -737,8 +737,8 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             if (!result)
                 continue;
 
-            do {
-
+            do
+            {
                 Field* fields = result->Fetch();
                 CharacterInfo info;
                 info.guid = fields[0].Get<uint32>();
@@ -760,6 +760,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
         {
             if (IsAlliance(charInfo.rRace))
                 allianceChars.push_back(charInfo);
+
             else
                 hordeChars.push_back(charInfo);
         }
@@ -767,16 +768,14 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
         // Lambda to handle bot login logic
         auto tryLoginBot = [&](const CharacterInfo& charInfo) -> bool
         {
-            if (GetEventValue(charInfo.guid, "add"))
+            if (GetEventValue(charInfo.guid, "add") ||
+                GetEventValue(charInfo.guid, "logout") ||
+                GetPlayerBot(charInfo.guid) ||
+                std::find(currentBots.begin(), currentBots.end(), charInfo.guid) != currentBots.end() ||
+                (sPlayerbotAIConfig->disableDeathKnightLogin && charInfo.rClass == CLASS_DEATH_KNIGHT))
+            {
                 return false;
-            if (GetEventValue(charInfo.guid, "logout"))
-                return false;
-            if (GetPlayerBot(charInfo.guid))
-                return false;
-            if (std::find(currentBots.begin(), currentBots.end(), charInfo.guid) != currentBots.end())
-                return false;
-            if (sPlayerbotAIConfig->disableDeathKnightLogin && charInfo.rClass == CLASS_DEATH_KNIGHT)
-                return false;
+            }
 
             uint32 add_time = sPlayerbotAIConfig->enablePeriodicOnlineOffline
                                 ? urand(sPlayerbotAIConfig->minRandomBotInWorldTime,
@@ -839,11 +838,13 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
                 missingBotsTimer = 0;	// Reset timer so error is not spammed every tick
             }
         }
-        else{
+        else
+        {
             missingBotsTimer = 0;   	// Reset timer if logins for this interval were successful
         }
     }
-    else{
+    else
+    {
         missingBotsTimer = 0;       	// Reset timer if there's enough bots
     }
 
@@ -2485,8 +2486,10 @@ bool RandomPlayerbotMgr::IsRandomBot(ObjectGuid::LowType bot)
     ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(bot);
     if (!sPlayerbotAIConfig->IsInRandomAccountList(sCharacterCache->GetCharacterAccountIdByGuid(guid)))
         return false;
+
     if (std::find(currentBots.begin(), currentBots.end(), bot) != currentBots.end())
         return true;
+
     return false;
 }
 
@@ -2501,6 +2504,7 @@ bool RandomPlayerbotMgr::IsAddclassBot(Player* bot)
     {
         return IsAddclassBot(bot->GetGUID().GetCounter());
     }
+
     return false;
 }
 
@@ -2513,18 +2517,23 @@ bool RandomPlayerbotMgr::IsAddclassBot(ObjectGuid::LowType bot)
     {
         if (claz == 10)
             continue;
+
         for (uint8 isAlliance = 0; isAlliance <= 1; isAlliance++)
         {
             if (addclassCache[GetTeamClassIdx(isAlliance, claz)].find(guid) !=
                 addclassCache[GetTeamClassIdx(isAlliance, claz)].end())
+            {
                 return true;
+            }
         }
     }
 
     // If not in cache, check the account type
     uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
     if (accountId && IsAccountType(accountId, 2)) // Type 2 = AddClass
+    {
         return true;
+    }
 
     return false;
 }

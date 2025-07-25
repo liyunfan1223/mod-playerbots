@@ -422,7 +422,9 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
                 sPlayerbotAIConfig->addClassAccountPoolSize == 0 ? 2 : -1);
 
             if (!res || res->Fetch()[0].Get<uint64>() == 0)
+            {
                 break;
+            }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(50));     // Extra 50ms fixed delay for safety.
         }
@@ -459,7 +461,9 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
     int maxBots = sPlayerbotAIConfig->maxRandomBots;
     // Take periodic online - offline into account
     if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
+    {
         maxBots *= sPlayerbotAIConfig->periodicOnlineOfflineRatio;
+    }
 
     // Calculate number of accounts needed for RNDbots
     // Result is rounded up for maxBots not cleanly divisible by the divisor
