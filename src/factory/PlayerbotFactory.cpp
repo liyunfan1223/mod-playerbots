@@ -3330,8 +3330,7 @@ void PlayerbotFactory::InitReagents()
 
 void PlayerbotFactory::InitGlyphs(bool increment)
 {
-    bot->InitGlyphsForLevel(); // Added for custom Glyphs
-    
+    bot->InitGlyphsForLevel();
     if (!increment &&
         botAI->GetAiObjectContext()->GetValue<bool>("custom_glyphs")->Get())
         return;   // // Added for custom Glyphs - custom glyphs flag test
