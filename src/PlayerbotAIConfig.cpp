@@ -448,7 +448,7 @@ bool PlayerbotAIConfig::Initialize()
     }
 
     botCheats.clear();
-    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "taxi"),
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "taxi,raid"),
                                              botCheats);
 
     botCheatMask = 0;
@@ -463,6 +463,8 @@ bool PlayerbotAIConfig::Initialize()
         botCheatMask |= (uint32)BotCheatMask::mana;
     if (std::find(botCheats.begin(), botCheats.end(), "power") != botCheats.end())
         botCheatMask |= (uint32)BotCheatMask::power;
+    if (std::find(botCheats.begin(), botCheats.end(), "raid") != botCheats.end())
+        botCheatMask |= (uint32)BotCheatMask::raid;
 
     LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AllowedLogFiles", ""),
                                              allowedLogFiles);
