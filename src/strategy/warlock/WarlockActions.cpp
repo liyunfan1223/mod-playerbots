@@ -171,24 +171,21 @@ bool CastCreateSoulstoneAction::isUseful()
     };
 
     // Check if the bot already has any soulstone
-    uint32 currentSoulstones = 0;
-    for (uint32 id : soulstoneIds)
-        currentSoulstones += bot->GetItemCount(id, false);  // false = only bags
-
-    // Allow only if the bot has no soulstone AND there is space for one
-    ItemPosCountVec dest;
-    uint32 count = 1;
-    bool hasSpace = false;
     for (uint32 id : soulstoneIds)
     {
-        if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count) == EQUIP_ERR_OK)
-        {
-            hasSpace = true;
-            break;
-        }
+        if (bot->GetItemCount(id, false) > 0)  
+            return false;                      // Already has a soulstone
     }
 
-    return (currentSoulstones == 0) && hasSpace;
+    // Only need to check one soulstone type for bag space (usually the highest-tier)
+    ItemPosCountVec dest;
+    uint32 count = 1;
+    // Use the last in the list (highest tier)
+    uint32 soulstoneToCreate = soulstoneIds.back();
+
+    bool hasSpace = (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, soulstoneToCreate, count) == EQUIP_ERR_OK);
+
+    return hasSpace;
 }
 
 bool DestroySoulShardAction::Execute(Event event)

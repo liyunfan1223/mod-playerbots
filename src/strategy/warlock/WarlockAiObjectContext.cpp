@@ -137,7 +137,7 @@ public:
         creators["no healthstone"] = &WarlockTriggerFactoryInternal::HasHealthstone;
         creators["no firestone"] = &WarlockTriggerFactoryInternal::HasFirestone;
         creators["no spellstone"] = &WarlockTriggerFactoryInternal::HasSpellstone;
-        creators["no soulstone"] = &WarlockTriggerFactoryInternal::HasSoulstone;
+        creators["no soulstone"] = &WarlockTriggerFactoryInternal::OutOfSoulstone;
         creators["firestone"] = &WarlockTriggerFactoryInternal::firestone;
         creators["spellstone"] = &WarlockTriggerFactoryInternal::spellstone;
         creators["soulstone"] = &WarlockTriggerFactoryInternal::soulstone;
@@ -181,7 +181,7 @@ private:
     static Trigger* HasHealthstone(PlayerbotAI* botAI) { return new HasHealthstoneTrigger(botAI); }
     static Trigger* HasFirestone(PlayerbotAI* botAI) { return new HasFirestoneTrigger(botAI); }
     static Trigger* HasSpellstone(PlayerbotAI* botAI) { return new HasSpellstoneTrigger(botAI); }
-    static Trigger* HasSoulstone(PlayerbotAI* botAI) { return new HasSoulstoneTrigger(botAI); }
+    static Trigger* OutOfSoulstone(PlayerbotAI* botAI) { return new OutOfSoulstoneTrigger(botAI); }
     static Trigger* firestone(PlayerbotAI* botAI) { return new FirestoneTrigger(botAI); }
     static Trigger* spellstone(PlayerbotAI* botAI) { return new SpellstoneTrigger(botAI); }
     static Trigger* soulstone(PlayerbotAI* botAI) { return new SoulstoneTrigger(botAI); }

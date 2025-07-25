@@ -46,7 +46,7 @@ bool OutOfSoulShardsTrigger::IsActive() { return GetSoulShardCount(botAI->GetBot
 
 bool TooManySoulShardsTrigger::IsActive() { return GetSoulShardCount(botAI->GetBot()) >= 6; }
 
-bool HasSoulstoneTrigger::IsActive() { return GetSoulstoneCount(botAI->GetBot()) == 0; }
+bool OutOfSoulstoneTrigger::IsActive() { return GetSoulstoneCount(botAI->GetBot()) == 0; }
 
 // Checks if the target marked with the moon icon can be banished
 bool BanishTrigger::IsActive()

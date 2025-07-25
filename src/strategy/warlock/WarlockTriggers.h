@@ -58,10 +58,10 @@ public:
     bool IsActive() override;
 };
 
-class HasSoulstoneTrigger : public Trigger
+class OutOfSoulstoneTrigger : public Trigger
 {
 public:
-    HasSoulstoneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soulstone") {}
+    OutOfSoulstoneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soulstone") {}
     bool IsActive() override;
 };
 
