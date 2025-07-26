@@ -53,10 +53,6 @@ void ArcaneMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericMageStrategy::InitTriggers(triggers);
 
-    // Cooldown Triggers
-    triggers.push_back(new TriggerNode("arcane power", NextAction::array(0, new NextAction("arcane power", 29.0f), nullptr)));
-    triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 28.5f), nullptr)));
-
     // Proc Trigger
     triggers.push_back(new TriggerNode("arcane blast 4 stacks and missile barrage", NextAction::array(0, new NextAction("arcane missiles", 15.0f), nullptr)));
 }

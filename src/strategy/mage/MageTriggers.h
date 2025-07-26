@@ -115,10 +115,10 @@ public:
     }
 };
 
-class CombustionTrigger : public BuffTrigger
+class CombustionTrigger : public BoostTrigger
 {
 public:
-    CombustionTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "combustion") {}
+    CombustionTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "combustion") {}
 };
 
 class IcyVeinsCooldownTrigger : public SpellCooldownTrigger
@@ -141,27 +141,27 @@ public:
     ColdSnapTrigger(PlayerbotAI* ai) : TwoTriggers(ai, "icy veins on cd", "deep freeze on cd") {}
 };
 
-class MirrorImageTrigger : public BuffTrigger
+class MirrorImageTrigger : public BoostTrigger
 {
 public:
-    MirrorImageTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "mirror image") {}
+    MirrorImageTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "mirror image") {}
 };
 
-class IcyVeinsTrigger : public BuffTrigger
+class IcyVeinsTrigger : public BoostTrigger
 {
 public:
-    IcyVeinsTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "icy veins") {}
+    IcyVeinsTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "icy veins") {}
 };
 
-class ArcanePowerTrigger : public BuffTrigger
+class ArcanePowerTrigger : public BoostTrigger
 {
 public:
-    ArcanePowerTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane power") {}
+    ArcanePowerTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "arcane power") {}
 };
-class PresenceOfMindTrigger : public BuffTrigger
+class PresenceOfMindTrigger : public BoostTrigger
 {
 public:
-    PresenceOfMindTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "presence of mind") {}
+    PresenceOfMindTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "presence of mind") {}
 };
 
 // CC, Interrupt, and Dispel Triggers

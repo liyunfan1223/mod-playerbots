@@ -59,10 +59,6 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericMageStrategy::InitTriggers(triggers);
 
-    // Cooldown triggers
-    triggers.push_back(new TriggerNode("cold snap", NextAction::array(0, new NextAction("cold snap", 28.0f), nullptr)));
-    triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 27.5f), nullptr)));
-
     // Pet/Defensive triggers
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon water elemental", 30.0f), nullptr)));
     triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 29.5f), nullptr)));

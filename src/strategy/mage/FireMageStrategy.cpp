@@ -52,9 +52,6 @@ void FireMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericMageStrategy::InitTriggers(triggers);
 
-    // Cooldown Trigger
-    triggers.push_back(new TriggerNode("combustion", NextAction::array(0, new NextAction("combustion", 18.0f), nullptr)));
-
     // Debuff Triggers
     triggers.push_back(new TriggerNode("improved scorch", NextAction::array(0, new NextAction("scorch", 19.0f), nullptr)));
     triggers.push_back(new TriggerNode("living bomb", NextAction::array(0, new NextAction("living bomb", 18.5f), nullptr)));

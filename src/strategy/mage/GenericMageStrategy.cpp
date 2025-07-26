@@ -203,6 +203,35 @@ void MageCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void MageBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
+    Player* bot = botAI->GetBot();
+    int tab = AiFactory::GetPlayerSpecTab(bot);
+
+    if (tab == 0)  // Arcane
+    {
+        triggers.push_back(new TriggerNode("arcane power", NextAction::array(0, new NextAction("arcane power", 29.0f), nullptr)));
+        triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 28.5f), nullptr)));
+        triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 28.0f), nullptr)));
+    }
+    else if (tab == 1)
+    {
+        if (bot->HasSpell(44614) /*Frostfire Bolt*/ && bot->HasAura(15047) /*Ice Shards*/) 
+        { // Frostfire
+            triggers.push_back(new TriggerNode("combustion", NextAction::array(0, new NextAction("combustion", 18.0f), nullptr)));
+            triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 17.5f), nullptr)));
+            triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 17.0f), nullptr)));
+        }
+        else 
+        { // Fire
+            triggers.push_back(new TriggerNode("combustion", NextAction::array(0, new NextAction("combustion", 18.0f), nullptr)));
+            triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 17.5f), nullptr)));
+        }
+    }
+    else if (tab == 2)  // Frost
+    {
+        triggers.push_back(new TriggerNode("cold snap", NextAction::array(0, new NextAction("cold snap", 28.0f), nullptr)));
+        triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 27.5f), nullptr)));
+        triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 26.0f), nullptr)));
+    }
 }
 
 void MageCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
