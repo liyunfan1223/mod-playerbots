@@ -14,22 +14,19 @@ void UseFoodStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     if (sPlayerbotAIConfig->freeFood)
     {
-        triggers.push_back(new TriggerNode("high health", NextAction::array(0, new NextAction("food", 1.0f), nullptr)));
+        // low and medium, avoid unnecessary use
         triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("food", 3.0f), nullptr)));
         triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("food", 5.0f), nullptr)));
 
-        triggers.push_back(new TriggerNode("high mana", NextAction::array(0, new NextAction("drink", 1.0f), nullptr)));
         triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("drink", 3.0f), nullptr)));
         triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("drink", 5.0f), nullptr)));
     }
     else
     {
-        triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("food", 5.0f), nullptr)));
         triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("food", 3.0f), nullptr)));
-        triggers.push_back(new TriggerNode("high health", NextAction::array(0, new NextAction("food", 1.0f), nullptr)));
+        triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("food", 5.0f), nullptr)));
 
-        triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("drink", 5.0f), nullptr)));
         triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("drink", 3.0f), nullptr)));
-        triggers.push_back(new TriggerNode("high mana", NextAction::array(0, new NextAction("drink", 1.0f), nullptr)));
+        triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("drink", 5.0f), nullptr)));
     }
 }
