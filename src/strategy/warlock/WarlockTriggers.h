@@ -112,6 +112,14 @@ public:
     HasHealthstoneTrigger(PlayerbotAI* botAI) : WarlockConjuredItemTrigger(botAI, "healthstone") {}
 };
 
+class WrongPetTrigger : public Trigger
+{
+public:
+    WrongPetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "wrong pet") {}
+    bool IsActive() override;
+};
+
+
 // CC and Pet Triggers
 
 class BanishTrigger : public HasCcTargetTrigger

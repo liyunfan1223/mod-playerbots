@@ -165,3 +165,66 @@ bool CurseOfWeaknessTrigger::IsActive()
     // Use default BuffTrigger logic for the rest (only trigger if debuff is missing or expiring)
     return BuffTrigger::IsActive();
 }
+
+struct WarlockPetDef
+{
+    const char* strategy;  // The strategy string as recognized by the AI (e.g., "imp", "voidwalker", etc.)
+    uint32 spellId;        // The spell ID required to summon this pet
+    uint32 npcEntry;       // The NPC entry ID for the summoned pet creature
+};
+
+// Static array with all relevant Warlock pets and their data
+static const WarlockPetDef pets[] = {{"imp", 688, 416},
+                                     {"voidwalker", 697, 1860},
+                                     {"succubus", 712, 1863},
+                                     {"felhunter", 691, 417},
+                                     {"felguard", 30146, 17252}};
+
+bool WrongPetTrigger::IsActive()
+{
+    // Retrieve the bot player and its current pet (if any)
+    Player* bot = botAI->GetBot();
+    Pet* pet = bot->GetPet();
+
+    // Step 1: Count how many pet strategies are currently enabled for this bot.
+    //         While doing so, also remember which pet strategy is the only enabled one (if that's the case).
+    int enabledCount = 0;
+    const WarlockPetDef* enabledPet =
+        nullptr;  // Pointer to the pet definition of the enabled strategy, if only one is enabled
+    for (const WarlockPetDef& pd : pets)
+    {
+        if (botAI->HasStrategy(pd.strategy, BOT_STATE_NON_COMBAT))
+        {
+            enabledCount++;
+            enabledPet = &pd;  // Save the pointer to last enabled pet
+        }
+    }
+
+    // Step 2: If not exactly one pet strategy is enabled, we should not trigger.
+    //         This prevents ambiguous or conflicting situations.
+    if (enabledCount != 1)
+        return false;
+
+    // Step 3: At this point, we know only one pet strategy is enabled.
+    //         We check if the currently summoned pet matches the enabled strategy.
+    bool correctPet = false;
+    if (pet)
+    {
+        CreatureTemplate const* ct = pet->GetCreatureTemplate();
+        // Check if the pet's NPC entry matches the expected one for the enabled strategy
+        if (ct && ct->Entry == enabledPet->npcEntry)
+            correctPet = true;
+    }
+
+    // Step 4: If the correct pet is already summoned, the trigger should not activate.
+    if (correctPet)
+        return false;
+
+    // Step 5: Finally, check if the bot actually knows the spell to summon the desired pet.
+    //         If so, the trigger is active (bot should summon the correct pet).
+    if (bot->HasSpell(enabledPet->spellId))
+        return true;
+
+    // Step 6: If we get here, the bot doesn't know the spell required to support the active pet strategy
+    return false;
+}

@@ -98,6 +98,7 @@ SummonImpStrategy::SummonImpStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
 void SummonImpStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon imp", 29.0f), NULL)));
+    triggers.push_back(new TriggerNode("wrong pet", NextAction::array(0, new NextAction("summon imp", 29.0f), NULL)));
 }
 
 // Non-combat strategy for summoning a Voidwalker
@@ -109,6 +110,7 @@ SummonVoidwalkerStrategy::SummonVoidwalkerStrategy(PlayerbotAI* ai) : NonCombatS
 void SummonVoidwalkerStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon voidwalker", 29.0f), NULL)));
+    triggers.push_back(new TriggerNode("wrong pet", NextAction::array(0, new NextAction("summon voidwalker", 29.0f), NULL)));
 }
 
 // Non-combat strategy for summoning a Succubus
@@ -120,6 +122,7 @@ SummonSuccubusStrategy::SummonSuccubusStrategy(PlayerbotAI* ai) : NonCombatStrat
 void SummonSuccubusStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon succubus", 29.0f), NULL)));
+    triggers.push_back(new TriggerNode("wrong pet", NextAction::array(0, new NextAction("summon succubus", 29.0f), NULL)));
 }
 
 // Non-combat strategy for summoning a Felhunter
@@ -131,6 +134,7 @@ SummonFelhunterStrategy::SummonFelhunterStrategy(PlayerbotAI* ai) : NonCombatStr
 void SummonFelhunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felhunter", 29.0f), NULL)));
+    triggers.push_back(new TriggerNode("wrong pet", NextAction::array(0, new NextAction("summon felhunter", 29.0f), NULL)));
 }
 
 // Non-combat strategy for summoning a Felguard
@@ -142,6 +146,7 @@ SummonFelguardStrategy::SummonFelguardStrategy(PlayerbotAI* ai) : NonCombatStrat
 void SummonFelguardStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon felguard", 29.0f), NULL)));
+    triggers.push_back(new TriggerNode("wrong pet", NextAction::array(0, new NextAction("summon felguard", 29.0f), NULL)));
 }
 
 // Non-combat strategy for selecting themselves to receive soulstone
