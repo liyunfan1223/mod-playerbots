@@ -302,22 +302,22 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_MAGE:
             if (tab == 0)
-                engine->addStrategiesNoInit("arcane", "arcane aoe", nullptr);
+                engine->addStrategiesNoInit("arcane", nullptr);
             else if (tab == 1)
             {
                 if (player->HasSpell(44614) /*Frostfire Bolt*/ && player->HasAura(15047) /*Ice Shards*/)
                 {
-                    engine->addStrategiesNoInit("frostfire", "frostfire aoe", nullptr);
+                    engine->addStrategiesNoInit("frostfire", nullptr);
                 }
                 else
                 {
-                    engine->addStrategiesNoInit("fire", "fire aoe", nullptr);
+                    engine->addStrategiesNoInit("fire", nullptr);
                 }
             } 
             else
-                engine->addStrategiesNoInit("frost", "frost aoe", nullptr);
+                engine->addStrategiesNoInit("frost", nullptr);
 
-            engine->addStrategiesNoInit("dps", "dps assist", "cure", nullptr);
+            engine->addStrategiesNoInit("dps", "dps assist", "cure", "aoe", nullptr);
             break;
         case CLASS_WARRIOR:
             if (tab == 2)

@@ -13,20 +13,11 @@ class PlayerbotAI;
 class FrostFireMageStrategy : public GenericMageStrategy
 {
 public:
-    FrostFireMageStrategy(PlayerbotAI* botAI) : GenericMageStrategy(botAI) {}
+    FrostFireMageStrategy(PlayerbotAI* botAI);
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override { return "frostfire"; }
     NextAction** getDefaultActions() override;
-};
-
-class FrostFireMageAoeStrategy : public CombatStrategy
-{
-public:
-    FrostFireMageAoeStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}
-
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName() override { return "frostfire aoe"; }
 };
 
 #endif
