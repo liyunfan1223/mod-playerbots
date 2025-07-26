@@ -88,6 +88,9 @@ uint8 AiFactory::GetPlayerSpecTab(Player* bot)
             case CLASS_PRIEST:
                 tab = PRIEST_TAB_HOLY;
                 break;
+            case CLASS_WARLOCK:
+                tab = WARLOCK_TAB_DEMONOLOGY;
+                break;
         }
 
         return tab;
