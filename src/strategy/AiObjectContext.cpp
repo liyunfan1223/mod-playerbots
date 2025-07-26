@@ -8,39 +8,89 @@
 #include "ActionContext.h"
 #include "ChatActionContext.h"
 #include "ChatTriggerContext.h"
+#include "DKAiObjectContext.h"
+#include "DruidAiObjectContext.h"
+#include "HunterAiObjectContext.h"
+#include "MageAiObjectContext.h"
+#include "PaladinAiObjectContext.h"
 #include "Playerbots.h"
-#include "RaidUlduarTriggerContext.h"
+#include "PriestAiObjectContext.h"
 #include "RaidUlduarActionContext.h"
+#include "RaidUlduarTriggerContext.h"
+#include "RogueAiObjectContext.h"
+#include "ShamanAiObjectContext.h"
 #include "SharedValueContext.h"
 #include "StrategyContext.h"
 #include "TriggerContext.h"
 #include "ValueContext.h"
+#include "WarlockAiObjectContext.h"
+#include "WarriorAiObjectContext.h"
 #include "WorldPacketActionContext.h"
 #include "WorldPacketTriggerContext.h"
-#include "raids/RaidStrategyContext.h"
-#include "raids/blackwinglair/RaidBwlActionContext.h"
-#include "raids/blackwinglair/RaidBwlTriggerContext.h"
-#include "raids/naxxramas/RaidNaxxActionContext.h"
-#include "raids/naxxramas/RaidNaxxTriggerContext.h"
-#include "raids/icecrown/RaidIccActionContext.h"
-#include "raids/icecrown/RaidIccTriggerContext.h"
-#include "raids/obsidiansanctum/RaidOsActionContext.h"
-#include "raids/obsidiansanctum/RaidOsTriggerContext.h"
-#include "raids/eyeofeternity/RaidEoEActionContext.h"
-#include "raids/vaultofarchavon/RaidVoATriggerContext.h"
-#include "raids/onyxia/RaidOnyxiaActionContext.h"
-#include "raids/onyxia/RaidOnyxiaTriggerContext.h"
-#include "raids/vaultofarchavon/RaidVoAActionContext.h"
-#include "raids/eyeofeternity/RaidEoETriggerContext.h"
-#include "raids/moltencore/RaidMcActionContext.h"
-#include "raids/moltencore/RaidMcTriggerContext.h"
-#include "raids/aq20/RaidAq20ActionContext.h"
-#include "raids/aq20/RaidAq20TriggerContext.h"
 #include "dungeons/DungeonStrategyContext.h"
 #include "dungeons/wotlk/WotlkDungeonActionContext.h"
 #include "dungeons/wotlk/WotlkDungeonTriggerContext.h"
+#include "raids/RaidStrategyContext.h"
+#include "raids/aq20/RaidAq20ActionContext.h"
+#include "raids/aq20/RaidAq20TriggerContext.h"
+#include "raids/blackwinglair/RaidBwlActionContext.h"
+#include "raids/blackwinglair/RaidBwlTriggerContext.h"
+#include "raids/eyeofeternity/RaidEoEActionContext.h"
+#include "raids/eyeofeternity/RaidEoETriggerContext.h"
+#include "raids/icecrown/RaidIccActionContext.h"
+#include "raids/icecrown/RaidIccTriggerContext.h"
+#include "raids/moltencore/RaidMcActionContext.h"
+#include "raids/moltencore/RaidMcTriggerContext.h"
+#include "raids/naxxramas/RaidNaxxActionContext.h"
+#include "raids/naxxramas/RaidNaxxTriggerContext.h"
+#include "raids/obsidiansanctum/RaidOsActionContext.h"
+#include "raids/obsidiansanctum/RaidOsTriggerContext.h"
+#include "raids/onyxia/RaidOnyxiaActionContext.h"
+#include "raids/onyxia/RaidOnyxiaTriggerContext.h"
+#include "raids/vaultofarchavon/RaidVoAActionContext.h"
+#include "raids/vaultofarchavon/RaidVoATriggerContext.h"
 
-AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
+SharedNamedObjectContextList<Strategy> AiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> AiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> AiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> AiObjectContext::sharedValueContexts;
+
+AiObjectContext::AiObjectContext(PlayerbotAI* botAI, SharedNamedObjectContextList<Strategy>& sharedStrategyContext,
+                                 SharedNamedObjectContextList<Action>& sharedActionContext,
+                                 SharedNamedObjectContextList<Trigger>& sharedTriggerContext,
+                                 SharedNamedObjectContextList<UntypedValue>& sharedValueContext)
+    : PlayerbotAIAware(botAI),
+      strategyContexts(sharedStrategyContext),
+      actionContexts(sharedActionContext),
+      triggerContexts(sharedTriggerContext),
+      valueContexts(sharedValueContext)
+{
+}
+
+void AiObjectContext::BuildAllSharedContexts()
+{
+    AiObjectContext::BuildSharedContexts();
+    PriestAiObjectContext::BuildSharedContexts();
+    MageAiObjectContext::BuildSharedContexts();
+    WarlockAiObjectContext::BuildSharedContexts();
+    WarriorAiObjectContext::BuildSharedContexts();
+    ShamanAiObjectContext::BuildSharedContexts();
+    PaladinAiObjectContext::BuildSharedContexts();
+    DruidAiObjectContext::BuildSharedContexts();
+    HunterAiObjectContext::BuildSharedContexts();
+    RogueAiObjectContext::BuildSharedContexts();
+    DKAiObjectContext::BuildSharedContexts();
+}
+
+void AiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void AiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
 {
     strategyContexts.Add(new StrategyContext());
     strategyContexts.Add(new MovementStrategyContext());
@@ -48,7 +98,10 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     strategyContexts.Add(new QuestStrategyContext());
     strategyContexts.Add(new RaidStrategyContext());
     strategyContexts.Add(new DungeonStrategyContext());
+}
 
+void AiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
     actionContexts.Add(new ActionContext());
     actionContexts.Add(new ChatActionContext());
     actionContexts.Add(new WorldPacketActionContext());
@@ -77,7 +130,10 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     actionContexts.Add(new WotlkDungeonFoSActionContext());
     actionContexts.Add(new WotlkDungeonPoSActionContext());
     actionContexts.Add(new WotlkDungeonToCActionContext());
+}
 
+void AiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
     triggerContexts.Add(new WorldPacketTriggerContext());
@@ -106,26 +162,11 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     triggerContexts.Add(new WotlkDungeonFoSTriggerContext());
     triggerContexts.Add(new WotlkDungeonPoSTriggerContext());
     triggerContexts.Add(new WotlkDungeonToCTriggerContext());
+}
 
+void AiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
     valueContexts.Add(new ValueContext());
-
-    valueContexts.Add(sSharedValueContext);
-}
-
-void AiObjectContext::Update()
-{
-    strategyContexts.Update();
-    triggerContexts.Update();
-    actionContexts.Update();
-    valueContexts.Update();
-}
-
-void AiObjectContext::Reset()
-{
-    strategyContexts.Reset();
-    triggerContexts.Reset();
-    actionContexts.Reset();
-    valueContexts.Reset();
 }
 
 std::vector<std::string> AiObjectContext::Save()
@@ -218,5 +259,3 @@ std::string const AiObjectContext::FormatValues()
 
     return out.str();
 }
-
-void AiObjectContext::AddShared(NamedObjectContext<UntypedValue>* sharedValues) { valueContexts.Add(sharedValues); }

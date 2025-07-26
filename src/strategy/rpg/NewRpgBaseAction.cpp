@@ -84,7 +84,7 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
     float rx, ry, rz;
     bool found = false;
     int attempt = 3;
-    while (--attempt)
+    while (attempt--)
     {
         float angle = bot->GetAngle(&dest);
         float delta = urand(1, 100) <= 75 ? (rand_norm() - 0.5) * M_PI * 0.5 : (rand_norm() - 0.5) * M_PI * 2;
@@ -163,8 +163,8 @@ bool NewRpgBaseAction::MoveRandomNear(float moveStep, MovementPriority priority)
     const float x = bot->GetPositionX();
     const float y = bot->GetPositionY();
     const float z = bot->GetPositionZ();
-    int attempts = 5;
-    while (--attempts)
+    int attempts = 1;
+    while (attempts--)
     {
         float angle = (float)rand_norm() * 2 * static_cast<float>(M_PI);
         float dx = x + distance * cos(angle);
