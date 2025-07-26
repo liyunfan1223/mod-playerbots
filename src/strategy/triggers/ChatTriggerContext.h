@@ -134,8 +134,8 @@ public:
         creators["qi"] = &ChatTriggerContext::qi;
         creators["wipe"] = &ChatTriggerContext::wipe;
         creators["pet"] = &ChatTriggerContext::pet;
-		creators["glyphs"] = &ChatTriggerContext::glyphs; // Added for custom Glyphs
-		creators["glyph equip"] = &ChatTriggerContext::glyph_equip; // Added for custom Glyphs
+        creators["glyphs"] = &ChatTriggerContext::glyphs; // Added for custom Glyphs
+        creators["glyph equip"] = &ChatTriggerContext::glyph_equip; // Added for custom Glyphs
     }
 
 private:
