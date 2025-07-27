@@ -1533,6 +1533,11 @@ bool MimironPhase4MarkDpsTrigger::IsActive()
 
 bool MimironCheatTrigger::IsActive()
 {
+    if (!botAI->HasCheat(BotCheatMask::raid))
+    {
+        return false;
+    }
+
     if (!botAI->IsMainTank(bot)) 
     {
         return false;
@@ -1556,4 +1561,61 @@ bool MimironCheatTrigger::IsActive()
     }
 
     return false;
+}
+
+bool VezaxCheatTrigger::IsActive()
+{
+    if (!botAI->HasCheat(BotCheatMask::raid))
+    {
+        return false;
+    }
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "general vezax");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    if (!AI_VALUE2(bool, "has mana", "self target"))
+    {
+        return false;
+    }
+
+    return AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;
+}
+
+bool VezaxShadowCrashTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "general vezax");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    return botAI->HasAura(SPELL_SHADOW_CRASH, bot);
+}
+
+bool VezaxMarkOfTheFacelessTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "general vezax");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    if (!botAI->HasAura(SPELL_MARK_OF_THE_FACELESS, bot))
+    {
+        return false;
+    }
+
+    float distance = bot->GetDistance2d(ULDUAR_VEZAX_MARK_OF_THE_FACELESS_SPOT.GetPositionX(),
+                                        ULDUAR_VEZAX_MARK_OF_THE_FACELESS_SPOT.GetPositionY());
+
+    return distance > 2.0f;
 }

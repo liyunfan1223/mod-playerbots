@@ -225,6 +225,21 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "mimiron cheat trigger",
         NextAction::array(0, new NextAction("mimiron cheat action", ACTION_RAID), nullptr)));
+
+    //
+    // General Vezax
+    //
+    triggers.push_back(new TriggerNode(
+        "vezax cheat trigger",
+        NextAction::array(0, new NextAction("vezax cheat action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "vezax shadow crash trigger",
+        NextAction::array(0, new NextAction("vezax shadow crash action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "vezax mark of the faceless trigger",
+        NextAction::array(0, new NextAction("vezax mark of the faceless action", ACTION_RAID), nullptr)));
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

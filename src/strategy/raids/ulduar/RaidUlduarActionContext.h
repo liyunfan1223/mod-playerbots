@@ -62,6 +62,9 @@ public:
         creators["mimiron rocket strike action"] = &RaidUlduarActionContext::mimiron_rocket_strike_action;
         creators["mimiron phase 4 mark dps action"] = &RaidUlduarActionContext::mimiron_phase_4_mark_dps_action;
         creators["mimiron cheat action"] = &RaidUlduarActionContext::mimiron_cheat_action;
+        creators["vezax cheat action"] = &RaidUlduarActionContext::vezax_cheat_action;
+        creators["vezax shadow crash action"] = &RaidUlduarActionContext::vezax_shadow_crash_action;
+        creators["vezax mark of the faceless action"] = &RaidUlduarActionContext::vezax_mark_of_the_faceless_action;
     }
 
 private:
@@ -111,6 +114,9 @@ private:
     static Action* mimiron_rocket_strike_action(PlayerbotAI* ai) { return new MimironRocketStrikeAction(ai); }
     static Action* mimiron_phase_4_mark_dps_action(PlayerbotAI* ai) { return new MimironPhase4MarkDpsAction(ai); }
     static Action* mimiron_cheat_action(PlayerbotAI* ai) { return new MimironCheatAction(ai); }
+    static Action* vezax_cheat_action(PlayerbotAI* ai) { return new VezaxCheatAction(ai); }
+    static Action* vezax_shadow_crash_action(PlayerbotAI* ai) { return new VezaxShadowCrashAction(ai); }
+    static Action* vezax_mark_of_the_faceless_action(PlayerbotAI* ai) { return new VezaxMarkOfTheFacelessAction(ai); }
 };
 
 #endif

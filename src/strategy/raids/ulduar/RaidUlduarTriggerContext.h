@@ -64,6 +64,9 @@ public:
         creators["mimiron rocket strike trigger"] = &RaidUlduarTriggerContext::mimiron_rocket_strike_trigger;
         creators["mimiron phase 4 mark dps trigger"] = &RaidUlduarTriggerContext::mimiron_phase_4_mark_dps_trigger;
         creators["mimiron cheat trigger"] = &RaidUlduarTriggerContext::mimiron_cheat_trigger;
+        creators["vezax cheat trigger"] = &RaidUlduarTriggerContext::vezax_cheat_trigger;
+        creators["vezax shadow crash trigger"] = &RaidUlduarTriggerContext::vezax_shadow_crash_trigger;
+        creators["vezax mark of the faceless trigger"] = &RaidUlduarTriggerContext::vezax_mark_of_the_faceless_trigger;
     }
 
 private:
@@ -115,6 +118,9 @@ private:
     static Trigger* mimiron_rocket_strike_trigger(PlayerbotAI* ai) { return new MimironRocketStrikeTrigger(ai); }
     static Trigger* mimiron_phase_4_mark_dps_trigger(PlayerbotAI* ai) { return new MimironPhase4MarkDpsTrigger(ai); }
     static Trigger* mimiron_cheat_trigger(PlayerbotAI* ai) { return new MimironCheatTrigger(ai); }
+    static Trigger* vezax_cheat_trigger(PlayerbotAI* ai) { return new VezaxCheatTrigger(ai); }
+    static Trigger* vezax_shadow_crash_trigger(PlayerbotAI* ai) { return new VezaxShadowCrashTrigger(ai); }
+    static Trigger* vezax_mark_of_the_faceless_trigger(PlayerbotAI* ai) { return new VezaxMarkOfTheFacelessTrigger(ai); }
 };
 
 #endif
