@@ -20,13 +20,4 @@ public:
     NextAction** getDefaultActions() override;
 };
 
-class FrostMageAoeStrategy : public CombatStrategy
-{
-public:
-    FrostMageAoeStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}
-
-    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName() override { return "frost aoe"; }
-};
-
 #endif

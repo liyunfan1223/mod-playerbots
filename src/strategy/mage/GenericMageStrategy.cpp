@@ -4,7 +4,7 @@
  */
 
 #include "GenericMageStrategy.h"
-
+#include "AiFactory.h"
 #include "Playerbots.h"
 #include "RangedCombatStrategy.h"
 
@@ -160,49 +160,119 @@ void GenericMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     RangedCombatStrategy::InitTriggers(triggers);
 
-    // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell",
-    // ACTION_MOVE + 9), nullptr)));
-    triggers.push_back(
-        new TriggerNode("enemy is close", NextAction::array(0, new NextAction("frost nova", 50.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("counterspell on enemy healer",
-                        NextAction::array(0, new NextAction("counterspell on enemy healer", 40.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("critical health", NextAction::array(0, new NextAction("ice block", 80.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("spellsteal", NextAction::array(0, new NextAction("spellsteal", 40.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("medium threat", NextAction::array(0, new NextAction("invisibility", 60.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("low mana", NextAction::array(0, new NextAction("evocation", ACTION_EMERGENCY + 5), nullptr)));
-    triggers.push_back(
-        new TriggerNode("fire ward", NextAction::array(0, new NextAction("fire ward", ACTION_EMERGENCY), nullptr)));
-    triggers.push_back(
-        new TriggerNode("frost ward", NextAction::array(0, new NextAction("frost ward", ACTION_EMERGENCY), nullptr)));
-        
-        triggers.push_back(new TriggerNode("enemy too close for spell",
-            NextAction::array(0, new NextAction("blink back", ACTION_MOVE + 5), nullptr)));
+    // Threat Triggers
+    triggers.push_back(new TriggerNode("high threat", NextAction::array(0, new NextAction("mirror image", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("medium threat", NextAction::array(0, new NextAction("invisibility", 30.0f), nullptr)));
+
+    // Defensive Triggers
+    triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("ice block", 90.0f), nullptr)));
+    triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("mana shield", 85.0f), nullptr)));
+    triggers.push_back(new TriggerNode("fire ward", NextAction::array(0, new NextAction("fire ward", 90.0f), nullptr)));
+    triggers.push_back(new TriggerNode("frost ward", NextAction::array(0, new NextAction("frost ward", 90.0f), nullptr)));
+    triggers.push_back(new TriggerNode("enemy is close and no firestarter strategy", NextAction::array(0, new NextAction("frost nova", 50.0f), nullptr)));
+    triggers.push_back(new TriggerNode("enemy too close for spell and no firestarter strategy", NextAction::array(0, new NextAction("blink back", 35.0f), nullptr)));
+
+    // Mana Threshold Triggers
+    Player* bot = botAI->GetBot();
+    if (bot->HasSpell(42985))  // Mana Sapphire
+        triggers.push_back(new TriggerNode("high mana", NextAction::array(0, new NextAction("use mana sapphire", 90.0f), nullptr)));
+    else if (bot->HasSpell(27101))  // Mana Emerald
+        triggers.push_back(new TriggerNode("high mana", NextAction::array(0, new NextAction("use mana emerald", 90.0f), nullptr)));
+    else if (bot->HasSpell(10054))  // Mana Ruby
+        triggers.push_back(new TriggerNode("high mana", NextAction::array(0, new NextAction("use mana ruby", 90.0f), nullptr)));
+    else if (bot->HasSpell(10053))  // Mana Citrine
+        triggers.push_back(new TriggerNode("high mana", NextAction::array(0, new NextAction("use mana citrine", 90.0f), nullptr)));
+    else if (bot->HasSpell(3552))  // Mana Jade
+        triggers.push_back(new TriggerNode("high mana", NextAction::array(0, new NextAction("use mana jade", 90.0f), nullptr)));
+    else if (bot->HasSpell(759))  // Mana Agate
+        triggers.push_back(new TriggerNode("high mana", NextAction::array(0, new NextAction("use mana agate", 90.0f), nullptr)));
+
+    triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("mana potion", 90.0f), nullptr)));
+    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("evocation", 90.0f), nullptr)));
+
+    // Counterspell / Spellsteal Triggers
+    triggers.push_back(new TriggerNode("spellsteal", NextAction::array(0, new NextAction("spellsteal", 40.0f), nullptr)));
+    triggers.push_back(new TriggerNode("counterspell on enemy healer", NextAction::array(0, new NextAction("counterspell on enemy healer", 40.0f), nullptr)));
 }
 
 void MageCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(
-        new TriggerNode("remove curse", NextAction::array(0, new NextAction("remove curse", 41.0f), nullptr)));
-    triggers.push_back(new TriggerNode("remove curse on party",
-                                       NextAction::array(0, new NextAction("remove curse on party", 40.0f), nullptr)));
+    triggers.push_back(new TriggerNode("remove curse", NextAction::array(0, new NextAction("remove curse", 41.0f), nullptr)));
+    triggers.push_back(new TriggerNode("remove curse on party", NextAction::array(0, new NextAction("remove curse on party", 40.0f), nullptr)));
 }
 
 void MageBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 50.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("presence of mind", NextAction::array(0, new NextAction("presence of mind", 42.0f), nullptr)));
-    // triggers.push_back(new TriggerNode("arcane power", NextAction::array(0, new NextAction("arcane power", 41.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 41.0f), nullptr)));
+    Player* bot = botAI->GetBot();
+    int tab = AiFactory::GetPlayerSpecTab(bot);
+
+    if (tab == 0)  // Arcane
+    {
+        triggers.push_back(new TriggerNode("arcane power", NextAction::array(0, new NextAction("arcane power", 29.0f), nullptr)));
+        triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 28.5f), nullptr)));
+        triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 28.0f), nullptr)));
+    }
+    else if (tab == 1)
+    {
+        if (bot->HasSpell(44614) /*Frostfire Bolt*/ && bot->HasAura(15047) /*Ice Shards*/) 
+        { // Frostfire
+            triggers.push_back(new TriggerNode("combustion", NextAction::array(0, new NextAction("combustion", 18.0f), nullptr)));
+            triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 17.5f), nullptr)));
+            triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 17.0f), nullptr)));
+        }
+        else 
+        { // Fire
+            triggers.push_back(new TriggerNode("combustion", NextAction::array(0, new NextAction("combustion", 18.0f), nullptr)));
+            triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 17.5f), nullptr)));
+        }
+    }
+    else if (tab == 2)  // Frost
+    {
+        triggers.push_back(new TriggerNode("cold snap", NextAction::array(0, new NextAction("cold snap", 28.0f), nullptr)));
+        triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 27.5f), nullptr)));
+        triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 26.0f), nullptr)));
+    }
 }
 
 void MageCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("polymorph", NextAction::array(0, new NextAction("polymorph", 30.0f), nullptr)));
+}
+
+void MageAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("blizzard channel check", NextAction::array(0, new NextAction("cancel channel", 26.0f), nullptr)));
+
+    Player* bot = botAI->GetBot();
+    int tab = AiFactory::GetPlayerSpecTab(bot);
+
+    if (tab == 0)  // Arcane
+    {
+        triggers.push_back(new TriggerNode("flamestrike active and medium aoe", NextAction::array(0, new NextAction("blizzard", 24.0f), nullptr)));
+        triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0,
+                                                     new NextAction("flamestrike", 23.0f),
+                                                     new NextAction("blizzard", 22.0f), nullptr)));
+        triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("arcane explosion", 21.0f), nullptr)));
+    }
+    else if (tab == 1)  // Fire and Frostfire
+    {
+        triggers.push_back(
+            new TriggerNode("medium aoe", NextAction::array(0,
+                                      new NextAction("dragon's breath", 39.0f),
+                                      new NextAction("blast wave", 38.0f),
+                                      new NextAction("flamestrike", 23.0f),
+                                      new NextAction("blizzard", 22.0f), nullptr)));
+
+        triggers.push_back(new TriggerNode("flamestrike active and medium aoe", NextAction::array(0, new NextAction("blizzard", 24.0f), nullptr)));
+        triggers.push_back(new TriggerNode("firestarter", NextAction::array(0, new NextAction("flamestrike", 40.0f), nullptr)));
+        triggers.push_back(new TriggerNode("living bomb on attackers", NextAction::array(0, new NextAction("living bomb on attackers", 21.0f), nullptr)));
+    }
+    else if (tab == 2)  // Frost
+    {
+        triggers.push_back(new TriggerNode("flamestrike active and medium aoe", NextAction::array(0, new NextAction("blizzard", 24.0f), nullptr)));
+        triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0,
+                                                     new NextAction("flamestrike", 23.0f),
+                                                     new NextAction("blizzard", 22.0f), nullptr)));
+        triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("cone of cold", 21.0f), nullptr)));
+    }
 }
