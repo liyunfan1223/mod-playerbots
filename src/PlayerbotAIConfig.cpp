@@ -471,25 +471,8 @@ bool PlayerbotAIConfig::Initialize()
                                              tradeActionExcludedPrefixes);
 
     worldBuffs.clear();
-
-    LOG_INFO("playerbots", "Loading Worldbuff...");
-    for (uint32 factionId = 0; factionId < 3; factionId++)
-    {
-        for (uint32 classId = 0; classId < MAX_CLASSES; classId++)
-        {
-            for (uint32 specId = 0; specId <= MAX_WORLDBUFF_SPECNO; specId++)
-            {
-                for (uint32 minLevel = 0; minLevel <= randomBotMaxLevel; minLevel++)
-                {
-                    for (uint32 maxLevel = minLevel; maxLevel <= randomBotMaxLevel; maxLevel++)
-                    {
-                        loadWorldBuff(factionId, classId, specId, minLevel, maxLevel);
-                    }
-                    loadWorldBuff(factionId, classId, specId, minLevel, 0);
-                }
-            }
-        }
-    }
+    loadWorldBuff();
+    LOG_INFO("playerbots", "Loading World Buff Feature...");
 
     randomBotAccountPrefix = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAccountPrefix", "rndbot");
     randomBotAccountCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotAccountCount", 0);
@@ -742,88 +725,62 @@ void PlayerbotAIConfig::log(std::string const fileName, char const* str, ...)
     fflush(stdout);
 }
 
-void PlayerbotAIConfig::loadWorldBuff(uint32 factionId1, uint32 classId1, uint32 specId1, uint32 minLevel1, uint32 maxLevel1)
+void PlayerbotAIConfig::loadWorldBuff()
 {
-    std::vector<uint32> buffs;
+    std::string matrix = sConfigMgr->GetOption<std::string>("AiPlayerbot.WorldBuffMatrix", "", true);
+    if (matrix.empty())
+        return;
 
-    std::ostringstream os;
-    os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1 << "." << maxLevel1;
+    std::istringstream entryStream(matrix);
+    std::string entry;
 
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-    for (auto buff : buffs)
+    while (std::getline(entryStream, entry, ';'))
     {
-        worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-        worldBuffs.push_back(wb);
-    }
 
-    if (maxLevel1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1;
+        entry.erase(0, entry.find_first_not_of(" \t\r\n"));
+        entry.erase(entry.find_last_not_of(" \t\r\n") + 1);
 
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
+        size_t firstColon = entry.find(':');
+        size_t secondColon = entry.find(':', firstColon + 1);
 
-        for (auto buff : buffs)
+        if (firstColon == std::string::npos || secondColon == std::string::npos)
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            LOG_ERROR("playerbots", "Malformed entry: [{}]", entry);
+            continue;
         }
-    }
 
-    if (maxLevel1 == 0 && minLevel1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1 << "." << specId1;
+        std::string metaPart = entry.substr(firstColon + 1, secondColon - firstColon - 1);
+        std::string spellPart = entry.substr(secondColon + 1);
 
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
+        std::vector<uint32> ids;
+        std::istringstream metaStream(metaPart);
+        std::string token;
+        while (std::getline(metaStream, token, ','))
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            try {
+                ids.push_back(static_cast<uint32>(std::stoi(token)));
+            } catch (...) {
+                LOG_ERROR("playerbots", "Invalid meta token in [{}]", entry);
+                break;
+            }
         }
-    }
 
-    if (maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
+        if (ids.size() != 5)
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            LOG_ERROR("playerbots", "Entry [{}] has incomplete meta block", entry);
+            continue;
         }
-    }
 
-    if (classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
+        std::istringstream spellStream(spellPart);
+        while (std::getline(spellStream, token, ','))
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (factionId1 == 0 && classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff";
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            try {
+                uint32 spellId = static_cast<uint32>(std::stoi(token));
+                worldBuff wb = { spellId, ids[0], ids[1], ids[2], ids[3], ids[4] };
+                worldBuffs.push_back(wb);
+            } catch (...) {
+                LOG_ERROR("playerbots", "Invalid spell ID in [{}]", entry);
+            }
         }
     }
 }
