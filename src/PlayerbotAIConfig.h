@@ -401,6 +401,10 @@ public:
     void loadWorldBuff(uint32 factionId, uint32 classId, uint32 specId, uint32 minLevel, uint32 maxLevel);
     static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
     static std::vector<std::vector<uint32>> ParseTempPetTalentsOrder(uint32 spec, std::string temp_talents_order);
+
+    bool restrictHealerDPS = false;
+    std::vector<uint32> restrictedHealerDPSMaps;
+    bool IsRestrictedHealerDPSMap(uint32 mapId) const;
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()
