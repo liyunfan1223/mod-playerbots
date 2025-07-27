@@ -2950,14 +2950,19 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell,
 
     if (!itemTarget)
     {
+        // Exception for Deep Freeze (44572) - allow cast for damage on immune targets (e.g., bosses)
         if (target->IsImmunedToSpell(spellInfo))
         {
-            if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
+            if (spellid != 44572)  // Deep Freeze
             {
-                LOG_DEBUG("playerbots", "target is immuned to spell - target name: {}, spellid: {}, bot name: {}",
-                          target->GetName(), spellid, bot->GetName());
+                if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && HasRealPlayerMaster()))
+                {
+                    LOG_DEBUG("playerbots", "target is immuned to spell - target name: {}, spellid: {}, bot name: {}",
+                              target->GetName(), spellid, bot->GetName());
+                }
+                return false;
             }
-            return false;
+            // Otherwise, allow Deep Freeze even if immune
         }
 
         if (bot != target && sServerFacade->GetDistance2d(bot, target) > sPlayerbotAIConfig->sightDistance)

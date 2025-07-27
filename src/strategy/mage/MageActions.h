@@ -8,11 +8,280 @@
 
 #include "GenericSpellActions.h"
 #include "SharedDefines.h"
+#include "UseItemAction.h"
 
 class PlayerbotAI;
 
-BUFF_ACTION(CastFireWardAction, "fire ward");
-BUFF_ACTION(CastFrostWardAction, "frost ward");
+// Buff and Out of Combat Actions
+
+class CastMoltenArmorAction : public CastBuffSpellAction
+{
+public:
+    CastMoltenArmorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "molten armor") {}
+};
+
+class CastMageArmorAction : public CastBuffSpellAction
+{
+public:
+    CastMageArmorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mage armor") {}
+};
+
+class CastIceArmorAction : public CastBuffSpellAction
+{
+public:
+    CastIceArmorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ice armor") {}
+};
+
+class CastFrostArmorAction : public CastBuffSpellAction
+{
+public:
+    CastFrostArmorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "frost armor") {}
+};
+
+class CastArcaneIntellectAction : public CastBuffSpellAction
+{
+public:
+    CastArcaneIntellectAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane intellect") {}
+};
+
+class CastArcaneIntellectOnPartyAction : public BuffOnPartyAction
+{
+public:
+    CastArcaneIntellectOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "arcane intellect") {}
+};
+
+class CastFocusMagicOnPartyAction : public CastSpellAction
+{
+public:
+    CastFocusMagicOnPartyAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "focus magic") {}
+    Unit* GetTarget() override;
+};
+
+class CastSummonWaterElementalAction : public CastBuffSpellAction
+{
+public:
+    CastSummonWaterElementalAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "summon water elemental") {}
+};
+
+// Boost Actions
+
+class CastCombustionAction : public CastBuffSpellAction
+{
+public:
+    CastCombustionAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "combustion") {}
+};
+
+class CastArcanePowerAction : public CastBuffSpellAction
+{
+public:
+    CastArcanePowerAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane power") {}
+};
+
+class CastPresenceOfMindAction : public CastBuffSpellAction
+{
+public:
+    CastPresenceOfMindAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "presence of mind") {}
+};
+
+class CastIcyVeinsAction : public CastBuffSpellAction
+{
+public:
+    CastIcyVeinsAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "icy veins") {}
+};
+
+class CastColdSnapAction : public CastBuffSpellAction
+{
+public:
+    CastColdSnapAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "cold snap") {}
+};
+
+// Defensive Actions
+
+class CastFireWardAction : public CastBuffSpellAction
+{
+public:
+    CastFireWardAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "fire ward") {}
+};
+
+class CastFrostWardAction : public CastBuffSpellAction
+{
+public:
+    CastFrostWardAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "frost ward") {}
+};
+
+class CastIceBarrierAction : public CastBuffSpellAction
+{
+public:
+    CastIceBarrierAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ice barrier") {}
+};
+
+class CastInvisibilityAction : public CastBuffSpellAction
+{
+public:
+    CastInvisibilityAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "invisibility") {}
+};
+class CastIceBlockAction : public CastBuffSpellAction
+{
+public:
+    CastIceBlockAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ice block") {}
+};
+
+class CastMirrorImageAction : public CastBuffSpellAction
+{
+public:
+    CastMirrorImageAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mirror image") {}
+};
+
+class CastBlinkBackAction : public CastSpellAction
+{
+public:
+    CastBlinkBackAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "blink") {}
+    bool Execute(Event event) override;
+};
+
+class CastManaShieldAction : public CastBuffSpellAction
+{
+public:
+    CastManaShieldAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mana shield") {}
+};
+
+// Utility Actions
+
+class CastEvocationAction : public CastSpellAction
+{
+public:
+    CastEvocationAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "evocation") {}
+    std::string const GetTargetName() override { return "self target"; }
+};
+
+class CastConjureManaGemAction : public CastBuffSpellAction
+{
+public:
+    CastConjureManaGemAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "conjure mana gem") {}
+};
+
+class CastConjureFoodAction : public CastBuffSpellAction
+{
+public:
+    CastConjureFoodAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "conjure food") {}
+};
+
+class CastConjureWaterAction : public CastBuffSpellAction
+{
+public:
+    CastConjureWaterAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "conjure water") {}
+};
+
+class UseManaSapphireAction : public UseItemAction
+{
+public:
+    UseManaSapphireAction(PlayerbotAI* botAI) : UseItemAction(botAI, "mana sapphire") {}
+    bool isUseful() override;
+};
+class UseManaEmeraldAction : public UseItemAction
+{
+public:
+    UseManaEmeraldAction(PlayerbotAI* botAI) : UseItemAction(botAI, "mana emerald") {}
+    bool isUseful() override;
+};
+
+class UseManaRubyAction : public UseItemAction
+{
+public:
+    UseManaRubyAction(PlayerbotAI* botAI) : UseItemAction(botAI, "mana ruby") {}
+    bool isUseful() override;
+};
+
+class UseManaCitrineAction : public UseItemAction
+{
+public:
+    UseManaCitrineAction(PlayerbotAI* botAI) : UseItemAction(botAI, "mana citrine") {}
+    bool isUseful() override;
+};
+
+class UseManaJadeAction : public UseItemAction
+{
+public:
+    UseManaJadeAction(PlayerbotAI* botAI) : UseItemAction(botAI, "mana jade") {}
+    bool isUseful() override;
+};
+
+class UseManaAgateAction : public UseItemAction
+{
+public:
+    UseManaAgateAction(PlayerbotAI* botAI) : UseItemAction(botAI, "mana agate") {}
+    bool isUseful() override;
+};
+
+// CC, Interrupt, and Dispel Actions
+
+class CastPolymorphAction : public CastBuffSpellAction
+{
+public:
+    CastPolymorphAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "polymorph") {}
+    Value<Unit*>* GetTargetValue() override;
+};
+
+class CastSpellstealAction : public CastSpellAction
+{
+public:
+    CastSpellstealAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "spellsteal") {}
+};
+
+class CastCounterspellAction : public CastSpellAction
+{
+public:
+    CastCounterspellAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "counterspell") {}
+};
+
+class CastCounterspellOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
+{
+public:
+    CastCounterspellOnEnemyHealerAction(PlayerbotAI* botAI) : CastSpellOnEnemyHealerAction(botAI, "counterspell") {}
+};
+
+class CastFrostNovaAction : public CastSpellAction
+{
+public:
+    CastFrostNovaAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "frost nova") {}
+    bool isUseful() override;
+};
+
+class CastDeepFreezeAction : public CastSpellAction
+{
+public:
+    CastDeepFreezeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "deep freeze") {}
+    bool isPossible() override { return true; }
+};
+
+class CastRemoveCurseAction : public CastCureSpellAction
+{
+public:
+    CastRemoveCurseAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "remove curse") {}
+};
+
+class CastRemoveLesserCurseAction : public CastCureSpellAction
+{
+public:
+    CastRemoveLesserCurseAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "remove lesser curse") {}
+};
+
+class CastRemoveCurseOnPartyAction : public CurePartyMemberAction
+{
+public:
+    CastRemoveCurseOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "remove curse", DISPEL_CURSE) {}
+};
+
+class CastRemoveLesserCurseOnPartyAction : public CurePartyMemberAction
+{
+public:
+    CastRemoveLesserCurseOnPartyAction(PlayerbotAI* botAI)
+        : CurePartyMemberAction(botAI, "remove lesser curse", DISPEL_CURSE)
+    {
+    }
+};
+
+// Damage and Debuff Actions
 
 class CastFireballAction : public CastSpellAction
 {
@@ -57,18 +326,26 @@ public:
     CastPyroblastAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "pyroblast") {}
 };
 
-class CastFlamestrikeAction : public CastDebuffSpellAction
+class CastLivingBombAction : public CastDebuffSpellAction
 {
 public:
-    CastFlamestrikeAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flamestrike", true, 0.0f) {}
-    ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
+    CastLivingBombAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "living bomb", true) {}
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
 };
 
-class CastFrostNovaAction : public CastSpellAction
+class CastLivingBombOnAttackersAction : public CastDebuffSpellOnAttackerAction
 {
 public:
-    CastFrostNovaAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "frost nova") {}
-    bool isUseful() override;
+    CastLivingBombOnAttackersAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "living bomb", true) {}
+    bool isUseful() override
+    {
+        // Bypass TTL check
+        return CastAuraSpellAction::isUseful();
+    }
 };
 
 class CastFrostboltAction : public CastSpellAction
@@ -89,12 +366,6 @@ public:
     CastIceLanceAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "ice lance") {}
 };
 
-class CastDeepFreezeAction : public CastSpellAction
-{
-public:
-    CastDeepFreezeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "deep freeze") {}
-};
-
 class CastBlizzardAction : public CastSpellAction
 {
 public:
@@ -110,143 +381,11 @@ public:
     bool isUseful() override;
 };
 
-class CastArcaneIntellectAction : public CastBuffSpellAction
+class CastFlamestrikeAction : public CastDebuffSpellAction
 {
 public:
-    CastArcaneIntellectAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane intellect") {}
-};
-
-class CastArcaneIntellectOnPartyAction : public BuffOnPartyAction
-{
-public:
-    CastArcaneIntellectOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "arcane intellect") {}
-};
-
-class CastRemoveCurseAction : public CastCureSpellAction
-{
-public:
-    CastRemoveCurseAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "remove curse") {}
-};
-
-class CastRemoveLesserCurseAction : public CastCureSpellAction
-{
-public:
-    CastRemoveLesserCurseAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "remove lesser curse") {}
-};
-
-class CastIcyVeinsAction : public CastBuffSpellAction
-{
-public:
-    CastIcyVeinsAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "icy veins") {}
-};
-
-class CastColdSnapAction : public CastBuffSpellAction
-{
-public:
-    CastColdSnapAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "cold snap") {}
-};
-
-class CastIceBarrierAction : public CastBuffSpellAction
-{
-public:
-    CastIceBarrierAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ice barrier") {}
-};
-
-class CastSummonWaterElementalAction : public CastBuffSpellAction
-{
-public:
-    CastSummonWaterElementalAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "summon water elemental") {}
-};
-
-class CastCombustionAction : public CastBuffSpellAction
-{
-public:
-    CastCombustionAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "combustion") {}
-};
-
-BEGIN_SPELL_ACTION(CastCounterspellAction, "counterspell")
-END_SPELL_ACTION()
-
-class CastRemoveCurseOnPartyAction : public CurePartyMemberAction
-{
-public:
-    CastRemoveCurseOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "remove curse", DISPEL_CURSE) {}
-};
-
-class CastRemoveLesserCurseOnPartyAction : public CurePartyMemberAction
-{
-public:
-    CastRemoveLesserCurseOnPartyAction(PlayerbotAI* botAI)
-        : CurePartyMemberAction(botAI, "remove lesser curse", DISPEL_CURSE)
-    {
-    }
-};
-
-class CastConjureFoodAction : public CastBuffSpellAction
-{
-public:
-    CastConjureFoodAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "conjure food") {}
-};
-
-class CastConjureWaterAction : public CastBuffSpellAction
-{
-public:
-    CastConjureWaterAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "conjure water") {}
-};
-
-class CastIceBlockAction : public CastBuffSpellAction
-{
-public:
-    CastIceBlockAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ice block") {}
-};
-
-class CastMoltenArmorAction : public CastBuffSpellAction
-{
-public:
-    CastMoltenArmorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "molten armor") {}
-};
-
-class CastMageArmorAction : public CastBuffSpellAction
-{
-public:
-    CastMageArmorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mage armor") {}
-};
-
-class CastIceArmorAction : public CastBuffSpellAction
-{
-public:
-    CastIceArmorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ice armor") {}
-};
-
-class CastFrostArmorAction : public CastBuffSpellAction
-{
-public:
-    CastFrostArmorAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "frost armor") {}
-};
-
-class CastPolymorphAction : public CastBuffSpellAction
-{
-public:
-    CastPolymorphAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "polymorph") {}
-    Value<Unit*>* GetTargetValue() override;
-};
-
-class CastSpellstealAction : public CastSpellAction
-{
-public:
-    CastSpellstealAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "spellsteal") {}
-};
-
-class CastLivingBombAction : public CastDebuffSpellAction
-{
-public:
-    CastLivingBombAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "living bomb", true) {}
-};
-
-class CastLivingBombOnAttackersAction : public CastDebuffSpellOnAttackerAction
-{
-public:
-    CastLivingBombOnAttackersAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "living bomb", true) {}
+    CastFlamestrikeAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flamestrike", true, 0.0f) {}
+    ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };
 
 class CastDragonsBreathAction : public CastSpellAction
@@ -265,55 +404,12 @@ public:
     bool isUseful() override;
 };
 
-class CastInvisibilityAction : public CastBuffSpellAction
+class CancelChannelAction : public Action
 {
 public:
-    CastInvisibilityAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "invisibility") {}
-};
+    CancelChannelAction(PlayerbotAI* botAI) : Action(botAI, "cancel channel") {}
 
-class CastEvocationAction : public CastSpellAction
-{
-public:
-    CastEvocationAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "evocation") {}
-    std::string const GetTargetName() override { return "self target"; }
-};
-
-class CastCounterspellOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
-{
-public:
-    CastCounterspellOnEnemyHealerAction(PlayerbotAI* botAI) : CastSpellOnEnemyHealerAction(botAI, "counterspell") {}
-};
-
-class CastArcanePowerAction : public CastBuffSpellAction
-{
-public:
-    CastArcanePowerAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane power") {}
-};
-
-class CastPresenceOfMindAction : public CastBuffSpellAction
-{
-public:
-    CastPresenceOfMindAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "presence of mind") {}
-};
-
-class CastMirrorImageAction : public CastBuffSpellAction
-{
-public:
-    CastMirrorImageAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mirror image") {}
-};
-
-class CastFocusMagicOnPartyAction : public CastSpellAction
-{
-public:
-    CastFocusMagicOnPartyAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "focus magic") {}
-    Unit* GetTarget() override;
-};
-
-class CastBlinkBackAction : public CastSpellAction
-{
-public:
-    CastBlinkBackAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "blink") {}
-    
     bool Execute(Event event) override;
 };
+
 #endif

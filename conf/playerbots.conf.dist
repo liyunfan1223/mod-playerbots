@@ -501,9 +501,10 @@ AiPlayerbot.AutoGearScoreLimit = 0
 # "mana" (bots have infinite mana)
 # "power" (bots have infinite energy, rage, and runic power)
 # "taxi" (bots may use all flight paths, though they will not actually learn them) 
+# "raid" (bots use cheats implemented into raid strategies) 
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,taxi")
 # Default: taxi is enabled
-AiPlayerbot.BotCheats = "taxi" 
+AiPlayerbot.BotCheats = "taxi,raid" 
 
 #
 #
@@ -1435,8 +1436,8 @@ AiPlayerbot.PremadeSpecLink.7.5.80 = -023222301004-05032331331013501120331251
 
 AiPlayerbot.PremadeSpecName.8.0 = arcane pve
 AiPlayerbot.PremadeSpecGlyph.8.0 = 42735,43339,44955,43364,43361,42751
-AiPlayerbot.PremadeSpecLink.8.0.60 = 23000503110033014032310150532
-AiPlayerbot.PremadeSpecLink.8.0.80 = 23000523310033015032310250532-03-203203001
+AiPlayerbot.PremadeSpecLink.8.0.60 = 230005231100330150323102500321
+AiPlayerbot.PremadeSpecLink.8.0.80 = 230005231100330150323102505321-03-203303001
 AiPlayerbot.PremadeSpecName.8.1 = fire pve
 AiPlayerbot.PremadeSpecGlyph.8.1 = 42739,43339,45737,43364,44920,42751
 AiPlayerbot.PremadeSpecLink.8.1.60 = -0055030011302231053120321341
@@ -1448,7 +1449,7 @@ AiPlayerbot.PremadeSpecLink.8.2.80 = 23002303110003--053303031320310003015223135
 AiPlayerbot.PremadeSpecName.8.3 = frostfire pve
 AiPlayerbot.PremadeSpecGlyph.8.3 = 44684,44920,42751,43339,43364,45737
 AiPlayerbot.PremadeSpecLink.8.3.60 = -2305032012303331053120300051
-AiPlayerbot.PremadeSpecLink.8.3.80 = -2305032012303331053120311351-023303031
+AiPlayerbot.PremadeSpecLink.8.3.80 = -2305032012303331053120321351-023302031
 AiPlayerbot.PremadeSpecName.8.4 = arcane pvp
 AiPlayerbot.PremadeSpecGlyph.8.4 = 42735,43364,42738,43360,43357,42752
 AiPlayerbot.PremadeSpecLink.8.4.60 = 205323200122032103303102015221

@@ -7,6 +7,7 @@
 
 #include "Playerbots.h"
 
+// ===== Action Node Factory =====
 class FrostMageStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
@@ -16,96 +17,66 @@ public:
         creators["ice barrier"] = &ice_barrier;
         creators["summon water elemental"] = &summon_water_elemental;
         creators["deep freeze"] = &deep_freeze;
+        creators["icy veins"] = &icy_veins;
+        creators["frostbolt"] = &frostbolt;
+        creators["ice lance"] = &ice_lance;
+        creators["fire blast"] = &fire_blast;
+        creators["fireball"] = &fireball;
+        creators["frostfire bolt"] = &frostfire_bolt;
     }
 
 private:
-    static ActionNode* cold_snap([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("cold snap",
-                              /*P*/ nullptr,
-                              /*A*/ nullptr,
-                              /*C*/ nullptr);
-    }
-
-    static ActionNode* ice_barrier([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("ice barrier",
-                              /*P*/ nullptr,
-                              /*A*/ nullptr,
-                              /*C*/ nullptr);
-    }
-
-    static ActionNode* summon_water_elemental([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("summon water elemental",
-                              /*P*/ nullptr,
-                              /*A*/ nullptr,
-                              /*C*/ nullptr);
-    }
-
-    static ActionNode* deep_freeze([[maybe_unused]] PlayerbotAI* botAI)
-    {
-        return new ActionNode("deep freeze",
-                              /*P*/ nullptr,
-                              /*A*/ NextAction::array(0, new NextAction("ice lance"), nullptr),
-                              /*C*/ nullptr);
-    }
+    static ActionNode* cold_snap(PlayerbotAI*) { return new ActionNode("cold snap", nullptr, nullptr, nullptr); }
+    static ActionNode* ice_barrier(PlayerbotAI*) { return new ActionNode("ice barrier", nullptr, nullptr, nullptr); }
+    static ActionNode* summon_water_elemental(PlayerbotAI*) { return new ActionNode("summon water elemental", nullptr, nullptr, nullptr); }
+    static ActionNode* deep_freeze(PlayerbotAI*) { return new ActionNode("deep freeze", nullptr, nullptr, nullptr); }
+    static ActionNode* icy_veins(PlayerbotAI*) { return new ActionNode("icy veins", nullptr, nullptr, nullptr); }
+    static ActionNode* frostbolt(PlayerbotAI*) { return new ActionNode("frostbolt", nullptr, nullptr, nullptr); }
+    static ActionNode* ice_lance(PlayerbotAI*) { return new ActionNode("ice lance", nullptr, nullptr, nullptr); }
+    static ActionNode* fire_blast(PlayerbotAI*) { return new ActionNode("fire blast", nullptr, nullptr, nullptr); }
+    static ActionNode* fireball(PlayerbotAI*) { return new ActionNode("fireball", nullptr, nullptr, nullptr); }
+    static ActionNode* frostfire_bolt(PlayerbotAI*) { return new ActionNode("frostfire bolt", nullptr, nullptr, nullptr); }
 };
 
+// ===== Single Target Strategy =====
 FrostMageStrategy::FrostMageStrategy(PlayerbotAI* botAI) : GenericMageStrategy(botAI)
 {
     actionNodeFactories.Add(new FrostMageStrategyActionNodeFactory());
 }
 
+// ===== Default Actions =====
 NextAction** FrostMageStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("frostbolt", ACTION_DEFAULT + 0.3f),
-                             new NextAction("fire blast", ACTION_DEFAULT + 0.2f), // cast during movement
-                             new NextAction("shoot", ACTION_DEFAULT + 0.1f),
-                             new NextAction("fireball", ACTION_DEFAULT), nullptr);
+    return NextAction::array(0, new NextAction("frostbolt", 5.4f),
+                                new NextAction("ice lance", 5.3f),   // cast during movement
+                                new NextAction("fire blast", 5.2f),  // cast during movement if ice lance is not learned
+                                new NextAction("shoot", 5.1f),
+                                new NextAction("fireball", 5.0f), nullptr);
 }
 
+// ===== Trigger Initialization ===
 void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericMageStrategy::InitTriggers(triggers);
-    triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 50.0f), nullptr)));
-    // No logic currently for cold snap usage.. possibly use right after icy veins drops off?
-    // triggers.push_back(new TriggerNode("cold snap", NextAction::array(0, new NextAction("cold snap", 50.0f),
-    // nullptr)));
 
-    triggers.push_back(new TriggerNode(
-        "no pet", NextAction::array(0, new NextAction("summon water elemental", ACTION_HIGH), nullptr)));
-    triggers.push_back(
-        new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", ACTION_HIGH + 1), nullptr)));
-    triggers.push_back(
-        new TriggerNode("medium health", NextAction::array(0, new NextAction("ice barrier", ACTION_NORMAL), nullptr)));
-    triggers.push_back(
-        new TriggerNode("being attacked", NextAction::array(0, new NextAction("ice barrier", ACTION_HIGH + 1), nullptr)));
-    triggers.push_back(new TriggerNode(
-        "brain freeze", NextAction::array(0, new NextAction("frostfire bolt", ACTION_NORMAL + 3), nullptr)));
-    // Combo cast the last charge of fingers of frost for double crits.
-    // Should only do this on the final charge of FoF.
-    triggers.push_back(new TriggerNode("fingers of frost single",
-                                       NextAction::array(0, new NextAction("frostbolt", ACTION_NORMAL + 2),
-                                                         new NextAction("deep freeze", ACTION_NORMAL + 1), nullptr)));
-    // May not need this, frostbolt is the default action so probably don't need to specify.
-    // Maybe uncomment if you find the mage is prioritising auxillary spells while this buff is up, and wasting the
-    // proc. triggers.push_back(new TriggerNode("fingers of frost double", NextAction::array(0, new
-    // NextAction("frostbolt", ACTION_NORMAL), nullptr)));
+    // Pet/Defensive triggers
+    triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("summon water elemental", 30.0f), nullptr)));
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 29.5f), nullptr)));
+    triggers.push_back(new TriggerNode("medium health", NextAction::array(0, new NextAction("ice barrier", 29.0f), nullptr)));
+    triggers.push_back(new TriggerNode("being attacked", NextAction::array(0, new NextAction("ice barrier", 29.0f), nullptr)));
 
-    // Same 2-spell combo for various freeze procs
-    triggers.push_back(new TriggerNode("frost nova on target",
-                                       NextAction::array(0, new NextAction("frostbolt", ACTION_NORMAL + 2),
-                                                         new NextAction("deep freeze", ACTION_NORMAL + 1), nullptr)));
-    triggers.push_back(new TriggerNode("frostbite on target",
-                                       NextAction::array(0, new NextAction("frostbolt", ACTION_NORMAL + 2),
-                                                         new NextAction("deep freeze", ACTION_NORMAL + 1), nullptr)));
-}
+    // Proc/Freeze triggers
+    triggers.push_back(new TriggerNode("brain freeze", NextAction::array(0, new NextAction("frostfire bolt", 19.5f), nullptr)));
+    triggers.push_back(new TriggerNode("fingers of frost", NextAction::array(0,
+                                                       new NextAction("deep freeze", 19.0f),
+                                                       new NextAction("frostbolt", 18.0f), nullptr)));
 
-void FrostMageAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
-{
-    triggers.push_back(
-        new TriggerNode("medium aoe", NextAction::array(0, new NextAction("blizzard", ACTION_HIGH), nullptr)));
-    triggers.push_back(
-        new TriggerNode("light aoe", NextAction::array(0, new NextAction("cone of cold", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("frostbite on target", NextAction::array(0,
+                                                          new NextAction("deep freeze", 19.0f),
+                                                          new NextAction("frostbolt", 18.0f), nullptr)));
+
+    triggers.push_back(new TriggerNode("frost nova on target", NextAction::array(0,
+                                                           new NextAction("deep freeze", 19.0f),
+                                                           new NextAction("frostbolt", 18.0f), nullptr)));
+      
 }

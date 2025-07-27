@@ -5,13 +5,49 @@
 
 #include "MageActions.h"
 #include <cmath>
-
+#include "UseItemAction.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
 
 Value<Unit*>* CastPolymorphAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", getName()); }
+
+bool UseManaSapphireAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(33312, false) > 0;  // Mana Sapphire
+}
+
+bool UseManaEmeraldAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(22044, false) > 0;  // Mana Emerald
+}
+
+bool UseManaRubyAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(8008, false) > 0;  // Mana Ruby
+}
+
+bool UseManaCitrineAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(8007, false) > 0;  // Mana Citrine
+}
+
+bool UseManaJadeAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(5513, false) > 0;  // Mana Jade
+}
+
+bool UseManaAgateAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(5514, false) > 0;  // Mana Agate
+}
 
 bool CastFrostNovaAction::isUseful()
 {
@@ -105,4 +141,14 @@ bool CastBlinkBackAction::Execute(Event event)
     // can cast spell check passed in isUseful()
     bot->SetOrientation(bot->GetAngle(target) + M_PI);
     return CastSpellAction::Execute(event);
+}
+
+bool CancelChannelAction::Execute(Event event)
+{
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+    {
+        bot->InterruptSpell(CURRENT_CHANNELED_SPELL);
+        return true;
+    }
+    return false;
 }

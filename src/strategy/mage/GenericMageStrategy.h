@@ -51,4 +51,13 @@ public:
     std::string const getName() override { return "cc"; }
 };
 
+class MageAoeStrategy : public CombatStrategy
+{
+public:
+    MageAoeStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI) {}
+
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    std::string const getName() override { return "aoe"; }
+};
+
 #endif

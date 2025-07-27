@@ -9,11 +9,15 @@
 #include "CureTriggers.h"
 #include "GenericTriggers.h"
 #include "SharedDefines.h"
+#include "Trigger.h"
+#include "Playerbots.h"
+#include "PlayerbotAI.h"
+#include <set>
+#include <unordered_set>
 
 class PlayerbotAI;
 
-DEFLECT_TRIGGER(FireWardTrigger, "fire ward");
-DEFLECT_TRIGGER(FrostWardTrigger, "frost ward");
+// Buff and Out of Combat Triggers
 
 class ArcaneIntellectOnPartyTrigger : public BuffOnPartyTrigger
 {
@@ -37,28 +41,51 @@ public:
     bool IsActive() override;
 };
 
-class LivingBombTrigger : public DebuffTrigger
+class NoFocusMagicTrigger : public Trigger
 {
 public:
-    LivingBombTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "living bomb", 1, true) {}
+    NoFocusMagicTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no focus magic") {}
+    bool IsActive() override;
 };
 
-class FireballTrigger : public DebuffTrigger
+class IceBarrierTrigger : public BuffTrigger
 {
 public:
-    FireballTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "fireball", 1, true) {}
+    IceBarrierTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "ice barrier") {}
 };
 
-class PyroblastTrigger : public DebuffTrigger
+class NoManaGemTrigger : public Trigger
 {
 public:
-    PyroblastTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "pyroblast", 1, true) {}
+    NoManaGemTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no mana gem") {}
+
+    bool IsActive() override;
 };
+
+class FireWardTrigger : public DeflectSpellTrigger
+{
+public:
+    FireWardTrigger(PlayerbotAI* botAI) : DeflectSpellTrigger(botAI, "fire ward") {}
+};
+
+class FrostWardTrigger : public DeflectSpellTrigger
+{
+public:
+    FrostWardTrigger(PlayerbotAI* botAI) : DeflectSpellTrigger(botAI, "frost ward") {}
+};
+
+// Proc and Boost Triggers
 
 class HotStreakTrigger : public HasAuraTrigger
 {
 public:
     HotStreakTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "hot streak") {}
+};
+
+class FirestarterTrigger : public HasAuraTrigger
+{
+public:
+    FirestarterTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "firestarter") {}
 };
 
 class MissileBarrageTrigger : public HasAuraTrigger
@@ -73,30 +100,19 @@ public:
     ArcaneBlastTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane blast") {}
 };
 
-class FingersOfFrostSingleTrigger : public HasAuraStackTrigger
+class ArcaneBlastStackTrigger : public HasAuraStackTrigger
 {
 public:
-    FingersOfFrostSingleTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "fingers of frost", 1, 1) {}
-    bool IsActive() override;
+    ArcaneBlastStackTrigger(PlayerbotAI* botAI) : HasAuraStackTrigger(botAI, "arcane blast", 4, 1) {}
 };
 
-class FingersOfFrostDoubleTrigger : public HasAuraStackTrigger
+class ArcaneBlast4StacksAndMissileBarrageTrigger : public TwoTriggers
 {
 public:
-    FingersOfFrostDoubleTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "fingers of frost", 2, 1) {}
-    // bool IsActive() override;
-};
-
-class BrainFreezeTrigger : public HasAuraTrigger
-{
-public:
-    BrainFreezeTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "fireball!") {}
-};
-
-class CounterspellInterruptSpellTrigger : public InterruptSpellTrigger
-{
-public:
-    CounterspellInterruptSpellTrigger(PlayerbotAI* botAI) : InterruptSpellTrigger(botAI, "counterspell") {}
+    ArcaneBlast4StacksAndMissileBarrageTrigger(PlayerbotAI* ai)
+        : TwoTriggers(ai, "arcane blast stack", "missile barrage")
+    {
+    }
 };
 
 class CombustionTrigger : public BoostTrigger
@@ -105,23 +121,50 @@ public:
     CombustionTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "combustion") {}
 };
 
+class IcyVeinsCooldownTrigger : public SpellCooldownTrigger
+{
+public:
+    IcyVeinsCooldownTrigger(PlayerbotAI* botAI) : SpellCooldownTrigger(botAI, "icy veins") {}
+};
+
+class DeepFreezeCooldownTrigger : public SpellCooldownTrigger
+{
+public:
+    DeepFreezeCooldownTrigger(PlayerbotAI* botAI) : SpellCooldownTrigger(botAI, "deep freeze") {}
+
+    bool IsActive() override;
+};
+
+class ColdSnapTrigger : public TwoTriggers
+{
+public:
+    ColdSnapTrigger(PlayerbotAI* ai) : TwoTriggers(ai, "icy veins on cd", "deep freeze on cd") {}
+};
+
+class MirrorImageTrigger : public BoostTrigger
+{
+public:
+    MirrorImageTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "mirror image") {}
+};
+
 class IcyVeinsTrigger : public BoostTrigger
 {
 public:
     IcyVeinsTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "icy veins") {}
 };
 
-class ColdSnapTrigger : public BoostTrigger
+class ArcanePowerTrigger : public BoostTrigger
 {
 public:
-    ColdSnapTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "cold snap") {}
+    ArcanePowerTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "arcane power") {}
+};
+class PresenceOfMindTrigger : public BoostTrigger
+{
+public:
+    PresenceOfMindTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "presence of mind") {}
 };
 
-class IceBarrierTrigger : public BuffTrigger
-{
-public:
-    IceBarrierTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "ice barrier") {}
-};
+// CC, Interrupt, and Dispel Triggers
 
 class PolymorphTrigger : public HasCcTargetTrigger
 {
@@ -155,29 +198,63 @@ public:
     CounterspellEnemyHealerTrigger(PlayerbotAI* botAI) : InterruptEnemyHealerTrigger(botAI, "counterspell") {}
 };
 
-class ArcanePowerTrigger : public BuffTrigger
+class CounterspellInterruptSpellTrigger : public InterruptSpellTrigger
 {
 public:
-    ArcanePowerTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane power") {}
+    CounterspellInterruptSpellTrigger(PlayerbotAI* botAI) : InterruptSpellTrigger(botAI, "counterspell") {}
 };
 
-class PresenceOfMindTrigger : public BuffTrigger
+// Damage and Debuff Triggers
+
+class LivingBombTrigger : public DebuffTrigger
 {
 public:
-    PresenceOfMindTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "presence of mind") {}
+    LivingBombTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "living bomb", 1, true) {}
+    bool IsActive() override { return BuffTrigger::IsActive(); }
 };
 
-class ArcaneBlastStackTrigger : public HasAuraStackTrigger
+class LivingBombOnAttackersTrigger : public DebuffOnAttackerTrigger
 {
 public:
-    ArcaneBlastStackTrigger(PlayerbotAI* botAI) : HasAuraStackTrigger(botAI, "arcane blast", 3, 1) {}
+    LivingBombOnAttackersTrigger(PlayerbotAI* ai) : DebuffOnAttackerTrigger(ai, "living bomb", true) {}
+    bool IsActive() override { return BuffTrigger::IsActive(); }
+};
+
+class FireballTrigger : public DebuffTrigger
+{
+public:
+    FireballTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "fireball", 1, true) {}
+};
+
+class ImprovedScorchTrigger : public DebuffTrigger
+{
+public:
+    ImprovedScorchTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "improved scorch", 1, true, 0.5f) {}
     bool IsActive() override;
 };
 
-class MirrorImageTrigger : public BoostTrigger
+class PyroblastTrigger : public DebuffTrigger
 {
 public:
-    MirrorImageTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "mirror image") {}
+    PyroblastTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "pyroblast", 1, true) {}
+};
+
+class FrostfireBoltTrigger : public DebuffTrigger
+{
+public:
+    FrostfireBoltTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frostfire bolt", 1, true) {}
+};
+
+class FingersOfFrostTrigger : public HasAuraTrigger
+{
+public:
+    FingersOfFrostTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "fingers of frost") {}
+};
+
+class BrainFreezeTrigger : public HasAuraTrigger
+{
+public:
+    BrainFreezeTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "fireball!") {}
 };
 
 class FrostNovaOnTargetTrigger : public DebuffTrigger
@@ -194,17 +271,74 @@ public:
     bool IsActive() override;
 };
 
-class NoFocusMagicTrigger : public Trigger
+class FlamestrikeNearbyTrigger : public Trigger
 {
 public:
-    NoFocusMagicTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no focus magic") {}
+    FlamestrikeNearbyTrigger(PlayerbotAI* botAI, float radius = 30.0f)
+        : Trigger(botAI, "flamestrike nearby"), radius(radius)
+    {
+    }
     bool IsActive() override;
+
+protected:
+    float radius;
+    static const std::set<uint32> FLAMESTRIKE_SPELL_IDS;
 };
 
-class FrostfireBoltTrigger : public DebuffTrigger
+class FlamestrikeBlizzardTrigger : public TwoTriggers
 {
 public:
-    FrostfireBoltTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "frostfire bolt", 1, true) {}
+    FlamestrikeBlizzardTrigger(PlayerbotAI* ai) : TwoTriggers(ai, "flamestrike nearby", "medium aoe") {}
+};
+
+class BlizzardChannelCheckTrigger : public Trigger
+{
+public:
+    BlizzardChannelCheckTrigger(PlayerbotAI* botAI, uint32 minEnemies = 2)
+        : Trigger(botAI, "blizzard channel check"), minEnemies(minEnemies) {}
+
+    bool IsActive() override;
+
+protected:
+    uint32 minEnemies;
+    static const std::set<uint32> BLIZZARD_SPELL_IDS;
+};
+
+class BlastWaveOffCdTrigger : public SpellNoCooldownTrigger
+{
+public:
+    BlastWaveOffCdTrigger(PlayerbotAI* botAI) : SpellNoCooldownTrigger(botAI, "blast wave") {}
+};
+
+class BlastWaveOffCdTriggerAndMediumAoeTrigger : public TwoTriggers
+{
+public:
+    BlastWaveOffCdTriggerAndMediumAoeTrigger(PlayerbotAI* ai) : TwoTriggers(ai, "blast wave off cd", "medium aoe") {}
+};
+
+class NoFirestarterStrategyTrigger : public Trigger
+{
+public:
+    NoFirestarterStrategyTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no firestarter strategy") {}
+
+    bool IsActive() override
+    {
+        return !botAI->HasStrategy("firestarter", BOT_STATE_COMBAT);
+    }
+};
+
+class EnemyIsCloseAndNoFirestarterStrategyTrigger : public TwoTriggers
+{
+public:
+    EnemyIsCloseAndNoFirestarterStrategyTrigger(PlayerbotAI* botAI)
+        : TwoTriggers(botAI, "enemy is close", "no firestarter strategy") {}
+};
+
+class EnemyTooCloseForSpellAndNoFirestarterStrategyTrigger : public TwoTriggers
+{
+public:
+    EnemyTooCloseForSpellAndNoFirestarterStrategyTrigger(PlayerbotAI* botAI)
+        : TwoTriggers(botAI, "enemy too close for spell", "no firestarter strategy") {}
 };
 
 #endif

@@ -77,6 +77,10 @@ enum UlduarIDs
     SPELL_P3WX2_LASER_BARRAGE_3 = 64042,
     SPELL_P3WX2_LASER_BARRAGE_AURA_1 = 63274,
     SPELL_P3WX2_LASER_BARRAGE_AURA_2 = 63300,
+
+    //General Vezax
+    SPELL_MARK_OF_THE_FACELESS = 63276,
+    SPELL_SHADOW_CRASH = 63277,
     
     // Buffs
     SPELL_FROST_TRAP = 13809
@@ -106,6 +110,7 @@ const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_5_YARDS_1 = Position(2217.8877f
 const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_1 = Position(2212.193f, -307.44992f, 412.1348f);
 const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_2 = Position(2212.1353f, -318.20795f, 412.1348f);
 const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_3 = Position(2212.1956f, -328.0144f, 412.1348f);
+const Position ULDUAR_THORIM_JUMP_END_POINT = Position(2137.8818f, -278.18942f, 419.66653f);
 const Position ULDUAR_THORIM_PHASE2_TANK_SPOT = Position(2134.8572f, -287.0291f, 419.4935f);
 const Position ULDUAR_THORIM_PHASE2_RANGE1_SPOT = Position(2112.8752f, -267.69305f, 419.52814f);
 const Position ULDUAR_THORIM_PHASE2_RANGE2_SPOT = Position(2134.1296f, -257.3316f, 419.8462f);
@@ -117,6 +122,7 @@ const Position ULDUAR_MIMIRON_PHASE2_SIDE2MELEE_SPOT = Position(2739.4746f, 2569
 const Position ULDUAR_MIMIRON_PHASE2_SIDE3RANGE_SPOT = Position(2754.1294f, 2553.9954f, 364.31357f);
 const Position ULDUAR_MIMIRON_PHASE2_SIDE3MELEE_SPOT = Position(2746.8513f, 2565.4263f, 364.31357f);
 const Position ULDUAR_MIMIRON_PHASE4_TANK_SPOT = Position(2744.5754f, 2570.8657f, 364.3138f);
+const Position ULDUAR_VEZAX_MARK_OF_THE_FACELESS_SPOT = Position(1913.6501f, 122.93989f, 342.38083f);
 
 //
 // Flame Levi
@@ -415,6 +421,30 @@ class MimironCheatTrigger : public Trigger
 {
 public:
     MimironCheatTrigger(PlayerbotAI* ai) : Trigger(ai, "mimiron cheat trigger") {}
+    bool IsActive() override;
+};
+
+//
+// General Vezax
+//
+class VezaxCheatTrigger : public Trigger
+{
+public:
+    VezaxCheatTrigger(PlayerbotAI* ai) : Trigger(ai, "vezax cheat trigger") {}
+    bool IsActive() override;
+};
+
+class VezaxShadowCrashTrigger : public Trigger
+{
+public:
+    VezaxShadowCrashTrigger(PlayerbotAI* ai) : Trigger(ai, "vezax shadow crash trigger") {}
+    bool IsActive() override;
+};
+
+class VezaxMarkOfTheFacelessTrigger : public Trigger
+{
+public:
+    VezaxMarkOfTheFacelessTrigger(PlayerbotAI* ai) : Trigger(ai, "vezax mark of the faceless trigger") {}
     bool IsActive() override;
 };
 
