@@ -4152,7 +4152,6 @@ bool ArenaTactics::Execute(Event event)
     if (bot->isMoving())
         return false;
 
-
     // startup phase
     if (bg->GetStartDelayTime() > 0)
         return false;
@@ -4163,12 +4162,15 @@ bool ArenaTactics::Execute(Event event)
     if (botAI->HasStrategy("buff", BOT_STATE_NON_COMBAT))
         botAI->ChangeStrategy("-buff", BOT_STATE_NON_COMBAT);
 
-    // this causes bot to reset constantly in arena
-    //    if (sBattlegroundMgr->IsArenaType(bg->GetBgTypeID()))
-    //    {
-    //        botAI->ResetStrategies(false);
-    //        botAI->SetMaster(nullptr);
-    //    }
+    // Repositioning if the target is out of line of sight
+    Unit* target = botAI->GetCombatTarget();
+    if (target && !bot->IsWithinLOSInMap(target))
+    {
+        float x, y, z;
+        target->GetPosition(x, y, z);
+        botAI->TellMasterNoFacing("Repositioning to exit LoS");
+        return MoveTo(target->GetMapId(), x + frand(-1, +1), y + frand(-1, +1), z, false, true);
+    }
 
     if (!bot->IsInCombat())
         return moveToCenter(bg);
