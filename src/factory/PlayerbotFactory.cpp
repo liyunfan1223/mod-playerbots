@@ -39,6 +39,7 @@
 #include "SpellAuraDefines.h"
 #include "StatsWeightCalculator.h"
 #include "World.h"
+#include "AiObjectContext.h"
 
 const uint64 diveMask = (1LL << 7) | (1LL << 44) | (1LL << 37) | (1LL << 38) | (1LL << 26) | (1LL << 30) | (1LL << 27) |
                         (1LL << 33) | (1LL << 24) | (1LL << 34);
@@ -3330,6 +3331,9 @@ void PlayerbotFactory::InitReagents()
 void PlayerbotFactory::InitGlyphs(bool increment)
 {
     bot->InitGlyphsForLevel();
+    if (!increment &&
+        botAI->GetAiObjectContext()->GetValue<bool>("custom_glyphs")->Get())
+        return;   // // Added for custom Glyphs - custom glyphs flag test
 
     if (!increment)
     {
