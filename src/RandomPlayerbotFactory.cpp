@@ -393,37 +393,118 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
     return std::move(botName);
 }
 
+// Calculates the total number of required accounts, either using the specified randomBotAccountCount
+// or determining it dynamically based on MaxRandomBots, EnablePeriodicOnlineOffline and its ratio,
+// and AddClassAccountPoolSize. The system also factors in the types of existing account, as assigned by
+// AssignAccountTypes()
 uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
 {
-    // Calculates the total number of required accounts, either using the specified randomBotAccountCount
-    // or determining it dynamically based on the WOTLK condition, max random bots, rotation pool size,
-    // and additional class account pool size.
+    // Reset account types if features are disabled
+    // Reset is done here to precede needed accounts calculations
+    if (sPlayerbotAIConfig->maxRandomBots == 0 || sPlayerbotAIConfig->addClassAccountPoolSize == 0)
+    {
+        if (sPlayerbotAIConfig->maxRandomBots == 0)
+        {
+            PlayerbotsDatabase.Execute("UPDATE playerbots_account_type SET account_type = 0 WHERE account_type = 1");
+            LOG_INFO("playerbots", "MaxRandomBots set to 0, any RNDbot accounts (type 1) will be unassigned (type 0)");
+        }
+        if (sPlayerbotAIConfig->addClassAccountPoolSize == 0)
+        {
+            PlayerbotsDatabase.Execute("UPDATE playerbots_account_type SET account_type = 0 WHERE account_type = 2");
+            LOG_INFO("playerbots", "AddClassAccountPoolSize set to 0, any AddClass accounts (type 2) will be unassigned (type 0)");
+        }
+
+        // Wait for DB to reflect the change, up to 1 second max. This is needed to make sure other logs don't show wrong info
+        for (int waited = 0; waited < 1000; waited += 50)
+        {
+            QueryResult res = PlayerbotsDatabase.Query("SELECT COUNT(*) FROM playerbots_account_type WHERE account_type IN ({}, {})",
+                sPlayerbotAIConfig->maxRandomBots == 0 ? 1 : -1,
+                sPlayerbotAIConfig->addClassAccountPoolSize == 0 ? 2 : -1);
+
+            if (!res || res->Fetch()[0].Get<uint64>() == 0)
+            {
+                break;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));     // Extra 50ms fixed delay for safety.
+        }
+    }
 
     // Checks if randomBotAccountCount is set, otherwise calculate it dynamically.
     if (sPlayerbotAIConfig->randomBotAccountCount > 0)
         return sPlayerbotAIConfig->randomBotAccountCount;
 
-    // Avoid creating accounts if both maxRandom & ClassBots are set to zero.
-    if (sPlayerbotAIConfig->maxRandomBots == 0 &&
-        sPlayerbotAIConfig->addClassAccountPoolSize == 0)
-        return 0;
+    // Check existing account types
+    uint32 existingRndBotAccounts = 0;
+    uint32 existingAddClassAccounts = 0;
+    uint32 existingUnassignedAccounts = 0;
 
-    //bool isWOTLK = sWorld->getIntConfig(CONFIG_EXPANSION) == EXPANSION_WRATH_OF_THE_LICH_KING; //not used, line marked for removal.
+    QueryResult typeCheck = PlayerbotsDatabase.Query("SELECT account_type, COUNT(*) FROM playerbots_account_type GROUP BY account_type");
+    if (typeCheck)
+    {
+        do
+        {
+            Field* fields = typeCheck->Fetch();
+            uint8 accountType = fields[0].Get<uint8>();
+            uint32 count = fields[1].Get<uint32>();
 
-    // Determine divisor based on WOTLK condition
+            if (accountType == 0) existingUnassignedAccounts = count;
+            else if (accountType == 1) existingRndBotAccounts = count;
+            else if (accountType == 2) existingAddClassAccounts = count;
+        } while (typeCheck->NextRow());
+    }
+
+    // Determine divisor based on Death Knight login eligibility and requested A&H faction ratio
     int divisor = CalculateAvailableCharsPerAccount();
 
     // Calculate max bots
     int maxBots = sPlayerbotAIConfig->maxRandomBots;
-    // Take perodic online - offline into account
+    // Take periodic online - offline into account
     if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
     {
         maxBots *= sPlayerbotAIConfig->periodicOnlineOfflineRatio;
     }
 
-    // Calculate base accounts, add class account pool size, and add 1 as a fixed offset
-    uint32 baseAccounts = maxBots / divisor;
-    return baseAccounts + sPlayerbotAIConfig->addClassAccountPoolSize + 1;
+    // Calculate number of accounts needed for RNDbots
+    // Result is rounded up for maxBots not cleanly divisible by the divisor
+    uint32 neededRndBotAccounts = (maxBots + divisor - 1) / divisor;
+    uint32 neededAddClassAccounts = sPlayerbotAIConfig->addClassAccountPoolSize;
+
+    // Start with existing total
+    uint32 existingTotal = existingRndBotAccounts + existingAddClassAccounts + existingUnassignedAccounts;
+
+    // Calculate shortfalls after using unassigned accounts
+    uint32 availableUnassigned = existingUnassignedAccounts;
+    uint32 additionalAccountsNeeded = 0;
+
+    // Check RNDbot needs
+    if (neededRndBotAccounts > existingRndBotAccounts)
+    {
+        uint32 rndBotShortfall = neededRndBotAccounts - existingRndBotAccounts;
+        if (rndBotShortfall <= availableUnassigned)
+            availableUnassigned -= rndBotShortfall;
+        else
+        {
+            additionalAccountsNeeded += (rndBotShortfall - availableUnassigned);
+            availableUnassigned = 0;
+        }
+    }
+
+    // Check AddClass needs
+    if (neededAddClassAccounts > existingAddClassAccounts)
+    {
+        uint32 addClassShortfall = neededAddClassAccounts - existingAddClassAccounts;
+        if (addClassShortfall <= availableUnassigned)
+            availableUnassigned -= addClassShortfall;
+        else
+        {
+            additionalAccountsNeeded += (addClassShortfall - availableUnassigned);
+            availableUnassigned = 0;
+        }
+    }
+
+    // Return existing total plus any additional accounts needed
+    return existingTotal + additionalAccountsNeeded;
 }
 
 uint32 RandomPlayerbotFactory::CalculateAvailableCharsPerAccount()
@@ -475,8 +556,9 @@ void RandomPlayerbotFactory::CreateRandomBots()
         LOG_INFO("playerbots", "Deleting all random bot characters and accounts...");
 
         // First execute all the cleanup SQL commands
-        // Clear playerbots_random_bots table
+        // Clear playerbots_random_bots and playerbots_account_type
         PlayerbotsDatabase.Execute("DELETE FROM playerbots_random_bots");
+        PlayerbotsDatabase.Execute("DELETE FROM playerbots_account_type");
 
         // Get the database names dynamically
         std::string loginDBName = LoginDatabase.GetConnectionInfo()->database;
