@@ -40,13 +40,13 @@ bool DrinkAction::Execute(Event event)
         float delay;
 
         if (!bot->InBattleground())
-            delay = 27000.0f * (100 - p) / 100.0f;
+            delay = 18000.0f * (100 - p) / 100.0f;
         else
-            delay = 20000.0f * (100 - p) / 100.0f;
+            delay = 12000.0f * (100 - p) / 100.0f;
 
         botAI->SetNextCheckDelay(delay);
 
-        bot->AddAura(24707, bot);
+        bot->AddAura(25990, bot);
         return true;
         // return botAI->CastSpell(24707, bot);
     }
@@ -90,13 +90,13 @@ bool EatAction::Execute(Event event)
         float delay;
 
         if (!bot->InBattleground())
-            delay = 27000.0f * (100 - p) / 100.0f;
+            delay = 18000.0f * (100 - p) / 100.0f;
         else
-            delay = 20000.0f * (100 - p) / 100.0f;
+            delay = 12000.0f * (100 - p) / 100.0f;
 
         botAI->SetNextCheckDelay(delay);
 
-        bot->AddAura(24707, bot);
+        bot->AddAura(25990, bot);
         return true;
     }
 
