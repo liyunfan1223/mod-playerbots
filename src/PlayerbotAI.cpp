@@ -5104,13 +5104,13 @@ Item* PlayerbotAI::FindAmmo() const
 }
 
 // Find Consumable
-Item* PlayerbotAI::FindConsumable(uint32 displayId) const
+Item* PlayerbotAI::FindConsumable(uint32 itemId) const
 {
     return FindItemInInventory(
-        [displayId](ItemTemplate const* pItemProto) -> bool
+        [itemId](ItemTemplate const* pItemProto) -> bool
         {
             return (pItemProto->Class == ITEM_CLASS_CONSUMABLE || pItemProto->Class == ITEM_CLASS_TRADE_GOODS) &&
-                   pItemProto->DisplayInfoID == displayId;
+                   pItemProto->ItemId == itemId;
         });
 }
 
@@ -5170,36 +5170,34 @@ Item* PlayerbotAI::FindLockedItem() const
         });
 }
 
-static const uint32 uPriorizedSharpStoneIds[8] = {ADAMANTITE_SHARPENING_DISPLAYID, FEL_SHARPENING_DISPLAYID,
-                                                  ELEMENTAL_SHARPENING_DISPLAYID,  DENSE_SHARPENING_DISPLAYID,
-                                                  SOLID_SHARPENING_DISPLAYID,      HEAVY_SHARPENING_DISPLAYID,
-                                                  COARSE_SHARPENING_DISPLAYID,     ROUGH_SHARPENING_DISPLAYID};
-
-static const uint32 uPriorizedWeightStoneIds[7] = {ADAMANTITE_WEIGHTSTONE_DISPLAYID, FEL_WEIGHTSTONE_DISPLAYID,
-                                                   DENSE_WEIGHTSTONE_DISPLAYID,      SOLID_WEIGHTSTONE_DISPLAYID,
-                                                   HEAVY_WEIGHTSTONE_DISPLAYID,      COARSE_WEIGHTSTONE_DISPLAYID,
-                                                   ROUGH_WEIGHTSTONE_DISPLAYID};
-
-/**
- * FindStoneFor()
- * return Item* Returns sharpening/weight stone item eligible to enchant a bot weapon
- *
- * params:weapon Item* the weap�n the function should search and return a enchanting item for
- * return nullptr if no relevant item is found in bot inventory, else return a sharpening or weight
- * stone based on the weapon subclass
- *
- */
 Item* PlayerbotAI::FindStoneFor(Item* weapon) const
 {
+    if (!weapon)
+        return nullptr;
+
+    const ItemTemplate* item_template = weapon->GetTemplate();
+    if (!item_template)
+        return nullptr;
+
+static const std::vector<uint32_t> uPrioritizedSharpStoneIds = {
+    ADAMANTITE_SHARPENING_STONE, FEL_SHARPENING_STONE, ELEMENTAL_SHARPENING_STONE, DENSE_SHARPENING_STONE,
+    SOLID_SHARPENING_STONE, HEAVY_SHARPENING_STONE, COARSE_SHARPENING_STONE, ROUGH_SHARPENING_STONE
+};
+
+static const std::vector<uint32_t> uPrioritizedWeightStoneIds = {
+    ADAMANTITE_WEIGHTSTONE, FEL_WEIGHTSTONE, DENSE_WEIGHTSTONE, SOLID_WEIGHTSTONE,
+    HEAVY_WEIGHTSTONE, COARSE_WEIGHTSTONE, ROUGH_WEIGHTSTONE
+};
+
     Item* stone = nullptr;
     ItemTemplate const* pProto = weapon->GetTemplate();
     if (pProto && (pProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD || pProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2 ||
                    pProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE || pProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
-                   pProto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER))
+                   pProto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER || pProto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM))
     {
-        for (uint8 i = 0; i < std::size(uPriorizedSharpStoneIds); ++i)
+        for (uint8 i = 0; i < std::size(uPrioritizedSharpStoneIds); ++i)
         {
-            stone = FindConsumable(uPriorizedSharpStoneIds[i]);
+            stone = FindConsumable(uPrioritizedSharpStoneIds[i]);
             if (stone)
             {
                 return stone;
@@ -5207,11 +5205,12 @@ Item* PlayerbotAI::FindStoneFor(Item* weapon) const
         }
     }
     else if (pProto &&
-             (pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2))
+             (pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE || pProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
+              pProto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF || pProto->SubClass == ITEM_SUBCLASS_WEAPON_FIST))
     {
-        for (uint8 i = 0; i < std::size(uPriorizedWeightStoneIds); ++i)
+        for (uint8 i = 0; i < std::size(uPrioritizedWeightStoneIds); ++i)
         {
-            stone = FindConsumable(uPriorizedWeightStoneIds[i]);
+            stone = FindConsumable(uPrioritizedWeightStoneIds[i]);
             if (stone)
             {
                 return stone;
@@ -5224,6 +5223,7 @@ Item* PlayerbotAI::FindStoneFor(Item* weapon) const
 
 Item* PlayerbotAI::FindOilFor(Item* weapon) const
 {
+
     if (!weapon)
         return nullptr;
 
@@ -5231,35 +5231,60 @@ Item* PlayerbotAI::FindOilFor(Item* weapon) const
     if (!item_template)
         return nullptr;
 
-    // static const will only get created once whatever the call amout
-    static const std::vector<uint32_t> uPriorizedWizardOilIds = {
-        MINOR_WIZARD_OIL,   MINOR_MANA_OIL, LESSER_WIZARD_OIL, LESSER_MANA_OIL,    BRILLIANT_WIZARD_OIL,
-        BRILLIANT_MANA_OIL, WIZARD_OIL,     SUPERIOR_MANA_OIL, SUPERIOR_WIZARD_OIL};
+    static const std::vector<uint32_t> uPrioritizedWizardOilIds = {
+        BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL,
+        BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL};
 
-    // static const will only get created once whatever the call amout
-    static const std::vector<uint32_t> uPriorizedManaOilIds = {
-        MINOR_MANA_OIL,       MINOR_WIZARD_OIL,  LESSER_MANA_OIL, LESSER_WIZARD_OIL,  BRILLIANT_MANA_OIL,
-        BRILLIANT_WIZARD_OIL, SUPERIOR_MANA_OIL, WIZARD_OIL,      SUPERIOR_WIZARD_OIL};
+    static const std::vector<uint32_t> uPrioritizedManaOilIds = {
+        BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL,
+        BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
 
     Item* oil = nullptr;
-    if (item_template->SubClass == ITEM_SUBCLASS_WEAPON_SWORD ||
-        item_template->SubClass == ITEM_SUBCLASS_WEAPON_STAFF || item_template->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+    int botClass = bot->getClass();
+    int specTab = AiFactory::GetPlayerSpecTab(bot);
+
+    const std::vector<uint32_t>* prioritizedOils = nullptr;
+    switch (botClass)
     {
-        for (const auto& id : uPriorizedWizardOilIds)
-        {
-            oil = FindConsumable(id);
-            if (oil)
-                return oil;
-        }
+        case CLASS_PRIEST:
+            prioritizedOils = (specTab == 2) ? &uPrioritizedWizardOilIds : &uPrioritizedManaOilIds;
+            break;
+        case CLASS_MAGE:
+            prioritizedOils = &uPrioritizedWizardOilIds;
+            break;
+        case CLASS_DRUID:
+            if (specTab == 0) // Balance
+                prioritizedOils = &uPrioritizedWizardOilIds;
+            else if (specTab == 1) // Feral
+                prioritizedOils = nullptr;
+            else // Restoration (specTab == 2) or any other/unspecified spec
+                prioritizedOils = &uPrioritizedManaOilIds;
+            break;
+        case CLASS_HUNTER:
+            prioritizedOils = &uPrioritizedManaOilIds;
+            break;
+        case CLASS_PALADIN:
+            if (specTab == 1) // Protection
+                prioritizedOils = &uPrioritizedWizardOilIds;
+            else if (specTab == 2) // Retribution
+                prioritizedOils = nullptr;
+            else // Holy (specTab == 0) or any other/unspecified spec
+                prioritizedOils = &uPrioritizedManaOilIds;
+            break;
+        default:
+            prioritizedOils = &uPrioritizedManaOilIds;
+            break;
     }
-    else if (item_template->SubClass == ITEM_SUBCLASS_WEAPON_MACE ||
-             item_template->SubClass == ITEM_SUBCLASS_WEAPON_MACE2)
+
+    if (prioritizedOils)
     {
-        for (const auto& id : uPriorizedManaOilIds)
+        for (const auto& id : *prioritizedOils)
         {
             oil = FindConsumable(id);
             if (oil)
+            {
                 return oil;
+            }
         }
     }
 

@@ -19,22 +19,51 @@ bool ImbueWithPoisonAction::Execute(Event event)
     if (bot->HasAura(SPELL_AURA_MOD_STEALTH))
         bot->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
 
-    // hp check
     if (bot->getStandState() != UNIT_STAND_STATE_STAND)
         bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-    // Search and apply poison to weapons
-    // Mainhand ...
+    static const std::vector<uint32_t> prioritizedInstantPoisons = {
+        INSTANT_POISON_IX, INSTANT_POISON_VIII, INSTANT_POISON_VII, INSTANT_POISON_VI, INSTANT_POISON_V, INSTANT_POISON_IV,
+        INSTANT_POISON_III, INSTANT_POISON_II, INSTANT_POISON
+    };
+
+    static const std::vector<uint32_t> prioritizedDeadlyPoisons = {
+        DEADLY_POISON_IX, DEADLY_POISON_VIII, DEADLY_POISON_VII, DEADLY_POISON_VI, DEADLY_POISON_V, DEADLY_POISON_IV,
+        DEADLY_POISON_III, DEADLY_POISON_II, DEADLY_POISON
+    };
+
+    // Check if we have any deadly or instant poisons
+    Item* deadlyPoison = nullptr;
+    for (auto id : prioritizedDeadlyPoisons)
+    {
+        deadlyPoison = botAI->FindConsumable(id);
+        if (deadlyPoison) break;
+    }
+
+    Item* instantPoison = nullptr;
+    for (auto id : prioritizedInstantPoisons)
+    {
+        instantPoison = botAI->FindConsumable(id);
+        if (instantPoison) break;
+    }
+
+    // Mainhand
     Item* poison = nullptr;
     Item* weapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
     if (weapon && weapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) == 0)
     {
-        poison = botAI->FindConsumable(INSTANT_POISON_DISPLAYID);
-        if (!poison)
-            poison = botAI->FindConsumable(DEADLY_POISON_DISPLAYID);
-
-        if (!poison)
-            poison = botAI->FindConsumable(WOUND_POISON_DISPLAYID);
+        if (instantPoison && deadlyPoison)
+        {
+            poison = instantPoison;
+        }
+        else if (deadlyPoison)
+        {
+            poison = deadlyPoison;
+        }
+        else if (instantPoison)
+        {
+            poison = instantPoison;
+        }
 
         if (poison)
         {
@@ -43,16 +72,23 @@ bool ImbueWithPoisonAction::Execute(Event event)
         }
     }
 
-    //... and offhand
+    // Offhand
+    poison = nullptr;
     weapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
     if (weapon && weapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) == 0)
     {
-        poison = botAI->FindConsumable(DEADLY_POISON_DISPLAYID);
-        if (!poison)
-            poison = botAI->FindConsumable(WOUND_POISON_DISPLAYID);
-
-        if (!poison)
-            poison = botAI->FindConsumable(INSTANT_POISON_DISPLAYID);
+        if (deadlyPoison && instantPoison)
+        {
+            poison = deadlyPoison;
+        }
+        else if (instantPoison)
+        {
+            poison = instantPoison;
+        }
+        else if (deadlyPoison)
+        {
+            poison = deadlyPoison;
+        }
 
         if (poison)
         {
@@ -141,8 +177,8 @@ bool ImbueWithOilAction::Execute(Event event)
     return true;
 }
 
-static const uint32 uPriorizedHealingItemIds[19] = {
-    HEALTHSTONE_DISPLAYID,
+static const uint32 uPrioritizedHealingItemIds[19] = {
+    HEALTHSTONE,
     FEL_REGENERATION_POTION,
     SUPER_HEALING_POTION,
     CRYSTAL_HEALING_POTION,
@@ -182,9 +218,9 @@ bool TryEmergencyAction::Execute(Event event)
     }
 
     // Else loop over the list of health consumable to pick one
-    for (uint8 i = 0; i < std::size(uPriorizedHealingItemIds); ++i)
+    for (uint8 i = 0; i < std::size(uPrioritizedHealingItemIds); ++i)
     {
-        if (Item* healthItem = botAI->FindConsumable(uPriorizedHealingItemIds[i]))
+        if (Item* healthItem = botAI->FindConsumable(uPrioritizedHealingItemIds[i]))
         {
             botAI->ImbueItem(healthItem);
         }

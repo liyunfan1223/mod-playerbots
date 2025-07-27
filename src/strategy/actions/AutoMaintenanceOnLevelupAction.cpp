@@ -157,16 +157,23 @@ void AutoMaintenanceOnLevelupAction::LearnSpell(uint32 spellId, std::ostringstre
 void AutoMaintenanceOnLevelupAction::AutoUpgradeEquip()
 {
     if (!sPlayerbotAIConfig->autoUpgradeEquip || !sRandomPlayerbotMgr->IsRandomBot(bot))
-    {
         return;
-    }
+    
     PlayerbotFactory factory(bot, bot->GetLevel());
+
+    // Clean up old consumables before adding new ones
+    factory.CleanupConsumables();
+
+    factory.InitAmmo();
+    factory.InitReagents();
+    factory.InitFood();
+    factory.InitConsumables();
+    factory.InitPotions();
+
     if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
     {
         if (sPlayerbotAIConfig->incrementalGearInit)
             factory.InitEquipment(true);
     }
-    factory.InitAmmo();
-    return;
 }
 
