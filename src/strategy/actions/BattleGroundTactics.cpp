@@ -4163,7 +4163,7 @@ bool ArenaTactics::Execute(Event event)
         botAI->ChangeStrategy("-buff", BOT_STATE_NON_COMBAT);
 
     // Repositioning if the target is out of line of sight
-    Unit* target = botAI->GetAiObject<Unit>("current target");
+    Unit* target = bot->GetVictim();
     if (target && !bot->IsWithinLOSInMap(target))
     {
         float x, y, z;
