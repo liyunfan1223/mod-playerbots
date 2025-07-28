@@ -4172,7 +4172,7 @@ bool ArenaTactics::Execute(Event event)
             if (path.GetPathType() != PATHFIND_NOPATH)
             {
                 // If you are casting a spell and lost your target due to LoS, interrupt the cast and move
-                if (bot->IsNonMeleeSpellCasted(false, true, true))
+                if (bot->IsNonMeleeSpellCast(false, true, true, false, true))
                     bot->InterruptNonMeleeSpells(true);
 
                 float x, y, z;
