@@ -139,6 +139,7 @@ bool FishingAction::Execute(Event event)
         eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
         bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
     }
+
     botAI->SetNextCheckDelay(100);
     botAI->CastSpell(FISHING_SPELL, bot);
     botAI->ChangeStrategy("+usebobber", BOT_STATE_NON_COMBAT);
@@ -152,14 +153,17 @@ bool FishingAction::isUseful()
         return false;
     return true;
 }
+bool UseBobber::isUseful()
+{
+    if (!AI_VALUE(bool, "can use fishing bobber"))
+        return false;
+    return true;
+}
 
 bool UseBobber::Execute(Event event)
 {
-    if (!bot)
+    if (!bot || !botAI)
         return false;
-    if (!botAI)
-        return false;
-
     GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
     for (const auto& guid : gos)
     {
@@ -170,10 +174,7 @@ bool UseBobber::Execute(Event event)
             if (go->GetEntry() != 35591)
                 continue;
             if (go->GetOwnerGUID() != bot->GetGUID())
-            {
                 continue;
-            }
-
             if (go->getLootState() != GO_READY)
             {
                 time_t bobberActiveTime = go->GetRespawnTime() - FISHING_BOBBER_READY_TIME;
@@ -183,13 +184,20 @@ bool UseBobber::Execute(Event event)
                     botAI->SetNextCheckDelay(1000);
                 return false;
             }
-            
             botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
             go->Use(bot);
             return true;
 
         }
     }
-
+    botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
     return false;
+}
+bool EndFishing::Execute(Event event)
+{
+    if (!bot || !botAI)
+        return false;
+
+    botAI->ChangeStrategy("-masterfishing", BOT_STATE_NON_COMBAT);
+    return true;
 }

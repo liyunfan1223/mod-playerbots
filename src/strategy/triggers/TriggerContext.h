@@ -229,6 +229,7 @@ public:
         creators["can self resurrect"] = &TriggerContext::can_self_resurrect;
         creators["can fish"] = &TriggerContext::can_fish;
         creators["can use fishing bobber"] = &TriggerContext::can_use_fishing_bobber;
+        creators["done fishing"] = &TriggerContext::done_fishing;
     }
 
 private:
@@ -428,6 +429,7 @@ private:
     static Trigger* can_self_resurrect(PlayerbotAI* ai) { return new SelfResurrectTrigger(ai); }
     static Trigger* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenFishingBobberTrigger(ai); }
     static Trigger* can_fish(PlayerbotAI* ai) { return new CanFishTrigger(ai); }
+    static Trigger* done_fishing(PlayerbotAI* ai) { return new DoneFishingTrigger(ai); }
 };
 
 #endif

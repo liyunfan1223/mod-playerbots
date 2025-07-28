@@ -15,23 +15,17 @@ bool FishWithMasterAction::Execute(Event event)
 
     WorldPacket p(event.getPacket());
     p.rpos(0);
-    uint8 castCount = 0, castFlags = 0;
-    uint32 spellId = 0;
-    p >> castCount >> spellId >> castFlags;
-
+    uint8 castcount = 0;
+    uint32 spellId = 0; 
+    p >> castcount >> spellId;
+    
     if (spellId == FISHING_SPELL)
     {
-        int32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
-
-        if (SkillFishing == 0)
-            return false;
-        int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
-        
-        if (!zone_skill)
-            zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetZoneId());
-       if (SkillFishing < zone_skill)
-            return false;
-        return FishingAction(botAI).Execute(event);
+        if (AI_VALUE(bool, "can fish"))
+        {
+            botAI->ChangeStrategy("+masterfishing", BOT_STATE_NON_COMBAT);
+            return true;
+        }
     }
     return false;
 }

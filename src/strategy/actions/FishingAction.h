@@ -25,6 +25,14 @@ public:
     bool isUseful() override;
 };
 
+class EquipFishingPoleAction : public Action, public Qualified
+{
+public:
+    EquipFishingPoleAction(PlayerbotAI* botAI) : Action(botAI, "equip fishing pole") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class MovetoFish: public MovementAction, public Qualified
 {
 public:
@@ -38,6 +46,13 @@ class UseBobber : public Action
 public:
     UseBobber(PlayerbotAI* botAI) : Action(botAI, "use fishing bobber"){}
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
+class EndFishing : public Action
+{
+    public:
+        EndFishing(PlayerbotAI* botAI) : Action(botAI, "end fishing") {}
+        bool Execute(Event event) override;
+};
 #endif

@@ -30,6 +30,6 @@ void RevealStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void BobberStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-     triggers.push_back(new TriggerNode("can use fishing bobber",
-                                       NextAction::array(0, new NextAction("use fishing bobber", 99.0f), NULL)));
+     triggers.push_back(
+        new TriggerNode("can use fishing bobber", NextAction::array(0, new NextAction("use fishing bobber", 99.0f), NULL)));
 }

@@ -193,6 +193,7 @@ public:
         creators["move to fish"] = &ActionContext::move_to_fish;
         creators["go fishing"] = &ActionContext::fishing_action;
         creators["use fishing bobber"] = &ActionContext::use_fishing_bobber;
+        creators["end fishing"] = &ActionContext::end_fishing;
 
         // BG Tactics
         creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -380,6 +381,7 @@ private:
     static Action* move_to_fish(PlayerbotAI* botAI) { return new MovetoFish(botAI); }
     static Action* fishing_action(PlayerbotAI* botAI) { return new FishingAction(botAI);}
     static Action* use_fishing_bobber(PlayerbotAI* botAI) { return new UseBobber(botAI);}
+    static Action* end_fishing(PlayerbotAI* botAI) { return new EndFishing(botAI); }
 
     // BG Tactics
     static Action* bg_tactics(PlayerbotAI* botAI) { return new BGTactics(botAI); }

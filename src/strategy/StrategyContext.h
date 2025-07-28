@@ -121,7 +121,7 @@ public:
         creators["move from group"] = &StrategyContext::move_from_group;
         creators["worldbuff"] = &StrategyContext::world_buff;
         creators["usebobber"] = &StrategyContext::bobber_strategy;
-        creators["fish"] = &StrategyContext::fishing_strategy;
+        creators["masterfishing"] = &StrategyContext::master_fishing;
     }
 
 private:
@@ -191,7 +191,7 @@ private:
     static Strategy* move_from_group(PlayerbotAI* botAI) { return new MoveFromGroupStrategy(botAI); }
     static Strategy* world_buff(PlayerbotAI* botAI) { return new WorldBuffStrategy(botAI); }
     static Strategy* bobber_strategy(PlayerbotAI* botAI) { return new BobberStrategy(botAI); }
-    static Strategy* fishing_strategy(PlayerbotAI* botAI) { return new FishStrategy(botAI); }
+    static Strategy* master_fishing(PlayerbotAI* botAI) { return new MasterFishStrategy(botAI); }
 };
 
 class MovementStrategyContext : public NamedObjectContext<Strategy>

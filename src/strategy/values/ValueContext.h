@@ -315,6 +315,7 @@ public:
 
         creators["can fish"] = &ValueContext::can_fish;
         creators["can use fishing bobber"] = &ValueContext::can_use_fishing_bobber;
+        creators["done fishing"] = &ValueContext::done_fishing;
     }
 
 private:
@@ -561,6 +562,7 @@ private:
 
     static UntypedValue* can_fish(PlayerbotAI* ai) {return new CanFishValue(ai); }
     static UntypedValue* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenBobberValue(ai); }
+    static UntypedValue* done_fishing(PlayerbotAI* ai) { return new DoneFishingValue(ai); }
 };
 
 #endif

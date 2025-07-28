@@ -12,15 +12,9 @@
 
 bool CanFishValue::Calculate()
 {
-  if (!bot)
-  {
+  if (!bot ||!botAI)
     return false;
-  }
-
-  if (!botAI)
-        {
-        return false;
-    }
+    
   int32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
 
   if (SkillFishing == 0)
@@ -43,11 +37,32 @@ bool CanFishValue::Calculate()
 
 bool CanOpenBobberValue::Calculate()
 {
-    if (!bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-        return false;
-    Spell* spell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
-    if (spell && spell->m_spellInfo && spell->m_spellInfo->Id != FISHING_SPELL)
-        return false;
-
-    return true;
+  if (!bot || !botAI)
+    return false;
+  return true;
 }
+
+bool DoneFishingValue::Calculate()
+{
+  if (!bot ||!botAI)
+    return false;
+  
+  Player* master = botAI->GetMaster();
+  
+  if (!master) // Check if master exists
+    return false;
+  ObjectGuid masterGUID;
+  masterGUID = master->GetGUID();
+  
+  if (!masterGUID)
+    {
+      return false;// Need to add triggers for free fishing. 
+    }
+  bool distance = master->GetDistance(bot) < 10.0f;
+  if (!distance)
+  {
+    return true;
+  }
+return false;
+}
+
