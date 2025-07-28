@@ -4170,7 +4170,7 @@ bool ArenaTactics::Execute(Event event)
         PathGenerator path(bot);
         path.CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
 
-        if (path.IsValid() && path.GetPathType() != PATHFIND_NOPATH)
+        if (path.GetPathType() != PATHFIND_NOPATH)
         {
             float x, y, z;
             target->GetPosition(x, y, z);
