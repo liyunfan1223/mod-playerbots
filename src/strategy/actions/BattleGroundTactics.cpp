@@ -26,6 +26,7 @@
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "PvpTriggers.h"
+#include "PathFinder.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
 
