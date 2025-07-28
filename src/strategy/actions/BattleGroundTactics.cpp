@@ -26,7 +26,7 @@
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "PvpTriggers.h"
-#include "PathFinder.h"
+#include "PathGenerator.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
 
@@ -4167,7 +4167,7 @@ bool ArenaTactics::Execute(Event event)
     Unit* target = bot->GetVictim();
     if (target && (!bot->IsWithinLOSInMap(target) || fabs(bot->GetPositionZ() - target->GetPositionZ()) > 5.0f))
     {
-        PathFinder path(bot);
+        PathGenerator path(bot);
         path.CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
 
         if (path.IsValid() && path.GetPathType() != PATHFIND_NOPATH)
