@@ -55,6 +55,8 @@ void ShadowPriestAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "vampiric touch on attacker",
         NextAction::array(0, new NextAction("vampiric touch on attacker", ACTION_NORMAL + 4), nullptr)));
     triggers.push_back(
+        new TriggerNode("mind sear channel check", NextAction::array(0, new NextAction("cancel channel", ACTION_HIGH + 5), nullptr)));
+    triggers.push_back(
         new TriggerNode("medium aoe", NextAction::array(0, new NextAction("mind sear", ACTION_HIGH + 4), nullptr)));
 }
 

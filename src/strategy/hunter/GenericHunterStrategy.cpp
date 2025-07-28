@@ -136,9 +136,9 @@ AoEHunterStrategy::AoEHunterStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI)
 
 void AoEHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
+    triggers.push_back(new TriggerNode("volley channel check", NextAction::array(0, new NextAction("cancel channel", 23.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("volley", 22.0f), nullptr)));
-    triggers.push_back(
-        new TriggerNode("light aoe", NextAction::array(0, new NextAction("multi-shot", 21.0f), nullptr)));
+    triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("multi-shot", 21.0f), nullptr)));
 }
 
 void HunterBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

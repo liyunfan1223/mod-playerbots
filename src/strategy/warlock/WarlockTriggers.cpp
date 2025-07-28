@@ -6,6 +6,8 @@
 #include "WarlockTriggers.h"
 #include "GenericTriggers.h"
 #include "Playerbots.h"
+#include "PlayerbotAI.h"
+#include "Player.h"
 
 static const uint32 SOUL_SHARD_ITEM_ID = 6265;
 
@@ -226,5 +228,34 @@ bool WrongPetTrigger::IsActive()
         return true;
 
     // Step 6: If we get here, the bot doesn't know the spell required to support the active pet strategy
+    return false;
+}
+
+const std::set<uint32> RainOfFireChannelCheckTrigger::RAIN_OF_FIRE_SPELL_IDS = {
+    5740,   // Rain of Fire Rank 1
+    6219,   // Rain of Fire Rank 2
+    11677,  // Rain of Fire Rank 3
+    11678,  // Rain of Fire Rank 4
+    27212,  // Rain of Fire Rank 5
+    47819,  // Rain of Fire Rank 6
+    47820   // Rain of Fire Rank 7
+};
+
+bool RainOfFireChannelCheckTrigger::IsActive()
+{
+    Player* bot = botAI->GetBot();
+
+    // Check if the bot is channeling a spell
+    if (Spell* spell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+    {
+        // Only trigger if the spell being channeled is Rain of Fire
+        if (RAIN_OF_FIRE_SPELL_IDS.count(spell->m_spellInfo->Id))
+        {
+            uint8 attackerCount = AI_VALUE(uint8, "attacker count");
+            return attackerCount < minEnemies;
+        }
+    }
+
+    // Not channeling Rain of Fire
     return false;
 }

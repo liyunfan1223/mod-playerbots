@@ -101,6 +101,7 @@ public:
         creators["lock and load"] = &HunterTriggerFactoryInternal::lock_and_load;
         creators["silencing shot"] = &HunterTriggerFactoryInternal::silencing_shot;
         creators["intimidation"] = &HunterTriggerFactoryInternal::intimidation;
+        creators["volley channel check"] = &HunterTriggerFactoryInternal::volley_channel_check;
     }
 
 private:
@@ -141,6 +142,7 @@ private:
     static Trigger* lock_and_load(PlayerbotAI* botAI) { return new LockAndLoadTrigger(botAI); }
     static Trigger* silencing_shot(PlayerbotAI* botAI) { return new SilencingShotTrigger(botAI); }
     static Trigger* intimidation(PlayerbotAI* botAI) { return new IntimidationTrigger(botAI); }
+    static Trigger* volley_channel_check(PlayerbotAI* botAI) { return new VolleyChannelCheckTrigger(botAI); }
 };
 
 class HunterAiObjectContextInternal : public NamedObjectContext<Action>

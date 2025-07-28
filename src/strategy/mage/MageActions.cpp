@@ -142,13 +142,3 @@ bool CastBlinkBackAction::Execute(Event event)
     bot->SetOrientation(bot->GetAngle(target) + M_PI);
     return CastSpellAction::Execute(event);
 }
-
-bool CancelChannelAction::Execute(Event event)
-{
-    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-    {
-        bot->InterruptSpell(CURRENT_CHANNELED_SPELL);
-        return true;
-    }
-    return false;
-}

@@ -152,6 +152,8 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void CasterDruidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
+        new TriggerNode("hurricane channel check", NextAction::array(0, new NextAction("cancel channel", ACTION_HIGH + 2), nullptr)));
+    triggers.push_back(
         new TriggerNode("medium aoe", NextAction::array(0, new NextAction("hurricane", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode(
         "light aoe", NextAction::array(0, new NextAction("insect swarm on attacker", ACTION_NORMAL + 3),
