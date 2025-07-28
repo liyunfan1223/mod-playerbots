@@ -4150,10 +4150,6 @@ bool ArenaTactics::Execute(Event event)
     if (bot->isDead())
         return false;
 
-    if (bot->isMoving())
-        return false;
-
-    // startup phase
     if (bg->GetStartDelayTime() > 0)
         return false;
 
@@ -4163,19 +4159,27 @@ bool ArenaTactics::Execute(Event event)
     if (botAI->HasStrategy("buff", BOT_STATE_NON_COMBAT))
         botAI->ChangeStrategy("-buff", BOT_STATE_NON_COMBAT);
 
-    // Repositioning if the target is out of line of sight
     Unit* target = bot->GetVictim();
-    if (target && (!bot->IsWithinLOSInMap(target) || fabs(bot->GetPositionZ() - target->GetPositionZ()) > 5.0f))
+    if (target)
     {
-        PathGenerator path(bot);
-        path.CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
+        bool losBlocked = !bot->IsWithinLOSInMap(target) || fabs(bot->GetPositionZ() - target->GetPositionZ()) > 5.0f;
 
-        if (path.GetPathType() != PATHFIND_NOPATH)
+        if (losBlocked)
         {
-            float x, y, z;
-            target->GetPosition(x, y, z);
-            botAI->TellMasterNoFacing("Repositioning to exit LoS or Height");
-            return MoveTo(target->GetMapId(), x + frand(-1, +1), y + frand(-1, +1), z, false, true);
+            PathGenerator path(bot);
+            path.CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
+
+            if (path.GetPathType() != PATHFIND_NOPATH)
+            {
+                // If you are casting a spell and lost your target due to LoS, interrupt the cast and move
+                if (bot->IsNonMeleeSpellCasted(false, true, true))
+                    bot->InterruptNonMeleeSpells(true);
+
+                float x, y, z;
+                target->GetPosition(x, y, z);
+                botAI->TellMasterNoFacing("Repositioning to regain LoS");
+                return MoveTo(target->GetMapId(), x + frand(-1, +1), y + frand(-1, +1), z, false, true);
+            }
         }
     }
 
