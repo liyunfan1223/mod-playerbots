@@ -4164,12 +4164,18 @@ bool ArenaTactics::Execute(Event event)
 
     // Repositioning if the target is out of line of sight
     Unit* target = bot->GetVictim();
-    if (target && !bot->IsWithinLOSInMap(target))
+    if (target && (!bot->IsWithinLOSInMap(target) || fabs(bot->GetPositionZ() - target->GetPositionZ()) > 5.0f))
     {
-        float x, y, z;
-        target->GetPosition(x, y, z);
-        botAI->TellMasterNoFacing("Repositioning to exit LoS");
-        return MoveTo(target->GetMapId(), x + frand(-1, +1), y + frand(-1, +1), z, false, true);
+        PathFinder path(bot);
+        path.CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
+
+        if (path.IsValid() && path.GetPathType() != PATHFIND_NOPATH)
+        {
+            float x, y, z;
+            target->GetPosition(x, y, z);
+            botAI->TellMasterNoFacing("Repositioning to exit LoS or Height");
+            return MoveTo(target->GetMapId(), x + frand(-1, +1), y + frand(-1, +1), z, false, true);
+        }
     }
 
     if (!bot->IsInCombat())
