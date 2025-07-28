@@ -4,7 +4,6 @@
  */
 
 #include "MageAiObjectContext.h"
-
 #include "ArcaneMageStrategy.h"
 #include "FireMageStrategy.h"
 #include "FrostFireMageStrategy.h"
@@ -23,27 +22,23 @@ public:
     {
         creators["nc"] = &MageStrategyFactoryInternal::nc;
         creators["pull"] = &MageStrategyFactoryInternal::pull;
-        creators["fire aoe"] = &MageStrategyFactoryInternal::fire_aoe;
-        creators["frostfire aoe"] = &MageStrategyFactoryInternal::frostfire_aoe; 
-        creators["frost aoe"] = &MageStrategyFactoryInternal::frost_aoe;
-        creators["arcane aoe"] = &MageStrategyFactoryInternal::arcane_aoe;
+        creators["aoe"] = &MageStrategyFactoryInternal::aoe;
         creators["cure"] = &MageStrategyFactoryInternal::cure;
         creators["buff"] = &MageStrategyFactoryInternal::buff;
         creators["boost"] = &MageStrategyFactoryInternal::boost;
         creators["cc"] = &MageStrategyFactoryInternal::cc;
+        creators["firestarter"] = &MageStrategyFactoryInternal::firestarter;
     }
 
 private:
     static Strategy* nc(PlayerbotAI* botAI) { return new GenericMageNonCombatStrategy(botAI); }
     static Strategy* pull(PlayerbotAI* botAI) { return new PullStrategy(botAI, "shoot"); }
-    static Strategy* fire_aoe(PlayerbotAI* botAI) { return new FireMageAoeStrategy(botAI); }
-    static Strategy* frostfire_aoe(PlayerbotAI* botAI) { return new FrostFireMageAoeStrategy(botAI); }
-    static Strategy* frost_aoe(PlayerbotAI* botAI) { return new FrostMageAoeStrategy(botAI); }
-    static Strategy* arcane_aoe(PlayerbotAI* botAI) { return new ArcaneMageAoeStrategy(botAI); }
+    static Strategy* aoe(PlayerbotAI* botAI) { return new MageAoeStrategy(botAI); }
     static Strategy* cure(PlayerbotAI* botAI) { return new MageCureStrategy(botAI); }
     static Strategy* buff(PlayerbotAI* botAI) { return new MageBuffStrategy(botAI); }
     static Strategy* boost(PlayerbotAI* botAI) { return new MageBoostStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new MageCcStrategy(botAI); }
+    static Strategy* firestarter(PlayerbotAI* botAI) { return new FirestarterStrategy(botAI); }
 };
 
 class MageCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -86,8 +81,7 @@ public:
         creators["fireball"] = &MageTriggerFactoryInternal::fireball;
         creators["pyroblast"] = &MageTriggerFactoryInternal::pyroblast;
         creators["combustion"] = &MageTriggerFactoryInternal::combustion;
-        creators["fingers of frost single"] = &MageTriggerFactoryInternal::fingers_of_frost_single;
-        creators["fingers of frost double"] = &MageTriggerFactoryInternal::fingers_of_frost_double;
+        creators["fingers of frost"] = &MageTriggerFactoryInternal::fingers_of_frost;
         creators["brain freeze"] = &MageTriggerFactoryInternal::brain_freeze;
         creators["icy veins"] = &MageTriggerFactoryInternal::icy_veins;
         creators["cold snap"] = &MageTriggerFactoryInternal::cold_snap;
@@ -102,6 +96,7 @@ public:
         creators["spellsteal"] = &MageTriggerFactoryInternal::spellsteal;
         creators["hot streak"] = &MageTriggerFactoryInternal::hot_streak;
         creators["living bomb"] = &MageTriggerFactoryInternal::living_bomb;
+        creators["living bomb on attackers"] = &MageTriggerFactoryInternal::living_bomb_on_attackers;
         creators["missile barrage"] = &MageTriggerFactoryInternal::missile_barrage;
         creators["arcane blast"] = &MageTriggerFactoryInternal::arcane_blast;
         creators["counterspell on enemy healer"] = &MageTriggerFactoryInternal::counterspell_enemy_healer;
@@ -115,6 +110,20 @@ public:
         creators["frostbite on target"] = &MageTriggerFactoryInternal::frostbite_on_target;
         creators["no focus magic"] = &MageTriggerFactoryInternal::no_focus_magic;
         creators["frostfire bolt"] = &MageTriggerFactoryInternal::frostfire_bolt;
+        creators["firestarter"] = &MageTriggerFactoryInternal::firestarter;
+        creators["improved scorch"] = &MageTriggerFactoryInternal::improved_scorch;
+        creators["flamestrike nearby"] = &MageTriggerFactoryInternal::flamestrike_nearby;
+        creators["flamestrike active and medium aoe"] = &MageTriggerFactoryInternal::flamestrike_blizzard;
+        creators["arcane blast 4 stacks and missile barrage"] = &MageTriggerFactoryInternal::arcane_blast_4_stacks_and_missile_barrage;
+        creators["icy veins on cd"] = &MageTriggerFactoryInternal::icy_veins_on_cd;
+        creators["deep freeze on cd"] = &MageTriggerFactoryInternal::deep_freeze_on_cd;
+        creators["no mana gem"] = &MageTriggerFactoryInternal::NoManaGem;
+        creators["blizzard channel check"] = &MageTriggerFactoryInternal::blizzard_channel_check;
+        creators["blast wave off cd"] = &MageTriggerFactoryInternal::blast_wave_off_cd;
+        creators["blast wave off cd and medium aoe"] = &MageTriggerFactoryInternal::blast_wave_off_cd_and_medium_aoe;
+        creators["no firestarter strategy"] = &MageTriggerFactoryInternal::no_firestarter_strategy;
+        creators["enemy is close and no firestarter strategy"] = &MageTriggerFactoryInternal::enemy_is_close_and_no_firestarter_strategy;
+        creators["enemy too close for spell and no firestarter strategy"] = &MageTriggerFactoryInternal::enemy_too_close_for_spell_and_no_firestarter_strategy;
     }
 
 private:
@@ -126,8 +135,7 @@ private:
     static Trigger* fireball(PlayerbotAI* botAI) { return new FireballTrigger(botAI); }
     static Trigger* pyroblast(PlayerbotAI* botAI) { return new PyroblastTrigger(botAI); }
     static Trigger* combustion(PlayerbotAI* botAI) { return new CombustionTrigger(botAI); }
-    static Trigger* fingers_of_frost_single(PlayerbotAI* botAI) { return new FingersOfFrostSingleTrigger(botAI); }
-    static Trigger* fingers_of_frost_double(PlayerbotAI* botAI) { return new FingersOfFrostDoubleTrigger(botAI); }
+    static Trigger* fingers_of_frost(PlayerbotAI* botAI) { return new FingersOfFrostTrigger(botAI); }
     static Trigger* brain_freeze(PlayerbotAI* botAI) { return new BrainFreezeTrigger(botAI); }
     static Trigger* icy_veins(PlayerbotAI* botAI) { return new IcyVeinsTrigger(botAI); }
     static Trigger* cold_snap(PlayerbotAI* botAI) { return new ColdSnapTrigger(botAI); }
@@ -141,6 +149,7 @@ private:
     static Trigger* polymorph(PlayerbotAI* botAI) { return new PolymorphTrigger(botAI); }
     static Trigger* spellsteal(PlayerbotAI* botAI) { return new SpellstealTrigger(botAI); }
     static Trigger* living_bomb(PlayerbotAI* botAI) { return new LivingBombTrigger(botAI); }
+    static Trigger* living_bomb_on_attackers(PlayerbotAI* botAI) { return new LivingBombOnAttackersTrigger(botAI); }
     static Trigger* missile_barrage(PlayerbotAI* botAI) { return new MissileBarrageTrigger(botAI); }
     static Trigger* arcane_blast(PlayerbotAI* botAI) { return new ArcaneBlastTrigger(botAI); }
     static Trigger* counterspell_enemy_healer(PlayerbotAI* botAI) { return new CounterspellEnemyHealerTrigger(botAI); }
@@ -150,6 +159,20 @@ private:
     static Trigger* frostbite_on_target(PlayerbotAI* botAI) { return new FrostbiteOnTargetTrigger(botAI); }
     static Trigger* no_focus_magic(PlayerbotAI* botAI) { return new NoFocusMagicTrigger(botAI); }
     static Trigger* frostfire_bolt(PlayerbotAI* botAI) { return new FrostfireBoltTrigger(botAI); }
+    static Trigger* improved_scorch(PlayerbotAI* botAI) { return new ImprovedScorchTrigger(botAI); }
+    static Trigger* firestarter(PlayerbotAI* botAI) { return new FirestarterTrigger(botAI); }
+    static Trigger* flamestrike_nearby(PlayerbotAI* botAI) { return new FlamestrikeNearbyTrigger(botAI); }
+    static Trigger* flamestrike_blizzard(PlayerbotAI* botAI) { return new FlamestrikeBlizzardTrigger(botAI); }
+    static Trigger* arcane_blast_4_stacks_and_missile_barrage(PlayerbotAI* botAI) { return new ArcaneBlast4StacksAndMissileBarrageTrigger(botAI); }
+    static Trigger* icy_veins_on_cd(PlayerbotAI* botAI) { return new IcyVeinsCooldownTrigger(botAI); }
+    static Trigger* deep_freeze_on_cd(PlayerbotAI* botAI) { return new DeepFreezeCooldownTrigger(botAI); }
+    static Trigger* NoManaGem(PlayerbotAI* botAI) { return new NoManaGemTrigger(botAI); }
+    static Trigger* blizzard_channel_check(PlayerbotAI* botAI) { return new BlizzardChannelCheckTrigger(botAI); }
+    static Trigger* blast_wave_off_cd(PlayerbotAI* botAI) { return new BlastWaveOffCdTrigger(botAI); }
+    static Trigger* blast_wave_off_cd_and_medium_aoe(PlayerbotAI* botAI) { return new BlastWaveOffCdTriggerAndMediumAoeTrigger(botAI); }
+    static Trigger* no_firestarter_strategy(PlayerbotAI* botAI) { return new NoFirestarterStrategyTrigger(botAI); }
+    static Trigger* enemy_is_close_and_no_firestarter_strategy(PlayerbotAI* botAI) { return new EnemyIsCloseAndNoFirestarterStrategyTrigger(botAI); }
+    static Trigger* enemy_too_close_for_spell_and_no_firestarter_strategy(PlayerbotAI* botAI) { return new EnemyTooCloseForSpellAndNoFirestarterStrategyTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
@@ -170,6 +193,7 @@ public:
         creators["arcane intellect on party"] = &MageAiObjectContextInternal::arcane_intellect_on_party;
         creators["conjure water"] = &MageAiObjectContextInternal::conjure_water;
         creators["conjure food"] = &MageAiObjectContextInternal::conjure_food;
+        creators["conjure mana gem"] = &MageAiObjectContextInternal::conjure_mana_gem;
         creators["molten armor"] = &MageAiObjectContextInternal::molten_armor;
         creators["mage armor"] = &MageAiObjectContextInternal::mage_armor;
         creators["ice armor"] = &MageAiObjectContextInternal::ice_armor;
@@ -207,6 +231,14 @@ public:
         creators["mirror image"] = &MageAiObjectContextInternal::mirror_image;
         creators["focus magic on party"] = &MageAiObjectContextInternal::focus_magic_on_party;
         creators["blink back"] = &MageAiObjectContextInternal::blink_back;
+        creators["use mana sapphire"] = &MageAiObjectContextInternal::use_mana_sapphire;
+        creators["use mana emerald"] = &MageAiObjectContextInternal::use_mana_emerald;
+        creators["use mana ruby"] = &MageAiObjectContextInternal::use_mana_ruby;
+        creators["use mana citrine"] = &MageAiObjectContextInternal::use_mana_citrine;
+        creators["use mana jade"] = &MageAiObjectContextInternal::use_mana_jade;
+        creators["use mana agate"] = &MageAiObjectContextInternal::use_mana_agate;
+        creators["cancel channel"] = &MageAiObjectContextInternal::cancel_channel;
+        creators["mana shield"] = &MageAiObjectContextInternal::mana_shield;
     }
 
 private:
@@ -228,6 +260,7 @@ private:
     static Action* arcane_intellect_on_party(PlayerbotAI* botAI) { return new CastArcaneIntellectOnPartyAction(botAI); }
     static Action* conjure_water(PlayerbotAI* botAI) { return new CastConjureWaterAction(botAI); }
     static Action* conjure_food(PlayerbotAI* botAI) { return new CastConjureFoodAction(botAI); }
+    static Action* conjure_mana_gem(PlayerbotAI* botAI) { return new CastConjureManaGemAction(botAI); }
     static Action* molten_armor(PlayerbotAI* botAI) { return new CastMoltenArmorAction(botAI); }
     static Action* mage_armor(PlayerbotAI* botAI) { return new CastMageArmorAction(botAI); }
     static Action* ice_armor(PlayerbotAI* botAI) { return new CastIceArmorAction(botAI); }
@@ -241,10 +274,7 @@ private:
     static Action* remove_curse(PlayerbotAI* botAI) { return new CastRemoveCurseAction(botAI); }
     static Action* remove_curse_on_party(PlayerbotAI* botAI) { return new CastRemoveCurseOnPartyAction(botAI); }
     static Action* remove_lesser_curse(PlayerbotAI* botAI) { return new CastRemoveLesserCurseAction(botAI); }
-    static Action* remove_lesser_curse_on_party(PlayerbotAI* botAI)
-    {
-        return new CastRemoveLesserCurseOnPartyAction(botAI);
-    }
+    static Action* remove_lesser_curse_on_party(PlayerbotAI* botAI) { return new CastRemoveLesserCurseOnPartyAction(botAI); }
     static Action* icy_veins(PlayerbotAI* botAI) { return new CastIcyVeinsAction(botAI); }
     static Action* cold_snap(PlayerbotAI* botAI) { return new CastColdSnapAction(botAI); }
     static Action* ice_barrier(PlayerbotAI* botAI) { return new CastIceBarrierAction(botAI); }
@@ -259,20 +289,59 @@ private:
     static Action* blast_wave(PlayerbotAI* botAI) { return new CastBlastWaveAction(botAI); }
     static Action* invisibility(PlayerbotAI* botAI) { return new CastInvisibilityAction(botAI); }
     static Action* evocation(PlayerbotAI* botAI) { return new CastEvocationAction(botAI); }
-    static Action* counterspell_on_enemy_healer(PlayerbotAI* botAI)
-    {
-        return new CastCounterspellOnEnemyHealerAction(botAI);
-    }
+    static Action* counterspell_on_enemy_healer(PlayerbotAI* botAI) { return new CastCounterspellOnEnemyHealerAction(botAI); }
     static Action* mirror_image(PlayerbotAI* botAI) { return new CastMirrorImageAction(botAI); }
     static Action* focus_magic_on_party(PlayerbotAI* botAI) { return new CastFocusMagicOnPartyAction(botAI); }
     static Action* blink_back(PlayerbotAI* botAI) { return new CastBlinkBackAction(botAI); }
+    static Action* use_mana_sapphire(PlayerbotAI* botAI) { return new UseManaSapphireAction(botAI); }
+    static Action* use_mana_emerald(PlayerbotAI* botAI) { return new UseManaEmeraldAction(botAI); }
+    static Action* use_mana_ruby(PlayerbotAI* botAI) { return new UseManaRubyAction(botAI); }
+    static Action* use_mana_citrine(PlayerbotAI* botAI) { return new UseManaCitrineAction(botAI); }
+    static Action* use_mana_jade(PlayerbotAI* botAI) { return new UseManaJadeAction(botAI); }
+    static Action* use_mana_agate(PlayerbotAI* botAI) { return new UseManaAgateAction(botAI); }
+    static Action* cancel_channel(PlayerbotAI* botAI) { return new CancelChannelAction(botAI); }
+    static Action* mana_shield(PlayerbotAI* botAI) { return new CastManaShieldAction(botAI); }
 };
 
-MageAiObjectContext::MageAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> MageAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> MageAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> MageAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> MageAiObjectContext::sharedValueContexts;
+
+MageAiObjectContext::MageAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void MageAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void MageAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new MageStrategyFactoryInternal());
     strategyContexts.Add(new MageCombatStrategyFactoryInternal());
     strategyContexts.Add(new MageBuffStrategyFactoryInternal());
+}
+
+void MageAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new MageAiObjectContextInternal());
+}
+
+void MageAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new MageTriggerFactoryInternal());
+}
+
+void MageAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }

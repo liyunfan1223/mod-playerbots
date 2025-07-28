@@ -175,8 +175,7 @@ public:
         creators["power word: shield on party"] = &PriestAiObjectContextInternal::power_word_shield_on_party;
         creators["power word: shield on almost full health below"] =
             &PriestAiObjectContextInternal::power_word_shield_on_almost_full_health_below;
-        creators["power word: shield on not full"] =
-            &PriestAiObjectContextInternal::power_word_shield_on_not_full;
+        creators["power word: shield on not full"] = &PriestAiObjectContextInternal::power_word_shield_on_not_full;
         creators["renew"] = &PriestAiObjectContextInternal::renew;
         creators["renew on party"] = &PriestAiObjectContextInternal::renew_on_party;
         creators["greater heal"] = &PriestAiObjectContextInternal::greater_heal;
@@ -289,10 +288,7 @@ private:
     {
         return new CastPowerWordShieldOnAlmostFullHealthBelowAction(ai);
     }
-    static Action* power_word_shield_on_not_full(PlayerbotAI* ai)
-    {
-        return new CastPowerWordShieldOnNotFullAction(ai);
-    }
+    static Action* power_word_shield_on_not_full(PlayerbotAI* ai) { return new CastPowerWordShieldOnNotFullAction(ai); }
     static Action* renew(PlayerbotAI* botAI) { return new CastRenewAction(botAI); }
     static Action* renew_on_party(PlayerbotAI* botAI) { return new CastRenewOnPartyAction(botAI); }
     static Action* greater_heal(PlayerbotAI* botAI) { return new CastGreaterHealAction(botAI); }
@@ -352,10 +348,44 @@ private:
     static Action* guardian_spirit_on_party(PlayerbotAI* ai) { return new CastGuardianSpiritOnPartyAction(ai); }
 };
 
-PriestAiObjectContext::PriestAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> PriestAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> PriestAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> PriestAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> PriestAiObjectContext::sharedValueContexts;
+
+PriestAiObjectContext::PriestAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void PriestAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void PriestAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new PriestStrategyFactoryInternal());
     strategyContexts.Add(new PriestCombatStrategyFactoryInternal());
+}
+
+void PriestAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new PriestAiObjectContextInternal());
+}
+
+void PriestAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new PriestTriggerFactoryInternal());
+}
+
+void PriestAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }

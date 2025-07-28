@@ -19,6 +19,8 @@
 #include <unordered_map>
 #include <mutex>
 
+const int ITEM_SOUL_SHARD = 6265;
+
 // Checks if the bot has less than 20 soul shards, and if so, allows casting Drain Soul
 bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 20; }
 
@@ -120,13 +122,11 @@ bool CreateSoulShardAction::Execute(Event event)
     if (!bot)
         return false;
 
-    // Soul Shard item ID is 6265
-    uint32 soulShardId = 6265;
     ItemPosCountVec dest;
     uint32 count = 1;
-    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, soulShardId, count) == EQUIP_ERR_OK)
+    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SOUL_SHARD, count) == EQUIP_ERR_OK)
     {
-        bot->StoreNewItem(dest, soulShardId, true, Item::GenerateItemRandomPropertyId(soulShardId));
+        bot->StoreNewItem(dest, ITEM_SOUL_SHARD, true, Item::GenerateItemRandomPropertyId(ITEM_SOUL_SHARD));
         SQLTransaction<CharacterDatabaseConnection> trans = CharacterDatabase.BeginTransaction();
         bot->SaveInventoryAndGoldToDB(trans);
         CharacterDatabase.CommitTransaction(trans);
@@ -142,17 +142,54 @@ bool CreateSoulShardAction::isUseful()
     if (!bot)
         return false;
 
-    uint32 soulShardId = 6265;
-    uint32 currentShards = bot->GetItemCount(soulShardId, false);  // false = only bags
+    uint32 currentShards = bot->GetItemCount(ITEM_SOUL_SHARD, false);  // false = only bags
     const uint32 SHARD_CAP = 6;                                    // adjust as needed
 
-    return currentShards < SHARD_CAP;
+    // Only allow if under cap AND there is space for a new shard
+    ItemPosCountVec dest;
+    uint32 count = 1;
+    bool hasSpace = (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SOUL_SHARD, count) == EQUIP_ERR_OK);
+
+    return (currentShards < SHARD_CAP) && hasSpace;
 }
 
+bool CastCreateSoulstoneAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+
+    // List of all Soulstone item IDs
+    static const std::vector<uint32> soulstoneIds = {
+        5232,   // Minor Soulstone
+        16892,  // Lesser Soulstone
+        16893,  // Soulstone
+        16895,  // Greater Soulstone
+        16896,  // Major Soulstone
+        22116,  // Master Soulstone
+        36895   // Demonic Soulstone
+    };
+
+    // Check if the bot already has any soulstone
+    for (uint32 id : soulstoneIds)
+    {
+        if (bot->GetItemCount(id, false) > 0)  
+            return false;                      // Already has a soulstone
+    }
+
+    // Only need to check one soulstone type for bag space (usually the highest-tier)
+    ItemPosCountVec dest;
+    uint32 count = 1;
+    // Use the last in the list (highest tier)
+    uint32 soulstoneToCreate = soulstoneIds.back();
+
+    bool hasSpace = (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, soulstoneToCreate, count) == EQUIP_ERR_OK);
+
+    return hasSpace;
+}
 
 bool DestroySoulShardAction::Execute(Event event)
 {
-    static const uint32 SOUL_SHARD_ID = 6265;
     // Look for the first soul shard in any bag and destroy it
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
     {
@@ -162,7 +199,7 @@ bool DestroySoulShardAction::Execute(Event event)
             {
                 if (Item* pItem = pBag->GetItemByPos(j))
                 {
-                    if (pItem->GetTemplate()->ItemId == SOUL_SHARD_ID)
+                    if (pItem->GetTemplate()->ItemId == ITEM_SOUL_SHARD)
                     {
                         bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                         return true;  // Only destroy one!
@@ -176,7 +213,7 @@ bool DestroySoulShardAction::Execute(Event event)
     {
         if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
-            if (pItem->GetTemplate()->ItemId == SOUL_SHARD_ID)
+            if (pItem->GetTemplate()->ItemId == ITEM_SOUL_SHARD)
             {
                 bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                 return true;

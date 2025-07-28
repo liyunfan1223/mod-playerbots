@@ -60,7 +60,6 @@ public:
 
     bool IsEmpty() { return !lastChangeTime; }
 
-public:
     uint32 value;
     uint32 lastChangeTime;
     uint32 validIn;
@@ -104,10 +103,6 @@ public:
     void LogPlayerLocation();
     void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
 
-private:
-    //void ScaleBotActivity();
-
-public:
     uint32 activeBots = 0;
     static bool HandlePlayerbotConsoleCommand(ChatHandler* handler, char const* args);
     bool IsRandomBot(Player* bot);
@@ -180,6 +175,8 @@ public:
     std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
     std::map<uint8, std::vector<WorldLocation>> allianceStarterPerLevelCache;
     std::map<uint8, std::vector<WorldLocation>> hordeStarterPerLevelCache;
+    std::vector<uint32> allianceFlightMasterCache;
+    std::vector<uint32> hordeFlightMasterCache;
     struct LevelBracket {
         uint32 low;
         uint32 high;
@@ -187,6 +184,11 @@ public:
     };
     std::map<uint32, LevelBracket> zone2LevelBracket;
     std::map<uint8, std::vector<WorldLocation>> bankerLocsPerLevelCache;
+
+    // Account type management
+    void AssignAccountTypes();
+    bool IsAccountType(uint32 accountId, uint8 accountType);
+
 protected:
     void OnBotLoginInternal(Player* const bot) override;
 
@@ -216,10 +218,8 @@ private:
     void RandomTeleport(Player* bot, std::vector<WorldLocation>& locs, bool hearth = false);
     uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
     typedef void (RandomPlayerbotMgr::*ConsoleCommandHandler)(Player*);
-
     std::vector<Player*> players;
     uint32 processTicks;
-    
 
     // std::map<uint32, std::vector<WorldLocation>> rpgLocsCache;
     std::map<uint32, std::map<uint32, std::vector<WorldLocation>>> rpgLocsCacheLevel;
@@ -228,6 +228,12 @@ private:
     std::list<uint32> currentBots;
     uint32 bgBotsCount;
     uint32 playersLevel;
+
+    // Account lists
+    std::vector<uint32> rndBotTypeAccounts;             // Accounts marked as RNDbot (type 1)
+    std::vector<uint32> addClassTypeAccounts;           // Accounts marked as AddClass (type 2)
+
+    //void ScaleBotActivity();      // Deprecated function
 };
 
 #define sRandomPlayerbotMgr RandomPlayerbotMgr::instance()

@@ -53,6 +53,9 @@ BotCheatMask CheatAction::GetCheatMask(std::string const cheat)
     if (cheat == "power")
         return BotCheatMask::power;
 
+    if (cheat == "raid")
+        return BotCheatMask::raid;
+
     return BotCheatMask::none;
 }
 
@@ -70,6 +73,8 @@ std::string const CheatAction::GetCheatName(BotCheatMask cheatMask)
             return "mana";
         case BotCheatMask::power:
             return "power";
+        case BotCheatMask::raid:
+            return "raid";
         default:
             return "none";
     }
