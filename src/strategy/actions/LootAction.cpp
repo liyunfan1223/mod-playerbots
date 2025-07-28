@@ -17,7 +17,6 @@
 #include "ServerFacade.h"
 #include "GuildMgr.h"
 #include "BroadcastHelper.h"
-#include "UseItemAction.h"
 
 bool LootAction::Execute(Event /*event*/)
 {   
