@@ -4150,6 +4150,10 @@ bool ArenaTactics::Execute(Event event)
     if (bot->isDead())
         return false;
 
+    if (bot->isMoving())
+        return false;
+
+    // startup phase
     if (bg->GetStartDelayTime() > 0)
         return false;
 
@@ -4177,7 +4181,7 @@ bool ArenaTactics::Execute(Event event)
 
                 float x, y, z;
                 target->GetPosition(x, y, z);
-                botAI->TellMasterNoFacing("Repositioning to regain LoS");
+                botAI->TellMasterNoFacing("Repositioning to exit the LoS target!");
                 return MoveTo(target->GetMapId(), x + frand(-1, +1), y + frand(-1, +1), z, false, true);
             }
         }
