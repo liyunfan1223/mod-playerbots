@@ -37,4 +37,12 @@ public:
     bool Execute(Event event) override;
 };
 
+class RollAction : public Action
+{
+public:
+    RollAction(PlayerbotAI* botAI) : Action(botAI, "roll") {}
+
+    bool Execute(Event event) override;
+};
+
 #endif
