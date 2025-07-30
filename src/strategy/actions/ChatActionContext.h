@@ -36,6 +36,7 @@
 #include "ListSpellsAction.h"
 #include "LogLevelAction.h"
 #include "LootStrategyAction.h"
+#include "LootRollAction.h"
 #include "MailAction.h"
 #include "NamedObjectContext.h"
 #include "NewRpgAction.h"
@@ -193,6 +194,7 @@ public:
         creators["pet"] = &ChatActionContext::pet;
 		creators["glyphs"] = &ChatActionContext::glyphs; // Added for custom Glyphs
 		creators["glyph equip"] = &ChatActionContext::glyph_equip; // Added for custom Glyphs
+        creators["roll"] = &ChatActionContext::roll_action;
     }
 
 private:
@@ -258,6 +260,7 @@ private:
     static Action* buy(PlayerbotAI* botAI) { return new BuyAction(botAI); }
     static Action* reward(PlayerbotAI* botAI) { return new RewardAction(botAI); }
     static Action* trade(PlayerbotAI* botAI) { return new TradeAction(botAI); }
+    static Action* roll_action(PlayerbotAI* botAI) { return new RollAction(botAI); }
 
     static Action* item_count(PlayerbotAI* botAI) { return new TellItemCountAction(botAI); }
     static Action* use(PlayerbotAI* botAI) { return new UseItemAction(botAI); }
