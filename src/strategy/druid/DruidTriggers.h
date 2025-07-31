@@ -12,6 +12,8 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "SharedDefines.h"
+#include "Trigger.h"
+#include <set>
 
 class PlayerbotAI;
 
@@ -261,6 +263,21 @@ public:
 
         return true;
     }
+};
+
+class HurricaneChannelCheckTrigger : public Trigger
+{
+public:
+    HurricaneChannelCheckTrigger(PlayerbotAI* botAI, uint32 minEnemies = 2)
+        : Trigger(botAI, "hurricane channel check"), minEnemies(minEnemies)
+    {
+    }
+
+    bool IsActive() override;
+
+protected:
+    uint32 minEnemies;
+    static const std::set<uint32> HURRICANE_SPELL_IDS;
 };
 
 #endif

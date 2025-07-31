@@ -63,6 +63,7 @@
 #include "WorldBuffAction.h"
 #include "XpGainAction.h"
 #include "NewRpgAction.h"
+#include "CancelChannelAction.h"
 
 class PlayerbotAI;
 
@@ -189,6 +190,7 @@ public:
         creators["buy tabard"] = &ActionContext::buy_tabard;
         creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
         creators["clean quest log"] = &ActionContext::clean_quest_log;
+        creators["cancel channel"] = &ActionContext::cancel_channel;
 
         // BG Tactics
         creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -298,6 +300,7 @@ private:
     static Action* arcane_torrent(PlayerbotAI* botAI) { return new CastArcaneTorrentAction(botAI); }
     static Action* mana_tap(PlayerbotAI* botAI) { return new CastManaTapAction(botAI); }
     static Action* end_pull(PlayerbotAI* botAI) { return new ChangeCombatStrategyAction(botAI, "-pull"); }
+    static Action* cancel_channel(PlayerbotAI* botAI) { return new CancelChannelAction(botAI); }
 
     static Action* emote(PlayerbotAI* botAI) { return new EmoteAction(botAI); }
     static Action* talk(PlayerbotAI* botAI) { return new TalkAction(botAI); }

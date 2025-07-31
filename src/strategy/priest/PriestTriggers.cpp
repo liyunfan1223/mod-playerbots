@@ -4,7 +4,8 @@
  */
 
 #include "PriestTriggers.h"
-
+#include "PlayerbotAI.h"
+#include "Player.h"
 #include "Playerbots.h"
 
 bool PowerWordFortitudeOnPartyTrigger::IsActive()
@@ -75,4 +76,28 @@ bool BindingHealTrigger::IsActive()
 {
     return PartyMemberLowHealthTrigger::IsActive() &&
            AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->mediumHealth;
+}
+
+const std::set<uint32> MindSearChannelCheckTrigger::MIND_SEAR_SPELL_IDS = {
+    48045,  // Mind Sear Rank 1
+    53023   // Mind Sear Rank 2
+};
+
+bool MindSearChannelCheckTrigger::IsActive()
+{
+    Player* bot = botAI->GetBot();
+
+    // Check if the bot is channeling a spell
+    if (Spell* spell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+    {
+        // Only trigger if the spell being channeled is Mind Sear
+        if (MIND_SEAR_SPELL_IDS.count(spell->m_spellInfo->Id))
+        {
+            uint8 attackerCount = AI_VALUE(uint8, "attacker count");
+            return attackerCount < minEnemies;
+        }
+    }
+
+    // Not channeling Mind Sear
+    return false;
 }
