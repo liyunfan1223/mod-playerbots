@@ -105,6 +105,7 @@ public:
         creators["silence"] = &PriestTriggerFactoryInternal::silence;
         creators["silence on enemy healer"] = &PriestTriggerFactoryInternal::silence_on_enemy_healer;
         creators["shadowfiend"] = &PriestTriggerFactoryInternal::shadowfiend;
+        creators["mind sear channel check"] = &PriestTriggerFactoryInternal::mind_sear_channel_check;
     }
 
 private:
@@ -148,6 +149,7 @@ private:
     static Trigger* silence(PlayerbotAI* botAI) { return new SilenceTrigger(botAI); }
     static Trigger* chastise(PlayerbotAI* botAI) { return new ChastiseTrigger(botAI); }
     static Trigger* binding_heal(PlayerbotAI* botAI) { return new BindingHealTrigger(botAI); }
+    static Trigger* mind_sear_channel_check(PlayerbotAI* botAI) { return new MindSearChannelCheckTrigger(botAI); }
 };
 
 class PriestAiObjectContextInternal : public NamedObjectContext<Action>
