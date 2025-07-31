@@ -65,6 +65,8 @@ public:
         creators["vezax cheat action"] = &RaidUlduarActionContext::vezax_cheat_action;
         creators["vezax shadow crash action"] = &RaidUlduarActionContext::vezax_shadow_crash_action;
         creators["vezax mark of the faceless action"] = &RaidUlduarActionContext::vezax_mark_of_the_faceless_action;
+        creators["yogg-saron ominous cloud cheat action"] = &RaidUlduarActionContext::yogg_saron_ominous_cloud_cheat_action;
+        creators["yogg-saron guardian positioning action"] = &RaidUlduarActionContext::yogg_saron_guardian_positioning_action;
     }
 
 private:
@@ -117,6 +119,8 @@ private:
     static Action* vezax_cheat_action(PlayerbotAI* ai) { return new VezaxCheatAction(ai); }
     static Action* vezax_shadow_crash_action(PlayerbotAI* ai) { return new VezaxShadowCrashAction(ai); }
     static Action* vezax_mark_of_the_faceless_action(PlayerbotAI* ai) { return new VezaxMarkOfTheFacelessAction(ai); }
+    static Action* yogg_saron_ominous_cloud_cheat_action(PlayerbotAI* ai) { return new YoggSaronOminousCloudCheatAction(ai); }
+    static Action* yogg_saron_guardian_positioning_action(PlayerbotAI* ai) { return new YoggSaronGuardianPositioningAction(ai); }
 };
 
 #endif

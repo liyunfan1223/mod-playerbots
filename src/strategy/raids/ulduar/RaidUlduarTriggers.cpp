@@ -12,6 +12,7 @@
 #include "Trigger.h"
 #include "Vehicle.h"
 #include <MovementActions.h>
+#include <RaidTriggers.h>
 
 const std::vector<uint32> availableVehicles = {NPC_VEHICLE_CHOPPER, NPC_SALVAGED_DEMOLISHER,
                                                NPC_SALVAGED_DEMOLISHER_TURRET, NPC_SALVAGED_SIEGE_ENGINE,
@@ -745,7 +746,7 @@ bool ThorimUnbalancingStrikeTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "thorim");
 
     // Check boss and it is alive
-    if (!boss || !boss->IsAlive())
+    if (!boss || !boss->IsAlive() || !boss->IsHostileTo(bot))
         return false;
 
     return bot->HasAura(SPELL_UNBALANCING_STRIKE);
@@ -783,7 +784,7 @@ bool ThorimMarkDpsTargetTrigger::IsActive()
         Unit* boss = AI_VALUE2(Unit*, "find target", "thorim");
 
         // Check boss and it is alive
-        if (!boss || !boss->IsAlive())
+        if (!boss || !boss->IsAlive() || !boss->IsHostileTo(bot))
             return false;
 
 
@@ -963,7 +964,7 @@ bool ThorimArenaPositioningTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "thorim");
 
     // Check boss and it is alive
-    if (!boss || !boss->IsAlive())
+    if (!boss || !boss->IsAlive() || !boss->IsHostileTo(bot))
         return false;
 
     if (boss->GetPositionZ() < ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD)
@@ -1061,7 +1062,7 @@ bool ThorimPhase2PositioningTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "thorim");
 
     // Check boss and it is alive
-    if (!boss || !boss->IsAlive())
+    if (!boss || !boss->IsAlive() || !boss->IsHostileTo(bot))
         return false;
 
     if (boss->GetPositionZ() > ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD)
@@ -1618,4 +1619,72 @@ bool VezaxMarkOfTheFacelessTrigger::IsActive()
                                         ULDUAR_VEZAX_MARK_OF_THE_FACELESS_SPOT.GetPositionY());
 
     return distance > 2.0f;
+}
+
+bool YoggSaronOminousCloudCheatTrigger::IsActive()
+{
+    if (!botAI->HasCheat(BotCheatMask::raid))
+    {
+        return false;
+    }
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sara");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    IsBotMainTankTrigger isBotMainTankTrigger(botAI);
+    if (!isBotMainTankTrigger.IsActive())
+    {
+        return false;
+    }
+
+    Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 25.0f, true);
+
+    return target;
+}
+
+bool YoggSaronGuardianPositioningTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "sara");
+
+    // Check boss and it is alive
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
+
+    if (!botAI->IsTank(bot))
+    {
+        return false;
+    }
+
+    GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
+    bool thereIsAnyGuardian = false;
+
+    for (const ObjectGuid& guid : targets)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit || !unit->IsAlive())
+        {
+            continue;
+        }
+
+        if (unit->GetEntry() == NPC_GUARDIAN_OF_YS)
+        {
+            thereIsAnyGuardian = true;
+            ObjectGuid unitTargetGuid = unit->GetTarget();
+            Player* targetedPlayer = botAI->GetPlayer(unitTargetGuid);
+            if (!targetedPlayer || !botAI->IsTank(targetedPlayer))
+            {
+                return false;
+            }
+        }
+    }
+
+    return thereIsAnyGuardian &&
+           bot->GetDistance2d(ULDUAR_YOGG_SARON_MIDDLE.GetPositionX(), ULDUAR_YOGG_SARON_MIDDLE.GetPositionY()) > 1.0f;
 }

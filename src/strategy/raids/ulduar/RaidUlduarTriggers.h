@@ -44,7 +44,7 @@ enum UlduarIDs
     NPC_EONARS_GIFT = 33228,
     GOBJECT_NATURE_BOMB = 194902,
 
-    //Thorim
+    // Thorim
     NPC_DARK_RUNE_ACOLYTE_I = 32886,
     NPC_CAPTURED_MERCENARY_SOLDIER_ALLY = 32885,
     NPC_CAPTURED_MERCENARY_SOLDIER_HORDE = 32883,
@@ -62,7 +62,7 @@ enum UlduarIDs
     NPC_IRON_HONOR_GUARD = 32875,
     SPELL_UNBALANCING_STRIKE = 62130,
 
-    //Mimiron
+    // Mimiron
     NPC_LEVIATHAN_MKII = 33432,
     NPC_VX001 = 33651,
     NPC_AERIAL_COMMAND_UNIT = 33670,
@@ -78,9 +78,13 @@ enum UlduarIDs
     SPELL_P3WX2_LASER_BARRAGE_AURA_1 = 63274,
     SPELL_P3WX2_LASER_BARRAGE_AURA_2 = 63300,
 
-    //General Vezax
+    // General Vezax
     SPELL_MARK_OF_THE_FACELESS = 63276,
     SPELL_SHADOW_CRASH = 63277,
+
+    // Yogg-Saron
+    NPC_GUARDIAN_OF_YS = 33136,
+    NPC_OMINOUS_CLOUD = 33292,
     
     // Buffs
     SPELL_FROST_TRAP = 13809
@@ -123,6 +127,7 @@ const Position ULDUAR_MIMIRON_PHASE2_SIDE3RANGE_SPOT = Position(2754.1294f, 2553
 const Position ULDUAR_MIMIRON_PHASE2_SIDE3MELEE_SPOT = Position(2746.8513f, 2565.4263f, 364.31357f);
 const Position ULDUAR_MIMIRON_PHASE4_TANK_SPOT = Position(2744.5754f, 2570.8657f, 364.3138f);
 const Position ULDUAR_VEZAX_MARK_OF_THE_FACELESS_SPOT = Position(1913.6501f, 122.93989f, 342.38083f);
+const Position ULDUAR_YOGG_SARON_MIDDLE = Position(1980.28f, -25.5868f, 329.397f);
 
 //
 // Flame Levi
@@ -445,6 +450,23 @@ class VezaxMarkOfTheFacelessTrigger : public Trigger
 {
 public:
     VezaxMarkOfTheFacelessTrigger(PlayerbotAI* ai) : Trigger(ai, "vezax mark of the faceless trigger") {}
+    bool IsActive() override;
+};
+
+//
+// Yogg-Saron
+//
+class YoggSaronOminousCloudCheatTrigger : public Trigger
+{
+public:
+    YoggSaronOminousCloudCheatTrigger(PlayerbotAI* ai) : Trigger(ai, "yogg-saron ominous cloud cheat trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronGuardianPositioningTrigger : public Trigger
+{
+public:
+    YoggSaronGuardianPositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "yogg-saron guardian positioning trigger") {}
     bool IsActive() override;
 };
 

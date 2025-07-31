@@ -248,6 +248,15 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // Phase 1
     // yogg-saron avoid floating clouds (NPC_OMINOUS_CLOU = 33292)
     //
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron ominous cloud cheat trigger",
+        NextAction::array(0, new NextAction("yogg-saron ominous cloud cheat action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron guardian positioning trigger",
+        NextAction::array(0, new NextAction("yogg-saron guardian positioning action", ACTION_RAID), nullptr)));
+
     // Phase 2
     // yogg-saron restore sanity (NPC_SANITY_WELL = 33991)
     // yogg-saron enter boss room portal (few seconds before SPELL_INDUCE_MADNESS = 64059 end)
@@ -256,7 +265,7 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // yogg-saron brain link (stay at least 20 yards near other linked player SPELL_BRAIN_LINK = 63802 SPELL_BRAIN_LINK_DAMAGE = 63803 SPELL_BRAIN_LINK_OK = 63804)
     // yogg-saron cheat (brain room sanity reset since skulls?)
     // yogg-saron mark dps target (NPC_CONSTRICTOR_TENTACLE = 33983)
-    //
+    
     // Phase 3
     // yogg-saron lunatic gaze (dont look at boss SPELL_LUNATIC_GAZE_YS = 64163)
 }
