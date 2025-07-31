@@ -231,6 +231,7 @@ bool RollAction::Execute(Event event)
     
     if (link.empty())
     {
+        bot->DoRandomRoll(0,100);
         return false;
     }
     ItemIds itemIds = chat->parseItems(link);
