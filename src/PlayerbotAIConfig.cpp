@@ -190,6 +190,15 @@ bool PlayerbotAIConfig::Initialize()
         sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotsPriceChangeInterval", 48 * HOUR);
     randomBotJoinLfg = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotJoinLfg", true);
 
+    restrictHealerDPS = sConfigMgr->GetOption<bool>("AiPlayerbot.HealerDPSMapRestriction", false);
+    LoadList<std::vector<uint32>>(
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.RestrictedHealerDPSMaps",
+                                             "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,"
+                                             "1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,"
+                                             "575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,"
+                                             "531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"),
+        restrictedHealerDPSMaps);
+	
 	//////////////////////////// ICC
 
 	EnableICCBuffs = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableICCBuffs", true);
@@ -651,6 +660,12 @@ bool PlayerbotAIConfig::IsInPvpProhibitedZone(uint32 id)
 bool PlayerbotAIConfig::IsInPvpProhibitedArea(uint32 id)
 {
     return find(pvpProhibitedAreaIds.begin(), pvpProhibitedAreaIds.end(), id) != pvpProhibitedAreaIds.end();
+}
+
+bool PlayerbotAIConfig::IsRestrictedHealerDPSMap(uint32 mapId) const
+{
+    return restrictHealerDPS &&
+            std::find(restrictedHealerDPSMaps.begin(), restrictedHealerDPSMaps.end(), mapId) != restrictedHealerDPSMaps.end();
 }
 
 std::string const PlayerbotAIConfig::GetTimestampStr()

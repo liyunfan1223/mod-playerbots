@@ -401,6 +401,7 @@ public:
     void ClearStrategies(BotState type);
     std::vector<std::string> GetStrategies(BotState type);
     void ApplyInstanceStrategies(uint32 mapId, bool tellMaster = false);
+    void EvaluateHealerDpsStrategy();
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(std::string const name, BotState type);
     BotState GetState() { return currentState; };
