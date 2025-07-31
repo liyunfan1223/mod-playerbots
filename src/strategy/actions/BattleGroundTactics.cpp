@@ -26,6 +26,7 @@
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "PvpTriggers.h"
+#include "PathGenerator.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
 
@@ -4152,7 +4153,6 @@ bool ArenaTactics::Execute(Event event)
     if (bot->isMoving())
         return false;
 
-
     // startup phase
     if (bg->GetStartDelayTime() > 0)
         return false;
@@ -4163,12 +4163,29 @@ bool ArenaTactics::Execute(Event event)
     if (botAI->HasStrategy("buff", BOT_STATE_NON_COMBAT))
         botAI->ChangeStrategy("-buff", BOT_STATE_NON_COMBAT);
 
-    // this causes bot to reset constantly in arena
-    //    if (sBattlegroundMgr->IsArenaType(bg->GetBgTypeID()))
-    //    {
-    //        botAI->ResetStrategies(false);
-    //        botAI->SetMaster(nullptr);
-    //    }
+    Unit* target = bot->GetVictim();
+    if (target)
+    {
+        bool losBlocked = !bot->IsWithinLOSInMap(target) || fabs(bot->GetPositionZ() - target->GetPositionZ()) > 5.0f;
+
+        if (losBlocked)
+        {
+            PathGenerator path(bot);
+            path.CalculatePath(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), false);
+
+            if (path.GetPathType() != PATHFIND_NOPATH)
+            {
+                // If you are casting a spell and lost your target due to LoS, interrupt the cast and move
+                if (bot->IsNonMeleeSpellCast(false, true, true, false, true))
+                    bot->InterruptNonMeleeSpells(true);
+
+                float x, y, z;
+                target->GetPosition(x, y, z);
+                botAI->TellMasterNoFacing("Repositioning to exit the LoS target!");
+                return MoveTo(target->GetMapId(), x + frand(-1, +1), y + frand(-1, +1), z, false, true);
+            }
+        }
+    }
 
     if (!bot->IsInCombat())
         return moveToCenter(bg);
