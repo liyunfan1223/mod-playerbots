@@ -224,3 +224,37 @@ bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
     }
     return false; // Item is not equipped or in bags, roll for it
 }
+
+bool RollAction::Execute(Event event)
+{
+    std::string link = event.getParam();
+    
+    if (link.empty())
+    {
+        bot->DoRandomRoll(0,100);
+        return false;
+    }
+    ItemIds itemIds = chat->parseItems(link);
+    if (itemIds.empty())
+        return false;
+    uint32 itemId = *itemIds.begin();
+    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+    if (!proto)
+    {
+        return false;
+    }
+    std::string itemUsageParam;
+    itemUsageParam = std::to_string(itemId);
+        
+    ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
+    switch (proto->Class)
+    {
+        case ITEM_CLASS_WEAPON:
+        case ITEM_CLASS_ARMOR:
+        if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
+        {
+            bot->DoRandomRoll(0,100);
+        }
+    }
+    return true;
+}
