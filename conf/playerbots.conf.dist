@@ -667,7 +667,7 @@ AiPlayerbot.IncrementalGearInit = 1
 AiPlayerbot.MinEnchantingBotLevel = 60
 
 # Enable expansion limitation for bot enchants
-# If enabled, bots will not use TBC enchants until level 61 or WotLK enchanges until level 71
+# If enabled, bots will not use TBC enchants until level 61 or WotLK enchants until level 71
 # Default: 1 (enabled)
 AiPlayerbot.LimitEnchantExpansion = 1
 
