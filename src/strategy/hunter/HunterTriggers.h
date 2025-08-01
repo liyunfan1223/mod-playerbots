@@ -10,6 +10,7 @@
 #include "GenericTriggers.h"
 #include "Trigger.h"
 #include "PlayerbotAI.h"
+#include <set>
 
 class PlayerbotAI;
 
@@ -243,5 +244,20 @@ END_TRIGGER()
 
 BEGIN_TRIGGER(HunterPetNotHappy, Trigger)
 END_TRIGGER()
+
+class VolleyChannelCheckTrigger : public Trigger
+{
+public:
+    VolleyChannelCheckTrigger(PlayerbotAI* botAI, uint32 minEnemies = 2)
+        : Trigger(botAI, "volley channel check"), minEnemies(minEnemies)
+    {
+    }
+
+    bool IsActive() override;
+
+protected:
+    uint32 minEnemies;
+    static const std::set<uint32> VOLLEY_SPELL_IDS;
+};
 
 #endif

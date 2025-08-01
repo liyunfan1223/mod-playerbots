@@ -404,12 +404,4 @@ public:
     bool isUseful() override;
 };
 
-class CancelChannelAction : public Action
-{
-public:
-    CancelChannelAction(PlayerbotAI* botAI) : Action(botAI, "cancel channel") {}
-
-    bool Execute(Event event) override;
-};
-
 #endif

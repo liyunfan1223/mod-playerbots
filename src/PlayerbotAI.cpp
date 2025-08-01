@@ -722,6 +722,7 @@ void PlayerbotAI::HandleTeleportAck()
         // SetNextCheckDelay(urand(2000, 5000));
         if (sPlayerbotAIConfig->applyInstanceStrategies)
             ApplyInstanceStrategies(bot->GetMapId(), true);
+        EvaluateHealerDpsStrategy();
         Reset(true);
     }
 
@@ -6406,4 +6407,15 @@ void PlayerbotAI::AddTimedEvent(std::function<void()> callback, uint32 delayMs)
 
     // Every Player already owns an EventMap called m_Events
     bot->m_Events.AddEvent(new LambdaEvent(std::move(callback)), bot->m_Events.CalculateTime(delayMs));
+}
+
+void PlayerbotAI::EvaluateHealerDpsStrategy()
+{
+    if (!IsHeal(bot, true))
+        return;
+
+    if (sPlayerbotAIConfig->IsRestrictedHealerDPSMap(bot->GetMapId()))
+        ChangeStrategy("-healer dps", BOT_STATE_COMBAT);
+    else
+        ChangeStrategy("+healer dps", BOT_STATE_COMBAT);
 }

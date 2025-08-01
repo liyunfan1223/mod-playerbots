@@ -54,4 +54,18 @@ private:
     std::string bossName;
 };
 
+class BossShadowResistanceAction : public Action
+{
+public:
+    BossShadowResistanceAction(PlayerbotAI* botAI, std::string const bossName)
+        : Action(botAI, bossName + " shadow resistance action"), bossName(bossName)
+    {
+    }
+    bool Execute(Event event) override;
+    bool isUseful() override;
+
+private:
+    std::string bossName;
+};
+
 #endif
