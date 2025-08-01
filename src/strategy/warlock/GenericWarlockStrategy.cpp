@@ -58,6 +58,9 @@ void AoEWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                                  new NextAction("seed of corruption on attacker", 22.0f),
                                                  new NextAction("seed of corruption", 21.5f),
                                                  new NextAction("rain of fire", 21.0f), nullptr)));
+
+    triggers.push_back(
+        new TriggerNode("rain of fire channel check", NextAction::array(0, new NextAction("cancel channel", 21.5f), nullptr)));
 }
 
 void WarlockBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

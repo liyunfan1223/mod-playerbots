@@ -237,7 +237,6 @@ public:
         creators["use mana citrine"] = &MageAiObjectContextInternal::use_mana_citrine;
         creators["use mana jade"] = &MageAiObjectContextInternal::use_mana_jade;
         creators["use mana agate"] = &MageAiObjectContextInternal::use_mana_agate;
-        creators["cancel channel"] = &MageAiObjectContextInternal::cancel_channel;
         creators["mana shield"] = &MageAiObjectContextInternal::mana_shield;
     }
 
@@ -299,7 +298,6 @@ private:
     static Action* use_mana_citrine(PlayerbotAI* botAI) { return new UseManaCitrineAction(botAI); }
     static Action* use_mana_jade(PlayerbotAI* botAI) { return new UseManaJadeAction(botAI); }
     static Action* use_mana_agate(PlayerbotAI* botAI) { return new UseManaAgateAction(botAI); }
-    static Action* cancel_channel(PlayerbotAI* botAI) { return new CancelChannelAction(botAI); }
     static Action* mana_shield(PlayerbotAI* botAI) { return new CastManaShieldAction(botAI); }
 };
 
