@@ -38,6 +38,7 @@
 #include "InviteToGroupAction.h"
 #include "LeaveGroupAction.h"
 #include "LootAction.h"
+#include "LootRollAction.h"
 #include "MoveToRpgTargetAction.h"
 #include "MoveToTravelTargetAction.h"
 #include "MovementActions.h"
@@ -195,6 +196,7 @@ public:
         creators["go fishing"] = &ActionContext::fishing_action;
         creators["use fishing bobber"] = &ActionContext::use_fishing_bobber;
         creators["end fishing"] = &ActionContext::end_fishing;
+        creators["roll"] = &ActionContext::roll_action;
         creators["cancel channel"] = &ActionContext::cancel_channel;
 
         // BG Tactics
@@ -386,6 +388,7 @@ private:
     static Action* fishing_action(PlayerbotAI* botAI) { return new FishingAction(botAI);}
     static Action* use_fishing_bobber(PlayerbotAI* botAI) { return new UseBobber(botAI);}
     static Action* end_fishing(PlayerbotAI* botAI) { return new EndFishing(botAI); }
+    static Action* roll_action(PlayerbotAI* botAI) { return new RollAction(botAI); }
 
     // BG Tactics
     static Action* bg_tactics(PlayerbotAI* botAI) { return new BGTactics(botAI); }

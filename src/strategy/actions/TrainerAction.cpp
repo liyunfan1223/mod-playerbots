@@ -175,6 +175,8 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitAmmo();
     factory.InitFood();
     factory.InitReagents();
+    factory.InitConsumables();
+    factory.InitPotions();
     factory.InitTalentsTree(true);
     factory.InitPet();
     factory.InitPetTalents();
@@ -186,7 +188,6 @@ bool MaintenanceAction::Execute(Event event)
     factory.InitMounts();
     factory.InitGlyphs(false);
     factory.InitKeyring();
-    factory.InitPotions();
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
         factory.ApplyEnchantAndGemsNew();
 
