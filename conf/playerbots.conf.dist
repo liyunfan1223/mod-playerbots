@@ -667,7 +667,7 @@ AiPlayerbot.IncrementalGearInit = 1
 AiPlayerbot.MinEnchantingBotLevel = 60
 
 # Enable expansion limitation for bot enchants
-# If enabled, bots will not use TBC enchants until level 61 or WotLK enchanges until level 71
+# If enabled, bots will not use TBC enchants until level 61 or WotLK enchants until level 71
 # Default: 1 (enabled)
 AiPlayerbot.LimitEnchantExpansion = 1
 
@@ -698,6 +698,10 @@ AiPlayerbot.AutoUpgradeEquip = 1
 # Only set wolf pets for hunters for optimal raid performance (0 = disabled, 1 = enabled only for max-level bots, 2 = enabled)
 # Default: 0 (disabled)
 AiPlayerbot.HunterWolfPet = 0
+
+# Prohibit hunter bots from creating pets with any family ID listed below in ExcludedHunterPetFamilies
+# See the creature_family database table for all pet families by ID (note: ID for spiders is 3)
+AiPlayerbot.ExcludedHunterPetFamilies = ""
 
 #
 #

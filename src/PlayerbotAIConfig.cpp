@@ -630,6 +630,9 @@ bool PlayerbotAIConfig::Initialize()
         sPlayerbotDungeonSuggestionMgr->LoadDungeonSuggestions();
     }
 
+    excludedHunterPetFamilies.clear();
+    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.ExcludedHunterPetFamilies", ""), excludedHunterPetFamilies);
+
     LOG_INFO("server.loading", "---------------------------------------");
     LOG_INFO("server.loading", "        AI Playerbots initialized       ");
     LOG_INFO("server.loading", "---------------------------------------");
