@@ -153,6 +153,8 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
     triggers.push_back(
         new TriggerNode("party member remove curse",
                         NextAction::array(0, new NextAction("remove curse on party", ACTION_DISPEL + 7), nullptr)));
+    triggers.push_back(
+        new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 60.0f), nullptr)));
 }
 
 GenericDruidBuffStrategy::GenericDruidBuffStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI)
