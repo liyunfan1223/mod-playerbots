@@ -828,6 +828,7 @@ void PlayerbotFactory::InitPet()
         std::vector<uint32> ids;
 
         CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
+
         for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
         {
             if (!itr->second.IsTameable(bot->CanTameExoticPets()))
@@ -841,6 +842,12 @@ void PlayerbotFactory::InitPet()
                              bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
             // Wolf only (for higher dps)
             if (onlyWolf && itr->second.family != CREATURE_FAMILY_WOLF)
+                continue;
+
+            // Exclude configured pet families
+            if (std::find(sPlayerbotAIConfig->excludedHunterPetFamilies.begin(),
+                          sPlayerbotAIConfig->excludedHunterPetFamilies.end(),
+                          itr->second.family) != sPlayerbotAIConfig->excludedHunterPetFamilies.end())
                 continue;
 
             ids.push_back(itr->first);

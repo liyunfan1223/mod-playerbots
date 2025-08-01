@@ -699,6 +699,10 @@ AiPlayerbot.AutoUpgradeEquip = 1
 # Default: 0 (disabled)
 AiPlayerbot.HunterWolfPet = 0
 
+# Prohibit hunter bots from creating pets with any family ID listed below in ExcludedHunterPetFamilies
+# See the creature_family database table for all pet families by ID (note: ID for spiders is 3)
+AiPlayerbot.ExcludedHunterPetFamilies = ""
+
 #
 #
 #
