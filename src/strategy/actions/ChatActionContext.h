@@ -193,8 +193,8 @@ public:
         creators["calc"] = &ChatActionContext::calc;
         creators["wipe"] = &ChatActionContext::wipe;
         creators["tame"] = &ChatActionContext::tame;
-	    creators["glyphs"] = &ChatActionContext::glyphs; // Added for custom Glyphs
-		creators["glyph equip"] = &ChatActionContext::glyph_equip; // Added for custom Glyphs
+		    creators["glyphs"] = &ChatActionContext::glyphs; // Added for custom Glyphs
+		    creators["glyph equip"] = &ChatActionContext::glyph_equip; // Added for custom Glyphs
         creators["pet"] = &ChatActionContext::pet;
         creators["pet attack"] = &ChatActionContext::pet_attack;
         creators["roll"] = &ChatActionContext::roll_action;
