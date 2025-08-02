@@ -227,10 +227,10 @@ public:
             Player* leader = group->GetLeader();
             if (leader != player)
             {
-                if (!player->GetSession()->IsBot())
+                if (!leader->GetSession()->IsBot())
                     return;
         
-                if (!sRandomPlayerbotMgr->IsRandomBot(player))
+                if (!sRandomPlayerbotMgr->IsRandomBot(leader))
                     return;
             }
         }
