@@ -209,16 +209,34 @@ public:
 
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
+        // when default no XP scaling.
+        if (sPlayerbotAIConfig->randomBotXPRate == 1.0)
+            return;
+
+        // when player is no bot.
         if (!player->GetSession()->IsBot())
             return;
-        
+
+        // when player is no bot, double check.
         if (!sRandomPlayerbotMgr->IsRandomBot(player))
             return;
 
-        if (sPlayerbotAIConfig->randomBotXPRate != 1.0)
+        // when bot has group where leader is a real player.
+        if (Group* group = player->GetGroup())
         {
-            amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
+            Player* leader = group->GetLeader();
+            if (leader != player)
+            {
+                if (!leader->GetSession()->IsBot())
+                    return;
+        
+                if (!sRandomPlayerbotMgr->IsRandomBot(leader))
+                    return;
+            }
         }
+
+        // otherwise apply bot XP scaling.
+        amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
     }
 };
 
