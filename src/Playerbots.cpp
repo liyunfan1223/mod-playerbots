@@ -215,6 +215,20 @@ public:
         if (!sRandomPlayerbotMgr->IsRandomBot(player))
             return;
 
+        // if player in group check leader is real player.
+        if (Group* group = player->GetGroup())
+        {
+            Player* leader = group->GetLeader();
+            if (leader != player)
+            {
+                if (!player->GetSession()->IsBot())
+                    return;
+        
+                if (!sRandomPlayerbotMgr->IsRandomBot(player))
+                    return;
+            }
+        }
+
         if (sPlayerbotAIConfig->randomBotXPRate != 1.0)
         {
             amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
