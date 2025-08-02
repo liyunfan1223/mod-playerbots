@@ -240,6 +240,21 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "vezax mark of the faceless trigger",
         NextAction::array(0, new NextAction("vezax mark of the faceless action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "vezax shadow resistance trigger",
+        NextAction::array(0, new NextAction("vezax shadow resistance action", ACTION_RAID), nullptr)));
+
+    //
+    // Yogg-Saron
+    //
+    triggers.push_back(new TriggerNode(
+        "sara shadow resistance trigger",
+        NextAction::array(0, new NextAction("sara shadow resistance action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron shadow resistance trigger",
+        NextAction::array(0, new NextAction("yogg-saron shadow resistance action", ACTION_RAID), nullptr)));
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

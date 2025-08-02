@@ -138,6 +138,7 @@ public:
         creators["glyph equip"] = &ChatTriggerContext::glyph_equip; // Added for custom Glyphs
         creators["pet"] = &ChatTriggerContext::pet;
         creators["pet attack"] = &ChatTriggerContext::pet_attack;
+        creators["roll"] = &ChatTriggerContext::roll_action;
     }
 
 private:
@@ -255,6 +256,7 @@ private:
     static Trigger* glyph_equip(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "glyph equip"); } // Added for custom Glyphs
     static Trigger* pet(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "pet"); }
     static Trigger* pet_attack(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "pet attack"); }
+    static Trigger* roll_action(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "roll"); }
 };
 
 #endif

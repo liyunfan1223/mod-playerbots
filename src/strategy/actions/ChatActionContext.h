@@ -36,6 +36,7 @@
 #include "ListSpellsAction.h"
 #include "LogLevelAction.h"
 #include "LootStrategyAction.h"
+#include "LootRollAction.h"
 #include "MailAction.h"
 #include "NamedObjectContext.h"
 #include "NewRpgAction.h"
@@ -192,10 +193,11 @@ public:
         creators["calc"] = &ChatActionContext::calc;
         creators["wipe"] = &ChatActionContext::wipe;
         creators["tame"] = &ChatActionContext::tame;
-		creators["glyphs"] = &ChatActionContext::glyphs; // Added for custom Glyphs
-		creators["glyph equip"] = &ChatActionContext::glyph_equip; // Added for custom Glyphs
+		    creators["glyphs"] = &ChatActionContext::glyphs; // Added for custom Glyphs
+		    creators["glyph equip"] = &ChatActionContext::glyph_equip; // Added for custom Glyphs
         creators["pet"] = &ChatActionContext::pet;
         creators["pet attack"] = &ChatActionContext::pet_attack;
+        creators["roll"] = &ChatActionContext::roll_action;
     }
 
 private:
@@ -303,10 +305,11 @@ private:
     static Action* calc(PlayerbotAI* ai) { return new TellCalculateItemAction(ai); }
     static Action* wipe(PlayerbotAI* ai) { return new WipeAction(ai); }
     static Action* tame(PlayerbotAI* botAI) { return new TameAction(botAI); }
-	static Action* glyphs(PlayerbotAI* botAI) { return new TellGlyphsAction(botAI); } // Added for custom Glyphs
-	static Action* glyph_equip(PlayerbotAI* ai) { return new EquipGlyphsAction(ai); } // Added for custom Glyphs
+	  static Action* glyphs(PlayerbotAI* botAI) { return new TellGlyphsAction(botAI); } // Added for custom Glyphs
+	  static Action* glyph_equip(PlayerbotAI* ai) { return new EquipGlyphsAction(ai); } // Added for custom Glyphs
     static Action* pet(PlayerbotAI* botAI) { return new PetAction(botAI); }
     static Action* pet_attack(PlayerbotAI* botAI) { return new PetAction(botAI, "attack"); }
+    static Action* roll_action(PlayerbotAI* botAI) { return new RollAction(botAI); }
 };
 
 #endif

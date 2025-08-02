@@ -408,6 +408,8 @@ public:
     bool restrictHealerDPS = false;
     std::vector<uint32> restrictedHealerDPSMaps;
     bool IsRestrictedHealerDPSMap(uint32 mapId) const;
+
+    std::vector<uint32> excludedHunterPetFamilies;
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()
