@@ -4,373 +4,254 @@
  */
 
 #include "PetAction.h"
-#include <algorithm>
-#include <iomanip>
-#include <sstream>
+
+#include "CharmInfo.h"
+#include "Creature.h"
+#include "CreatureAI.h"
 #include "Pet.h"
-#include "SpellMgr.h"
-#include "DBCStructure.h"
-#include "Log.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
-#include "PlayerbotFactory.h"
-#include <random>
-#include <cctype>
-#include "WorldSession.h"
-
-bool IsExoticPet(const CreatureTemplate* creature)
-{
-    // Use the IsExotic() method from CreatureTemplate
-    return creature && creature->IsExotic();
-}
-
-bool HasBeastMastery(Player* bot)
-{
-    // Beast Mastery talent aura ID for WotLK is 53270
-    return bot->HasAura(53270);
-}
+#include "SharedDefines.h"
 
 bool PetAction::Execute(Event event)
 {
+    // Extract the command parameter from the event (e.g., "aggressive", "defensive", "attack", etc.)
     std::string param = event.getParam();
-    std::istringstream iss(param);
-    std::string mode, value;
-    iss >> mode;
-    std::getline(iss, value);
-    value.erase(0, value.find_first_not_of(" "));  // trim leading spaces
+    if (param.empty() && !defaultCmd.empty())
+    {
+        param = defaultCmd;
+    }
 
-    bool found = false;
-
-    // Reset lastPetName/Id each time
-    lastPetName = "";
-    lastPetId = 0;
-
-    if (mode == "name" && !value.empty())
+    if (param.empty())
     {
-        found = SetPetByName(value);
-    }
-    else if (mode == "id" && !value.empty())
-    {
-        try
-        {
-            uint32 id = std::stoul(value);
-            found = SetPetById(id);
-        }
-        catch (...)
-        {
-            botAI->TellError("Invalid pet id.");
-        }
-    }
-    else if (mode == "family" && !value.empty())
-    {
-        found = SetPetByFamily(value);
-    }
-    else if (mode == "rename" && !value.empty())
-    {
-        found = RenamePet(value);
-    }
-    else
-    {
-        botAI->TellError("Usage: pet name <name> | pet id <id> | pet family <family> | pet rename <new name> ");
+        // If no parameter is provided, show usage instructions and return.
+        botAI->TellError("Usage: pet <aggressive|defensive|passive|stance|attack|follow|stay>");
         return false;
     }
 
-    if (!found)
-        return false;
-
-    // For non-rename commands, initialize pet and give feedback
-    if (mode != "rename")
-    {
-        Player* bot = botAI->GetBot();
-        PlayerbotFactory factory(bot, bot->GetLevel());
-        factory.InitPet();
-        factory.InitPetTalents();
-
-        if (!lastPetName.empty() && lastPetId != 0)
-        {
-            std::ostringstream oss;
-            oss << "Pet changed to " << lastPetName << ", ID: " << lastPetId << ".";
-            botAI->TellMaster(oss.str());
-        }
-        else
-        {
-            botAI->TellMaster("Pet changed and initialized!");
-        }
-    }
-
-    return true;
-}
-
-bool PetAction::SetPetByName(const std::string& name)
-{
-    // Convert the input to lowercase for case-insensitive comparison
-    std::string lowerName = name;
-    std::transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
-
-    CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
     Player* bot = botAI->GetBot();
 
-    for (auto itr = creatures->begin(); itr != creatures->end(); ++itr)
-    {
-        const CreatureTemplate& creature = itr->second;
-        std::string creatureName = creature.Name;
-        std::transform(creatureName.begin(), creatureName.end(), creatureName.begin(), ::tolower);
+    // Collect all controlled pets and guardians, except totems, into the targets vector.
+    std::vector<Creature*> targets;
+    Pet* pet = bot->GetPet();
+    if (pet)
+        targets.push_back(pet);
 
-        // Only match if names match (case-insensitive)
-        if (creatureName == lowerName)
+    for (Unit::ControlSet::const_iterator itr = bot->m_Controlled.begin(); itr != bot->m_Controlled.end(); ++itr)
+    {
+        Creature* creature = dynamic_cast<Creature*>(*itr);
+        if (!creature)
+            continue;
+        if (pet && creature == pet)
+            continue;
+        if (creature->IsTotem())
+            continue;
+        targets.push_back(creature);
+    }
+
+    // If no pets or guardians are found, notify and return.
+    if (targets.empty())
+    {
+        botAI->TellError("You have no pet or guardian pet.");
+        return false;
+    }
+
+    ReactStates react;
+    std::string stanceText;
+
+    // Handle stance commands: aggressive, defensive, or passive.
+    if (param == "aggressive")
+    {
+        react = REACT_AGGRESSIVE;
+        stanceText = "aggressive";
+    }
+    else if (param == "defensive")
+    {
+        react = REACT_DEFENSIVE;
+        stanceText = "defensive";
+    }
+    else if (param == "passive")
+    {
+        react = REACT_PASSIVE;
+        stanceText = "passive";
+    }
+    // The "stance" command simply reports the current stance of each pet/guardian.
+    else if (param == "stance")
+    {
+        for (Creature* target : targets)
         {
-            // Check if the pet is tameable at all
-            if (!creature.IsTameable(true))
+            std::string type = target->IsPet() ? "pet" : "guardian";
+            std::string name = target->GetName();
+            std::string stance;
+            switch (target->GetReactState())
+            {
+                case REACT_AGGRESSIVE:
+                    stance = "aggressive";
+                    break;
+                case REACT_DEFENSIVE:
+                    stance = "defensive";
+                    break;
+                case REACT_PASSIVE:
+                    stance = "passive";
+                    break;
+                default:
+                    stance = "unknown";
+                    break;
+            }
+            botAI->TellMaster("Current stance of " + type + " \"" + name + "\": " + stance + ".");
+        }
+        return true;
+    }
+    // The "attack" command forces pets/guardians to attack the master's selected target.
+    else if (param == "attack")
+    {
+        // Try to get the master's selected target.
+        Player* master = botAI->GetMaster();
+        Unit* targetUnit = nullptr;
+
+        if (master)
+        {
+            ObjectGuid masterTargetGuid = master->GetTarget();
+            if (!masterTargetGuid.IsEmpty())
+            {
+                targetUnit = botAI->GetUnit(masterTargetGuid);
+            }
+        }
+
+        // If no valid target is selected, show an error and return.
+        if (!targetUnit)
+        {
+            botAI->TellError("No valid target selected by master.");
+            return false;
+        }
+        if (!targetUnit->IsAlive())
+        {
+            botAI->TellError("Target is not alive.");
+            return false;
+        }
+        if (!bot->IsValidAttackTarget(targetUnit))
+        {
+            botAI->TellError("Target is not a valid attack target for the bot.");
+            return false;
+        }
+
+        bool didAttack = false;
+        // For each controlled pet/guardian, command them to attack the selected target.
+        for (Creature* petCreature : targets)
+        {
+            CharmInfo* charmInfo = petCreature->GetCharmInfo();
+            if (!charmInfo)
                 continue;
 
-            // Exotic pet check with talent requirement
-            if (IsExoticPet(&creature) && !HasBeastMastery(bot))
+            petCreature->ClearUnitState(UNIT_STATE_FOLLOW);
+            // Only command attack if not already attacking the target, or if not currently under command attack.
+            if (petCreature->GetVictim() != targetUnit ||
+                (petCreature->GetVictim() == targetUnit && !charmInfo->IsCommandAttack()))
             {
-                botAI->TellError("I cannot use exotic pets unless I have the Beast Mastery talent.");
-                return false;
+                if (petCreature->GetVictim())
+                    petCreature->AttackStop();
+
+                if (!petCreature->IsPlayer() && petCreature->ToCreature()->IsAIEnabled)
+                {
+                    // For AI-enabled creatures (NPC pets/guardians): issue attack command and set flags.
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+
+                    petCreature->ToCreature()->AI()->AttackStart(targetUnit);
+
+                    didAttack = true;
+                }
+                else  // For charmed player pets/guardians
+                {
+                    if (petCreature->GetVictim() && petCreature->GetVictim() != targetUnit)
+                        petCreature->AttackStop();
+
+                    charmInfo->SetIsCommandAttack(true);
+                    charmInfo->SetIsAtStay(false);
+                    charmInfo->SetIsFollowing(false);
+                    charmInfo->SetIsCommandFollow(false);
+                    charmInfo->SetIsReturning(false);
+
+                    petCreature->Attack(targetUnit, true);
+                    didAttack = true;
+                }
+            }
+        }
+        // Inform the master if the command succeeded or failed.
+        if (didAttack && sPlayerbotAIConfig->petChatCommandDebug == 1)
+            botAI->TellMaster("Pet commanded to attack your target.");
+        else if (!didAttack)
+            botAI->TellError("Pet did not attack. (Already attacking or unable to attack target)");
+        return didAttack;
+    }
+    // The "follow" command makes all pets/guardians follow the bot.
+    else if (param == "follow")
+    {
+        botAI->PetFollow();
+        if (sPlayerbotAIConfig->petChatCommandDebug == 1)
+            botAI->TellMaster("Pet commanded to follow.");
+        return true;
+    }
+    // The "stay" command causes all pets/guardians to stop and stay in place.
+    else if (param == "stay")
+    {
+        for (Creature* target : targets)
+        {
+            // If not already in controlled motion, stop movement and set to idle.
+            bool controlledMotion =
+                target->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE;
+            if (!controlledMotion)
+            {
+                target->StopMovingOnCurrentPos();
+                target->GetMotionMaster()->Clear(false);
+                target->GetMotionMaster()->MoveIdle();
             }
 
-            // Final tameable check based on hunter's actual ability
-            if (!creature.IsTameable(bot->CanTameExoticPets()))
-                continue;
+            CharmInfo* charmInfo = target->GetCharmInfo();
+            if (charmInfo)
+            {
+                // Set charm/pet state flags for "stay".
+                charmInfo->SetCommandState(COMMAND_STAY);
+                charmInfo->SetIsCommandAttack(false);
+                charmInfo->SetIsCommandFollow(false);
+                charmInfo->SetIsFollowing(false);
+                charmInfo->SetIsReturning(false);
+                charmInfo->SetIsAtStay(!controlledMotion);
+                charmInfo->SaveStayPosition(controlledMotion);
+                if (target->ToPet())
+                    target->ToPet()->ClearCastWhenWillAvailable();
 
-            lastPetName = creature.Name;
-            lastPetId = creature.Entry;
-            return CreateAndSetPet(creature.Entry);
+                charmInfo->SetForcedSpell(0);
+                charmInfo->SetForcedTargetGUID();
+            }
         }
+        if (sPlayerbotAIConfig->petChatCommandDebug == 1)
+            botAI->TellMaster("Pet commanded to stay.");
+        return true;
     }
-
-    botAI->TellError("No tameable pet found with name: " + name);
-    return false;
-}
-
-bool PetAction::SetPetById(uint32 id)
-{
-    CreatureTemplate const* creature = sObjectMgr->GetCreatureTemplate(id);
-    Player* bot = botAI->GetBot();
-
-    if (creature)
+    // Unknown command: show usage instructions and return.
+    else
     {
-        // Check if the pet is tameable at all
-        if (!creature->IsTameable(true))
-        {
-            botAI->TellError("No tameable pet found with id: " + std::to_string(id));
-            return false;
-        }
-
-        // Exotic pet check with talent requirement
-        if (IsExoticPet(creature) && !HasBeastMastery(bot))
-        {
-            botAI->TellError("I cannot use exotic pets unless I have the Beast Mastery talent.");
-            return false;
-        }
-
-        // Final tameable check based on hunter's actual ability
-        if (!creature->IsTameable(bot->CanTameExoticPets()))
-        {
-            botAI->TellError("No tameable pet found with id: " + std::to_string(id));
-            return false;
-        }
-
-        lastPetName = creature->Name;
-        lastPetId = creature->Entry;
-        return CreateAndSetPet(creature->Entry);
-    }
-
-    botAI->TellError("No tameable pet found with id: " + std::to_string(id));
-    return false;
-}
-
-bool PetAction::SetPetByFamily(const std::string& family)
-{
-    std::string lowerFamily = family;
-    std::transform(lowerFamily.begin(), lowerFamily.end(), lowerFamily.begin(), ::tolower);
-
-    CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
-    Player* bot = botAI->GetBot();
-
-    std::vector<const CreatureTemplate*> candidates;
-    bool foundExotic = false;
-
-    for (auto itr = creatures->begin(); itr != creatures->end(); ++itr)
-    {
-        const CreatureTemplate& creature = itr->second;
-
-        if (!creature.IsTameable(true))  // allow exotics for search
-            continue;
-
-        CreatureFamilyEntry const* familyEntry = sCreatureFamilyStore.LookupEntry(creature.family);
-        if (!familyEntry)
-            continue;
-
-        std::string familyName = familyEntry->Name[0];
-        std::transform(familyName.begin(), familyName.end(), familyName.begin(), ::tolower);
-
-        if (familyName != lowerFamily)
-            continue;
-
-        // Exotic/BM check
-        if (IsExoticPet(&creature))
-        {
-            foundExotic = true;
-            if (!HasBeastMastery(bot))
-                continue;
-        }
-
-        if (!creature.IsTameable(bot->CanTameExoticPets()))
-            continue;
-
-        candidates.push_back(&creature);
-    }
-
-    if (candidates.empty())
-    {
-        if (foundExotic && !HasBeastMastery(bot))
-            botAI->TellError("I cannot use exotic pets unless I have the Beast Mastery talent.");
-        else
-            botAI->TellError("No tameable pet found with family: " + family);
+        botAI->TellError("Unknown pet command: " + param +
+                         ". Use: pet <aggressive|defensive|passive|stance|attack|follow|stay>");
         return false;
     }
 
-    // Randomly select one from candidates
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, candidates.size() - 1);
-
-    const CreatureTemplate* selected = candidates[dis(gen)];
-
-    lastPetName = selected->Name;
-    lastPetId = selected->Entry;
-    return CreateAndSetPet(selected->Entry);
-}
-
-bool PetAction::RenamePet(const std::string& newName)
-{
-    Player* bot = botAI->GetBot();
-    Pet* pet = bot->GetPet();
-    if (!pet)
+    // For stance commands, apply the chosen stance to all targets.
+    for (Creature* target : targets)
     {
-        botAI->TellError("You have no pet to rename.");
-        return false;
+        target->SetReactState(react);
+        CharmInfo* charmInfo = target->GetCharmInfo();
+        if (charmInfo)
+            charmInfo->SetPlayerReactState(react);
     }
 
-    // Length check (WoW max pet name is 12 characters)
-    if (newName.empty() || newName.length() > 12)
-    {
-        botAI->TellError("Pet name must be between 1 and 12 alphabetic characters.");
-        return false;
-    }
-
-    // Alphabetic character check
-    for (char c : newName)
-    {
-        if (!std::isalpha(static_cast<unsigned char>(c)))
-        {
-            botAI->TellError("Pet name must only contain alphabetic characters (A-Z, a-z).");
-            return false;
-        }
-    }
-
-    // Normalize case: capitalize first letter, lower the rest
-    std::string normalized = newName;
-    normalized[0] = std::toupper(normalized[0]);
-    for (size_t i = 1; i < normalized.size(); ++i)
-        normalized[i] = std::tolower(normalized[i]);
-
-    // Forbidden name check
-    if (sObjectMgr->IsReservedName(normalized))
-    {
-        botAI->TellError("That pet name is forbidden. Please choose another name.");
-        return false;
-    }
-
-    // Set the pet's name, save to DB, and send instant client update
-    pet->SetName(normalized);
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-    bot->GetSession()->SendPetNameQuery(pet->GetGUID(), pet->GetEntry());
-
-    botAI->TellMaster("Your pet has been renamed to " + normalized + "!");
-    botAI->TellMaster("If you do not see the new name, please dismiss and recall your pet.");
-
-    // Dismiss pet
-    bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT, true);
-    // Recall pet using Hunter's Call Pet spell (spellId 883)
-    if (bot->getClass() == CLASS_HUNTER && bot->HasSpell(883))
-    {
-        bot->CastSpell(bot, 883, true);
-    }
-
-    return true;
-}
-
-bool PetAction::CreateAndSetPet(uint32 creatureEntry)
-{
-    Player* bot = botAI->GetBot();
-    if (bot->getClass() != CLASS_HUNTER || bot->GetLevel() < 10)
-    {
-        botAI->TellError("Only level 10+ hunters can have pets.");
-        return false;
-    }
-
-    CreatureTemplate const* creature = sObjectMgr->GetCreatureTemplate(creatureEntry);
-    if (!creature)
-    {
-        botAI->TellError("Creature template not found.");
-        return false;
-    }
-
-    // Remove current pet(s)
-    if (bot->GetPetStable() && bot->GetPetStable()->CurrentPet)
-    {
-        bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
-        bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
-    }
-    if (bot->GetPetStable() && bot->GetPetStable()->GetUnslottedHunterPet())
-    {
-        bot->GetPetStable()->UnslottedPets.clear();
-        bot->RemovePet(nullptr, PET_SAVE_AS_CURRENT);
-        bot->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT);
-    }
-
-    // Actually create the new pet
-    Pet* pet = bot->CreateTamedPetFrom(creatureEntry, 0);
-    if (!pet)
-    {
-        botAI->TellError("Failed to create pet.");
-        return false;
-    }
-
-    // Set pet level and add to world
-    pet->SetUInt32Value(UNIT_FIELD_LEVEL, bot->GetLevel() - 1);
-    pet->GetMap()->AddToMap(pet->ToCreature());
-    pet->SetUInt32Value(UNIT_FIELD_LEVEL, bot->GetLevel());
-    bot->SetMinion(pet, true);
-    pet->InitTalentForLevel();
-    pet->SavePetToDB(PET_SAVE_AS_CURRENT);
-    bot->PetSpellInitialize();
-
-    // Set stats
-    pet->InitStatsForLevel(bot->GetLevel());
-    pet->SetLevel(bot->GetLevel());
-    pet->SetPower(POWER_HAPPINESS, pet->GetMaxPower(Powers(POWER_HAPPINESS)));
-    pet->SetHealth(pet->GetMaxHealth());
-
-    // Enable autocast for active spells
-    for (PetSpellMap::const_iterator itr = pet->m_spells.begin(); itr != pet->m_spells.end(); ++itr)
-    {
-        if (itr->second.state == PETSPELL_REMOVED)
-            continue;
-
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-        if (!spellInfo)
-            continue;
-
-        if (spellInfo->IsPassive())
-            continue;
-
-        pet->ToggleAutocast(spellInfo, true);
-    }
+    // Inform the master of the new stance if debug is enabled.
+    if (sPlayerbotAIConfig->petChatCommandDebug == 1)
+        botAI->TellMaster("Pet stance set to " + stanceText + ".");
 
     return true;
 }

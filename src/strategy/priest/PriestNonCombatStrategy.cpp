@@ -56,6 +56,8 @@ void PriestNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(
         new TriggerNode("group heal setting", NextAction::array(0, new NextAction("circle of healing on party", 27.0f), NULL)));
+    triggers.push_back(new TriggerNode("new pet",
+                                       NextAction::array(0, new NextAction("set pet stance", 10.0f), nullptr)));
 }
 
 void PriestBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

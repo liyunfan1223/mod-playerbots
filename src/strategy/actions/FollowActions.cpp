@@ -36,10 +36,13 @@ bool FollowAction::Execute(Event event)
                        true, priority, true);
     }
 
-    if (Pet* pet = bot->GetPet())
-    {
-        botAI->PetFollow();
-    }
+    // This section has been commented out because it was forcing the pet to 
+    // follow the bot on every "follow" action tick, overriding any attack or
+    // stay commands that might have been issued by the player.
+    // if (Pet* pet = bot->GetPet())
+    // {
+    //     botAI->PetFollow();
+    // }
     // if (moved)
     // botAI->SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
 
