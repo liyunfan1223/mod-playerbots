@@ -172,6 +172,7 @@ public:
         creators["curse of tongues"] = &WarlockTriggerFactoryInternal::curse_of_tongues;
         creators["curse of weakness"] = &WarlockTriggerFactoryInternal::curse_of_weakness;
         creators["wrong pet"] = &WarlockTriggerFactoryInternal::wrong_pet;
+        creators["rain of fire channel check"] = &WarlockTriggerFactoryInternal::rain_of_fire_channel_check;
     }
 
 private:
@@ -217,6 +218,7 @@ private:
     static Trigger* curse_of_tongues(PlayerbotAI* ai) { return new CurseOfTonguesTrigger(ai); }
     static Trigger* curse_of_weakness(PlayerbotAI* ai) { return new CurseOfWeaknessTrigger(ai); }
     static Trigger* wrong_pet(PlayerbotAI* ai) { return new WrongPetTrigger(ai); }
+    static Trigger* rain_of_fire_channel_check(PlayerbotAI* ai) { return new RainOfFireChannelCheckTrigger(ai); }
 };
 
 class WarlockAiObjectContextInternal : public NamedObjectContext<Action>

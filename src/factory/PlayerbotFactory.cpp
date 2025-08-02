@@ -414,7 +414,7 @@ void PlayerbotFactory::Randomize(bool incremental)
 
     pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "PlayerbotFactory_Consumable");
     LOG_DEBUG("playerbots", "Initializing consumables...");
-    AddConsumables();
+    InitConsumables();
     if (pmo)
         pmo->finish();
 
@@ -482,11 +482,8 @@ void PlayerbotFactory::Refresh()
     InitAmmo();
     InitFood();
     InitReagents();
-    // InitPotions();
-    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
-    {
-        InitTalentsTree(true, true, true);
-    }
+    InitConsumables();
+    InitPotions();
     InitPet();
     InitPetTalents();
     InitClassSpells();
@@ -496,7 +493,10 @@ void PlayerbotFactory::Refresh()
     InitSpecialSpells();
     InitMounts();
     InitKeyring();
-    InitPotions();
+    if (!sPlayerbotAIConfig->equipmentPersistence || bot->GetLevel() < sPlayerbotAIConfig->equipmentPersistenceLevel)
+    {
+        InitTalentsTree(true, true, true);
+    }
     if (bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
     {
         ApplyEnchantAndGemsNew();
@@ -510,151 +510,218 @@ void PlayerbotFactory::Refresh()
     // bot->SaveToDB(false, false);
 }
 
-void PlayerbotFactory::AddConsumables()
+void PlayerbotFactory::InitConsumables()
 {
+    int specTab = AiFactory::GetPlayerSpecTab(bot);
+    std::vector<std::pair<uint32, uint32>> items;
+
     switch (bot->getClass())
     {
         case CLASS_PRIEST:
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
         {
-            if (level >= 5 && level < 20)
+            // Discipline or Holy: Mana Oil
+            if (specTab == 0 || specTab == 1)
             {
-                StoreItem(CONSUM_ID_MINOR_WIZARD_OIL, 5);
+                std::vector<uint32> mana_oils = {BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL};
+                for (uint32 itemId : mana_oils)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 4});
+                    break;
+                }
             }
-
-            if (level >= 20 && level < 40)
+            // Shadow: Wizard Oil
+            if (specTab == 2)
             {
-                StoreItem(CONSUM_ID_MINOR_MANA_OIL, 5);
-                StoreItem(CONSUM_ID_MINOR_WIZARD_OIL, 5);
+                std::vector<uint32> wizard_oils = {BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
+                for (uint32 itemId : wizard_oils)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 4});
+                    break;
+                }
             }
-
-            if (level >= 40 && level < 45)
+            break;
+        }
+        case CLASS_MAGE:
+        {
+            // Always Wizard Oil
+            std::vector<uint32> wizard_oils = {BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
+            for (uint32 itemId : wizard_oils)
             {
-                StoreItem(CONSUM_ID_MINOR_MANA_OIL, 5);
-                StoreItem(CONSUM_ID_WIZARD_OIL, 5);
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > level || level > 75)
+                    continue;
+                items.push_back({itemId, 4});
+                break;
             }
-
-            if (level >= 45 && level < 52)
+            break;
+        }
+        case CLASS_DRUID:
+        {
+            // Balance: Wizard Oil
+            if (specTab == 0)
             {
-                StoreItem(CONSUM_ID_BRILLIANT_MANA_OIL, 5);
-                StoreItem(CONSUM_ID_BRILLIANT_WIZARD_OIL, 5);
+                std::vector<uint32> wizard_oils = {BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
+                for (uint32 itemId : wizard_oils)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 4});
+                    break;
+                }
             }
-            if (level >= 52 && level < 58)
+            // Feral: Sharpening Stones & Weightstones
+            else if (specTab == 1)
             {
-                StoreItem(CONSUM_ID_SUPERIOR_MANA_OIL, 5);
-                StoreItem(CONSUM_ID_BRILLIANT_WIZARD_OIL, 5);
+                std::vector<uint32> sharpening_stones = {ADAMANTITE_SHARPENING_STONE, FEL_SHARPENING_STONE, DENSE_SHARPENING_STONE, SOLID_SHARPENING_STONE, HEAVY_SHARPENING_STONE, COARSE_SHARPENING_STONE, ROUGH_SHARPENING_STONE};
+                std::vector<uint32> weightstones = {ADAMANTITE_WEIGHTSTONE, FEL_WEIGHTSTONE, DENSE_WEIGHTSTONE, SOLID_WEIGHTSTONE, HEAVY_WEIGHTSTONE, COARSE_WEIGHTSTONE, ROUGH_WEIGHTSTONE};
+                for (uint32 itemId : sharpening_stones)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 20});
+                    break;
+                }
+                for (uint32 itemId : weightstones)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 20});
+                    break;
+                }
             }
-
-            if (level >= 58)
+            // Restoration: Mana Oil
+            else if (specTab == 2)
             {
-                StoreItem(CONSUM_ID_SUPERIOR_MANA_OIL, 5);
-                StoreItem(CONSUM_ID_SUPERIOR_WIZARD_OIL, 5);
+                std::vector<uint32> mana_oils = {BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL};
+                for (uint32 itemId : mana_oils)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 4});
+                    break;
+                }
             }
             break;
         }
         case CLASS_PALADIN:
+        {
+            // Holy: Mana Oil
+            if (specTab == 0)
+            {
+                std::vector<uint32> mana_oils = {BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL};
+                for (uint32 itemId : mana_oils)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 4});
+                    break;
+                }
+            }
+            // Protection: Wizard Oil (Protection prioritizes Superior over Brilliant)
+            else if (specTab == 1)
+            {
+                std::vector<uint32> wizard_oils = {BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL};
+                for (uint32 itemId : wizard_oils)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 4});
+                    break;
+                }
+            }
+            // Retribution: Sharpening Stones & Weightstones
+            else if (specTab == 2)
+            {
+                std::vector<uint32> sharpening_stones = {ADAMANTITE_SHARPENING_STONE, FEL_SHARPENING_STONE, DENSE_SHARPENING_STONE, SOLID_SHARPENING_STONE, HEAVY_SHARPENING_STONE, COARSE_SHARPENING_STONE, ROUGH_SHARPENING_STONE};
+                std::vector<uint32> weightstones = {ADAMANTITE_WEIGHTSTONE, FEL_WEIGHTSTONE, DENSE_WEIGHTSTONE, SOLID_WEIGHTSTONE, HEAVY_WEIGHTSTONE, COARSE_WEIGHTSTONE, ROUGH_WEIGHTSTONE};
+                for (uint32 itemId : sharpening_stones)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 20});
+                    break;
+                }
+                for (uint32 itemId : weightstones)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                    if (proto->RequiredLevel > level || level > 75)
+                        continue;
+                    items.push_back({itemId, 20});
+                    break;
+                }
+            }
+            break;
+        }
         case CLASS_WARRIOR:
         case CLASS_HUNTER:
         {
-            if (level >= 1 && level < 5)
+            // Sharpening Stones & Weightstones
+            std::vector<uint32> sharpening_stones = {ADAMANTITE_SHARPENING_STONE, FEL_SHARPENING_STONE, DENSE_SHARPENING_STONE, SOLID_SHARPENING_STONE, HEAVY_SHARPENING_STONE, COARSE_SHARPENING_STONE, ROUGH_SHARPENING_STONE};
+            std::vector<uint32> weightstones = {ADAMANTITE_WEIGHTSTONE, FEL_WEIGHTSTONE, DENSE_WEIGHTSTONE, SOLID_WEIGHTSTONE, HEAVY_WEIGHTSTONE, COARSE_WEIGHTSTONE, ROUGH_WEIGHTSTONE};
+            for (uint32 itemId : sharpening_stones)
             {
-                StoreItem(CONSUM_ID_ROUGH_SHARPENING_STONE, 5);
-                StoreItem(CONSUM_ID_ROUGH_WEIGHTSTONE, 5);
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > level || level > 75)
+                    continue;
+                items.push_back({itemId, 20});
+                break;
             }
-
-            if (level >= 5 && level < 15)
+            for (uint32 itemId : weightstones)
             {
-                StoreItem(CONSUM_ID_COARSE_WEIGHTSTONE, 5);
-                StoreItem(CONSUM_ID_COARSE_SHARPENING_STONE, 5);
-            }
-
-            if (level >= 15 && level < 25)
-            {
-                StoreItem(CONSUM_ID_HEAVY_WEIGHTSTONE, 5);
-                StoreItem(CONSUM_ID_HEAVY_SHARPENING_STONE, 5);
-            }
-
-            if (level >= 25 && level < 35)
-            {
-                StoreItem(CONSUM_ID_SOL_SHARPENING_STONE, 5);
-                StoreItem(CONSUM_ID_SOLID_WEIGHTSTONE, 5);
-            }
-
-            if (level >= 35 && level < 50)
-            {
-                StoreItem(CONSUM_ID_DENSE_WEIGHTSTONE, 5);
-                StoreItem(CONSUM_ID_DENSE_SHARPENING_STONE, 5);
-            }
-
-            if (level >= 50 && level < 60)
-            {
-                StoreItem(CONSUM_ID_FEL_SHARPENING_STONE, 5);
-                StoreItem(CONSUM_ID_FEL_WEIGHTSTONE, 5);
-            }
-
-            if (level >= 60)
-            {
-                StoreItem(CONSUM_ID_ADAMANTITE_WEIGHTSTONE, 5);
-                StoreItem(CONSUM_ID_ADAMANTITE_SHARPENING_STONE, 5);
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > level || level > 75)
+                    continue;
+                items.push_back({itemId, 20});
+                break;
             }
             break;
         }
         case CLASS_ROGUE:
         {
-            if (level >= 20 && level < 28)
+            // Poisons
+            std::vector<uint32> instant_poisons = {INSTANT_POISON_IX, INSTANT_POISON_VIII, INSTANT_POISON_VII, INSTANT_POISON_VI, INSTANT_POISON_V, INSTANT_POISON_IV, INSTANT_POISON_III, INSTANT_POISON_II, INSTANT_POISON};
+            std::vector<uint32> deadly_poisons = {DEADLY_POISON_IX, DEADLY_POISON_VIII, DEADLY_POISON_VII, DEADLY_POISON_VI, DEADLY_POISON_V, DEADLY_POISON_IV, DEADLY_POISON_III, DEADLY_POISON_II, DEADLY_POISON};
+            for (uint32 itemId : deadly_poisons)
             {
-                StoreItem(CONSUM_ID_INSTANT_POISON, 5);
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > level)
+                    continue;
+                items.push_back({itemId, 20});
+                break;
             }
-
-            if (level >= 28 && level < 30)
+            for (uint32 itemId : instant_poisons)
             {
-                StoreItem(CONSUM_ID_INSTANT_POISON_II, 5);
-            }
-
-            if (level >= 30 && level < 36)
-            {
-                StoreItem(CONSUM_ID_DEADLY_POISON, 5);
-                StoreItem(CONSUM_ID_INSTANT_POISON_II, 5);
-            }
-
-            if (level >= 36 && level < 44)
-            {
-                StoreItem(CONSUM_ID_DEADLY_POISON_II, 5);
-                StoreItem(CONSUM_ID_INSTANT_POISON_III, 5);
-            }
-
-            if (level >= 44 && level < 52)
-            {
-                StoreItem(CONSUM_ID_DEADLY_POISON_III, 5);
-                StoreItem(CONSUM_ID_INSTANT_POISON_IV, 5);
-            }
-            if (level >= 52 && level < 60)
-            {
-                StoreItem(CONSUM_ID_DEADLY_POISON_IV, 5);
-                StoreItem(CONSUM_ID_INSTANT_POISON_V, 5);
-            }
-
-            if (level >= 60 && level < 62)
-            {
-                StoreItem(CONSUM_ID_DEADLY_POISON_V, 5);
-                StoreItem(CONSUM_ID_INSTANT_POISON_VI, 5);
-            }
-
-            if (level >= 62 && level < 68)
-            {
-                StoreItem(CONSUM_ID_DEADLY_POISON_VI, 5);
-                StoreItem(CONSUM_ID_INSTANT_POISON_VI, 5);
-            }
-
-            if (level >= 68)
-            {
-                StoreItem(CONSUM_ID_DEADLY_POISON_VII, 5);
-                StoreItem(CONSUM_ID_INSTANT_POISON_VII, 5);
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (proto->RequiredLevel > level)
+                    continue;
+                items.push_back({itemId, 20});
+                break;
             }
             break;
         }
+        default:
+            break;
     }
+
+    for (std::pair<uint32, uint32> item : items)
+    {
+        int count = (int)item.second - (int)bot->GetItemCount(item.first);
+        if (count > 0)
+            StoreItem(item.first, count);
+    } 
 }
 
 void PlayerbotFactory::InitPetTalents()
@@ -828,6 +895,7 @@ void PlayerbotFactory::InitPet()
         std::vector<uint32> ids;
 
         CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();
+
         for (CreatureTemplateContainer::const_iterator itr = creatures->begin(); itr != creatures->end(); ++itr)
         {
             if (!itr->second.IsTameable(bot->CanTameExoticPets()))
@@ -841,6 +909,12 @@ void PlayerbotFactory::InitPet()
                              bot->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL));
             // Wolf only (for higher dps)
             if (onlyWolf && itr->second.family != CREATURE_FAMILY_WOLF)
+                continue;
+
+            // Exclude configured pet families
+            if (std::find(sPlayerbotAIConfig->excludedHunterPetFamilies.begin(),
+                          sPlayerbotAIConfig->excludedHunterPetFamilies.end(),
+                          itr->second.family) != sPlayerbotAIConfig->excludedHunterPetFamilies.end())
                 continue;
 
             ids.push_back(itr->first);
@@ -3220,102 +3294,97 @@ void PlayerbotFactory::InitFood()
 
 void PlayerbotFactory::InitReagents()
 {
-    int level = bot->GetLevel();
+    int specTab = AiFactory::GetPlayerSpecTab(bot);
     std::vector<std::pair<uint32, uint32>> items;
     switch (bot->getClass())
     {
-        case CLASS_ROGUE:
-        {
-            std::vector<int> instant_poison_ids = {43231, 43230, 21927, 8928, 8927, 8926, 6950, 6949, 6947};
-            std::vector<int> deadly_poison_ids = {43233, 43232, 22054, 22053, 20844, 8985, 8984, 2893, 2892};
-            for (int& itemId : deadly_poison_ids)
-            {
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-                if (proto->RequiredLevel > bot->GetLevel())
-                    continue;
-                items.push_back({itemId, 20});  // deadly poison
-                break;
-            }
-            for (int& itemId : instant_poison_ids)
-            {
-                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-                if (proto->RequiredLevel > bot->GetLevel())
-                    continue;
-                items.push_back({itemId, 20});  // instant poison
-                break;
-            }
-        }
-        break;
-        case CLASS_SHAMAN:
-            // items.push_back({46978, 1}); // Totem
-            items.push_back({5175, 1});  // Earth Totem
-            items.push_back({5176, 1});  // Flame Totem
-            items.push_back({5177, 1});  // Water Totem
-            items.push_back({5178, 1});  // Air Totem
-            if (bot->GetLevel() >= 30)
-                items.push_back({17030, 40});  // Ankh
-            break;
-        case CLASS_WARLOCK:
-            items.push_back({6265, 5});  // shard
-            break;
-        case CLASS_PRIEST:
-            if (level >= 48 && level < 60)
-            {
-                items.push_back({17028, 40});  // Wild Berries
-            }
-            else if (level >= 60 && level < 80)
-            {
-                items.push_back({17029, 40});  // Wild Berries
-            }
-            else if (level >= 80)
-            {
-                items.push_back({44615, 40});  // Wild Berries
-            }
-            break;
-        case CLASS_MAGE:
-            items.push_back({17020, 40});  // Arcane Powder
-            items.push_back({17031, 40});  // portal
-            items.push_back({17032, 40});  // portal
+        case CLASS_DEATH_KNIGHT:
+        if (level >= 56)    
+                items.push_back({37201, 40});   // Corpse Dust
             break;
         case CLASS_DRUID:
             if (level >= 20 && level < 30)
+                items.push_back({17034, 20});   // Maple Seed
+            else if (level >= 30 && level < 40)
+                items.push_back({17035, 20});   // Stranglethorn Seed
+            else if (level >= 40 && level < 50)
+                items.push_back({17036, 20});   // Ashwood Seed
+            else if (level >= 50 && level < 60)
             {
-                items.push_back({17034, 40});
+                items.push_back({17037, 20});   // Hornbeam Seed
+                items.push_back({17021, 20});   // Wild Berries
             }
-            if (level >= 30 && level < 40)
+            else if (level >= 60 && level < 69)
             {
-                items.push_back({17035, 40});
+                items.push_back({17038, 20});   // Ironwood Seed
+                items.push_back({17026, 20});   // Wild Thornroot
             }
-            if (level >= 40 && level < 50)
+            else if (level == 69)
             {
-                items.push_back({17036, 40});
+                items.push_back({22147, 20});   // Flintweed Seed
+                items.push_back({17026, 20});   // Wild Thornroot
             }
-            if (level >= 50 && level < 60)
+            else if (level >= 70 && level < 79)
             {
-                items.push_back({17037, 40});
-                items.push_back({17021, 40});
+                items.push_back({22147, 20});   // Flintweed Seed
+                items.push_back({22148, 20});   // Wild Quillvine
             }
-            if (level >= 60 && level < 70)
+            else if (level == 79)
             {
-                items.push_back({17038, 40});
-                items.push_back({17026, 40});
+                items.push_back({44614, 20});   // Starleaf Seed
+                items.push_back({22148, 20});   // Wild Quillvine
             }
-            if (level >= 70 && level < 80)
+            else if (level >= 80)
             {
-                items.push_back({22147, 40});
-                items.push_back({22148, 40});
+                items.push_back({44614, 20});   // Starleaf Seed
+                items.push_back({44605, 20});   // Wild Spineleaf
             }
-            if (level >= 80)
-            {
-                items.push_back({44614, 40});
-                items.push_back({44605, 40});
-            }
+            break;
+        case CLASS_MAGE:
+            if (level >= 20)
+                items.push_back({17031, 20});  // Rune of Teleportation
+            if (level >= 40)
+                items.push_back({17032, 20});  // Rune of Portals
+            if (level >= 56)
+                items.push_back({17020, 20});  // Arcane Powder
             break;
         case CLASS_PALADIN:
-            items.push_back({21177, 100});
+            if (level >= 52)
+                items.push_back({21177, 80});   // Symbol of Kings
             break;
-        case CLASS_DEATH_KNIGHT:
-            items.push_back({37201, 40});
+        case CLASS_PRIEST:
+            if (level >= 48 && level < 56)
+                items.push_back({17028, 40});  // Holy Candle
+            else if (level >= 56 && level < 60)
+            {
+                items.push_back({17028, 20});  // Holy Candle
+                items.push_back({17029, 20});  // Sacred Candle
+            }
+            else if (level >= 60 && level < 77)
+                items.push_back({17029, 40});  // Sacred Candle
+            else if (level >= 77 && level < 80)
+            {
+                items.push_back({17029, 20});  // Sacred Candle
+                items.push_back({44615, 20});  // Devout Candle
+            }
+            else if (level >= 80)
+                items.push_back({44615, 40});  // Devout Candle
+            break;
+        case CLASS_SHAMAN:
+            if (level >= 4)
+                items.push_back({5175, 1});  // Earth Totem
+            if (level >= 10)
+                items.push_back({5176, 1});  // Flame Totem
+            if (level >= 20)
+                items.push_back({5177, 1});  // Water Totem
+            if (level >= 30)
+            {
+                items.push_back({5178, 1});  // Air Totem
+                items.push_back({17030, 20});  // Ankh
+            }
+            break;
+        case CLASS_WARLOCK:
+            items.push_back({6265, 5});  // Soul Shard
             break;
         default:
             break;
@@ -3328,10 +3397,73 @@ void PlayerbotFactory::InitReagents()
     }
 }
 
+void PlayerbotFactory::CleanupConsumables() // remove old consumables as part of randombot level-up maintenance
+{
+    std::vector<Item*> itemsToDelete;
+
+    std::vector<Item*> items;
+    for (uint32 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        if (Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            items.push_back(item);
+
+    for (uint32 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        if (Bag* bag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            for (uint32 j = 0; j < bag->GetBagSize(); ++j)
+                if (Item* item = bag->GetItemByPos(j))
+                    items.push_back(item);
+
+    for (Item* item : items)
+    {
+        ItemTemplate const* proto = item->GetTemplate();
+        if (!proto) continue;
+
+        // Remove ammo
+        if (proto->Class == ITEM_CLASS_PROJECTILE)
+            itemsToDelete.push_back(item);
+
+        // Remove food/drink
+        if (proto->Class == ITEM_CLASS_CONSUMABLE && proto->SubClass == ITEM_SUBCLASS_FOOD)
+            itemsToDelete.push_back(item);
+
+        // Remove potions
+        if (proto->Class == ITEM_CLASS_CONSUMABLE && proto->SubClass == ITEM_SUBCLASS_POTION)
+            itemsToDelete.push_back(item);
+
+        // Remove reagents
+        if (proto->Class == ITEM_CLASS_REAGENT || (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_REAGENT))
+            itemsToDelete.push_back(item);
+    }
+
+    std::set<uint32> idsToDelete = {
+        BRILLIANT_MANA_OIL, SUPERIOR_MANA_OIL, LESSER_MANA_OIL, MINOR_MANA_OIL,
+        BRILLIANT_WIZARD_OIL, SUPERIOR_WIZARD_OIL, WIZARD_OIL, LESSER_WIZARD_OIL, MINOR_WIZARD_OIL,
+        ADAMANTITE_SHARPENING_STONE, FEL_SHARPENING_STONE, DENSE_SHARPENING_STONE, SOLID_SHARPENING_STONE,
+        HEAVY_SHARPENING_STONE, COARSE_SHARPENING_STONE, ROUGH_SHARPENING_STONE,
+        ADAMANTITE_WEIGHTSTONE, FEL_WEIGHTSTONE, DENSE_WEIGHTSTONE, SOLID_WEIGHTSTONE,
+        HEAVY_WEIGHTSTONE, COARSE_WEIGHTSTONE, ROUGH_WEIGHTSTONE,
+        INSTANT_POISON_IX, INSTANT_POISON_VIII, INSTANT_POISON_VII, INSTANT_POISON_VI, INSTANT_POISON_V,
+        INSTANT_POISON_IV, INSTANT_POISON_III, INSTANT_POISON_II, INSTANT_POISON,
+        DEADLY_POISON_IX, DEADLY_POISON_VIII, DEADLY_POISON_VII, DEADLY_POISON_VI, DEADLY_POISON_V,
+        DEADLY_POISON_IV, DEADLY_POISON_III, DEADLY_POISON_II, DEADLY_POISON
+    };
+
+    for (Item* item : items)
+    {
+        ItemTemplate const* proto = item->GetTemplate();
+        if (!proto) continue;
+
+        if (idsToDelete.find(proto->ItemId) != idsToDelete.end())
+            itemsToDelete.push_back(item);
+    }
+
+    for (Item* item : itemsToDelete)
+        bot->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+}
+
 void PlayerbotFactory::InitGlyphs(bool increment)
 {
     bot->InitGlyphsForLevel();
-    if (!increment &&
+    if (!increment && botAI &&
         botAI->GetAiObjectContext()->GetValue<bool>("custom_glyphs")->Get())
         return;   // // Added for custom Glyphs - custom glyphs flag test
 
