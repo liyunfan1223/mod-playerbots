@@ -2846,3 +2846,12 @@ bool YoggSaronGuardianPositioningAction::Execute(Event event)
                   ULDUAR_YOGG_SARON_MIDDLE.GetPositionZ(), false, false, false, true,
                   MovementPriority::MOVEMENT_FORCED, true, false);
 }
+
+bool YoggSaronSanityAction::Execute(Event event)
+{
+    Creature* sanityWell = bot->FindNearestCreature(NPC_SANITY_WELL, 200.0f);
+
+    return MoveTo(bot->GetMapId(), sanityWell->GetPositionX(), sanityWell->GetPositionY(), sanityWell->GetPositionZ(),
+                  false, false, false, true, MovementPriority::MOVEMENT_FORCED,
+                  true, false);
+}

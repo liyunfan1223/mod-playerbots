@@ -18,7 +18,7 @@ enum UlduarIDs
     SPELL_OVERLOAD_25_MAN_2 = 61886,
     SPELL_RUNE_OF_POWER = 64320,
 
-    //Kologarn
+    // Kologarn
     NPC_RIGHT_ARM = 32934,
     NPC_RUBBLE = 33768,
     SPELL_CRUNCH_ARMOR = 64002,
@@ -27,13 +27,13 @@ enum UlduarIDs
     SPELL_FOCUSED_EYEBEAM_10 = 63347,
     SPELL_FOCUSED_EYEBEAM_25_2 = 63976,
     SPELL_FOCUSED_EYEBEAM_25 = 63977,
-    
+
     // Hodir
     NPC_SNOWPACKED_ICICLE = 33174,
     NPC_TOASTY_FIRE = 33342,
     SPELL_FLASH_FREEZE = 61968,
     SPELL_BITING_COLD_PLAYER_AURA = 62039,
-    
+
     // Freya
     NPC_SNAPLASHER = 32916,
     NPC_STORM_LASHER = 32919,
@@ -85,7 +85,10 @@ enum UlduarIDs
     // Yogg-Saron
     NPC_GUARDIAN_OF_YS = 33136,
     NPC_OMINOUS_CLOUD = 33292,
-    
+    NPC_DEATH_ORB = 33882,
+    NPC_SANITY_WELL = 33991,
+    SPELL_SANITY = 63050,
+
     // Buffs
     SPELL_FROST_TRAP = 13809
 };
@@ -456,17 +459,39 @@ public:
 //
 // Yogg-Saron
 //
-class YoggSaronOminousCloudCheatTrigger : public Trigger
+class YoggSaronTrigger : public Trigger
 {
 public:
-    YoggSaronOminousCloudCheatTrigger(PlayerbotAI* ai) : Trigger(ai, "yogg-saron ominous cloud cheat trigger") {}
+    YoggSaronTrigger(PlayerbotAI* ai, std::string const name) : Trigger(ai, name) {}
+
+    Unit* GetSaraIfAlive();
+};
+
+class YoggSaronOminousCloudCheatTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronOminousCloudCheatTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron ominous cloud cheat trigger") {}
     bool IsActive() override;
 };
 
-class YoggSaronGuardianPositioningTrigger : public Trigger
+class YoggSaronGuardianPositioningTrigger : public YoggSaronTrigger
 {
 public:
-    YoggSaronGuardianPositioningTrigger(PlayerbotAI* ai) : Trigger(ai, "yogg-saron guardian positioning trigger") {}
+    YoggSaronGuardianPositioningTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron guardian positioning trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronSanityTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronSanityTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron sanity trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronDeathOrbTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronDeathOrbTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron death orb trigger") {}
     bool IsActive() override;
 };
 

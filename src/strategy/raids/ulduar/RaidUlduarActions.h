@@ -404,4 +404,12 @@ public:
     bool Execute(Event event) override;
 };
 
+class YoggSaronSanityAction : public MovementAction
+{
+public:
+    YoggSaronSanityAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron sanity action") {}
+
+    bool Execute(Event event) override;
+};
+
 #endif

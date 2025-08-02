@@ -244,11 +244,6 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     //
     // Yogg-Saron
     //
-    
-    // Phase 1
-    // yogg-saron avoid floating clouds (NPC_OMINOUS_CLOU = 33292)
-    //
-
     triggers.push_back(new TriggerNode(
         "yogg-saron ominous cloud cheat trigger",
         NextAction::array(0, new NextAction("yogg-saron ominous cloud cheat action", ACTION_RAID), nullptr)));
@@ -259,6 +254,16 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     // Phase 2
     // yogg-saron restore sanity (NPC_SANITY_WELL = 33991)
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron sanity trigger",
+        NextAction::array(0, new NextAction("yogg-saron sanity action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron death orb trigger",
+        NextAction::array(0, new NextAction("yogg-saron death orb action", ACTION_RAID), nullptr)));
+
+    // yogg-saron avoid death orb (NPC_DEATH_ORB = 33882)
     // yogg-saron enter boss room portal (few seconds before SPELL_INDUCE_MADNESS = 64059 end)
     // yogg-saron enter brain room portal (dynamic assign players to specific portals (variable yoggPortalLoc) 10man 4 portals 25man 10 portals)
     // yogg-saron malady of the mind (go away from boss, other avoid players with debuff SPELL_MALADY_OF_THE_MIND = 63830)

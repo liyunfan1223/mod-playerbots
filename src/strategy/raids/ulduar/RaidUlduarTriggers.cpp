@@ -1621,6 +1621,17 @@ bool VezaxMarkOfTheFacelessTrigger::IsActive()
     return distance > 2.0f;
 }
 
+Unit* YoggSaronTrigger::GetSaraIfAlive()
+{
+    Unit* sara = AI_VALUE2(Unit*, "find target", "sara");
+
+    if (!sara || !sara->IsAlive())
+    {
+        return nullptr;
+    }
+    return sara;
+}
+
 bool YoggSaronOminousCloudCheatTrigger::IsActive()
 {
     if (!botAI->HasCheat(BotCheatMask::raid))
@@ -1628,10 +1639,8 @@ bool YoggSaronOminousCloudCheatTrigger::IsActive()
         return false;
     }
 
-    Unit* boss = AI_VALUE2(Unit*, "find target", "sara");
-
-    // Check boss and it is alive
-    if (!boss || !boss->IsAlive())
+    Unit* boss = GetSaraIfAlive();
+    if (!boss)
     {
         return false;
     }
@@ -1649,10 +1658,7 @@ bool YoggSaronOminousCloudCheatTrigger::IsActive()
 
 bool YoggSaronGuardianPositioningTrigger::IsActive()
 {
-    Unit* boss = AI_VALUE2(Unit*, "find target", "sara");
-
-    // Check boss and it is alive
-    if (!boss || !boss->IsAlive())
+    if (!GetSaraIfAlive())
     {
         return false;
     }
@@ -1687,4 +1693,22 @@ bool YoggSaronGuardianPositioningTrigger::IsActive()
 
     return thereIsAnyGuardian &&
            bot->GetDistance2d(ULDUAR_YOGG_SARON_MIDDLE.GetPositionX(), ULDUAR_YOGG_SARON_MIDDLE.GetPositionY()) > 1.0f;
+}
+
+bool YoggSaronSanityTrigger::IsActive()
+{
+    Aura* sanityAura = bot->GetAura(SPELL_SANITY);
+
+    if (!sanityAura)
+    {
+        return false;
+    }
+
+    int sanityAuraStacks = sanityAura->GetStackAmount();
+
+    Creature* sanityWell = bot->FindNearestCreature(NPC_SANITY_WELL, 200.0f);
+    float distanceToSanityWell = bot->GetDistance(sanityWell);
+
+    return (distanceToSanityWell >= 1.0f && sanityAuraStacks < 40) ||
+           (distanceToSanityWell < 1.0f && sanityAuraStacks < 100);
 }
