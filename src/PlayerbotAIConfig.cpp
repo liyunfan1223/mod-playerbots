@@ -83,6 +83,9 @@ bool PlayerbotAIConfig::Initialize()
     lootDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.LootDelay", 1000);
     disabledWithoutRealPlayerLoginDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLoginDelay", 30);
     disabledWithoutRealPlayerLogoutDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay", 300);
+    randomBotMinLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMinLoginLevel", 1);
+    randomBotMaxLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMaxLoginLevel", 80);
+    randomBotLogoutOutsideLoginRange = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotLogoutOutsideLoginRange", false);
 
     farDistance = sConfigMgr->GetOption<float>("AiPlayerbot.FarDistance", 20.0f);
     sightDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SightDistance", 75.0f);
@@ -198,7 +201,7 @@ bool PlayerbotAIConfig::Initialize()
                                              "575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,"
                                              "531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"),
         restrictedHealerDPSMaps);
-	
+
 	//////////////////////////// ICC
 
 	EnableICCBuffs = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableICCBuffs", true);
