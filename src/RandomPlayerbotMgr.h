@@ -193,8 +193,8 @@ public:
     void ForceRecount() { SetEventValue(0, "bot_count", 0, 0); }
     void MarkBotForLogout(uint32 bot)
     {
-        SetEventValue(bot, "add", 0, 0);  // Clear the "add" event to trigger logout
-        SetEventValue(bot, "logout", 1, 1);  // Also set logout for clarity
+        SetEventValue(bot, "add", 0, 0);        // Clear the "add" event to trigger logout
+        SetEventValue(bot, "logout", 1, 1);     // Also set logout for clarity
     }
 
 protected:
