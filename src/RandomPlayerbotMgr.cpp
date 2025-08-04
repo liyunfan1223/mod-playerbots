@@ -2666,7 +2666,7 @@ void RandomPlayerbotMgr::GetBots()
                     if (botLevel < sPlayerbotAIConfig->randomBotMinLoginLevel ||
                         botLevel > sPlayerbotAIConfig->randomBotMaxLoginLevel)
                     {
-                        continue; // Skip this bot
+                        continue;
                     }
                 }
 
