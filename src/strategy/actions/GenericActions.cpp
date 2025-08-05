@@ -156,9 +156,6 @@ bool PetAttackAction::Execute(Event event)
 
 bool SetPetStanceAction::Execute(Event /*event*/)
 {
-    // Get the bot player object from the AI
-    Player* bot = botAI->GetBot();
-
     // Prepare a list to hold all controlled pet and guardian creatures
     std::vector<Creature*> targets;
 

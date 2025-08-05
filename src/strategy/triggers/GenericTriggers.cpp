@@ -692,9 +692,11 @@ bool NewPetTrigger::IsActive()
 {
     // Get the bot player object from the AI
     Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
 
     // Try to get the current pet; initialize guardian and GUID to null/empty
-    Pet* pet = bot ? bot->GetPet() : nullptr;
+    Pet* pet = bot->GetPet();
     Guardian* guardian = nullptr;
     ObjectGuid currentPetGuid = ObjectGuid::Empty;
 
@@ -706,7 +708,7 @@ bool NewPetTrigger::IsActive()
     else
     {
         // If no pet, try to get a guardian pet and its GUID
-        guardian = bot ? bot->GetGuardianPet() : nullptr;
+        guardian = bot->GetGuardianPet();
         if (guardian)
             currentPetGuid = guardian->GetGUID();
     }

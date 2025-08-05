@@ -25,7 +25,7 @@ private:
     bool SetPetByFamily(const std::string& family);
     bool RenamePet(const std::string& newName);
     bool CreateAndSetPet(uint32 creatureEntry);
-    bool abandonPet();
+    bool AbandonPet();
 
     std::string lastPetName;
     uint32 lastPetId = 0;

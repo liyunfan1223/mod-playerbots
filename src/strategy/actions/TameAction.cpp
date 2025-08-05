@@ -108,7 +108,7 @@ bool TameAction::Execute(Event event)
     // Handle "tame abandon" command to give up your current pet
     if (mode == "abandon")
     {
-        return abandonPet();
+        return AbandonPet();
     }
 
     // Try to process the command based on mode and value
@@ -476,7 +476,7 @@ bool TameAction::CreateAndSetPet(uint32 creatureEntry)
     return true;
 }
 
-bool TameAction::abandonPet()
+bool TameAction::AbandonPet()
 {
     // Get the bot player and its current pet (if any)
     Player* bot = botAI->GetBot();
