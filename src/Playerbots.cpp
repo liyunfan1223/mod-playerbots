@@ -221,7 +221,7 @@ public:
         if (Group* group = player->GetGroup())
         {
             Player* leader = group->GetLeader();
-            if (leader != player)
+            if (leader && leader != player)
             {
                 if (PlayerbotAI* leaderBotAI = GET_PLAYERBOT_AI(leader))
                 {
