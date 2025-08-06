@@ -213,29 +213,25 @@ public:
         if (sPlayerbotAIConfig->randomBotXPRate == 1.0 || !player)
             return;
 
-        // when player is no bot.
-        if (!player->GetSession()->IsBot())
+        // no XP multiplier, when player is no bot.
+        if (!player->GetSession()->IsBot() || !sRandomPlayerbotMgr->IsRandomBot(player))
             return;
 
-        // when player is no bot, double check.
-        if (!sRandomPlayerbotMgr->IsRandomBot(player))
-            return;
-
-        // when bot has group where leader is a real player.
+        // no XP multiplier, when bot has group where leader is a real player.
         if (Group* group = player->GetGroup())
         {
             Player* leader = group->GetLeader();
             if (leader != player)
             {
-                if (!leader->GetSession()->IsBot())
-                    return;
-        
-                if (!sRandomPlayerbotMgr->IsRandomBot(leader))
-                    return;
+                if (PlayerbotAI* leaderBotAI = GET_PLAYERBOT_AI(leader))
+                {
+                    if (leaderBotAI->HasRealPlayerMaster())
+                        return;
+                }
             }
         }
 
-        // otherwise apply bot XP scaling.
+        // otherwise apply bot XP multiplier.
         amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
     }
 };
