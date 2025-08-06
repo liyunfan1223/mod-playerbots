@@ -111,4 +111,13 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
+class WarlockDrainSoulStrategy : public Strategy
+{
+public:
+    WarlockDrainSoulStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+
+    std::string const getName() override { return "drain soul"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
 #endif

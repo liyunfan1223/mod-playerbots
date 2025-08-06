@@ -612,7 +612,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             {
                 nonCombatEngine->addStrategiesNoInit("imp", "firestone", nullptr);
             }
-            nonCombatEngine->addStrategiesNoInit("dps assist", "ss self", nullptr);
+            nonCombatEngine->addStrategiesNoInit("dps assist", "ss self", "auto shards", nullptr);
             break;
         case CLASS_DEATH_KNIGHT:
             if (tab == 0)

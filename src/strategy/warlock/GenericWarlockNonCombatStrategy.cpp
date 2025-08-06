@@ -80,8 +80,6 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
     NonCombatStrategy::InitTriggers(triggers);
     triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("fel domination", 30.0f), nullptr)));
-    triggers.push_back(new TriggerNode("no soul shard", NextAction::array(0, new NextAction("create soul shard", 60.0f), nullptr)));
-    triggers.push_back(new TriggerNode("too many soul shards", NextAction::array(0, new NextAction("destroy soul shard", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("soul link", NextAction::array(0, new NextAction("soul link", 28.0f), nullptr)));
     triggers.push_back(new TriggerNode("demon armor", NextAction::array(0, new NextAction("fel armor", 27.0f), nullptr)));
     triggers.push_back(new TriggerNode("no healthstone", NextAction::array(0, new NextAction("create healthstone", 26.0f), nullptr)));
@@ -215,4 +213,16 @@ void UseFirestoneStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("no firestone", NextAction::array(0, new NextAction("create firestone", 24.0f), nullptr)));
     triggers.push_back(new TriggerNode("firestone", NextAction::array(0, new NextAction("firestone", 24.0f), nullptr)));
+}
+
+// Non-combat strategy for the automatic creation of soul shards
+// Enabled by default
+// To enable, type "nc +auto shards"
+// To disable, type "nc -auto shards"
+AutomaticSoulShardsStrategy::AutomaticSoulShardsStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai) {}
+
+void AutomaticSoulShardsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("no soul shard", NextAction::array(0, new NextAction("create soul shard", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("too many soul shards", NextAction::array(0, new NextAction("destroy soul shard", 60.0f), nullptr)));
 }

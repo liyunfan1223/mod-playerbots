@@ -41,8 +41,6 @@ void GenericWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("life tap", 95.0f), nullptr)));
     triggers.push_back(new TriggerNode("medium threat", NextAction::array(0, new NextAction("soulshatter", 55.0f), nullptr)));
     triggers.push_back(new TriggerNode("spell lock", NextAction::array(0, new NextAction("spell lock", 40.0f), nullptr)));
-    triggers.push_back(new TriggerNode("no soul shard", NextAction::array(0, new NextAction("create soul shard", 60.0f), nullptr)));
-    triggers.push_back(new TriggerNode("too many soul shards", NextAction::array(0, new NextAction("destroy soul shard", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("devour magic purge", NextAction::array(0, new NextAction("devour magic purge", 50.0f), nullptr)));
     triggers.push_back(new TriggerNode("devour magic cleanse", NextAction::array(0, new NextAction("devour magic cleanse", 50.0f), nullptr)));
 }
@@ -132,4 +130,13 @@ void WarlockCurseOfTonguesStrategy::InitTriggers(std::vector<TriggerNode*>& trig
 void WarlockCurseOfWeaknessStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("curse of weakness", NextAction::array(0, new NextAction("curse of weakness", 29.0f), nullptr)));
+}
+
+// Combat strategy for using drain soul as an execute for all warlock specs
+// Disabled by default
+// To enable, type "co +drain soul"
+// To disable, type "co -drain soul"
+void WarlockDrainSoulStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("target low health", NextAction::array(0, new NextAction("drain soul", 29.5f), nullptr)));
 }

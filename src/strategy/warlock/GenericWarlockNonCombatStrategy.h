@@ -129,4 +129,14 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };
 
+class AutomaticSoulShardsStrategy : public NonCombatStrategy
+{
+public:
+    AutomaticSoulShardsStrategy(PlayerbotAI* ai);
+    virtual std::string const getName() override { return "auto shards"; }
+
+public:
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+};
+
 #endif
