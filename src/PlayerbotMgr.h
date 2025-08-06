@@ -12,6 +12,7 @@
 #include "PlayerbotAIBase.h"
 #include "QueryHolder.h"
 #include "QueryResult.h"
+#include <shared_mutex>                 // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
 
 class ChatHandler;
 class PlayerbotAI;
@@ -114,11 +115,13 @@ public:
     void RemovePlayerBotData(ObjectGuid const& guid, bool is_AI);
 
     PlayerbotAI* GetPlayerbotAI(Player* player);
+    void RemovePlayerbotAI(ObjectGuid const& guid);   // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
     PlayerbotMgr* GetPlayerbotMgr(Player* player);
 
 private:
     std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsAIMap;
     std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsMgrMap;
+    mutable std::shared_mutex _aiMutex;   // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
 };
 
 #define sPlayerbotsMgr PlayerbotsMgr::instance()
