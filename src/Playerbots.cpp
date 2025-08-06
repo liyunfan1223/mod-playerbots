@@ -209,8 +209,8 @@ public:
 
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
-        // when default no XP scaling.
-        if (sPlayerbotAIConfig->randomBotXPRate == 1.0)
+        // early return
+        if (sPlayerbotAIConfig->randomBotXPRate == 1.0 || !player)
             return;
 
         // when player is no bot.
