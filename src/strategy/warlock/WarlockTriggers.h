@@ -10,6 +10,8 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "CureTriggers.h"
+#include "Trigger.h"
+#include <set>
 
 class PlayerbotAI;
 
@@ -34,14 +36,14 @@ class OutOfSoulShardsTrigger : public Trigger
 {
 public:
     OutOfSoulShardsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soul shard", 2) {}
-    bool IsActive() override { return AI_VALUE2(uint32, "item count", "soul shard") == 0; }
+    bool IsActive() override;
 };
 
 class TooManySoulShardsTrigger : public Trigger
 {
 public:
     TooManySoulShardsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "too many soul shards") {}
-    bool IsActive() override { return AI_VALUE2(uint32, "item count", "soul shard") >= 6; }
+    bool IsActive() override;
 };
 
 class FirestoneTrigger : public BuffTrigger
@@ -58,11 +60,11 @@ public:
     bool IsActive() override;
 };
 
-class HasSoulstoneTrigger : public Trigger
+class OutOfSoulstoneTrigger : public Trigger
 {
 public:
-    HasSoulstoneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soulstone") {}
-    bool IsActive() override { return AI_VALUE2(uint32, "item count", "soulstone") == 0; }
+    OutOfSoulstoneTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soulstone") {}
+    bool IsActive() override;
 };
 
 class SoulstoneTrigger : public Trigger
@@ -111,6 +113,14 @@ class HasHealthstoneTrigger : public WarlockConjuredItemTrigger
 public:
     HasHealthstoneTrigger(PlayerbotAI* botAI) : WarlockConjuredItemTrigger(botAI, "healthstone") {}
 };
+
+class WrongPetTrigger : public Trigger
+{
+public:
+    WrongPetTrigger(PlayerbotAI* botAI) : Trigger(botAI, "wrong pet") {}
+    bool IsActive() override;
+};
+
 
 // CC and Pet Triggers
 
@@ -322,6 +332,21 @@ class MetaMeleeEnemyTooCloseForSpellTrigger : public TwoTriggers
 public:
     MetaMeleeEnemyTooCloseForSpellTrigger(PlayerbotAI* ai)
         : TwoTriggers(ai, "enemy too close for spell", "metamorphosis not active") {}
+};
+
+class RainOfFireChannelCheckTrigger : public Trigger
+{
+public:
+    RainOfFireChannelCheckTrigger(PlayerbotAI* botAI, uint32 minEnemies = 2)
+        : Trigger(botAI, "rain of fire channel check"), minEnemies(minEnemies)
+    {
+    }
+
+    bool IsActive() override;
+
+protected:
+    uint32 minEnemies;
+    static const std::set<uint32> RAIN_OF_FIRE_SPELL_IDS;
 };
 
 #endif

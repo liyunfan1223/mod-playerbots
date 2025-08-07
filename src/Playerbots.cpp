@@ -197,21 +197,13 @@ public:
         sRandomPlayerbotMgr->HandleCommand(type, msg, player);
     }
 
-    bool OnPlayerBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* /*criteria*/) override
+    bool OnPlayerBeforeAchievementComplete(Player* player, AchievementEntry const* achievement) override
     {
-        if (sRandomPlayerbotMgr->IsRandomBot(player))
+        if (sRandomPlayerbotMgr->IsRandomBot(player) && (achievement->flags == 256 || achievement->flags == 768))
         {
             return false;
         }
-        return true;
-    }
 
-    bool OnPlayerBeforeAchievementComplete(Player* player, AchievementEntry const* /*achievement*/) override
-    {
-        if (sRandomPlayerbotMgr->IsRandomBot(player))
-        {
-            return false;
-        }
         return true;
     }
 
@@ -371,6 +363,10 @@ public:
 
     void OnPlayerbotLogout(Player* player) override
     {
+        // immediate purge of the bot's AI upon disconnection
+        if (player && player->GetSession()->IsBot())
+            sPlayerbotsMgr->RemovePlayerbotAI(player->GetGUID()); // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+    
         if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
         {
             PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);

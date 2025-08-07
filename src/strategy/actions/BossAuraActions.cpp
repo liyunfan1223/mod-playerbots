@@ -50,3 +50,16 @@ bool BossNatureResistanceAction::Execute(Event event)
     botAI->ChangeStrategy(ADD_STRATEGY_CHAR + hunterNatureResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
     return true;
 }
+
+bool BossShadowResistanceAction::isUseful()
+{
+    BossShadowResistanceTrigger bossShadowResistanceTrigger(botAI, bossName);
+    return bossShadowResistanceTrigger.IsActive();
+}
+
+bool BossShadowResistanceAction::Execute(Event event)
+{
+    PaladinShadowResistanceStrategy paladinShadowResistanceStrategy(botAI);
+    botAI->ChangeStrategy(ADD_STRATEGY_CHAR + paladinShadowResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
+    return true;
+}

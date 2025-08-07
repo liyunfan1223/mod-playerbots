@@ -515,15 +515,174 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
 //     setActivityPercentage(activityPercentage);
 // }
 
+// Assigns accounts as RNDbot accounts (type 1) based on MaxRandomBots and EnablePeriodicOnlineOffline and its ratio,
+// and assigns accounts as AddClass accounts (type 2) based AddClassAccountPoolSize. Type 1 and 2 assignments are
+// permenant, unless MaxRandomBots or AddClassAccountPoolSize are set to 0. If so, their associated accounts will
+// be unassigned (type 0)
+void RandomPlayerbotMgr::AssignAccountTypes()
+{
+    LOG_INFO("playerbots", "Assigning account types for random bot accounts...");
+
+    // Clear existing filtered lists
+    rndBotTypeAccounts.clear();
+    addClassTypeAccounts.clear();
+
+    // First, get ALL randombot accounts from the database
+    std::vector<uint32> allRandomBotAccounts;
+    QueryResult allAccounts = LoginDatabase.Query(
+        "SELECT id FROM account WHERE username LIKE '{}%%' ORDER BY id",
+        sPlayerbotAIConfig->randomBotAccountPrefix.c_str());
+
+    if (allAccounts)
+    {
+        do
+        {
+            Field* fields = allAccounts->Fetch();
+            uint32 accountId = fields[0].Get<uint32>();
+            allRandomBotAccounts.push_back(accountId);
+        } while (allAccounts->NextRow());
+    }
+
+    LOG_INFO("playerbots", "Found {} total randombot accounts in database", allRandomBotAccounts.size());
+
+    // Check existing assignments
+    QueryResult existingAssignments = PlayerbotsDatabase.Query("SELECT account_id, account_type FROM playerbots_account_type");
+    std::map<uint32, uint8> currentAssignments;
+
+    if (existingAssignments)
+    {
+        do
+        {
+            Field* fields = existingAssignments->Fetch();
+            uint32 accountId = fields[0].Get<uint32>();
+            uint8 accountType = fields[1].Get<uint8>();
+            currentAssignments[accountId] = accountType;
+        } while (existingAssignments->NextRow());
+    }
+
+    // Mark ALL randombot accounts as unassigned if not already assigned
+    for (uint32 accountId : allRandomBotAccounts)
+    {
+        if (currentAssignments.find(accountId) == currentAssignments.end())
+        {
+            PlayerbotsDatabase.Execute("INSERT INTO playerbots_account_type (account_id, account_type) VALUES ({}, 0) ON DUPLICATE KEY UPDATE account_type = account_type", accountId);
+            currentAssignments[accountId] = 0;
+        }
+    }
+
+    // Calculate needed RNDbot accounts
+    uint32 neededRndBotAccounts = 0;
+    if (sPlayerbotAIConfig->maxRandomBots > 0)
+    {
+        int divisor = RandomPlayerbotFactory::CalculateAvailableCharsPerAccount();
+        int maxBots = sPlayerbotAIConfig->maxRandomBots;
+
+        // Take periodic online-offline into account
+        if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
+        {
+            maxBots *= sPlayerbotAIConfig->periodicOnlineOfflineRatio;
+        }
+
+        // Calculate base accounts needed for RNDbots, ensuring round up for maxBots not cleanly divisible by the divisor
+        neededRndBotAccounts = (maxBots + divisor - 1) / divisor;
+    }
+
+    // Count existing assigned accounts
+    uint32 existingRndBotAccounts = 0;
+    uint32 existingAddClassAccounts = 0;
+
+    for (const auto& [accountId, accountType] : currentAssignments)
+    {
+        if (accountType == 1) existingRndBotAccounts++;
+        else if (accountType == 2) existingAddClassAccounts++;
+    }
+
+    // Assign RNDbot accounts from lowest position if needed
+    if (existingRndBotAccounts < neededRndBotAccounts)
+    {
+        uint32 toAssign = neededRndBotAccounts - existingRndBotAccounts;
+        uint32 assigned = 0;
+
+        for (uint32 i = 0; i < allRandomBotAccounts.size() && assigned < toAssign; i++)
+        {
+            uint32 accountId = allRandomBotAccounts[i];
+            if (currentAssignments[accountId] == 0) // Unassigned
+            {
+                PlayerbotsDatabase.Execute("UPDATE playerbots_account_type SET account_type = 1, assignment_date = NOW() WHERE account_id = {}", accountId);
+                currentAssignments[accountId] = 1;
+                assigned++;
+            }
+        }
+
+        if (assigned < toAssign)
+        {
+            LOG_ERROR("playerbots", "Not enough unassigned accounts to fulfill RNDbot requirements. Need {} more accounts.", toAssign - assigned);
+        }
+    }
+
+    // Assign AddClass accounts from highest position if needed
+    uint32 neededAddClassAccounts = sPlayerbotAIConfig->addClassAccountPoolSize;
+
+    if (existingAddClassAccounts < neededAddClassAccounts)
+    {
+        uint32 toAssign = neededAddClassAccounts - existingAddClassAccounts;
+        uint32 assigned = 0;
+
+        for (int i = allRandomBotAccounts.size() - 1; i >= 0 && assigned < toAssign; i--)
+        {
+            uint32 accountId = allRandomBotAccounts[i];
+            if (currentAssignments[accountId] == 0) // Unassigned
+            {
+                PlayerbotsDatabase.Execute("UPDATE playerbots_account_type SET account_type = 2, assignment_date = NOW() WHERE account_id = {}", accountId);
+                currentAssignments[accountId] = 2;
+                assigned++;
+            }
+        }
+
+        if (assigned < toAssign)
+        {
+            LOG_ERROR("playerbots", "Not enough unassigned accounts to fulfill AddClass requirements. Need {} more accounts.", toAssign - assigned);
+        }
+    }
+
+    // Populate filtered account lists with ALL accounts of each type
+    for (const auto& [accountId, accountType] : currentAssignments)
+    {
+        if (accountType == 1) rndBotTypeAccounts.push_back(accountId);
+        else if (accountType == 2) addClassTypeAccounts.push_back(accountId);
+    }
+
+    LOG_INFO("playerbots", "Account type assignment complete: {} RNDbot accounts, {} AddClass accounts, {} unassigned",
+             rndBotTypeAccounts.size(), addClassTypeAccounts.size(),
+             currentAssignments.size() - rndBotTypeAccounts.size() - addClassTypeAccounts.size());
+}
+
+bool RandomPlayerbotMgr::IsAccountType(uint32 accountId, uint8 accountType)
+{
+    QueryResult result = PlayerbotsDatabase.Query("SELECT 1 FROM playerbots_account_type WHERE account_id = {} AND account_type = {}", accountId, accountType);
+    return result != nullptr;
+}
+
+// Logs-in bots in 4 phases. Phase 1 logs Alliance bots up to how much is expected according to the faction ratio,
+// and Phase 2 logs-in the remainder Horde bots to reach the total maxAllowedBotCount. If maxAllowedBotCount is not
+// reached after Phase 2, the function goes back to log-in Alliance bots and reach maxAllowedBotCount. This is done
+// because not every account is guaranteed 5A/5H bots, so the true ratio might be skewed by few percentages. Finally,
+// Phase 4 is reached if and only if the value of RandomBotAccountCount is lower than it should.
 uint32 RandomPlayerbotMgr::AddRandomBots()
 {
     uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
+    static time_t missingBotsTimer = 0;
 
     if (currentBots.size() < maxAllowedBotCount)
     {
+	    // Calculate how many bots to add
         maxAllowedBotCount -= currentBots.size();
         maxAllowedBotCount = std::min(sPlayerbotAIConfig->randomBotsPerInterval, maxAllowedBotCount);
 
+	    // Single RNG instance for all shuffling
+        std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+
+	    // Only need to track the Alliance count, as it's in Phase 1
         uint32 totalRatio = sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio;
         uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) / totalRatio;
 
@@ -535,26 +694,42 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             allowedAllianceCount++;
         }
 
-        uint32 allowedHordeCount = maxAllowedBotCount - allowedAllianceCount;
-
-        for (std::vector<uint32>::iterator i = sPlayerbotAIConfig->randomBotAccounts.begin();
-             i != sPlayerbotAIConfig->randomBotAccounts.end(); i++)
+        // Determine which accounts to use based on EnablePeriodicOnlineOffline
+        std::vector<uint32> accountsToUse;
+        if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
         {
-            uint32 accountId = *i;
-            if (sPlayerbotAIConfig->enablePeriodicOnlineOffline)
-            {
-                // minus addclass bots account
-                int32 baseAccount =
-                    RandomPlayerbotFactory::CalculateTotalAccountCount() - sPlayerbotAIConfig->addClassAccountPoolSize;
 
-                if (baseAccount <= 0 || baseAccount > sPlayerbotAIConfig->randomBotAccounts.size())
-                {
-                    LOG_ERROR("playerbots", "Account calculation error with PeriodicOnlineOffline");
-                    return 0;
-                }
-                uint32 index = urand(0, baseAccount - 1);
-                accountId = sPlayerbotAIConfig->randomBotAccounts[index];
+            // Calculate how many accounts can be used
+            // With enablePeriodicOnlineOffline, don't use all of rndBotTypeAccounts right away. Fraction results are rounded up
+            uint32 accountsToUseCount = (rndBotTypeAccounts.size() + sPlayerbotAIConfig->periodicOnlineOfflineRatio - 1)
+                                        / sPlayerbotAIConfig->periodicOnlineOfflineRatio;
+
+            // Randomly select accounts
+            std::vector<uint32> shuffledAccounts = rndBotTypeAccounts;
+            std::shuffle(shuffledAccounts.begin(), shuffledAccounts.end(), rng);
+
+            for (uint32 i = 0; i < accountsToUseCount && i < shuffledAccounts.size(); i++)
+            {
+                accountsToUse.push_back(shuffledAccounts[i]);
             }
+        }
+        else
+        {
+            accountsToUse = rndBotTypeAccounts;
+        }
+
+        // Pre-map all characters from selected accounts
+        struct CharacterInfo
+        {
+            uint32 guid;
+            uint8 rClass;
+            uint8 rRace;
+            uint32 accountId;
+        };
+        std::vector<CharacterInfo> allCharacters;
+
+        for (uint32 accountId : accountsToUse)
+        {
             CharacterDatabasePreparedStatement* stmt =
                 CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
             stmt->SetData(0, accountId);
@@ -562,87 +737,115 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             if (!result)
                 continue;
 
-            std::vector<GuidClassRaceInfo> allGuidInfos;
-
             do
             {
                 Field* fields = result->Fetch();
-                GuidClassRaceInfo info;
+                CharacterInfo info;
                 info.guid = fields[0].Get<uint32>();
                 info.rClass = fields[1].Get<uint8>();
                 info.rRace = fields[2].Get<uint8>();
-                allGuidInfos.push_back(info);
+                info.accountId = accountId;
+                allCharacters.push_back(info);
             } while (result->NextRow());
-
-            // random shuffle for class balance
-            std::mt19937 rnd(time(0));
-            std::shuffle(allGuidInfos.begin(), allGuidInfos.end(), rnd);
-
-            std::vector<uint32> guids;
-            for (const auto& info : allGuidInfos)
-            {
-                ObjectGuid::LowType guid = info.guid;
-                uint32 rClass = info.rClass;
-                uint32 rRace = info.rRace;
-
-                if (GetEventValue(guid, "add"))
-                    continue;
-
-                if (GetEventValue(guid, "logout"))
-                    continue;
-
-                if (GetPlayerBot(guid))
-                    continue;
-
-                if (std::find(currentBots.begin(), currentBots.end(), guid) != currentBots.end())
-                    continue;
-
-                if (sPlayerbotAIConfig->disableDeathKnightLogin)
-                {
-                    if (rClass == CLASS_DEATH_KNIGHT)
-                    {
-                        continue;
-                    }
-                }
-
-                uint32 isAlliance = IsAlliance(rRace);
-                bool factionNotAllowed = (!allowedAllianceCount && isAlliance) || (!allowedHordeCount && !isAlliance);
-
-                if (factionNotAllowed)
-                    continue;
-
-                if (isAlliance)
-                {
-                    allowedAllianceCount--;
-                }
-                else
-                {
-                    allowedHordeCount--;
-                }
-
-                uint32 add_time = sPlayerbotAIConfig->enablePeriodicOnlineOffline
-                                      ? urand(sPlayerbotAIConfig->minRandomBotInWorldTime,
-                                              sPlayerbotAIConfig->maxRandomBotInWorldTime)
-                                      : sPlayerbotAIConfig->permanantlyInWorldTime;
-
-                SetEventValue(guid, "add", 1, add_time);
-                SetEventValue(guid, "logout", 0, 0);
-                currentBots.push_back(guid);
-
-                maxAllowedBotCount--;
-                if (!maxAllowedBotCount)
-                    break;
-            }
-
-            if (!maxAllowedBotCount)
-                break;
         }
 
+        // Shuffle for class balance
+        std::shuffle(allCharacters.begin(), allCharacters.end(), rng);
+
+        // Separate characters by faction for phased login
+        std::vector<CharacterInfo> allianceChars;
+        std::vector<CharacterInfo> hordeChars;
+
+        for (const auto& charInfo : allCharacters)
+        {
+            if (IsAlliance(charInfo.rRace))
+                allianceChars.push_back(charInfo);
+
+            else
+                hordeChars.push_back(charInfo);
+        }
+
+        // Lambda to handle bot login logic
+        auto tryLoginBot = [&](const CharacterInfo& charInfo) -> bool
+        {
+            if (GetEventValue(charInfo.guid, "add") ||
+                GetEventValue(charInfo.guid, "logout") ||
+                GetPlayerBot(charInfo.guid) ||
+                std::find(currentBots.begin(), currentBots.end(), charInfo.guid) != currentBots.end() ||
+                (sPlayerbotAIConfig->disableDeathKnightLogin && charInfo.rClass == CLASS_DEATH_KNIGHT))
+            {
+                return false;
+            }
+
+            uint32 add_time = sPlayerbotAIConfig->enablePeriodicOnlineOffline
+                                ? urand(sPlayerbotAIConfig->minRandomBotInWorldTime,
+                                        sPlayerbotAIConfig->maxRandomBotInWorldTime)
+                                : sPlayerbotAIConfig->permanantlyInWorldTime;
+
+            SetEventValue(charInfo.guid, "add", 1, add_time);
+            SetEventValue(charInfo.guid, "logout", 0, 0);
+            currentBots.push_back(charInfo.guid);
+
+            return true;
+        };
+
+        // PHASE 1: Log-in Alliance bots up to allowedAllianceCount
+        for (const auto& charInfo : allianceChars)
+        {
+            if (!allowedAllianceCount)
+                break;
+
+            if (tryLoginBot(charInfo))
+            {
+                maxAllowedBotCount--;
+                allowedAllianceCount--;
+            }
+        }
+
+        // PHASE 2: Log-in Horde bots up to maxAllowedBotCount
+        for (const auto& charInfo : hordeChars)
+        {
+            if (!maxAllowedBotCount)
+                break;
+
+            if (tryLoginBot(charInfo))
+                maxAllowedBotCount--;
+        }
+
+        // PHASE 3: If maxAllowedBotCount wasn't reached, log-in more Alliance bots
+        for (const auto& charInfo : allianceChars)
+        {
+            if (!maxAllowedBotCount)
+                break;
+
+            if (tryLoginBot(charInfo))
+                maxAllowedBotCount--;
+        }
+
+        // PHASE 4: An error is given if maxAllowedBotCount is still not reached
         if (maxAllowedBotCount)
-            LOG_ERROR("playerbots",
-                      "Not enough random bot accounts available. Try to increase RandomBotAccountCount "
-                      "in your conf file",
-                      ceil(maxAllowedBotCount / 10));
+        {
+            if (missingBotsTimer == 0)
+                missingBotsTimer = time(nullptr);
+
+            if (time(nullptr) - missingBotsTimer >= 10)
+            {
+                int divisor = RandomPlayerbotFactory::CalculateAvailableCharsPerAccount();
+                uint32 moreAccountsNeeded = (maxAllowedBotCount + divisor - 1) / divisor;
+                LOG_ERROR("playerbots",
+                          "Can't log-in all the requested bots. Try increasing RandomBotAccountCount in your conf file.\n"
+                          "{} more accounts needed.", moreAccountsNeeded);
+                missingBotsTimer = 0;	// Reset timer so error is not spammed every tick
+            }
+        }
+        else
+        {
+            missingBotsTimer = 0;   	// Reset timer if logins for this interval were successful
+        }
+    }
+    else
+    {
+        missingBotsTimer = 0;       	// Reset timer if there's enough bots
     }
 
     return currentBots.size();
@@ -1165,7 +1368,6 @@ void RandomPlayerbotMgr::ScheduleChangeStrategy(uint32 bot, uint32 time)
 bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 {
     ObjectGuid botGUID = ObjectGuid::Create<HighGuid::Player>(bot);
-
     Player* player = GetPlayerBot(botGUID);
     PlayerbotAI* botAI = player ? GET_PLAYERBOT_AI(player) : nullptr;
 
@@ -1875,24 +2077,21 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 
 void RandomPlayerbotMgr::PrepareAddclassCache()
 {
-    /// @FIXME: Modifying RandomBotAccountCount may cause the original addclass bots to be converted into rndbots,
-    // which needs to be fixed by separating the two accounts in implementation
-    size_t poolSize = sPlayerbotAIConfig->addClassAccountPoolSize;
-    size_t start = sPlayerbotAIConfig->randomBotAccounts.size() > poolSize
-                       ? sPlayerbotAIConfig->randomBotAccounts.size() - poolSize
-                       : 0;
+    // Using accounts marked as type 2 (AddClass)
     int32 collected = 0;
-    for (size_t i = start; i < sPlayerbotAIConfig->randomBotAccounts.size(); i++)
+
+    for (uint32 accountId : addClassTypeAccounts)
     {
         for (uint8 claz = CLASS_WARRIOR; claz <= CLASS_DRUID; claz++)
         {
             if (claz == 10)
                 continue;
+
             QueryResult results = CharacterDatabase.Query(
                 "SELECT guid, race FROM characters "
-                "WHERE account = {} AND class = '{}' AND online = 0 "
-                "ORDER BY account DESC",
-                sPlayerbotAIConfig->randomBotAccounts[i], claz);
+                "WHERE account = {} AND class = '{}' AND online = 0",
+                accountId, claz);
+
             if (results)
             {
                 do
@@ -1907,7 +2106,8 @@ void RandomPlayerbotMgr::PrepareAddclassCache()
             }
         }
     }
-    LOG_INFO("playerbots", ">> {} characters collected for addclass command.", collected);
+
+    LOG_INFO("playerbots", ">> {} characters collected for addclass command from {} AddClass accounts.", collected, addClassTypeAccounts.size());
 }
 
 void RandomPlayerbotMgr::Init()
@@ -2286,10 +2486,13 @@ bool RandomPlayerbotMgr::IsRandomBot(ObjectGuid::LowType bot)
     ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(bot);
     if (!sPlayerbotAIConfig->IsInRandomAccountList(sCharacterCache->GetCharacterAccountIdByGuid(guid)))
         return false;
+
     if (std::find(currentBots.begin(), currentBots.end(), bot) != currentBots.end())
         return true;
+
     return false;
 }
+
 bool RandomPlayerbotMgr::IsAddclassBot(Player* bot)
 {
     if (bot && GET_PLAYERBOT_AI(bot))
@@ -2301,23 +2504,37 @@ bool RandomPlayerbotMgr::IsAddclassBot(Player* bot)
     {
         return IsAddclassBot(bot->GetGUID().GetCounter());
     }
+
     return false;
 }
 
 bool RandomPlayerbotMgr::IsAddclassBot(ObjectGuid::LowType bot)
 {
     ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(bot);
+
+    // Check the cache with faction considerations
     for (uint8 claz = CLASS_WARRIOR; claz <= CLASS_DRUID; claz++)
     {
         if (claz == 10)
             continue;
+
         for (uint8 isAlliance = 0; isAlliance <= 1; isAlliance++)
         {
             if (addclassCache[GetTeamClassIdx(isAlliance, claz)].find(guid) !=
                 addclassCache[GetTeamClassIdx(isAlliance, claz)].end())
+            {
                 return true;
+            }
         }
     }
+
+    // If not in cache, check the account type
+    uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
+    if (accountId && IsAccountType(accountId, 2)) // Type 2 = AddClass
+    {
+        return true;
+    }
+
     return false;
 }
 

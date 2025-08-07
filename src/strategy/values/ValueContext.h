@@ -160,6 +160,7 @@ public:
         creators["my attacker count"] = &ValueContext::my_attacker_count;
         creators["has aggro"] = &ValueContext::has_aggro;
         creators["mounted"] = &ValueContext::mounted;
+		creators["custom_glyphs"] = &ValueContext::custom_glyphs;   // Added for custom glyphs
 
         creators["can loot"] = &ValueContext::can_loot;
         creators["loot target"] = &ValueContext::loot_target;
@@ -554,6 +555,13 @@ private:
     static UntypedValue* last_flee_angle(PlayerbotAI* ai) { return new LastFleeAngleValue(ai); }
     static UntypedValue* last_flee_timestamp(PlayerbotAI* ai) { return new LastFleeTimestampValue(ai); }
     static UntypedValue* recently_flee_info(PlayerbotAI* ai) { return new RecentlyFleeInfo(ai); }
+	// -------------------------------------------------------
+    // Flag for cutom glyphs : true when /w bot glyph equip …
+    // -------------------------------------------------------
+    static UntypedValue* custom_glyphs(PlayerbotAI* ai)
+    {
+        return new ManualSetValue<bool>(ai, false, "custom_glyphs");
+    }
 };
 
 #endif

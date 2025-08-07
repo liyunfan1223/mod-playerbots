@@ -36,6 +36,10 @@
 #include "BroadcastHelper.h"
 #include "PlayerbotDbStore.h"
 #include "WorldSessionMgr.h"
+#include "DatabaseEnv.h"        // Added for gender choice
+#include <algorithm>            // Added for gender choice
+#include "Log.h" // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+#include <shared_mutex> // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
 
 class BotInitGuard
 {
@@ -166,7 +170,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     uint32 botAccountId = holder.GetAccountId();
     // At login DBC locale should be what the server is set to use by default (as spells etc are hardcoded to ENUS this
     // allows channels to work as intended)
-    WorldSession* botSession = new WorldSession(botAccountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
+    WorldSession* botSession = new WorldSession(botAccountId, "", 0x0, nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
                                                 time_t(0), sWorld->GetDefaultDbcLocale(), 0, false, false, 0, true);
 
     botSession->HandlePlayerLoginFromDB(holder);  // will delete lqh
@@ -584,8 +588,8 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
 
     bot->SaveToDB(false, false);
-    bool addClassBot = sRandomPlayerbotMgr->IsAddclassBot(bot->GetGUID().GetCounter());
-    if (addClassBot && master && isRandomAccount && abs((int)master->GetLevel() - (int)bot->GetLevel()) > 3)
+    bool addClassBot = sRandomPlayerbotMgr->IsAccountType(accountId, 2);
+    if (addClassBot && master && abs((int)master->GetLevel() - (int)bot->GetLevel()) > 3)
     {
         // PlayerbotFactory factory(bot, master->GetLevel());
         // factory.Randomize(false);
@@ -837,6 +841,18 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     return "unknown command";
 }
 
+// Added for gender choice : Returns the gender of an offline character: 0 = male, 1 = female.
+static uint8 GetOfflinePlayerGender(ObjectGuid guid)
+{
+    QueryResult result = CharacterDatabase.Query(
+        "SELECT gender FROM characters WHERE guid = {}", guid.GetCounter());
+
+    if (result)
+        return (*result)[0].Get<uint8>();       // 0 = male, 1 = female
+
+    return GENDER_MALE;                         // fallback value
+}
+
 bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* args)
 {
     if (!sPlayerbotAIConfig->enabled)
@@ -879,15 +895,17 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
     if (!*args)
     {
         messages.push_back("usage: list/reload/tweak/self or add/addaccount/init/remove PLAYERNAME\n");
-        messages.push_back("usage: addclass CLASSNAME");
+        messages.push_back("usage: addclass CLASSNAME [male|female|0|1]");
         return messages;
     }
 
     char* cmd = strtok((char*)args, " ");
     char* charname = strtok(nullptr, " ");
+    char* genderArg = strtok(nullptr, " ");    // Added for gender choice [male|female|0|1] optionnel
+
     if (!cmd)
     {
-        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME or addclass CLASSNAME");
+        messages.push_back("usage: list/reload/tweak/self or add/init/remove PLAYERNAME or addclass CLASSNAME [male|female]");
         return messages;
     }
 
@@ -1110,6 +1128,24 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             messages.push_back("Error: Invalid Class. Try again.");
             return messages;
         }
+        //  Added for gender choice : Parsing gender
+        int8 gender = -1; // -1 = gender will be random
+        if (genderArg)
+        {
+        	std::string g = genderArg;
+        	std::transform(g.begin(), g.end(), g.begin(), ::tolower);
+        
+        	if (g == "male" || g == "0")
+        		gender = GENDER_MALE; // 0
+        	else if (g == "female" || g == "1")
+        		gender = GENDER_FEMALE; // 1
+        	else
+        	{
+        		messages.push_back("Unknown gender : " + g + " (male/female/0/1)");
+        		return messages;
+        	}
+        } //end
+
         if (claz == 6 && master->GetLevel() < sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL))
         {
             messages.push_back("Your level is too low to summon Deathknight");
@@ -1119,6 +1155,9 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         const std::unordered_set<ObjectGuid> &guidCache = sRandomPlayerbotMgr->addclassCache[RandomPlayerbotMgr::GetTeamClassIdx(teamId == TEAM_ALLIANCE, claz)];
         for (const ObjectGuid &guid: guidCache)
         {
+            // If the user requested a specific gender, skip any character that doesn't match.
+            if (gender != -1 && GetOfflinePlayerGender(guid) != gender)
+                continue;			
             if (botLoading.find(guid) != botLoading.end())
                 continue;
             if (ObjectAccessor::FindConnectedPlayer(guid))
@@ -1689,21 +1728,53 @@ void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid, bool is_AI)
 
 PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
-    if (!(sPlayerbotAIConfig->enabled) || !player)
-    {
-        return nullptr;
-    }
-    // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
+    // if (!(sPlayerbotAIConfig->enabled) || !player)
+    // {
     //     return nullptr;
     // }
-    auto itr = _playerbotsAIMap.find(player->GetGUID());
-    if (itr != _playerbotsAIMap.end())
-    {
-        if (itr->second->IsBotAI())
+    // // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
+    // //     return nullptr;
+    // // }
+    // auto itr = _playerbotsAIMap.find(player->GetGUID());
+    // if (itr != _playerbotsAIMap.end())
+    // {
+    //     if (itr->second->IsBotAI())
+    //         return reinterpret_cast<PlayerbotAI*>(itr->second);
+    // }
+	// 
+    // return nullptr;
+	
+	// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+    if (!sPlayerbotAIConfig->enabled || !player)
+        return nullptr;
+
+    {   // protected read
+        std::shared_lock lock(_aiMutex);
+        auto itr = _playerbotsAIMap.find(player->GetGUID());
+        if (itr != _playerbotsAIMap.end() && itr->second->IsBotAI())
             return reinterpret_cast<PlayerbotAI*>(itr->second);
     }
 
+    // does the player still exist?
+    if (!ObjectAccessor::FindPlayer(player->GetGUID()))
+        RemovePlayerbotAI(player->GetGUID());          // orphaned AI -> cleanup
+
     return nullptr;
+}
+
+// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid)
+{
+    std::unique_lock lock(_aiMutex);
+
+    if (auto itr = _playerbotsAIMap.find(guid); itr != _playerbotsAIMap.end())
+    {
+        delete itr->second;
+        _playerbotsAIMap.erase(itr);
+        LOG_DEBUG("playerbots", "Removed stale AI entry for GUID {}", static_cast<uint64>(guid.GetRawValue()));
+    }
+
+    _playerbotsMgrMap.erase(guid);
 }
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)

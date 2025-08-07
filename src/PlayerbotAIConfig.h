@@ -22,7 +22,8 @@ enum class BotCheatMask : uint32
     health = 4,
     mana = 8,
     power = 16,
-    maxMask = 32
+    raid = 32,
+    maxMask = 64
 };
 
 enum class HealingManaEfficiency : uint8
@@ -56,7 +57,6 @@ enum NewRpgStatus : int
 };
 
 #define MAX_SPECNO 20
-#define MAX_WORLDBUFF_SPECNO 3
 
 class PlayerbotAIConfig
 {
@@ -287,11 +287,11 @@ public:
     struct worldBuff
     {
         uint32 spellId;
-        uint32 factionId = 0;
-        uint32 classId = 0;
-        uint32 specId = 0;
-        uint32 minLevel = 0;
-        uint32 maxLevel = 0;
+        uint32 factionId;
+        uint32 classId;
+        uint32 specId;
+        uint32 minLevel;
+        uint32 maxLevel;
     };
 
     std::vector<worldBuff> worldBuffs;
@@ -398,9 +398,16 @@ public:
     }
     void log(std::string const fileName, const char* str, ...);
 
-    void loadWorldBuff(uint32 factionId, uint32 classId, uint32 specId, uint32 minLevel, uint32 maxLevel);
+    void loadWorldBuff();
+
     static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
     static std::vector<std::vector<uint32>> ParseTempPetTalentsOrder(uint32 spec, std::string temp_talents_order);
+
+    bool restrictHealerDPS = false;
+    std::vector<uint32> restrictedHealerDPSMaps;
+    bool IsRestrictedHealerDPSMap(uint32 mapId) const;
+
+    std::vector<uint32> excludedHunterPetFamilies;
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::instance()

@@ -198,6 +198,7 @@ class HodirBitingColdJumpAction : public MovementAction
 public:
     HodirBitingColdJumpAction(PlayerbotAI* ai) : MovementAction(ai, "hodir biting cold jump") {}
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class FreyaMoveAwayNatureBombAction : public MovementAction
@@ -353,5 +354,28 @@ public:
     bool Execute(Event event) override;
 };
 
+class VezaxCheatAction : public Action
+{
+public:
+    VezaxCheatAction(PlayerbotAI* ai) : Action(ai, "vezax cheat action") {}
+
+    bool Execute(Event event) override;
+};
+
+class VezaxShadowCrashAction : public MovementAction
+{
+public:
+    VezaxShadowCrashAction(PlayerbotAI* ai) : MovementAction(ai, "vezax shadow crash action") {}
+
+    bool Execute(Event event) override;
+};
+
+class VezaxMarkOfTheFacelessAction : public MovementAction
+{
+public:
+    VezaxMarkOfTheFacelessAction(PlayerbotAI* ai) : MovementAction(ai, "vezax mark of the faceless action") {}
+
+    bool Execute(Event event) override;
+};
 
 #endif

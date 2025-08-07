@@ -118,7 +118,6 @@ bool PlayerbotAIConfig::Initialize()
     tellWhenAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.TellWhenAvoidAoe", false);
 
     randomGearLoweringChance = sConfigMgr->GetOption<float>("AiPlayerbot.RandomGearLoweringChance", 0.0f);
-    
     incrementalGearInit = sConfigMgr->GetOption<bool>("AiPlayerbot.IncrementalGearInit", true);
     randomGearQualityLimit = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomGearQualityLimit", 3);
     randomGearScoreLimit = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomGearScoreLimit", 0);
@@ -157,7 +156,7 @@ bool PlayerbotAIConfig::Initialize()
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761"),
         randomBotQuestIds);
-    
+
     LoadSet<std::set<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.DisallowedGameObjects", "176213,17155"),
                               disallowedGameObjects);
     botAutologin = sConfigMgr->GetOption<bool>("AiPlayerbot.BotAutologin", false);
@@ -190,6 +189,15 @@ bool PlayerbotAIConfig::Initialize()
     maxRandomBotsPriceChangeInterval =
         sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotsPriceChangeInterval", 48 * HOUR);
     randomBotJoinLfg = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotJoinLfg", true);
+
+    restrictHealerDPS = sConfigMgr->GetOption<bool>("AiPlayerbot.HealerDPSMapRestriction", false);
+    LoadList<std::vector<uint32>>(
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.RestrictedHealerDPSMaps",
+                                             "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,"
+                                             "1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,"
+                                             "575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,"
+                                             "531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"),
+        restrictedHealerDPSMaps);
 	
 	//////////////////////////// ICC
 
@@ -346,7 +354,7 @@ bool PlayerbotAIConfig::Initialize()
     {
         std::string setting = "AiPlayerbot.ZoneBracket." + std::to_string(zoneId);
         std::string value = sConfigMgr->GetOption<std::string>(setting, "");
-        
+
         if (!value.empty())
         {
             size_t commaPos = value.find(',');
@@ -448,7 +456,7 @@ bool PlayerbotAIConfig::Initialize()
     }
 
     botCheats.clear();
-    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "taxi"),
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "taxi,raid"),
                                              botCheats);
 
     botCheatMask = 0;
@@ -463,6 +471,8 @@ bool PlayerbotAIConfig::Initialize()
         botCheatMask |= (uint32)BotCheatMask::mana;
     if (std::find(botCheats.begin(), botCheats.end(), "power") != botCheats.end())
         botCheatMask |= (uint32)BotCheatMask::power;
+    if (std::find(botCheats.begin(), botCheats.end(), "raid") != botCheats.end())
+        botCheatMask |= (uint32)BotCheatMask::raid;
 
     LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AllowedLogFiles", ""),
                                              allowedLogFiles);
@@ -470,25 +480,8 @@ bool PlayerbotAIConfig::Initialize()
                                              tradeActionExcludedPrefixes);
 
     worldBuffs.clear();
-
-    LOG_INFO("playerbots", "Loading Worldbuff...");
-    for (uint32 factionId = 0; factionId < 3; factionId++)
-    {
-        for (uint32 classId = 0; classId < MAX_CLASSES; classId++)
-        {
-            for (uint32 specId = 0; specId <= MAX_WORLDBUFF_SPECNO; specId++)
-            {
-                for (uint32 minLevel = 0; minLevel <= randomBotMaxLevel; minLevel++)
-                {
-                    for (uint32 maxLevel = minLevel; maxLevel <= randomBotMaxLevel; maxLevel++)
-                    {
-                        loadWorldBuff(factionId, classId, specId, minLevel, maxLevel);
-                    }
-                    loadWorldBuff(factionId, classId, specId, minLevel, 0);
-                }
-            }
-        }
-    }
+    loadWorldBuff();
+    LOG_INFO("playerbots", "Loading World Buff Feature...");
 
     randomBotAccountPrefix = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAccountPrefix", "rndbot");
     randomBotAccountCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotAccountCount", 0);
@@ -616,6 +609,9 @@ bool PlayerbotAIConfig::Initialize()
         return true;
     }
 
+    // Assign account types after accounts are created
+    sRandomPlayerbotMgr->AssignAccountTypes();
+
     if (sPlayerbotAIConfig->enabled)
     {
         sRandomPlayerbotMgr->Init();
@@ -627,17 +623,15 @@ bool PlayerbotAIConfig::Initialize()
     sPlayerbotTextMgr->LoadBotTextChance();
     PlayerbotFactory::Init();
 
-    if (!sPlayerbotAIConfig->autoDoQuests)
-    {
-        LOG_INFO("server.loading", "Loading Quest Detail Data...");
-        sTravelMgr->LoadQuestTravelTable();
-    }
-
+    AiObjectContext::BuildAllSharedContexts();
 
     if (sPlayerbotAIConfig->randomBotSuggestDungeons)
     {
         sPlayerbotDungeonSuggestionMgr->LoadDungeonSuggestions();
     }
+
+    excludedHunterPetFamilies.clear();
+    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.ExcludedHunterPetFamilies", ""), excludedHunterPetFamilies);
 
     LOG_INFO("server.loading", "---------------------------------------");
     LOG_INFO("server.loading", "        AI Playerbots initialized       ");
@@ -669,6 +663,12 @@ bool PlayerbotAIConfig::IsInPvpProhibitedZone(uint32 id)
 bool PlayerbotAIConfig::IsInPvpProhibitedArea(uint32 id)
 {
     return find(pvpProhibitedAreaIds.begin(), pvpProhibitedAreaIds.end(), id) != pvpProhibitedAreaIds.end();
+}
+
+bool PlayerbotAIConfig::IsRestrictedHealerDPSMap(uint32 mapId) const
+{
+    return restrictHealerDPS &&
+            std::find(restrictedHealerDPSMaps.begin(), restrictedHealerDPSMaps.end(), mapId) != restrictedHealerDPSMaps.end();
 }
 
 std::string const PlayerbotAIConfig::GetTimestampStr()
@@ -743,88 +743,62 @@ void PlayerbotAIConfig::log(std::string const fileName, char const* str, ...)
     fflush(stdout);
 }
 
-void PlayerbotAIConfig::loadWorldBuff(uint32 factionId1, uint32 classId1, uint32 specId1, uint32 minLevel1, uint32 maxLevel1)
+void PlayerbotAIConfig::loadWorldBuff()
 {
-    std::vector<uint32> buffs;
+    std::string matrix = sConfigMgr->GetOption<std::string>("AiPlayerbot.WorldBuffMatrix", "", true);
+    if (matrix.empty())
+        return;
 
-    std::ostringstream os;
-    os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1 << "." << maxLevel1;
+    std::istringstream entryStream(matrix);
+    std::string entry;
 
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-    for (auto buff : buffs)
+    while (std::getline(entryStream, entry, ';'))
     {
-        worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-        worldBuffs.push_back(wb);
-    }
 
-    if (maxLevel1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1;
+        entry.erase(0, entry.find_first_not_of(" \t\r\n"));
+        entry.erase(entry.find_last_not_of(" \t\r\n") + 1);
 
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
+        size_t firstColon = entry.find(':');
+        size_t secondColon = entry.find(':', firstColon + 1);
 
-        for (auto buff : buffs)
+        if (firstColon == std::string::npos || secondColon == std::string::npos)
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            LOG_ERROR("playerbots", "Malformed entry: [{}]", entry);
+            continue;
         }
-    }
 
-    if (maxLevel1 == 0 && minLevel1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1 << "." << specId1;
+        std::string metaPart = entry.substr(firstColon + 1, secondColon - firstColon - 1);
+        std::string spellPart = entry.substr(secondColon + 1);
 
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
+        std::vector<uint32> ids;
+        std::istringstream metaStream(metaPart);
+        std::string token;
+        while (std::getline(metaStream, token, ','))
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            try {
+                ids.push_back(static_cast<uint32>(std::stoi(token)));
+            } catch (...) {
+                LOG_ERROR("playerbots", "Invalid meta token in [{}]", entry);
+                break;
+            }
         }
-    }
 
-    if (maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
+        if (ids.size() != 5)
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            LOG_ERROR("playerbots", "Entry [{}] has incomplete meta block", entry);
+            continue;
         }
-    }
 
-    if (classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff." << factionId1;
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
+        std::istringstream spellStream(spellPart);
+        while (std::getline(spellStream, token, ','))
         {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
-        }
-    }
-
-    if (factionId1 == 0 && classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0 && specId1 == 0)
-    {
-        std::ostringstream os;
-        os << "AiPlayerbot.WorldBuff";
-
-        LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(os.str().c_str(), "", false), buffs);
-
-        for (auto buff : buffs)
-        {
-            worldBuff wb = {buff, factionId1, classId1, specId1, minLevel1, maxLevel1};
-            worldBuffs.push_back(wb);
+            try {
+                uint32 spellId = static_cast<uint32>(std::stoi(token));
+                worldBuff wb = { spellId, ids[0], ids[1], ids[2], ids[3], ids[4] };
+                worldBuffs.push_back(wb);
+            } catch (...) {
+                LOG_ERROR("playerbots", "Invalid spell ID in [{}]", entry);
+            }
         }
     }
 }

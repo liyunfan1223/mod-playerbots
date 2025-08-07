@@ -501,9 +501,10 @@ AiPlayerbot.AutoGearScoreLimit = 0
 # "mana" (bots have infinite mana)
 # "power" (bots have infinite energy, rage, and runic power)
 # "taxi" (bots may use all flight paths, though they will not actually learn them) 
+# "raid" (bots use cheats implemented into raid strategies) 
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,taxi")
 # Default: taxi is enabled
-AiPlayerbot.BotCheats = "taxi" 
+AiPlayerbot.BotCheats = "taxi,raid" 
 
 #
 #
@@ -666,7 +667,7 @@ AiPlayerbot.IncrementalGearInit = 1
 AiPlayerbot.MinEnchantingBotLevel = 60
 
 # Enable expansion limitation for bot enchants
-# If enabled, bots will not use TBC enchants until level 61 or WotLK enchanges until level 71
+# If enabled, bots will not use TBC enchants until level 61 or WotLK enchants until level 71
 # Default: 1 (enabled)
 AiPlayerbot.LimitEnchantExpansion = 1
 
@@ -697,6 +698,10 @@ AiPlayerbot.AutoUpgradeEquip = 1
 # Only set wolf pets for hunters for optimal raid performance (0 = disabled, 1 = enabled only for max-level bots, 2 = enabled)
 # Default: 0 (disabled)
 AiPlayerbot.HunterWolfPet = 0
+
+# Prohibit hunter bots from creating pets with any family ID listed below in ExcludedHunterPetFamilies
+# See the creature_family database table for all pet families by ID (note: ID for spiders is 3)
+AiPlayerbot.ExcludedHunterPetFamilies = ""
 
 #
 #
@@ -807,6 +812,14 @@ AiPlayerbot.RandomBotNonCombatStrategies = ""
 # Strategies added here are applied to all altbots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
+
+# Remove "healer dps" strategy on specified maps.
+# Default: 0 (disabled)
+AiPlayerbot.HealerDPSMapRestriction = 0
+
+# List of Map IDs where "healer dps" strategy will be removed if AiPlayerbot.HealerDPSMapRestriction is enabled
+# Default: (Dungeon and Raid maps) "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"
+AiPlayerbot.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"
 
 #
 #
@@ -1427,8 +1440,8 @@ AiPlayerbot.PremadeSpecLink.7.5.80 = -023222301004-05032331331013501120331251
 
 AiPlayerbot.PremadeSpecName.8.0 = arcane pve
 AiPlayerbot.PremadeSpecGlyph.8.0 = 42735,43339,44955,43364,43361,42751
-AiPlayerbot.PremadeSpecLink.8.0.60 = 23000503110033014032310150532
-AiPlayerbot.PremadeSpecLink.8.0.80 = 23000523310033015032310250532-03-203203001
+AiPlayerbot.PremadeSpecLink.8.0.60 = 230005231100330150323102500321
+AiPlayerbot.PremadeSpecLink.8.0.80 = 230005231100330150323102505321-03-203303001
 AiPlayerbot.PremadeSpecName.8.1 = fire pve
 AiPlayerbot.PremadeSpecGlyph.8.1 = 42739,43339,45737,43364,44920,42751
 AiPlayerbot.PremadeSpecLink.8.1.60 = -0055030011302231053120321341
@@ -1440,7 +1453,7 @@ AiPlayerbot.PremadeSpecLink.8.2.80 = 23002303110003--053303031320310003015223135
 AiPlayerbot.PremadeSpecName.8.3 = frostfire pve
 AiPlayerbot.PremadeSpecGlyph.8.3 = 44684,44920,42751,43339,43364,45737
 AiPlayerbot.PremadeSpecLink.8.3.60 = -2305032012303331053120300051
-AiPlayerbot.PremadeSpecLink.8.3.80 = -2305032012303331053120311351-023303031
+AiPlayerbot.PremadeSpecLink.8.3.80 = -2305032012303331053120321351-023302031
 AiPlayerbot.PremadeSpecName.8.4 = arcane pvp
 AiPlayerbot.PremadeSpecGlyph.8.4 = 42735,43364,42738,43360,43357,42752
 AiPlayerbot.PremadeSpecLink.8.4.60 = 205323200122032103303102015221
@@ -1551,41 +1564,12 @@ AiPlayerbot.PremadeSpecLink.11.6.80 = 05320021--230033312031500531353013251
 
 # Applies a permanent buff to all bots simulating effects of spells, flasks, food, runes, etc.
 # Requires sending the command "nc +worldbuff" in chat to a bot (or a group of bots) to enable
-# Numbers after the equal signs are spell IDs and may be customized
-# See Randombots Default Talent Specs for more info on each spec; they are listed in that section by the names in the parentheticals (e.g., arms pve, fury pve)
+# Each entry in the matrix should be formatted as follows: Entry:FactionID,ClassID,SpecID,MinimumLevel,MaximumLevel:SpellID1,SpellID2,etc.;
+# Use 0 for any field to make it agnostic (e.g., 0 for FactionID means the entry will apply buffs to either faction)
+# The default entries create a cross-faction list of level 80 buffs for each implemented pve spec from the "Premade Specs" section
+# The default entries may be deleted or modified, and new custom entries may be added
 
-AiPlayerbot.WorldBuff.0.1.0.80.80 = 53760,57358                    #WARRIOR ARMS (arms pve)
-AiPlayerbot.WorldBuff.0.1.1.80.80 = 53760,57358                    #WARRIOR FURY (fury pve)
-AiPlayerbot.WorldBuff.0.1.2.80.80 = 53758,57356                    #WARRIOR PROTECTION (prot pve)
-AiPlayerbot.WorldBuff.0.2.0.80.80 = 60347,53749,57332              #PALADIN HOLY (holy pve)
-AiPlayerbot.WorldBuff.0.2.1.80.80 = 53758,57356                    #PALADIN PROTECTION (prot pve)
-AiPlayerbot.WorldBuff.0.2.2.80.80 = 53760,57371                    #PALADIN RETRIBUTION (ret pve)
-AiPlayerbot.WorldBuff.0.3.0.80.80 = 53760,57325                    #HUNTER BEAST (bm pve)
-AiPlayerbot.WorldBuff.0.3.1.80.80 = 53760,57358                    #HUNTER MARKSMANSHIP (mm pve)
-AiPlayerbot.WorldBuff.0.3.2.80.80 = 53760,57367                    #HUNTER SURVIVAL (surv pve)
-AiPlayerbot.WorldBuff.0.4.0.80.80 = 53760,57325                    #ROGUE ASSASINATION (as pve)
-AiPlayerbot.WorldBuff.0.4.1.80.80 = 53760,57358                    #ROGUE COMBAT (combat pve)
-AiPlayerbot.WorldBuff.0.4.2.80.80 = 53760,57367                    #ROGUE SUBTLETY (subtlety pve)
-AiPlayerbot.WorldBuff.0.5.0.80.80 = 53755,57327                    #PRIEST DISCIPLINE (disc pve)
-AiPlayerbot.WorldBuff.0.5.1.80.80 = 53755,57327                    #PRIEST HOLY (holy pve)
-AiPlayerbot.WorldBuff.0.5.2.80.80 = 53755,57327                    #PRIEST SHADOW (shadow pve)
-AiPlayerbot.WorldBuff.0.6.0.80.80 = 53758,57356                    #DEATH KNIGHT BLOOD (blood pve)
-AiPlayerbot.WorldBuff.0.6.1.80.80 = 53760,57358                    #DEATH KNIGHT FROST (frost pve)
-AiPlayerbot.WorldBuff.0.6.2.80.80 = 53760,57358                    #DEATH KNIGHT UNHOLY (unholy pve)
-AiPlayerbot.WorldBuff.0.6.3.80.80 = 53760,57371                    #DEATH KNIGHT BLOOD DPS (double aura blood pve)
-AiPlayerbot.WorldBuff.0.7.0.80.80 = 53755,57327                    #SHAMAN ELEMENTAL (ele pve)
-AiPlayerbot.WorldBuff.0.7.1.80.80 = 53760,57325                    #SHAMAN ENHANCEMENT (enh pve)
-AiPlayerbot.WorldBuff.0.7.2.80.80 = 53755,57327                    #SHAMAN RESTORATION (resto pve)
-AiPlayerbot.WorldBuff.0.8.0.80.80 = 53755,57327                    #MAGE ARCANE (arcane pve)
-AiPlayerbot.WorldBuff.0.8.1.80.80 = 53755,57327                    #MAGE FIRE (fire pve)
-AiPlayerbot.WorldBuff.0.8.2.80.80 = 53755,57327                    #MAGE FROST (frost pve)
-AiPlayerbot.WorldBuff.0.9.0.80.80 = 53755,57327                    #WARLOCK AFFLICTION (affli pve)
-AiPlayerbot.WorldBuff.0.9.1.80.80 = 53755,57327                    #WARLOCK DEMONOLOGY (demo pve)
-AiPlayerbot.WorldBuff.0.9.2.80.80 = 53755,57327                    #WARLOCK DESTRUCTION (destro pve)
-AiPlayerbot.WorldBuff.0.11.0.80.80 = 53755,57327                   #DRUID BALANCE (balance pve)
-AiPlayerbot.WorldBuff.0.11.1.80.80 = 53749,53763,57367             #DRUID FERAL BEAR (bear pve)
-AiPlayerbot.WorldBuff.0.11.2.80.80 = 54212,57334                   #DRUID RESTORATION (resto pve)
-AiPlayerbot.WorldBuff.0.11.3.80.80 = 53760,57358                   #DRUID FERAL CAT (cat pve)
+AiPlayerbot.WorldBuffMatrix = # WARRIOR ARMS 1:0,1,0,80,80:53760,57358; # WARRIOR FURY 2:0,1,1,80,80:53760,57358; # WARRIOR PROTECTION 3:0,1,2,80,80:53758,57356; # PALADIN HOLY 4:0,2,0,80,80:53749,57332,60347; # PALADIN PROTECTION 5:0,2,1,80,80:53758,57356; # PALADIN RETRIBUTION 6:0,2,2,80,80:53760,57371; # HUNTER BEAST 7:0,3,0,80,80:53760,57325; # HUNTER MARKSMANSHIP 8:0,3,1,80,80:53760,57358; # HUNTER SURVIVAL 9:0,3,2,80,80:53760,57367; # ROGUE ASSASSINATION 10:0,4,0,80,80:53760,57325; # ROGUE COMBAT 11:0,4,1,80,80:53760,57358; # ROGUE SUBTLETY 12:0,4,2,80,80:53760,57367; # PRIEST DISCIPLINE 13:0,5,0,80,80:53755,57327; # PRIEST HOLY 14:0,5,1,80,80:53755,57327; # PRIEST SHADOW 15:0,5,2,80,80:53755,57327; # DEATH KNIGHT BLOOD 16:0,6,0,80,80:53758,57356; # DEATH KNIGHT FROST 17:0,6,1,80,80:53760,57358; # DEATH KNIGHT UNHOLY 18:0,6,2,80,80:53760,57358; # DEATH KNIGHT BLOOD DPS 19:0,6,3,80,80:53760,57371; # SHAMAN ELEMENTAL 20:0,7,0,80,80:53755,57327; # SHAMAN ENHANCEMENT 21:0,7,1,80,80:53760,57325; # SHAMAN RESTORATION 22:0,7,2,80,80:53755,57327; # MAGE ARCANE 23:0,8,0,80,80:53755,57327; # MAGE FIRE 24:0,8,1,80,80:53755,57327; # MAGE FROST 25:0,8,2,80,80:53755,57327; # WARLOCK AFFLICTION 26:0,9,0,80,80:53755,57327; # WARLOCK DEMONOLOGY 27:0,9,1,80,80:53755,57327; # WARLOCK DESTRUCTION 28:0,9,2,80,80:53755,57327; # DRUID BALANCE 29:0,11,0,80,80:53755,57327; # DRUID FERAL BEAR 30:0,11,1,80,80:53749,53763,57367; # DRUID RESTORATION 31:0,11,2,80,80:54212,57334; # DRUID FERAL CAT 32:0,11,3,80,80:53760,57358
 
 #
 #

@@ -8,7 +8,6 @@
 #include "BearTankDruidStrategy.h"
 #include "CasterDruidStrategy.h"
 #include "CatDpsDruidStrategy.h"
-#include "OffhealDruidCatStrategy.h"
 #include "DruidActions.h"
 #include "DruidBearActions.h"
 #include "DruidCatActions.h"
@@ -18,6 +17,7 @@
 #include "GenericDruidStrategy.h"
 #include "HealDruidStrategy.h"
 #include "MeleeDruidStrategy.h"
+#include "OffhealDruidCatStrategy.h"
 #include "Playerbots.h"
 
 class DruidStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -111,6 +111,7 @@ public:
         creators["eclipse (lunar) cooldown"] = &DruidTriggerFactoryInternal::eclipse_lunar_cooldown;
         creators["mangle (cat)"] = &DruidTriggerFactoryInternal::mangle_cat;
         creators["ferocious bite time"] = &DruidTriggerFactoryInternal::ferocious_bite_time;
+        creators["hurricane channel check"] = &DruidTriggerFactoryInternal::hurricane_channel_check;
     }
 
 private:
@@ -147,6 +148,7 @@ private:
     static Trigger* eclipse_lunar_cooldown(PlayerbotAI* ai) { return new EclipseLunarCooldownTrigger(ai); }
     static Trigger* mangle_cat(PlayerbotAI* ai) { return new MangleCatTrigger(ai); }
     static Trigger* ferocious_bite_time(PlayerbotAI* ai) { return new FerociousBiteTimeTrigger(ai); }
+    static Trigger* hurricane_channel_check(PlayerbotAI* ai) { return new HurricaneChannelCheckTrigger(ai); }
 };
 
 class DruidAiObjectContextInternal : public NamedObjectContext<Action>
@@ -324,10 +326,44 @@ private:
     static Action* force_of_nature(PlayerbotAI* ai) { return new CastForceOfNatureAction(ai); }
 };
 
-DruidAiObjectContext::DruidAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> DruidAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> DruidAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> DruidAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> DruidAiObjectContext::sharedValueContexts;
+
+DruidAiObjectContext::DruidAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void DruidAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void DruidAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new DruidStrategyFactoryInternal());
     strategyContexts.Add(new DruidDruidStrategyFactoryInternal());
+}
+
+void DruidAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new DruidAiObjectContextInternal());
+}
+
+void DruidAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new DruidTriggerFactoryInternal());
+}
+
+void DruidAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }

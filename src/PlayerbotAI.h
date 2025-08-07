@@ -46,27 +46,27 @@ struct GameObjectData;
 
 enum StrategyType : uint32;
 
-enum HealingItemDisplayId
+enum HealingItemId
 {
-    HEALTHSTONE_DISPLAYID = 8026,
-    MAJOR_HEALING_POTION = 24152,
-    WHIPPER_ROOT_TUBER = 21974,
-    NIGHT_DRAGON_BREATH = 21975,
-    LIMITED_INVULNERABILITY_POTION = 24213,
-    GREATER_DREAMLESS_SLEEP_POTION = 17403,
-    SUPERIOR_HEALING_POTION = 15714,
-    CRYSTAL_RESTORE = 2516,
-    DREAMLESS_SLEEP_POTION = 17403,
-    GREATER_HEALING_POTION = 15713,
-    HEALING_POTION = 15712,
-    LESSER_HEALING_POTION = 15711,
-    DISCOLORED_HEALING_POTION = 15736,
-    MINOR_HEALING_POTION = 15710,
-    VOLATILE_HEALING_POTION = 24212,
-    SUPER_HEALING_POTION = 37807,
-    CRYSTAL_HEALING_POTION = 47132,
-    FEL_REGENERATION_POTION = 37864,
-    MAJOR_DREAMLESS_SLEEP_POTION = 37845
+    HEALTHSTONE = 5512,
+    MAJOR_HEALING_POTION = 13446,
+    WHIPPER_ROOT_TUBER = 11951,
+    NIGHT_DRAGON_BREATH = 11952,
+    LIMITED_INVULNERABILITY_POTION = 3387,
+    GREATER_DREAMLESS_SLEEP_POTION = 22886,
+    SUPERIOR_HEALING_POTION = 3928,
+    CRYSTAL_RESTORE = 11564,
+    DREAMLESS_SLEEP_POTION = 12190,
+    GREATER_HEALING_POTION = 1710,
+    HEALING_POTION = 929,
+    LESSER_HEALING_POTION = 858,
+    DISCOLORED_HEALING_POTION = 3391,
+    MINOR_HEALING_POTION = 118,
+    VOLATILE_HEALING_POTION = 28100,
+    SUPER_HEALING_POTION = 22829,
+    CRYSTAL_HEALING_POTION = 13462,
+    FEL_REGENERATION_POTION = 28101,
+    MAJOR_DREAMLESS_SLEEP_POTION = 20002
 };
 
 enum BotState
@@ -152,6 +152,7 @@ static std::map<ChatChannelSource, std::string> ChatChannelSourceStr = {
     {SRC_RAID, "SRC_RAID"},
 
     {SRC_UNDEFINED, "SRC_UNDEFINED"}};
+
 enum ChatChannelId
 {
     GENERAL = 1,
@@ -162,60 +163,66 @@ enum ChatChannelId
     GUILD_RECRUITMENT = 25,
 };
 
-enum RoguePoisonDisplayId
+enum RoguePoisonId
 {
-    DEADLY_POISON_DISPLAYID = 13707,
-    INSTANT_POISON_DISPLAYID = 13710,
-    WOUND_POISON_DISPLAYID = 37278
+    INSTANT_POISON      = 6947,
+    INSTANT_POISON_II   = 6949,
+    INSTANT_POISON_III  = 6950,
+    INSTANT_POISON_IV   = 8926,
+    INSTANT_POISON_V    = 8927,
+    INSTANT_POISON_VI   = 8928,
+    INSTANT_POISON_VII  = 21927,
+    INSTANT_POISON_VIII = 43230,
+    INSTANT_POISON_IX   = 43231,
+    DEADLY_POISON       = 2892,
+    DEADLY_POISON_II    = 2893,
+    DEADLY_POISON_III   = 8984,
+    DEADLY_POISON_IV    = 8985,
+    DEADLY_POISON_V     = 20844,
+    DEADLY_POISON_VI    = 22053,
+    DEADLY_POISON_VII   = 22054,
+    DEADLY_POISON_VIII  = 43232,
+    DEADLY_POISON_IX    = 43233
 };
 
-enum SharpeningStoneDisplayId
+enum SharpeningStoneId
 {
-    ROUGH_SHARPENING_DISPLAYID = 24673,
-    COARSE_SHARPENING_DISPLAYID = 24674,
-    HEAVY_SHARPENING_DISPLAYID = 24675,
-    SOLID_SHARPENING_DISPLAYID = 24676,
-    DENSE_SHARPENING_DISPLAYID = 24677,
-    CONSECRATED_SHARPENING_DISPLAYID =
-        24674,  // will not be used because bot can not know if it will face undead targets
-    ELEMENTAL_SHARPENING_DISPLAYID = 21072,
-    FEL_SHARPENING_DISPLAYID = 39192,
-    ADAMANTITE_SHARPENING_DISPLAYID = 39193
+    ROUGH_SHARPENING_STONE      = 2862,
+    COARSE_SHARPENING_STONE     = 2863,
+    HEAVY_SHARPENING_STONE      = 2871,
+    SOLID_SHARPENING_STONE      = 7964,
+    DENSE_SHARPENING_STONE      = 12404,
+    ELEMENTAL_SHARPENING_STONE  = 18262,
+    FEL_SHARPENING_STONE        = 23528,
+    ADAMANTITE_SHARPENING_STONE = 23529
 };
 
-enum WeightStoneDisplayId
+enum WeightstoneId
 {
-    ROUGH_WEIGHTSTONE_DISPLAYID = 24683,
-    COARSE_WEIGHTSTONE_DISPLAYID = 24684,
-    HEAVY_WEIGHTSTONE_DISPLAYID = 24685,
-    SOLID_WEIGHTSTONE_DISPLAYID = 24686,
-    DENSE_WEIGHTSTONE_DISPLAYID = 24687,
-    FEL_WEIGHTSTONE_DISPLAYID = 39548,
-    ADAMANTITE_WEIGHTSTONE_DISPLAYID = 39549
+    ROUGH_WEIGHTSTONE      = 3239,
+    COARSE_WEIGHTSTONE     = 3240,
+    HEAVY_WEIGHTSTONE      = 3241,
+    SOLID_WEIGHTSTONE      = 7965,
+    DENSE_WEIGHTSTONE      = 12643,
+    FEL_WEIGHTSTONE        = 28420,
+    ADAMANTITE_WEIGHTSTONE = 28421
 };
 
-enum WizardOilDisplayId
+enum WizardOilId
 {
-    MINOR_WIZARD_OIL = 9731,
-    LESSER_WIZARD_OIL = 47903,
-    BRILLIANT_WIZARD_OIL = 47901,
-    WIZARD_OIL = 47905,
-    SUPERIOR_WIZARD_OIL = 47904,
-    /// Blessed Wizard Oil    = 26865 //scourge inv
+    MINOR_WIZARD_OIL      = 20744,
+    LESSER_WIZARD_OIL     = 20746,
+    WIZARD_OIL            = 20750,
+    BRILLIANT_WIZARD_OIL  = 20749,
+    SUPERIOR_WIZARD_OIL   = 22522
 };
 
-enum ManaOilDisplayId
+enum ManaOilId
 {
-    MINOR_MANA_OIL = 34492,
-    LESSER_MANA_OIL = 47902,
-    BRILLIANT_MANA_OIL = 41488,
-    SUPERIOR_MANA_OIL = 36862
-};
-
-enum ShieldWardDisplayId
-{
-    LESSER_WARD_OFSHIELDING = 38759,
-    GREATER_WARD_OFSHIELDING = 38760
+    MINOR_MANA_OIL        = 20745,
+    LESSER_MANA_OIL       = 20747,
+    BRILLIANT_MANA_OIL    = 20748,
+    SUPERIOR_MANA_OIL     = 22521
 };
 
 enum class BotTypeNumber : uint8
@@ -401,6 +408,7 @@ public:
     void ClearStrategies(BotState type);
     std::vector<std::string> GetStrategies(BotState type);
     void ApplyInstanceStrategies(uint32 mapId, bool tellMaster = false);
+    void EvaluateHealerDpsStrategy();
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(std::string const name, BotState type);
     BotState GetState() { return currentState; };
@@ -471,7 +479,7 @@ public:
     Item* FindBandage() const;
     Item* FindOpenableItem() const;
     Item* FindLockedItem() const;
-    Item* FindConsumable(uint32 displayId) const;
+    Item* FindConsumable(uint32 itemId) const;
     Item* FindStoneFor(Item* weapon) const;
     Item* FindOilFor(Item* weapon) const;
     void ImbueItem(Item* item, uint32 targetFlag, ObjectGuid targetGUID);

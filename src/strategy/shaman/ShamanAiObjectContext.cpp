@@ -328,11 +328,45 @@ private:
     static Action* feral_spirit(PlayerbotAI* ai) { return new CastFeralSpiritAction(ai); }
 };
 
-ShamanAiObjectContext::ShamanAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
+SharedNamedObjectContextList<Strategy> ShamanAiObjectContext::sharedStrategyContexts;
+SharedNamedObjectContextList<Action> ShamanAiObjectContext::sharedActionContexts;
+SharedNamedObjectContextList<Trigger> ShamanAiObjectContext::sharedTriggerContexts;
+SharedNamedObjectContextList<UntypedValue> ShamanAiObjectContext::sharedValueContexts;
+
+ShamanAiObjectContext::ShamanAiObjectContext(PlayerbotAI* botAI)
+    : AiObjectContext(botAI, sharedStrategyContexts, sharedActionContexts, sharedTriggerContexts, sharedValueContexts)
 {
+}
+
+void ShamanAiObjectContext::BuildSharedContexts()
+{
+    BuildSharedStrategyContexts(sharedStrategyContexts);
+    BuildSharedActionContexts(sharedActionContexts);
+    BuildSharedTriggerContexts(sharedTriggerContexts);
+    BuildSharedValueContexts(sharedValueContexts);
+}
+
+void ShamanAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+{
+    AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new ShamanStrategyFactoryInternal());
     strategyContexts.Add(new ShamanCombatStrategyFactoryInternal());
     strategyContexts.Add(new ShamanBuffStrategyFactoryInternal());
+}
+
+void ShamanAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+{
+    AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new ShamanAiObjectContextInternal());
+}
+
+void ShamanAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+{
+    AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new ShamanATriggerFactoryInternal());
+}
+
+void ShamanAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+{
+    AiObjectContext::BuildSharedValueContexts(valueContexts);
 }
