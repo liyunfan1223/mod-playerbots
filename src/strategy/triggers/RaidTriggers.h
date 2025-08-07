@@ -18,5 +18,13 @@ public:
     bool IsActive() override;
 };
 
+class RaidTrigger : public Trigger
+{
+public:
+    RaidTrigger(PlayerbotAI* ai, std::string const name = "raid trigger") : Trigger(ai, name) {}
+
+
+};
+
 
 #endif

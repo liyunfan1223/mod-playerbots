@@ -264,9 +264,6 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "yogg-saron guardian positioning trigger",
         NextAction::array(0, new NextAction("yogg-saron guardian positioning action", ACTION_RAID), nullptr)));
 
-    // Phase 2
-    // yogg-saron restore sanity (NPC_SANITY_WELL = 33991)
-
     triggers.push_back(new TriggerNode(
         "yogg-saron sanity trigger",
         NextAction::array(0, new NextAction("yogg-saron sanity action", ACTION_RAID), nullptr)));
@@ -275,13 +272,42 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "yogg-saron death orb trigger",
         NextAction::array(0, new NextAction("yogg-saron death orb action", ACTION_RAID), nullptr)));
 
-    // yogg-saron avoid death orb (NPC_DEATH_ORB = 33882)
+    triggers.push_back(new TriggerNode(
+        "yogg-saron malady of the mind trigger",
+        NextAction::array(0, new NextAction("yogg-saron malady of the mind action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron mark target trigger",
+        NextAction::array(0, new NextAction("yogg-saron mark target action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron brain link trigger",
+        NextAction::array(0, new NextAction("yogg-saron brain link action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron move to enter portal trigger",
+        NextAction::array(0, new NextAction("yogg-saron move to enter portal action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron use portal trigger",
+        NextAction::array(0, new NextAction("yogg-saron use portal action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron fall from floor trigger",
+        NextAction::array(0, new NextAction("yogg-saron fall from floor action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron boss room movement cheat trigger",
+        NextAction::array(0, new NextAction("yogg-saron boss room movement cheat action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron illusion room trigger",
+        NextAction::array(0, new NextAction("yogg-saron illusion room action", ACTION_RAID), nullptr)));
+    
+    // yogg-saron brain room mark illusion proper mark per room
+    // yogg-saron move to brain room after killing all illusions and attack brain
     // yogg-saron enter boss room portal (few seconds before SPELL_INDUCE_MADNESS = 64059 end)
-    // yogg-saron enter brain room portal (dynamic assign players to specific portals (variable yoggPortalLoc) 10man 4 portals 25man 10 portals)
-    // yogg-saron malady of the mind (go away from boss, other avoid players with debuff SPELL_MALADY_OF_THE_MIND = 63830)
-    // yogg-saron brain link (stay at least 20 yards near other linked player SPELL_BRAIN_LINK = 63802 SPELL_BRAIN_LINK_DAMAGE = 63803 SPELL_BRAIN_LINK_OK = 63804)
     // yogg-saron cheat (brain room sanity reset since skulls?)
-    // yogg-saron mark dps target (NPC_CONSTRICTOR_TENTACLE = 33983)
     
     // Phase 3
     // yogg-saron lunatic gaze (dont look at boss SPELL_LUNATIC_GAZE_YS = 64163)

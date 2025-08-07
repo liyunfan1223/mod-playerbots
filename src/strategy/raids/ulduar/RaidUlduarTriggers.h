@@ -83,25 +83,56 @@ enum UlduarIDs
     SPELL_SHADOW_CRASH = 63277,
 
     // Yogg-Saron
+    ACTION_ILLUSION_DRAGONS = 1,
+    ACTION_ILLUSION_ICECROWN = 2,
+    ACTION_ILLUSION_STORMWIND = 3,
     NPC_GUARDIAN_OF_YS = 33136,
+    NPC_YOGG_SARON = 33288,
     NPC_OMINOUS_CLOUD = 33292,
+    NPC_CONSORT_FIRST = 33716,
+    NPC_CONSORT_LAST = 33720,
+    NPC_ALEXTRASZA = 33536,
+    NPC_MALYGOS_ILLUSION = 33535,
+    NPC_NELTHARION = 33523,
+    NPC_YSERA = 33495,
+    GO_DRAGON_SOUL = 194462,
+    NPC_DEATHSWORN_ZEALOT = 33567,
+    NPC_LICH_KING_ILLUSION = 33441,
+    NPC_IMMOLATED_CHAMPION = 33442,
+    NPC_SUIT_OF_ARMOR = 33433,
+    NPC_GARONA = 33436,
+    NPC_KING_LLANE = 33437,
+    NPC_INFLUENCE_TENTACLE = 33943,
     NPC_DEATH_ORB = 33882,
+    NPC_CRUSHER_TENTACLE = 33966,
+    NPC_CONSTRICTOR_TENTACLE = 33983,
+    NPC_CORRUPTOR_TENTACLE = 33985,
     NPC_SANITY_WELL = 33991,
+    NPC_DESCEND_INTO_MADNESS = 34072,
     SPELL_SANITY = 63050,
+    SPELL_BRAIN_LINK = 63802,
+    SPELL_MALADY_OF_THE_MIND = 63830,
+    SPELL_SHADOW_BARRIER = 63894,
+    SPELL_TELEPORT_TO_CHAMBER = 63997,
+    SPELL_TELEPORT_TO_ICECROWN = 63998,
+    SPELL_TELEPORT_TO_STORMWIND = 63989,
+    SPELL_TELEPORT_BACK = 63992,
+    SPELL_CANCEL_ILLUSION_AURA = 63993,
 
     // Buffs
     SPELL_FROST_TRAP = 13809
 };
-
-const int8 skullIndex = 7;  // Skull
-const int8 crossIndex = 6;  // Cross
-const int8 moonIndex = 4;   // Moon
 
 const float ULDUAR_KOLOGARN_AXIS_Z_PATHING_ISSUE_DETECT = 420.0f;
 const float ULDUAR_KOLOGARN_EYEBEAM_RADIUS = 3.0f;
 const float ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD = 429.6094f;
 const float ULDUAR_THORIM_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
 const float ULDUAR_AURIAYA_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
+const float ULDUAR_YOGG_SARON_BOSS_ROOM_AXIS_Z_PATHING_ISSUE_DETECT = 300.0f;
+const float ULDUAR_YOGG_SARON_BRAIN_ROOM_AXIS_Z_PATHING_ISSUE_DETECT = 200.0f;
+const float ULDUAR_YOGG_SARON_STORMWIND_KEEPER_RADIUS = 60.0f;
+const float ULDUAR_YOGG_SARON_ICECROWN_CITADEL_RADIUS = 73.0f;
+const float ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_RADIUS = 78.0f;
 
 const Position ULDUAR_THORIM_NEAR_ARENA_CENTER = Position(2134.9854f, -263.11853f, 419.8465f);
 const Position ULDUAR_THORIM_NEAR_ENTRANCE_POSITION = Position(2172.4355f, -258.27957f, 418.47162f);
@@ -131,6 +162,9 @@ const Position ULDUAR_MIMIRON_PHASE2_SIDE3MELEE_SPOT = Position(2746.8513f, 2565
 const Position ULDUAR_MIMIRON_PHASE4_TANK_SPOT = Position(2744.5754f, 2570.8657f, 364.3138f);
 const Position ULDUAR_VEZAX_MARK_OF_THE_FACELESS_SPOT = Position(1913.6501f, 122.93989f, 342.38083f);
 const Position ULDUAR_YOGG_SARON_MIDDLE = Position(1980.28f, -25.5868f, 329.397f);
+const Position ULDUAR_YOGG_SARON_STORMWIND_KEEPER_MIDDLE = Position(1927.1511f, 68.507256f, 242.37657f);
+const Position ULDUAR_YOGG_SARON_ICECROWN_CITADEL_MIDDLE = Position(1925.6553f, -121.59296f, 239.98965f);
+const Position ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_MIDDLE = Position(2104.5667f, -25.509348f, 242.64679f);
 
 //
 // Flame Levi
@@ -462,8 +496,17 @@ public:
 class YoggSaronTrigger : public Trigger
 {
 public:
-    YoggSaronTrigger(PlayerbotAI* ai, std::string const name) : Trigger(ai, name) {}
+    YoggSaronTrigger(PlayerbotAI* ai, std::string const name = "yogg saron trigger") : Trigger(ai, name) {}
 
+    bool IsYoggSaronFight();
+    bool IsPhase2();
+    bool IsPhase3();
+    bool IsInIllusionRoom();
+    bool IsInStormwindKeeperIllusion();
+    bool IsInIcecrownKeeperIllusion();
+    bool IsInChamberOfTheAspectsIllusion();
+    Unit* GetIllusionRoomRtiTarget();
+    Unit* GetNextIllusionRoomRtiTarget();
     Unit* GetSaraIfAlive();
 };
 
@@ -493,6 +536,66 @@ class YoggSaronDeathOrbTrigger : public YoggSaronTrigger
 public:
     YoggSaronDeathOrbTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron death orb trigger") {}
     bool IsActive() override;
+};
+
+class YoggSaronMaladyOfTheMindTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronMaladyOfTheMindTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron malady of the mind trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronMarkTargetTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronMarkTargetTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron mark target trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronBrainLinkTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronBrainLinkTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron brain link trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronMoveToEnterPortalTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronMoveToEnterPortalTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron move to enter portal trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronFallFromFloorTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronFallFromFloorTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron fall from floor trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronBossRoomMovementCheatTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronBossRoomMovementCheatTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron boss room movement cheat trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronUsePortalTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronUsePortalTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron use portal trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronIllusionRoomTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronIllusionRoomTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron illusion room trigger") {}
+    bool IsActive() override;
+
+private:
+    bool SetRtiMarkRequired();
+    bool SetRtiTargetRequired();
 };
 
 #endif
