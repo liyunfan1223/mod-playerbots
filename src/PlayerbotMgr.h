@@ -130,10 +130,16 @@ private:
 
 #define sPlayerbotsMgr PlayerbotsMgr::instance()
 
+// Temporary addition If it keeps crashing, we will use them.
+// Like
+// BEFORE : PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+// AFTER (safe) : PlayerbotAI* botAI = GET_PLAYERBOT_AI_SAFE(bot);
+// BEFORE : if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player)) { ... }
+// AFTER (safe) : if (PlayerbotAI* botAI = GET_PLAYERBOT_AI_SAFE(player)) { ... }
 // --- SAFE helpers (append to PlayerbotMgr.h) ---
 inline PlayerbotAI* GET_PLAYERBOT_AI_SAFE(Player* p)
 {
-    // Evite tout déréférencement pendant des états transitoires (nullptr, téléport, vol, etc.)
+    // Avoid any dereference during transient states (nullptr, teleport, flight, etc.)
     return p ? sPlayerbotsMgr->GetPlayerbotAI(p) : nullptr;
 }
 
