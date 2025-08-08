@@ -1747,35 +1747,37 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 	// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
     if (!player || !sPlayerbotAIConfig->enabled)
         return nullptr;
-
-    {   // protected read
+    
+    // First read the GUID into a local variable, but ONLY after the check!
+    ObjectGuid guid = player->GetGUID();           // <-- OK here, we know that player != nullptr
+    { 
         std::shared_lock rlock(_aiMutex);
-        auto it = _playerbotsAIMap.find(player->GetGUID());
+        auto it = _playerbotsAIMap.find(guid);
         if (it != _playerbotsAIMap.end() && it->second->IsBotAI())
             return static_cast<PlayerbotAI*>(it->second);
     }
 
-    // does the player still exist?
-    // The player/bot may be temporarily "out of world".
-    // Clean up the AI if needed, but do NOT break the master ⇄ bots relationship.
-    if (!ObjectAccessor::FindPlayer(player->GetGUID()))    
+    // Transient state: NEVER break the master ⇄ bots relationship here.
+    if (!ObjectAccessor::FindPlayer(guid))    
     {
-        LOG_INFO("playerbots", "GetPlayerbotAI: player {} out of world (TP={}, FLIGHT={})",
-                 player->GetName().c_str(),
-                 player->IsBeingTeleported() ? 1 : 0,
-                 player->HasUnitState(UNIT_STATE_IN_FLIGHT) ? 1 : 0);
-        
-       // "Transient" case: teleportation / flight → do NOT purge at all
-        if (player->IsBeingTeleported() || player->HasUnitState(UNIT_STATE_IN_FLIGHT))
-            return nullptr;
-
-       // Otherwise, we can clean up the AI in memory ("soft" purge), BUT keep the master ⇄ bots relationship
-        RemovePlayerbotAI(player->GetGUID(), /*removeMgrEntry=*/false);
+        RemovePlayerbotAI(guid, /*removeMgrEntry=*/false);
     }
     return nullptr;
 }
 
 // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+PlayerbotAI* PlayerbotsMgr::GetPlayerbotAIByGuid(ObjectGuid guid)
+{
+    if (!sPlayerbotAIConfig->enabled)
+        return nullptr;
+
+    std::shared_lock rlock(_aiMutex);
+    auto it = _playerbotsAIMap.find(guid);
+    if (it != _playerbotsAIMap.end() && it->second->IsBotAI())
+        return static_cast<PlayerbotAI*>(it->second);
+    return nullptr;
+}
+
 void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry /*= true*/)
 {
     std::unique_lock wlock(_aiMutex);
