@@ -1758,9 +1758,20 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     // does the player still exist?
     // The player/bot may be temporarily "out of world".
     // Clean up the AI if needed, but do NOT break the master ⇄ bots relationship.
-    if (!ObjectAccessor::FindPlayer(player->GetGUID()))
-    RemovePlayerbotAI(player->GetGUID(), /*removeMgrEntry=*/false); // "soft" purge: does not remove the master ⇄ bots relationship
+    if (!ObjectAccessor::FindPlayer(player->GetGUID()))    
+    {
+        LOG_INFO("playerbots", "GetPlayerbotAI: player %s out of world (TP=%d, FLIGHT=%d)",
+                 player->GetName().c_str(),
+                 player->IsBeingTeleported() ? 1 : 0,
+                 player->HasUnitState(UNIT_STATE_IN_FLIGHT) ? 1 : 0);
+        
+       // "Transient" case: teleportation / flight → do NOT purge at all
+        if (player->IsBeingTeleported() || player->HasUnitState(UNIT_STATE_IN_FLIGHT))
+            return nullptr;
 
+       // Otherwise, we can clean up the AI in memory ("soft" purge), BUT keep the master ⇄ bots relationship
+        RemovePlayerbotAI(player->GetGUID(), /*removeMgrEntry=*/false);
+    }
     return nullptr;
 }
 
