@@ -130,4 +130,17 @@ private:
 
 #define sPlayerbotsMgr PlayerbotsMgr::instance()
 
+// --- SAFE helpers (append to PlayerbotMgr.h) ---
+inline PlayerbotAI* GET_PLAYERBOT_AI_SAFE(Player* p)
+{
+    // Evite tout déréférencement pendant des états transitoires (nullptr, téléport, vol, etc.)
+    return p ? sPlayerbotsMgr->GetPlayerbotAI(p) : nullptr;
+}
+
+inline PlayerbotMgr* GET_PLAYERBOT_MGR_SAFE(Player* p)
+{
+    return p ? sPlayerbotsMgr->GetPlayerbotMgr(p) : nullptr;
+}
+// --- end SAFE helpers ---
+
 #endif
