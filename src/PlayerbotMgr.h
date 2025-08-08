@@ -115,7 +115,10 @@ public:
     void RemovePlayerBotData(ObjectGuid const& guid, bool is_AI);
 
     PlayerbotAI* GetPlayerbotAI(Player* player);
-    void RemovePlayerbotAI(ObjectGuid const& guid);   // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+    // void RemovePlayerbotAI(ObjectGuid const& guid);   // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+    // removeMgrEntry = true  => "hard" purge (AI + manager relation), for real logouts
+    // removeMgrEntry = false => "soft" purge (AI only), for detected "stale" cases
+    void RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry = true);
     PlayerbotMgr* GetPlayerbotMgr(Player* player);
 
 private:
