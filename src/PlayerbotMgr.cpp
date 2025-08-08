@@ -1763,18 +1763,20 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 }
 
 // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid)
+void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry /*=true*/)
 {
-    std::unique_lock lock(_aiMutex);
+    std::unique_lock wlock(_aiMutex);
 
-    if (auto itr = _playerbotsAIMap.find(guid); itr != _playerbotsAIMap.end())
+    if (auto it = _playerbotsAIMap.find(guid); it != _playerbotsAIMap.end())
     {
-        delete itr->second;
-        _playerbotsAIMap.erase(itr);
-        LOG_DEBUG("playerbots", "Removed stale AI entry for GUID {}", static_cast<uint64>(guid.GetRawValue()));
+        delete it->second;
+        _playerbotsAIMap.erase(it);
+        LOG_DEBUG("playerbots", "Removed stale AI for GUID {}",
+                  static_cast<uint64>(guid.GetRawValue()));
     }
 
-    _playerbotsMgrMap.erase(guid);
+    +   if (removeMgrEntry)
++       _playerbotsMgrMap.erase(guid);  // we NO longer touch the relation in a "soft" purge
 }
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
