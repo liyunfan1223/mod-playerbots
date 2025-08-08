@@ -1760,7 +1760,7 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     // Clean up the AI if needed, but do NOT break the master ⇄ bots relationship.
     if (!ObjectAccessor::FindPlayer(player->GetGUID()))    
     {
-        LOG_INFO("playerbots", "GetPlayerbotAI: player %s out of world (TP=%d, FLIGHT=%d)",
+        LOG_INFO("playerbots", "GetPlayerbotAI: player {} out of world (TP={}, FLIGHT={})",
                  player->GetName().c_str(),
                  player->IsBeingTeleported() ? 1 : 0,
                  player->HasUnitState(UNIT_STATE_IN_FLIGHT) ? 1 : 0);
