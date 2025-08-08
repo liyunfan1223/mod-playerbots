@@ -1777,8 +1777,8 @@ void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntr
                   static_cast<uint64>(guid.GetRawValue()));
     }
 
-    +   if (removeMgrEntry)
-+       _playerbotsMgrMap.erase(guid);  // we NO longer touch the relation in a "soft" purge
+        if (removeMgrEntry)
+       _playerbotsMgrMap.erase(guid);  // we NO longer touch the relation in a "soft" purge
 }
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
