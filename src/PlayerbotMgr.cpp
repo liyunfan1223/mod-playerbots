@@ -1759,13 +1759,13 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     // The player/bot may be temporarily "out of world".
     // Clean up the AI if needed, but do NOT break the master ⇄ bots relationship.
     if (!ObjectAccessor::FindPlayer(player->GetGUID()))
-    RemovePlayerbotAI(player->GetGUID(), /*removeMgrEntry=*/false);
+    RemovePlayerbotAI(player->GetGUID(), /*removeMgrEntry=*/false); // "soft" purge: does not remove the master ⇄ bots relationship
 
     return nullptr;
 }
 
 // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry /*=true*/)
+void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry /*= true*/)
 {
     std::unique_lock wlock(_aiMutex);
 
