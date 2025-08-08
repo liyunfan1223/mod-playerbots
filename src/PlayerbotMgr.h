@@ -120,6 +120,7 @@ public:
     // removeMgrEntry = false => "soft" purge (AI only), for detected "stale" cases
     void RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry = true);
     PlayerbotMgr* GetPlayerbotMgr(Player* player);
+    PlayerbotAI* GetPlayerbotAIByGuid(ObjectGuid guid);  // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
 
 private:
     std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsAIMap;
