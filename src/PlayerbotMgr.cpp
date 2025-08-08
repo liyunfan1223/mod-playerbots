@@ -1745,19 +1745,21 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     // return nullptr;
 	
 	// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-    if (!sPlayerbotAIConfig->enabled || !player)
+    if (!player || !sPlayerbotAIConfig->enabled)
         return nullptr;
 
     {   // protected read
-        std::shared_lock lock(_aiMutex);
-        auto itr = _playerbotsAIMap.find(player->GetGUID());
-        if (itr != _playerbotsAIMap.end() && itr->second->IsBotAI())
-            return reinterpret_cast<PlayerbotAI*>(itr->second);
+        std::shared_lock rlock(_aiMutex);
+        auto it = _playerbotsAIMap.find(player->GetGUID());
+        if (it != _playerbotsAIMap.end() && it->second->IsBotAI())
+            return static_cast<PlayerbotAI*>(it->second);
     }
 
     // does the player still exist?
+    // The player/bot may be temporarily "out of world".
+    // Clean up the AI if needed, but do NOT break the master ⇄ bots relationship.
     if (!ObjectAccessor::FindPlayer(player->GetGUID()))
-        RemovePlayerbotAI(player->GetGUID());          // orphaned AI -> cleanup
+    RemovePlayerbotAI(player->GetGUID(), /*removeMgrEntry=*/false);
 
     return nullptr;
 }
