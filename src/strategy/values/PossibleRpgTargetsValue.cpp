@@ -49,7 +49,7 @@ void PossibleRpgTargetsValue::FindUnits(std::list<Unit*>& targets)
 {
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
-    Cell::VisitAllObjects(bot, searcher, range);
+    Cell::VisitObjects(bot, searcher, range);
 }
 
 bool PossibleRpgTargetsValue::AcceptUnit(Unit* unit)
@@ -141,7 +141,7 @@ void PossibleNewRpgTargetsValue::FindUnits(std::list<Unit*>& targets)
 {
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
-    Cell::VisitAllObjects(bot, searcher, range);
+    Cell::VisitObjects(bot, searcher, range);
 }
 
 bool PossibleNewRpgTargetsValue::AcceptUnit(Unit* unit)
@@ -168,7 +168,7 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
     std::list<GameObject*> targets;
     AnyGameObjectInObjectRangeCheck u_check(bot, range);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
-    Cell::VisitAllObjects(bot, searcher, range);
+    Cell::VisitObjects(bot, searcher, range);
 
     
     std::vector<std::pair<ObjectGuid, float>> guidDistancePairs;
