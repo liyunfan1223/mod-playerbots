@@ -2180,7 +2180,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot)
     float range = sPlayerbotAIConfig->randomBotTeleportDistance;
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
-    Cell::VisitAllObjects(bot, searcher, range);
+    Cell::VisitObjects(bot, searcher, range);
 
     if (!targets.empty())
     {
