@@ -14,7 +14,7 @@ void NearestNonBotPlayersValue::FindUnits(std::list<Unit*>& targets)
 {
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
-    Cell::VisitAllObjects(bot, searcher, range);
+    Cell::VisitObjects(bot, searcher, range);
 }
 
 bool NearestNonBotPlayersValue::AcceptUnit(Unit* unit)
