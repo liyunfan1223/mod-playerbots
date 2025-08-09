@@ -246,7 +246,8 @@ public:
         creators["rpg mount anim"] = &ActionContext::rpg_mount_anim;
 
         creators["toggle pet spell"] = &ActionContext::toggle_pet_spell;
-        creators["pet attack"] = &ActionContext::pet_attack; 
+        creators["pet attack"] = &ActionContext::pet_attack;
+        creators["set pet stance"] = &ActionContext::set_pet_stance;
 
         creators["new rpg status update"] = &ActionContext::new_rpg_status_update;
         creators["new rpg go grind"] = &ActionContext::new_rpg_go_grind;
@@ -434,6 +435,7 @@ private:
 
     static Action* toggle_pet_spell(PlayerbotAI* ai) { return new TogglePetSpellAutoCastAction(ai); }
     static Action* pet_attack(PlayerbotAI* ai) { return new PetAttackAction(ai); }
+    static Action* set_pet_stance(PlayerbotAI* ai) { return new SetPetStanceAction(ai); }
 
     static Action* new_rpg_status_update(PlayerbotAI* ai) { return new NewRpgStatusUpdateAction(ai); }
     static Action* new_rpg_go_grind(PlayerbotAI* ai) { return new NewRpgGoGrindAction(ai); }

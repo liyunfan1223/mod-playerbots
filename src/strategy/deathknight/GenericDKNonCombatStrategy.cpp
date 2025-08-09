@@ -50,7 +50,9 @@ void GenericDKNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(
         new TriggerNode("bone shield", NextAction::array(0, new NextAction("bone shield", 21.0f), nullptr)));
     triggers.push_back(
-        new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 11.0f), NULL)));
+        new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), NULL)));
+    triggers.push_back(
+        new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 60.0f), NULL)));
 }
 
 void DKBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

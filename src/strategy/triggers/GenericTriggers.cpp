@@ -20,6 +20,8 @@
 #include "TemporarySummon.h"
 #include "ThreatMgr.h"
 #include "Timer.h"
+#include "PlayerbotAI.h"
+#include "Player.h"
 
 bool LowManaTrigger::IsActive()
 {
@@ -684,4 +686,47 @@ bool AmmoCountTrigger::IsActive()
         return true;  // Found ammo in inventory but not equipped
 
     return ItemCountTrigger::IsActive();
+}
+
+bool NewPetTrigger::IsActive()
+{
+    // Get the bot player object from the AI
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+
+    // Try to get the current pet; initialize guardian and GUID to null/empty
+    Pet* pet = bot->GetPet();
+    Guardian* guardian = nullptr;
+    ObjectGuid currentPetGuid = ObjectGuid::Empty;
+
+    // If bot has a pet, get its GUID
+    if (pet)
+    {
+        currentPetGuid = pet->GetGUID();
+    }
+    else
+    {
+        // If no pet, try to get a guardian pet and its GUID
+        guardian = bot->GetGuardianPet();
+        if (guardian)
+            currentPetGuid = guardian->GetGUID();
+    }
+
+    // If the current pet or guardian GUID has changed (including becoming empty), reset the trigger state
+    if (currentPetGuid != lastPetGuid)
+    {
+        triggered = false;
+        lastPetGuid = currentPetGuid;
+    }
+
+    // If there's a valid current pet/guardian (non-empty GUID) and we haven't triggered yet, activate trigger
+    if (currentPetGuid != ObjectGuid::Empty && !triggered)
+    {
+        triggered = true;
+        return true;
+    }
+
+    // Otherwise, do not activate
+    return false;
 }
