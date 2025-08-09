@@ -87,7 +87,8 @@ public:
         PLAYERHOOK_ON_BEFORE_CRITERIA_PROGRESS,
         PLAYERHOOK_ON_BEFORE_ACHI_COMPLETE,
         PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT,
-        PLAYERHOOK_ON_GIVE_EXP
+        PLAYERHOOK_ON_GIVE_EXP,
+        PLAYERHOOK_ON_LEVEL_CHANGED
     }) {}
 
     void OnPlayerLogin(Player* player) override
@@ -115,9 +116,36 @@ public:
                 roundedTime = roundedTime.substr(0, roundedTime.find('.') + 2);
 
                 ChatHandler(player->GetSession()).SendSysMessage(
-                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '" 
+                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '"
                     + roundedTime + "' minutes.");
             }
+        }
+    }
+
+    void OnPlayerLevelChanged(Player* player, uint8 oldLevel) override
+    {
+        // Check if feature is enabled and required objects are valid
+        if (!sPlayerbotAIConfig || !sPlayerbotAIConfig->randomBotLogoutOutsideLoginRange || !sRandomPlayerbotMgr)
+            return;
+
+        // Only apply to bots from rndBotTypeAccounts (type 1)
+        uint32 accountId = player->GetSession()->GetAccountId();
+        if (!sRandomPlayerbotMgr->IsAccountType(accountId, 1))
+            return;
+
+        uint32 newLevel = player->GetLevel();
+
+        // Check if the new level is outside the allowed login range
+        if (newLevel < sPlayerbotAIConfig->randomBotMinLoginLevel ||
+            newLevel > sPlayerbotAIConfig->randomBotMaxLoginLevel)
+        {
+            LOG_INFO("playerbots", "Bot {} changed levels from {} to {}, outside login range ({}-{}). Marking for logout",
+                    player->GetName(), oldLevel, newLevel,
+                    sPlayerbotAIConfig->randomBotMinLoginLevel, sPlayerbotAIConfig->randomBotMaxLoginLevel);
+
+            // Mark the bot for removal in the next update cycle
+            sRandomPlayerbotMgr->MarkBotForLogout(player->GetGUID().GetCounter());
+            sRandomPlayerbotMgr->ForceRecount();
         }
     }
 
@@ -211,7 +239,7 @@ public:
     {
         if (!player->GetSession()->IsBot())
             return;
-        
+
         if (!sRandomPlayerbotMgr->IsRandomBot(player))
             return;
 
@@ -281,7 +309,7 @@ public:
         LOG_INFO("server.loading", "╚══════════════════════════════════════════════════════════╝");
 
         uint32 oldMSTime = getMSTime();
-        
+
         LOG_INFO("server.loading", " ");
         LOG_INFO("server.loading", "Load Playerbots Config...");
 
