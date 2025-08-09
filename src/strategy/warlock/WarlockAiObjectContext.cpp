@@ -29,8 +29,6 @@ public:
         creators["boost"] = &WarlockStrategyFactoryInternal::boost;
         creators["cc"] = &WarlockStrategyFactoryInternal::cc;
         creators["pet"] = &WarlockStrategyFactoryInternal::pet;
-        creators["spellstone"] = &WarlockStrategyFactoryInternal::spellstone;
-        creators["firestone"] = &WarlockStrategyFactoryInternal::firestone;
         creators["meta melee"] = &WarlockStrategyFactoryInternal::meta_melee_aoe;
         creators["tank"] = &WarlockStrategyFactoryInternal::tank;
         creators["aoe"] = &WarlockStrategyFactoryInternal::aoe;
@@ -42,8 +40,6 @@ private:
     static Strategy* boost(PlayerbotAI* botAI) { return new WarlockBoostStrategy(botAI); }
     static Strategy* cc(PlayerbotAI* botAI) { return new WarlockCcStrategy(botAI); }
     static Strategy* pet(PlayerbotAI* botAI) { return new WarlockPetStrategy(botAI); }
-    static Strategy* spellstone(PlayerbotAI* botAI) { return new UseSpellstoneStrategy(botAI); }
-    static Strategy* firestone(PlayerbotAI* botAI) { return new UseFirestoneStrategy(botAI); }
     static Strategy* meta_melee_aoe(PlayerbotAI* botAI) { return new MetaMeleeAoeStrategy(botAI); }
     static Strategy* tank(PlayerbotAI* botAI) { return new TankWarlockStrategy(botAI); }
     static Strategy* aoe(PlayerbotAI* botAI) { return new AoEWarlockStrategy(botAI); }
@@ -123,6 +119,20 @@ private:
     static Strategy* curse_of_exhaustion(PlayerbotAI* botAI) { return new WarlockCurseOfExhaustionStrategy(botAI); }
     static Strategy* curse_of_tongues(PlayerbotAI* botAI) { return new WarlockCurseOfTonguesStrategy(botAI); }
     static Strategy* curse_of_weakness(PlayerbotAI* botAI) { return new WarlockCurseOfWeaknessStrategy(botAI); }
+};
+
+class WarlockWeaponStoneStrategyFactoryInternal : public NamedObjectContext<Strategy>
+{
+public:
+    WarlockWeaponStoneStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
+    {
+        creators["firestone"] = &WarlockWeaponStoneStrategyFactoryInternal::firestone;
+        creators["spellstone"] = &WarlockWeaponStoneStrategyFactoryInternal::spellstone;
+    }
+
+private:
+    static Strategy* firestone(PlayerbotAI* ai) { return new UseFirestoneStrategy(ai); }
+    static Strategy* spellstone(PlayerbotAI* ai) { return new UseSpellstoneStrategy(ai); }
 };
 
 class WarlockTriggerFactoryInternal : public NamedObjectContext<Trigger>
@@ -333,19 +343,13 @@ private:
     static Action* devour_magic_purge(PlayerbotAI* botAI) { return new CastDevourMagicPurgeAction(botAI); }
     static Action* devour_magic_cleanse(PlayerbotAI* botAI) { return new CastDevourMagicCleanseAction(botAI); }
     static Action* seed_of_corruption(PlayerbotAI* botAI) { return new CastSeedOfCorruptionAction(botAI); }
-    static Action* seed_of_corruption_on_attacker(PlayerbotAI* botAI)
-    {
-        return new CastSeedOfCorruptionOnAttackerAction(botAI);
-    }
+    static Action* seed_of_corruption_on_attacker(PlayerbotAI* botAI) { return new CastSeedOfCorruptionOnAttackerAction(botAI); }
     static Action* rain_of_fire(PlayerbotAI* botAI) { return new CastRainOfFireAction(botAI); }
     static Action* hellfire(PlayerbotAI* botAI) { return new CastHellfireAction(botAI); }
     static Action* shadowfury(PlayerbotAI* botAI) { return new CastShadowfuryAction(botAI); }
     static Action* life_tap(PlayerbotAI* botAI) { return new CastLifeTapAction(botAI); }
     static Action* unstable_affliction(PlayerbotAI* ai) { return new CastUnstableAfflictionAction(ai); }
-    static Action* unstable_affliction_on_attacker(PlayerbotAI* ai)
-    {
-        return new CastUnstableAfflictionOnAttackerAction(ai);
-    }
+    static Action* unstable_affliction_on_attacker(PlayerbotAI* ai) { return new CastUnstableAfflictionOnAttackerAction(ai); }
     static Action* haunt(PlayerbotAI* ai) { return new CastHauntAction(ai); }
     static Action* demonic_empowerment(PlayerbotAI* ai) { return new CastDemonicEmpowermentAction(ai); }
     static Action* metamorphosis(PlayerbotAI* ai) { return new CastMetamorphosisAction(ai); }
@@ -360,10 +364,7 @@ private:
     static Action* searing_pain(PlayerbotAI* botAI) { return new CastSearingPainAction(botAI); }
     static Action* shadow_ward(PlayerbotAI* botAI) { return new CastShadowWardAction(botAI); }
     static Action* curse_of_agony(PlayerbotAI* botAI) { return new CastCurseOfAgonyAction(botAI); }
-    static Action* curse_of_agony_on_attacker(PlayerbotAI* botAI)
-    {
-        return new CastCurseOfAgonyOnAttackerAction(botAI);
-    }
+    static Action* curse_of_agony_on_attacker(PlayerbotAI* botAI) { return new CastCurseOfAgonyOnAttackerAction(botAI); }
     static Action* curse_of_the_elements(PlayerbotAI* ai) { return new CastCurseOfTheElementsAction(ai); }
     static Action* curse_of_doom(PlayerbotAI* ai) { return new CastCurseOfDoomAction(ai); }
     static Action* curse_of_exhaustion(PlayerbotAI* ai) { return new CastCurseOfExhaustionAction(ai); }
@@ -397,6 +398,7 @@ void WarlockAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContex
     strategyContexts.Add(new WarlockPetStrategyFactoryInternal());
     strategyContexts.Add(new WarlockSoulstoneStrategyFactoryInternal());
     strategyContexts.Add(new WarlockCurseStrategyFactoryInternal());
+    strategyContexts.Add(new WarlockWeaponStoneStrategyFactoryInternal());
 }
 
 void WarlockAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
