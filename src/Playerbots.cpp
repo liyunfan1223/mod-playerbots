@@ -109,7 +109,7 @@ public:
                     "|cffcccccchttps://github.com/liyunfan1223/mod-playerbots|r");
             }
 
-            if (sPlayerbotAIConfig->enabled || sPlayerbotAIConfig->randomBotAutologin)
+            /*if (sPlayerbotAIConfig->enabled || sPlayerbotAIConfig->randomBotAutologin)
             {
                 std::string roundedTime =
                     std::to_string(std::ceil((sPlayerbotAIConfig->maxRandomBots * 0.11 / 60) * 10) / 10.0);
@@ -118,7 +118,7 @@ public:
                 ChatHandler(player->GetSession()).SendSysMessage(
                     "|cff00ff00Playerbots:|r bot initialization at server startup takes about '"
                     + roundedTime + "' minutes.");
-            }
+            }*/
         }
     }
 
@@ -237,16 +237,30 @@ public:
 
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
-        if (!player->GetSession()->IsBot())
+        // early return
+        if (sPlayerbotAIConfig->randomBotXPRate == 1.0 || !player)
             return;
 
-        if (!sRandomPlayerbotMgr->IsRandomBot(player))
+        // no XP multiplier, when player is no bot.
+        if (!player->GetSession()->IsBot() || !sRandomPlayerbotMgr->IsRandomBot(player))
             return;
 
-        if (sPlayerbotAIConfig->randomBotXPRate != 1.0)
+        // no XP multiplier, when bot has group where leader is a real player.
+        if (Group* group = player->GetGroup())
         {
-            amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
+            Player* leader = group->GetLeader();
+            if (leader && leader != player)
+            {
+                if (PlayerbotAI* leaderBotAI = GET_PLAYERBOT_AI(leader))
+                {
+                    if (leaderBotAI->HasRealPlayerMaster())
+                        return;
+                }
+            }
         }
+
+        // otherwise apply bot XP multiplier.
+        amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
     }
 };
 
