@@ -4214,19 +4214,6 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
         }
     }
 
-    // only keep updating till initializing time has completed,
-    // which prevents unneeded expensive GameTime calls.
-    if (_isBotInitializing)
-    {
-        _isBotInitializing = GameTime::GetUptime().count() < sPlayerbotAIConfig->maxRandomBots * 0.11;
-
-        // no activity allowed during bot initialization
-        if (_isBotInitializing)
-        {
-            return false;
-        }
-    }
-
     // General exceptions
     if (activityType == PACKET_ACTIVITY)
     {
