@@ -529,6 +529,9 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     {
         botAI->ResetStrategies(!sRandomPlayerbotMgr->IsRandomBot(bot));
     }
+
+    botAI->Reset(true);  // Reset transient states (incl. LFG "proposal") to avoid the "one or more players are not eligible" error after reconnect.
+
     sPlayerbotDbStore->Load(botAI);
 
     if (master && !master->HasUnitState(UNIT_STATE_IN_FLIGHT))
@@ -548,16 +551,21 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     if (master && master->GetGroup() && !group)
     {
         Group* mgroup = master->GetGroup();
-        if (mgroup->GetMembersCount() >= 5)
+        // if (mgroup->GetMembersCount() >= 5)
+        if (mgroup->GetMembersCount() + 1 > 5)  // only convert in raid if the add of THIS bot make group > 5
         {
             if (!mgroup->isRaidGroup() && !mgroup->isLFGGroup() && !mgroup->isBGGroup() && !mgroup->isBFGroup())
             {
                 mgroup->ConvertToRaid();
             }
-            if (mgroup->isRaidGroup())
-            {
-                mgroup->AddMember(bot);
-            }
+            //if (mgroup->isRaidGroup())
+            //{
+                //mgroup->AddMember(bot);
+            //}
+            mgroup->AddMember(bot);
+
+            LOG_DEBUG("playerbots", "[GROUP] after add: members={}, isRaid={}, isLFG={}",
+                      (int)mgroup->GetMembersCount(), mgroup->isRaidGroup() ? 1 : 0, mgroup->isLFGGroup() ? 1 : 0);
         }
         else
         {
