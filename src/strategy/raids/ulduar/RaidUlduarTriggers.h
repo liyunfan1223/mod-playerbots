@@ -89,8 +89,11 @@ enum UlduarIDs
     NPC_GUARDIAN_OF_YS = 33136,
     NPC_YOGG_SARON = 33288,
     NPC_OMINOUS_CLOUD = 33292,
-    NPC_CONSORT_FIRST = 33716,
-    NPC_CONSORT_LAST = 33720,
+    NPC_RUBY_CONSORT = 33716,
+    NPC_AZURE_CONSORT = 33717,
+    NPC_BRONZE_CONSORT = 33718,
+    NPC_EMERALD_CONSORT = 33719,
+    NPC_OBSIDIAN_CONSORT = 33720,
     NPC_ALEXTRASZA = 33536,
     NPC_MALYGOS_ILLUSION = 33535,
     NPC_NELTHARION = 33523,
@@ -104,9 +107,11 @@ enum UlduarIDs
     NPC_KING_LLANE = 33437,
     NPC_INFLUENCE_TENTACLE = 33943,
     NPC_DEATH_ORB = 33882,
+    NPC_BRAIN = 33890,
     NPC_CRUSHER_TENTACLE = 33966,
     NPC_CONSTRICTOR_TENTACLE = 33983,
     NPC_CORRUPTOR_TENTACLE = 33985,
+    NPC_LAUGHING_SKULL = 33990,
     NPC_SANITY_WELL = 33991,
     NPC_DESCEND_INTO_MADNESS = 34072,
     SPELL_SANITY = 63050,
@@ -118,7 +123,10 @@ enum UlduarIDs
     SPELL_TELEPORT_TO_STORMWIND = 63989,
     SPELL_TELEPORT_BACK = 63992,
     SPELL_CANCEL_ILLUSION_AURA = 63993,
+    SPELL_INDUCE_MADNESS = 64059,
 
+    
+    
     // Buffs
     SPELL_FROST_TRAP = 13809
 };
@@ -130,9 +138,13 @@ const float ULDUAR_THORIM_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
 const float ULDUAR_AURIAYA_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
 const float ULDUAR_YOGG_SARON_BOSS_ROOM_AXIS_Z_PATHING_ISSUE_DETECT = 300.0f;
 const float ULDUAR_YOGG_SARON_BRAIN_ROOM_AXIS_Z_PATHING_ISSUE_DETECT = 200.0f;
-const float ULDUAR_YOGG_SARON_STORMWIND_KEEPER_RADIUS = 60.0f;
-const float ULDUAR_YOGG_SARON_ICECROWN_CITADEL_RADIUS = 73.0f;
-const float ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_RADIUS = 78.0f;
+//const float ULDUAR_YOGG_SARON_STORMWIND_KEEPER_RADIUS = 70.0f;
+//const float ULDUAR_YOGG_SARON_ICECROWN_CITADEL_RADIUS = 80.0f;
+//const float ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_RADIUS = 78.0f;
+const float ULDUAR_YOGG_SARON_STORMWIND_KEEPER_RADIUS = 150.0f;
+const float ULDUAR_YOGG_SARON_ICECROWN_CITADEL_RADIUS = 150.0f;
+const float ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_RADIUS = 150.0f;
+const float ULDUAR_YOGG_SARON_BRAIN_ROOM_RADIUS = 50.0f;
 
 const Position ULDUAR_THORIM_NEAR_ARENA_CENTER = Position(2134.9854f, -263.11853f, 419.8465f);
 const Position ULDUAR_THORIM_NEAR_ENTRANCE_POSITION = Position(2172.4355f, -258.27957f, 418.47162f);
@@ -165,6 +177,10 @@ const Position ULDUAR_YOGG_SARON_MIDDLE = Position(1980.28f, -25.5868f, 329.397f
 const Position ULDUAR_YOGG_SARON_STORMWIND_KEEPER_MIDDLE = Position(1927.1511f, 68.507256f, 242.37657f);
 const Position ULDUAR_YOGG_SARON_ICECROWN_CITADEL_MIDDLE = Position(1925.6553f, -121.59296f, 239.98965f);
 const Position ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_MIDDLE = Position(2104.5667f, -25.509348f, 242.64679f);
+const Position ULDUAR_YOGG_SARON_BRAIN_ROOM_MIDDLE = Position(1980.1971f, -27.854689f, 236.06789f);
+const Position ULDUAR_YOGG_SARON_STORMWIND_KEEPER_ENTRANCE = Position(1954.06f, 21.66f, 239.71f);
+const Position ULDUAR_YOGG_SARON_ICECROWN_CITADEL_ENTRANCE = Position(1950.11f, -79.284f, 239.98982f);
+const Position ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_ENTRANCE = Position(2048.63f, -25.5f, 239.72f);
 
 //
 // Flame Levi
@@ -501,10 +517,14 @@ public:
     bool IsYoggSaronFight();
     bool IsPhase2();
     bool IsPhase3();
+    bool IsInBrainLevel();
     bool IsInIllusionRoom();
     bool IsInStormwindKeeperIllusion();
     bool IsInIcecrownKeeperIllusion();
     bool IsInChamberOfTheAspectsIllusion();
+    bool IsMasterIsInIllusionGroup();
+    bool IsMasterIsInBrainRoom();
+    Position GetIllusionRoomEntrancePosition();
     Unit* GetIllusionRoomRtiTarget();
     Unit* GetNextIllusionRoomRtiTarget();
     Unit* GetSaraIfAlive();
@@ -594,8 +614,16 @@ public:
     bool IsActive() override;
 
 private:
+    bool GoToBrainRoomRequired();
     bool SetRtiMarkRequired();
     bool SetRtiTargetRequired();
+};
+
+class YoggSaronMoveToExitPortalTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronMoveToExitPortalTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron move to exit portal trigger") {}
+    bool IsActive() override;
 };
 
 #endif

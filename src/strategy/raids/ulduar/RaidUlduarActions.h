@@ -481,8 +481,17 @@ public:
     bool Execute(Event event) override;
 
 private:
-    void SetRtiMark(YoggSaronTrigger yoggSaronTrigger);
-    void SetRtiTarget(YoggSaronTrigger yoggSaronTrigger);
+    bool SetRtiMark(YoggSaronTrigger yoggSaronTrigger);
+    bool SetIllusionRtiTarget(YoggSaronTrigger yoggSaronTrigger);
+    bool SetBrainRtiTarget(YoggSaronTrigger yoggSaronTrigger);
+};
+
+class YoggSaronMoveToExitPortalAction : public MovementAction
+{
+public:
+    YoggSaronMoveToExitPortalAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron move to exit portal action") {}
+
+    bool Execute(Event event) override;
 };
 
 #endif

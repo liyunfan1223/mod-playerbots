@@ -82,6 +82,7 @@ public:
         creators["yogg-saron fall from floor trigger"] = &RaidUlduarTriggerContext::yogg_saron_fall_from_floor_trigger;
         creators["yogg-saron boss room movement cheat trigger"] = &RaidUlduarTriggerContext::yogg_saron_boss_room_movement_cheat_trigger;
         creators["yogg-saron illusion room trigger"] = &RaidUlduarTriggerContext::yogg_saron_illusion_room_trigger;
+        creators["yogg-saron move to exit portal trigger"] = &RaidUlduarTriggerContext::yogg_saron_move_to_exit_portal_trigger;
     }
 
 private:
@@ -151,6 +152,7 @@ private:
     static Trigger* yogg_saron_fall_from_floor_trigger(PlayerbotAI* ai) { return new YoggSaronFallFromFloorTrigger(ai); }
     static Trigger* yogg_saron_boss_room_movement_cheat_trigger(PlayerbotAI* ai) { return new YoggSaronBossRoomMovementCheatTrigger(ai); }
     static Trigger* yogg_saron_illusion_room_trigger(PlayerbotAI* ai) { return new YoggSaronIllusionRoomTrigger(ai); }
+    static Trigger* yogg_saron_move_to_exit_portal_trigger(PlayerbotAI* ai) { return new YoggSaronMoveToExitPortalTrigger(ai); }
 };
 
 #endif
