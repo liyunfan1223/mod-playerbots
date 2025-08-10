@@ -108,7 +108,7 @@ public:
                     "|cffcccccchttps://github.com/liyunfan1223/mod-playerbots|r");
             }
 
-            if (sPlayerbotAIConfig->enabled || sPlayerbotAIConfig->randomBotAutologin)
+            /*if (sPlayerbotAIConfig->enabled || sPlayerbotAIConfig->randomBotAutologin)
             {
                 std::string roundedTime =
                     std::to_string(std::ceil((sPlayerbotAIConfig->maxRandomBots * 0.11 / 60) * 10) / 10.0);
@@ -117,7 +117,7 @@ public:
                 ChatHandler(player->GetSession()).SendSysMessage(
                     "|cff00ff00Playerbots:|r bot initialization at server startup takes about '" 
                     + roundedTime + "' minutes.");
-            }
+            }*/
         }
     }
 
