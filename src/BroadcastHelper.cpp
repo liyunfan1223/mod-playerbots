@@ -947,8 +947,21 @@ bool BroadcastHelper::BroadcastSuggestThunderfury(PlayerbotAI* ai, Player* bot)
     {
         std::map<std::string, std::string> placeholders;
         ItemTemplate const* thunderfuryProto = sObjectMgr->GetItemTemplate(19019);
-        placeholders["%thunderfury_link"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatItem(thunderfuryProto);
-
+        // placeholders["%thunderfury_link"] = GET_PLAYERBOT_AI(bot)->GetChatHelper()->FormatItem(thunderfuryProto); // Old code
+		// [Crash fix] Protect from nil AI : a real player doesn't have PlayerbotAI.
+        // Before: direct deref GET_PLAYERBOT_AI(bot)->... could crash World/General.
+        if (auto* ai = GET_PLAYERBOT_AI(bot))
+        {
+	        if (auto* chat = ai->GetChatHelper())
+		        placeholders["%thunderfury_link"] = chat->FormatItem(thunderfuryProto);
+	        else
+		        placeholders["%thunderfury_link"] = ""; // fallback: no chat helper
+        }
+        else
+        {
+	        placeholders["%thunderfury_link"] = "";     // fallback: no d'AI (real player)
+        }
+        // End crash fix
         return BroadcastToChannelWithGlobalChance(
             ai,
             BOT_TEXT2("thunderfury_spam", placeholders),

@@ -1227,7 +1227,7 @@ std::string const QuestObjectiveTravelDestination::getTitle()
     return out.str();
 }
 
-bool RpgTravelDestination::isActive(Player* bot)
+/*bool RpgTravelDestination::isActive(Player* bot) // Old Code
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     AiObjectContext* context = botAI->GetAiObjectContext();
@@ -1264,6 +1264,62 @@ bool RpgTravelDestination::isActive(Player* bot)
     ReputationRank reaction = bot->GetReputationRank(factionEntry->faction);
 
     return reaction > REP_NEUTRAL;
+}*/
+
+bool RpgTravelDestination::isActive(Player* bot)
+{
+    // [Crash fix] Never dereference the AI if the player is real (null AI).
+    if (!bot)
+        return false;
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+        return false; // real player (no AI) => inactive destination
+
+    AiObjectContext* context = botAI->GetAiObjectContext();
+    if (!context)
+        return false;
+
+    CreatureTemplate const* cInfo = GetCreatureTemplate();
+    if (!cInfo)
+        return false;
+
+    bool isUsefull = false;
+
+    if (cInfo->npcflag & UNIT_NPC_FLAG_VENDOR)
+        if (AI_VALUE2_LAZY(bool, "group or", "should sell,can sell,following party,near leader"))
+            isUsefull = true;
+
+    if (cInfo->npcflag & UNIT_NPC_FLAG_REPAIR)
+        if (AI_VALUE2_LAZY(bool, "group or", "should repair,can repair,following party,near leader"))
+            isUsefull = true;
+
+    if (!isUsefull)
+        return false;
+
+    // [Crash fix] Read the ignore list via 'context' and check that the Value exists
+    GuidSet const* ignoreList = nullptr;
+    if (auto* value = context->GetValue<GuidSet&>("ignore rpg target"))
+        ignoreList = &value->Get();
+
+    if (ignoreList)
+    {
+        for (ObjectGuid const& guid : *ignoreList)
+        {
+            if (guid.GetEntry() == getEntry())
+                return false;
+        }
+    }
+
+    // Secure access to the faction template
+    if (FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->faction))
+    {
+        ReputationRank reaction = bot->GetReputationRank(factionEntry->faction);
+        return reaction > REP_NEUTRAL;
+    }
+
+    // As a precaution, if the faction is not found, consider inactive
+    return false;
 }
 
 CreatureTemplate const* RpgTravelDestination::GetCreatureTemplate() { return sObjectMgr->GetCreatureTemplate(entry); }

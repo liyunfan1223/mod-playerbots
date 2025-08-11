@@ -2373,7 +2373,7 @@ std::string PlayerbotAI::GetLocalizedGameObjectName(uint32 entry)
     return name;
 }
 
-std::vector<Player*> PlayerbotAI::GetPlayersInGroup()
+/*std::vector<Player*> PlayerbotAI::GetPlayersInGroup()
 {
     std::vector<Player*> members;
 
@@ -2390,6 +2390,34 @@ std::vector<Player*> PlayerbotAI::GetPlayersInGroup()
             continue;
 
         members.push_back(ref->GetSource());
+    }
+
+    return members;
+}*/
+
+std::vector<Player*> PlayerbotAI::GetPlayersInGroup()
+{
+    std::vector<Player*> members;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return members;
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (!member)
+            continue;
+
+        // Celaning, we don't call 2 times GET_PLAYERBOT_AI and never reference it if nil
+        if (auto* ai = GET_PLAYERBOT_AI(member))
+        {
+            // If it's a bot (not real player) => we ignor it
+            if (!ai->IsRealPlayer())
+                continue;
+        }
+
+        members.push_back(member);
     }
 
     return members;
