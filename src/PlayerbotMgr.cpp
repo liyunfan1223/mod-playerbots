@@ -222,20 +222,39 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
 
 void PlayerbotHolder::UpdateSessions()
 {
-    for (PlayerBotMap::const_iterator itr = GetPlayerBotsBegin(); itr != GetPlayerBotsEnd(); ++itr)
+    // snapshot of keys
+    std::vector<ObjectGuid> guids;
+    guids.reserve(playerBots.size());
+    for (auto const& kv : playerBots)
+        guids.push_back(kv.first);
+
+    // safe iterate of snapshot of keys.
+    for (ObjectGuid const& guid : guids)
     {
-        Player* const bot = itr->second;
+        Player* bot = GetPlayerBot(guid);
+        if (!bot)
+            continue;
+
         if (bot->IsBeingTeleported())
         {
-            PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-            if (botAI)
+            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot))
             {
                 botAI->HandleTeleportAck();
+
+                // Don’t process packets in the same tick as a teleport ack
+                continue;
             }
         }
-        else if (bot->IsInWorld())
+
+        if (!bot->IsInWorld())
         {
-            HandleBotPackets(bot->GetSession());
+            continue;
+        }
+
+        if (WorldSession* sess = bot->GetSession())
+        {
+            // This may log the bot out or mutate the map, hence the usage of a snapshop
+            HandleBotPackets(sess);
         }
     }
 }
