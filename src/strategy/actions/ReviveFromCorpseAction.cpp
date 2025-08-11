@@ -169,7 +169,8 @@ bool FindCorpseAction::Execute(Event event)
         if (deadTime > delay)
         {
             bot->GetMotionMaster()->Clear();
-            bot->TeleportTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), 0);
+            // bot->TeleportTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), 0);
+			TeleportToSafe(bot, moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), 0); // [fix] Avoid Silly Teleport
         }
 
         moved = true;
@@ -350,7 +351,8 @@ bool SpiritHealerAction::Execute(Event event)
     // if (!botAI->HasActivePlayerMaster())
     // {
     context->GetValue<uint32>("death count")->Set(dCount + 1);
-    return bot->TeleportTo(ClosestGrave->Map, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, 0.f);
+    // return bot->TeleportTo(ClosestGrave->Map, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, 0.f);
+	return TeleportToSafe(bot, ClosestGrave->Map, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, 0.f); // [Fix] Avoid Silly teleport
     // }
 
     // LOG_INFO("playerbots", "Bot {} {}:{} <{}> can't find a spirit healer", bot->GetGUID().ToString().c_str(),

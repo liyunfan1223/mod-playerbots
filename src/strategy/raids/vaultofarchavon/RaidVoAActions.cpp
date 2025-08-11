@@ -175,9 +175,13 @@ bool EmalonOverchargeAction::isUseful()
 
 bool EmalonFallFromFloorAction::Execute(Event event)
 {
-    return bot->TeleportTo(bot->GetMapId(), VOA_EMALON_RESTORE_POSITION.GetPositionX(),
+    /*return bot->TeleportTo(bot->GetMapId(), VOA_EMALON_RESTORE_POSITION.GetPositionX(),
                            VOA_EMALON_RESTORE_POSITION.GetPositionY(), VOA_EMALON_RESTORE_POSITION.GetPositionZ(),
-                           VOA_EMALON_RESTORE_POSITION.GetOrientation());
+                           VOA_EMALON_RESTORE_POSITION.GetOrientation());*/
+	return TeleportToSafe(bot, bot->GetMapId(), VOA_EMALON_RESTORE_POSITION.GetPositionX(), //[Fix] Avoid Silly Teleport
+                      VOA_EMALON_RESTORE_POSITION.GetPositionY(),
+                      VOA_EMALON_RESTORE_POSITION.GetPositionZ(),
+                      VOA_EMALON_RESTORE_POSITION.GetOrientation());					   
 }
 
 bool EmalonFallFromFloorAction::isUseful()

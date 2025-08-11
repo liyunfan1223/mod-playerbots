@@ -1357,10 +1357,14 @@ bool KologarnMarkDpsTargetAction::Execute(Event event)
 
 bool KologarnFallFromFloorAction::Execute(Event event)
 {
-    return bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionX(),
+    /*return bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionX(),
                            ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionY(),
                            ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionZ(),
-                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetOrientation());
+                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetOrientation());*/
+	return TeleportToSafe(bot, bot->GetMapId(), ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionX(), // [Fix] Avoid silly teleport
+                      ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionY(),
+                      ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionZ(),
+                      ULDUAR_KOLOGARN_RESTORE_POSITION.GetOrientation());					   
 }
 
 bool KologarnFallFromFloorAction::isUseful()
@@ -1407,14 +1411,18 @@ bool KologarnEyebeamAction::Execute(Event event)
     KologarnEyebeamTrigger kologarnEyebeamTrigger(botAI);
     if (runToLeftSide)
     {
-        teleportedToPoint = bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionX(),
+        // teleportedToPoint = bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionX(),
+		teleportedToPoint = TeleportToSafe(bot, bot->GetMapId(), 
+		                                    ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionX(),
                                             ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionY(),
                                             ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionZ(),
                                             ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetOrientation());
     }
     else
     {
-        teleportedToPoint = bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionX(),
+        // teleportedToPoint = bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionX(),
+		teleportedToPoint = TeleportToSafe(bot, bot->GetMapId(),
+		                                    ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionX(),
                                             ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionY(),
                                             ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionZ(),
                                             ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetOrientation());

@@ -176,7 +176,8 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
             continue;
 
         memberBotAI->Reset();
-        member->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 0);
+        // member->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 0);
+		TeleportToSafe(member, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 0);
 
         LOG_INFO("playerbots", "Bot {} <{}>: Member of <{}>", member->GetGUID().ToString().c_str(),
                  member->GetName().c_str(), arenateam->GetName().c_str());

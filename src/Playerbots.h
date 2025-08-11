@@ -49,4 +49,46 @@ int strcmpi(char const* s1, char const* s2);
 #define GAI_VALUE(type, name) sSharedValueContext->getGlobalValue<type>(name)->Get()
 #define GAI_VALUE2(type, name, param) sSharedValueContext->getGlobalValue<type>(name, param)->Get()
 
+// ---- Safe teleport wrappers (module-only) ----
+#include "Map.h"
+#include <cmath>
+#include "TravelMgr.h"
+
+inline bool TeleportToSafe(Player* p, uint32 mapId, float x, float y, float z, float o)
+{
+    if (!p) return false;
+
+    // If the height is invalid (-200000) or not finite, attempt ONE correction on the same map.
+    if (z <= -199000.0f || !std::isfinite(z))
+    {
+        if (p->GetMapId() == mapId && p->GetMap())
+        {
+            float hz = p->GetMap()->GetHeight(p->GetPhaseMask(), x, y, p->GetPositionZ(), true);
+            if (hz > -199000.0f && std::isfinite(hz))
+                z = hz;
+            else
+                return false; // still invalid -> cancel the TP
+        }
+        else
+        {
+            return false; // different map: do not "guess" the height here
+        }
+    }
+    return p->TeleportTo(mapId, x, y, z, o);
+}
+
+inline bool TeleportToSafe(Player* p, Position const& pos)
+{
+    // Position doesn't have mapId: we keep actual bot map
+    return TeleportToSafe(p, p->GetMapId(),
+                          pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(),
+                          pos.GetOrientation());
+}
+
+inline bool TeleportToSafe(Player* p, WorldPosition pos)
+{
+    return TeleportToSafe(p, pos.getMapId(), pos.getX(), pos.getY(), pos.getZ(), pos.getO());
+}
+// ---- /Safe teleport wrappers ----
+
 #endif
