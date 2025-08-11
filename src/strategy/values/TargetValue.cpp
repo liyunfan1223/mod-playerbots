@@ -14,7 +14,7 @@
 
 Unit* FindTargetStrategy::GetResult() { return result; }
 
-Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
+/*Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
 {
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
     for (ObjectGuid const guid : attackers)
@@ -25,6 +25,28 @@ Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
 
         ThreatMgr& ThreatMgr = unit->GetThreatMgr();
         strategy->CheckAttacker(unit, &ThreatMgr);
+    }
+
+    return strategy->GetResult();
+}*/
+
+Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
+{
+    // [Crash fix] The very first AI tick can occur before everything is "in world".
+    // Filter out units that are non-living / being removed / out of world.
+    AiObjectContext* ctx = botAI->GetAiObjectContext();
+    if (!ctx)
+        return strategy->GetResult();
+
+    GuidVector attackers = ctx->GetValue<GuidVector>("attackers")->Get();
+    for (ObjectGuid const& guid : attackers)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit || !unit->IsAlive() || !unit->IsInWorld() || unit->IsDuringRemoveFromWorld())
+            continue;
+
+        ThreatMgr& threatMgrRef = unit->GetThreatMgr();
+        strategy->CheckAttacker(unit, &threatMgrRef);
     }
 
     return strategy->GetResult();
