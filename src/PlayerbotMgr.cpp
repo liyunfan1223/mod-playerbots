@@ -591,6 +591,17 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         bot->CleanupAfterTaxiFlight();
     }
 
+    // [Fix MoveSplineInitArgs::Validate: expression 'velocity > 0.01f' failed for GUID Full: 0x00000000000019ba Type: Player Low: 6586] Ensure valid speeds before any next movement command
+    bot->StopMoving();
+    bot->UpdateSpeed(MOVE_WALK,   true);
+    bot->UpdateSpeed(MOVE_RUN,    true);
+    bot->UpdateSpeed(MOVE_SWIM,   true);
+    bot->UpdateSpeed(MOVE_FLIGHT, true);   // OK even if not flying
+    
+    if (bot->GetSpeed(MOVE_RUN) <= 0.01f) // Belt-and-suspenders: if the run speed has stayed ~0, reset to the default rate
+        bot->SetSpeedRate(MOVE_RUN, 1.0f);
+    // End Fix
+
     // check activity
     botAI->AllowActivity(ALL_ACTIVITY, true);
 

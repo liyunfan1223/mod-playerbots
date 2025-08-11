@@ -42,6 +42,7 @@
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "Corpse.h"
+#include "BotMovementUtils.h"
 
 MovementAction::MovementAction(PlayerbotAI* botAI, std::string const name) : Action(botAI, name)
 {
@@ -81,6 +82,10 @@ bool MovementAction::JumpTo(uint32 mapId, float x, float y, float z, MovementPri
     float botZ = bot->GetPositionZ();
     float speed = bot->GetSpeed(MOVE_RUN);
     MotionMaster& mm = *bot->GetMotionMaster();
+	// [Fix: MoveSplineInitArgs::Validate: expression 'velocity > 0.01f' failed for GUID Full:]
+	if (!CanStartMoveSpline(bot))
+    return false;
+    // End Fix
     mm.Clear();
     mm.MoveJump(x, y, z, speed, speed, 1);
     AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), 1000, priority);
@@ -207,6 +212,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         if (distance > 0.01f)
         {
             MotionMaster& mm = *vehicleBase->GetMotionMaster();  // need to move vehicle, not bot
+			// [Fix: MoveSplineInitArgs::Validate: expression 'velocity > 0.01f' failed for GUID Full:]
+			if (!CanStartMoveSpline(bot))
+            return false;
+		    // End Fix
             mm.Clear();
             if (!backwards)
             {
@@ -242,6 +251,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             //     botAI->InterruptSpell();
             // }
             MotionMaster& mm = *bot->GetMotionMaster();
+			//[Fix: MoveSplineInitArgs::Validate: expression 'velocity > 0.01f' failed for GUID Full:]
+			if (!CanStartMoveSpline(bot))
+            return false;
+		    // End Fix
             mm.Clear();
             if (!backwards)
             {
@@ -284,6 +297,10 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             // }
             MotionMaster& mm = *bot->GetMotionMaster();
             G3D::Vector3 endP = path.back();
+			// [Fix: MoveSplineInitArgs::Validate: expression 'velocity > 0.01f' failed for GUID Full:]
+			if (!CanStartMoveSpline(bot))
+            return false;
+			// End Fix
             mm.Clear();
             if (!backwards)
             {

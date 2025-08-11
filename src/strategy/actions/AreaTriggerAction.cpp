@@ -9,6 +9,7 @@
 #include "LastMovementValue.h"
 #include "Playerbots.h"
 #include "Transport.h"
+#include "BotMovementUtils.h"
 
 bool ReachAreaTriggerAction::Execute(Event event)
 {
@@ -40,7 +41,18 @@ bool ReachAreaTriggerAction::Execute(Event event)
         return true;
     }
 
-    bot->GetMotionMaster()->MovePoint(at->map, at->x, at->y, at->z);
+    // bot->GetMotionMaster()->MovePoint(at->map, at->x, at->y, at->z);
+	// [Fix: MoveSplineInitArgs::Validate: expression 'velocity > 0.01f' failed for GUID Full:]
+	if (CanStartMoveSpline(bot))
+	{
+		bot->GetMotionMaster()->MovePoint(at->map, at->x, at->y, at->z);
+	}
+	else
+	{
+		bot->StopMovingOnCurrentPos();
+		botAI->SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
+		return false;
+	}
 
     float distance = bot->GetDistance(at->x, at->y, at->z);
     float delay = 1000.0f * distance / bot->GetSpeed(MOVE_RUN) + sPlayerbotAIConfig->reactDelay;
