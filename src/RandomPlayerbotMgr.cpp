@@ -1725,7 +1725,11 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         }
 
         // Prevent blink to be detected by visible real players
-        if (botAI->HasPlayerNearby(150.0f))
+        /*if (botAI->HasPlayerNearby(150.0f))
+        {
+            break;
+        }*/
+        if (botAI && botAI->HasPlayerNearby(150.0f)) // [Crash fix] 'botAI' can be null earlier in the function.
         {
             break;
         }
@@ -2333,8 +2337,10 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     PlayerbotsDatabase.Execute(stmt);
 
     // teleport to a random inn for bot level
-    if (GET_PLAYERBOT_AI(bot))
-        GET_PLAYERBOT_AI(bot)->Reset(true);
+    /*if (GET_PLAYERBOT_AI(bot))
+        GET_PLAYERBOT_AI(bot)->Reset(true);*/
+    if (auto* ai = GET_PLAYERBOT_AI(bot)) // [Crash fix] Avoid 2 calls to GET_PLAYERBOT_AI and protect the dereference.
+        ai->Reset(true);
 
     if (bot->GetGroup())
         bot->RemoveFromGroup();
@@ -2374,8 +2380,10 @@ void RandomPlayerbotMgr::RandomizeMin(Player* bot)
     PlayerbotsDatabase.Execute(stmt);
 
     // teleport to a random inn for bot level
-    if (GET_PLAYERBOT_AI(bot))
-        GET_PLAYERBOT_AI(bot)->Reset(true);
+    /*if (GET_PLAYERBOT_AI(bot))
+        GET_PLAYERBOT_AI(bot)->Reset(true);*/
+	if (auto* ai = GET_PLAYERBOT_AI(bot)) // [Crash fix] Avoid 2 calls to GET_PLAYERBOT_AI and protect the dereference.
+    ai->Reset(true);
 
     if (bot->GetGroup())
         bot->RemoveFromGroup();
@@ -2468,7 +2476,7 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
 
 bool RandomPlayerbotMgr::IsRandomBot(Player* bot)
 {
-    if (bot && GET_PLAYERBOT_AI(bot))
+    /*if (bot && GET_PLAYERBOT_AI(bot))
     {
         if (GET_PLAYERBOT_AI(bot)->IsRealPlayer())
             return false;
@@ -2478,6 +2486,17 @@ bool RandomPlayerbotMgr::IsRandomBot(Player* bot)
         return IsRandomBot(bot->GetGUID().GetCounter());
     }
 
+    return false;*/
+
+    if (bot) // [Tidy] Single AI acquisition + same logic.
+    {
+        if (auto* ai = GET_PLAYERBOT_AI(bot))
+        {
+            if (ai->IsRealPlayer())
+                return false;
+        }
+        return IsRandomBot(bot->GetGUID().GetCounter());
+    }
     return false;
 }
 
@@ -2495,7 +2514,7 @@ bool RandomPlayerbotMgr::IsRandomBot(ObjectGuid::LowType bot)
 
 bool RandomPlayerbotMgr::IsAddclassBot(Player* bot)
 {
-    if (bot && GET_PLAYERBOT_AI(bot))
+    /*if (bot && GET_PLAYERBOT_AI(bot))
     {
         if (GET_PLAYERBOT_AI(bot)->IsRealPlayer())
             return false;
@@ -2505,6 +2524,17 @@ bool RandomPlayerbotMgr::IsAddclassBot(Player* bot)
         return IsAddclassBot(bot->GetGUID().GetCounter());
     }
 
+    return false;*/
+
+    if (bot) // [Tidy] Single AI acquisition + same logic.
+    {
+        if (auto* ai = GET_PLAYERBOT_AI(bot))
+        {
+            if (ai->IsRealPlayer())
+                return false;
+        }
+        return IsAddclassBot(bot->GetGUID().GetCounter());
+    }
     return false;
 }
 
@@ -2844,8 +2874,9 @@ void RandomPlayerbotMgr::HandleCommand(uint32 type, std::string const text, Play
                     continue;
             }
         }
-
-        GET_PLAYERBOT_AI(bot)->HandleCommand(type, text, fromPlayer);
+        // GET_PLAYERBOT_AI(bot)->HandleCommand(type, text, fromPlayer); // Possible crash source because we don't check if the returned pointer is not null
+        if (auto* ai = GET_PLAYERBOT_AI(bot)) // [Crash fix] Protect the call on a null AI (World/General chat path).
+            ai->HandleCommand(type, text, fromPlayer);
     }
 }
 
@@ -2918,7 +2949,7 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+            /*PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
             if (botAI && member == player && (!botAI->GetMaster() || GET_PLAYERBOT_AI(botAI->GetMaster())))
             {
                 if (!bot->InBattleground())
@@ -2929,6 +2960,20 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
                 }
 
                 break;
+            }*/
+			if (auto* botAI = GET_PLAYERBOT_AI(bot)) // [Tidy] Avoid GET_PLAYERBOT_AI(...) on a potentially null master.
+            {
+                Player* master = botAI->GetMaster();
+                if (member == player && (!master || GET_PLAYERBOT_AI(master)))
+                {
+                    if (!bot->InBattleground())
+                    {
+                        botAI->SetMaster(player);
+                        botAI->ResetStrategies();
+                        botAI->TellMaster("Hello");
+                    }
+                    break;
+                }
             }
         }
     }
@@ -3067,13 +3112,29 @@ void RandomPlayerbotMgr::PrintStats()
         lvlPerClass[bot->getClass()] += bot->GetLevel();
         lvlPerRace[bot->getRace()] += bot->GetLevel();
 
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        /*PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI->AllowActivity())
             ++active;
 
         if (botAI->GetAiObjectContext()->GetValue<bool>("random bot update")->Get())
-            ++update;
-
+            ++update;*/
+		
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot); // [Crash fix] Declare botAI in the loop scope and exit early if null,
+        if (!botAI)
+            continue;  // real player / no AI → ignore this bot for stats
+        
+        if (botAI->AllowActivity())
+            ++active;
+        
+        // Secure access to the context and the value
+        if (AiObjectContext* ctx = botAI->GetAiObjectContext())
+        {
+            if (auto* v = ctx->GetValue<bool>("random bot update"))
+                if (v->Get())
+                    ++update;
+        } 
+        // End CrashFix
+		
         uint32 botId = bot->GetGUID().GetCounter();
         if (!GetEventValue(botId, "randomize"))
             ++randomize;

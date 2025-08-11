@@ -137,7 +137,7 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
     {
-        if (type == CHAT_MSG_WHISPER)
+        /*if (type == CHAT_MSG_WHISPER)
         {
             if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
             {
@@ -145,14 +145,23 @@ public:
 
                 return false;
             }
-        }
+        }*/
+		
+       if (type == CHAT_MSG_WHISPER && receiver) // [Crash Fix] Add non-null receiver check to avoid calling on a null pointer in edge cases.
+       {
+           if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
+           {
+               botAI->HandleCommand(type, msg, player);
+               return false;
+           }
+       }
 
         return true;
     }
 
     void OnPlayerChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Group* group) override
     {
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        /*for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             if (Player* member = itr->GetSource())
             {
@@ -160,6 +169,18 @@ public:
                 {
                     botAI->HandleCommand(type, msg, player);
                 }
+            }
+        }*/
+		if (!group) return; // [Crash Fix] 'group' should not be null in this hook, but this safeguard prevents a crash if the caller changes or in case of an unexpected call.
+
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* member = itr->GetSource();
+            if (!member) continue;
+        
+            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(member))
+            {
+                botAI->HandleCommand(type, msg, player);
             }
         }
     }
@@ -177,7 +198,9 @@ public:
                     {
                         if (bot->GetGuildId() == player->GetGuildId())
                         {
-                            GET_PLAYERBOT_AI(bot)->HandleCommand(type, msg, player);
+                            // GET_PLAYERBOT_AI(bot)->HandleCommand(type, msg, player);
+							if (PlayerbotAI* ai = GET_PLAYERBOT_AI(bot))  // [Crash Fix] Possible crash source because we don't check if the returned pointer is not null
+                                ai->HandleCommand(type, msg, player);
                         }
                     }
                 }
