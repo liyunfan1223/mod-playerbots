@@ -555,6 +555,9 @@ AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
 
 # Minimum and maximum level range for randombots allowed to login
+# If level filtration is used, minRandomBots and maxRandomBots might be automatically adjusted to lower values,
+# depending on available eligible bots in the database
+# Default Min,Max: 1,80 (no level filtration)
 AiPlayerbot.RandomBotMinLoginLevel = 1
 AiPlayerbot.RandomBotMaxLoginLevel = 80
 
