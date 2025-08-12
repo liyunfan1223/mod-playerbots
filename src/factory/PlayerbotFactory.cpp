@@ -164,16 +164,15 @@ void PlayerbotFactory::Init()
         {
             continue;
         }
-        
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
-        if (proto) {
-            if (proto->ItemLevel < 60)
-                continue;
 
-            if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
-               continue;
+        if (proto->ItemLevel < 60)
+            continue;
+
+        if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
+        {
+            continue;
         }
-        
         if (sRandomItemMgr->IsTestItem(gemId))
             continue;
 
@@ -181,11 +180,9 @@ void PlayerbotFactory::Init()
         {
             continue;
         }
-        
         // LOG_INFO("playerbots", "Add {} to enchantment gems", gemId);
         enchantGemIdCache.push_back(gemId);
     }
-    
     LOG_INFO("playerbots", "Loading {} enchantment gems", enchantGemIdCache.size());
 }
 
