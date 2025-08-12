@@ -336,34 +336,39 @@ void PlayerbotHolder::HandleBotPackets(WorldSession* session) // [Crash Fix] Sec
     }
 }
 
-void PlayerbotHolder::LogoutAllBots()
+// void PlayerbotHolder::LogoutAllBots() // Original function
+// {
+//     /*
+//     while (true)
+//     {
+//         PlayerBotMap::const_iterator itr = GetPlayerBotsBegin();
+//         if (itr == GetPlayerBotsEnd())
+//             break;
+// 
+//         Player* bot= itr->second;
+//         if (!GET_PLAYERBOT_AI(bot)->IsRealPlayer())
+//             LogoutPlayerBot(bot->GetGUID());
+//     }
+//     */
+// 
+//     PlayerBotMap bots = playerBots;
+//     for (auto& itr : bots)
+//     {
+//         Player* bot = itr.second;
+//         if (!bot)
+//             continue;
+// 
+//         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+//         if (!botAI || botAI->IsRealPlayer())
+//             continue;
+// 
+//         LogoutPlayerBot(bot->GetGUID());
+//     }
+// }
+
+// New function to avoid crashs
+/*void PlayerbotHolder::LogoutAllBots()
 {
-    /*
-    while (true)
-    {
-        PlayerBotMap::const_iterator itr = GetPlayerBotsBegin();
-        if (itr == GetPlayerBotsEnd())
-            break;
-
-        Player* bot= itr->second;
-        if (!GET_PLAYERBOT_AI(bot)->IsRealPlayer())
-            LogoutPlayerBot(bot->GetGUID());
-    }
-    */
-
-    /*PlayerBotMap bots = playerBots;
-    for (auto& itr : bots)
-    {
-        Player* bot = itr.second;
-        if (!bot)
-            continue;
-
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        if (!botAI || botAI->IsRealPlayer())
-            continue;
-
-        LogoutPlayerBot(bot->GetGUID());
-    }*/
 	// Snapshot under lock for safe iteration
     PlayerBotMap botsCopy;
     {
@@ -383,9 +388,50 @@ void PlayerbotHolder::LogoutAllBots()
 
         LogoutPlayerBot(bot->GetGUID());
     }
+}*/
+
+// FIX function to Crash report on server restart #1545
+void PlayerbotHolder::LogoutAllBots()
+{
+    // Non-blocking reentrancy guard (prevents a second pass during a restart).
+    static std::mutex s_logoutAllMx;
+    std::unique_lock<std::mutex> reentryGuard(s_logoutAllMx, std::try_to_lock);
+    if (!reentryGuard.owns_lock())
+    {
+        LOG_DEBUG("mod-playerbots", "LogoutAllBots skipped: already running");
+        return;
+    }
+
+    // Snapshot of GUIDs under lock (absolutely no Player* here).
+    std::vector<ObjectGuid> botGuids;
+    {
+        std::lock_guard<std::mutex> lk(g_botMapsMx);
+        botGuids.reserve(playerBots.size());
+        for (auto const& kv : playerBots)
+            botGuids.push_back(kv.first);
+    }
+
+    // Re-lookup by GUID outside the lock + late filtering (maximum safety).
+    for (ObjectGuid guid : botGuids)
+    {
+        Player* bot = GetPlayerBot(guid);
+        if (!bot)
+            continue;
+
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+        if (!botAI || botAI->IsRealPlayer())
+            continue;
+
+        // Avoids duplicate work if another path has already started the logout.
+        if (WorldSession* sess = bot->GetSession())
+            if (sess->isLogingOut())
+                continue;
+
+        LogoutPlayerBot(guid);
+    }
 }
 
-/*void PlayerbotMgr::CancelLogout()
+/*void PlayerbotMgr::CancelLogout() // Original function
 {
     Player* master = GetMaster();
     if (!master)
@@ -472,112 +518,155 @@ void PlayerbotMgr::CancelLogout()
     }
 }
 
+// void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid) // Original function
+// {
+//     if (Player* bot = GetPlayerBot(guid))
+//     {
+//         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+//         if (!botAI)
+//             return;
+// 
+//         Group* group = bot->GetGroup();
+//         if (group && !bot->InBattleground() && !bot->InBattlegroundQueue() && botAI->HasActivePlayerMaster())
+//         {
+//             sPlayerbotDbStore->Save(botAI);
+//         }
+// 
+//         LOG_DEBUG("mod-playerbots", "Bot {} logging out", bot->GetName().c_str());
+//         bot->SaveToDB(false, false);
+// 
+//         // WorldSession* botWorldSessionPtr = bot->GetSession();
+// 		WorldSession* botWorldSessionPtr = bot->GetSession(); // Small safeguard on the session (as a precaution)
+//         if (!botWorldSessionPtr)
+//             return;
+//         WorldSession* masterWorldSessionPtr = nullptr;
+// 
+//         if (botWorldSessionPtr->isLogingOut())
+//             return;
+// 
+//         //Player* master = botAI->GetMaster();
+//         if (master)
+//             masterWorldSessionPtr = master->GetSession();
+// 
+//         // check for instant logout
+//         bool logout = botWorldSessionPtr->ShouldLogOut(time(nullptr));
+// 
+//         if (masterWorldSessionPtr && masterWorldSessionPtr->ShouldLogOut(time(nullptr)))
+//             logout = true;
+// 
+//         if (masterWorldSessionPtr && !masterWorldSessionPtr->GetPlayer())
+//             logout = true;
+// 
+//         if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
+//             botWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
+//         {
+//             logout = true;
+//         }
+// 
+//         if (master &&
+//             (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || master->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
+//              (masterWorldSessionPtr &&
+//               masterWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))))
+//         {
+//             logout = true;
+//         }
+// 
+//         /*TravelTarget* target = nullptr;
+//         if (botAI->GetAiObjectContext())  // Maybe some day re-write to delate all pointer values.
+//         {
+//             target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
+//         }*/
+//         // [Crash fix] Centralized cleanup of pointer values in the context
+//         ClearAIContextPointerValues(botAI);
+// 
+//         // Peiru: Allow bots to always instant logout to see if this resolves logout crashes
+//         logout = true;
+// 
+//         // if no instant logout, request normal logout
+//         if (!logout)
+//         {
+//             if (bot->GetSession()->isLogingOut())
+//                 return;
+//             else if (bot)
+//             {
+//                 botAI->TellMaster("I'm logging out!");
+//                 WorldPackets::Character::LogoutRequest data = WorldPacket(CMSG_LOGOUT_REQUEST);
+//                 botWorldSessionPtr->HandleLogoutRequestOpcode(data);
+//                 if (!bot)
+//                 {
+//                     /*RemoveFromPlayerbotsMap(guid);
+//                     delete botWorldSessionPtr;
+//                     if (target)
+//                         delete target;*/
+// 					// [Crash fix] bot can be destroyed by the logout request: clean up without touching old pointers
+//                     RemoveFromPlayerbotsMap(guid);
+//                     delete botWorldSessionPtr;
+//                 }
+//                 return;
+//             }
+//             else
+//             {
+//                 /*RemoveFromPlayerbotsMap(guid);     // deletes bot player ptr inside this WorldSession PlayerBotMap
+//                 delete botWorldSessionPtr;  // finally delete the bot's WorldSession
+//                 if (target)
+//                     delete target;*/
+// 				// [Crash fix] no more deleting 'target' here: ownership handled by the AI/Context
+//                 RemoveFromPlayerbotsMap(guid);     // deletes bot player ptr inside this WorldSession PlayerBotMap
+//                 delete botWorldSessionPtr;         // finally delete the bot's WorldSession
+//             }
+//             return;
+//         }  // if instant logout possible, do it
+//         else if (bot && (logout || !botWorldSessionPtr->isLogingOut()))
+//         {
+//             botAI->TellMaster("Goodbye!");
+//             RemoveFromPlayerbotsMap(guid);                  // deletes bot player ptr inside this WorldSession PlayerBotMap
+//             botWorldSessionPtr->LogoutPlayer(true);  // this will delete the bot Player object and PlayerbotAI object
+//             delete botWorldSessionPtr;               // finally delete the bot's WorldSession
+//         }
+//     }
+// }
+
 void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
 {
-    if (Player* bot = GetPlayerBot(guid))
+    // Retrieve the bot from the GUID.
+    Player* bot = GetPlayerBot(guid);
+    if (!bot)
+        return;
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+        return;
+
+    // Backups before any destruction.
+    Group* group = bot->GetGroup();
+    if (group && !bot->InBattleground() && !bot->InBattlegroundQueue() && botAI->HasActivePlayerMaster())
     {
-        PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        if (!botAI)
-            return;
-
-        Group* group = bot->GetGroup();
-        if (group && !bot->InBattleground() && !bot->InBattlegroundQueue() && botAI->HasActivePlayerMaster())
-        {
-            sPlayerbotDbStore->Save(botAI);
-        }
-
-        LOG_DEBUG("mod-playerbots", "Bot {} logging out", bot->GetName().c_str());
-        bot->SaveToDB(false, false);
-
-        // WorldSession* botWorldSessionPtr = bot->GetSession();
-		WorldSession* botWorldSessionPtr = bot->GetSession(); // Small safeguard on the session (as a precaution)
-        if (!botWorldSessionPtr)
-            return;
-        WorldSession* masterWorldSessionPtr = nullptr;
-
-        if (botWorldSessionPtr->isLogingOut())
-            return;
-
-        Player* master = botAI->GetMaster();
-        if (master)
-            masterWorldSessionPtr = master->GetSession();
-
-        // check for instant logout
-        bool logout = botWorldSessionPtr->ShouldLogOut(time(nullptr));
-
-        if (masterWorldSessionPtr && masterWorldSessionPtr->ShouldLogOut(time(nullptr)))
-            logout = true;
-
-        if (masterWorldSessionPtr && !masterWorldSessionPtr->GetPlayer())
-            logout = true;
-
-        if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
-            botWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
-        {
-            logout = true;
-        }
-
-        if (master &&
-            (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || master->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
-             (masterWorldSessionPtr &&
-              masterWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))))
-        {
-            logout = true;
-        }
-
-        /*TravelTarget* target = nullptr;
-        if (botAI->GetAiObjectContext())  // Maybe some day re-write to delate all pointer values.
-        {
-            target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
-        }*/
-        // [Crash fix] Centralized cleanup of pointer values in the context
-        ClearAIContextPointerValues(botAI);
-
-        // Peiru: Allow bots to always instant logout to see if this resolves logout crashes
-        logout = true;
-
-        // if no instant logout, request normal logout
-        if (!logout)
-        {
-            if (bot->GetSession()->isLogingOut())
-                return;
-            else if (bot)
-            {
-                botAI->TellMaster("I'm logging out!");
-                WorldPackets::Character::LogoutRequest data = WorldPacket(CMSG_LOGOUT_REQUEST);
-                botWorldSessionPtr->HandleLogoutRequestOpcode(data);
-                if (!bot)
-                {
-                    /*RemoveFromPlayerbotsMap(guid);
-                    delete botWorldSessionPtr;
-                    if (target)
-                        delete target;*/
-					// [Crash fix] bot can be destroyed by the logout request: clean up without touching old pointers
-                    RemoveFromPlayerbotsMap(guid);
-                    delete botWorldSessionPtr;
-                }
-                return;
-            }
-            else
-            {
-                /*RemoveFromPlayerbotsMap(guid);     // deletes bot player ptr inside this WorldSession PlayerBotMap
-                delete botWorldSessionPtr;  // finally delete the bot's WorldSession
-                if (target)
-                    delete target;*/
-				// [Crash fix] no more deleting 'target' here: ownership handled by the AI/Context
-                RemoveFromPlayerbotsMap(guid);     // deletes bot player ptr inside this WorldSession PlayerBotMap
-                delete botWorldSessionPtr;         // finally delete the bot's WorldSession
-            }
-            return;
-        }  // if instant logout possible, do it
-        else if (bot && (logout || !botWorldSessionPtr->isLogingOut()))
-        {
-            botAI->TellMaster("Goodbye!");
-            RemoveFromPlayerbotsMap(guid);                  // deletes bot player ptr inside this WorldSession PlayerBotMap
-            botWorldSessionPtr->LogoutPlayer(true);  // this will delete the bot Player object and PlayerbotAI object
-            delete botWorldSessionPtr;               // finally delete the bot's WorldSession
-        }
+        sPlayerbotDbStore->Save(botAI);
     }
+
+    LOG_DEBUG("mod-playerbots", "Bot {} logging out", bot->GetName().c_str());
+    bot->SaveToDB(false, false);
+
+    // Bot session (required for logout).
+    WorldSession* botWorldSessionPtr = bot->GetSession();
+    if (!botWorldSessionPtr)
+        return;
+
+    // If another path is already logging out this bot, do not touch anything.
+    if (botWorldSessionPtr->isLogingOut())
+        return;
+
+    // Inform the master (before cleaning up the context).
+    botAI->TellMaster("Goodbye!");
+
+    // Defensive cleanup of the AI context (prevents dangling pointers).
+    ClearAIContextPointerValues(botAI);
+
+    // Bots: force instant logout to prevent any state read on a destroying object
+    // Important: do not touch 'bot' or 'botAI' after the map has been removed.
+    RemoveFromPlayerbotsMap(guid);          // Remove the Player* from the internal mapping.
+    botWorldSessionPtr->LogoutPlayer(true); // Destroy Player and PlayerbotAI.
+    delete botWorldSessionPtr;              // Remove the bot's WorldSession.
 }
 
 void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
