@@ -1018,13 +1018,15 @@ void PlayerbotFactory::ClearSkills()
     bot->SetUInt32Value(PLAYER_SKILL_INDEX(0), 0);
     bot->SetUInt32Value(PLAYER_SKILL_INDEX(1), 0);
     // unlearn default race/class skills
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(bot->getRace(), bot->getClass());
-    for (PlayerCreateInfoSkills::const_iterator itr = info->skills.begin(); itr != info->skills.end(); ++itr)
+    if (PlayerInfo const* info = sObjectMgr->GetPlayerInfo(bot->getRace(), bot->getClass()))
     {
-        uint32 skillId = itr->SkillId;
-        if (!bot->HasSkill(skillId))
-            continue;
-        bot->SetSkill(skillId, 0, 0, 0);
+        for (PlayerCreateInfoSkills::const_iterator itr = info->skills.begin(); itr != info->skills.end(); ++itr)
+        {
+            uint32 skillId = itr->SkillId;
+            if (!bot->HasSkill(skillId))
+                continue;
+            bot->SetSkill(skillId, 0, 0, 0);
+        }
     }
 }
 
