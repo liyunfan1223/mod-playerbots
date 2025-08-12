@@ -994,18 +994,9 @@ void RandomPlayerbotMgr::CheckBgQueue()
                     isRated = ginfo.IsRated;
                 }
 
-                /*if (bgQueue.IsPlayerInvitedToRatedArena(player->GetGUID()) ||
+                if (bgQueue.IsPlayerInvitedToRatedArena(player->GetGUID()) ||
                     (player->InArena() && player->GetBattleground()->isRated()))
-                    isRated = true;*/
-                if (bgQueue.IsPlayerInvitedToRatedArena(player->GetGUID())) // [Crash Fix] Issue Crash in RandomPlayerbotMgr:1018 #1528
-                {
                     isRated = true;
-                }
-                else if (Battleground const* bg = player->GetBattleground())
-                {
-                    if (player->InArena() && bg->isRated())
-                        isRated = true;
-                }
 
                 if (isRated)
                     BattlegroundData[queueTypeId][bracketId].ratedArenaPlayerCount++;
@@ -1020,24 +1011,15 @@ void RandomPlayerbotMgr::CheckBgQueue()
                 else
                     BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount++;
 
-                /*// If a player has joined the BG, update the instance count in BattlegroundData (for consistency)
+                // If a player has joined the BG, update the instance count in BattlegroundData (for consistency)
                 if (player->InBattleground())
                 {
                     std::vector<uint32>* instanceIds = nullptr;
                     uint32 instanceId = player->GetBattleground()->GetInstanceID();
 
-                    instanceIds = &BattlegroundData[queueTypeId][bracketId].bgInstances;*/
-                // If a player has joined the BG, update the instance count in BattlegroundData (for consistency)
-                if (Battleground const* bg = player->GetBattleground()) // [Crash Fix] Issue Crash in RandomPlayerbotMgr:1018 #1528
-                {
-                    std::vector<uint32>* instanceIds = nullptr;
-                    uint32 instanceId = bg->GetInstanceID();
-
-                    instanceIds = &BattlegroundData[queueTypeId][bracketId].bgInstances;					
-                   
-				   if (instanceIds &&
+                    instanceIds = &BattlegroundData[queueTypeId][bracketId].bgInstances;
+                    if (instanceIds &&
                         std::find(instanceIds->begin(), instanceIds->end(), instanceId) == instanceIds->end())
-						
                         instanceIds->push_back(instanceId);
 
                     BattlegroundData[queueTypeId][bracketId].bgInstanceCount = instanceIds->size();
@@ -1100,20 +1082,10 @@ void RandomPlayerbotMgr::CheckBgQueue()
                     isRated = ginfo.IsRated;
                 }
 
-                /*if (bgQueue.IsPlayerInvitedToRatedArena(guid) || (bot->InArena() && bot->GetBattleground()->isRated()))
-                    isRated = true;*/
-				if (bgQueue.IsPlayerInvitedToRatedArena(guid)) // [Crash Fix] Issue Crash in RandomPlayerbotMgr:1018 #1528
-                {
+                if (bgQueue.IsPlayerInvitedToRatedArena(guid) || (bot->InArena() && bot->GetBattleground()->isRated()))
                     isRated = true;
-                }
-                else if (Battleground const* bg = bot->GetBattleground())
-                {
-                    if (bot->InArena() && bg->isRated())
-                        isRated = true;
-                }
-                // END [Crash Fix] Issue Crash in RandomPlayerbotMgr:1018 #1528
-                
-				if (isRated)
+
+                if (isRated)
                     BattlegroundData[queueTypeId][bracketId].ratedArenaBotCount++;
                 else
                     BattlegroundData[queueTypeId][bracketId].skirmishArenaBotCount++;
@@ -1126,15 +1098,10 @@ void RandomPlayerbotMgr::CheckBgQueue()
                     BattlegroundData[queueTypeId][bracketId].bgHordeBotCount++;
             }
 
-            /*if (bot->InBattleground())
+            if (bot->InBattleground())
             {
                 std::vector<uint32>* instanceIds = nullptr;
-                uint32 instanceId = bot->GetBattleground()->GetInstanceID();*/
-            if (Battleground const* bg = bot->GetBattleground()) // [Crash Fix] Issue Crash in RandomPlayerbotMgr:1018 #1528
-            {
-                std::vector<uint32>* instanceIds = nullptr;
-                uint32 instanceId = bg->GetInstanceID();
-                //END  [Crash Fix] Issue Crash in RandomPlayerbotMgr:1018 #1528				
+                uint32 instanceId = bot->GetBattleground()->GetInstanceID();
                 bool isArena = false;
                 bool isRated = false;
 
@@ -1142,8 +1109,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
                 if (bot->InArena())
                 {
                     isArena = true;
-                    // if (bot->GetBattleground()->isRated())
-					if (bg->isRated())	// [Crash Fix] Issue Crash in RandomPlayerbotMgr:1018 #1528
+                    if (bot->GetBattleground()->isRated())
                     {
                         isRated = true;
                         instanceIds = &BattlegroundData[queueTypeId][bracketId].ratedArenaInstances;
