@@ -57,7 +57,6 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
-#include "BotMovementUtils.h"
 
 const int SPELL_TITAN_GRIP = 49152;
 
@@ -6326,27 +6325,11 @@ void PlayerbotAI::PetFollow()
     if (!pet)
         return;
     pet->AttackStop();
-    /* pet->InterruptNonMeleeSpells(false);
+    pet->InterruptNonMeleeSpells(false);
     pet->ClearInPetCombat();
     pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
     if (pet->ToPet())
-        pet->ToPet()->ClearCastWhenWillAvailable();*/
-	// [Fix: MoveSplineInitArgs::Validate: expression 'velocity > 0.01f' failed for GUID Full:]
-	pet->InterruptNonMeleeSpells(false);
-    pet->ClearInPetCombat();
-
-    if (CanStartMoveSpline(pet))
-    {
-        pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
-    }
-    else
-    {
-        pet->StopMovingOnCurrentPos();  // on n’envoie pas d’ordre invalide
-    }
-
-    if (pet->ToPet())
         pet->ToPet()->ClearCastWhenWillAvailable();
-	//End Fix
     CharmInfo* charmInfo = pet->GetCharmInfo();
     if (!charmInfo)
         return;

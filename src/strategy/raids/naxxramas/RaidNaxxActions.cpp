@@ -9,7 +9,6 @@
 #include "RaidNaxxStrategy.h"
 #include "ScriptedCreature.h"
 #include "SharedDefines.h"
-#include "BotMovementUtils.h"
 
 bool GrobbulusGoBehindAction::Execute(Event event)
 {
@@ -259,26 +258,11 @@ bool RazuviousUseObedienceCrystalAction::Execute(Event event)
             return false;
         }
         if (charm->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == NULL_MOTION_TYPE)
-        /*{
+        {
             charm->GetMotionMaster()->Clear();
             charm->GetMotionMaster()->MoveChase(target);
             charm->GetAI()->AttackStart(target);
-        }*/
-		// [Fix: MoveSplineInitArgs::Validate: expression 'velocity > 0.01f' failed for GUID Full:]
-		{
-            if (CanStartMoveSpline(charm))
-            {
-                charm->GetMotionMaster()->Clear();
-                charm->GetMotionMaster()->MoveChase(target);
-            }
-            else
-            {
-                charm->StopMoving();
-            }
-        
-            charm->GetAI()->AttackStart(target);
         }
-		// End Fix
         Aura* forceObedience = botAI->GetAura("force obedience", charm);
         uint32 duration_time;
         if (!forceObedience)
