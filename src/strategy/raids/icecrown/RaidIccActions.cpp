@@ -957,8 +957,7 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
 
 bool IccGunshipTeleportHordeAction::TeleportTo(const Position& position)
 {
-    // return bot->TeleportTo(bot->GetMapId(), position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(),
-	return TeleportToSafe(bot, bot->GetMapId(), position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(),// [Fix]Avoid silly teleport
+    return bot->TeleportTo(bot->GetMapId(), position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(),
                            bot->GetOrientation());
 }
 

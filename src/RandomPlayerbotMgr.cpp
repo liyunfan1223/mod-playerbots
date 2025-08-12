@@ -1772,8 +1772,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI)
             botAI->Reset(true);
-        //bot->TeleportTo(loc.GetMapId(), x, y, z, 0);
-		TeleportToSafe(bot, loc.GetMapId(), x, y, z, 0); // [Fix] Avoid silly teleports
+        bot->TeleportTo(loc.GetMapId(), x, y, z, 0);
         bot->SendMovementFlagUpdate();
 
         if (pmo)
@@ -3048,8 +3047,7 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
             } while (true);
         }
 
-        // player->TeleportTo(botPos);
-		TeleportToSafe(player, botPos); // [Fix] Avoid silly teleports
+        player->TeleportTo(botPos);
 
         // player->Relocate(botPos.getX(), botPos.getY(), botPos.getZ(), botPos.getO());
     }

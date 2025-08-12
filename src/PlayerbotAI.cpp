@@ -721,7 +721,6 @@ void PlayerbotAI::HandleTeleportAck()
             bot->GetSession()->HandleMoveWorldportAck();
         }
         // SetNextCheckDelay(urand(2000, 5000));
-		SetNextCheckDelay(urand(500, 1500)); // short delay to break bursts without hindering gameplay
         if (sPlayerbotAIConfig->applyInstanceStrategies)
             ApplyInstanceStrategies(bot->GetMapId(), true);
         EvaluateHealerDpsStrategy();
