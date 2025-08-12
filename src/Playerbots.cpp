@@ -352,7 +352,7 @@ public:
     }*/
 
     // New LFG Function
-    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList)
+    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList) override // Fix missing override
     {
         const size_t totalSlots = guidsList.guids.size();
         size_t ignoredEmpty = 0, ignoredNonPlayer = 0;
