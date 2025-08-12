@@ -30,7 +30,6 @@
 #include "cs_playerbots.h"
 #include "cmath"
 #include "BattleGroundTactics.h"
-#include "ObjectAccessor.h"
 
 class PlayerbotsDatabaseScript : public DatabaseScript
 {
@@ -109,7 +108,7 @@ public:
                     "|cffcccccchttps://github.com/liyunfan1223/mod-playerbots|r");
             }
 
-            /*if (sPlayerbotAIConfig->enabled || sPlayerbotAIConfig->randomBotAutologin)
+            if (sPlayerbotAIConfig->enabled || sPlayerbotAIConfig->randomBotAutologin)
             {
                 std::string roundedTime =
                     std::to_string(std::ceil((sPlayerbotAIConfig->maxRandomBots * 0.11 / 60) * 10) / 10.0);
@@ -118,7 +117,7 @@ public:
                 ChatHandler(player->GetSession()).SendSysMessage(
                     "|cff00ff00Playerbots:|r bot initialization at server startup takes about '" 
                     + roundedTime + "' minutes.");
-            }*/
+            }
         }
     }
 
@@ -137,7 +136,7 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
     {
-        /*if (type == CHAT_MSG_WHISPER)
+        if (type == CHAT_MSG_WHISPER)
         {
             if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
             {
@@ -145,23 +144,14 @@ public:
 
                 return false;
             }
-        }*/
-		
-       if (type == CHAT_MSG_WHISPER && receiver) // [Crash Fix] Add non-null receiver check to avoid calling on a null pointer in edge cases.
-       {
-           if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
-           {
-               botAI->HandleCommand(type, msg, player);
-               return false;
-           }
-       }
+        }
 
         return true;
     }
 
     void OnPlayerChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Group* group) override
     {
-        /*for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             if (Player* member = itr->GetSource())
             {
@@ -169,18 +159,6 @@ public:
                 {
                     botAI->HandleCommand(type, msg, player);
                 }
-            }
-        }*/
-		if (!group) return; // [Crash Fix] 'group' should not be null in this hook, but this safeguard prevents a crash if the caller changes or in case of an unexpected call.
-
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            Player* member = itr->GetSource();
-            if (!member) continue;
-        
-            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(member))
-            {
-                botAI->HandleCommand(type, msg, player);
             }
         }
     }
@@ -198,9 +176,7 @@ public:
                     {
                         if (bot->GetGuildId() == player->GetGuildId())
                         {
-                            // GET_PLAYERBOT_AI(bot)->HandleCommand(type, msg, player);
-							if (PlayerbotAI* ai = GET_PLAYERBOT_AI(bot))  // [Crash Fix] Possible crash source because we don't check if the returned pointer is not null
-                                ai->HandleCommand(type, msg, player);
+                            GET_PLAYERBOT_AI(bot)->HandleCommand(type, msg, player);
                         }
                     }
                 }
@@ -335,7 +311,7 @@ class PlayerbotsScript : public PlayerbotScript
 public:
     PlayerbotsScript() : PlayerbotScript("PlayerbotsScript") {}
 
-    /*bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList) override
+    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList) override
     {
         bool nonBotFound = false;
         for (ObjectGuid const& guid : guidsList.guids)
@@ -349,137 +325,7 @@ public:
         }
 
         return nonBotFound;
-    }*/
-
-    // New LFG Function
-    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList)
-    {
-        const size_t totalSlots = guidsList.guids.size();
-        size_t ignoredEmpty = 0, ignoredNonPlayer = 0;
-        size_t offlinePlayers = 0, botPlayers = 0, realPlayers = 0;
-        bool groupGuidSeen = false;
-
-        LOG_DEBUG("playerbots", "[LFG] check start: slots={}", totalSlots);
-
-        for (size_t i = 0; i < totalSlots; ++i)
-        {
-            ObjectGuid const& guid = guidsList.guids[i];
-
-            // 1) Placeholders to ignore
-            if (guid.IsEmpty())
-            {
-                ++ignoredEmpty;
-                LOG_DEBUG("playerbots", "[LFG] slot {}: <empty> -> ignored", i);
-                continue;
-            }
-
-            // Group GUID: in the original implementation this counted as "non-bot found"
-            if (guid.IsGroup())
-            {
-                groupGuidSeen = true;
-                LOG_DEBUG("playerbots", "[LFG] slot {}: <GROUP GUID> -> counts as having a real player (compat)", i);
-                continue;
-            }
-
-            // Other non-Player GUIDs: various placeholders, ignore them
-            if (!guid.IsPlayer())
-            {
-                ++ignoredNonPlayer;
-                LOG_DEBUG("playerbots", "[LFG] slot {}: guid={} (non-player/high={}) -> ignored", i,
-                          static_cast<uint64>(guid.GetRawValue()), (unsigned)guid.GetHigh());
-                continue;
-            }
-
-            // 2) Player present?
-            Player* player = ObjectAccessor::FindPlayer(guid);
-            if (!player)
-            {
-                ++offlinePlayers;
-                LOG_DEBUG("playerbots", "[LFG] slot {}: player guid={} is offline/not in world", i,
-                          static_cast<uint64>(guid.GetRawValue()));
-                continue;
-            }
-
-            // 3) Bot or real player?
-            if (GET_PLAYERBOT_AI(player) != nullptr)
-            {
-                ++botPlayers;
-                LOG_DEBUG("playerbots", "[LFG] slot {}: BOT {} (lvl {}, class {})", i, player->GetName().c_str(),
-                          player->GetLevel(), player->getClass());
-            }
-            else
-            {
-                ++realPlayers;
-                LOG_DEBUG("playerbots", "[LFG] slot {}: REAL {} (lvl {}, class {})", i, player->GetName().c_str(),
-                          player->GetLevel(), player->getClass());
-            }
-        }
-
-        // "Ultra-early phase" detection: only placeholders => DO NOT VETO
-        const bool onlyPlaceholders = (realPlayers + botPlayers + (groupGuidSeen ? 1 : 0)) == 0 &&
-                                      (ignoredEmpty + ignoredNonPlayer) == totalSlots;
-
-        // "Soft" LFG preflight if we actually see players AND at least one offline
-        if (!onlyPlaceholders && offlinePlayers > 0)
-        {
-            // Find a plausible leader: prefer a real online player, otherwise any online player
-            Player* leader = nullptr;
-
-            for (ObjectGuid const& guid : guidsList.guids)
-                if (guid.IsPlayer())
-                    if (Player* p = ObjectAccessor::FindPlayer(guid))
-                        if (GET_PLAYERBOT_AI(p) == nullptr)
-                        {
-                            leader = p;
-                            break;
-                        }
-
-            if (!leader)
-                for (ObjectGuid const& guid : guidsList.guids)
-                    if (guid.IsPlayer())
-                        if (Player* p = ObjectAccessor::FindPlayer(guid))
-                        {
-                            leader = p;
-                            break;
-                        }
-
-            if (leader)
-            {
-                Group* g = leader->GetGroup();
-                if (g)
-                {
-                    LOG_DEBUG("playerbots", "[LFG-RESET] group members={}, isRaid={}, isLFGGroup={}",
-                              (int)g->GetMembersCount(), g->isRaidGroup() ? 1 : 0, g->isLFGGroup() ? 1 : 0);
-
-                    // "Soft" reset of LFG states on the bots' AI side (proposal/role-check, etc.)
-                    for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
-                    {
-                        Player* member = ref->GetSource();
-                        if (!member)
-                            continue;
-
-                        if (PlayerbotAI* ai = GET_PLAYERBOT_AI(member))
-                            ai->Reset(true);
-                    }
-                }
-            }
-
-            LOG_DEBUG("playerbots", "[LFG] preflight soft-reset triggered (offline detected) -> allowQueue=no (retry)");
-            return false;  // ask the client to retry right after the reset
-        }
-
-        // "Hybrid" policy: permissive if only placeholders; otherwise original logic
-        bool allowQueue = onlyPlaceholders ? true : ((offlinePlayers == 0) && (realPlayers >= 1 || groupGuidSeen));
-
-        LOG_DEBUG("playerbots",
-                  "[LFG] summary: slots={}, real={}, bots={}, offline={}, ignored(empty+nonPlayer)={}, "
-                  "groupGuidSeen={} -> allowQueue={}",
-                  totalSlots, realPlayers, botPlayers, offlinePlayers, (ignoredEmpty + ignoredNonPlayer),
-                  (groupGuidSeen ? "yes" : "no"), (allowQueue ? "yes" : "no"));
-
-        return allowQueue;
     }
-    // End LFG
 
     void OnPlayerbotCheckKillTask(Player* player, Unit* victim) override
     {

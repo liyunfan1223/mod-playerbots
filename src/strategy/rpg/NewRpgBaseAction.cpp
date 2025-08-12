@@ -67,8 +67,7 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
             bot->GetName(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(),
             dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ(), dest.getMapId(), bot->GetZoneId(),
             zone_name);
-        // return bot->TeleportTo(dest);
-		return TeleportToSafe(bot, dest); //[Fix] Avoid Silly teleport
+        return bot->TeleportTo(dest);
     }
 
     float dis = bot->GetExactDist(dest);

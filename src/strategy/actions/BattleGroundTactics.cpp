@@ -4289,11 +4289,9 @@ bool ArenaTactics::moveToCenter(Battleground* bg)
             {
                 // they like to hang around at the tip of the pipes doing nothing, so we just teleport them down
                 if (bot->GetDistance(1333.07f, 817.18f, 13.35f) < 4)
-                    // bot->TeleportTo(bg->GetMapId(), 1330.96f, 816.75f, 3.2f, bot->GetOrientation());
-				TeleportToSafe(bot, bg->GetMapId(), 1330.96f, 816.75f, 3.2f, bot->GetOrientation()); // [Fix] Avaid silly teleport
+                    bot->TeleportTo(bg->GetMapId(), 1330.96f, 816.75f, 3.2f, bot->GetOrientation());
                 if (bot->GetDistance(1250.13f, 764.79f, 13.34f) < 4)
-                    // bot->TeleportTo(bg->GetMapId(), 1252.19f, 765.41f, 3.2f, bot->GetOrientation());
-				TeleportToSafe(bot, bg->GetMapId(), 1252.19f, 765.41f, 3.2f, bot->GetOrientation());  // [Fix] Avaid silly teleport
+                    bot->TeleportTo(bg->GetMapId(), 1252.19f, 765.41f, 3.2f, bot->GetOrientation());
             }
             break;
         case BATTLEGROUND_RV:
