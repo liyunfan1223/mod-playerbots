@@ -161,23 +161,35 @@ void PlayerbotFactory::Init()
     {
         uint32 gemId = iter->GemID;
         if (gemId == 0)
+        {
             continue;
+        }
         
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
-        if (!proto) 
-            continue
-                
-        if (proto->ItemLevel < 60)    
-            continue;   
-
-        if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
+        if (!proto)
+        {
             continue;
+        }
+        
+        if (proto->ItemLevel < 60)
+        {
+            continue;
+        }
+        
+        if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
+        {
+            continue;
+        }
         
         if (sRandomItemMgr->IsTestItem(gemId))
-            continue;
-
+        {
+           continue;
+        }
+            
         if (!sGemPropertiesStore.LookupEntry(proto->GemProperties))
+        {
             continue;
+        }
         
         // LOG_INFO("playerbots", "Add {} to enchantment gems", gemId);
         enchantGemIdCache.push_back(gemId);
