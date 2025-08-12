@@ -124,6 +124,15 @@ public:
 
     void OnPlayerAfterUpdate(Player* player, uint32 diff) override
     {
+		if (!player)
+        return;
+
+        WorldSession* sess = player->GetSession();
+        // Skip AI pendant login/TP/vol/transport/hors-monde
+        if (!player->IsInWorld() || !sess || sess->isLogingOut() ||
+        player->IsBeingTeleported() || player->IsInFlight() || player->GetTransport())
+        return;
+	
         if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
         {
             botAI->UpdateAI(diff);
@@ -459,7 +468,15 @@ public:
                             continue;
 
                         if (PlayerbotAI* ai = GET_PLAYERBOT_AI(member))
-                            ai->Reset(true);
+                        {
+                            // Do not touch anything if the member is teleporting, fliying, in transports, speedhacking, flihacking or not yet in the world (transient state).
+                            if (!member->IsInWorld() || member->IsBeingTeleported() || member->IsInFlight() || member->GetTransport())
+                                continue;
+                        
+                           // "Light" reset of transient LFG states, without breaking strategies.
+                            ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
+                            ai->Reset(); // non-"full" version (instead of Reset(true))
+                        }
                     }
                 }
             }

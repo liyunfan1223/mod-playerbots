@@ -85,6 +85,17 @@ uint32 LfgJoinAction::GetRoles()
 
 bool LfgJoinAction::JoinLFG()
 {
+    // "Ready" guard: prevents AI actions during login initialization.
+    Player* p = bot;
+    if (!p)
+        return false;
+
+    WorldSession* sess = p->GetSession();
+    if (!sess || !p->IsInWorld() || sess->isLogingOut() ||
+        p->IsBeingTeleported() || p->IsInFlight() || p->GetTransport())
+        return false;
+    // [END FIX]
+	
     // check if already in lfg
     LfgState state = sLFGMgr->GetState(bot->GetGUID());
     if (state != LFG_STATE_NONE)
