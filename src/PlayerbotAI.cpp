@@ -720,14 +720,16 @@ void PlayerbotAI::HandleTeleportAck()
         {
             bot->GetSession()->HandleMoveWorldportAck();
         }
-        // SetNextCheckDelay(urand(2000, 5000));
-		SetNextCheckDelay(urand(500, 1500)); // short delay to break bursts without hindering gameplay
+
         if (sPlayerbotAIConfig->applyInstanceStrategies)
             ApplyInstanceStrategies(bot->GetMapId(), true);
         EvaluateHealerDpsStrategy();
         Reset(true);
+		
+		SetNextCheckDelay(urand(300, 700)); // Safety : short delay after a worldport to prevent rapid re-teleports.
+		return;
     }
-
+    // If teleportNear : we stay cool and keep the standard GCD.
     SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
 }
 

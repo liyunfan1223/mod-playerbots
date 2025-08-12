@@ -1357,10 +1357,6 @@ bool KologarnMarkDpsTargetAction::Execute(Event event)
 
 bool KologarnFallFromFloorAction::Execute(Event event)
 {
-    /*return bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionX(),
-                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionY(),
-                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionZ(),
-                           ULDUAR_KOLOGARN_RESTORE_POSITION.GetOrientation());*/
 	return TeleportToSafe(bot, bot->GetMapId(), ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionX(), // [Fix] Avoid silly teleport
                       ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionY(),
                       ULDUAR_KOLOGARN_RESTORE_POSITION.GetPositionZ(),
@@ -1411,7 +1407,6 @@ bool KologarnEyebeamAction::Execute(Event event)
     KologarnEyebeamTrigger kologarnEyebeamTrigger(botAI);
     if (runToLeftSide)
     {
-        // teleportedToPoint = bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionX(),
 		teleportedToPoint = TeleportToSafe(bot, bot->GetMapId(), 
 		                                    ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionX(),
                                             ULDUAR_KOLOGARN_EYEBEAM_LEFT_POSITION.GetPositionY(),
@@ -1420,7 +1415,6 @@ bool KologarnEyebeamAction::Execute(Event event)
     }
     else
     {
-        // teleportedToPoint = bot->TeleportTo(bot->GetMapId(), ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionX(),
 		teleportedToPoint = TeleportToSafe(bot, bot->GetMapId(),
 		                                    ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionX(),
                                             ULDUAR_KOLOGARN_EYEBEAM_RIGHT_POSITION.GetPositionY(),
@@ -1487,7 +1481,7 @@ bool AuriayaFallFromFloorAction::Execute(Event event)
     if (!master)
         return false;
 
-    return bot->TeleportTo(bot->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(),
+    return TeleportToSafe(bot, bot->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(),
                            master->GetOrientation());
 }
 
@@ -2121,7 +2115,7 @@ bool ThorimFallFromFloorAction::Execute(Event event)
     if (!master)
         return false;
 
-    return bot->TeleportTo(bot->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(),
+    return TeleportToSafe(bot, bot->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(),
                            master->GetOrientation());
 }
 
@@ -2251,7 +2245,7 @@ bool MimironShockBlastAction::Execute(Event event)
             if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
                                                                bot->GetPositionZ(), dx, dy, dz))
             {
-                bot->TeleportTo(target->GetMapId(), dx, dy, dz, target->GetOrientation());
+                TeleportToSafe(bot, target->GetMapId(), dx, dy, dz, target->GetOrientation());
                 return true;
             }
         }
@@ -2287,7 +2281,7 @@ bool MimironP3Wx2LaserBarrageAction::Execute(Event event)
 
     if (bot->GetDistance2d(master) > 15.0f)
     {
-        return bot->TeleportTo(master->GetMapId(), master->GetPositionX(), master->GetPositionY(),
+        return TeleportToSafe(bot, master->GetMapId(), master->GetPositionX(), master->GetPositionY(),
                                master->GetPositionZ(), master->GetOrientation());
     }
 
@@ -2533,7 +2527,7 @@ bool MimironRocketStrikeAction::Execute(Event event)
             if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
                                                                bot->GetPositionZ(), dx, dy, dz))
             {
-                bot->TeleportTo(target->GetMapId(), dx, dy, dz, target->GetOrientation());
+                TeleportToSafe(bot, target->GetMapId(), dx, dy, dz, target->GetOrientation());
                 return true;
             }
         }

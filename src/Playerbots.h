@@ -58,6 +58,10 @@ inline bool TeleportToSafe(Player* p, uint32 mapId, float x, float y, float z, f
 {
     if (!p) return false;
 
+    // Do not attempt another teleport if the client is already teleporting (safety check).
+    if (p->IsBeingTeleportedNear() || p->IsBeingTeleportedFar())
+        return false;
+	
     // If the height is invalid (-200000) or not finite, attempt ONE correction on the same map.
     if (z <= -199000.0f || !std::isfinite(z))
     {
@@ -80,9 +84,7 @@ inline bool TeleportToSafe(Player* p, uint32 mapId, float x, float y, float z, f
 inline bool TeleportToSafe(Player* p, Position const& pos)
 {
     // Position doesn't have mapId: we keep actual bot map
-    return TeleportToSafe(p, p->GetMapId(),
-                          pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(),
-                          pos.GetOrientation());
+    return TeleportToSafe(p, p->GetMapId(), pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
 }
 
 inline bool TeleportToSafe(Player* p, WorldPosition pos)

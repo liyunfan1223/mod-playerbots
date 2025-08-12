@@ -85,25 +85,27 @@ uint32 LfgJoinAction::GetRoles()
 
 bool LfgJoinAction::JoinLFG()
 {
+    // "Ready" guard: prevents AI actions during login initialization.
+    Player* p = bot;
+    if (!p)
+        return false;
+
+    WorldSession* sess = p->GetSession();
+    if (!sess || !p->IsInWorld() || sess->isLogingOut() ||
+        p->IsBeingTeleported() || p->IsInFlight() || p->GetTransport())
+        return false;
+    // [END FIX]
+
     // check if already in lfg
     LfgState state = sLFGMgr->GetState(bot->GetGUID());
     if (state != LFG_STATE_NONE)
         return false;
 
-    /*ItemCountByQuality visitor;
-    IterateItems(&visitor, ITERATE_ITEMS_IN_EQUIP);
-    bool random = urand(0, 100) < 20;
-    bool heroic = urand(0, 100) < 50 &&
-                  (visitor.count[ITEM_QUALITY_EPIC] >= 3 || visitor.count[ITEM_QUALITY_RARE] >= 10) &&
-                  bot->GetLevel() >= 70;
-    bool rbotAId = !heroic && (urand(0, 100) < 50 && visitor.count[ITEM_QUALITY_EPIC] >= 5 &&
-                               (bot->GetLevel() == 60 || bot->GetLevel() == 70 || bot->GetLevel() == 80));*/
-
-    LfgDungeonSet list;
-    std::vector<uint32> selected;
+    LfgDungeonSet list;              // contiendra les entries encodés (Type<<24 | ID)
+    std::vector<uint32> selected;    // IDs bruts (DBC), inchangé (si tu t'en sers ailleurs)
 
     std::vector<uint32> dungeons = sRandomPlayerbotMgr->LfgDungeons[bot->GetTeamId()];
-    if (!dungeons.size())
+    if (dungeons.empty())
         return false;
 
     for (std::vector<uint32>::iterator i = dungeons.begin(); i != dungeons.end(); ++i)
@@ -115,59 +117,76 @@ bool LfgJoinAction::JoinLFG()
 
         const auto& botLevel = bot->GetLevel();
 
-        /*LFG_TYPE_RANDOM on classic is 15-58 so bot over level 25 will never queue*/
-        if (dungeon->MinLevel && (botLevel < dungeon->MinLevel || botLevel > dungeon->MaxLevel) ||
+        /* LFG_TYPE_RANDOM on classic is 15-58 so bot over level 25 will never queue */
+        if ((dungeon->MinLevel && (botLevel < dungeon->MinLevel || botLevel > dungeon->MaxLevel)) ||
             (botLevel > dungeon->MinLevel + 10 && dungeon->TypeID == LFG_TYPE_DUNGEON))
             continue;
 
+        // IDs bruts à titre de sélection interne
         selected.push_back(dungeon->ID);
-        list.insert(dungeon->ID);
+
+        // IMPORTANT : encoder l'entry attendu par le core (TypeID<<24 | ID)
+        uint32 entry = (uint32(dungeon->TypeID) << 24) | dungeon->ID;
+        list.insert(entry);
     }
 
-    if (!selected.size())
+    if (selected.empty() || list.empty())
         return false;
 
-    if (list.empty())
-        return false;
-
+    // Pour le log, il faut décoder l'entry pour LookupEntry (qui attend l'ID brut)
     bool many = list.size() > 1;
-    LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(*list.begin());
+    uint32 first = *list.begin();
+    LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(first & 0x00FFFFFF);
+	
+	// Log des donjons envoyés au LFG (entries encodés -> on décode id & type pour l'affichage)
+    for (uint32 e : list)
+    {
+        uint32 typeId = e >> 24;
+        uint32 id     = e & 0x00FFFFFF;
+        LFGDungeonEntry const* d = sLFGDungeonStore.LookupEntry(id);
+        LOG_DEBUG("playerbots", "LFG: entry={} (type={}, id={}) name={}",
+                 e, typeId, id, d ? d->Name[0] : "<null>");
+    }
 
     // check role for console msg
     std::string _roles = "multiple roles";
     uint32 roleMask = GetRoles();
-    if (roleMask & PLAYER_ROLE_TANK)
-        _roles = "TANK";
+    if (roleMask & PLAYER_ROLE_TANK)   _roles = "TANK";
+    if (roleMask & PLAYER_ROLE_HEALER) _roles = "HEAL";
+    if (roleMask & PLAYER_ROLE_DAMAGE) _roles = "DPS";
 
-    if (roleMask & PLAYER_ROLE_HEALER)
-        _roles = "HEAL";
+    LOG_INFO("playerbots", "Bot {} {}:{} <{}>: queues LFG, Dungeon as {} ({})",
+             bot->GetGUID().ToString().c_str(),
+             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H",
+             bot->GetLevel(), bot->GetName().c_str(), _roles,
+             many ? "several dungeons" : (dungeon ? dungeon->Name[0] : "<unknown>"));
 
-    if (roleMask & PLAYER_ROLE_DAMAGE)
-        _roles = "DPS";
+    // GearScore en commentaire LFG
+    std::string const _gs = std::to_string(botAI->GetEquipGearScore(bot));
 
-    LOG_INFO("playerbots", "Bot {} {}:{} <{}>: queues LFG, Dungeon as {} ({})", bot->GetGUID().ToString().c_str(),
-             bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName().c_str(), _roles,
-             many ? "several dungeons" : dungeon->Name[0]);
+    // Sanity check : ne jamais envoyer d'entry 0/0
+    for (uint32 e : list)
+    {
+        uint32 typeId = e >> 24;
+        uint32 id     = e & 0x00FFFFFF;
+        if (typeId == 0 || id == 0)
+            return false; // on n'envoie pas un entry invalide
+    }
 
-    // Set RbotAId Browser comment
-    std::string const _gs = std::to_string(botAI->GetEquipGearScore(bot/*, false, false*/));
-    
-    // JoinLfg is not threadsafe, so make packet and queue into session
-    // sLFGMgr->JoinLfg(bot, roleMask, list, _gs);
-
+    // JoinLfg n'est pas threadsafe: on construit le paquet et on le queue dans la session
     WorldPacket* data = new WorldPacket(CMSG_LFG_JOIN);
     *data << (uint32)roleMask;
-    *data << (bool)false;
-    *data << (bool)false;
-    // Slots
+    *data << (bool)false; // Need tank
+    *data << (bool)false; // Need healer
+    // Slots (entries déjà encodés)
     *data << (uint8)(list.size());
-    for (uint32 dungeon : list)
-        *data << (uint32)dungeon;
+    for (uint32 dungeonEntry : list)
+        *data << (uint32)dungeonEntry;
     // Needs
     *data << (uint8)3 << (uint8)0 << (uint8)0 << (uint8)0;
     *data << _gs;
-    bot->GetSession()->QueuePacket(data);
 
+    bot->GetSession()->QueuePacket(data);
     return true;
 }
 

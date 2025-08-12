@@ -890,8 +890,9 @@ bool IccGunshipTeleportAllyAction::Execute(Event event)
 
 bool IccGunshipTeleportAllyAction::TeleportTo(const Position& position)
 {
-    return bot->TeleportTo(bot->GetMapId(), position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(),
-                           bot->GetOrientation());
+    return TeleportToSafe(bot, bot->GetMapId(),
+                          position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(),
+                          bot->GetOrientation());
 }
 
 void IccGunshipTeleportAllyAction::CleanupSkullIcon(uint8_t SKULL_ICON_INDEX)
@@ -957,7 +958,6 @@ bool IccGunshipTeleportHordeAction::Execute(Event event)
 
 bool IccGunshipTeleportHordeAction::TeleportTo(const Position& position)
 {
-    // return bot->TeleportTo(bot->GetMapId(), position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(),
 	return TeleportToSafe(bot, bot->GetMapId(), position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(),// [Fix]Avoid silly teleport
                            bot->GetOrientation());
 }
@@ -3635,8 +3635,8 @@ bool IccBpcKineticBombAction::Execute(Event event)
     // Handle edge case where bot is too high
     if (bot->GetPositionZ() > SAFE_HEIGHT)
     {
-        bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), TELEPORT_HEIGHT,
-                        bot->GetOrientation());
+		TeleportToSafe(bot, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), TELEPORT_HEIGHT, 
+		               bot->GetOrientation());				
     }
 
     // Check current target if valid
@@ -5480,8 +5480,9 @@ bool IccValithriaHealAction::Execute(Event event)
     constexpr float MAX_Z_POSITION = 367.961f;
     constexpr float TARGET_Z_POSITION = 365.0f;
     if (bot->GetPositionZ() > MAX_Z_POSITION)
-        bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), TARGET_Z_POSITION,
-                        bot->GetOrientation());
+
+		TeleportToSafe(bot, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), TARGET_Z_POSITION, 
+		               bot->GetOrientation());
 
     // Find Valithria within range
     Creature* valithria = bot->FindNearestCreature(NPC_VALITHRIA_DREAMWALKER, 100.0f);
@@ -5610,8 +5611,8 @@ bool IccValithriaDreamCloudAction::Execute(Event event)
         {
             if (bot->GetDistance(leader) > PORTALSTART_TOLERANCE)
             {
-                bot->TeleportTo(bot->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(),
-                                bot->GetOrientation());
+				TeleportToSafe(bot, bot->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(), 
+				                bot->GetOrientation());				
             }
         }
     }
@@ -5826,7 +5827,7 @@ bool IccValithriaDreamCloudAction::Execute(Event event)
         if (bot->GetDistance(leader) > PORTALSTART_TOLERANCE)
         {
             botAI->Reset();
-            bot->TeleportTo(bot->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(),
+            TeleportToSafe(bot, bot->GetMapId(), leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(),
                             bot->GetOrientation());
         }
     }
@@ -7074,7 +7075,7 @@ void IccLichKingWinterAction::HandlePositionCorrection()
 
     // Fix underground bug
     if (abs(bot->GetPositionZ() - 840.857f) > 1.0f)
-        bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), 840.857f, bot->GetOrientation());
+        TeleportToSafe(bot, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), 840.857f, bot->GetOrientation());
 
     // Reset targeting for specific conditions
     if (currentTarget && boss && currentTarget == boss)
@@ -7934,7 +7935,7 @@ void IccLichKingAddsAction::HandleTeleportationFixes(Difficulty diff, Unit* tere
     if (!(diff == RAID_DIFFICULTY_10MAN_HEROIC || diff == RAID_DIFFICULTY_25MAN_HEROIC) &&
         abs(bot->GetPositionY() - -2095.7915f) > 200.0f)
     {
-        bot->TeleportTo(bot->GetMapId(), ICC_LICH_KING_ADDS_POSITION.GetPositionX(),
+        TeleportToSafe(bot, bot->GetMapId(), ICC_LICH_KING_ADDS_POSITION.GetPositionX(),
                         ICC_LICH_KING_ADDS_POSITION.GetPositionY(), ICC_LICH_KING_ADDS_POSITION.GetPositionZ(),
                         bot->GetOrientation());
     }
@@ -7942,11 +7943,11 @@ void IccLichKingAddsAction::HandleTeleportationFixes(Difficulty diff, Unit* tere
     // temp solution for bots going underground due to buggy ice platfroms and adds that go underground
     if (abs(bot->GetPositionZ() - 840.857f) > 1.0f && !botAI->GetAura("Harvest Soul", bot, false, false) &&
         !botAI->GetAura("Harvest Souls", bot, false, false))
-        bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), 840.857f, bot->GetOrientation());
+        TeleportToSafe(bot, bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), 840.857f, bot->GetOrientation());
 
     if (abs(bot->GetPositionZ() - 1049.865f) > 5.0f && botAI->GetAura("Harvest Soul", bot, false, false) &&
         terenasMenethilHC)
-        bot->TeleportTo(bot->GetMapId(), terenasMenethilHC->GetPositionX(), terenasMenethilHC->GetPositionY(), 1049.865f,
+        TeleportToSafe(bot, bot->GetMapId(), terenasMenethilHC->GetPositionX(), terenasMenethilHC->GetPositionY(), 1049.865f,
                         bot->GetOrientation());
 }
 

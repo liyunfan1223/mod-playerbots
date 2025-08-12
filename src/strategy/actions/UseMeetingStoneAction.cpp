@@ -225,7 +225,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
                 player->GetMotionMaster()->Clear();
                 AI_VALUE(LastMovement&, "last movement").clear();
-                player->TeleportTo(mapId, x, y, z, 0);
+                TeleportToSafe(player, mapId, x, y, z, 0.0f);
 
                 if (botAI->HasStrategy("stay", botAI->GetState()))
                 {

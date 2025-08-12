@@ -124,6 +124,15 @@ public:
 
     void OnPlayerAfterUpdate(Player* player, uint32 diff) override
     {
+		if (!player)
+        return;
+
+        WorldSession* sess = player->GetSession();
+        // Skip AI pendant login/TP/vol/transport/hors-monde
+        if (!player->IsInWorld() || !sess || sess->isLogingOut() ||
+        player->IsBeingTeleported() || player->IsInFlight() || player->GetTransport())
+        return;
+		
         if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player))
         {
             botAI->UpdateAI(diff);
@@ -137,16 +146,6 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Player* receiver) override
     {
-        /*if (type == CHAT_MSG_WHISPER)
-        {
-            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
-            {
-                botAI->HandleCommand(type, msg, player);
-
-                return false;
-            }
-        }*/
-		
        if (type == CHAT_MSG_WHISPER && receiver) // [Crash Fix] Add non-null receiver check to avoid calling on a null pointer in edge cases.
        {
            if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(receiver))
@@ -161,16 +160,6 @@ public:
 
     void OnPlayerChat(Player* player, uint32 type, uint32 /*lang*/, std::string& msg, Group* group) override
     {
-        /*for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            if (Player* member = itr->GetSource())
-            {
-                if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(member))
-                {
-                    botAI->HandleCommand(type, msg, player);
-                }
-            }
-        }*/
 		if (!group) return; // [Crash Fix] 'group' should not be null in this hook, but this safeguard prevents a crash if the caller changes or in case of an unexpected call.
 
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -335,24 +324,8 @@ class PlayerbotsScript : public PlayerbotScript
 public:
     PlayerbotsScript() : PlayerbotScript("PlayerbotsScript") {}
 
-    /*bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList) override
-    {
-        bool nonBotFound = false;
-        for (ObjectGuid const& guid : guidsList.guids)
-        {
-            Player* player = ObjectAccessor::FindPlayer(guid);
-            if (guid.IsGroup() || (player && !GET_PLAYERBOT_AI(player)))
-            {
-                nonBotFound = true;
-                break;
-            }
-        }
-
-        return nonBotFound;
-    }*/
-
     // New LFG Function
-    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList)
+    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList) override // Fix missing override
     {
         const size_t totalSlots = guidsList.guids.size();
         size_t ignoredEmpty = 0, ignoredNonPlayer = 0;
@@ -459,7 +432,15 @@ public:
                             continue;
 
                         if (PlayerbotAI* ai = GET_PLAYERBOT_AI(member))
-                            ai->Reset(true);
+                        {
+                            // Pas de reset pendant TP/vol/transport/hors-monde
+                            if (!member->IsInWorld() || member->IsBeingTeleported() || member->IsInFlight() || member->GetTransport())
+                                continue;
+                        
+                            // Reset LFG léger (états transitoires) sans toucher aux stratégies
+                            ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
+                            ai->Reset(); // version légère (pas Reset(true))
+                        }
                     }
                 }
             }

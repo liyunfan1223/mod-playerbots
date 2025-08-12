@@ -12,7 +12,8 @@
 #include "PlayerbotAIBase.h"
 #include "QueryHolder.h"
 #include "QueryResult.h"
-#include <shared_mutex>                 // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+#include <shared_mutex>
+#include <atomic> // Added to avoid crash on restart
 
 class ChatHandler;
 class PlayerbotAI;
@@ -62,6 +63,7 @@ protected:
 
     PlayerBotMap playerBots;
     std::unordered_set<ObjectGuid> botLoading;
+	std::atomic<bool> _loggingOutAll{false}; // reentrancy guard for LogoutAllBots
 };
 
 class PlayerbotMgr : public PlayerbotHolder
