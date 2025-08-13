@@ -1,3 +1,4 @@
+#include "RaidNaxxAi40.h"
 #include "RaidNaxxMultipliers.h"
 
 #include "ChooseTargetActions.h"
@@ -23,7 +24,7 @@
 float GrobbulusMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "grobbulus");
-    if (!boss)
+    if (!boss || boss->isDead())
     {
         return 1.0f;
     }
@@ -37,20 +38,54 @@ float GrobbulusMultiplier::GetValue(Action* action)
 float HeiganDanceMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "heigan the unclean");
-    if (!boss)
+    if (!boss || boss->isDead())
     {
         return 1.0f;
     }
-    auto* boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI*>(boss->GetAI());
-    if (!boss_ai || boss_ai->events.Empty())
+    auto* ai = boss->GetAI();
+    if (!ai)
     {
         return 1.0f;
     }
-    EventMap* eventMap = &boss_ai->events;
-    uint32 curr_phase = boss_ai->currentPhase;
-    uint32 curr_dance = eventMap->GetNextEventTime(4);
+    EventMap* eventMap = nullptr;
+    uint32 curr_phase = 0;
+    const char* typeName = typeid(*ai).name();
+    if (std::string(typeName).find("boss_heigan_40") != std::string::npos)
+    {
+        auto* boss_ai = reinterpret_cast<BossAiHeigan40*>(ai);
+        if (boss_ai)
+        {
+            if (!boss_ai->events.Empty())
+                eventMap = &boss_ai->events;
+            if (boss_ai->currentPhase)
+                curr_phase = boss_ai->currentPhase;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        auto* boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI*>(ai);
+        if (!boss_ai || boss_ai->events.Empty())
+        {
+            return 1.0f;
+        }
+        eventMap = &boss_ai->events;
+        curr_phase = boss_ai->currentPhase;
+    }
+    if (!eventMap || eventMap->Empty())
+    {
+        return 1.0f;
+    }
     uint32 curr_timer = eventMap->GetTimer();
-    uint32 curr_erupt = eventMap->GetNextEventTime(3);
+    if (curr_timer > 1000000)
+    {
+        return 1.0f;
+    }
+    uint32 curr_dance = eventMap->GetNextEventTime(4); // EVENT_SWITCH_PHASE
+    uint32 curr_erupt = eventMap->GetNextEventTime(3); // EVENT_ERUPT_SECTION
     if (dynamic_cast<CombatFormationMoveAction*>(action) ||
         dynamic_cast<CastDisengageAction*>(action) ||
         dynamic_cast<CastBlinkBackAction*>(action) )
@@ -86,7 +121,7 @@ float HeiganDanceMultiplier::GetValue(Action* action)
 float LoathebGenericMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "loatheb");
-    if (!boss)
+    if (!boss || boss->isDead())
     {
         return 1.0f;
     }
@@ -220,7 +255,7 @@ float KelthuzadGenericMultiplier::GetValue(Action* action)
 float AnubrekhanGenericMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "anub'rekhan");
-    if (!boss)
+    if (!boss || boss->isDead())
     {
         return 1.0f;
     }
@@ -309,7 +344,9 @@ float GluthGenericMultiplier::GetValue(Action* action)
     if (dynamic_cast<PetAttackAction*>(action))
     {
         Unit* target = AI_VALUE(Unit*, "current target");
-        if (target && target->GetEntry() == Gluth::NPC_ZOMBIE_CHOW)
+        if (target && !target->isDead() 
+                && (target->GetEntry() == 16360  // Default Azerothcore Zombie Chow
+                    || target->GetEntry() == 351069)) // mod-individual-progression Zombie Chow
         {
             return 0.0f;
         }

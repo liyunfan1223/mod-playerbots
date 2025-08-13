@@ -42,7 +42,7 @@ bool RaidOnyxiaSpreadOutAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
 
-    if (!boss)
+    if (!boss || boss->isDead())
         return false;
 
     Player* target = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_targets.GetUnitTarget()->ToPlayer();
@@ -56,7 +56,7 @@ bool RaidOnyxiaSpreadOutAction::Execute(Event event)
 bool RaidOnyxiaMoveToSafeZoneAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "onyxia");
-    if (!boss)
+    if (!boss || boss->isDead())
         return false;
 
     Spell* currentSpell = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
@@ -98,7 +98,9 @@ bool RaidOnyxiaKillWhelpsAction::Execute(Event event)
 {
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     // If already attacking a whelp, don't swap targets
-    if (currentTarget && currentTarget->GetEntry() == 11262)
+    if (currentTarget
+        && (currentTarget->GetEntry() == 11262 // Default AzerothCore Onyxian Whelp
+            || currentTarget->GetEntry() == 301001)) // mod-individual-progression Onyxian Whelp
     {
         return false;
     }
@@ -109,7 +111,8 @@ bool RaidOnyxiaKillWhelpsAction::Execute(Event event)
         if (!unit || !unit->IsAlive() || !unit->IsInWorld())
             continue;
 
-        if (unit->GetEntry() == 11262)  // Onyxia Whelp
+        if (unit->GetEntry() == 11262 // Default AzerothCore Onyxian Whelp
+            || unit->GetEntry() == 301001) // mod-individual-progression Onyxian Whelp
         {
             // bot->Yell("Attacking Whelps!", LANG_UNIVERSAL);
             return Attack(unit);
