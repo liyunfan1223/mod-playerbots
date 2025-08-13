@@ -99,21 +99,24 @@ enum UlduarIDs
     NPC_NELTHARION = 33523,
     NPC_YSERA = 33495,
     GO_DRAGON_SOUL = 194462,
-    NPC_DEATHSWORN_ZEALOT = 33567,
+    NPC_SARA_PHASE_1 = 33134,
     NPC_LICH_KING_ILLUSION = 33441,
     NPC_IMMOLATED_CHAMPION = 33442,
     NPC_SUIT_OF_ARMOR = 33433,
     NPC_GARONA = 33436,
     NPC_KING_LLANE = 33437,
+    NPC_DEATHSWORN_ZEALOT = 33567,
     NPC_INFLUENCE_TENTACLE = 33943,
     NPC_DEATH_ORB = 33882,
     NPC_BRAIN = 33890,
     NPC_CRUSHER_TENTACLE = 33966,
     NPC_CONSTRICTOR_TENTACLE = 33983,
     NPC_CORRUPTOR_TENTACLE = 33985,
+    NPC_IMMORTAL_GUARDIAN = 33988,
     NPC_LAUGHING_SKULL = 33990,
     NPC_SANITY_WELL = 33991,
     NPC_DESCEND_INTO_MADNESS = 34072,
+    NPC_MARKED_IMMORTAL_GUARDIAN = 36064,
     SPELL_SANITY = 63050,
     SPELL_BRAIN_LINK = 63802,
     SPELL_MALADY_OF_THE_MIND = 63830,
@@ -124,8 +127,8 @@ enum UlduarIDs
     SPELL_TELEPORT_BACK = 63992,
     SPELL_CANCEL_ILLUSION_AURA = 63993,
     SPELL_INDUCE_MADNESS = 64059,
-
-    
+    SPELL_LUNATIC_GAZE_YS = 64163,
+    GO_FLEE_TO_THE_SURFACE_PORTAL = 194625,
     
     // Buffs
     SPELL_FROST_TRAP = 13809
@@ -138,9 +141,6 @@ const float ULDUAR_THORIM_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
 const float ULDUAR_AURIAYA_AXIS_Z_PATHING_ISSUE_DETECT = 410.0f;
 const float ULDUAR_YOGG_SARON_BOSS_ROOM_AXIS_Z_PATHING_ISSUE_DETECT = 300.0f;
 const float ULDUAR_YOGG_SARON_BRAIN_ROOM_AXIS_Z_PATHING_ISSUE_DETECT = 200.0f;
-//const float ULDUAR_YOGG_SARON_STORMWIND_KEEPER_RADIUS = 70.0f;
-//const float ULDUAR_YOGG_SARON_ICECROWN_CITADEL_RADIUS = 80.0f;
-//const float ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_RADIUS = 78.0f;
 const float ULDUAR_YOGG_SARON_STORMWIND_KEEPER_RADIUS = 150.0f;
 const float ULDUAR_YOGG_SARON_ICECROWN_CITADEL_RADIUS = 150.0f;
 const float ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_RADIUS = 150.0f;
@@ -181,6 +181,8 @@ const Position ULDUAR_YOGG_SARON_BRAIN_ROOM_MIDDLE = Position(1980.1971f, -27.85
 const Position ULDUAR_YOGG_SARON_STORMWIND_KEEPER_ENTRANCE = Position(1954.06f, 21.66f, 239.71f);
 const Position ULDUAR_YOGG_SARON_ICECROWN_CITADEL_ENTRANCE = Position(1950.11f, -79.284f, 239.98982f);
 const Position ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_ENTRANCE = Position(2048.63f, -25.5f, 239.72f);
+const Position ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT = Position(1998.5377f, -22.90317f, 324.8895f);
+const Position ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT = Position(2003.0934f, -1.3189063f, 326.1626f);
 
 //
 // Flame Levi
@@ -512,7 +514,8 @@ public:
 class YoggSaronTrigger : public Trigger
 {
 public:
-    YoggSaronTrigger(PlayerbotAI* ai, std::string const name = "yogg saron trigger") : Trigger(ai, name) {}
+    YoggSaronTrigger(PlayerbotAI* ai, std::string const name = "yogg saron trigger", int32 checkInteval = 1)
+        : Trigger(ai, name, checkInteval) {}
 
     bool IsYoggSaronFight();
     bool IsPhase2();
@@ -623,6 +626,20 @@ class YoggSaronMoveToExitPortalTrigger : public YoggSaronTrigger
 {
 public:
     YoggSaronMoveToExitPortalTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron move to exit portal trigger") {}
+    bool IsActive() override;
+};
+
+class YoggSaronLunaticGazeTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronLunaticGazeTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron lunatic gaze trigger", 0) {}
+    bool IsActive() override;
+};
+
+class YoggSaronPhase3PositioningTrigger : public YoggSaronTrigger
+{
+public:
+    YoggSaronPhase3PositioningTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron phase 3 positioning trigger", 0) {}
     bool IsActive() override;
 };
 

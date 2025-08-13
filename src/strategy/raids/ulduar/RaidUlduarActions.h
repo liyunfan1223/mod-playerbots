@@ -494,4 +494,20 @@ public:
     bool Execute(Event event) override;
 };
 
+class YoggSaronLunaticGazeAction : public Action
+{
+public:
+    YoggSaronLunaticGazeAction(PlayerbotAI* ai) : Action(ai, "yogg-saron lunatic gaze action") {}
+
+    bool Execute(Event event) override;
+};
+
+class YoggSaronPhase3PositioningAction : public MovementAction
+{
+public:
+    YoggSaronPhase3PositioningAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron phase 3 positioning action") {}
+
+    bool Execute(Event event) override;
+};
+
 #endif

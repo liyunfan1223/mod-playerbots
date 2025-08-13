@@ -1665,8 +1665,10 @@ bool YoggSaronTrigger::IsPhase2()
 bool YoggSaronTrigger::IsPhase3()
 {
     Creature* target = bot->FindNearestCreature(NPC_YOGG_SARON, 200.0f, true);
+    Creature* guardian = bot->FindNearestCreature(NPC_GUARDIAN_OF_YS, 200.0f, true);
+    //Creature* sara = bot->FindNearestCreature(NPC_SARA_PHASE_1, 200.0f, true);
 
-    return target && target->IsAlive() && !target->HasAura(SPELL_SHADOW_BARRIER);
+    return target && target->IsAlive() && !target->HasAura(SPELL_SHADOW_BARRIER) && !guardian;
 }
 
 bool YoggSaronTrigger::IsInBrainLevel()
@@ -2027,6 +2029,25 @@ bool YoggSaronMarkTargetTrigger::IsActive()
 
         return true;
     }
+    else if (IsPhase3())
+    {
+        IsBotMainTankTrigger isBotMainTankTrigger(botAI);
+        if (!isBotMainTankTrigger.IsActive())
+        {
+            return false;
+        }
+        Group* group = bot->GetGroup();
+        if (!group)
+        {
+            return false;
+        }
+        ObjectGuid currentSkullTarget = group->GetTargetIcon(RtiTargetValue::skullIndex);
+        Creature* yogg_saron = bot->FindNearestCreature(NPC_YOGG_SARON, 200.0f, true);
+        if (!currentSkullTarget || currentSkullTarget != yogg_saron->GetGUID())
+        {
+            return true;
+        }
+    }
 
     return false;
 }
@@ -2184,7 +2205,7 @@ bool YoggSaronUsePortalTrigger::IsActive()
 
 bool YoggSaronIllusionRoomTrigger::IsActive()
 {
-    if (!IsYoggSaronFight() || !IsInIllusionRoom())
+    if (!IsYoggSaronFight() || !IsInIllusionRoom() || AI_VALUE(std::string, "rti") == "square")
     {
         return false;
     }
@@ -2217,19 +2238,20 @@ bool YoggSaronIllusionRoomTrigger::GoToBrainRoomRequired()
     return IsMasterIsInBrainRoom();
 }
 
-bool YoggSaronIllusionRoomTrigger::SetRtiMarkRequired() {
+bool YoggSaronIllusionRoomTrigger::SetRtiMarkRequired()
+{
     return AI_VALUE(std::string, "rti") == "diamond";
 }
 
 bool YoggSaronIllusionRoomTrigger::SetRtiTargetRequired()
 {
-    Unit* currentRtiTarget = GetIllusionRoomRtiTarget();
-    if (!currentRtiTarget)
+    Unit const* currentRtiTarget = GetIllusionRoomRtiTarget();
+    if (currentRtiTarget != nullptr)
     {
         return false;
     }
 
-    return true;
+    return GetNextIllusionRoomRtiTarget() != nullptr;
 }
 
 bool YoggSaronMoveToExitPortalTrigger::IsActive()
@@ -2252,12 +2274,98 @@ bool YoggSaronMoveToExitPortalTrigger::IsActive()
         if (induceMadnessSpell && induceMadnessSpell->m_spellInfo->Id == SPELL_INDUCE_MADNESS)
         {
             uint32 castingTimeLeft = induceMadnessSpell->GetCastTimeRemaining();
-            if (castingTimeLeft < 5000)
+            if ((botAI->HasCheat(BotCheatMask::raid) && castingTimeLeft < 4000) ||
+                (!botAI->HasCheat(BotCheatMask::raid) && castingTimeLeft < 6000))
             {
-                botAI->TellMaster("Brain has " + std::to_string(brain->GetHealth()) + "/" +
-                                  std::to_string(brain->GetMaxHealth()) + " health left");
                 return true;
             }
+        }
+    }
+    else if (brain->GetHealth() < brain->GetMaxHealth() * 0.3f)
+    {
+        botAI->TellMaster("Ok brain is angry. Time to run out :)");
+        return true;
+    }
+
+    return false;
+}
+
+bool YoggSaronLunaticGazeTrigger::IsActive()
+{
+    if (!IsYoggSaronFight() || !IsPhase3())
+    {
+        return false;
+    }
+
+    Unit* yoggsaron = AI_VALUE2(Unit*, "find target", "yogg-saron");
+
+    if (yoggsaron && yoggsaron->IsAlive() && yoggsaron->HasUnitState(UNIT_STATE_CASTING))
+    {
+        Spell* currentSpell = yoggsaron->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+        if (currentSpell && currentSpell->m_spellInfo->Id == SPELL_LUNATIC_GAZE_YS)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool YoggSaronPhase3PositioningTrigger::IsActive()
+{
+    if (!IsYoggSaronFight() || !IsPhase3())
+    {
+        return false;
+    }
+
+    YoggSaronSanityTrigger sanityTrigger(botAI);
+    if (sanityTrigger.IsActive())
+    {
+        return false;
+    }
+
+    if (botAI->IsRanged(bot) && bot->GetDistance2d(ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionX(),
+                                                   ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionY()) > 15.0f)
+    {
+        return true;
+    }
+
+    if (botAI->IsMelee(bot) && !botAI->IsTank(bot) &&
+        bot->GetDistance2d(ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
+            ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY()) > 15.0f)
+    {
+        return true;
+    }
+
+    if (botAI->IsTank(bot))
+    {
+        GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
+        bool thereIsAnyGuardian = false;
+
+        for (const ObjectGuid& guid : targets)
+        {
+            Unit* unit = botAI->GetUnit(guid);
+            if (!unit || !unit->IsAlive())
+            {
+                continue;
+            }
+
+            if (unit->GetEntry() == NPC_IMMORTAL_GUARDIAN || unit->GetEntry() == NPC_MARKED_IMMORTAL_GUARDIAN)
+            {
+                thereIsAnyGuardian = true;
+                ObjectGuid unitTargetGuid = unit->GetTarget();
+                Player* targetedPlayer = botAI->GetPlayer(unitTargetGuid);
+                if (!targetedPlayer || !botAI->IsTank(targetedPlayer))
+                {
+                    return false;
+                }
+            }
+        }
+
+        if (thereIsAnyGuardian && bot->GetDistance2d(ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
+                                                     ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY()) > 3.0f)
+        {
+            return true;
         }
     }
 

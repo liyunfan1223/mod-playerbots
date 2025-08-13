@@ -266,7 +266,7 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "yogg-saron sanity trigger",
-        NextAction::array(0, new NextAction("yogg-saron sanity action", ACTION_RAID), nullptr)));
+        NextAction::array(0, new NextAction("yogg-saron sanity action", ACTION_RAID + 1), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "yogg-saron death orb trigger",
@@ -304,17 +304,22 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "yogg-saron illusion room trigger",
         NextAction::array(0, new NextAction("yogg-saron illusion room action", ACTION_RAID), nullptr)));
 
-    //triggers.push_back(new TriggerNode(
-    //    "yogg-saron move to exit portal trigger",
-    //    NextAction::array(0, new NextAction("yogg-saron move to exit portal action", ACTION_RAID), nullptr)));
+    triggers.push_back(new TriggerNode(
+        "yogg-saron move to exit portal trigger",
+        NextAction::array(0, new NextAction("yogg-saron move to exit portal action", ACTION_RAID), nullptr)));
 
-    // yogg-saron brain room mark illusion proper mark per room
-    // yogg-saron move to brain room after killing all illusions and attack brain
-    // yogg-saron enter boss room portal (few seconds before SPELL_INDUCE_MADNESS = 64059 end)
-    // yogg-saron cheat (brain room sanity reset since skulls?)
+    triggers.push_back(new TriggerNode(
+        "yogg-saron lunatic gaze trigger",
+        NextAction::array(0, new NextAction("yogg-saron lunatic gaze action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron phase 3 positioning trigger",
+        NextAction::array(0, new NextAction("yogg-saron phase 3 positioning action", ACTION_RAID), nullptr)));
+
     // Phase 3
-    // yogg-saron guardiang positioning
-    // yogg-saron lunatic gaze (dont look at boss SPELL_LUNATIC_GAZE_YS = 64163)
+    // yogg-saron cheat sanity because of lunatic gaze
+    // yogg-saron guardiang positioning to aoe them
+    
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

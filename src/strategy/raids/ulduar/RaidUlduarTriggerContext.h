@@ -83,6 +83,8 @@ public:
         creators["yogg-saron boss room movement cheat trigger"] = &RaidUlduarTriggerContext::yogg_saron_boss_room_movement_cheat_trigger;
         creators["yogg-saron illusion room trigger"] = &RaidUlduarTriggerContext::yogg_saron_illusion_room_trigger;
         creators["yogg-saron move to exit portal trigger"] = &RaidUlduarTriggerContext::yogg_saron_move_to_exit_portal_trigger;
+        creators["yogg-saron lunatic gaze trigger"] = &RaidUlduarTriggerContext::yogg_saron_lunatic_gaze_trigger;
+        creators["yogg-saron phase 3 positioning trigger"] = &RaidUlduarTriggerContext::yogg_saron_phase_3_positioning_trigger;
     }
 
 private:
@@ -153,6 +155,8 @@ private:
     static Trigger* yogg_saron_boss_room_movement_cheat_trigger(PlayerbotAI* ai) { return new YoggSaronBossRoomMovementCheatTrigger(ai); }
     static Trigger* yogg_saron_illusion_room_trigger(PlayerbotAI* ai) { return new YoggSaronIllusionRoomTrigger(ai); }
     static Trigger* yogg_saron_move_to_exit_portal_trigger(PlayerbotAI* ai) { return new YoggSaronMoveToExitPortalTrigger(ai); }
+    static Trigger* yogg_saron_lunatic_gaze_trigger(PlayerbotAI* ai) { return new YoggSaronLunaticGazeTrigger(ai); }
+    static Trigger* yogg_saron_phase_3_positioning_trigger(PlayerbotAI* ai) { return new YoggSaronPhase3PositioningTrigger(ai); }
 };
 
 #endif

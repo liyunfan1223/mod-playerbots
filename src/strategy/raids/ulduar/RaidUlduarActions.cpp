@@ -2866,6 +2866,12 @@ bool YoggSaronSanityAction::Execute(Event event)
 bool YoggSaronMarkTargetAction::Execute(Event event)
 {
     YoggSaronTrigger yoggSaronTrigger(botAI);
+
+    if (!yoggSaronTrigger.IsYoggSaronFight())
+    {
+        return false;
+    }
+
     if (yoggSaronTrigger.IsPhase2())
     {
         Group* group = bot->GetGroup();
@@ -2915,6 +2921,29 @@ bool YoggSaronMarkTargetAction::Execute(Event event)
         }
 
         group->SetTargetIcon(RtiTargetValue::skullIndex, bot->GetGUID(), nextPossibleTarget->GetGUID());
+    }
+    else if (yoggSaronTrigger.IsPhase3())
+    {
+        Group* group = bot->GetGroup();
+        if (!group)
+        {
+            return false;
+        }
+        ObjectGuid currentSkullTarget = group->GetTargetIcon(RtiTargetValue::skullIndex);
+        Creature* yogg_saron = bot->FindNearestCreature(NPC_YOGG_SARON, 200.0f, true);
+        if (!yogg_saron)
+        {
+            return false;
+        }
+        if (currentSkullTarget)
+        {
+            Unit* currentSkullUnit = botAI->GetUnit(currentSkullTarget);
+            if (currentSkullUnit && currentSkullUnit->IsAlive() && currentSkullUnit->GetGUID() == yogg_saron->GetGUID())
+            {
+                return false;
+            }
+        }
+        group->SetTargetIcon(RtiTargetValue::skullIndex, bot->GetGUID(), yogg_saron->GetGUID());
     }
 }
 
@@ -3001,7 +3030,6 @@ bool YoggSaronMoveToEnterPortalAction::Execute(Event event)
 
     if (botAI->HasCheat(BotCheatMask::raid))
     {
-        botAI->TellMaster("Moving near my portal");
         return bot->TeleportTo(bot->GetMapId(), assignedPortalPosition.GetPositionX(),
                                       assignedPortalPosition.GetPositionY(),
                         assignedPortalPosition.GetPositionZ(), bot->GetOrientation());
@@ -3095,7 +3123,6 @@ bool YoggSaronUsePortalAction::Execute(Event event)
          return false;
      }
 
-     botAI->TellMaster("Using my portal (i hope so)");
      return assignedPortal->HandleSpellClick(bot);
 }
 
@@ -3106,12 +3133,6 @@ bool YoggSaronIllusionRoomAction::Execute(Event event)
     bool resultSetRtiMark = SetRtiMark(yoggSaronTrigger);
     bool resultSetIllusionRtiTarget = SetIllusionRtiTarget(yoggSaronTrigger);
     bool resultSetBrainRtiTarget = SetBrainRtiTarget(yoggSaronTrigger);
-
-    //TODO AS debug purpose delete
-    if (!resultSetRtiMark && !resultSetIllusionRtiTarget && !resultSetBrainRtiTarget)
-    {
-        botAI->TellMaster("No action taken in Yogg-Saron Illusion Room");
-    }
 
     return resultSetRtiMark || resultSetIllusionRtiTarget || resultSetBrainRtiTarget;
 }
@@ -3156,12 +3177,9 @@ bool YoggSaronIllusionRoomAction::SetIllusionRtiTarget(YoggSaronTrigger yoggSaro
 
     if (botAI->HasCheat(BotCheatMask::raid))
     {
-        botAI->TellMaster("Im moving near mob to kill");
-
         bot->TeleportTo(bot->GetMapId(), nextRtiTarget->GetPositionX(), nextRtiTarget->GetPositionY(),
                         nextRtiTarget->GetPositionZ(), bot->GetOrientation());
 
-        botAI->TellMaster("Im killing illusion mob " + nextRtiTarget->GetName());
         Unit::DealDamage(bot->GetSession()->GetPlayer(), nextRtiTarget, nextRtiTarget->GetHealth(), nullptr,
                          DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
     }
@@ -3188,7 +3206,6 @@ bool YoggSaronIllusionRoomAction::SetBrainRtiTarget(YoggSaronTrigger yoggSaronTr
         return false;
     }
 
-    botAI->TellMaster("Changing rti mark to square");
     botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set("square");
 
     Group* group = bot->GetGroup();
@@ -3203,7 +3220,6 @@ bool YoggSaronIllusionRoomAction::SetBrainRtiTarget(YoggSaronTrigger yoggSaronTr
         return false;
     }
 
-    botAI->TellMaster("Marking brain to attack it");
     group->SetTargetIcon(RtiTargetValue::squareIndex, bot->GetGUID(), brain->GetGUID());
 
     Position entrancePosition = yoggSaronTrigger.GetIllusionRoomEntrancePosition();
@@ -3212,14 +3228,12 @@ bool YoggSaronIllusionRoomAction::SetBrainRtiTarget(YoggSaronTrigger yoggSaronTr
     {
         if (Unit const* master = botAI->GetMaster())
         {
-            botAI->TellMaster("Move near master");
             Position masterPosition = master->GetPosition();
             bot->TeleportTo(bot->GetMapId(), masterPosition.GetPositionX(), masterPosition.GetPositionY(),
                             masterPosition.GetPositionZ(), bot->GetOrientation());
         }
         else
         {
-            botAI->TellMaster("Move near illusion entrance");
             bot->TeleportTo(bot->GetMapId(), entrancePosition.GetPositionX(), entrancePosition.GetPositionY(),
                             entrancePosition.GetPositionZ(), bot->GetOrientation());
         }
@@ -3237,13 +3251,102 @@ bool YoggSaronIllusionRoomAction::SetBrainRtiTarget(YoggSaronTrigger yoggSaronTr
 
 bool YoggSaronMoveToExitPortalAction::Execute(Event event)
 {
-    Creature* assignedPortal = bot->FindNearestCreature(NPC_DESCEND_INTO_MADNESS, 60.0f, true);
-    if (!assignedPortal)
+    GameObject* portal = bot->FindNearestGameObject(GO_FLEE_TO_THE_SURFACE_PORTAL, 100.0f);
+    if (!portal)
     {
         return false;
     }
 
-    botAI->TellMaster("Using exit portal");
+    // move or teleport to the portal
+    if (botAI->HasCheat(BotCheatMask::raid))
+    {
+        bot->TeleportTo(bot->GetMapId(), portal->GetPositionX(), portal->GetPositionY(), portal->GetPositionZ(),
+                               bot->GetOrientation());
+    }
+    else
+    {
+        MoveTo(bot->GetMapId(), portal->GetPositionX(), portal->GetPositionY(), portal->GetPositionZ(), false,
+                      false, false, true, MovementPriority::MOVEMENT_FORCED,
+                      true, false);
+    }
+
+    // Distance to portal should be less than 2.0f to use it
+    if (bot->GetDistance2d(portal) > 2.0f)
+    {
+        return false;
+    }
+
+    portal->Use(bot);
+
     botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set("skull");
-    return assignedPortal->HandleSpellClick(bot);
+    return true;
+}
+
+bool YoggSaronLunaticGazeAction::Execute(Event event)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "yogg saron");
+    float angle = bot->GetAngle(boss);
+    float newAngle = Position::NormalizeOrientation(angle + M_PI);  // Add 180 degrees (PI radians)
+    //if (botAI->IsTank(bot))
+    //{
+    botAI->TellMaster("Turning away from Yogg-Saron in Lunatic Gaze");
+        bot->SetFacingTo(newAngle);
+        return true;
+    //}
+    //else
+    //{
+    //    return bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
+    //                           newAngle);
+    //}
+}
+
+bool YoggSaronPhase3PositioningAction::Execute(Event event)
+{
+    if (botAI->IsRanged(bot))
+    {
+        if (botAI->HasCheat(BotCheatMask::raid))
+        {
+            botAI->TellMaster("Teleporting to ranged spot in Yogg-Saron Phase 3");
+            return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionX(),
+                            ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionY(),
+                            ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionZ(),
+                            bot->GetOrientation());
+        }
+        else
+        {
+            return MoveTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionX(),
+                   ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionY(),
+                   ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionZ(), false,
+                   false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
+        }
+    }
+
+    if (botAI->IsMelee(bot) && !botAI->IsTank(bot))
+    {
+        if (botAI->HasCheat(BotCheatMask::raid))
+        {
+            botAI->TellMaster("Teleporting to melee spot in Yogg-Saron Phase 3");
+            return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
+                            ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY(),
+                            ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionZ(), bot->GetOrientation());
+        }
+        else
+        {
+            return MoveTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
+                   ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY(),
+                   ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionZ(), false, false, false, true,
+                   MovementPriority::MOVEMENT_FORCED, true, false);
+        }
+    }
+
+    if (botAI->IsTank(bot))
+    {
+        botAI->TellMaster("Teleporting to melee spot in Yogg-Saron Phase 3");
+        return MoveTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
+                      ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY(),
+                      ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionZ(), false, false, false, true,
+                      MovementPriority::MOVEMENT_FORCED, true, false);
+    }
+
+    return false;
 }
