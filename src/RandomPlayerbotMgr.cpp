@@ -1012,10 +1012,10 @@ void RandomPlayerbotMgr::CheckBgQueue()
                     BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount++;
 
                 // If a player has joined the BG, update the instance count in BattlegroundData (for consistency)
-                if (player->InBattleground())
+                if (Battleground const* bg = player->GetBattleground())
                 {
                     std::vector<uint32>* instanceIds = nullptr;
-                    uint32 instanceId = player->GetBattleground()->GetInstanceID();
+                    uint32 instanceId = bg->GetInstanceID();
 
                     instanceIds = &BattlegroundData[queueTypeId][bracketId].bgInstances;
                     if (instanceIds &&
