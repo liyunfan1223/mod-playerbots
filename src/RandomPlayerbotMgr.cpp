@@ -1098,10 +1098,10 @@ void RandomPlayerbotMgr::CheckBgQueue()
                     BattlegroundData[queueTypeId][bracketId].bgHordeBotCount++;
             }
 
-            if (bot->InBattleground())
+            if (bg)
             {
                 std::vector<uint32>* instanceIds = nullptr;
-                uint32 instanceId = bot->GetBattleground()->GetInstanceID();
+                uint32 instanceId = bg->GetInstanceID();
                 bool isArena = false;
                 bool isRated = false;
 
@@ -1109,7 +1109,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
                 if (bot->InArena())
                 {
                     isArena = true;
-                    if (bot->GetBattleground()->isRated())
+                    if (bg->isRated())
                     {
                         isRated = true;
                         instanceIds = &BattlegroundData[queueTypeId][bracketId].ratedArenaInstances;
