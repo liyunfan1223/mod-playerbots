@@ -1753,7 +1753,6 @@ bool YoggSaronTrigger::IsMasterIsInBrainRoom()
            master->GetPositionZ() > 230.0f && master->GetPositionZ() < 250.0f;
 }
 
-//TODO AS change that method to return point to attack brain
 Position YoggSaronTrigger::GetIllusionRoomEntrancePosition()
 {
     if (IsInChamberOfTheAspectsIllusion())
@@ -1894,9 +1893,7 @@ bool YoggSaronOminousCloudCheatTrigger::IsActive()
         return false;
     }
 
-    //TODO AS zwiększono na czas testów
-    //Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 25.0f, true);
-    Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 40.0f, true);
+    Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 25.0f, true);
 
     return target;
 }
@@ -2034,7 +2031,7 @@ bool YoggSaronMarkTargetTrigger::IsActive()
     }
     else if (IsPhase3())
     {
-        ObjectGuid currentCrossTarget = group->GetTargetIcon(RtiTargetValue::crossIndex);
+        /*ObjectGuid currentCrossTarget = group->GetTargetIcon(RtiTargetValue::crossIndex);
         if (!currentCrossTarget)
         {
             return true;
@@ -2044,7 +2041,7 @@ bool YoggSaronMarkTargetTrigger::IsActive()
         if (currentCrossUnit && currentCrossUnit->GetEntry() != NPC_YOGG_SARON)
         {
             return true;
-        }
+        }*/
 
         ObjectGuid currentSkullTarget = group->GetTargetIcon(RtiTargetValue::skullIndex);
         Unit* currentSkullUnit = nullptr;
@@ -2056,7 +2053,7 @@ bool YoggSaronMarkTargetTrigger::IsActive()
         if (currentSkullUnit &&
             (currentSkullUnit->GetEntry() == NPC_IMMORTAL_GUARDIAN ||
              currentSkullUnit->GetEntry() == NPC_MARKED_IMMORTAL_GUARDIAN) &&
-            currentSkullUnit->GetHealth() > 1)
+            currentSkullUnit->GetHealthPct() > 10)
         {
             return false;
         }
@@ -2071,10 +2068,15 @@ bool YoggSaronMarkTargetTrigger::IsActive()
             }
 
             if ((unit->GetEntry() == NPC_IMMORTAL_GUARDIAN || unit->GetEntry() == NPC_MARKED_IMMORTAL_GUARDIAN) &&
-                unit->GetHealth() > 1)
+                unit->GetHealthPct() > 10)
             {
                 return true;
             }
+        }
+
+        if (!currentSkullUnit || currentSkullUnit->GetEntry() != NPC_YOGG_SARON)
+        {
+            return true;
         }
 
         return false;

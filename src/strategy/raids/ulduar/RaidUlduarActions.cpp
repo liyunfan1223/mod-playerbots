@@ -2837,9 +2837,7 @@ bool YoggSaronOminousCloudCheatAction::Execute(Event event)
         return false;
     }
 
-    //TODO AS zwiększono na czas testów
-    //Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 25.0f);
-    Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 40.0f);
+    Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 25.0f);
     if (!target || !target->IsAlive())
     {
         return false;
@@ -2932,7 +2930,7 @@ bool YoggSaronMarkTargetAction::Execute(Event event)
             botAI->ChangeStrategy(ADD_STRATEGY_CHAR + tankAssistStrategy.getName(), BotState::BOT_STATE_COMBAT);
         }
 
-        ObjectGuid currentCrossTarget = group->GetTargetIcon(RtiTargetValue::crossIndex);
+        /*ObjectGuid currentCrossTarget = group->GetTargetIcon(RtiTargetValue::crossIndex);
         Unit* currentCrossUnit = nullptr;
         if (currentCrossTarget)
         {
@@ -2946,7 +2944,7 @@ bool YoggSaronMarkTargetAction::Execute(Event event)
             {
                 group->SetTargetIcon(RtiTargetValue::crossIndex, bot->GetGUID(), yoggsaron->GetGUID());
             }
-        }
+        }*/
 
         GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
 
@@ -2961,7 +2959,7 @@ bool YoggSaronMarkTargetAction::Execute(Event event)
             }
 
             if ((unit->GetEntry() == NPC_IMMORTAL_GUARDIAN || unit->GetEntry() == NPC_MARKED_IMMORTAL_GUARDIAN) &&
-                unit->GetHealth() > 1)
+                unit->GetHealthPct() > 10)
             {
                 if (unit->GetHealth() < lowestHealth)
                 {
@@ -2973,8 +2971,35 @@ bool YoggSaronMarkTargetAction::Execute(Event event)
 
         if (lowestHealthUnit)
         {
-            group->SetTargetIcon(RtiTargetValue::skullIndex, bot->GetGUID(), lowestHealthUnit->GetGUID());
+            // Added because lunatic gaze freeze all bots and they can't attack
+            // If someone fix it then this cheat can be removed
+            if (botAI->HasCheat(BotCheatMask::raid))
+            {
+                lowestHealthUnit->Kill(bot, lowestHealthUnit);
+            }
+            else
+            {
+                group->SetTargetIcon(RtiTargetValue::skullIndex, bot->GetGUID(), lowestHealthUnit->GetGUID());
+            }
+
             return true;
+        }
+
+        ObjectGuid currentSkullTarget = group->GetTargetIcon(RtiTargetValue::skullIndex);
+        Unit* currentSkullUnit = nullptr;
+        if (currentSkullTarget)
+        {
+            currentSkullUnit = botAI->GetUnit(currentSkullTarget);
+        }
+
+        if (!currentSkullUnit || currentSkullUnit->GetEntry() != NPC_YOGG_SARON)
+        {
+            Unit* yoggsaron = AI_VALUE2(Unit*, "find target", "yogg-saron");
+            if (yoggsaron && yoggsaron->IsAlive())
+            {
+                group->SetTargetIcon(RtiTargetValue::skullIndex, bot->GetGUID(), yoggsaron->GetGUID());
+                return true;
+            }
         }
 
         return false;
@@ -3159,6 +3184,12 @@ bool YoggSaronUsePortalAction::Execute(Event event)
          return false;
      }
 
+     FollowMasterStrategy followMasterStrategy(botAI);
+     if (botAI->HasStrategy(followMasterStrategy.getName(), BotState::BOT_STATE_NON_COMBAT))
+     {
+         botAI->ChangeStrategy(ADD_STRATEGY_CHAR + followMasterStrategy.getName(), BotState::BOT_STATE_NON_COMBAT);
+     }
+
      return assignedPortal->HandleSpellClick(bot);
 }
 
@@ -3211,6 +3242,7 @@ bool YoggSaronIllusionRoomAction::SetIllusionRtiTarget(YoggSaronTrigger yoggSaro
         return false;
     }
 
+    // If proper adds handling in illusion room will be implemented, then this can be removed
     if (botAI->HasCheat(BotCheatMask::raid))
     {
         bot->TeleportTo(bot->GetMapId(), nextRtiTarget->GetPositionX(), nextRtiTarget->GetPositionY(),
@@ -3229,7 +3261,6 @@ bool YoggSaronIllusionRoomAction::SetIllusionRtiTarget(YoggSaronTrigger yoggSaro
 
         uint8 rtiIndex = RtiTargetValue::GetRtiIndex(AI_VALUE(std::string, "rti"));
         group->SetTargetIcon(rtiIndex, bot->GetGUID(), nextRtiTarget->GetGUID());
-        botAI->DoSpecificAction("attack rti target");
     }
 
     return true;

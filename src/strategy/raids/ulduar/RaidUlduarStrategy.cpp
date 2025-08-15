@@ -315,11 +315,6 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "yogg-saron phase 3 positioning trigger",
         NextAction::array(0, new NextAction("yogg-saron phase 3 positioning action", ACTION_RAID), nullptr)));
-
-    // Phase 3
-    // yogg-saron cheat sanity because of lunatic gaze
-    // yogg-saron guardiang positioning to aoe them
-    
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
