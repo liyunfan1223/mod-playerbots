@@ -2888,23 +2888,16 @@ bool YoggSaronBrainLinkAction::Execute(Event event)
         return false;
     }
 
-    std::vector<Player*> debuffedPlayers;
-
     for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
     {
         Player* player = gref->GetSource();
         if (player && player->IsAlive() && player->HasAura(SPELL_BRAIN_LINK) && player->GetGUID() != bot->GetGUID())
         {
-            debuffedPlayers.push_back(player);
+            return MoveNear(player, 10.0f, MovementPriority::MOVEMENT_FORCED);
         }
     }
 
-    if (debuffedPlayers.empty())
-    {
-        return false;
-    }
-
-    return MoveNear(debuffedPlayers.front(), 10.0f, MovementPriority::MOVEMENT_FORCED);
+    return false;
 }
 
 bool YoggSaronMoveToEnterPortalAction::Execute(Event event)
@@ -3191,7 +3184,6 @@ bool YoggSaronMoveToExitPortalAction::Execute(Event event)
         return false;
     }
 
-    // move or teleport to the portal
     if (botAI->HasCheat(BotCheatMask::raid))
     {
         bot->TeleportTo(bot->GetMapId(), portal->GetPositionX(), portal->GetPositionY(), portal->GetPositionZ(),
@@ -3204,7 +3196,6 @@ bool YoggSaronMoveToExitPortalAction::Execute(Event event)
                       true, false);
     }
 
-    // Distance to portal should be less than 2.0f to use it
     if (bot->GetDistance2d(portal) > 2.0f)
     {
         return false;

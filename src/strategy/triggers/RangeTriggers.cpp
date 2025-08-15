@@ -240,8 +240,6 @@ bool TooCloseToPlayerWithDebuffTrigger::TooCloseToPlayerWithDebuff(uint32 spellI
         }
     }
 
-    return !debuffedPlayers.empty();
-
     if (debuffedPlayers.empty())
     {
         return false;
