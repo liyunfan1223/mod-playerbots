@@ -333,8 +333,8 @@ bool BGJoinAction::isUseful()
         return false;
 
     // check level
-    if (bot->GetLevel() < 10)
-        return false;
+    //if (bot->GetLevel() < 10)
+    //    return false;
 
     // do not try if with player master
     if (GET_PLAYERBOT_AI(bot)->HasActivePlayerMaster())
