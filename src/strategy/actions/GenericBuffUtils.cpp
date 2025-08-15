@@ -64,7 +64,7 @@ namespace ai::buff
                         return false;
                 }
             }
-            // Aucun réactif requis OU tous disponibles
+            // No composant to buff greater
             return true;
         }
         return false;
@@ -89,14 +89,13 @@ namespace ai::buff
          uint32 const groupId = botAI->GetAiObjectContext()
               ->GetValue<uint32>("spell id", groupName)->Get();
           
-          // On teste l'utilité sur le buff **de base** (pas la version greater),
-          // car "spell cast useful" peut être faux pour la variante greater.
+          // we test the utility of **base** buff (no greater version), because "spell cast useful" may be false for Greater variant.
           bool const usefulBase = botAI->GetAiObjectContext()
               ->GetValue<bool>("spell cast useful", baseName)->Get();
           
           if (groupId && HasRequiredReagents(bot, groupId))
           {
-              // appris + réactifs OK -> passer en greater
+              // spell active + componants OK -> Buff with Greater
               return groupName;
           }
           
