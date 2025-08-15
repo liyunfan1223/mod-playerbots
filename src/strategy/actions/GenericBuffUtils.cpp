@@ -54,7 +54,6 @@ namespace ai::buff
 
         if (SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId))
         {
-            // for (int i = 0; i < MAX_SPELL_REAGENTS; ++i)
 		    for (int i = 0; i < 8; ++i)
             {
                 if (info->Reagent[i] > 0)
@@ -101,8 +100,6 @@ namespace ai::buff
               return groupName;
           }
           
-          // Réactifs manquants -> annoncer si (a) on connaît la greater, (b) le buff de base est utile,
-          // (c) on a demandé l'annonce, (d) un callback est fourni.
           if (announceOnMissing && groupId && usefulBase && announce)
           {
               static time_t s_lastWarn = 0;
