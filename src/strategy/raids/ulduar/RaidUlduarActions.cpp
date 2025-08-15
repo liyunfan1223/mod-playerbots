@@ -26,8 +26,8 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 #include "Vehicle.h"
-#include <RaidTriggers.h>
 #include <RtiTargetValue.h>
+#include <TankAssistStrategy.h>
 
 const std::string ADD_STRATEGY_CHAR = "+";
 const std::string REMOVE_STRATEGY_CHAR = "-";
@@ -2837,7 +2837,9 @@ bool YoggSaronOminousCloudCheatAction::Execute(Event event)
         return false;
     }
 
-    Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 25.0f);
+    //TODO AS zwiększono na czas testów
+    //Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 25.0f);
+    Creature* target = boss->FindNearestCreature(NPC_OMINOUS_CLOUD, 40.0f);
     if (!target || !target->IsAlive())
     {
         return false;
@@ -2865,21 +2867,15 @@ bool YoggSaronSanityAction::Execute(Event event)
 
 bool YoggSaronMarkTargetAction::Execute(Event event)
 {
-    YoggSaronTrigger yoggSaronTrigger(botAI);
-
-    if (!yoggSaronTrigger.IsYoggSaronFight())
+    Group* group = bot->GetGroup();
+    if (!group)
     {
         return false;
     }
 
+    YoggSaronTrigger yoggSaronTrigger(botAI);
     if (yoggSaronTrigger.IsPhase2())
     {
-        Group* group = bot->GetGroup();
-        if (!group)
-        {
-            return false;
-        }
-
         if (botAI->HasCheat(BotCheatMask::raid))
         {
             Unit* crusherTentacle = bot->FindNearestCreature(NPC_CRUSHER_TENTACLE, 200.0f, true);
@@ -2924,27 +2920,67 @@ bool YoggSaronMarkTargetAction::Execute(Event event)
     }
     else if (yoggSaronTrigger.IsPhase3())
     {
-        Group* group = bot->GetGroup();
-        if (!group)
+        TankFaceStrategy tankFaceStrategy(botAI);
+        if (botAI->HasStrategy(tankFaceStrategy.getName(), BotState::BOT_STATE_COMBAT))
         {
-            return false;
+            botAI->ChangeStrategy(REMOVE_STRATEGY_CHAR + tankFaceStrategy.getName(), BotState::BOT_STATE_COMBAT);
         }
-        ObjectGuid currentSkullTarget = group->GetTargetIcon(RtiTargetValue::skullIndex);
-        Creature* yogg_saron = bot->FindNearestCreature(NPC_YOGG_SARON, 200.0f, true);
-        if (!yogg_saron)
+
+        TankAssistStrategy tankAssistStrategy(botAI);
+        if (!botAI->HasStrategy(tankAssistStrategy.getName(), BotState::BOT_STATE_COMBAT))
         {
-            return false;
+            botAI->ChangeStrategy(ADD_STRATEGY_CHAR + tankAssistStrategy.getName(), BotState::BOT_STATE_COMBAT);
         }
-        if (currentSkullTarget)
+
+        ObjectGuid currentCrossTarget = group->GetTargetIcon(RtiTargetValue::crossIndex);
+        Unit* currentCrossUnit = nullptr;
+        if (currentCrossTarget)
         {
-            Unit* currentSkullUnit = botAI->GetUnit(currentSkullTarget);
-            if (currentSkullUnit && currentSkullUnit->IsAlive() && currentSkullUnit->GetGUID() == yogg_saron->GetGUID())
+            currentCrossUnit = botAI->GetUnit(currentCrossTarget);
+        }
+
+        if (!currentCrossTarget || !currentCrossUnit || (currentCrossUnit && currentCrossUnit->GetEntry() != NPC_YOGG_SARON))
+        {
+            Unit* yoggsaron = AI_VALUE2(Unit*, "find target", "yogg-saron");
+            if (yoggsaron && yoggsaron->IsAlive())
             {
-                return false;
+                group->SetTargetIcon(RtiTargetValue::crossIndex, bot->GetGUID(), yoggsaron->GetGUID());
             }
         }
-        group->SetTargetIcon(RtiTargetValue::skullIndex, bot->GetGUID(), yogg_saron->GetGUID());
+
+        GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
+
+        int lowestHealth = std::numeric_limits<int>::max();
+        Unit* lowestHealthUnit = nullptr;
+        for (const ObjectGuid& guid : targets)
+        {
+            Unit* unit = botAI->GetUnit(guid);
+            if (!unit || !unit->IsAlive())
+            {
+                continue;
+            }
+
+            if ((unit->GetEntry() == NPC_IMMORTAL_GUARDIAN || unit->GetEntry() == NPC_MARKED_IMMORTAL_GUARDIAN) &&
+                unit->GetHealth() > 1)
+            {
+                if (unit->GetHealth() < lowestHealth)
+                {
+                    lowestHealth = unit->GetHealth();
+                    lowestHealthUnit = unit;
+                }
+            }
+        }
+
+        if (lowestHealthUnit)
+        {
+            group->SetTargetIcon(RtiTargetValue::skullIndex, bot->GetGUID(), lowestHealthUnit->GetGUID());
+            return true;
+        }
+
+        return false;
     }
+
+    return false;
 }
 
 bool YoggSaronBrainLinkAction::Execute(Event event)
@@ -3284,20 +3320,24 @@ bool YoggSaronMoveToExitPortalAction::Execute(Event event)
 
 bool YoggSaronLunaticGazeAction::Execute(Event event)
 {
-    Unit* boss = AI_VALUE2(Unit*, "find target", "yogg saron");
+    Unit* boss = AI_VALUE2(Unit*, "find target", "yogg-saron");
+    if (!boss || !boss->IsAlive())
+    {
+        return false;
+    }
     float angle = bot->GetAngle(boss);
     float newAngle = Position::NormalizeOrientation(angle + M_PI);  // Add 180 degrees (PI radians)
-    //if (botAI->IsTank(bot))
-    //{
-    botAI->TellMaster("Turning away from Yogg-Saron in Lunatic Gaze");
-        bot->SetFacingTo(newAngle);
-        return true;
-    //}
-    //else
-    //{
-    //    return bot->TeleportTo(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
-    //                           newAngle);
-    //}
+    bot->SetFacingTo(newAngle);
+
+    if (botAI->IsRangedDps(bot))
+    {
+        if (AI_VALUE(std::string, "rti") != "cross")
+        {
+            botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set("cross");
+        }
+    }
+
+    return true;
 }
 
 bool YoggSaronPhase3PositioningAction::Execute(Event event)
@@ -3306,7 +3346,6 @@ bool YoggSaronPhase3PositioningAction::Execute(Event event)
     {
         if (botAI->HasCheat(BotCheatMask::raid))
         {
-            botAI->TellMaster("Teleporting to ranged spot in Yogg-Saron Phase 3");
             return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionX(),
                             ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionY(),
                             ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionZ(),
@@ -3325,7 +3364,6 @@ bool YoggSaronPhase3PositioningAction::Execute(Event event)
     {
         if (botAI->HasCheat(BotCheatMask::raid))
         {
-            botAI->TellMaster("Teleporting to melee spot in Yogg-Saron Phase 3");
             return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
                             ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY(),
                             ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionZ(), bot->GetOrientation());
@@ -3341,7 +3379,16 @@ bool YoggSaronPhase3PositioningAction::Execute(Event event)
 
     if (botAI->IsTank(bot))
     {
-        botAI->TellMaster("Teleporting to melee spot in Yogg-Saron Phase 3");
+        if (bot->GetDistance(ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT) > 30.0f)
+        {
+            if (botAI->HasCheat(BotCheatMask::raid))
+            {
+                return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
+                                       ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY(),
+                                       ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionZ(), bot->GetOrientation());
+            }
+        }
+
         return MoveTo(bot->GetMapId(), ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
                       ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY(),
                       ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionZ(), false, false, false, true,

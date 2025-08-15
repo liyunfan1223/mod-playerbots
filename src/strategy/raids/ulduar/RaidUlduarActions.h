@@ -494,10 +494,10 @@ public:
     bool Execute(Event event) override;
 };
 
-class YoggSaronLunaticGazeAction : public Action
+class YoggSaronLunaticGazeAction : public MovementAction
 {
 public:
-    YoggSaronLunaticGazeAction(PlayerbotAI* ai) : Action(ai, "yogg-saron lunatic gaze action") {}
+    YoggSaronLunaticGazeAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron lunatic gaze action") {}
 
     bool Execute(Event event) override;
 };

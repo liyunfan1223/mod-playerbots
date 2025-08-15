@@ -310,7 +310,7 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "yogg-saron lunatic gaze trigger",
-        NextAction::array(0, new NextAction("yogg-saron lunatic gaze action", ACTION_RAID), nullptr)));
+        NextAction::array(0, new NextAction("yogg-saron lunatic gaze action", ACTION_EMERGENCY), nullptr)));
 
     triggers.push_back(new TriggerNode(
         "yogg-saron phase 3 positioning trigger",

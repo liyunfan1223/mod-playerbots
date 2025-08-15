@@ -182,7 +182,7 @@ const Position ULDUAR_YOGG_SARON_STORMWIND_KEEPER_ENTRANCE = Position(1954.06f, 
 const Position ULDUAR_YOGG_SARON_ICECROWN_CITADEL_ENTRANCE = Position(1950.11f, -79.284f, 239.98982f);
 const Position ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_ENTRANCE = Position(2048.63f, -25.5f, 239.72f);
 const Position ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT = Position(1998.5377f, -22.90317f, 324.8895f);
-const Position ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT = Position(2003.0934f, -1.3189063f, 326.1626f);
+const Position ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT = Position(2018.7628f, -18.896868f, 327.07245f);
 
 //
 // Flame Levi
@@ -632,14 +632,14 @@ public:
 class YoggSaronLunaticGazeTrigger : public YoggSaronTrigger
 {
 public:
-    YoggSaronLunaticGazeTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron lunatic gaze trigger", 0) {}
+    YoggSaronLunaticGazeTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron lunatic gaze trigger") {}
     bool IsActive() override;
 };
 
 class YoggSaronPhase3PositioningTrigger : public YoggSaronTrigger
 {
 public:
-    YoggSaronPhase3PositioningTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron phase 3 positioning trigger", 0) {}
+    YoggSaronPhase3PositioningTrigger(PlayerbotAI* ai) : YoggSaronTrigger(ai, "yogg-saron phase 3 positioning trigger") {}
     bool IsActive() override;
 };
 
