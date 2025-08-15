@@ -5,6 +5,8 @@
 
 #include "GenericSpellActions.h"
 
+#include <ctime>
+
 #include "Event.h"
 #include "ItemTemplate.h"
 #include "ObjectDefines.h"
@@ -13,6 +15,9 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "WorldPacket.h"
+#include "Group.h"
+#include "Chat.h"
+#include "Language.h"
 
 CastSpellAction::CastSpellAction(PlayerbotAI* botAI, std::string const spell)
     : Action(botAI, spell), range(botAI->GetRange("spell")), spell(spell)
@@ -216,10 +221,120 @@ Value<Unit*>* CurePartyMemberAction::GetTargetValue()
     return context->GetValue<Unit*>("party member to dispel", dispelType);
 }
 
+// Make Bots Paladin, druid, mage use the greater buff rank spell
+// TODO Priest doen't verify il he have components
+// local util send "simple,group if buff has greater variant, here we choose te target of the buff
+static std::string MakeAuraQualifierForBuff(std::string const& name)
+{
+    if (name == "blessing of kings")        return "blessing of kings,greater blessing of kings";
+    if (name == "blessing of might")        return "blessing of might,greater blessing of might";
+    if (name == "blessing of wisdom")       return "blessing of wisdom,greater blessing of wisdom";
+    if (name == "blessing of sanctuary")    return "blessing of sanctuary,greater blessing of sanctuary";
+    if (name == "mark of the wild")         return "mark of the wild,gift of the wild";
+    if (name == "arcane intellect")         return "arcane intellect,arcane brilliance";
+    return name;
+}
+
+// Seache who need buffs
 Value<Unit*>* BuffOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", spell);
+    return context->GetValue<Unit*>("party member without aura", MakeAuraQualifierForBuff(spell));
 }
+
+//  Here we choose the spell to cas
+static std::string GroupVariantFor(std::string const& name)
+{
+    if (name == "blessing of kings")        return "greater blessing of kings";
+    if (name == "blessing of might")        return "greater blessing of might";
+    if (name == "blessing of wisdom")       return "greater blessing of wisdom";
+    if (name == "blessing of sanctuary")    return "greater blessing of sanctuary";
+    if (name == "mark of the wild")         return "gift of the wild";
+    if (name == "arcane intellect")         return "arcane brilliance";
+    return std::string();
+}
+
+static bool HasRequiredReagents(Player* bot, uint32 spellId)
+{
+    if (!spellId)
+        return false;
+
+    if (SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId))
+    {
+        for (int i = 0; i < 8; ++i)
+        {
+            if (info->Reagent[i] > 0)
+            {
+                uint32 const itemId = info->Reagent[i];
+                int32  const need   = info->ReagentCount[i];
+                if ((int32)bot->GetItemCount(itemId, false) < need)
+                    return false;
+            }
+        }
+        return true; // no composant required or the bot have composants
+    }
+    return false;
+}
+
+// Decide what buff launch
+bool BuffOnPartyAction::Execute(Event event)
+{
+    std::string castName = spell; // default: single-target
+
+    // helper to send RP line to the right channel
+    auto SendGroupRP = [&](std::string const& msg)
+    {
+        if (Group* g = bot->GetGroup())
+        {
+            WorldPacket data;
+            ChatMsg type = g->isRaidGroup() ? CHAT_MSG_RAID : CHAT_MSG_PARTY; // <-- isRaidGroup()
+            ChatHandler::BuildChatPacket(data, type, LANG_UNIVERSAL, bot, /*receiver=*/nullptr, msg.c_str());
+            g->BroadcastPacket(&data, true, -1, bot->GetGUID());
+        }
+        else
+        {
+            bot->Say(msg, LANG_UNIVERSAL);
+        }
+    };
+
+    // Use group variant only in parties of 3+ to save components in duo
+    if (bot->GetGroup() && bot->GetGroup()->GetMembersCount() > 2)
+    {
+        if (std::string const groupName = GroupVariantFor(spell); !groupName.empty())
+        {
+            uint32 const groupId = AI_VALUE2(uint32, "spell id", groupName);
+			
+			bool const allowGroup = AI_VALUE2(bool, "spell cast useful", groupName);
+
+		    if (groupId && allowGroup && HasRequiredReagents(bot, groupId))
+            {
+                castName = groupName; // learned + have component we use group variant
+            }
+			else if (groupId && allowGroup)
+            {
+                static time_t s_lastWarn = 0;
+                time_t now = std::time(nullptr);
+                if (!s_lastWarn || now - s_lastWarn >= 30) // 30s cooldown to avoid spam
+                {
+                    std::string rp;
+                    if (groupName.find("greater blessing") != std::string::npos)
+                        rp = "By the Light... I forgot my Symbols of Kings. We’ll make do with the simple blessings!";
+                    else if (groupName == "gift of the wild")
+                        rp = "Nature is generous, my bags are not... out of herbs for Gift of the Wild. Take Mark of the Wild for now!";
+                    else if (groupName == "arcane brilliance")
+                        rp = "Out of Arcane Powder... Brilliance will have to wait. Casting simple Intellect!";
+                    else
+                        rp = "Oops, I’m out of components for the group version. We’ll go with the single one!";
+
+                    SendGroupRP(rp);
+                    s_lastWarn = now;
+                }
+            }
+        }
+    }
+
+    return botAI->CastSpell(castName, GetTarget());
+}
+// End greater buff fix
 
 CastShootAction::CastShootAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shoot")
 {
