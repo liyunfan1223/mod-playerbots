@@ -226,7 +226,6 @@ Value<Unit*>* CurePartyMemberAction::GetTargetValue()
     return context->GetValue<Unit*>("party member to dispel", dispelType);
 }
 
-// TODO Vois pourquoi ils parlent pas quand ils ont plus de simboles!
 // Make Bots Paladin, druid, mage use the greater buff rank spell
 // TODO Priest doen't verify il he have components
 Value<Unit*>* BuffOnPartyAction::GetTargetValue()
