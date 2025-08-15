@@ -350,7 +350,6 @@ public:
 
     void OnPlayerbotUpdate(uint32 diff) override
     {
-        //how protect this method while running command rel
         sRandomPlayerbotMgr->UpdateAI(diff);
         sRandomPlayerbotMgr->UpdateSessions();
     }

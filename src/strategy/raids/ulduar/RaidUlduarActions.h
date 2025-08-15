@@ -379,16 +379,6 @@ public:
     bool Execute(Event event) override;
 };
 
-class MoveAwayFromCreaturesAction : public MovementAction
-{
-public:
-    MoveAwayFromCreaturesAction(PlayerbotAI* ai) : MovementAction(ai, "move away from creatures action") {}
-
-    bool Execute(Event event) override;
-
-    bool MoveAwayFromCreatures(Unit* boss, uint32 creatureId, float minimumDistance);
-};
-
 class YoggSaronOminousCloudCheatAction : public Action
 {
 public:

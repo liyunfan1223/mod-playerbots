@@ -1645,8 +1645,6 @@ bool VezaxMarkOfTheFacelessTrigger::IsActive()
 Unit* YoggSaronTrigger::GetSaraIfAlive()
 {
     Unit* sara = AI_VALUE2(Unit*, "find target", "sara");
-    //Creature* sara = bot->FindNearestCreature(NPC_SARA, 200.0f, true);
-
     if (!sara || !sara->IsAlive())
     {
         return nullptr;
@@ -1665,7 +1663,6 @@ bool YoggSaronTrigger::IsPhase3()
 {
     Creature* target = bot->FindNearestCreature(NPC_YOGG_SARON, 200.0f, true);
     Creature* guardian = bot->FindNearestCreature(NPC_GUARDIAN_OF_YS, 200.0f, true);
-    //Creature* sara = bot->FindNearestCreature(NPC_SARA_PHASE_1, 200.0f, true);
 
     return target && target->IsAlive() && !target->HasAura(SPELL_SHADOW_BARRIER) && !guardian;
 }
@@ -1781,8 +1778,7 @@ Unit* YoggSaronTrigger::GetIllusionRoomRtiTarget()
         return nullptr;
     }
 
-    std::string rtiMark = AI_VALUE(std::string, "rti");
-    uint8 rtiIndex = RtiTargetValue::GetRtiIndex(rtiMark);
+    uint8 rtiIndex = RtiTargetValue::GetRtiIndex(AI_VALUE(std::string, "rti"));
     if (rtiIndex == -1)
     {
         return nullptr;  // Invalid RTI mark
@@ -1857,7 +1853,6 @@ Unit* YoggSaronTrigger::GetNextIllusionRoomRtiTarget()
         return nextIllusionRoomRtiTarget;
     }
 
-    // Failsafe for Suit of Armor in Stormwind Keeper illusion
     if (IsInStormwindKeeperIllusion())
     {
         Creature* target = bot->FindNearestCreature(NPC_SUIT_OF_ARMOR, detectionRadius, true);
@@ -2031,18 +2026,6 @@ bool YoggSaronMarkTargetTrigger::IsActive()
     }
     else if (IsPhase3())
     {
-        /*ObjectGuid currentCrossTarget = group->GetTargetIcon(RtiTargetValue::crossIndex);
-        if (!currentCrossTarget)
-        {
-            return true;
-        }
-
-        Unit* currentCrossUnit = botAI->GetUnit(currentCrossTarget);
-        if (currentCrossUnit && currentCrossUnit->GetEntry() != NPC_YOGG_SARON)
-        {
-            return true;
-        }*/
-
         ObjectGuid currentSkullTarget = group->GetTargetIcon(RtiTargetValue::skullIndex);
         Unit* currentSkullUnit = nullptr;
         if (currentSkullTarget)

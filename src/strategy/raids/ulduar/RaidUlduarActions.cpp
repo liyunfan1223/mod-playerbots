@@ -2715,118 +2715,6 @@ bool VezaxMarkOfTheFacelessAction::Execute(Event event)
                   MovementPriority::MOVEMENT_FORCED, true, false);
 }
 
-bool MoveAwayFromCreaturesAction::Execute(Event event)
-{
-    Unit* boss = AI_VALUE2(Unit*, "find target", "sara");
-    if (!boss)
-        return false;
-
-    return MoveAwayFromCreatures(boss, NPC_OMINOUS_CLOUD, 10.0f);
-}
-
-bool MoveAwayFromCreaturesAction::MoveAwayFromCreatures(Unit* boss, uint32 creatureId, float minimumDistance)
-{
-    // Find all creatures with the specified ID
-    std::vector<Unit*> creatures;
-    const GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
-    for (const auto& guid : npcs)
-    {
-        Unit* unit = botAI->GetUnit(guid);
-        if (unit && unit->IsAlive() && unit->GetEntry() == creatureId)
-        {
-            creatures.push_back(unit);
-        }
-    }
-
-    if (creatures.empty())
-        return false;
-
-    // Determine max distance from boss based on role
-    const float maxBossDistance = botAI->IsRanged(bot) ? 15.0f : 1.0f;
-
-    // Check if current position is already safe
-    bool isCurrentPosSafe = true;
-    if (bot->GetExactDist2d(boss) > maxBossDistance)
-    {
-        isCurrentPosSafe = false;
-    }
-    else
-    {
-        for (Unit* creature : creatures)
-        {
-            if (bot->GetExactDist2d(creature) < minimumDistance)
-            {
-                isCurrentPosSafe = false;
-                break;
-            }
-        }
-    }
-
-    if (isCurrentPosSafe)
-        return false;
-
-    // Search for a safe position
-    const int directions = 8;
-    const float increment = 3.0f;
-    float bestX = bot->GetPositionX();
-    float bestY = bot->GetPositionY();
-    float bestZ = bot->GetPositionZ();
-    float maxSafetyScore = -1.0f;
-
-    for (int i = 0; i < directions; ++i)
-    {
-        float angle = (i * 2 * M_PI) / directions;
-        for (float distance = increment; distance <= 30.0f; distance += increment)
-        {
-            float moveX = bot->GetPositionX() + distance * cos(angle);
-            float moveY = bot->GetPositionY() + distance * sin(angle);
-            float moveZ = bot->GetPositionZ();
-
-            // Check boss distance constraint
-            if (boss->GetExactDist2d(moveX, moveY) > maxBossDistance)
-                continue;
-
-            // Check creature distance constraints
-            bool isSafeFromCreatures = true;
-            float minCreatureDist = std::numeric_limits<float>::max();
-            for (Unit* creature : creatures)
-            {
-                float dist = creature->GetExactDist2d(moveX, moveY);
-                if (dist < minimumDistance)
-                {
-                    isSafeFromCreatures = false;
-                    break;
-                }
-                if (dist < minCreatureDist)
-                {
-                    minCreatureDist = dist;
-                }
-            }
-
-            if (isSafeFromCreatures && bot->IsWithinLOS(moveX, moveY, moveZ))
-            {
-                // A simple safety score: the minimum distance to any creature. Higher is better.
-                if (minCreatureDist > maxSafetyScore)
-                {
-                    maxSafetyScore = minCreatureDist;
-                    bestX = moveX;
-                    bestY = moveY;
-                    bestZ = moveZ;
-                }
-            }
-        }
-    }
-
-    // Move to the best position found
-    if (maxSafetyScore > 0.0f)
-    {
-        return MoveTo(bot->GetMapId(), bestX, bestY, bestZ, false, false, false, false,
-                      MovementPriority::MOVEMENT_COMBAT);
-    }
-
-    return false;
-}
-
 bool YoggSaronOminousCloudCheatAction::Execute(Event event)
 {
     YoggSaronTrigger yoggSaronTrigger(botAI);
@@ -2929,22 +2817,6 @@ bool YoggSaronMarkTargetAction::Execute(Event event)
         {
             botAI->ChangeStrategy(ADD_STRATEGY_CHAR + tankAssistStrategy.getName(), BotState::BOT_STATE_COMBAT);
         }
-
-        /*ObjectGuid currentCrossTarget = group->GetTargetIcon(RtiTargetValue::crossIndex);
-        Unit* currentCrossUnit = nullptr;
-        if (currentCrossTarget)
-        {
-            currentCrossUnit = botAI->GetUnit(currentCrossTarget);
-        }
-
-        if (!currentCrossTarget || !currentCrossUnit || (currentCrossUnit && currentCrossUnit->GetEntry() != NPC_YOGG_SARON))
-        {
-            Unit* yoggsaron = AI_VALUE2(Unit*, "find target", "yogg-saron");
-            if (yoggsaron && yoggsaron->IsAlive())
-            {
-                group->SetTargetIcon(RtiTargetValue::crossIndex, bot->GetGUID(), yoggsaron->GetGUID());
-            }
-        }*/
 
         GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
 
@@ -3109,7 +2981,6 @@ bool YoggSaronFallFromFloorAction::Execute(Event event)
     std::string rtiMark = AI_VALUE(std::string, "rti");
     if (rtiMark == "skull")
     {
-        botAI->TellMaster("Fall from floor skull :(");
         return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_BOSS_ROOM_RESTORE_POINT.GetPositionX(),
                                ULDUAR_YOGG_SARON_BOSS_ROOM_RESTORE_POINT.GetPositionY(),
                                ULDUAR_YOGG_SARON_BOSS_ROOM_RESTORE_POINT.GetPositionZ(),
@@ -3117,7 +2988,6 @@ bool YoggSaronFallFromFloorAction::Execute(Event event)
     }
     if (rtiMark == "cross")
     {
-        botAI->TellMaster("Fall from floor cross :(");
         return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_STORMWIND_KEEPER_MIDDLE.GetPositionX(),
                                ULDUAR_YOGG_SARON_STORMWIND_KEEPER_MIDDLE.GetPositionY(),
                                ULDUAR_YOGG_SARON_STORMWIND_KEEPER_MIDDLE.GetPositionZ(),
@@ -3125,14 +2995,12 @@ bool YoggSaronFallFromFloorAction::Execute(Event event)
     }
     if (rtiMark == "circle")
     {
-        botAI->TellMaster("Fall from floor circle :(");
         return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_ICECROWN_CITADEL_MIDDLE.GetPositionX(),
                                ULDUAR_YOGG_SARON_ICECROWN_CITADEL_MIDDLE.GetPositionY(),
                                ULDUAR_YOGG_SARON_ICECROWN_CITADEL_MIDDLE.GetPositionZ(), bot->GetOrientation());
     }
     if (rtiMark == "star")
     {
-        botAI->TellMaster("Fall from floor star :(");
         return bot->TeleportTo(bot->GetMapId(), ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_MIDDLE.GetPositionX(),
                                ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_MIDDLE.GetPositionY(),
                                ULDUAR_YOGG_SARON_CHAMBER_OF_ASPECTS_MIDDLE.GetPositionZ(), bot->GetOrientation());
@@ -3206,8 +3074,7 @@ bool YoggSaronIllusionRoomAction::Execute(Event event)
 
 bool YoggSaronIllusionRoomAction::SetRtiMark(YoggSaronTrigger yoggSaronTrigger)
 {
-    std::string rtiMark = AI_VALUE(std::string, "rti");
-    if (rtiMark == "diamond")
+    if (AI_VALUE(std::string, "rti") == "diamond")
     {
         if (yoggSaronTrigger.IsInStormwindKeeperIllusion())
         {
