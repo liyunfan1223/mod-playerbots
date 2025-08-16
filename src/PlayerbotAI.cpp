@@ -722,7 +722,8 @@ void PlayerbotAI::HandleTeleportAck()
         // SetNextCheckDelay(urand(2000, 5000));
         if (sPlayerbotAIConfig->applyInstanceStrategies)
             ApplyInstanceStrategies(bot->GetMapId(), true);
-        EvaluateHealerDpsStrategy();
+        if (sPlayerbotAIConfig->restrictHealerDPS)
+            EvaluateHealerDpsStrategy();
         Reset(true);
     }
 
