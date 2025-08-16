@@ -21,6 +21,7 @@
 #        THRESHOLDS
 #        QUESTS
 #        COMBAT
+#        BUFFS STRATEGIES
 #        CHEATS
 #        SPELLS
 #        FLIGHTPATH
@@ -462,6 +463,38 @@ AiPlayerbot.FleeingEnabled = 1
 ####################################################################################################
 
 ####################################################################################################
+# BUFFS STRATEGIES
+#
+#
+
+# Min group size to use Greater buffs (Paladin, Mage, Druid)
+# Default: 3
+AiPlayerbot.MinBotsForGreaterBuff = 3
+
+# Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff
+# Default: 30
+AiPlayerbot.RPWarningCooldown = 30
+
+# Paladin — Strict Role Mode (opt-in)
+# If enabled (1) and the group size is at least AiPlayerbot.MinBotsForGreaterBuff,
+# Paladin buff strategies become strict:
+#   - bstats -> (Greater) Blessing of Kings only, on everyone
+#   - bdps   -> (Greater) Blessing of Might only, on physical DPS; ignores others
+#   - bmana  -> (Greater) Blessing of Wisdom only, on mana users; ignores others
+# Sanctuary remains handled by Protection paladins for tanks if learned.
+# Default: 0
+AiPlayerbot.Paladin.StrictRoleMode = 0
+
+# Minimum group size to enable StrictRoleMode (independent of Greater).
+# Default is 10: no strict mode in 5-man dungeons, strict mode in 10/25 raids.
+AiPlayerbot.Paladin.StrictMinGroupSize = 10
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
 # CHEATS
 #
 #
@@ -592,14 +625,6 @@ AiPlayerbot.EnableRandomBotTrading = 1
 
 # Configure message prefixes which will be excluded in analysis in trade action to open trade window
 AiPlayerbot.TradeActionExcludedPrefixes = "RPLL_H_,DBMv4,{звезда} Questie,{rt1} Questie"
-
-# Min group size to use Greater buffs (Paladin, Mage, Druid)
-# Default: 3
-AiPlayerbot.MinBotsForGreaterBuff = 3
-
-# Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff
-# Default: 30
-AiPlayerbot.RPWarningCooldown = 30
 
 #
 #

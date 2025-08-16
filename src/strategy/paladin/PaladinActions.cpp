@@ -14,6 +14,24 @@
 #include "SharedDefines.h"
 #include "../../../../../src/server/scripts/Spells/spell_generic.cpp"
 #include "GenericBuffUtils.h"
+#include "Config.h"
+#include "Group.h"
+
+namespace {
+    inline bool StrictRoleModeEnabledFor(Player* bot)
+    {
+        static bool strict = sConfigMgr->GetOption<bool>("AiPlayerbot.Paladin.StrictRoleMode", false);
+        if (!strict)
+            return false;
+    
+        Group* g = bot->GetGroup();
+        if (!g)
+            return false;
+    
+        static int32 minStrict = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.StrictMinGroupSize", 10);
+        return g->GetMembersCount() >= static_cast<uint32>(minStrict);
+    }
+}
 
 using ai::buff::MakeAuraQualifierForBuff;
 using ai::buff::UpgradeToGroupIfAppropriate;
@@ -146,6 +164,19 @@ bool CastBlessingOfMightOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
+    // Strict mode: Might only for relevant targets (no fallback to Wisdom)
+    if (StrictRoleModeEnabledFor(bot))
+    {
+        std::string desired = GetActualBlessingOfMight(target);
+        if (desired != "blessing of might")
+            return false; // on ignore la cible non-pertinente
+
+        std::string castName = "blessing of might";
+        auto RP = ai::chat::MakeGroupAnnouncer(bot);
+        castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+        return botAI->CastSpell(castName, target);
+    }
+
     std::string castName = GetActualBlessingOfMight(target);
 
     auto RP = ai::chat::MakeGroupAnnouncer(bot);
@@ -185,8 +216,20 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    std::string castName = GetActualBlessingOfWisdom(target);
+    // Strict mode: Wisdom only for mana users (no fallback to Might)
+    if (StrictRoleModeEnabledFor(bot))
+    {
+        std::string desired = GetActualBlessingOfWisdom(target);
+        if (desired != "blessing of wisdom")
+            return false; // on ignore la cible non-pertinente
 
+        std::string castName = "blessing of wisdom";
+        auto RP = ai::chat::MakeGroupAnnouncer(bot);
+        castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+        return botAI->CastSpell(castName, target);
+    }
+
+    std::string castName = GetActualBlessingOfWisdom(target);
 
     auto RP = ai::chat::MakeGroupAnnouncer(bot);
 
