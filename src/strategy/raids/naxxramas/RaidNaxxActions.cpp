@@ -1,5 +1,6 @@
 
 #include "RaidNaxxActions.h"
+#include "RaidNaxxAi40.h"
 
 #include "LastMovementValue.h"
 #include "ObjectGuid.h"
@@ -13,7 +14,9 @@
 bool GrobbulusGoBehindAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE(Unit*, "boss target");
-    if (!boss)
+    if (!boss 
+        || (boss->GetEntry() != 15931 // Default Azerothcore Grobbulus
+            && boss->GetEntry() != 351003)) // mod-individual-progression Grobbulus
     {
         return false;
     }
@@ -47,37 +50,97 @@ uint32 RotateAroundTheCenterPointAction::FindNearestWaypoint()
 uint32 GrobbulusRotateAction::GetCurrWaypoint()
 {
     Unit* boss = AI_VALUE(Unit*, "boss target");
-    if (!boss)
+    if (!boss 
+        || (boss->GetEntry() != 15931  // Default AzerothCore Grobbulus
+            && boss->GetEntry() != 351003)) // mod-individual-progression Grobbulus
     {
         return false;
     }
-    auto* boss_ai = dynamic_cast<Grobbulus::boss_grobbulus::boss_grobbulusAI*>(boss->GetAI());
-    if (!boss_ai || boss_ai->events.Empty())
+    auto* ai = boss->GetAI();
+    if (!ai)
     {
         return false;
     }
-    EventMap* eventMap = &boss_ai->events;
-    const uint32 event_time = eventMap->GetNextEventTime(2);
+    EventMap* eventMap = nullptr;
+    const char* typeName = typeid(*ai).name();
+    if (std::string(typeName).find("boss_grobbulus_40") != std::string::npos)
+    {
+        auto* boss_ai = reinterpret_cast<BossAiGrobbulus40*>(ai);
+        if (!boss_ai->events.Empty())
+            eventMap = &boss_ai->events;
+    }
+    else
+    {
+        auto* boss_ai = dynamic_cast<Grobbulus::boss_grobbulus::boss_grobbulusAI*>(ai);
+        if (!boss_ai || boss_ai->events.Empty())
+        {
+            return false;
+        }
+        eventMap = &boss_ai->events;
+    }
+    if (!eventMap || eventMap->Empty())
+    {
+        return false;
+    }
+    if (eventMap->GetTimer() > 1000000)
+    {
+        return false;
+    }
+    const uint32 event_time = eventMap->GetNextEventTime(2); // EVENT_DECEPIT_FEVER
     return (event_time / 15000) % intervals;
 }
 
 bool HeiganDanceAction::CalculateSafe()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "heigan the unclean");
-    if (!boss)
+    if (!boss || boss->isDead())
     {
         return false;
     }
-    auto* boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI*>(boss->GetAI());
-    if (!boss_ai || boss_ai->events.Empty())
+    auto* ai = boss->GetAI();
+    if (!ai)
     {
         return false;
     }
-    EventMap* eventMap = &boss_ai->events;
-    uint32 curr_phase = boss_ai->currentPhase;
-    uint32 curr_erupt = eventMap->GetNextEventTime(3);
-    uint32 curr_dance = eventMap->GetNextEventTime(4);
+    EventMap* eventMap = nullptr;
+    uint32 curr_phase = 0;
+    const char* typeName = typeid(*ai).name();
+    if (std::string(typeName).find("boss_heigan_40") != std::string::npos)
+    {
+        auto* boss_ai = reinterpret_cast<BossAiHeigan40*>(ai);
+        if (boss_ai)
+        {
+            if (!boss_ai->events.Empty())
+                eventMap = &boss_ai->events;
+            if (boss_ai->currentPhase)
+                curr_phase = boss_ai->currentPhase;
+        }
+        else 
+        {
+            return false;
+        }
+    }
+    else
+    {
+        auto* boss_ai = dynamic_cast<Heigan::boss_heigan::boss_heiganAI*>(ai);
+        if (!boss_ai || boss_ai->events.Empty())
+        {
+            return false;
+        }
+        eventMap = &boss_ai->events;
+        curr_phase = boss_ai->currentPhase;
+    }
+    if (!eventMap || eventMap->Empty())
+    {
+        return false;
+    }
     uint32 curr_timer = eventMap->GetTimer();
+    if (curr_timer > 1000000)
+    {
+        return false;
+    }
+    uint32 curr_erupt = eventMap->GetNextEventTime(3); // EVENT_ERUPT_SECTION
+    uint32 curr_dance = eventMap->GetNextEventTime(4); // EVENT_SWITCH_PHASE
     if ((curr_phase == 0 && curr_dance - curr_timer >= 85000) || (curr_phase == 1 && curr_dance - curr_timer >= 40000))
     {
         ResetSafe();
@@ -563,7 +626,7 @@ bool SapphironFlightPositionAction::MoveToNearestIcebolt()
     if (playerWithIcebolt)
     {
         Unit* boss = AI_VALUE2(Unit*, "find target", "sapphiron");
-        if (boss)
+        if (boss || !boss->isDead())
         {
             float angle = boss->GetAngle(playerWithIcebolt);
             return MoveTo(NAXX_MAP_ID, playerWithIcebolt->GetPositionX() + cos(angle) * 3.0f,
