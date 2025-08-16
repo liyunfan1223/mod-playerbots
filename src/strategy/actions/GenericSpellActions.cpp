@@ -237,22 +237,11 @@ bool BuffOnPartyAction::Execute(Event event)
 {
     std::string castName = spell; // default = mono
 
-    Player*      me = bot;
-    PlayerbotAI* ai = botAI;
-    
-	auto SendGroupRP = [me, ai](std::string const& msg) {
-        if (Group* g = me->GetGroup()) {
-            if (g->isRaidGroup()) ai->SayToRaid(msg);
-            else                  ai->SayToParty(msg);
-        } else {
-            ai->Say(msg);
-        }
-    };
-    castName = ai::buff::UpgradeToGroupIfAppropriate(me, ai, castName, /*announceOnMissing=*/true, SendGroupRP);
+	auto SendGroupRP = ai::chat::MakeGroupAnnouncer(bot);
+	castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, SendGroupRP);
 
     return botAI->CastSpell(castName, GetTarget());
 }
-
 // End greater buff fix
  
 CastShootAction::CastShootAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shoot")

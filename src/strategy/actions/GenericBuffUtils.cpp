@@ -5,6 +5,8 @@
  
 #include "GenericBuffUtils.h"
 
+#include <map>
+
 #include "Player.h"
 #include "Group.h"
 #include "SpellMgr.h"
@@ -12,8 +14,22 @@
 #include "PlayerbotAI.h"
 #include "ServerFacade.h"
 #include "AiObjectContext.h"
-#include "Value.h" 
+#include "Value.h"
+#include "Config.h"
 
+namespace {
+    inline int32 RPWarningCooldown()
+    {
+        static int32 v = sConfigMgr->GetOption<int32>("AiPlayerbot.RPWarningCooldown", 30);
+        return v;
+    }
+
+    inline int32 MinBotsForGreaterBuff()
+    {
+        static int32 v = sConfigMgr->GetOption<int32>("AiPlayerbot.MinBotsForGreaterBuff", 3);
+        return v;
+    }
+}
 
 namespace ai::buff
 {
@@ -64,7 +80,7 @@ namespace ai::buff
                         return false;
                 }
             }
-            // No composant to buff greater
+            // No reagent required
             return true;
         }
         return false;
@@ -79,31 +95,36 @@ namespace ai::buff
     )
     {
         std::string castName = baseName;
-
-        Group* g = bot->GetGroup();
-        if (!g || g->GetMembersCount() <= 2)
-            return castName; // duo ou solo: rester en mono pour économiser les composants
+		
+		Group* g = bot->GetGroup();
+        if (!g || g->GetMembersCount() < static_cast<uint32>(MinBotsForGreaterBuff()))
+            return castName; // Group too small: stay in solo mode
 
         if (std::string const groupName = GroupVariantFor(baseName); !groupName.empty())
         {
          uint32 const groupId = botAI->GetAiObjectContext()
               ->GetValue<uint32>("spell id", groupName)->Get();
           
-          // we test the utility of **base** buff (no greater version), because "spell cast useful" may be false for Greater variant.
+		  // We check usefulness on the **basic** buff (not the greater version),
+		  // because "spell cast useful" may return false for the greater variant.
           bool const usefulBase = botAI->GetAiObjectContext()
               ->GetValue<bool>("spell cast useful", baseName)->Get();
           
           if (groupId && HasRequiredReagents(bot, groupId))
           {
-              // spell active + componants OK -> Buff with Greater
+              // Learned + reagents OK -> switch to greater
               return groupName;
           }
           
-          if (announceOnMissing && groupId && usefulBase && announce)
+          // Missing reagents -> announce if (a) greater is known, (b) base buff is useful,
+          // (c) announce was requested, (d) a callback is provided.
+		  if (announceOnMissing && groupId && announce)
           {
-              static time_t s_lastWarn = 0;
-              time_t now = std::time(nullptr);
-              if (!s_lastWarn || now - s_lastWarn >= 30)
+            static std::map<std::pair<uint32, std::string>, time_t> s_lastWarn; // par bot & par buff
+            time_t now = std::time(nullptr);
+            uint32 botLow = static_cast<uint32>(bot->GetGUID().GetCounter());
+            time_t& last = s_lastWarn[ std::make_pair(botLow, groupName) ];
+			if (!last || now - last >= RPWarningCooldown()) // Configurable anti-spam
               {
                   std::string rp;
                   if (groupName.find("greater blessing") != std::string::npos)
@@ -116,8 +137,8 @@ namespace ai::buff
                       rp = "Oops, I’m out of components for the group version. We’ll go with the single one!";
           
                   announce(rp);
-                  s_lastWarn = now;
-              }
+				  last = now;
+             }
           }   
         }
 

@@ -593,6 +593,14 @@ AiPlayerbot.EnableRandomBotTrading = 1
 # Configure message prefixes which will be excluded in analysis in trade action to open trade window
 AiPlayerbot.TradeActionExcludedPrefixes = "RPLL_H_,DBMv4,{звезда} Questie,{rt1} Questie"
 
+# Min group size to use Greater buffs (Paladin, Mage, Druid)
+# Default: 3
+AiPlayerbot.MinBotsForGreaterBuff = 3
+
+# Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff
+# Default: 30
+AiPlayerbot.RPWarningCooldown = 30
+
 #
 #
 #
@@ -698,16 +706,6 @@ AiPlayerbot.AutoUpgradeEquip = 1
 # Only set wolf pets for hunters for optimal raid performance (0 = disabled, 1 = enabled only for max-level bots, 2 = enabled)
 # Default: 0 (disabled)
 AiPlayerbot.HunterWolfPet = 0
-
-# Default pet stance when a bot summons a pet
-# 0 = Passive, 1 = Defensive, 2 = Aggressive
-# Default: 1 (Defensive)
-AiPlayerbot.DefaultPetStance = 1
-
-# Enable/disable debug messages about pet commands
-# 0 = Disabled, 1 = Enabled
-# Default = 0 (disabled)
-AiPlayerbot.PetChatCommandDebug = 0
 
 # Prohibit hunter bots from creating pets with any family ID listed below in ExcludedHunterPetFamilies
 # See the creature_family database table for all pet families by ID (note: ID for spiders is 3)
