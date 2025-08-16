@@ -54,7 +54,9 @@ bool MovetoFish::Execute(Event event)
 bool MovetoFish::isUseful()
 {
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
+    {
         return false;
+    }
     return true;
 }
 
@@ -150,13 +152,17 @@ bool FishingAction::Execute(Event event)
 bool FishingAction::isUseful()
 {
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
+    {
         return false;
+    }
     return true;
 }
 bool UseBobber::isUseful()
 {
     if (!AI_VALUE(bool, "can use fishing bobber"))
+    {
         return false;
+    }
     return true;
 }
 
@@ -196,8 +202,9 @@ bool UseBobber::Execute(Event event)
 bool EndFishing::Execute(Event event)
 {
     if (!bot || !botAI)
+    {
         return false;
-
+    }
     botAI->ChangeStrategy("-masterfishing", BOT_STATE_NON_COMBAT);
     return true;
 }
