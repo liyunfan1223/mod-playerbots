@@ -13,6 +13,28 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "../../../../../src/server/scripts/Spells/spell_generic.cpp"
+#include "GenericBuffUtils.h"
+#include "Config.h"
+#include "Group.h"
+
+namespace {
+    inline bool StrictRoleModeEnabledFor(Player* bot)
+    {
+        static bool strict = sConfigMgr->GetOption<bool>("AiPlayerbot.Paladin.StrictRoleMode", false);
+        if (!strict)
+            return false;
+    
+        Group* g = bot->GetGroup();
+        if (!g)
+            return false;
+    
+        static int32 minStrict = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.StrictMinGroupSize", 10);
+        return g->GetMembersCount() >= static_cast<uint32>(minStrict);
+    }
+}
+
+using ai::buff::MakeAuraQualifierForBuff;
+using ai::buff::UpgradeToGroupIfAppropriate;
 
 inline std::string const GetActualBlessingOfMight(Unit* target)
 {
@@ -109,7 +131,8 @@ inline std::string const GetActualBlessingOfSanctuary(Unit* target, Player* bot)
 
 Value<Unit*>* CastBlessingOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", name);
+
+	return context->GetValue<Unit*>("party member without aura", MakeAuraQualifierForBuff(spell));
 }
 
 bool CastBlessingOfMightAction::Execute(Event event)
@@ -118,12 +141,21 @@ bool CastBlessingOfMightAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfMight(target), target);
+    std::string castName = GetActualBlessingOfMight(target);
+
+    auto RP = ai::chat::MakeGroupAnnouncer(bot);
+
+    // Upgrade to Greater if relevant, otherwise single (with RP if reagents missing)
+    castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+    return botAI->CastSpell(castName, target);
 }
 
 Value<Unit*>* CastBlessingOfMightOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom");
+    return context->GetValue<Unit*>(
+    "party member without aura",
+    "blessing of might,greater blessing of might,blessing of wisdom,greater blessing of wisdom"
+    );
 }
 
 bool CastBlessingOfMightOnPartyAction::Execute(Event event)
@@ -132,7 +164,26 @@ bool CastBlessingOfMightOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfMight(target), target);
+    // Strict mode: Might only for relevant targets (no fallback to Wisdom)
+    if (StrictRoleModeEnabledFor(bot))
+    {
+        std::string desired = GetActualBlessingOfMight(target);
+        if (desired != "blessing of might")
+            return false; // on ignore la cible non-pertinente
+
+        std::string castName = "blessing of might";
+        auto RP = ai::chat::MakeGroupAnnouncer(bot);
+        castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+        return botAI->CastSpell(castName, target);
+    }
+
+    std::string castName = GetActualBlessingOfMight(target);
+
+    auto RP = ai::chat::MakeGroupAnnouncer(bot);
+
+    // Upgrade to Greater if relevant, otherwise single (with RP if reagents missing)
+    castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+    return botAI->CastSpell(castName, target);
 }
 
 bool CastBlessingOfWisdomAction::Execute(Event event)
@@ -141,12 +192,22 @@ bool CastBlessingOfWisdomAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfWisdom(target), target);
+    std::string castName = GetActualBlessingOfWisdom(target);
+
+
+    auto RP = ai::chat::MakeGroupAnnouncer(bot);
+
+    // Upgrade to Greater if relevant, otherwise single (with RP if reagents missing)
+    castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+    return botAI->CastSpell(castName, target);
 }
 
 Value<Unit*>* CastBlessingOfWisdomOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", "blessing of might,blessing of wisdom");
+	return context->GetValue<Unit*>(
+    "party member without aura",
+    "blessing of wisdom,greater blessing of wisdom,blessing of might,greater blessing of might"
+    );
 }
 
 bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
@@ -155,12 +216,34 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfWisdom(target), target);
+    // Strict mode: Wisdom only for mana users (no fallback to Might)
+    if (StrictRoleModeEnabledFor(bot))
+    {
+        std::string desired = GetActualBlessingOfWisdom(target);
+        if (desired != "blessing of wisdom")
+            return false; // on ignore la cible non-pertinente
+
+        std::string castName = "blessing of wisdom";
+        auto RP = ai::chat::MakeGroupAnnouncer(bot);
+        castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+        return botAI->CastSpell(castName, target);
+    }
+
+    std::string castName = GetActualBlessingOfWisdom(target);
+
+    auto RP = ai::chat::MakeGroupAnnouncer(bot);
+
+    // Upgrade to Greater if relevant, otherwise single (with RP if reagents missing)
+    castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+    return botAI->CastSpell(castName, target);
 }
 
 Value<Unit*>* CastBlessingOfSanctuaryOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", "blessing of sanctuary,blessing of kings");
+	return context->GetValue<Unit*>(
+    "party member without aura",
+    "blessing of sanctuary,greater blessing of sanctuary,blessing of kings,greater blessing of kings"
+    );
 }
 
 bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
@@ -169,7 +252,14 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    return botAI->CastSpell(GetActualBlessingOfSanctuary(target, bot), target);
+    std::string castName = GetActualBlessingOfSanctuary(target, bot); // "sanctuary" ou "blessing of kings"
+
+
+    auto RP = ai::chat::MakeGroupAnnouncer(bot);
+
+    // Upgrade to Greater if relevant, otherwise single (with RP if reagents missing)
+    castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+    return botAI->CastSpell(castName, target);
 }
 
 bool CastSealSpellAction::isUseful() { return AI_VALUE2(bool, "combat", "self target"); }
