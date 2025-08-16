@@ -4,9 +4,19 @@
  */
 
 #include "GenericActions.h"
-
+#include "PlayerbotAI.h"
+#include "Player.h"
+#include "Pet.h"
+#include "PlayerbotAIConfig.h"
 #include "CreatureAI.h"
 #include "Playerbots.h"
+#include "CharmInfo.h"
+#include "SharedDefines.h"
+#include "ObjectGuid.h"
+#include "SpellMgr.h"
+#include "SpellInfo.h"
+#include <vector>
+#include <algorithm>
 
 enum PetSpells
 {
@@ -23,7 +33,8 @@ enum PetSpells
     PET_DEVOUR_MAGIC_4 = 19736,
     PET_DEVOUR_MAGIC_5 = 27276,
     PET_DEVOUR_MAGIC_6 = 27277,
-    PET_DEVOUR_MAGIC_7 = 48011
+    PET_DEVOUR_MAGIC_7 = 48011,
+    PET_SPIRIT_WOLF_LEAP = 58867
 };
 
 static std::vector<uint32> disabledPetSpells = {
@@ -31,7 +42,7 @@ static std::vector<uint32> disabledPetSpells = {
     PET_COWER, PET_LEAP,
     PET_SPELL_LOCK_1, PET_SPELL_LOCK_2,
     PET_DEVOUR_MAGIC_1, PET_DEVOUR_MAGIC_2, PET_DEVOUR_MAGIC_3,
-    PET_DEVOUR_MAGIC_4, PET_DEVOUR_MAGIC_5, PET_DEVOUR_MAGIC_6, PET_DEVOUR_MAGIC_7
+    PET_DEVOUR_MAGIC_4, PET_DEVOUR_MAGIC_5, PET_DEVOUR_MAGIC_6, PET_DEVOUR_MAGIC_7, PET_SPIRIT_WOLF_LEAP
 };
 
 bool MeleeAction::isUseful()
@@ -100,6 +111,11 @@ bool TogglePetSpellAutoCastAction::Execute(Event event)
             toggled = true;
         }
     }
+
+    // Debug message if pet spells have been toggled and debug is enabled
+    if (toggled && sPlayerbotAIConfig->petChatCommandDebug == 1)
+        botAI->TellMaster("Pet autocast spells have been toggled.");
+
     return toggled;
 }
 
@@ -107,22 +123,23 @@ bool PetAttackAction::Execute(Event event)
 {
     Guardian* pet = bot->GetGuardianPet();
     if (!pet)
-    {
         return false;
-    }
+
+    // Do not attack if the pet's stance is set to "passive".
+    if (pet->GetReactState() == REACT_PASSIVE)
+        return false;
 
     Unit* target = AI_VALUE(Unit*, "current target");
     if (!target)
-    {
         return false;
-    }
 
     if (!bot->IsValidAttackTarget(target))
-    {
         return false;
-    }
 
-    pet->SetReactState(REACT_PASSIVE);
+    // This section has been commented because it was overriding the
+    // pet's stance to "passive" every time the attack action was executed.
+    // pet->SetReactState(REACT_PASSIVE);
+
     pet->ClearUnitState(UNIT_STATE_FOLLOW);
     pet->AttackStop();
     pet->SetTarget(target->GetGUID());
@@ -134,5 +151,78 @@ bool PetAttackAction::Execute(Event event)
     pet->GetCharmInfo()->SetIsReturning(false);
 
     pet->ToCreature()->AI()->AttackStart(target);
+    return true;
+}
+
+bool SetPetStanceAction::Execute(Event /*event*/)
+{
+    // Prepare a list to hold all controlled pet and guardian creatures
+    std::vector<Creature*> targets;
+
+    // Add the bot's main pet (if it exists) to the target list
+    Pet* pet = bot->GetPet();
+    if (pet)
+        targets.push_back(pet);
+
+    // Loop through all units controlled by the bot (could be pets, guardians, etc.)
+    for (Unit::ControlSet::const_iterator itr = bot->m_Controlled.begin(); itr != bot->m_Controlled.end(); ++itr)
+    {
+        // Only add creatures (skip players, vehicles, etc.)
+        Creature* creature = dynamic_cast<Creature*>(*itr);
+        if (!creature)
+            continue;
+        // Avoid adding the main pet twice
+        if (pet && creature == pet)
+            continue;
+        targets.push_back(creature);
+    }
+
+    // If there are no controlled pets or guardians, notify the player and exit
+    if (targets.empty())
+    {
+        botAI->TellError("You have no pet or guardian pet.");
+        return false;
+    }
+
+    // Get the default pet stance from the configuration
+    int32 stance = sPlayerbotAIConfig->defaultPetStance;
+    ReactStates react = REACT_DEFENSIVE;
+    std::string stanceText = "defensive (from config, fallback)";
+
+    // Map the config stance integer to a ReactStates value and a message
+    switch (stance)
+    {
+        case 0:
+            react = REACT_PASSIVE;
+            stanceText = "passive (from config)";
+            break;
+        case 1:
+            react = REACT_DEFENSIVE;
+            stanceText = "defensive (from config)";
+            break;
+        case 2:
+            react = REACT_AGGRESSIVE;
+            stanceText = "aggressive (from config)";
+            break;
+        default:
+            react = REACT_DEFENSIVE;
+            stanceText = "defensive (from config, fallback)";
+            break;
+    }
+
+    // Apply the stance to all target creatures (pets/guardians)
+    for (Creature* target : targets)
+    {
+        target->SetReactState(react);
+        CharmInfo* charmInfo = target->GetCharmInfo();
+        // If the creature has a CharmInfo, set the player-visible stance as well
+        if (charmInfo)
+            charmInfo->SetPlayerReactState(react);
+    }
+
+    // If debug is enabled in config, inform the master of the new stance
+    if (sPlayerbotAIConfig->petChatCommandDebug == 1)
+        botAI->TellMaster("Pet stance set to " + stanceText + " (applied to all pets/guardians).");
+
     return true;
 }
