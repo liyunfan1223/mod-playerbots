@@ -49,6 +49,10 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("cure disease", NextAction::array(0, new NextAction("cure disease", 31.0f), nullptr)));
     triggers.push_back(new TriggerNode("party member cure disease",
                                        NextAction::array(0, new NextAction("cure disease on party", 30.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 65.0f), nullptr)));
 }
 
 void ShamanNonCombatStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

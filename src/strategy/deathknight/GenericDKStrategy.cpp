@@ -172,6 +172,10 @@ void GenericDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("no pet", NextAction::array(0, new NextAction("raise dead", ACTION_NORMAL + 5), nullptr)));
     triggers.push_back(
+        new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 60.0f), nullptr)));
+    triggers.push_back(
         new TriggerNode("mind freeze", NextAction::array(0, new NextAction("mind freeze", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(
         new TriggerNode("mind freeze on enemy healer",
