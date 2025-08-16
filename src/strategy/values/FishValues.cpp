@@ -19,7 +19,6 @@ bool CanFishValue::Calculate()
 
   if (SkillFishing == 0)
     {
-        botAI->TellError("I don't know how to fish");
         return false;
     }
 
@@ -31,14 +30,16 @@ bool CanFishValue::Calculate()
   {
     botAI->TellError("I don't have enough skill to fish here");
     return false;
-}
-	return true;
+  }
+  return true;
 }
 
 bool CanOpenBobberValue::Calculate()
 {
   if (!bot || !botAI)
+  {
     return false;
+  }
   return true;
 }
 
@@ -63,6 +64,6 @@ bool DoneFishingValue::Calculate()
   {
     return true;
   }
-return false;
+  return false;
 }
 
