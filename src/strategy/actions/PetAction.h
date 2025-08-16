@@ -10,25 +10,20 @@
 
 #include "Action.h"
 #include "PlayerbotFactory.h"
+#include "Unit.h"
 
 class PlayerbotAI;
 
 class PetAction : public Action
 {
 public:
-    PetAction(PlayerbotAI* botAI) : Action(botAI, "pet") {}
+    PetAction(PlayerbotAI* botAI, const std::string& defaultCmd = "") : Action(botAI, "pet"), defaultCmd(defaultCmd) {}
 
     bool Execute(Event event) override;
 
 private:
-    bool SetPetByName(const std::string& name);
-    bool SetPetById(uint32 id);
-    bool SetPetByFamily(const std::string& family);
-    bool RenamePet(const std::string& newName);
-
-    bool CreateAndSetPet(uint32 creatureEntry);
-
-    std::string lastPetName;
-    uint32 lastPetId = 0;
+    bool warningEnabled = true;
+    std::string defaultCmd; 
 };
+
 #endif

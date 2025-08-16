@@ -231,6 +231,7 @@ public:
         creators["can fish"] = &TriggerContext::can_fish;
         creators["can use fishing bobber"] = &TriggerContext::can_use_fishing_bobber;
         creators["done fishing"] = &TriggerContext::done_fishing;
+        creators["new pet"] = &TriggerContext::new_pet;
     }
 
 private:
@@ -432,6 +433,7 @@ private:
     static Trigger* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenFishingBobberTrigger(ai); }
     static Trigger* can_fish(PlayerbotAI* ai) { return new CanFishTrigger(ai); }
     static Trigger* done_fishing(PlayerbotAI* ai) { return new DoneFishingTrigger(ai); }
+    static Trigger* new_pet(PlayerbotAI* ai) { return new NewPetTrigger(ai); }
 };
 
 #endif

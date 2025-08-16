@@ -38,6 +38,8 @@
 #include "WorldSessionMgr.h"
 #include "DatabaseEnv.h"        // Added for gender choice
 #include <algorithm>            // Added for gender choice
+#include "Log.h" // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+#include <shared_mutex> // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
 
 class BotInitGuard
 {
@@ -168,7 +170,7 @@ void PlayerbotHolder::HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder con
     uint32 botAccountId = holder.GetAccountId();
     // At login DBC locale should be what the server is set to use by default (as spells etc are hardcoded to ENUS this
     // allows channels to work as intended)
-    WorldSession* botSession = new WorldSession(botAccountId, "", nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
+    WorldSession* botSession = new WorldSession(botAccountId, "", 0x0, nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING,
                                                 time_t(0), sWorld->GetDefaultDbcLocale(), 0, false, false, 0, true);
 
     botSession->HandlePlayerLoginFromDB(holder);  // will delete lqh
@@ -1726,21 +1728,70 @@ void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid, bool is_AI)
 
 PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
-    if (!(sPlayerbotAIConfig->enabled) || !player)
-    {
-        return nullptr;
-    }
-    // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
+    // if (!(sPlayerbotAIConfig->enabled) || !player)
+    // {
     //     return nullptr;
     // }
-    auto itr = _playerbotsAIMap.find(player->GetGUID());
-    if (itr != _playerbotsAIMap.end())
-    {
-        if (itr->second->IsBotAI())
-            return reinterpret_cast<PlayerbotAI*>(itr->second);
+    // // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
+    // //     return nullptr;
+    // // }
+    // auto itr = _playerbotsAIMap.find(player->GetGUID());
+    // if (itr != _playerbotsAIMap.end())
+    // {
+    //     if (itr->second->IsBotAI())
+    //         return reinterpret_cast<PlayerbotAI*>(itr->second);
+    // }
+	// 
+    // return nullptr;
+	
+	// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+    if (!player || !sPlayerbotAIConfig->enabled)
+        return nullptr;
+    
+    // First read the GUID into a local variable, but ONLY after the check!
+    ObjectGuid guid = player->GetGUID();           // <-- OK here, we know that player != nullptr
+    { 
+        std::shared_lock rlock(_aiMutex);
+        auto it = _playerbotsAIMap.find(guid);
+        if (it != _playerbotsAIMap.end() && it->second->IsBotAI())
+            return static_cast<PlayerbotAI*>(it->second);
     }
 
+    // Transient state: NEVER break the master ⇄ bots relationship here.
+    if (!ObjectAccessor::FindPlayer(guid))    
+    {
+        RemovePlayerbotAI(guid, /*removeMgrEntry=*/false);
+    }
     return nullptr;
+}
+
+// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+PlayerbotAI* PlayerbotsMgr::GetPlayerbotAIByGuid(ObjectGuid guid)
+{
+    if (!sPlayerbotAIConfig->enabled)
+        return nullptr;
+
+    std::shared_lock rlock(_aiMutex);
+    auto it = _playerbotsAIMap.find(guid);
+    if (it != _playerbotsAIMap.end() && it->second->IsBotAI())
+        return static_cast<PlayerbotAI*>(it->second);
+    return nullptr;
+}
+
+void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry /*= true*/)
+{
+    std::unique_lock wlock(_aiMutex);
+
+    if (auto it = _playerbotsAIMap.find(guid); it != _playerbotsAIMap.end())
+    {
+        delete it->second;
+        _playerbotsAIMap.erase(it);
+        LOG_DEBUG("playerbots", "Removed stale AI for GUID {}",
+                  static_cast<uint64>(guid.GetRawValue()));
+    }
+
+        if (removeMgrEntry)
+       _playerbotsMgrMap.erase(guid);  // we NO longer touch the relation in a "soft" purge
 }
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)

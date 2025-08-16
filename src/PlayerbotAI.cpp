@@ -3970,14 +3970,36 @@ bool IsAlliance(uint8 race)
 
 bool PlayerbotAI::HasRealPlayerMaster()
 {
-    if (master)
+//     if (master)
+//     {
+//         PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(master);
+//         return !masterBotAI || masterBotAI->IsRealPlayer();
+//     }
+// 
+//     return false;
+
+     // Removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+    /* 1) The "master" pointer can be null if the bot was created
+          without a master player or if the master was just removed. */
+    if (!master)
+        return false;
+
+ /* 2) Is the master player still present in the world?
+          If FindPlayer fails, we invalidate "master" and stop here. */
+    if (!ObjectAccessor::FindPlayer(master->GetGUID()))
     {
-        PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(master);
-        return !masterBotAI || masterBotAI->IsRealPlayer();
+        master = nullptr;           // avoids repeating the check on the next tick
+        return false;
     }
 
-    return false;
+   /* 3) If the master is a bot, we check that it is itself controlled
+          by a real player. Otherwise, it's already a real player → true. */
+    if (PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(master))
+        return masterBotAI->IsRealPlayer();   // bot controlled by a player?
+
+    return true;                              // master = real player
 }
+
 
 bool PlayerbotAI::HasActivePlayerMaster() { return master && !GET_PLAYERBOT_AI(master); }
 

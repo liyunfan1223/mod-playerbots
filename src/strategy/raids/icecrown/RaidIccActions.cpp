@@ -6549,7 +6549,7 @@ bool IccSindragosaFrostBombAction::Execute(Event event)
     float range = 200.0f;
     Acore::AnyUnitInObjectRangeCheck u_check(bot, range);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, units, u_check);
-    Cell::VisitAllObjects(bot, searcher, range);
+    Cell::VisitObjects(bot, searcher, range);
 
     for (Unit* unit : units)
     {

@@ -197,36 +197,42 @@ public:
         sRandomPlayerbotMgr->HandleCommand(type, msg, player);
     }
 
-    bool OnPlayerBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* /*criteria*/) override
+    bool OnPlayerBeforeAchievementComplete(Player* player, AchievementEntry const* achievement) override
     {
-        if (sRandomPlayerbotMgr->IsRandomBot(player))
+        if (sRandomPlayerbotMgr->IsRandomBot(player) && (achievement->flags == 256 || achievement->flags == 768))
         {
             return false;
         }
-        return true;
-    }
 
-    bool OnPlayerBeforeAchievementComplete(Player* player, AchievementEntry const* /*achievement*/) override
-    {
-        if (sRandomPlayerbotMgr->IsRandomBot(player))
-        {
-            return false;
-        }
         return true;
     }
 
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
-        if (!player->GetSession()->IsBot())
-            return;
-        
-        if (!sRandomPlayerbotMgr->IsRandomBot(player))
+        // early return
+        if (sPlayerbotAIConfig->randomBotXPRate == 1.0 || !player)
             return;
 
-        if (sPlayerbotAIConfig->randomBotXPRate != 1.0)
+        // no XP multiplier, when player is no bot.
+        if (!player->GetSession()->IsBot() || !sRandomPlayerbotMgr->IsRandomBot(player))
+            return;
+
+        // no XP multiplier, when bot has group where leader is a real player.
+        if (Group* group = player->GetGroup())
         {
-            amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
+            Player* leader = group->GetLeader();
+            if (leader && leader != player)
+            {
+                if (PlayerbotAI* leaderBotAI = GET_PLAYERBOT_AI(leader))
+                {
+                    if (leaderBotAI->HasRealPlayerMaster())
+                        return;
+                }
+            }
         }
+
+        // otherwise apply bot XP multiplier.
+        amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig->randomBotXPRate));
     }
 };
 
@@ -371,6 +377,10 @@ public:
 
     void OnPlayerbotLogout(Player* player) override
     {
+        // immediate purge of the bot's AI upon disconnection
+        if (player && player->GetSession()->IsBot())
+            sPlayerbotsMgr->RemovePlayerbotAI(player->GetGUID()); // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
+    
         if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
         {
             PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);

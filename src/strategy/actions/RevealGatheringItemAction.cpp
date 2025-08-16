@@ -39,7 +39,7 @@ bool RevealGatheringItemAction::Execute(Event event)
     std::list<GameObject*> targets;
     AnyGameObjectInObjectRangeCheck u_check(bot, sPlayerbotAIConfig->grindDistance);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
-    Cell::VisitAllObjects(bot, searcher, sPlayerbotAIConfig->reactDistance);
+    Cell::VisitObjects(bot, searcher, sPlayerbotAIConfig->reactDistance);
 
     std::vector<GameObject*> result;
     for (GameObject* go : targets)
