@@ -18,7 +18,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
     WorldLocation location = *target->getPosition();
 
     Group* group = bot->GetGroup();
-    if (group && !urand(0, 1) && bot == botAI->GetGroupMaster())
+    if (group && !urand(0, 1) && bot == botAI->GetGroupMaster() && !bot->IsInCombat())
     {
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
