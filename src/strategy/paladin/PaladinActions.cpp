@@ -5,6 +5,10 @@
 
 #include "PaladinActions.h"
 
+#include <algorithm>
+#include <unordered_map>
+#include <ctime>
+ 
 #include "AiFactory.h"
 #include "Event.h"
 #include "PlayerbotAI.h"
@@ -16,23 +20,138 @@
 #include "GenericBuffUtils.h"
 #include "Config.h"
 #include "Group.h"
+#include "ObjectAccessor.h"
+#include "Playerbots.h"
 
 namespace {
+    enum class StrictSetting { Off = 0, On = 1, Auto = 2 };
+
+    inline StrictSetting ReadStrictSetting()
+    {
+        // Accept "OFF|ON|AUTO" (case-insensitive) OR "0|1|2"
+        static std::string value = sConfigMgr->GetOption<std::string>("AiPlayerbot.Paladin.StrictRoleMode", "OFF");
+        std::string v = value;
+        std::transform(v.begin(), v.end(), v.begin(), ::tolower);
+        if (v == "on" || v == "1")  return StrictSetting::On;
+        if (v == "auto" || v == "2") return StrictSetting::Auto;
+        return StrictSetting::Off;
+    }
+
+    struct StrictAnnounceState
+    {
+        bool lastStrict = false;
+        time_t lastAnnounce = 0;
+    };
+
+	static std::unordered_map<uintptr_t /*groupPtr*/, StrictAnnounceState> s_strictByGroup;
+
+    inline void AnnounceStrict(Player* bot, bool strictOn, StrictSetting setting, uint32 size, uint32 pals)
+    {
+        static bool notify = sConfigMgr->GetOption<bool>("AiPlayerbot.Paladin.StrictNotify", true);
+        if (!notify) return;
+
+        Group* g = bot->GetGroup();
+        if (!g) return;
+
+		uintptr_t key = reinterpret_cast<uintptr_t>(g);
+        StrictAnnounceState& st = s_strictByGroup[key];
+
+        // Only announces when the state changes
+        if (st.lastStrict == strictOn)
+            return;
+
+        time_t now = std::time(nullptr);
+        static int32 cd = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.StrictNotifyCooldown", 60);
+        if (st.lastAnnounce && (now - st.lastAnnounce) < cd)
+            return;
+
+        std::string msg;
+        switch (setting)
+        {
+            case StrictSetting::On:   msg = strictOn ? "[Paladin AI] Strict Mode: ON (FORCED)" : "[Paladin AI] Strict Mode: OFF (FORCED override)"; break;
+            case StrictSetting::Off:  msg = "[Paladin AI] Strict Mode: OFF"; break; // Shouldn’t change dynamically, but safe
+            case StrictSetting::Auto:
+            default:
+                if (strictOn)
+                    msg = "[Paladin AI] Strict Mode: ON (AUTO; size≥" + std::to_string(sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictRaidSize", 20)) +
+                          ", paladins≥" + std::to_string(sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictMinPaladins", 3)) + ")";
+                else
+                    msg = "[Paladin AI] Strict Mode: OFF (AUTO; reverting to smart per-target)";
+                break;
+        }
+
+        std::string scope = sConfigMgr->GetOption<std::string>("AiPlayerbot.Paladin.StrictNotifyScope", "MASTER");
+        if (!scope.empty() && (scope == "GROUP" || scope == "group"))
+        {
+            ai::chat::MakeGroupAnnouncer(bot)(msg);
+        }
+        else
+        {
+            if (auto* ai = GET_PLAYERBOT_AI(bot))
+                ai->TellMaster(msg);
+        }
+
+        st.lastStrict = strictOn;
+        st.lastAnnounce = now;
+    }
+
+    inline uint32 CountPaladinsInGroup(Group* g)
+    {
+        if (!g) return 0;
+        uint32 count = 0;
+    
+        Group::MemberSlotList const& slots = g->GetMemberSlots();
+        for (auto const& slot : slots)
+        {
+            Player* p = ObjectAccessor::FindConnectedPlayer(slot.guid);
+            if (!p) continue;
+    
+            if (p->getClass() == CLASS_PALADIN)
+                ++count;
+        }
+        return count;
+    }
+
     inline bool StrictRoleModeEnabledFor(Player* bot)
     {
-        static bool strict = sConfigMgr->GetOption<bool>("AiPlayerbot.Paladin.StrictRoleMode", false);
-        if (!strict)
-            return false;
-    
         Group* g = bot->GetGroup();
         if (!g)
             return false;
-    
-        static int32 minStrict = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.StrictMinGroupSize", 10);
-        return g->GetMembersCount() >= static_cast<uint32>(minStrict);
+		
+        int32 raidSizeAuto    = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictRaidSize", 20);
+        int32 minPalsAuto     = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictMinPaladins", 3);
+        int32 minStrictManual = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.StrictMinGroupSize", 10);
+		
+        switch (ReadStrictSetting())
+        {
+            case StrictSetting::On:
+            {
+                bool on = true;
+                AnnounceStrict(bot, on, StrictSetting::On, g->GetMembersCount(), CountPaladinsInGroup(g));
+                return on;
+            }
+			
+            case StrictSetting::Off:
+            {
+                bool on = false;
+                AnnounceStrict(bot, on, StrictSetting::Off, g->GetMembersCount(), CountPaladinsInGroup(g));
+                return on;
+            }
+
+            case StrictSetting::Auto:
+            default:
+            {
+                uint32 size = g->GetMembersCount();
+                uint32 palCount = CountPaladinsInGroup(g);
+                bool on = (size >= static_cast<uint32>(raidSizeAuto)) &&
+                          (palCount >= static_cast<uint32>(minPalsAuto));
+                AnnounceStrict(bot, on, StrictSetting::Auto, size, palCount);
+                return on;
+            }
+        }
     }
 }
-
+	
 using ai::buff::MakeAuraQualifierForBuff;
 using ai::buff::UpgradeToGroupIfAppropriate;
 

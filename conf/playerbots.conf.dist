@@ -475,19 +475,43 @@ AiPlayerbot.MinBotsForGreaterBuff = 3
 # Default: 30
 AiPlayerbot.RPWarningCooldown = 30
 
-# Paladin — Strict Role Mode (opt-in)
-# If enabled (1) and the group size is at least AiPlayerbot.MinBotsForGreaterBuff,
-# Paladin buff strategies become strict:
+# Paladin — Strict Role Mode
+# Controls how strictly Paladins stick to a single blessing based on their non-combat buff strategy.
+# Values (case-insensitive): OFF | ON | AUTO  (also accepts 0 | 1 | 2)
+#   OFF  (0): disabled (default)
+#   ON   (1): always strict, regardless of group size
+#   AUTO (2): strict only when group and paladin thresholds are met (see AutoStrict*)
+# In strict mode:
 #   - bstats -> (Greater) Blessing of Kings only, on everyone
 #   - bdps   -> (Greater) Blessing of Might only, on physical DPS; ignores others
 #   - bmana  -> (Greater) Blessing of Wisdom only, on mana users; ignores others
 # Sanctuary remains handled by Protection paladins for tanks if learned.
-# Default: 0
-AiPlayerbot.Paladin.StrictRoleMode = 0
+#
+# Default: OFF
+AiPlayerbot.Paladin.StrictRoleMode = OFF
 
-# Minimum group size to enable StrictRoleMode (independent of Greater).
-# Default is 10: no strict mode in 5-man dungeons, strict mode in 10/25 raids.
+# Minimum group size to enable StrictRoleMode in manual ON workflows/scripts if needed.
+# (Kept for backward compatibility from PR1; ON now forces strict regardless of size by default.)
+# Default: 10
 AiPlayerbot.Paladin.StrictMinGroupSize = 10
+
+# --- AUTO mode thresholds ---
+# Strict mode turns ON automatically if BOTH thresholds are satisfied:
+#   - group size >= AutoStrictRaidSize
+#   - paladin count in group >= AutoStrictMinPaladins
+#
+# Default: 20 players, 3 paladins
+AiPlayerbot.Paladin.AutoStrictRaidSize = 20
+AiPlayerbot.Paladin.AutoStrictMinPaladins = 3
+
+# Announce strict mode transitions (ON/OFF). Default: 1
+AiPlayerbot.Paladin.StrictNotify = 1
+
+# Who should receive the message: MASTER | GROUP. Default: MASTER
+AiPlayerbot.Paladin.StrictNotifyScope = MASTER
+
+# Anti-spam cooldown in seconds for strict notifications. Default: 60
+AiPlayerbot.Paladin.StrictNotifyCooldown = 60
 
 #
 #
