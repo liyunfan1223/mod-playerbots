@@ -214,3 +214,84 @@ bool FarFromMasterTrigger::IsActive()
 {
     return sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "master target"), distance);
 }
+
+bool TooCloseToCreatureTrigger::TooCloseToCreature(uint32 creatureId, float range, bool alive)
+{
+    Creature* nearestCreature = bot->FindNearestCreature(creatureId, range, alive);
+    return nearestCreature != nullptr;
+}
+
+bool TooCloseToPlayerWithDebuffTrigger::TooCloseToPlayerWithDebuff(uint32 spellId, float range)
+{
+    Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
+    std::vector<Player*> debuffedPlayers;
+
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* player = gref->GetSource();
+        if (player && player->IsAlive() && player->HasAura(spellId))
+        {
+            debuffedPlayers.push_back(player);
+        }
+    }
+
+    if (debuffedPlayers.empty())
+    {
+        return false;
+    }
+
+    for (Unit* debuffedPlayer : debuffedPlayers)
+    {
+        float dist = debuffedPlayer->GetExactDist2d(bot->GetPositionX(), bot->GetPositionY());
+        if (dist < range)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool TooFarFromPlayerWithAuraTrigger::TooFarFromPlayerWithAura(uint32 spellId, float range, bool selfInclude)
+{
+    Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
+    std::vector<Player*> debuffedPlayers;
+
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* player = gref->GetSource();
+        if (player && player->IsAlive() && player->HasAura(spellId) &&
+            (selfInclude || (!selfInclude && player->GetGUID() != bot->GetGUID())))
+        {
+            debuffedPlayers.push_back(player);
+        }
+    }
+
+    return !debuffedPlayers.empty();
+
+    if (debuffedPlayers.empty())
+    {
+        return false;
+    }
+
+    for (Unit* debuffedPlayer : debuffedPlayers)
+    {
+        float dist = debuffedPlayer->GetExactDist2d(bot->GetPositionX(), bot->GetPositionY());
+        if (dist > range)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

@@ -2767,3 +2767,177 @@ bool MoveFromGroupAction::Execute(Event event)
         distance = 20.0f; // flee distance from config is too small for this
     return MoveFromGroup(distance);
 }
+
+bool MoveAwayFromCreatureAction::Execute(Event event)
+{
+    GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
+    Creature* nearestCreature = bot->FindNearestCreature(creatureId, range, alive);
+
+    // Find all creatures with the specified Id
+    std::vector<Unit*> creatures;
+    for (const auto& guid : targets)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (unit && (alive && unit->IsAlive()) && unit->GetEntry() == creatureId)
+        {
+            creatures.push_back(unit);
+        }
+    }
+
+    if (creatures.empty())
+    {
+        return false;
+    }
+
+    // Search for a safe position
+    const int directions = 8;
+    const float increment = 3.0f;
+    float bestX = bot->GetPositionX();
+    float bestY = bot->GetPositionY();
+    float bestZ = bot->GetPositionZ();
+    float maxSafetyScore = -1.0f;
+
+    for (int i = 0; i < directions; ++i)
+    {
+        float angle = (i * 2 * M_PI) / directions;
+        for (float distance = increment; distance <= 30.0f; distance += increment)
+        {
+            float moveX = bot->GetPositionX() + distance * cos(angle);
+            float moveY = bot->GetPositionY() + distance * sin(angle);
+            float moveZ = bot->GetPositionZ();
+
+            // Check creature distance constraints
+            bool isSafeFromCreatures = true;
+            float minCreatureDist = std::numeric_limits<float>::max();
+            for (Unit* creature : creatures)
+            {
+                float dist = creature->GetExactDist2d(moveX, moveY);
+                if (dist < range)
+                {
+                    isSafeFromCreatures = false;
+                    break;
+                }
+                if (dist < minCreatureDist)
+                {
+                    minCreatureDist = dist;
+                }
+            }
+
+            if (isSafeFromCreatures && bot->IsWithinLOS(moveX, moveY, moveZ))
+            {
+                // A simple safety score: the minimum distance to any creature. Higher is better.
+                if (minCreatureDist > maxSafetyScore)
+                {
+                    maxSafetyScore = minCreatureDist;
+                    bestX = moveX;
+                    bestY = moveY;
+                    bestZ = moveZ;
+                }
+            }
+        }
+    }
+
+    // Move to the best position found
+    if (maxSafetyScore > 0.0f)
+    {
+        return MoveTo(bot->GetMapId(), bestX, bestY, bestZ, false, false, false, false,
+                      MovementPriority::MOVEMENT_COMBAT);
+    }
+
+    return false;
+}
+
+bool MoveAwayFromCreatureAction::isPossible()
+{
+    return bot->CanFreeMove();
+}
+
+bool MoveAwayFromPlayerWithDebuffAction::Execute(Event event)
+{
+    Player* closestPlayer = nullptr;
+    float minDistance = 0.0f;
+
+    Group* group = bot->GetGroup();
+    if (!group)
+    {
+        return false;
+    }
+
+    std::vector<Player*> debuffedPlayers;
+
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* player = gref->GetSource();
+        if (player && player->IsAlive() && player->HasAura(spellId))
+        {
+            debuffedPlayers.push_back(player);
+        }
+    }
+
+    if (debuffedPlayers.empty())
+    {
+        return false;
+    }
+
+    // Search for a safe position
+    const int directions = 8;
+    const float increment = 3.0f;
+    float bestX = bot->GetPositionX();
+    float bestY = bot->GetPositionY();
+    float bestZ = bot->GetPositionZ();
+    float maxSafetyScore = -1.0f;
+
+    for (int i = 0; i < directions; ++i)
+    {
+        float angle = (i * 2 * M_PI) / directions;
+        for (float distance = increment; distance <= (range + 5.0f); distance += increment)
+        {
+            float moveX = bot->GetPositionX() + distance * cos(angle);
+            float moveY = bot->GetPositionY() + distance * sin(angle);
+            float moveZ = bot->GetPositionZ();
+
+            // Check creature distance constraints
+            bool isSafeFromDebuffedPlayer = true;
+            float minDebuffedPlayerDistance = std::numeric_limits<float>::max();
+            for (Unit* debuffedPlayer : debuffedPlayers)
+            {
+                float dist = debuffedPlayer->GetExactDist2d(moveX, moveY);
+                if (dist < range)
+                {
+                    isSafeFromDebuffedPlayer = false;
+                    break;
+                }
+                if (dist < minDebuffedPlayerDistance)
+                {
+                    minDebuffedPlayerDistance = dist;
+                }
+            }
+
+            if (isSafeFromDebuffedPlayer && bot->IsWithinLOS(moveX, moveY, moveZ))
+            {
+                // A simple safety score: the minimum distance to any debuffed player. Higher is better.
+                if (minDebuffedPlayerDistance > maxSafetyScore)
+                {
+                    maxSafetyScore = minDebuffedPlayerDistance;
+                    bestX = moveX;
+                    bestY = moveY;
+                    bestZ = moveZ;
+                }
+            }
+        }
+    }
+
+    // Move to the best position found
+    if (maxSafetyScore > 0.0f)
+    {
+        return MoveTo(bot->GetMapId(), bestX, bestY, bestZ, false, false, false, false,
+                      MovementPriority::MOVEMENT_COMBAT, true);
+    }
+
+    return false;
+}
+
+bool MoveAwayFromPlayerWithDebuffAction::isPossible()
+{
+    return bot->CanFreeMove();
+}

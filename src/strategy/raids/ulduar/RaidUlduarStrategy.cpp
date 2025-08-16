@@ -255,6 +255,66 @@ void RaidUlduarStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "yogg-saron shadow resistance trigger",
         NextAction::array(0, new NextAction("yogg-saron shadow resistance action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron ominous cloud cheat trigger",
+        NextAction::array(0, new NextAction("yogg-saron ominous cloud cheat action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron guardian positioning trigger",
+        NextAction::array(0, new NextAction("yogg-saron guardian positioning action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron sanity trigger",
+        NextAction::array(0, new NextAction("yogg-saron sanity action", ACTION_RAID + 1), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron death orb trigger",
+        NextAction::array(0, new NextAction("yogg-saron death orb action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron malady of the mind trigger",
+        NextAction::array(0, new NextAction("yogg-saron malady of the mind action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron mark target trigger",
+        NextAction::array(0, new NextAction("yogg-saron mark target action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron brain link trigger",
+        NextAction::array(0, new NextAction("yogg-saron brain link action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron move to enter portal trigger",
+        NextAction::array(0, new NextAction("yogg-saron move to enter portal action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron use portal trigger",
+        NextAction::array(0, new NextAction("yogg-saron use portal action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron fall from floor trigger",
+        NextAction::array(0, new NextAction("yogg-saron fall from floor action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron boss room movement cheat trigger",
+        NextAction::array(0, new NextAction("yogg-saron boss room movement cheat action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron illusion room trigger",
+        NextAction::array(0, new NextAction("yogg-saron illusion room action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron move to exit portal trigger",
+        NextAction::array(0, new NextAction("yogg-saron move to exit portal action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron lunatic gaze trigger",
+        NextAction::array(0, new NextAction("yogg-saron lunatic gaze action", ACTION_EMERGENCY), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "yogg-saron phase 3 positioning trigger",
+        NextAction::array(0, new NextAction("yogg-saron phase 3 positioning action", ACTION_RAID), nullptr)));
 }
 
 void RaidUlduarStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)

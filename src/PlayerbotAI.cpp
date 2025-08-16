@@ -1765,7 +1765,7 @@ bool PlayerbotAI::IsRangedDps(Player* player, bool bySpec) { return IsRanged(pla
 
 bool PlayerbotAI::IsHealAssistantOfIndex(Player* player, int index)
 {
-    Group* group = bot->GetGroup();
+    Group* group = player->GetGroup();
     if (!group)
     {
         return false;
@@ -1776,6 +1776,11 @@ bool PlayerbotAI::IsHealAssistantOfIndex(Player* player, int index)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
 
         if (IsHeal(member))  // Check if the member is a healer
         {
@@ -1796,7 +1801,7 @@ bool PlayerbotAI::IsHealAssistantOfIndex(Player* player, int index)
 
 bool PlayerbotAI::IsRangedDpsAssistantOfIndex(Player* player, int index)
 {
-    Group* group = bot->GetGroup();
+    Group* group = player->GetGroup();
     if (!group)
     {
         return false;
@@ -1807,6 +1812,11 @@ bool PlayerbotAI::IsRangedDpsAssistantOfIndex(Player* player, int index)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
 
         if (IsRangedDps(member))  // Check if the member is a ranged DPS
         {
@@ -1840,6 +1850,35 @@ bool PlayerbotAI::HasAggro(Unit* unit)
     return false;
 }
 
+int32 PlayerbotAI::GetAssistTankIndex(Player* player)
+{
+    Group* group = player->GetGroup();
+    if (!group)
+    {
+        return -1;
+    }
+    int counter = 0;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
+        if (player == member)
+        {
+            return counter;
+        }
+        if (IsTank(member, true) && group->IsAssistant(member->GetGUID()))
+        {
+            counter++;
+        }
+    }
+    return 0;
+}
+
 int32 PlayerbotAI::GetGroupSlotIndex(Player* player)
 {
     Group* group = bot->GetGroup();
@@ -1851,6 +1890,12 @@ int32 PlayerbotAI::GetGroupSlotIndex(Player* player)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (player == member)
         {
             return counter;
@@ -1875,6 +1920,12 @@ int32 PlayerbotAI::GetRangedIndex(Player* player)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (player == member)
         {
             return counter;
@@ -1902,6 +1953,12 @@ int32 PlayerbotAI::GetClassIndex(Player* player, uint8 cls)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (player == member)
         {
             return counter;
@@ -1928,6 +1985,12 @@ int32 PlayerbotAI::GetRangedDpsIndex(Player* player)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (player == member)
         {
             return counter;
@@ -1955,6 +2018,12 @@ int32 PlayerbotAI::GetMeleeIndex(Player* player)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (player == member)
         {
             return counter;
@@ -2126,11 +2195,73 @@ bool PlayerbotAI::IsMainTank(Player* player)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (IsTank(member) && member->IsAlive())
         {
             return player->GetGUID() == member->GetGUID();
         }
     }
+    return false;
+}
+
+bool PlayerbotAI::IsBotMainTank(Player* player)
+{
+    if (!player->GetSession()->IsBot() || !IsTank(player))
+    {
+        return false;
+    }
+
+    if (IsMainTank(player))
+    {
+        return true;
+    }
+
+    Group* group = player->GetGroup();
+    if (!group)
+    {
+        return true;  // If no group, consider the bot as main tank
+    }
+
+    uint32 botAssistTankIndex = GetAssistTankIndex(player);
+
+    if (botAssistTankIndex == -1)
+    {
+        return false;
+    }
+
+    for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+    {
+        Player* member = gref->GetSource();
+        if (!member)
+        {
+            continue;
+        }
+
+        uint32 memberAssistTankIndex = GetAssistTankIndex(member);
+
+        if (memberAssistTankIndex == -1)
+        {
+            continue;
+        }
+
+        if (memberAssistTankIndex == botAssistTankIndex && player == member)
+        {
+            return true;
+        }
+
+        if (memberAssistTankIndex < botAssistTankIndex && member->GetSession()->IsBot())
+        {
+            return false;
+        }
+
+        return false;
+    }
+
     return false;
 }
 
@@ -2145,6 +2276,12 @@ uint32 PlayerbotAI::GetGroupTankNum(Player* player)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (IsTank(member) && member->IsAlive())
         {
             result++;
@@ -2157,7 +2294,7 @@ bool PlayerbotAI::IsAssistTank(Player* player) { return IsTank(player) && !IsMai
 
 bool PlayerbotAI::IsAssistTankOfIndex(Player* player, int index)
 {
-    Group* group = bot->GetGroup();
+    Group* group = player->GetGroup();
     if (!group)
     {
         return false;
@@ -2166,6 +2303,12 @@ bool PlayerbotAI::IsAssistTankOfIndex(Player* player, int index)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (group->IsAssistant(member->GetGUID()) && IsAssistTank(member))
         {
             if (index == counter)
@@ -2179,6 +2322,12 @@ bool PlayerbotAI::IsAssistTankOfIndex(Player* player, int index)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
+
         if (!group->IsAssistant(member->GetGUID()) && IsAssistTank(member))
         {
             if (index == counter)
@@ -2385,6 +2534,11 @@ std::vector<Player*> PlayerbotAI::GetPlayersInGroup()
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
+
+        if (!member)
+        {
+            continue;
+        }
 
         if (GET_PLAYERBOT_AI(member) && !GET_PLAYERBOT_AI(member)->IsRealPlayer())
             continue;

@@ -121,4 +121,28 @@ public:
     OutOfReactRangeTrigger(PlayerbotAI* botAI) : FarFromMasterTrigger(botAI, "out of react range", 50.0f, 5) {}
 };
 
+class TooCloseToCreatureTrigger : public Trigger
+{
+public:
+    TooCloseToCreatureTrigger(PlayerbotAI* ai) : Trigger(ai, "too close to creature trigger") {}
+
+    bool TooCloseToCreature(uint32 creatureId, float range, bool alive = true);
+};
+
+class TooCloseToPlayerWithDebuffTrigger : public Trigger
+{
+public:
+    TooCloseToPlayerWithDebuffTrigger(PlayerbotAI* ai) : Trigger(ai, "too cloose to player with debuff trigger") {}
+
+    bool TooCloseToPlayerWithDebuff(uint32 spellId, float range);
+};
+
+class TooFarFromPlayerWithAuraTrigger : public Trigger
+{
+public:
+    TooFarFromPlayerWithAuraTrigger(PlayerbotAI* ai) : Trigger(ai, "too far from player with aura trigger") {}
+
+    bool TooFarFromPlayerWithAura(uint32 spellId, float range, bool selfInclude = false);
+};
+
 #endif

@@ -294,4 +294,34 @@ public:
     bool Execute(Event event) override;
 };
 
+class MoveAwayFromCreatureAction : public MovementAction
+{
+public:
+    MoveAwayFromCreatureAction(PlayerbotAI* botAI, std::string name, uint32 creatureId, float range, bool alive = true)
+        : MovementAction(botAI, name), creatureId(creatureId), range(range), alive(alive) {}
+
+    bool Execute(Event event) override;
+    bool isPossible() override;
+
+private:
+    uint32 creatureId;
+    float range;
+    bool alive;
+};
+
+class MoveAwayFromPlayerWithDebuffAction : public MovementAction
+{
+public:
+    MoveAwayFromPlayerWithDebuffAction(PlayerbotAI* botAI, std::string name, uint32 spellId, float range)
+        : MovementAction(botAI, name), spellId(spellId), range(range) {}
+
+    bool Execute(Event event) override;
+    bool isPossible() override;
+
+private:
+    uint32 spellId;
+    float range;
+    bool alive;
+};
+
 #endif
