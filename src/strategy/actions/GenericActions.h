@@ -7,6 +7,8 @@
 #define _PLAYERBOT_GENERICACTIONS_H
 
 #include "AttackAction.h"
+#include "Action.h"
+#include "PlayerbotAI.h"
 
 class PlayerbotAI;
 
@@ -31,6 +33,14 @@ class PetAttackAction : public Action
 public:
     PetAttackAction(PlayerbotAI* ai) : Action(ai, "pet attack") {}
     virtual bool Execute(Event event) override;
+};
+
+class SetPetStanceAction : public Action
+{
+public:
+    SetPetStanceAction(PlayerbotAI* botAI) : Action(botAI, "set pet stance") {}
+
+    bool Execute(Event event) override;
 };
 
 #endif

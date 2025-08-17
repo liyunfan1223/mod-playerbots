@@ -133,6 +133,8 @@ void GenericShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // NextAction("riptide", 26.0f), nullptr)));
     triggers.push_back(new TriggerNode("heroism", NextAction::array(0, new NextAction("heroism", 31.0f), nullptr)));
     triggers.push_back(new TriggerNode("bloodlust", NextAction::array(0, new NextAction("bloodlust", 30.0f), nullptr)));
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 65.0f), nullptr)));
 }
 
 void ShamanBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

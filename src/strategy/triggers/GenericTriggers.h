@@ -943,4 +943,16 @@ public:
     bool IsActive() override { return !bot->IsAlive() && bot->GetUInt32Value(PLAYER_SELF_RES_SPELL); }
 };
 
+class NewPetTrigger : public Trigger
+{
+public:
+    NewPetTrigger(PlayerbotAI* ai) : Trigger(ai, "new pet"), lastPetGuid(ObjectGuid::Empty), triggered(false) {}
+
+    bool IsActive() override;
+
+private:
+    ObjectGuid lastPetGuid;
+    bool triggered;
+};
+
 #endif
