@@ -48,7 +48,7 @@ namespace {
 
     struct StrictAnnounceState
     {
-        bool  lastStrict   = false;
+        bool lastStrict  = false;
         time_t lastAnnounce = 0;
     };
 
