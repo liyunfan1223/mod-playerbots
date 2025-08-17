@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "BattleGroundTactics.h"
@@ -2903,7 +2903,7 @@ bool BGTactics::selectObjective(bool reset)
                         {
                             // just make bot stay where it is if already close
                             // (stops them shifting around between the random spots)
-                            if (bot->GetDistance(IC_GATE_ATTACK_POS_HORDE) < 8.0f)  
+                            if (bot->GetDistance(IC_GATE_ATTACK_POS_HORDE) < 8.0f)
                                 pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
                             else
                                 pos.Set(IC_GATE_ATTACK_POS_HORDE.GetPositionX() + frand(-5.0f, +5.0f),
@@ -3213,7 +3213,7 @@ bool BGTactics::moveToObjective(bool ignoreDist)
         // sServerFacade->GetDistance2d(bot, pos.x, pos.y); bot->Say(out.str(), LANG_UNIVERSAL);
 
         // dont increase from 1.5 will cause bugs with horde capping AV towers
-        return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z, 1.5f);  
+        return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z, 1.5f);
     }
     return false;
 }
@@ -3549,14 +3549,14 @@ bool BGTactics::startNewPathFree(std::vector<BattleBotPath*> const& vPaths)
 
 /**
  * @brief Handles flag/base capturing gameplay in battlegrounds
- * 
+ *
  * This function manages the logic for capturing flags and bases in various battlegrounds.
  * It handles:
  * - Enemy detection and combat near objectives
  * - Coordination with friendly players who are capturing
  * - Different capture mechanics for each battleground type
  * - Proper positioning and movement
- * 
+ *
  * @param vPaths Vector of possible paths the bot can take
  * @param vFlagIds Vector of flag/base GameObjects that can be captured
  * @return true if handling a flag/base action, false otherwise
@@ -3687,7 +3687,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                 float y = bot->GetPositionY() + 5.0f * sin(angle);
                 MoveTo(bot->GetMapId(), x, y, bot->GetPositionZ());
             }
-            
+
             // Reset objective and take new path for defending
             resetObjective();
             if (!startNewPathBegin(vPaths))
@@ -3895,7 +3895,7 @@ bool BGTactics::protectFC()
         float fcY = teamFC->GetPositionY();
         float fcZ = teamFC->GetPositionZ();
         uint32 mapId = bot->GetMapId();
-        
+
         return MoveNear(mapId, fcX, fcY, fcZ, 5.0f, MovementPriority::MOVEMENT_NORMAL);
     }
 

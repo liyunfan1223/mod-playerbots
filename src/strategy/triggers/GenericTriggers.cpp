@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "GenericTriggers.h"
@@ -370,7 +370,7 @@ bool BoostTrigger::IsActive()
     return AI_VALUE(uint8, "balance") <= balance;
 }
 
-bool GenericBoostTrigger::IsActive() 
+bool GenericBoostTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
     if (target && target->ToPlayer())
@@ -378,15 +378,15 @@ bool GenericBoostTrigger::IsActive()
     return AI_VALUE(uint8, "balance") <= balance;
 }
 
-bool HealerShouldAttackTrigger::IsActive() 
+bool HealerShouldAttackTrigger::IsActive()
 {
     // nobody can help me
     if (botAI->GetNearGroupMemberCount(sPlayerbotAIConfig->sightDistance) <= 1)
         return true;
-    
+
     if (AI_VALUE2(uint8, "health", "party member to heal") < sPlayerbotAIConfig->almostFullHealth)
         return false;
-    
+
     // special check for resto druid (dont remove tree of life frequently)
     if (bot->GetAura(33891))
     {
@@ -679,10 +679,10 @@ Value<Unit*>* BuffOnMainTankTrigger::GetTargetValue() { return context->GetValue
 
 bool AmmoCountTrigger::IsActive()
 {
-    if (bot->GetUInt32Value(PLAYER_AMMO_ID) != 0)  
+    if (bot->GetUInt32Value(PLAYER_AMMO_ID) != 0)
         return ItemCountTrigger::IsActive();  // Ammo already equipped
 
-    if (botAI->FindAmmo())  
+    if (botAI->FindAmmo())
         return true;  // Found ammo in inventory but not equipped
 
     return ItemCountTrigger::IsActive();

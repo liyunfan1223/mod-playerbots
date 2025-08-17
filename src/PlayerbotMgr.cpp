@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotMgr.h"
@@ -1134,7 +1134,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         {
         	std::string g = genderArg;
         	std::transform(g.begin(), g.end(), g.begin(), ::tolower);
-        
+
         	if (g == "male" || g == "0")
         		gender = GENDER_MALE; // 0
         	else if (g == "female" || g == "1")
@@ -1157,7 +1157,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         {
             // If the user requested a specific gender, skip any character that doesn't match.
             if (gender != -1 && GetOfflinePlayerGender(guid) != gender)
-                continue;			
+                continue;
             if (botLoading.find(guid) != botLoading.end())
                 continue;
             if (ObjectAccessor::FindConnectedPlayer(guid))
@@ -1741,16 +1741,16 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     //     if (itr->second->IsBotAI())
     //         return reinterpret_cast<PlayerbotAI*>(itr->second);
     // }
-	// 
+	//
     // return nullptr;
-	
+
 	// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
     if (!player || !sPlayerbotAIConfig->enabled)
         return nullptr;
-    
+
     // First read the GUID into a local variable, but ONLY after the check!
     ObjectGuid guid = player->GetGUID();           // <-- OK here, we know that player != nullptr
-    { 
+    {
         std::shared_lock rlock(_aiMutex);
         auto it = _playerbotsAIMap.find(guid);
         if (it != _playerbotsAIMap.end() && it->second->IsBotAI())
@@ -1758,7 +1758,7 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     }
 
     // Transient state: NEVER break the master ⇄ bots relationship here.
-    if (!ObjectAccessor::FindPlayer(guid))    
+    if (!ObjectAccessor::FindPlayer(guid))
     {
         RemovePlayerbotAI(guid, /*removeMgrEntry=*/false);
     }

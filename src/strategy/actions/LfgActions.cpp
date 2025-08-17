@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "LfgActions.h"
@@ -151,7 +151,7 @@ bool LfgJoinAction::JoinLFG()
 
     // Set RbotAId Browser comment
     std::string const _gs = std::to_string(botAI->GetEquipGearScore(bot/*, false, false*/));
-    
+
     // JoinLfg is not threadsafe, so make packet and queue into session
     // sLFGMgr->JoinLfg(bot, roleMask, list, _gs);
 
@@ -180,7 +180,7 @@ bool LfgRoleCheckAction::Execute(Event event)
         // if (currentRoles == newRoles)
         //     return false;
 
-        
+
         WorldPacket* packet = new WorldPacket(CMSG_LFG_SET_ROLES);
         *packet << (uint8)newRoles;
         bot->GetSession()->QueuePacket(packet);
@@ -317,7 +317,7 @@ bool LfgJoinAction::isUseful()
 
     if (bot->GetLevel() < 15)
         return false;
-	
+
 	// don't use if active player master
     if (GET_PLAYERBOT_AI(bot)->IsRealPlayer())
         return false;

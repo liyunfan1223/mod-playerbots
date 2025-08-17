@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "MovementActions.h"
@@ -1040,7 +1040,7 @@ void MovementAction::UpdateMovementState()
 
     // Save current state for the next check
     wasMovementRestricted = isCurrentlyRestricted;
-    
+
     // Temporary speed increase in group
     // if (botAI->HasRealPlayerMaster()) {
     //     bot->SetSpeedRate(MOVE_RUN, 1.1f);
@@ -2412,7 +2412,7 @@ bool TankFaceAction::Execute(Event event)
 
     if (!AI_VALUE2(bool, "has aggro", "current target"))
         return false;
-    
+
     float averageAngle = AverageGroupAngle(target, true);
 
     if (averageAngle == 0.0f)
@@ -2435,7 +2435,7 @@ bool TankFaceAction::Execute(Event event)
     std::vector<Position> availablePos;
     float x, y, z;
     target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle1);
-    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
+    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
         x, y, z))
     {
         /// @todo: movement control now is a mess, prepare to rewrite
@@ -2448,7 +2448,7 @@ bool TankFaceAction::Execute(Event event)
         }
     }
     target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
-    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
+    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
         x, y, z))
     {
         std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");
@@ -2500,7 +2500,7 @@ bool RearFlankAction::Execute(Event event)
     {
         destination = &rightFlank;
     }
-    
+
     return MoveTo(bot->GetMapId(), destination->GetPositionX(), destination->GetPositionY(), destination->GetPositionZ(),
                   false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
 }
@@ -2666,7 +2666,7 @@ bool SetBehindTargetAction::Execute(Event event)
     std::vector<Position> availablePos;
     float x, y, z;
     target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle1);
-    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
+    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
         x, y, z))
     {
         /// @todo: movement control now is a mess, prepare to rewrite
@@ -2679,7 +2679,7 @@ bool SetBehindTargetAction::Execute(Event event)
         }
     }
     target->GetNearPoint(bot, x, y, z, 0.0f, dist, goodAngle2);
-    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 
+    if (bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
         x, y, z))
     {
         std::list<FleeInfo>& infoList = AI_VALUE(std::list<FleeInfo>&, "recently flee info");

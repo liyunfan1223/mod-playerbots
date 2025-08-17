@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "CasterShamanStrategy.h"
@@ -49,13 +49,13 @@ NextAction** CasterShamanStrategy::getDefaultActions()
 void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
-    
+
     // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell",
     // ACTION_NORMAL + 9), nullptr))); triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new
     // NextAction("flametongue weapon", 23.0f), nullptr)));
     triggers.push_back(new TriggerNode(
         "enough mana", NextAction::array(0, new NextAction("chain lightning", ACTION_DEFAULT + 0.1f), nullptr)));
-        
+
     triggers.push_back(new TriggerNode("main hand weapon no imbue",
                                        NextAction::array(0, new NextAction("flametongue weapon", 22.0f), nullptr)));
     // triggers.push_back(new TriggerNode("searing totem", NextAction::array(0, new NextAction("searing totem", 19.0f),
@@ -74,10 +74,10 @@ void CasterShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("fire elemental totem",
                                        NextAction::array(0, new NextAction("fire elemental totem", 32.0f), nullptr)));
-                                       
+
     triggers.push_back(
         new TriggerNode("medium mana", NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
-    
+
 
     triggers.push_back(new TriggerNode("enemy is close",
                                        NextAction::array(0, new NextAction("thunderstorm", ACTION_HIGH + 1), nullptr)));
@@ -90,7 +90,7 @@ void CasterAoeShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
         new TriggerNode("light aoe", NextAction::array(0, new NextAction("chain lightning", 25.0f), nullptr)));
-    
+
     triggers.push_back(
         new TriggerNode("medium aoe", NextAction::array(0, new NextAction("fire nova", 24.0f), nullptr)));
 }

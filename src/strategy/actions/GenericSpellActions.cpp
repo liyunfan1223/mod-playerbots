@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "GenericSpellActions.h"
@@ -299,14 +299,14 @@ bool CastVehicleSpellAction::Execute(Event event)
 bool UseTrinketAction::Execute(Event event)
 {
     Item* trinket1 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1);
-    
+
     if (trinket1 && UseTrinket(trinket1))
         return true;
 
     Item* trinket2 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2);
     if (trinket2 && UseTrinket(trinket2))
         return true;
-    
+
     return false;
 }
 
@@ -336,7 +336,7 @@ bool UseTrinketAction::UseTrinket(Item* item)
 
             if (!spellInfo || !spellInfo->IsPositive())
                 return false;
-            
+
             bool applyAura = false;
             for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
             {
@@ -346,12 +346,12 @@ bool UseTrinketAction::UseTrinket(Item* item)
                     break;
                 }
             }
-            
+
             if (!applyAura)
                 return false;
-            
+
             uint32 spellProcFlag = spellInfo->ProcFlags;
-            
+
             // Handle items with procflag "if you kill a target that grants honor or experience"
             // Bots will "learn" the trinket proc, so CanCastSpell() will be true
             // e.g. on Item https://www.wowhead.com/wotlk/item=44074/oracle-talisman-of-ablution leading to

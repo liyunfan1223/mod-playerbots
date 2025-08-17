@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "HolyPriestStrategy.h"
@@ -64,7 +64,7 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(
         new TriggerNode("group heal setting",
-                        NextAction::array(0, 
+                        NextAction::array(0,
                             new NextAction("prayer of mending on party", ACTION_MEDIUM_HEAL + 9),
                             new NextAction("circle of healing on party", ACTION_MEDIUM_HEAL + 8), nullptr)));
 
@@ -77,7 +77,7 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "party member critical health",
-        NextAction::array(0, 
+        NextAction::array(0,
                           new NextAction("guardian spirit on party", ACTION_CRITICAL_HEAL + 6),
                           new NextAction("power word: shield on party", ACTION_CRITICAL_HEAL + 5),
                           new NextAction("prayer of mending on party", ACTION_CRITICAL_HEAL + 3),

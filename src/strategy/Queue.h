@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #ifndef PLAYERBOT_QUEUE_H
@@ -12,7 +12,7 @@
 /**
  * @class Queue
  * @brief Manages a priority queue of actions for the playerbot system
- * 
+ *
  * This queue maintains a list of ActionBasket objects, each containing an action
  * and its relevance score. Actions with higher relevance scores are prioritized.
  */
@@ -25,7 +25,7 @@ public:
     /**
      * @brief Adds an action to the queue or updates existing action's relevance
      * @param action Pointer to the ActionBasket to be added
-     * 
+     *
      * If an action with the same name exists, updates its relevance if the new
      * relevance is higher, then deletes the new action. Otherwise, adds the new
      * action to the queue.
@@ -35,7 +35,7 @@ public:
     /**
      * @brief Removes and returns the action with highest relevance
      * @return Pointer to the highest relevance ActionNode, or nullptr if queue is empty
-     * 
+     *
      * Ownership of the returned ActionNode is transferred to the caller.
      * The associated ActionBasket is deleted.
      */
@@ -55,7 +55,7 @@ public:
 
     /**
      * @brief Removes and deletes expired actions from the queue
-     * 
+     *
      * Uses sPlayerbotAIConfig->expireActionTime to determine if actions have expired.
      * Both the ActionNode and ActionBasket are deleted for expired actions.
      */

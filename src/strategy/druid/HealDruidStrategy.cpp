@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "HealDruidStrategy.h"
@@ -82,7 +82,7 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "group heal setting",
-        NextAction::array(0, 
+        NextAction::array(0,
                           new NextAction("tree form", ACTION_MEDIUM_HEAL + 2.3f),
                           new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 2.2f),
                           new NextAction("rejuvenation on not full", ACTION_MEDIUM_HEAL + 2.1f),
@@ -90,7 +90,7 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(
         new TriggerNode("medium group heal setting",
-                        NextAction::array(0, 
+                        NextAction::array(0,
                         new NextAction("tree form", ACTION_CRITICAL_HEAL + 0.6f),
                         new NextAction("tranquility", ACTION_CRITICAL_HEAL + 0.5f), nullptr)));
 
@@ -107,7 +107,7 @@ void HealDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // MEDIUM
     triggers.push_back(
         new TriggerNode("party member medium health",
-                        NextAction::array(0, 
+                        NextAction::array(0,
                                           new NextAction("tree form", ACTION_MEDIUM_HEAL + 0.5f),
                                           new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 0.4f),
                                           new NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 0.3f),

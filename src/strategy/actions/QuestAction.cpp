@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "QuestAction.h"
@@ -278,7 +278,7 @@ bool QuestUpdateCompleteAction::Execute(Event event)
     {
         // std::map<std::string, std::string> placeholders;
         // placeholders["%quest_link"] = format;
-        
+
         // if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
         // {
             //     LOG_INFO("playerbots", "{} => Quest [ {} ] completed", bot->GetName(), qInfo->GetTitle());
@@ -338,7 +338,7 @@ bool QuestUpdateAddKillAction::Execute(Event event)
                 botAI->TellMasterNoFacing(out.str());
             }
         }
-    }    
+    }
     return false;
 }
 
@@ -373,7 +373,7 @@ bool QuestUpdateAddItemAction::Execute(Event event)
 
             BroadcastHelper::BroadcastQuestUpdateAddItem(botAI, bot, pair.first, availableItemsCount, requiredItemsCount, itemPrototype);
         }
-    } 
+    }
     return false;
 }
 
@@ -390,7 +390,7 @@ bool QuestItemPushResultAction::Execute(Event event)
 
     if (guid != bot->GetGUID())
         return false;
-    
+
     const ItemTemplate* proto = sObjectMgr->GetItemTemplate(itemEntry);
     if (!proto)
         return false;
@@ -406,13 +406,13 @@ bool QuestItemPushResultAction::Execute(Event event)
             return false;
 
         const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
-        
+
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
         {
             uint32 itemId = quest->RequiredItemId[i];
             if (!itemId)
                 continue;
-            
+
             int32 previousCount = itemCount - count;
             if (itemId == itemEntry && previousCount < quest->RequiredItemCount[i])
             {
