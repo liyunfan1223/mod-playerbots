@@ -48,7 +48,7 @@ namespace {
 
     struct StrictAnnounceState
     {
-        bool lastStrict  = false;
+        bool lastStrict = false;
         time_t lastAnnounce = 0;
     };
 
@@ -321,7 +321,20 @@ bool CastBlessingOfMightAction::Execute(Event event)
     if (!target)
         return false;
 
-    std::string castName = GetActualBlessingOfMight(target);
+    // Strict mode: Might only for relevant targets (no fallback to Wisdom)
+    if (StrictRoleModeEnabledFor(bot))
+    {
+        std::string desired = GetActualBlessingOfMight(target);
+        if (desired != "blessing of might")
+            return false; // Ignore irrelevant target (non-physique)
+    
+        std::string castName = "blessing of might";
+        auto RP = ai::chat::MakeGroupAnnouncer(bot);
+        castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+        return botAI->CastSpell(castName, target);
+    }
+    
+    std::string castName = GetActualBlessingOfMight(target);	
 
     auto RP = ai::chat::MakeGroupAnnouncer(bot);
 
@@ -372,8 +385,20 @@ bool CastBlessingOfWisdomAction::Execute(Event event)
     if (!target)
         return false;
 
-    std::string castName = GetActualBlessingOfWisdom(target);
-
+    // Strict mode: Wisdom only for mana users (no fallback to Might)
+    if (StrictRoleModeEnabledFor(bot))
+    {
+        std::string desired = GetActualBlessingOfWisdom(target);
+        if (desired != "blessing of wisdom")
+            return false; // Ignore irrelevant target (non-mana)
+    
+        std::string castName = "blessing of wisdom";
+        auto RP = ai::chat::MakeGroupAnnouncer(bot);
+        castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
+        return botAI->CastSpell(castName, target);
+    }
+    
+    std::string castName = GetActualBlessingOfWisdom(target);	
 
     auto RP = ai::chat::MakeGroupAnnouncer(bot);
 
