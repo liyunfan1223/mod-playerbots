@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <functional>
 
 #include "Common.h"
 
@@ -29,10 +30,10 @@ public:
 
     std::string const getQualifier() { return qualifier; }
 
-    static std::string const MultiQualify(std::vector<std::string> qualifiers, const std::string& separator,
+    static std::string const MultiQualify(const std::vector<std::string>& qualifiers, const std::string& separator,
                                           const std::string_view brackets = "{}");
-    static std::vector<std::string> getMultiQualifiers(std::string const qualifier1);
-    static int32 getMultiQualifier(std::string const qualifier1, uint32 pos);
+    static std::vector<std::string> getMultiQualifiers(const std::string& qualifier1);
+    static int32 getMultiQualifier(const std::string& qualifier1, uint32 pos);
 
 protected:
     std::string qualifier;
@@ -42,11 +43,11 @@ template <class T>
 class NamedObjectFactory
 {
 public:
-    typedef T* (*ObjectCreator)(PlayerbotAI* botAI);
+    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
     std::unordered_map<std::string, ObjectCreator> creators;
 
 public:
-    T* create(std::string name, PlayerbotAI* botAI)
+    virtual T* create(std::string name, PlayerbotAI* botAI)
     {
         size_t found = name.find("::");
         std::string qualifier;
@@ -59,11 +60,9 @@ public:
         if (creators.find(name) == creators.end())
             return nullptr;
 
-        ObjectCreator creator = creators[name];
-        if (!creator)
-            return nullptr;
+        ObjectCreator& creator = creators[name];
 
-        T* object = (*creator)(botAI);
+        T* object = creator(botAI);
         Qualified* q = dynamic_cast<Qualified*>(object);
         if (q && found != std::string::npos)
             q->Qualify(qualifier);
@@ -74,7 +73,7 @@ public:
     std::set<std::string> supports()
     {
         std::set<std::string> keys;
-        for (typename std::unordered_map<std::string, ObjectCreator>::iterator it = creators.begin();
+        for (typename std::unordered_map<std::string, ObjectCreator>::const_iterator it = creators.begin();
              it != creators.end(); it++)
             keys.insert(it->first);
 
@@ -93,7 +92,7 @@ public:
 
     virtual ~NamedObjectContext() { Clear(); }
 
-    T* create(std::string const name, PlayerbotAI* botAI)
+    virtual T* create(std::string name, PlayerbotAI* botAI) override
     {
         if (created.find(name) == created.end())
             return created[name] = NamedObjectFactory<T>::create(name, botAI);
@@ -103,7 +102,7 @@ public:
 
     void Clear()
     {
-        for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+        for (typename std::unordered_map<std::string, T*>::const_iterator i = created.begin(); i != created.end(); i++)
         {
             if (i->second)
                 delete i->second;
@@ -134,13 +133,13 @@ template <class T>
 class SharedNamedObjectContextList
 {
 public:
-    typedef T* (*ObjectCreator)(PlayerbotAI* botAI);
+    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
     std::unordered_map<std::string, ObjectCreator> creators;
     std::vector<NamedObjectContext<T>*> contexts;
 
     ~SharedNamedObjectContextList()
     {
-        for (typename std::vector<NamedObjectContext<T>*>::iterator i = contexts.begin(); i != contexts.end(); i++)
+        for (typename std::vector<NamedObjectContext<T>*>::const_iterator i = contexts.begin(); i != contexts.end(); i++)
             delete *i;
     }
 
@@ -158,7 +157,7 @@ template <class T>
 class NamedObjectContextList
 {
 public:
-    typedef T* (*ObjectCreator)(PlayerbotAI* botAI);
+    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
     const std::unordered_map<std::string, ObjectCreator>& creators;
     const std::vector<NamedObjectContext<T>*>& contexts;
     std::unordered_map<std::string, T*> created;
@@ -170,7 +169,7 @@ public:
 
     ~NamedObjectContextList()
     {
-        for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+        for (typename std::unordered_map<std::string, T*>::const_iterator i = created.begin(); i != created.end(); i++)
         {
             if (i->second)
                 delete i->second;
@@ -192,11 +191,9 @@ public:
         if (creators.find(name) == creators.end())
             return nullptr;
 
-        ObjectCreator creator = creators.at(name);
-        if (!creator)
-            return nullptr;
+        const ObjectCreator& creator = creators.at(name);
 
-        T* object = (*creator)(botAI);
+        T* object = creator(botAI);
         Qualified* q = dynamic_cast<Qualified*>(object);
         if (q && found != std::string::npos)
             q->Qualify(qualifier);
@@ -204,7 +201,7 @@ public:
         return object;
     }
 
-    T* GetContextObject(std::string const name, PlayerbotAI* botAI)
+    T* GetContextObject(const std::string& name, PlayerbotAI* botAI)
     {
         if (created.find(name) == created.end())
         {
@@ -214,7 +211,7 @@ public:
         return created[name];
     }
 
-    std::set<std::string> GetSiblings(std::string const name)
+    std::set<std::string> GetSiblings(const std::string& name)
     {
         for (auto i = contexts.begin(); i != contexts.end(); i++)
         {
@@ -240,7 +237,7 @@ public:
         {
             std::set<std::string> supported = (*i)->supports();
 
-            for (std::set<std::string>::iterator j = supported.begin(); j != supported.end(); j++)
+            for (std::set<std::string>::const_iterator j = supported.begin(); j != supported.end(); ++j)
                 result.insert(*j);
         }
 
@@ -250,7 +247,7 @@ public:
     std::set<std::string> GetCreated()
     {
         std::set<std::string> result;
-        for (typename std::unordered_map<std::string, T*>::iterator i = created.begin(); i != created.end(); i++)
+        for (typename std::unordered_map<std::string, T*>::const_iterator i = created.begin(); i != created.end(); i++)
         {
             result.insert(i->first);
         }
@@ -263,13 +260,13 @@ template <class T>
 class NamedObjectFactoryList
 {
 public:
-    typedef T* (*ObjectCreator)(PlayerbotAI* botAI);
+    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
     std::vector<NamedObjectFactory<T>*> factories;
     std::unordered_map<std::string, ObjectCreator> creators;
 
     virtual ~NamedObjectFactoryList()
     {
-        for (typename std::vector<NamedObjectFactory<T>*>::iterator i = factories.begin(); i != factories.end(); i++)
+        for (typename std::vector<NamedObjectFactory<T>*>::const_iterator i = factories.begin(); i != factories.end(); i++)
             delete *i;
     }
 
@@ -286,11 +283,9 @@ public:
         if (creators.find(name) == creators.end())
             return nullptr;
 
-        ObjectCreator creator = creators[name];
-        if (!creator)
-            return nullptr;
+        const ObjectCreator& creator = creators[name];
 
-        T* object = (*creator)(botAI);
+        T* object = creator(botAI);
         Qualified* q = dynamic_cast<Qualified*>(object);
         if (q && found != std::string::npos)
             q->Qualify(qualifier);
@@ -307,7 +302,7 @@ public:
         }
     }
 
-    T* GetContextObject(std::string const name, PlayerbotAI* botAI)
+    T* GetContextObject(const std::string& name, PlayerbotAI* botAI)
     {
         if (T* object = create(name, botAI))
             return object;
