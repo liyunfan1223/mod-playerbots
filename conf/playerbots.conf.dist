@@ -490,11 +490,6 @@ AiPlayerbot.RPWarningCooldown = 30
 # Default: OFF
 AiPlayerbot.Paladin.StrictRoleMode = OFF
 
-# Minimum group size to enable StrictRoleMode in manual ON workflows/scripts if needed.
-# (Kept for backward compatibility from PR1; ON now forces strict regardless of size by default.)
-# Default: 10
-AiPlayerbot.Paladin.StrictMinGroupSize = 10
-
 # --- AUTO mode thresholds ---
 # Strict mode turns ON automatically if BOTH thresholds are satisfied:
 #   - group size >= AutoStrictRaidSize
@@ -504,14 +499,23 @@ AiPlayerbot.Paladin.StrictMinGroupSize = 10
 AiPlayerbot.Paladin.AutoStrictRaidSize = 20
 AiPlayerbot.Paladin.AutoStrictMinPaladins = 3
 
-# Announce strict mode transitions (ON/OFF). Default: 1
+# Announce strict mode transitions (ON/OFF).
+# Default: 1 (ON)
 AiPlayerbot.Paladin.StrictNotify = 1
 
-# Who should receive the message: MASTER | GROUP. Default: MASTER
+# Who should receive the message: MASTER | GROUP.
+# Default: MASTER
 AiPlayerbot.Paladin.StrictNotifyScope = MASTER
 
-# Anti-spam cooldown in seconds for strict notifications. Default: 60
+# Anti-spam cooldown in seconds for strict notifications.
+# Default: 60
 AiPlayerbot.Paladin.StrictNotifyCooldown = 60
+
+# Paladin — Sanctuary policy on tanks
+# 1 = Sanctuary on tanks if learned (fallback Kings)
+# 0 = Kings has priority; Sanctuary is not used automatically
+# Default: 1
+AiPlayerbot.Paladin.SanctuaryPriority = 1
 
 #
 #
@@ -2113,3 +2117,8 @@ AiPlayerbot.SummonAtInnkeepersEnabled = 1
 # Buffs will be applied on PP, Sindragosa and Lich King
 
 AiPlayerbot.EnableICCBuffs = 1
+
+# Minimum group size to enable StrictRoleMode in manual ON workflows/scripts if needed.
+# (Kept for backward compatibility from PR1; ON now forces strict regardless of size by default.)
+# Default: 10
+AiPlayerbot.Paladin.StrictMinGroupSize = 10

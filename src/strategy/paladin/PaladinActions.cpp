@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <ctime>
+#include <cctype>
  
 #include "AiFactory.h"
 #include "Event.h"
@@ -22,66 +23,103 @@
 #include "Group.h"
 #include "ObjectAccessor.h"
 #include "Playerbots.h"
+#include "WorldPacket.h"
+
+// Color helpers for chat
+inline std::string CC(const char* hex, std::string const& s) { return std::string("|cff") + hex + s + "|r"; }
+inline std::string C_GREEN (std::string const& s){ return CC("00ff00", s); }
+inline std::string C_RED   (std::string const& s){ return CC("ff3333", s); }
+inline std::string C_YELLOW(std::string const& s){ return CC("ffff00", s); }
+inline std::string C_CYAN  (std::string const& s){ return CC("00ffff", s); }
+inline std::string C_GRAY  (std::string const& s){ return CC("9d9d9d", s); }
 
 namespace {
     enum class StrictSetting { Off = 0, On = 1, Auto = 2 };
 
     inline StrictSetting ReadStrictSetting()
     {
-        // Accept "OFF|ON|AUTO" (case-insensitive) OR "0|1|2"
-        static std::string value = sConfigMgr->GetOption<std::string>("AiPlayerbot.Paladin.StrictRoleMode", "OFF");
-        std::string v = value;
-        std::transform(v.begin(), v.end(), v.begin(), ::tolower);
-        if (v == "on" || v == "1")  return StrictSetting::On;
+        std::string v = sConfigMgr->GetOption<std::string>("AiPlayerbot.Paladin.StrictRoleMode", "OFF");
+        std::transform(v.begin(), v.end(), v.begin(),
+                       [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+        if (v == "on"   || v == "1") return StrictSetting::On;
         if (v == "auto" || v == "2") return StrictSetting::Auto;
         return StrictSetting::Off;
     }
 
     struct StrictAnnounceState
     {
-        bool lastStrict = false;
+        bool  lastStrict   = false;
         time_t lastAnnounce = 0;
     };
 
-	static std::unordered_map<uintptr_t /*groupPtr*/, StrictAnnounceState> s_strictByGroup;
+    // One entry per group (key = Group address)
+    static std::unordered_map<uintptr_t /*groupPtr*/, StrictAnnounceState> s_strictByGroup;
 
     inline void AnnounceStrict(Player* bot, bool strictOn, StrictSetting setting, uint32 size, uint32 pals)
     {
-        static bool notify = sConfigMgr->GetOption<bool>("AiPlayerbot.Paladin.StrictNotify", true);
+        // Hot-reload friendly
+        bool notify = sConfigMgr->GetOption<bool>("AiPlayerbot.Paladin.StrictNotify", true);
         if (!notify) return;
 
         Group* g = bot->GetGroup();
         if (!g) return;
 
-		uintptr_t key = reinterpret_cast<uintptr_t>(g);
+        uintptr_t key = reinterpret_cast<uintptr_t>(g);
         StrictAnnounceState& st = s_strictByGroup[key];
 
-        // Only announces when the state changes
+        // Only announces on state transition
         if (st.lastStrict == strictOn)
             return;
 
         time_t now = std::time(nullptr);
-        static int32 cd = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.StrictNotifyCooldown", 60);
+        int32 cd = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.StrictNotifyCooldown", 60);
         if (st.lastAnnounce && (now - st.lastAnnounce) < cd)
             return;
 
         std::string msg;
         switch (setting)
         {
-            case StrictSetting::On:   msg = strictOn ? "[Paladin AI] Strict Mode: ON (FORCED)" : "[Paladin AI] Strict Mode: OFF (FORCED override)"; break;
-            case StrictSetting::Off:  msg = "[Paladin AI] Strict Mode: OFF"; break; // Shouldn’t change dynamically, but safe
+            case StrictSetting::On:
+                msg = strictOn ? "[Paladin AI] Strict Mode: ON (FORCED)"
+                               : "[Paladin AI] Strict Mode: OFF (FORCED override)";
+                break;
+            case StrictSetting::Off:
+                msg = "[Paladin AI] Strict Mode: OFF";
+                break;
             case StrictSetting::Auto:
             default:
+            {
+                // Threshold values for the message
+                int32 reqSize = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictRaidSize", 20);
+                int32 reqPals = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictMinPaladins", 3);
+
+                // Colored announcements
+                std::string sizeCmp = (size >= static_cast<uint32>(reqSize)) ? C_GREEN("≥") : C_RED("<");
+                std::string palCmp  = (pals >= static_cast<uint32>(reqPals)) ? C_GREEN("≥") : C_RED("<");
+                std::string sizePart = C_YELLOW("size=")     + std::to_string(size) + sizeCmp + std::to_string(reqSize);
+                std::string palPart  = C_YELLOW("paladins=") + std::to_string(pals) + palCmp  + std::to_string(reqPals);
+
                 if (strictOn)
-                    msg = "[Paladin AI] Strict Mode: ON (AUTO; size≥" + std::to_string(sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictRaidSize", 20)) +
-                          ", paladins≥" + std::to_string(sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictMinPaladins", 3)) + ")";
+                {
+                    msg = C_CYAN("[Paladin AI] ") + "Strict Mode: " + C_GREEN("ON") +
+                          " " + C_GRAY("(AUTO)") + " " + sizePart + ", " + palPart;
+                }
                 else
-                    msg = "[Paladin AI] Strict Mode: OFF (AUTO; reverting to smart per-target)";
+                {
+                    msg = C_CYAN("[Paladin AI] ") + "Strict Mode: " + C_RED("OFF") +
+                          " " + C_GRAY("(AUTO)") + " " + sizePart + ", " + palPart +
+                          C_GRAY("; reverting to smart per-target");
+                }				
                 break;
+            }
         }
 
-        std::string scope = sConfigMgr->GetOption<std::string>("AiPlayerbot.Paladin.StrictNotifyScope", "MASTER");
-        if (!scope.empty() && (scope == "GROUP" || scope == "group"))
+        std::string scopeCfg = sConfigMgr->GetOption<std::string>("AiPlayerbot.Paladin.StrictNotifyScope", "MASTER");
+        std::string scope = scopeCfg;
+        std::transform(scope.begin(), scope.end(), scope.begin(),
+                       [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+
+        if (scope == "group")
         {
             ai::chat::MakeGroupAnnouncer(bot)(msg);
         }
@@ -91,7 +129,7 @@ namespace {
                 ai->TellMaster(msg);
         }
 
-        st.lastStrict = strictOn;
+        st.lastStrict   = strictOn;
         st.lastAnnounce = now;
     }
 
@@ -99,13 +137,13 @@ namespace {
     {
         if (!g) return 0;
         uint32 count = 0;
-    
+
         Group::MemberSlotList const& slots = g->GetMemberSlots();
         for (auto const& slot : slots)
         {
-            Player* p = ObjectAccessor::FindConnectedPlayer(slot.guid);
-            if (!p) continue;
-    
+			Player* p = ObjectAccessor::FindPlayer(slot.guid);
+			if (!p || !p->IsInWorld()) continue;
+
             if (p->getClass() == CLASS_PALADIN)
                 ++count;
         }
@@ -117,38 +155,45 @@ namespace {
         Group* g = bot->GetGroup();
         if (!g)
             return false;
-		
-        int32 raidSizeAuto    = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictRaidSize", 20);
-        int32 minPalsAuto     = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictMinPaladins", 3);
-        int32 minStrictManual = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.StrictMinGroupSize", 10);
-		
+
+        uint32 palCount = CountPaladinsInGroup(g);
+        uint32 size = 0;
+        for (auto const& slot : g->GetMemberSlots())
+        {
+            Player* p = ObjectAccessor::FindPlayer(slot.guid);
+            if (p && p->IsInWorld())
+                ++size;
+        }
+
         switch (ReadStrictSetting())
         {
             case StrictSetting::On:
-            {
-                bool on = true;
-                AnnounceStrict(bot, on, StrictSetting::On, g->GetMembersCount(), CountPaladinsInGroup(g));
-                return on;
-            }
-			
+                AnnounceStrict(bot, /*on=*/true,  StrictSetting::On,  size, palCount);
+                return true;
+
             case StrictSetting::Off:
-            {
-                bool on = false;
-                AnnounceStrict(bot, on, StrictSetting::Off, g->GetMembersCount(), CountPaladinsInGroup(g));
-                return on;
-            }
+                AnnounceStrict(bot, /*on=*/false, StrictSetting::Off, size, palCount);
+                return false;
 
             case StrictSetting::Auto:
             default:
             {
-                uint32 size = g->GetMembersCount();
-                uint32 palCount = CountPaladinsInGroup(g);
-                bool on = (size >= static_cast<uint32>(raidSizeAuto)) &&
-                          (palCount >= static_cast<uint32>(minPalsAuto));
+                int32 reqSize = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictRaidSize", 20);
+                int32 reqPals = sConfigMgr->GetOption<int32>("AiPlayerbot.Paladin.AutoStrictMinPaladins", 3);
+
+                bool on = (size >= static_cast<uint32>(reqSize)) &&
+                          (palCount >= static_cast<uint32>(reqPals));
+
                 AnnounceStrict(bot, on, StrictSetting::Auto, size, palCount);
                 return on;
             }
         }
+    }
+
+    inline bool SanctuaryPriorityOn()
+    {
+        // 1 = Priority Sanctuary on tanks (fallback Kings), 0 = Priority Kings
+        return sConfigMgr->GetOption<bool>("AiPlayerbot.Paladin.SanctuaryPriority", true);
     }
 }
 	
@@ -233,19 +278,35 @@ inline std::string const GetActualBlessingOfWisdom(Unit* target)
 
 inline std::string const GetActualBlessingOfSanctuary(Unit* target, Player* bot)
 {
-    Player* targetPlayer = target->ToPlayer();
+    // Policy: if Kings is prioritized, this action does nothing
+    if (!SanctuaryPriorityOn())
+        return "";
 
-    if (!targetPlayer)
+    // Paladin doesn’t have Sanctuary we do nothing
+    if (!bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY))
+        return "";
+
+    // Do not buff non-players (pets/vehicles)
+    Player* tp = target->ToPlayer();
+    if (!tp)
+        return "";
+
+    // If the target is the Main Tank, apply Sanctuary
+    if (auto* ai = GET_PLAYERBOT_AI(bot))
     {
-        return "blessing of sanctuary";
+        if (Unit* mt = ai->GetAiObjectContext()->GetValue<Unit*>("main tank")->Get())
+        {
+            if (mt == target)
+                return "blessing of sanctuary";
+        }
     }
 
-    if (targetPlayer->HasTankSpec() && bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY))
-    {
+    // Otherwise, standard logic: only on tanks
+    if (tp->HasTankSpec())
         return "blessing of sanctuary";
-    }
 
-    return "blessing of kings";
+    // Non-tank -> do nothing (Kings will be handled by the Kings action)
+    return "";
 }
 
 Value<Unit*>* CastBlessingOnPartyAction::GetTargetValue()
@@ -288,7 +349,7 @@ bool CastBlessingOfMightOnPartyAction::Execute(Event event)
     {
         std::string desired = GetActualBlessingOfMight(target);
         if (desired != "blessing of might")
-            return false; // on ignore la cible non-pertinente
+            return false; // Ignore irrelevant target
 
         std::string castName = "blessing of might";
         auto RP = ai::chat::MakeGroupAnnouncer(bot);
@@ -359,9 +420,19 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
 
 Value<Unit*>* CastBlessingOfSanctuaryOnPartyAction::GetTargetValue()
 {
-	return context->GetValue<Unit*>(
-    "party member without aura",
-    "blessing of sanctuary,greater blessing of sanctuary,blessing of kings,greater blessing of kings"
+    if (SanctuaryPriorityOn())
+    {
+        // Allow the target even if it has Kings, as long as it does NOT have Sanctuary
+        return context->GetValue<Unit*>(
+            "party member without aura",
+            "blessing of sanctuary,greater blessing of sanctuary"
+        );
+    }
+
+    // // Only target if it has NEITHER Kings NOR Sanctuary
+    return context->GetValue<Unit*>(
+        "party member without aura",
+        "blessing of sanctuary,greater blessing of sanctuary,blessing of kings,greater blessing of kings"
     );
 }
 
@@ -371,14 +442,36 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
-    std::string castName = GetActualBlessingOfSanctuary(target, bot); // "sanctuary" ou "blessing of kings"
+    // Focus MT when Sanctuary is prioritized
+    if (SanctuaryPriorityOn())
+    {
+        Unit* mainTank = AI_VALUE(Unit*, "main tank"); // PartyMemberMainTankValue
+        if (mainTank)
+        {
+            bool hasSanct =
+                botAI->HasAura("blessing of sanctuary", mainTank, false, true, -1, true) ||
+                botAI->HasAura("greater blessing of sanctuary", mainTank, false, true, -1, true);
+            if (!hasSanct)
+                target = mainTank; // Force target = MT without Sanctuary
+        }
+    }
 
+    std::string castName = GetActualBlessingOfSanctuary(target, bot);
+    if (castName.empty())
+        return false; // Strict action: if not a tank / spell unavailable we do nothing
 
     auto RP = ai::chat::MakeGroupAnnouncer(bot);
-
-    // Upgrade to Greater if relevant, otherwise single (with RP if reagents missing)
     castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
     return botAI->CastSpell(castName, target);
+}
+
+Value<Unit*>* CastBlessingOfKingsOnPartyAction::GetTargetValue()
+{
+    // Never overwrite Sanctuary: if the target already has Sanctuary (single or greater), skip it
+    return context->GetValue<Unit*>(
+        "party member without aura",
+        "blessing of kings,greater blessing of kings,blessing of sanctuary,greater blessing of sanctuary"
+    );
 }
 
 bool CastSealSpellAction::isUseful() { return AI_VALUE2(bool, "combat", "self target"); }

@@ -141,6 +141,7 @@ public:
     CastBlessingOfKingsOnPartyAction(PlayerbotAI* botAI) : CastBlessingOnPartyAction(botAI, "blessing of kings") {}
 
     std::string const getName() override { return "blessing of kings on party"; }
+    Value<Unit*>* GetTargetValue() override; // added for Sanctuary priority
 };
 
 class CastBlessingOfSanctuaryAction : public CastBuffSpellAction
