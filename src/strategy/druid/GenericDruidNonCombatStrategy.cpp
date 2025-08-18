@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "GenericDruidNonCombatStrategy.h"
@@ -132,7 +132,7 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
 
     triggers.push_back(
         new TriggerNode("party member low health",
-                        NextAction::array(0, 
+                        NextAction::array(0,
                                           new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 5),
                                           new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 4),
                                           new NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 3),
@@ -160,7 +160,7 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
                        new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 6),
                        new NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 5),
                        nullptr)));
-    triggers.push_back(new TriggerNode("party member low health", NextAction::array(0, 
+    triggers.push_back(new TriggerNode("party member low health", NextAction::array(0,
                        new NextAction("wild growth on party", ACTION_MEDIUM_HEAL + 5),
                        new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 4),
                        new NextAction("rejuvenation on party", ACTION_MEDIUM_HEAL + 3),
@@ -174,8 +174,8 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
                        new NextAction("wild growth on party", ACTION_LIGHT_HEAL + 3),
                        new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 2),
                        nullptr)));
-    triggers.push_back(new TriggerNode("party member remove curse", NextAction::array(0, 
-                       new NextAction("remove curse on party", ACTION_DISPEL + 7), 
+    triggers.push_back(new TriggerNode("party member remove curse", NextAction::array(0,
+                       new NextAction("remove curse on party", ACTION_DISPEL + 7),
                        nullptr)));
 
     int specTab = AiFactory::GetPlayerSpecTab(botAI->GetBot());
@@ -196,12 +196,12 @@ void GenericDruidBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     NonCombatStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("mark of the wild on party", NextAction::array(0,
-                       new NextAction("mark of the wild on party", 13.0f), 
+                       new NextAction("mark of the wild on party", 13.0f),
                        nullptr)));
-    triggers.push_back(new TriggerNode("thorns on main tank", NextAction::array(0, 
-                       new NextAction("thorns on main tank", 11.0f), 
+    triggers.push_back(new TriggerNode("thorns on main tank", NextAction::array(0,
+                       new NextAction("thorns on main tank", 11.0f),
                        nullptr)));
-    triggers.push_back(new TriggerNode("thorns", NextAction::array(0, 
-                       new NextAction("thorns", 10.0f), 
+    triggers.push_back(new TriggerNode("thorns", NextAction::array(0,
+                       new NextAction("thorns", 10.0f),
                        nullptr)));
 }

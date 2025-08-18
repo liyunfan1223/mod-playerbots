@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "AfflictionWarlockStrategy.h"
@@ -73,7 +73,7 @@ void AfflictionWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
     // Drain Soul as execute if target is low HP // Shadow Trance for free casts
     triggers.push_back(new TriggerNode("shadow trance", NextAction::array(0, new NextAction("shadow bolt", 16.0f), nullptr)));
     triggers.push_back(new TriggerNode("target critical health", NextAction::array(0, new NextAction("drain soul", 15.5f), nullptr)));
-    
+
     // Life Tap glyph buff, and Life Tap as filler
     triggers.push_back(new TriggerNode("life tap glyph buff", NextAction::array(0, new NextAction("life tap", 29.5f), nullptr)));
     triggers.push_back(new TriggerNode("life tap", NextAction::array(0, new NextAction("life tap", 5.1f), nullptr)));

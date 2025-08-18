@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "LootAction.h"
@@ -19,7 +19,7 @@
 #include "BroadcastHelper.h"
 
 bool LootAction::Execute(Event /*event*/)
-{   
+{
     if (!AI_VALUE(bool, "has available loot"))
         return false;
 
@@ -156,7 +156,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
         return false;
-    
+
     return botAI->CastSpell(spellId, bot);
 }
 

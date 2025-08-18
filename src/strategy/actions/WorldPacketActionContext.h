@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_WORLDPACKETACTIONCONTEXT_H
@@ -86,7 +86,7 @@ public:
         creators["quest update complete"] = &WorldPacketActionContext::quest_update_complete;
         creators["turn in query quest"] = &WorldPacketActionContext::turn_in_query_quest;
         creators["quest item push result"] = &WorldPacketActionContext::quest_item_push_result;
-        
+
         creators["party command"] = &WorldPacketActionContext::party_command;
         creators["tell cast failed"] = &WorldPacketActionContext::tell_cast_failed;
         creators["accept duel"] = &WorldPacketActionContext::accept_duel;

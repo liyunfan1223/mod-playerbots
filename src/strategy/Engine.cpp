@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "Engine.h"
@@ -88,7 +88,7 @@ Engine::~Engine(void)
 void Engine::Reset()
 {
     strategyTypeMask = 0;
-    
+
     ActionNode* action = nullptr;
 
     while ((action = queue.Pop()) != nullptr)
@@ -154,7 +154,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
     uint32 iterations = 0;
     uint32 iterationsPerTick = queue.Size() * (minimal ? 2 : sPlayerbotAIConfig->iterationsPerTick);
-    
+
     while (++iterations <= iterationsPerTick)
     {
         basket = queue.Peek();

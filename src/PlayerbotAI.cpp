@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotAI.h"
@@ -1050,7 +1050,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                     default:
                         return;
                 }
-                
+
                 if (chanName == "World")
                     return;
 
@@ -3975,7 +3975,7 @@ bool PlayerbotAI::HasRealPlayerMaster()
 //         PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(master);
 //         return !masterBotAI || masterBotAI->IsRealPlayer();
 //     }
-// 
+//
 //     return false;
 
      // Removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
