@@ -133,9 +133,11 @@ public:
         creators["calc"] = &ChatTriggerContext::calc;
         creators["qi"] = &ChatTriggerContext::qi;
         creators["wipe"] = &ChatTriggerContext::wipe;
-        creators["pet"] = &ChatTriggerContext::pet;
+        creators["tame"] = &ChatTriggerContext::tame;
         creators["glyphs"] = &ChatTriggerContext::glyphs; // Added for custom Glyphs
         creators["glyph equip"] = &ChatTriggerContext::glyph_equip; // Added for custom Glyphs
+        creators["pet"] = &ChatTriggerContext::pet;
+        creators["pet attack"] = &ChatTriggerContext::pet_attack;
         creators["roll"] = &ChatTriggerContext::roll_action;
     }
 
@@ -249,9 +251,11 @@ private:
     static Trigger* calc(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "calc"); }
     static Trigger* qi(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "qi"); }
     static Trigger* wipe(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "wipe"); }
-    static Trigger* pet(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "pet"); }
+    static Trigger* tame(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "tame"); }
     static Trigger* glyphs(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "glyphs"); } // Added for custom Glyphs
     static Trigger* glyph_equip(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "glyph equip"); } // Added for custom Glyphs
+    static Trigger* pet(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "pet"); }
+    static Trigger* pet_attack(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "pet attack"); }
     static Trigger* roll_action(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "roll"); }
 };
 

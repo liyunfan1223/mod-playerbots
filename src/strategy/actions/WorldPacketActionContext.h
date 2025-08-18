@@ -41,6 +41,7 @@
 #include "UseMeetingStoneAction.h"
 #include "NamedObjectContext.h"
 #include "ReleaseSpiritAction.h"
+#include "PetAction.h"
 
 class PlayerbotAI;
 
@@ -70,6 +71,7 @@ public:
         creators["trade status extended"] = &WorldPacketActionContext::trade_status_extended;
         creators["store loot"] = &WorldPacketActionContext::store_loot;
         creators["self resurrect"] = &WorldPacketActionContext::self_resurrect;
+        creators["pet"] = &WorldPacketActionContext::pet;
 
         // quest
         creators["talk to quest giver"] = &WorldPacketActionContext::turn_in_quest;
@@ -139,6 +141,7 @@ private:
     static Action* tell_not_enough_reputation(PlayerbotAI* botAI) { return new TellMasterAction(botAI, "Not enough reputation"); }
     static Action* tell_cannot_equip(PlayerbotAI* botAI) { return new InventoryChangeFailureAction(botAI); }
     static Action* self_resurrect(PlayerbotAI* botAI) { return new SelfResurrectAction(botAI); }
+    static Action* pet(PlayerbotAI* botAI) { return new PetAction(botAI); }
 
     // quest
     static Action* quest_update_add_kill(PlayerbotAI* ai) { return new QuestUpdateAddKillAction(ai); }
