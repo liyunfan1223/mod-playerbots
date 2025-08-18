@@ -15,10 +15,19 @@ void DuelStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("duel requested", NextAction::array(0, new NextAction("accept duel", relevance), nullptr)));
     triggers.push_back(
         new TriggerNode("no attackers", NextAction::array(0, new NextAction("attack duel opponent", 70.0f), nullptr)));
+    triggers.push_back(
+        new TriggerNode("duel opponent dead", NextAction::array(0, new NextAction("stop duel", relevance), nullptr)));
 }
 
 DuelStrategy::DuelStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI) {}
 
-void StartDuelStrategy::InitTriggers(std::vector<TriggerNode*>& triggers) {}
+void StartDuelStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("rpg duel",
+        NextAction::array(0, new NextAction("start duel", 1.0f), nullptr)));
+
+    triggers.push_back(new TriggerNode("should duel",
+        NextAction::array(0, new NextAction("start duel", 5.0f), nullptr)));
+}
 
 StartDuelStrategy::StartDuelStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
