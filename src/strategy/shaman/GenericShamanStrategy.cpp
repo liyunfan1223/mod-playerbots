@@ -108,6 +108,7 @@ void GenericShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("wind shear on enemy healer", NextAction::array(0, new NextAction("wind shear on enemy healer", 23.0f), nullptr)));
     triggers.push_back(new TriggerNode("purge", NextAction::array(0, new NextAction("purge", ACTION_DISPEL), nullptr)));
     triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("mana potion", ACTION_DISPEL), nullptr)));
+    triggers.push_back(new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 65.0f), nullptr))); 
 }
 
 void ShamanCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -144,6 +145,7 @@ void ShamanBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void ShamanAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
+
     Player* bot = botAI->GetBot();
     int tab = AiFactory::GetPlayerSpecTab(bot);
 

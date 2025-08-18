@@ -699,6 +699,16 @@ AiPlayerbot.AutoUpgradeEquip = 1
 # Default: 0 (disabled)
 AiPlayerbot.HunterWolfPet = 0
 
+# Default pet stance when a bot summons a pet
+# 0 = Passive, 1 = Defensive, 2 = Aggressive
+# Default: 1 (Defensive)
+AiPlayerbot.DefaultPetStance = 1
+
+# Enable/disable debug messages about pet commands
+# 0 = Disabled, 1 = Enabled
+# Default = 0 (disabled)
+AiPlayerbot.PetChatCommandDebug = 0
+
 # Prohibit hunter bots from creating pets with any family ID listed below in ExcludedHunterPetFamilies
 # See the creature_family database table for all pet families by ID (note: ID for spiders is 3)
 AiPlayerbot.ExcludedHunterPetFamilies = ""

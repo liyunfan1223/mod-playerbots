@@ -115,7 +115,9 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("water breathing on party", NextAction::array(0, new NextAction("water breathing on party", 11.0f), nullptr)));
     triggers.push_back(new TriggerNode("water walking on party", NextAction::array(0, new NextAction("water walking on party", 11.0f), nullptr)));
 
-}
+    // Pet Triggers
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 65.0f), nullptr)));
 
 void ShamanNonCombatStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
