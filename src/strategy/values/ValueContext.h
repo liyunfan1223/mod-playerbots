@@ -556,7 +556,7 @@ private:
     static UntypedValue* last_flee_timestamp(PlayerbotAI* ai) { return new LastFleeTimestampValue(ai); }
     static UntypedValue* recently_flee_info(PlayerbotAI* ai) { return new RecentlyFleeInfo(ai); }
 	// -------------------------------------------------------
-    // Flag for cutom glyphs : true when /w bot glyph equip …
+    // Flag for cutom glyphs : true when /w bot glyph equip
     // -------------------------------------------------------
     static UntypedValue* custom_glyphs(PlayerbotAI* ai)
     {
