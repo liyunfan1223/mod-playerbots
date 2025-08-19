@@ -9,7 +9,7 @@
 #include "WorldSession.h"
 #include "DuelTargetValue.h"
 
-StartDuelAction::StartDuelAction(PlayerbotAI* botAI) : Action(botAI, "start duel") {}
+#define SPELL_DUEL 7266
 
 bool StartDuelAction::Execute(Event event)
 {
@@ -39,7 +39,7 @@ bool StartDuelAction::Execute(Event event)
     bot->CastStop();
 
     // Safest method: Cast the spell "Duel" (ID 7266)
-    bot->CastSpell(target, 7266, true);
+    bot->CastSpell(target, SPELL_DUEL, true);
 
     botAI->TellMaster("I challenge " + target->GetName() + " to a duel!");
     return true;
@@ -48,6 +48,9 @@ bool StartDuelAction::Execute(Event event)
 bool StartDuelAction::isUseful()
 {
     if (!bot->IsAlive() || bot->IsInCombat() || bot->duel)
+        return false;
+
+    if (bot->InBattleground() || bot->InArena())
         return false;
 
     return true;
