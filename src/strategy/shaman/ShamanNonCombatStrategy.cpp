@@ -68,19 +68,19 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     // Healing/Resurrect Triggers
     triggers.push_back(new TriggerNode("party member dead", NextAction::array(0, new NextAction("ancestral spirit", ACTION_CRITICAL_HEAL + 10), nullptr)));
-    triggers.push_back(new TriggerNode("party member critical health",
-                                    NextAction::array(0, new NextAction("riptide on party", 31.0f),
-                                                         new NextAction("healing wave on party", 30.0f), NULL)));
-    triggers.push_back(new TriggerNode("party member low health",
-                                    NextAction::array(0, new NextAction("riptide on party", 29.0f),
-                                                         new NextAction("healing wave on party", 28.0f), NULL)));
-    triggers.push_back(new TriggerNode("party member medium health",
-                                    NextAction::array(0, new NextAction("riptide on party", 27.0f),
-                                                         new NextAction("healing wave on party", 26.0f), NULL)));
-    triggers.push_back(new TriggerNode("party member almost full health",
-                                    NextAction::array(0, new NextAction("riptide on party", 25.0f),
-                                                         new NextAction("lesser healing wave on party", 24.0f), NULL)));
-    triggers.push_back(new TriggerNode("group heal setting", NextAction::array(0, new NextAction("chain heal on party", 27.0f), NULL)));
+    triggers.push_back(new TriggerNode("party member critical health", NextAction::array(0,
+                                                                   new NextAction("riptide on party", 31.0f),
+                                                                   new NextAction("healing wave on party", 30.0f), NULL)));
+    triggers.push_back(new TriggerNode("party member low health",NextAction::array(0,
+                                                             new NextAction("riptide on party", 29.0f),
+                                                             new NextAction("healing wave on party", 28.0f), NULL)));
+    triggers.push_back(new TriggerNode("party member medium health",NextAction::array(0,
+                                                                new NextAction("riptide on party", 27.0f),
+                                                                new NextAction("healing wave on party", 26.0f), NULL)));
+    triggers.push_back(new TriggerNode("party member almost full health",NextAction::array(0,
+                                                                     new NextAction("riptide on party", 25.0f),
+                                                                     new NextAction("lesser healing wave on party", 24.0f), NULL)));
+    triggers.push_back(new TriggerNode("group heal setting",NextAction::array(0, new NextAction("chain heal on party", 27.0f), NULL)));
 
     // Cure Triggers
     triggers.push_back(new TriggerNode("cure poison", NextAction::array(0, new NextAction("cure poison", 21.0f), nullptr)));
@@ -118,6 +118,7 @@ void ShamanNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // Pet Triggers
     triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 65.0f), nullptr)));
+}
 
 void ShamanNonCombatStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
