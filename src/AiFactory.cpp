@@ -641,7 +641,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
         Player* master = facade->GetMaster();
 
         // configurable chance to start duel
-        if (frand(0.0f, 1.0f) < sPlayerbotAIConfig.randomBotDuelChance)
+        if (frand(0.0f, 1.0f) < sPlayerbotAIConfig->randomBotDuelChance)
         {
             nonCombatEngine->addStrategy("start duel", false);
         }
