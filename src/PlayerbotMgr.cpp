@@ -1745,53 +1745,36 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
     // return nullptr;
 	
 	// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-    if (!player || !sPlayerbotAIConfig->enabled)
+    if (!sPlayerbotAIConfig->enabled || !player)
         return nullptr;
-    
-    // First read the GUID into a local variable, but ONLY after the check!
-    ObjectGuid guid = player->GetGUID();           // <-- OK here, we know that player != nullptr
-    { 
-        std::shared_lock rlock(_aiMutex);
-        auto it = _playerbotsAIMap.find(guid);
-        if (it != _playerbotsAIMap.end() && it->second->IsBotAI())
-            return static_cast<PlayerbotAI*>(it->second);
+
+    {   // protected read
+        std::shared_lock lock(_aiMutex);
+        auto itr = _playerbotsAIMap.find(player->GetGUID());
+        if (itr != _playerbotsAIMap.end() && itr->second->IsBotAI())
+            return reinterpret_cast<PlayerbotAI*>(itr->second);
     }
 
-    // Transient state: NEVER break the master ⇄ bots relationship here.
-    if (!ObjectAccessor::FindPlayer(guid))    
-    {
-        RemovePlayerbotAI(guid, /*removeMgrEntry=*/false);
-    }
+    // does the player still exist?
+    if (!ObjectAccessor::FindPlayer(player->GetGUID()))
+        RemovePlayerbotAI(player->GetGUID());          // orphaned AI -> cleanup
+
     return nullptr;
 }
 
 // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-PlayerbotAI* PlayerbotsMgr::GetPlayerbotAIByGuid(ObjectGuid guid)
+void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid)
 {
-    if (!sPlayerbotAIConfig->enabled)
-        return nullptr;
+    std::unique_lock lock(_aiMutex);
 
-    std::shared_lock rlock(_aiMutex);
-    auto it = _playerbotsAIMap.find(guid);
-    if (it != _playerbotsAIMap.end() && it->second->IsBotAI())
-        return static_cast<PlayerbotAI*>(it->second);
-    return nullptr;
-}
-
-void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry /*= true*/)
-{
-    std::unique_lock wlock(_aiMutex);
-
-    if (auto it = _playerbotsAIMap.find(guid); it != _playerbotsAIMap.end())
+    if (auto itr = _playerbotsAIMap.find(guid); itr != _playerbotsAIMap.end())
     {
-        delete it->second;
-        _playerbotsAIMap.erase(it);
-        LOG_DEBUG("playerbots", "Removed stale AI for GUID {}",
-                  static_cast<uint64>(guid.GetRawValue()));
+        delete itr->second;
+        _playerbotsAIMap.erase(itr);
+        LOG_DEBUG("playerbots", "Removed stale AI entry for GUID {}", static_cast<uint64>(guid.GetRawValue()));
     }
 
-        if (removeMgrEntry)
-       _playerbotsMgrMap.erase(guid);  // we NO longer touch the relation in a "soft" purge
+    _playerbotsMgrMap.erase(guid);
 }
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
