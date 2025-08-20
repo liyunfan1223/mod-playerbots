@@ -38,8 +38,6 @@
 #include "WorldSessionMgr.h"
 #include "DatabaseEnv.h"        // Added for gender choice
 #include <algorithm>            // Added for gender choice
-#include "Log.h" // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-#include <shared_mutex> // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
 
 class BotInitGuard
 {
@@ -1728,53 +1726,21 @@ void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid, bool is_AI)
 
 PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
-    // if (!(sPlayerbotAIConfig->enabled) || !player)
-    // {
+    if (!(sPlayerbotAIConfig->enabled) || !player)
+    {
+        return nullptr;
+    }
+    // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
     //     return nullptr;
     // }
-    // // if (player->GetSession()->isLogingOut() || player->IsDuringRemoveFromWorld()) {
-    // //     return nullptr;
-    // // }
-    // auto itr = _playerbotsAIMap.find(player->GetGUID());
-    // if (itr != _playerbotsAIMap.end())
-    // {
-    //     if (itr->second->IsBotAI())
-    //         return reinterpret_cast<PlayerbotAI*>(itr->second);
-    // }
-	// 
-    // return nullptr;
-	
-	// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-    if (!sPlayerbotAIConfig->enabled || !player)
-        return nullptr;
-
-    {   // protected read
-        std::shared_lock lock(_aiMutex);
-        auto itr = _playerbotsAIMap.find(player->GetGUID());
-        if (itr != _playerbotsAIMap.end() && itr->second->IsBotAI())
+    auto itr = _playerbotsAIMap.find(player->GetGUID());
+    if (itr != _playerbotsAIMap.end())
+    {
+        if (itr->second->IsBotAI())
             return reinterpret_cast<PlayerbotAI*>(itr->second);
     }
 
-    // does the player still exist?
-    if (!ObjectAccessor::FindPlayer(player->GetGUID()))
-        RemovePlayerbotAI(player->GetGUID());          // orphaned AI -> cleanup
-
     return nullptr;
-}
-
-// removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-void PlayerbotsMgr::RemovePlayerbotAI(ObjectGuid const& guid)
-{
-    std::unique_lock lock(_aiMutex);
-
-    if (auto itr = _playerbotsAIMap.find(guid); itr != _playerbotsAIMap.end())
-    {
-        delete itr->second;
-        _playerbotsAIMap.erase(itr);
-        LOG_DEBUG("playerbots", "Removed stale AI entry for GUID {}", static_cast<uint64>(guid.GetRawValue()));
-    }
-
-    _playerbotsMgrMap.erase(guid);
 }
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)

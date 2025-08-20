@@ -377,10 +377,6 @@ public:
 
     void OnPlayerbotLogout(Player* player) override
     {
-        // immediate purge of the bot's AI upon disconnection
-        if (player && player->GetSession()->IsBot())
-            sPlayerbotsMgr->RemovePlayerbotAI(player->GetGUID()); // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-    
         if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
         {
             PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
