@@ -157,8 +157,12 @@ bool PlayerbotAIConfig::Initialize()
         sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761"),
         randomBotQuestIds);
 
-    LoadSet<std::set<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.DisallowedGameObjects", "176213,17155"),
-                              disallowedGameObjects);
+    LoadSet<std::set<uint32>>(
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.DisallowedGameObjects",
+                                           "176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,"
+                                           "179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,"
+                                           "165739,165738,175245,175970,176325,176327,123329"),
+        disallowedGameObjects);
     botAutologin = sConfigMgr->GetOption<bool>("AiPlayerbot.BotAutologin", false);
     randomBotAutologin = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotAutologin", true);
     minRandomBots = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBots", 50);
@@ -198,7 +202,7 @@ bool PlayerbotAIConfig::Initialize()
                                              "575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,"
                                              "531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"),
         restrictedHealerDPSMaps);
-	
+
 	//////////////////////////// ICC
 
 	EnableICCBuffs = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableICCBuffs", true);
