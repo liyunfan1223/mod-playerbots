@@ -360,7 +360,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
             // Cap eligible bots by maxRandomBots
             uint32 effectiveMaxBots = std::min(eligibleBotCount, sPlayerbotAIConfig->maxRandomBots);
 
-            LOG_INFO("playerbots", "Level filter active: {} eligible bots found in range {}-{}. Effective maximum: {} bots",
+            LOG_INFO("playerbots", "Level filter active: {} eligible bots found in range {}-{}. Effective maximum: {} bots.",
                     eligibleBotCount, sPlayerbotAIConfig->randomBotMinLoginLevel,
                     sPlayerbotAIConfig->randomBotMaxLoginLevel, effectiveMaxBots);
 
@@ -382,8 +382,11 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         }
         else
         {
-            LOG_ERROR("playerbots", "No eligible bots found with level filter {}-{}",
+            LOG_ERROR("playerbots", "No eligible bots found with level filter {}-{}. Change the level range.",
                     sPlayerbotAIConfig->randomBotMinLoginLevel, sPlayerbotAIConfig->randomBotMaxLoginLevel);
+            SetEventValue(0, "bot_count", 0, 999999999);
+            maxAllowedBotCount = 0;
+            currentBots.clear();
             levelFilterAdjusted = true;
         }
     }
