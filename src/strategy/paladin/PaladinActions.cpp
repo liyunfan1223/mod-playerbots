@@ -16,7 +16,7 @@
 #include "GenericBuffUtils.h"
 #include "Config.h"
 #include "Group.h"
-#include "ObjectAccessor.h"
+//#include "ObjectAccessor.h"
 #include "Log.h"
 	
 using ai::buff::MakeAuraQualifierForBuff;
@@ -35,9 +35,9 @@ namespace {
         if (!g) return false;
         uint32 palCount = 0;
         bool otherHasBstats = false, selfHasBmana = false;
-        for (auto const& slot : g->GetMemberSlots())
+        for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
         {
-            Player* p = ObjectAccessor::FindPlayer(slot.guid);
+            Player* p = ref->GetSource();
             if (!p || !p->IsInWorld() || p->getClass() != CLASS_PALADIN)
                 continue;
             ++palCount;
@@ -67,7 +67,9 @@ namespace {
         bool selfHasBstats = false, otherHasBmana = false;
         for (auto const& slot : g->GetMemberSlots())
         {
-            Player* p = ObjectAccessor::FindPlayer(slot.guid);
+		for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* p = ref->GetSource();
             if (!p || !p->IsInWorld() || p->getClass() != CLASS_PALADIN)
                 continue;
             ++palCount;
@@ -268,14 +270,15 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
     {
         if (Group* g = bot->GetGroup())
         {
-            for (auto const& slot : g->GetMemberSlots())
+        if (Group* g = bot->GetGroup())
+        {
+            for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
             {
-                Player* p = ObjectAccessor::FindPlayer(slot.guid);
+                Player* p = ref->GetSource();
                 if (!p || !p->IsInWorld()) continue;
-                if (!g->IsMember(p->GetGUID())) continue;
 
                 Player* pp = p->ToPlayer();
-                if (!pp || !pp->HasTankSpec()) continue;
+                if (!pp || !botAI->IsTank(pp)) continue;
 
                 bool hasKings = botAI->HasAura("blessing of kings", p) ||
                                 botAI->HasAura("greater blessing of kings", p);
@@ -378,14 +381,13 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
             {
                 if (Group* g = bot->GetGroup())
                 {
-                    for (auto const& slot : g->GetMemberSlots())
+                    for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
                     {
-                        Player* p = ObjectAccessor::FindPlayer(slot.guid);
+                        Player* p = ref->GetSource();
                         if (!p || !p->IsInWorld()) continue;
-                        if (!g->IsMember(p->GetGUID())) continue;
-
+ 
                         Player* pp = p->ToPlayer();
-                        if (!pp || !pp->HasTankSpec()) continue;
+                        if (!pp || !botAI->IsTank(pp)) continue;
 
                         bool need = !botAI->HasAura("blessing of sanctuary", p) &&
                                     !botAI->HasAura("greater blessing of sanctuary", p);
