@@ -460,11 +460,13 @@ bool PlayerbotAIConfig::Initialize()
     }
 
     botCheats.clear();
-    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "taxi,raid"),
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "food,taxi,raid"),
                                              botCheats);
 
     botCheatMask = 0;
 
+    if (std::find(botCheats.begin(), botCheats.end(), "food") != botCheats.end())
+        botCheatMask |= (uint32)BotCheatMask::food;
     if (std::find(botCheats.begin(), botCheats.end(), "taxi") != botCheats.end())
         botCheatMask |= (uint32)BotCheatMask::taxi;
     if (std::find(botCheats.begin(), botCheats.end(), "gold") != botCheats.end())
@@ -596,7 +598,6 @@ bool PlayerbotAIConfig::Initialize()
     RpgStatusProbWeight[RPG_REST] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.Rest", 5);
 
     syncLevelWithPlayers = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncLevelWithPlayers", false);
-    freeFood = sConfigMgr->GetOption<bool>("AiPlayerbot.FreeFood", true);
     randomBotGroupNearby = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotGroupNearby", true);
 
     // arena

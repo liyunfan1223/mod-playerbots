@@ -249,7 +249,7 @@ bool AoeTrigger::IsActive()
 bool NoFoodTrigger::IsActive()
 {
     bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot);
-    if (isRandomBot && sPlayerbotAIConfig->freeFood)
+    if (isRandomBot && botAI->HasCheat(BotCheatMask::food))
         return false;
 
     return AI_VALUE2(std::vector<Item*>, "inventory items", "conjured food").empty();
@@ -258,7 +258,7 @@ bool NoFoodTrigger::IsActive()
 bool NoDrinkTrigger::IsActive()
 {
     bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(bot);
-    if (isRandomBot && sPlayerbotAIConfig->freeFood)
+    if (isRandomBot && botAI->HasCheat(BotCheatMask::food))
         return false;
 
     return AI_VALUE2(std::vector<Item*>, "inventory items", "conjured water").empty();
