@@ -44,7 +44,11 @@ namespace ai::buff
         if (name == "mark of the wild")         return "mark of the wild,gift of the wild";
         // Mage
         if (name == "arcane intellect")         return "arcane intellect,arcane brilliance";
-
+        // Priest
+        if (name == "power word: fortitude")    return "power word: fortitude,prayer of fortitude";
+        if (name == "divine spirit")            return "divine spirit,prayer of spirit";
+        if (name == "shadow protection")        return "shadow protection,prayer of shadow protection";
+        
         return name;
     }
 
@@ -59,7 +63,11 @@ namespace ai::buff
         if (name == "mark of the wild")         return "gift of the wild";
         // Mage
         if (name == "arcane intellect")         return "arcane brilliance";
-
+        // Priest
+        if (name == "power word: fortitude")    return "prayer of fortitude";
+        if (name == "divine spirit")            return "prayer of spirit";
+        if (name == "shadow protection")        return "prayer of shadow protection";
+        
         return std::string();
     }
 
@@ -133,6 +141,8 @@ namespace ai::buff
                       rp = "Nature is generous, my bags are not... out of herbs for Gift of the Wild. Take Mark of the Wild for now!";
                   else if (groupName == "arcane brilliance")
                       rp = "Out of Arcane Powder... Brilliance will have to wait. Casting simple Intellect!";
+                  else if (groupName == "prayer of fortitude" || groupName == "prayer of spirit" || groupName == "prayer of shadow protection")
+                      rp = "Out of Sacred Candles for the prayers. I’ll cast the single buffs instead.";                      
                   else
                       rp = "Oops, I’m out of components for the group version. We’ll go with the single one!";
           
