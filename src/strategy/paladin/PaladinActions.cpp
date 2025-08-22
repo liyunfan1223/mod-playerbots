@@ -351,10 +351,10 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     // Paladin — special logic "2 paladins (bstats + bmana)"
     if (TwoPallyLogicEnabled() && IsTwoPaladinsSelfBstatsOtherBmana(bot))
     {
-        if (auto* ai = GET_PLAYERBOT_AI(bot))
+        if (botAI)
         {
             // Main Tank prioritized if missing Sanctuary (Kings present does not block Sanctuary)
-            if (Unit* mt = ai->GetAiObjectContext()->GetValue<Unit*>("main tank")->Get())
+            if (Unit* mt = botAI->GetAiObjectContext()->GetValue<Unit*>("main tank")->Get())
             {
                 Player* mtp = mt->ToPlayer();
                 bool mtHasSanct = botAI->HasAura("blessing of sanctuary", mt) ||
