@@ -352,56 +352,53 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     }
 
     // Paladin — special logic "2 paladins (bstats + bmana)"
-    if (TwoPallyLogicEnabled() && IsTwoPaladinsSelfBstatsOtherBmana(bot))
-    {
-        if (botAI)
-        {
-            // Main Tank prioritized if missing Sanctuary (Kings present does not block Sanctuary)
-            if (Unit* mt = botAI->GetAiObjectContext()->GetValue<Unit*>("main tank")->Get())
-            {
-                Player* mtp = mt->ToPlayer();
-                bool mtHasSanct = botAI->HasAura("blessing of sanctuary", mt) ||
-                                  botAI->HasAura("greater blessing of sanctuary", mt);
-                bool mtNeed = (mtp && mtp->HasTankSpec() && !mtHasSanct);
+   if (TwoPallyLogicEnabled() && IsTwoPaladinsSelfBstatsOtherBmana(bot))
+   {
+       // Main Tank prioritaire s’il manque Sanctuary
+       if (Unit* mt = AI_VALUE(Unit*, "main tank"))
+       {
+           Player* mtp = mt->ToPlayer();
+           bool mtHasSanct = botAI->HasAura("blessing of sanctuary", mt) ||
+                             botAI->HasAura("greater blessing of sanctuary", mt);
+           bool mtNeed = (mtp && botAI->IsTank(mtp) && !mtHasSanct);
 
-                LOG_DEBUG("playerbots", "[PallyBuff][Sanct] MT={} needSanct={}",
-                         mtp ? mtp->GetName() : "<null>", mtNeed);
+           LOG_DEBUG("playerbots", "[PallyBuff][Sanct] MT={} needSanct={}",
+                     mtp ? mtp->GetName() : "<null>", mtNeed);
 
-                if (mtNeed)
-                    target = mt;
-            }
+           if (mtNeed)
+               target = mt;
+       }
 
-            // Otherwise, look for another tank in the group without Sanctuary
-            Player* tp = target->ToPlayer();
-            bool targetIsTank = (tp && tp->HasTankSpec());
-            bool targetHasSanct = botAI->HasAura("blessing of sanctuary", target) ||
-                                  botAI->HasAura("greater blessing of sanctuary", target);
+       // Sinon, chercher un autre tank du groupe sans Sanctuary
+       Player* tp = target->ToPlayer();
+       bool targetIsTank = (tp && botAI->IsTank(tp));
+       bool targetHasSanct = botAI->HasAura("blessing of sanctuary", target) ||
+                             botAI->HasAura("greater blessing of sanctuary", target);
 
-            if (!targetIsTank || targetHasSanct)
-            {
-                if (Group* g = bot->GetGroup())
-                {
-                    for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
-                    {
-                        Player* p = ref->GetSource();
-                        if (!p || !p->IsInWorld()) continue;
- 
-                        Player* pp = p->ToPlayer();
-                        if (!pp || !botAI->IsTank(pp)) continue;
+       if (!targetIsTank || targetHasSanct)
+       {
+           if (Group* g = bot->GetGroup())
+           {
+               for (GroupReference* ref = g->GetFirstMember(); ref; ref = ref->next())
+               {
+                   Player* p = ref->GetSource();
+                   if (!p || !p->IsInWorld()) continue;
 
-                        bool need = !botAI->HasAura("blessing of sanctuary", p) &&
-                                    !botAI->HasAura("greater blessing of sanctuary", p);
+                   Player* pp = p->ToPlayer();
+                   if (!pp || !botAI->IsTank(pp)) continue;
 
-                        if (need)
-                        {
-                            LOG_DEBUG("playerbots", "[PallyBuff][Sanct] Fallback tank selected={}", p->GetName());
-                            target = p;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+                   bool need = !botAI->HasAura("blessing of sanctuary", p) &&
+                               !botAI->HasAura("greater blessing of sanctuary", p);
+
+                   if (need)
+                   {
+                       LOG_DEBUG("playerbots", "[PallyBuff][Sanct] Fallback tank selected={}", p->GetName());
+                       target = p;
+                       break;
+                   }
+               }
+           }
+       }
     }
 
     // LOG: befor cast
