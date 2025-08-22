@@ -78,17 +78,20 @@ namespace ai::buff
 
         if (SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId))
         {
-		    for (int i = 0; i < 8; ++i)
+            for (uint8 i = 0; i < MAX_SPELL_REAGENTS; ++i)
             {
-                if (info->Reagent[i] > 0)
-                {
-                    uint32 const itemId = info->Reagent[i];
-                    int32  const need   = info->ReagentCount[i];
-                    if ((int32)bot->GetItemCount(itemId, false) < need)
-                        return false;
-                }
+                int32 const reagentId    = info->Reagent[i];
+                int32 const reagentCount = info->ReagentCount[i];
+                if (reagentId <= 0 || reagentCount <= 0)
+                    continue; // enplty slot
+    
+                uint32 const itemId = static_cast<uint32>(reagentId);
+                uint32 const need   = static_cast<uint32>(reagentCount);
+                uint32 const have   = bot->GetItemCount(itemId, /*inBank=*/false);
+                if (have < need)
+                    return false; // reagent missing
             }
-            // No reagent required
+            // no reagent requirent or already have thems
             return true;
         }
         return false;
