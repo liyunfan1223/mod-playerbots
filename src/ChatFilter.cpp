@@ -46,6 +46,14 @@ public:
         if (melee && botAI->IsRanged(bot))
             return "";
 
+        bool rangeddps = message.find("@rangeddps") == 0;
+        if (rangeddps && (!botAI->IsRanged(bot) || botAI->IsTank(bot) || botAI->IsHeal(bot)))
+            return "";
+
+        bool meleedps = message.find("@meleedps") == 0;
+        if (meleedps && (!botAI->IsMelee(bot) || botAI->IsTank(bot) || botAI->IsHeal(bot)))
+            return "";
+
         if (tank || dps || heal || ranged || melee)
             return ChatFilter::Filter(message);
 
@@ -246,21 +254,41 @@ public:
 
         if (message.find("@group") == 0)
         {
-            std::string const pnum = message.substr(6, message.find(" "));
-            uint32 from = atoi(pnum.c_str());
-            uint32 to = from;
-            if (pnum.find("-") != std::string::npos)
+            size_t spacePos = message.find(" ");
+            if (spacePos == std::string::npos)
+                return message;
+
+            std::string pnum = message.substr(6, spacePos - 6);
+            std::string actualMessage = message.substr(spacePos + 1);
+
+            std::set<uint32> targets;
+            std::istringstream ss(pnum);
+            std::string token;
+
+            while (std::getline(ss, token, ','))
             {
-                from = atoi(pnum.substr(pnum.find("@") + 1, pnum.find("-")).c_str());
-                to = atoi(pnum.substr(pnum.find("-") + 1, pnum.find(" ")).c_str());
+                size_t dashPos = token.find("-");
+                if (dashPos != std::string::npos)
+                {
+                    uint32 from = atoi(token.substr(0, dashPos).c_str());
+                    uint32 to = atoi(token.substr(dashPos + 1).c_str());
+                    if (from > to) std::swap(from, to);
+                    for (uint32 i = from; i <= to; ++i)
+                        targets.insert(i);
+                }
+                else
+                {
+                    uint32 index = atoi(token.c_str());
+                    targets.insert(index);
+                }
             }
 
             if (!bot->GetGroup())
                 return message;
 
             uint32 sg = bot->GetSubGroup() + 1;
-            if (sg >= from && sg <= to)
-                return ChatFilter::Filter(message);
+            if (targets.find(sg) != targets.end())
+                return ChatFilter::Filter(actualMessage);
         }
 
         return message;
