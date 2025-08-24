@@ -174,10 +174,6 @@ AiPlayerbot.SummonWhenGroup = 1
 # Selfbot permission level (0 = disabled, 1 = GM only (default), 2 = all players, 3 = activate on login)
 AiPlayerbot.SelfBotLevel = 1
 
-# Give free food to bots
-# Default: 1 (enabled)
-AiPlayerbot.FreeFood = 1
-
 # Non-GM player can only use init=auto to initialize bots based on their own level and gearscore
 # Default: 0 (non-GM player can use any intialization commands)
 AiPlayerbot.AutoInitOnly = 0
@@ -496,6 +492,7 @@ AiPlayerbot.AutoGearQualityLimit = 3
 AiPlayerbot.AutoGearScoreLimit = 0
 
 # Enable/Disable cheats for bots
+# "food" (bots use cheat when eat or drink)
 # "gold" (bots have infinite gold)
 # "health" (bots have infinite health)
 # "mana" (bots have infinite mana)
@@ -504,7 +501,7 @@ AiPlayerbot.AutoGearScoreLimit = 0
 # "raid" (bots use cheats implemented into raid strategies) 
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,raid,taxi")
 # Default: taxi and raid are enabled
-AiPlayerbot.BotCheats = "taxi,raid" 
+AiPlayerbot.BotCheats = "food,taxi,raid" 
 
 #
 #

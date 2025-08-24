@@ -23,7 +23,8 @@ enum class BotCheatMask : uint32
     mana = 8,
     power = 16,
     raid = 32,
-    maxMask = 64
+    food = 64,
+    maxMask = 128
 };
 
 enum class HealingManaEfficiency : uint8
@@ -340,7 +341,6 @@ public:
     bool enableNewRpgStrategy;
     std::unordered_map<NewRpgStatus, uint32> RpgStatusProbWeight;
     bool syncLevelWithPlayers;
-    bool freeFood;
     bool autoLearnQuestSpells;
     bool autoTeleportForLevel;
     bool randomBotGroupNearby;
