@@ -1681,6 +1681,8 @@ bool YoggSaronTrigger::IsYoggSaronFight()
     {
         return true;
     }
+
+    return false;
 }
 
 bool YoggSaronTrigger::IsInIllusionRoom()
