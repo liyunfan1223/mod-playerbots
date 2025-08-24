@@ -2697,12 +2697,18 @@ void PlayerbotFactory::InitSpecialSpells()
          i != sPlayerbotAIConfig->randomBotSpellIds.end(); ++i)
     {
         uint32 spellId = *i;
-        bot->learnSpell(spellId);
+        if (!bot->HasSpell(spellId))
+        {
+            bot->learnSpell(spellId);
+        }
     }
     // to leave DK starting area
     if (bot->getClass() == CLASS_DEATH_KNIGHT)
     {
-        bot->learnSpell(50977, false);
+        if (!bot->HasSpell(50977))
+        {
+            bot->learnSpell(50977, false);
+        }
     }
 }
 
