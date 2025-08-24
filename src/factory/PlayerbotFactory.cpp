@@ -2574,8 +2574,8 @@ void PlayerbotFactory::InitAvailableSpells()
 
             if (tSpell->IsCastable())
                 bot->CastSpell(bot, tSpell->spell, true);
-            else
-                bot->learnSpell(tSpell->learnedSpell[0], false);
+            else if (!bot->HasSpell(tSpell->learnedSpell[0]))
+                bot->learnSpell(tSpell->learnedSpell[0], false, true);
         }
     }
 }
