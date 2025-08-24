@@ -21,6 +21,7 @@
 #        THRESHOLDS
 #        QUESTS
 #        COMBAT
+#        BUFFS STRATEGIES
 #        CHEATS
 #        SPELLS
 #        FLIGHTPATH
@@ -455,6 +456,36 @@ AiPlayerbot.SaveManaThreshold = 60
 
 # Bots can flee from enemies
 AiPlayerbot.FleeingEnabled = 1
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
+# BUFFS STRATEGIES
+#
+#
+
+# Min group size to use Greater buffs (Paladin, Mage, Druid)
+# Default: 3
+AiPlayerbot.MinBotsForGreaterBuff = 3
+
+# Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff
+# Default: 30
+AiPlayerbot.RPWarningCooldown = 30
+
+# Paladin — special logic "2 paladins (bstats + bmana)"
+# When enabled, in a setup with EXACTLY 2 paladins where one uses the
+# non-combat strategy 'bstats' and the other 'bmana':
+#  - bstats casts SANCTUARY on all tanks (overwrites Kings if present) and
+#    does not cast Kings on tanks;
+#  - bmana casts KINGS (single) on tanks that have neither Kings nor Sanctuary,
+#    and does not attempt Might/Wisdom on tanks.
+# Set to OFF (=0) to restore the original behavior.
+#
+# 1 = ON  |  0 = OFF  (default)
+AiPlayerbot.Paladin.TwoPallyKingsSanctuary = 0
 
 #
 #
