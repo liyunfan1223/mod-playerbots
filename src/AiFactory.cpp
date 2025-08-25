@@ -472,6 +472,10 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             }
         }
     }
+    if (sRandomPlayerbotMgr->IsRandomBot(player))
+    {
+        engine->ChangeStrategy(sPlayerbotAIConfig->randomBotCombatStrategies);
+    }
     else
     {
         engine->ChangeStrategy(sPlayerbotAIConfig->combatStrategies);
