@@ -811,12 +811,13 @@ AiPlayerbot.OpenGoSpell = 6477
 #
 
 # Additional randombot strategies
-# Strategies added here are applied to all randombots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
-AiPlayerbot.RandomBotCombatStrategies = "+dps,+dps assist,-threat"
+# Strategies added here are applied to all randombots, in addition (or subtraction) to spec/role-based default strategies. These rules are processed after the defaults.
+# Example: "+threat,-potions"
+AiPlayerbot.RandomBotCombatStrategies = ""
 AiPlayerbot.RandomBotNonCombatStrategies = ""
 
 # Additional altbot strategies
-# Strategies added here are applied to all altbots, in addition (or subtraction) to spec-based default strategies. These rules are processed after the defaults.
+# Strategies added here are applied to all altbots, in addition (or subtraction) to spec/role-based default strategies. These rules are processed after the defaults.
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
 
