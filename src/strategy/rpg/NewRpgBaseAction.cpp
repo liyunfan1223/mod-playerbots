@@ -1060,6 +1060,13 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
             probSum += sPlayerbotAIConfig->RpgStatusProbWeight[status];
         }
     }
+    // Safety check. Default to "rest" if all RPG weights = 0
+    if (availableStatus.empty() || probSum == 0)
+    {
+        botAI->rpgInfo.ChangeToRest();
+        bot->SetStandState(UNIT_STAND_STATE_SIT);
+        return true;
+    }
     uint32 rand = urand(1, probSum);
     uint32 accumulate = 0;
     NewRpgStatus chosenStatus = RPG_STATUS_END;
