@@ -299,9 +299,10 @@ bool LootObject::IsLootPossible(Player* bot)
             return false;
     }
 
-    // Prevent bot from running to chests that are unlootable (e.g. Gunship Armory before completing the event)
+    // Prevent bot from running to chests that are unlootable (e.g. Gunship Armory before completing the event) or on
+    // respawn time
     GameObject* go = botAI->GetGameObject(guid);
-    if (go && go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE))
+    if (go && (go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE) || !go->isSpawned()))
         return false;
 
     if (skillId == SKILL_NONE)
