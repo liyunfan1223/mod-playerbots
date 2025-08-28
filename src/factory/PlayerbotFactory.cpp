@@ -123,7 +123,7 @@ void PlayerbotFactory::Init()
         if (id == 47181 || id == 50358 || id == 47242 || id == 52639 || id == 47147 || id == 7218)  // Test Enchant
             continue;
 
-        if (id == 15463) // Legendary Arcane Amalgamation
+        if (id == 15463 || id == 15490) // Legendary Arcane Amalgamation
             continue;
 
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(id);
