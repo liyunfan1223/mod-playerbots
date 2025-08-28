@@ -3244,7 +3244,7 @@ std::vector<uint32> PlayerbotFactory::GetCurrentGemsCount()
 
 void PlayerbotFactory::InitFood()
 {
-    if (!botAI->HasCheat(BotCheatMask::food))
+    if (botAI && botAI->HasCheat(BotCheatMask::food))
     {
         return;
     }
