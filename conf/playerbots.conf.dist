@@ -492,7 +492,7 @@ AiPlayerbot.AutoGearQualityLimit = 3
 AiPlayerbot.AutoGearScoreLimit = 0
 
 # Enable/Disable cheats for bots
-# "food" (bots use cheat when eat or drink)
+# "food" (bots eat or drink without using food or drinks from their inventory)
 # "gold" (bots have infinite gold)
 # "health" (bots have infinite health)
 # "mana" (bots have infinite mana)
