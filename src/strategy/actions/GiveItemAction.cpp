@@ -76,7 +76,7 @@ bool GiveFoodAction::isUseful()
 
     bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player*)GetTarget());
 
-    return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
+    return !isRandomBot || (isRandomBot && !botAI->HasCheat(BotCheatMask::food));
 }
 
 Unit* GiveWaterAction::GetTarget() { return AI_VALUE(Unit*, "party member without water"); }
@@ -88,5 +88,5 @@ bool GiveWaterAction::isUseful()
 
     bool isRandomBot = GetTarget()->IsPlayer() && sRandomPlayerbotMgr->IsRandomBot((Player*)GetTarget());
 
-    return !isRandomBot || (isRandomBot && !sPlayerbotAIConfig->freeFood);
+    return !isRandomBot || (isRandomBot && !botAI->HasCheat(BotCheatMask::food));
 }

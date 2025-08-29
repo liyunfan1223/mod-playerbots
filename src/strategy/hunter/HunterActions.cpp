@@ -40,7 +40,7 @@ bool CastArcaneShotAction::isUseful()
         return false;
 
     // Armor Penetration rating check - will not cast Arcane Shot above 435 ArP
-    int32 armorPenRating = bot->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_ARMOR_PENETRATION);
+    int32 armorPenRating = bot->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1) + bot->GetUInt32Value(CR_ARMOR_PENETRATION);
     if (armorPenRating > 435)
         return false;
 

@@ -12,7 +12,6 @@
 #include "PlayerbotAIBase.h"
 #include "QueryHolder.h"
 #include "QueryResult.h"
-#include <shared_mutex>                 // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
 
 class ChatHandler;
 class PlayerbotAI;
@@ -115,38 +114,13 @@ public:
     void RemovePlayerBotData(ObjectGuid const& guid, bool is_AI);
 
     PlayerbotAI* GetPlayerbotAI(Player* player);
-    PlayerbotAI* GetPlayerbotAIByGuid(ObjectGuid guid);  // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-    // void RemovePlayerbotAI(ObjectGuid const& guid);   // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
-    // removeMgrEntry = true  => "hard" purge (AI + manager relation), for real logouts
-    // removeMgrEntry = false => "soft" purge (AI only), for detected "stale" cases
-    void RemovePlayerbotAI(ObjectGuid const& guid, bool removeMgrEntry = true);
     PlayerbotMgr* GetPlayerbotMgr(Player* player);
 
 private:
     std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsAIMap;
     std::unordered_map<ObjectGuid, PlayerbotAIBase*> _playerbotsMgrMap;
-    mutable std::shared_mutex _aiMutex;   // removes a long-standing crash (0xC0000005 ACCESS_VIOLATION)
 };
 
 #define sPlayerbotsMgr PlayerbotsMgr::instance()
-
-// Temporary addition If it keeps crashing, we will use them.
-// Like
-// BEFORE : PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-// AFTER (safe) : PlayerbotAI* botAI = GET_PLAYERBOT_AI_SAFE(bot);
-// BEFORE : if (PlayerbotAI* botAI = GET_PLAYERBOT_AI(player)) { ... }
-// AFTER (safe) : if (PlayerbotAI* botAI = GET_PLAYERBOT_AI_SAFE(player)) { ... }
-// --- SAFE helpers (append to PlayerbotMgr.h) ---
-inline PlayerbotAI* GET_PLAYERBOT_AI_SAFE(Player* p)
-{
-    // Avoid any dereference during transient states (nullptr, teleport, flight, etc.)
-    return p ? sPlayerbotsMgr->GetPlayerbotAI(p) : nullptr;
-}
-
-inline PlayerbotMgr* GET_PLAYERBOT_MGR_SAFE(Player* p)
-{
-    return p ? sPlayerbotsMgr->GetPlayerbotMgr(p) : nullptr;
-}
-// --- end SAFE helpers ---
 
 #endif

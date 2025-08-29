@@ -15,7 +15,7 @@ bool BossFireResistanceTrigger::IsActive()
 {
     // Check boss and it is alive
     Unit* boss = AI_VALUE2(Unit*, "find target", bossName);
-    if (!boss || !boss->IsAlive())
+    if (!boss || !boss->IsAlive() || boss->IsFriendlyTo(bot))
         return false;
 
     // Check if bot is paladin
@@ -68,7 +68,7 @@ bool BossFrostResistanceTrigger::IsActive()
 {
     // Check boss and it is alive
     Unit* boss = AI_VALUE2(Unit*, "find target", bossName);
-    if (!boss || !boss->IsAlive())
+    if (!boss || !boss->IsAlive() || boss->IsFriendlyTo(bot))
         return false;
 
     // Check if bot is paladin
@@ -121,7 +121,7 @@ bool BossNatureResistanceTrigger::IsActive()
 {
     // Check boss and it is alive
     Unit* boss = AI_VALUE2(Unit*, "find target", bossName);
-    if (!boss || !boss->IsAlive())
+    if (!boss || !boss->IsAlive() || boss->IsFriendlyTo(bot))
         return false;
 
     // Check if bot is alive
@@ -176,7 +176,7 @@ bool BossShadowResistanceTrigger::IsActive()
 {
     // Check boss and it is alive
     Unit* boss = AI_VALUE2(Unit*, "find target", bossName);
-    if (!boss || !boss->IsAlive())
+    if (!boss || !boss->IsAlive() || boss->IsFriendlyTo(bot))
         return false;
 
     // Check if bot is paladin

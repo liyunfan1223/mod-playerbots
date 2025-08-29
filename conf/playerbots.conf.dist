@@ -174,10 +174,6 @@ AiPlayerbot.SummonWhenGroup = 1
 # Selfbot permission level (0 = disabled, 1 = GM only (default), 2 = all players, 3 = activate on login)
 AiPlayerbot.SelfBotLevel = 1
 
-# Give free food to bots
-# Default: 1 (enabled)
-AiPlayerbot.FreeFood = 1
-
 # Non-GM player can only use init=auto to initialize bots based on their own level and gearscore
 # Default: 0 (non-GM player can use any intialization commands)
 AiPlayerbot.AutoInitOnly = 0
@@ -496,6 +492,7 @@ AiPlayerbot.AutoGearQualityLimit = 3
 AiPlayerbot.AutoGearScoreLimit = 0
 
 # Enable/Disable cheats for bots
+# "food" (bots eat or drink without using food or drinks from their inventory)
 # "gold" (bots have infinite gold)
 # "health" (bots have infinite health)
 # "mana" (bots have infinite mana)
@@ -504,7 +501,7 @@ AiPlayerbot.AutoGearScoreLimit = 0
 # "raid" (bots use cheats implemented into raid strategies) 
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,raid,taxi")
 # Default: taxi and raid are enabled
-AiPlayerbot.BotCheats = "taxi,raid" 
+AiPlayerbot.BotCheats = "food,taxi,raid" 
 
 #
 #
@@ -1120,7 +1117,7 @@ AiPlayerbot.DeleteRandomBotArenaTeams = 0
 AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,3951"
 
 # PvP Restricted Areas (bots don't pvp)
-AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080"
+AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080,3938,3754"
 
 # Improve reaction speeds in battlegrounds and arenas (may cause lag)
 AiPlayerbot.FastReactInBG = 1
@@ -1985,13 +1982,15 @@ AiPlayerbot.AllowedLogFiles = ""
 ####################################################################################################
 # A list of gameObject GUID's that are not allowed for bots to interact with.
 #
-AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,17155,2857,179490
+AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,165739,165738,175245,175970,176325,176327,123329
 #
 # List of GUID's:
 # QuestItems:
-# 176213 = Blood of Heroes, 17155 = Defias Gunpowder, 2656 = Waterlogged Envelope
+# 176213 = Blood of Heroes, 17155 = Defias Gunpowder, 2656 = Waterlogged Envelope, 123329 = Baelogs Chest
 # Chests:
-# Large Solid Chest = 74448, Box of Assorted Parts = 19020, Food Crate = 3719, Water Barrel = 3658, Barrel of Milk = 3705, Barrel of sweet Nectar = 3706, Tattered Chest = 105579, Large bettered Chest = 75293, Solid Chest = 2857, Battered Foodlocker = 179490
+# Large Solid Chest = 74448, Box of Assorted Parts = 19020, Food Crate = 3719, Water Barrel = 3658, Barrel of Milk = 3705, Barrel of sweet Nectar = 3706, Tattered Chest = 105579, Large bettered Chest = 75293, Solid Chest = 2857, Battered Foodlocker = 179490, Witch Doctor's Chest = 141596, Relic Coffer = 160836, Dark Coffer = 160845, Fengus's Chest = 179516, Supply Crate = 176224/181085, Malor's Strongbox = 176112
+# Other:
+# Shallow Grave (Zul'Farrak) = 128308/128403, Grim Guzzler Boar (Blackrock Depths) = 165739, Dark Iron Ale Mug (Blackrock Depths) = 165738, Father Flame (Blackrock Spire) = 175245, Unforged Runic Breastplate (Blackrock Spire) = 175970, Blacksmithing Plans (Stratholme) = 176325/176327
 # Feel free to edit and help to complete.
 #
 ####################################################################################################
