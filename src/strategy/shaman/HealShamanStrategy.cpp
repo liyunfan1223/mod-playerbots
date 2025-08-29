@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "HealShamanStrategy.h"
@@ -108,7 +108,7 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("no fire totem", NextAction::array(0, new NextAction("flametongue totem", 7.0f),
                                                            new NextAction("searing totem", 6.0f), nullptr)));
     triggers.push_back(new TriggerNode("fire elemental totem",
-                                       NextAction::array(0, new NextAction("fire elemental totem", 32.0f), nullptr)));                                                       
+                                       NextAction::array(0, new NextAction("fire elemental totem", 32.0f), nullptr)));
     triggers.push_back(new TriggerNode(
         "party member to heal out of spell range",
         NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), nullptr)));

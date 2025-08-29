@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "LootRollAction.h"
@@ -39,7 +39,7 @@ bool LootRollAction::Execute(Event event)
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
-        
+
         std::string itemUsageParam;
         if (randomProperty != 0) {
             itemUsageParam = std::to_string(itemId) + "," + std::to_string(randomProperty);
@@ -47,7 +47,7 @@ bool LootRollAction::Execute(Event event)
             itemUsageParam = std::to_string(itemId);
         }
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
-        
+
         // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), luckily no other items I found have class bits and epic quality.
         if (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK && proto->Quality == ITEM_QUALITY_EPIC)
         {
@@ -93,7 +93,7 @@ bool LootRollAction::Execute(Event event)
                     {
                         vote = PASS;
                     }
-                else 
+                else
                     {
                         vote = GREED;
                     }
@@ -228,7 +228,7 @@ bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
 bool RollAction::Execute(Event event)
 {
     std::string link = event.getParam();
-    
+
     if (link.empty())
     {
         bot->DoRandomRoll(0,100);
@@ -245,7 +245,7 @@ bool RollAction::Execute(Event event)
     }
     std::string itemUsageParam;
     itemUsageParam = std::to_string(itemId);
-        
+
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
     switch (proto->Class)
     {

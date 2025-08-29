@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "ReleaseSpiritAction.h"
@@ -20,7 +20,7 @@ bool ReleaseSpiritAction::Execute(Event event)
 {
     if (bot->IsAlive())
     {
-        if (!bot->InBattleground()) 
+        if (!bot->InBattleground())
         {
             botAI->TellMasterNoFacing("I am not dead, will wait here");
             // -follow in bg is overwriten each tick with +follow
@@ -38,8 +38,8 @@ bool ReleaseSpiritAction::Execute(Event event)
     }
 
     const WorldPacket& packet = event.getPacket();
-    const std::string message = !packet.empty() && packet.GetOpcode() == CMSG_REPOP_REQUEST 
-                                ? "Releasing..." 
+    const std::string message = !packet.empty() && packet.GetOpcode() == CMSG_REPOP_REQUEST
+                                ? "Releasing..."
                                 : "Meet me at the graveyard";
     botAI->TellMasterNoFacing(message);
 
@@ -89,7 +89,7 @@ bool AutoReleaseSpiritAction::Execute(Event event)
     bot->GetSession()->HandleRepopRequestOpcode(packet);
 
     LogRelease("releases spirit", true);
-    
+
     if (bot->InBattleground())
     {
         return HandleBattlegroundSpiritHealer();
@@ -117,8 +117,8 @@ bool AutoReleaseSpiritAction::HandleBattlegroundSpiritHealer()
 {
     constexpr uint32_t RESURRECT_DELAY = 15;
     const time_t now = time(nullptr);
-    
-    if ((now - m_bgGossipTime < RESURRECT_DELAY) && 
+
+    if ((now - m_bgGossipTime < RESURRECT_DELAY) &&
         bot->HasAura(SPELL_WAITING_FOR_RESURRECT))
     {
         return false;
@@ -174,9 +174,9 @@ bool AutoReleaseSpiritAction::ShouldAutoRelease() const
     if (!botAI->HasActivePlayerMaster())
         return true;
 
-    if (botAI->HasActivePlayerMaster() && 
+    if (botAI->HasActivePlayerMaster() &&
         groupMaster->GetMapId() == bot->GetMapId() &&
-        bot->GetMap() && 
+        bot->GetMap() &&
         (bot->GetMap()->IsRaid() || bot->GetMap()->IsDungeon()))
     {
         return false;
@@ -218,7 +218,7 @@ bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
 bool RepopAction::Execute(Event event)
 {
     const GraveyardStruct* graveyard = GetGrave(
-        AI_VALUE(uint32, "death count") > 10 || 
+        AI_VALUE(uint32, "death count") > 10 ||
         CalculateDeadTime() > 30 * MINUTE
     );
 
@@ -238,7 +238,7 @@ int64 RepopAction::CalculateDeadTime() const
 {
     if (Corpse* corpse = bot->GetCorpse())
         return time(nullptr) - corpse->GetGhostTime();
-    
+
     return bot->isDead() ? 0 : 60 * MINUTE;
 }
 

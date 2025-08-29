@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "TeleportAction.h"
@@ -13,13 +13,13 @@ bool TeleportAction::Execute(Event event)
 {
     /*
     // List of allowed portal entries (you can populate this dynamically)
-    std::vector<uint32> allowedPortals = { 
-        187055, 195142, 195141, 201797, 202079, 194481, 195682, 191164, 176498, 182351, 
-        178404, 176497, 181146, 184605, 176499, 195140, 193948, 193427, 193052, 193206, 
-        192786, 184594, 183384, 182352, 184604, 189994, 193053, 193207, 193956, 195139, 
-        176296, 194011, 194012, 189993, 176500, 176501, 193955, 193425, 193772, 193604, 
-        191006, 191007, 191008, 191009, 191013, 191014, 191010, 190960, 191011, 191012, 
-        183317, 183321, 183322, 187056, 183323, 183324, 183325, 183326, 183327, 190203, 
+    std::vector<uint32> allowedPortals = {
+        187055, 195142, 195141, 201797, 202079, 194481, 195682, 191164, 176498, 182351,
+        178404, 176497, 181146, 184605, 176499, 195140, 193948, 193427, 193052, 193206,
+        192786, 184594, 183384, 182352, 184604, 189994, 193053, 193207, 193956, 195139,
+        176296, 194011, 194012, 189993, 176500, 176501, 193955, 193425, 193772, 193604,
+        191006, 191007, 191008, 191009, 191013, 191014, 191010, 190960, 191011, 191012,
+        183317, 183321, 183322, 187056, 183323, 183324, 183325, 183326, 183327, 190203,
         190204, 190205, 190206, 193908, 181575, 181576, 181577, 181578, 202277, 202278
     };
 
@@ -60,7 +60,7 @@ bool TeleportAction::Execute(Event event)
         return true;
     }
     */
-    
+
     // If no portal was found, fallback to spellcaster-type game objects
     GuidVector gos = *context->GetValue<GuidVector>("nearest game objects");
     for (ObjectGuid const guid : gos)
@@ -91,7 +91,7 @@ bool TeleportAction::Execute(Event event)
         spell->cast(true);
         return true;
     }
-    
+
     // If no game objects were found, try using the last area trigger
     LastMovement& movement = context->GetValue<LastMovement&>("last area trigger")->Get();
     if (movement.lastAreaTrigger)
