@@ -5,6 +5,8 @@
 
 #include "GenericSpellActions.h"
 
+#include <ctime>
+
 #include "Event.h"
 #include "ItemTemplate.h"
 #include "ObjectDefines.h"
@@ -13,6 +15,14 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "WorldPacket.h"
+#include "Group.h"
+#include "Chat.h"
+#include "Language.h"
+#include "GenericBuffUtils.h"
+#include "PlayerbotAI.h"
+
+using ai::buff::MakeAuraQualifierForBuff;
+using ai::buff::UpgradeToGroupIfAppropriate;
 
 CastSpellAction::CastSpellAction(PlayerbotAI* botAI, std::string const spell)
     : Action(botAI, spell), range(botAI->GetRange("spell")), spell(spell)
@@ -216,11 +226,24 @@ Value<Unit*>* CurePartyMemberAction::GetTargetValue()
     return context->GetValue<Unit*>("party member to dispel", dispelType);
 }
 
+// Make Bots Paladin, druid, mage use the greater buff rank spell
+// TODO Priest doen't verify il he have components
 Value<Unit*>* BuffOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", spell);
+    return context->GetValue<Unit*>("party member without aura", MakeAuraQualifierForBuff(spell));
 }
 
+bool BuffOnPartyAction::Execute(Event event)
+{
+    std::string castName = spell; // default = mono
+
+	auto SendGroupRP = ai::chat::MakeGroupAnnouncer(bot);
+	castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, SendGroupRP);
+
+    return botAI->CastSpell(castName, GetTarget());
+}
+// End greater buff fix
+ 
 CastShootAction::CastShootAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shoot")
 {
     if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
