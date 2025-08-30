@@ -21,8 +21,7 @@
 using ai::buff::MakeAuraQualifierForBuff;
 using ai::buff::UpgradeToGroupIfAppropriate;
 
-// --- Helper : detect tank role on the target (player bot or not) ---
-// - true if spec is tank or if the bot have tank strategies (bear/tank/tank face).
+// Helper : detect tank role on the target (player bot or not) return true if spec is tank or if the bot have tank strategies (bear/tank/tank face).
 static inline bool IsTankRole(Player* p)
 {
     if (!p) return false;
