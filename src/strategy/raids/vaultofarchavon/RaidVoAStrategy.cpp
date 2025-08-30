@@ -24,4 +24,16 @@ void RaidVoAStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "emalon fall from floor trigger",
         NextAction::array(0, new NextAction("emalon fall from floor action", ACTION_RAID), nullptr)));
+
+    triggers.push_back(new TriggerNode(
+        "emalon nature resistance trigger",
+        NextAction::array(0, new NextAction("emalon nature resistance action", ACTION_RAID), nullptr)));
+
+    //
+    // Koralon the Flame Watcher
+    //
+
+    triggers.push_back(new TriggerNode(
+        "koralon fire resistance trigger",
+        NextAction::array(0, new NextAction("koralon fire resistance action", ACTION_RAID), nullptr)));
 }
