@@ -253,7 +253,15 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     target = bot;
 
     Player* targetPlayer = target ? target->ToPlayer() : nullptr;
-
+	
+    // Small helpers to check relevant auras
+    const auto HasKingsAura = [&](Unit* u) -> bool {
+        return botAI->HasAura("blessing of kings", u) || botAI->HasAura("greater blessing of kings", u);
+    };
+    const auto HasSanctAura = [&](Unit* u) -> bool {
+        return botAI->HasAura("blessing of sanctuary", u) || botAI->HasAura("greater blessing of sanctuary", u);
+    };
+	
     if (Group* g = bot->GetGroup())
         if (targetPlayer)
             if (!g->IsMember(targetPlayer->GetGUID()))
@@ -265,8 +273,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
 
     if (Player* self = bot->ToPlayer())
     {
-        bool selfHasSanct = botAI->HasAura("blessing of sanctuary", self) ||
-                            botAI->HasAura("greater blessing of sanctuary", self);
+        bool selfHasSanct = HasSanctAura(self);
 		bool needSelf = IsTankRole(self) && !selfHasSanct;
 
         LOG_DEBUG("playerbots", "[Sanct] {} isTank={} selfHasSanct={} needSelf={}",
@@ -283,8 +290,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     bool targetOk = false;
     if (targetPlayer)
     {
-        bool hasSanct = botAI->HasAura("blessing of sanctuary", targetPlayer) ||
-                        botAI->HasAura("greater blessing of sanctuary", targetPlayer);
+        bool hasSanct = HasSanctAura(targetPlayer);
         targetOk = IsTankRole(targetPlayer) && !hasSanct;
     }
     
@@ -299,8 +305,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
                 if (!p->IsInWorld() || !p->IsAlive()) continue;
                 if (!IsTankRole(p)) continue;
 
-                bool hasSanct = botAI->HasAura("blessing of sanctuary", p) ||
-                                botAI->HasAura("greater blessing of sanctuary", p);
+                bool hasSanct = HasSanctAura(p);
                 if (!hasSanct)
                 {
                     target = p; // prioritize this tank
@@ -313,13 +318,11 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     }
 
     {
-        bool hasKings = botAI->HasAura("blessing of kings", target) ||
-                        botAI->HasAura("greater blessing of kings", target);
-        bool hasSanct = botAI->HasAura("blessing of sanctuary", target) ||
-                        botAI->HasAura("greater blessing of sanctuary", target);
+        bool hasKings = HasKingsAura(target);
+        bool hasSanct = HasSanctAura(target);
         bool knowSanct = bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY);
         LOG_DEBUG("playerbots", "[Sanct] Final target={} hasKings={} hasSanct={} knowSanct={}",
-                 target->GetName(), hasKings, hasSanct, knowSanct);
+                  target->GetName(), hasKings, hasSanct, knowSanct);
     }
 
     std::string castName = GetActualBlessingOfSanctuary(target, bot);
