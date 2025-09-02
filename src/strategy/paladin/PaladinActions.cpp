@@ -282,7 +282,6 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     {
         bool hasSanct = botAI->HasAura("blessing of sanctuary", tp) ||
                         botAI->HasAura("greater blessing of sanctuary", tp);
-        //targetOk = tp->HasTankSpec() && !hasSanct;
         targetOk = IsTankRole(tp) && !hasSanct;
     }
     
@@ -290,23 +289,20 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     {
         if (Group* g = bot->GetGroup())
         {
-            for (auto const& slot : g->GetMemberSlots())
+            for (GroupReference* gref = g->GetFirstMember(); gref; gref = gref->next())
             {
-                if (Player* p = ObjectAccessor::FindPlayer(slot.guid))
+                Player* p = gref->GetSource();
+                if (!p) continue;
+                if (!p->IsInWorld() || !p->IsAlive()) continue;
+                if (!IsTankRole(p)) continue;
+
+                bool hasSanct = botAI->HasAura("blessing of sanctuary", p) ||
+                                botAI->HasAura("greater blessing of sanctuary", p);
+                if (!hasSanct)
                 {
-                    if (!g->IsMember(p->GetGUID())) continue;
-                    if (!p->IsInWorld() || !p->IsAlive()) continue;
-                    // if (!p->HasTankSpec()) continue;
-                    if (!IsTankRole(p)) continue;
-	
-                    bool hasSanct = botAI->HasAura("blessing of sanctuary", p) ||
-                                    botAI->HasAura("greater blessing of sanctuary", p);
-                    if (!hasSanct)
-                    {
-                        target = p; // prioritize this tank
-                        targetOk = true;
-                        break;
-                    }
+                    target = p; // prioritize this tank
+                    targetOk = true;
+                    break;
                 }
             }
         }
