@@ -23,8 +23,7 @@ enum class BotCheatMask : uint32
     mana = 8,
     power = 16,
     raid = 32,
-    food = 64,
-    maxMask = 128
+    maxMask = 64
 };
 
 enum class HealingManaEfficiency : uint8
@@ -326,6 +325,13 @@ public:
     std::string autoPickReward;
     bool autoEquipUpgradeLoot;
     float equipUpgradeThreshold;
+    bool allowBoENeedIfUpgrade; // Loot roll fine-tuning
+	bool allowBoUNeedIfUpgrade; // Allow NEED on BoU if upgrade
+    float crossArmorExtraMargin;
+    bool useDEButton; // Allow "Disenchant" on NBG if available
+    float tokenILevelMargin; // ilvl threshold to consider the token an upgrade
+	bool announceLootRollsToMaster; // ANotify the bot’s master of the roll choice
+    bool smartNeedBySpec; // Intelligent NEED (based on stats/spec)
     bool twoRoundsGearInit;
     bool syncQuestWithPlayer;
     bool syncQuestForPlayer;
@@ -341,6 +347,7 @@ public:
     bool enableNewRpgStrategy;
     std::unordered_map<NewRpgStatus, uint32> RpgStatusProbWeight;
     bool syncLevelWithPlayers;
+    bool freeFood;
     bool autoLearnQuestSpells;
     bool autoTeleportForLevel;
     bool randomBotGroupNearby;
