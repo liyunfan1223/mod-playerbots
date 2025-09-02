@@ -9,9 +9,11 @@
 #include "Playerbots.h"
 #include "RtiTargetValue.h"
 #include "AiFactory.h"
+#include "Log.h"
 
 #include <algorithm>
 #include <cctype>
+#include <string>
 
 static std::string ToLower(const std::string& str) 
 {
@@ -439,25 +441,18 @@ public:
             return message;
         }
 
+        // Trim any leading spaces after @aura or @noaura (can use space between prefix and spell ID if desired, but not required)
         std::string auraIdOrName = message.substr(prefixLen);
+        auraIdOrName.erase(0, auraIdOrName.find_first_not_of(' '));
         if (auraIdOrName.empty())
         {
             return message;
         }
 
-        std::string rest = "";
         uint32 auraId = 0;
-
         size_t spacePos = auraIdOrName.find(' ');
         std::string idStr = (spacePos != std::string::npos) ? auraIdOrName.substr(0, spacePos) : auraIdOrName;
-        if (spacePos != std::string::npos)
-        {
-            rest = auraIdOrName.substr(spacePos + 1);
-        }
-        else
-        {
-            rest = "";
-        }
+        std::string rest = (spacePos != std::string::npos) ? auraIdOrName.substr(spacePos + 1) : "";
         if (!idStr.empty())
         {
             bool isNumeric = std::all_of(idStr.begin(), idStr.end(), ::isdigit);
@@ -468,10 +463,7 @@ public:
         }
 
         if (auraId == 0)
-        {
-            // Only allow numeric spell IDs
             return message;
-        }
 
         bool hasAura = bot->HasAura(auraId);
         bool match = isNoAura ? !hasAura : hasAura;
@@ -496,15 +488,17 @@ public:
             return message;
         }
 
+        // Trim any leading spaces after @aggroby (can use space between prefix and entry ID/creature name if desired, but not required)
         std::string enemyStr = message.substr(prefixLen);
+        enemyStr.erase(0, enemyStr.find_first_not_of(' '));
         if (enemyStr.empty())
         {
             return message;
         }
 
+        // If creature name is more than one word, it must be enclosed in quotes, e.g. @aggroby "Scarlet Commander Mograine" flee
         std::string rest = "";
         std::string enemyName = "";
-        std::string entryIdStr = "";
         bool isName = false;
         uint32 entryId = 0;
 
@@ -534,11 +528,11 @@ public:
         }
         else
         {
-            size_t spacePos = enemyStr.find(' ');
-            std::string idOrName = (spacePos != std::string::npos) ? enemyStr.substr(0, spacePos) : enemyStr;
-            if (spacePos != std::string::npos)
+            size_t splitPos = enemyStr.find_first_of(" ");
+            std::string idOrName = (splitPos != std::string::npos) ? enemyStr.substr(0, splitPos) : enemyStr;
+            if (splitPos != std::string::npos)
             {
-                rest = enemyStr.substr(spacePos + 1);
+                rest = enemyStr.substr(splitPos + 1);
             }
             else
             {
@@ -559,22 +553,17 @@ public:
             }
         }
 
-        // Use nearest hostile npcs value and filter by entryID or name within 100 yards
         const float radius = 100.0f;
-        GuidVector npcs = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest hostile npcs")->Get();
+        GuidVector npcs = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();
         bool match = false;
         for (const auto& guid : npcs)
         {
-            Unit* unit = botAI->GetUnit(guid);
-            if (!unit)
+            Creature* c = botAI->GetCreature(guid);
+            if (!c)
             {
                 continue;
             }
-            if (!unit->IsCreature())
-            {
-                continue;
-            }
-            Creature* c = static_cast<Creature*>(unit);
+
             bool nameMatch = isName && ToLower(c->GetName()) == ToLower(enemyName);
             bool idMatch = (entryId != 0) && c->GetEntry() == entryId;
             if ((nameMatch || idMatch) && c->GetDistance2d(bot) <= radius)
