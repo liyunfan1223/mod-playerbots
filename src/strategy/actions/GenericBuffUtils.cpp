@@ -31,7 +31,9 @@ namespace ai::buff
         if (name == "mark of the wild")         return "mark of the wild,gift of the wild";
         // Mage
         if (name == "arcane intellect")         return "arcane intellect,arcane brilliance";
-
+        // Priest
+        if (name == "power word: fortitude")    return "power word: fortitude,prayer of fortitude";
+		
         return name;
     }
 
@@ -46,6 +48,8 @@ namespace ai::buff
         if (name == "mark of the wild")         return "gift of the wild";
         // Mage
         if (name == "arcane intellect")         return "arcane brilliance";
+        // Priest
+        if (name == "power word: fortitude")    return "prayer of fortitude";
 
         return std::string();
     }
