@@ -565,8 +565,8 @@ private:
     static UntypedValue* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenBobberValue(ai); }
     static UntypedValue* done_fishing(PlayerbotAI* ai) { return new DoneFishingValue(ai); }
 
-	// -------------------------------------------------------
-    // Flag for cutom glyphs : true when /w bot glyph equip 
+	  // -------------------------------------------------------
+    // Flag for cutom glyphs : true when /w bot glyph equip
     // -------------------------------------------------------
     static UntypedValue* custom_glyphs(PlayerbotAI* ai)
     {

@@ -123,7 +123,7 @@ void PlayerbotFactory::Init()
         if (id == 47181 || id == 50358 || id == 47242 || id == 52639 || id == 47147 || id == 7218)  // Test Enchant
             continue;
 
-        if (id == 15463) // Legendary Arcane Amalgamation
+        if (id == 15463 || id == 15490) // Legendary Arcane Amalgamation
             continue;
 
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(id);
@@ -164,22 +164,33 @@ void PlayerbotFactory::Init()
         {
             continue;
         }
+        
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
-
-        if (proto->ItemLevel < 60)
+        if (!proto)
+        {
             continue;
-
+        }
+        
+        if (proto->ItemLevel < 60)
+        {
+            continue;
+        }
+        
         if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
         {
             continue;
         }
+        
         if (sRandomItemMgr->IsTestItem(gemId))
-            continue;
-
-        if (!proto || !sGemPropertiesStore.LookupEntry(proto->GemProperties))
+        {
+           continue;
+        }
+            
+        if (!sGemPropertiesStore.LookupEntry(proto->GemProperties))
         {
             continue;
         }
+        
         // LOG_INFO("playerbots", "Add {} to enchantment gems", gemId);
         enchantGemIdCache.push_back(gemId);
     }
@@ -1017,15 +1028,18 @@ void PlayerbotFactory::ClearSkills()
     }
     bot->SetUInt32Value(PLAYER_SKILL_INDEX(0), 0);
     bot->SetUInt32Value(PLAYER_SKILL_INDEX(1), 0);
+    
     // unlearn default race/class skills
-    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(bot->getRace(), bot->getClass());
-    for (PlayerCreateInfoSkills::const_iterator itr = info->skills.begin(); itr != info->skills.end(); ++itr)
-    {
-        uint32 skillId = itr->SkillId;
-        if (!bot->HasSkill(skillId))
-            continue;
-        bot->SetSkill(skillId, 0, 0, 0);
-    }
+    if (PlayerInfo const* info = sObjectMgr->GetPlayerInfo(bot->getRace(), bot->getClass()))
+    {    
+        for (PlayerCreateInfoSkills::const_iterator itr = info->skills.begin(); itr != info->skills.end(); ++itr)
+        {
+            uint32 skillId = itr->SkillId;
+            if (!bot->HasSkill(skillId))
+                continue;
+            bot->SetSkill(skillId, 0, 0, 0);
+        }
+    }    
 }
 
 void PlayerbotFactory::ClearEverything()
@@ -3230,7 +3244,7 @@ std::vector<uint32> PlayerbotFactory::GetCurrentGemsCount()
 
 void PlayerbotFactory::InitFood()
 {
-    if (sPlayerbotAIConfig->freeFood)
+    if (botAI && botAI->HasCheat(BotCheatMask::food))
     {
         return;
     }
