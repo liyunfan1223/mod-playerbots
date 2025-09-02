@@ -4,6 +4,7 @@
  */
  
 #include "GenericBuffUtils.h"
+#include "PlayerbotAIConfig.h"
 
 #include <map>
 
@@ -16,20 +17,6 @@
 #include "AiObjectContext.h"
 #include "Value.h"
 #include "Config.h"
-
-namespace {
-    inline int32 RPWarningCooldown()
-    {
-        static int32 v = sConfigMgr->GetOption<int32>("AiPlayerbot.RPWarningCooldown", 30);
-        return v;
-    }
-
-    inline int32 MinBotsForGreaterBuff()
-    {
-        static int32 v = sConfigMgr->GetOption<int32>("AiPlayerbot.MinBotsForGreaterBuff", 3);
-        return v;
-    }
-}
 
 namespace ai::buff
 {
@@ -97,7 +84,7 @@ namespace ai::buff
         std::string castName = baseName;
 		
 		Group* g = bot->GetGroup();
-        if (!g || g->GetMembersCount() < static_cast<uint32>(MinBotsForGreaterBuff()))
+        if (!g || g->GetMembersCount() < static_cast<uint32>(sPlayerbotAIConfig->minBotsForGreaterBuff))
             return castName; // Group too small: stay in solo mode
 
         if (std::string const groupName = GroupVariantFor(baseName); !groupName.empty())
@@ -124,7 +111,7 @@ namespace ai::buff
             time_t now = std::time(nullptr);
             uint32 botLow = static_cast<uint32>(bot->GetGUID().GetCounter());
             time_t& last = s_lastWarn[ std::make_pair(botLow, groupName) ];
-			if (!last || now - last >= RPWarningCooldown()) // Configurable anti-spam
+			if (!last || now - last >= sPlayerbotAIConfig->rpWarningCooldown) // Configurable anti-spam
               {
                   std::string rp;
                   if (groupName.find("greater blessing") != std::string::npos)
