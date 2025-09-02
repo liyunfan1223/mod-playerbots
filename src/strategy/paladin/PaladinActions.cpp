@@ -213,19 +213,18 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
     if (!target)
         return false;
 
+    Player* targetPlayer = target->ToPlayer();
+
     if (Group* g = bot->GetGroup())
-        if (Player* tp = target->ToPlayer())
-            if (!g->IsMember(tp->GetGUID()))
-                return false;
+        if (targetPlayer && !g->IsMember(targetPlayer->GetGUID()))
+            return false;
 
     if (botAI->HasStrategy("bmana", BOT_STATE_NON_COMBAT))
-        if (Player* tp = target->ToPlayer())
-            // if (tp->HasTankSpec())
-			if (IsTankRole(tp))
-            {
-                LOG_DEBUG("playerbots", "[PallyBuff][Wisdom/bmana] Skip tank {} (Kings only)", target->GetName());
-                return false;
-            }
+        if (targetPlayer && IsTankRole(targetPlayer))
+        {
+            LOG_DEBUG("playerbots", "[Wisdom/bmana] Skip tank {} (Kings only)", target->GetName());
+            return false;
+        }
 
     std::string castName = GetActualBlessingOfWisdom(target);
     if (castName.empty())
@@ -253,36 +252,40 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     if (!target)
     target = bot;
 
+    Player* targetPlayer = target ? target->ToPlayer() : nullptr;
+
     if (Group* g = bot->GetGroup())
-        if (Player* tp = target->ToPlayer())
-            if (!g->IsMember(tp->GetGUID()))
+        if (targetPlayer)
+            if (!g->IsMember(targetPlayer->GetGUID()))
             {
-                LOG_DEBUG("playerbots", "[PallyBuff][Sanct] Initial target not in group, ignoring");
+                LOG_DEBUG("playerbots", "[Sanct] Initial target not in group, ignoring");
                 target = bot;
+                targetPlayer = bot->ToPlayer();
             }
 
     if (Player* self = bot->ToPlayer())
     {
         bool selfHasSanct = botAI->HasAura("blessing of sanctuary", self) ||
                             botAI->HasAura("greater blessing of sanctuary", self);
-        // bool needSelf = self->HasTankSpec() && !selfHasSanct;
 		bool needSelf = IsTankRole(self) && !selfHasSanct;
 
-        LOG_DEBUG("playerbots", "[PallyBuff][Sanct] {} isTank={} selfHasSanct={} needSelf={}",
-                 //bot->GetName(), self->HasTankSpec(), selfHasSanct, needSelf);
+        LOG_DEBUG("playerbots", "[Sanct] {} isTank={} selfHasSanct={} needSelf={}",
 				 bot->GetName(), IsTankRole(self), selfHasSanct, needSelf);
 
         if (needSelf)
+        {
             target = self;
+            targetPlayer = self;
+        }
     }
 
     // Try to re-target a valid tank in group if needed
     bool targetOk = false;
-    if (Player* tp = target->ToPlayer())
+    if (targetPlayer)
     {
-        bool hasSanct = botAI->HasAura("blessing of sanctuary", tp) ||
-                        botAI->HasAura("greater blessing of sanctuary", tp);
-        targetOk = IsTankRole(tp) && !hasSanct;
+        bool hasSanct = botAI->HasAura("blessing of sanctuary", targetPlayer) ||
+                        botAI->HasAura("greater blessing of sanctuary", targetPlayer);
+        targetOk = IsTankRole(targetPlayer) && !hasSanct;
     }
     
     if (!targetOk)
@@ -301,6 +304,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
                 if (!hasSanct)
                 {
                     target = p; // prioritize this tank
+					targetPlayer = p;
                     targetOk = true;
                     break;
                 }
@@ -314,7 +318,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
         bool hasSanct = botAI->HasAura("blessing of sanctuary", target) ||
                         botAI->HasAura("greater blessing of sanctuary", target);
         bool knowSanct = bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY);
-        LOG_DEBUG("playerbots", "[PallyBuff][Sanct] Final target={} hasKings={} hasSanct={} knowSanct={}",
+        LOG_DEBUG("playerbots", "[Sanct] Final target={} hasKings={} hasSanct={} knowSanct={}",
                  target->GetName(), hasKings, hasSanct, knowSanct);
     }
 
@@ -322,9 +326,9 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     // If internal logic didn't recognize the tank (e.g., bear druid), force single-target Sanctuary
     if (castName.empty())
     {
-        if (Player* tp = target->ToPlayer())
+        if (targetPlayer)
         {
-            if (IsTankRole(tp))
+            if (IsTankRole(targetPlayer))
                 castName = "blessing of sanctuary"; // force single-target
             else
                 return false;
@@ -333,9 +337,9 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
             return false;
     }
 
-    if (Player* tp = target->ToPlayer())
+    if (targetPlayer)
     {
-		if (IsTankRole(tp))
+		if (IsTankRole(targetPlayer))
         {
             castName = "blessing of sanctuary";
         }
@@ -350,7 +354,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
         castName = "blessing of sanctuary";
     }
     bool ok = botAI->CastSpell(castName, target);
-    LOG_DEBUG("playerbots", "[PallyBuff][Sanct] Cast {} on {} result={}", castName, target->GetName(), ok);
+    LOG_DEBUG("playerbots", "[Sanct] Cast {} on {} result={}", castName, target->GetName(), ok);
     return ok;
 }
 
@@ -371,23 +375,26 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
     Group* g = bot->GetGroup();
     if (!g)
         return false;
-    if (Player* tp = target->ToPlayer())
-        if (!g->IsMember(tp->GetGUID()))
-            return false;
+
+    Player* targetPlayer = target->ToPlayer();
+    if (targetPlayer && !g->IsMember(targetPlayer->GetGUID()))
+        return false;
 		
-    if (botAI->HasStrategy("bmana", BOT_STATE_NON_COMBAT))
+    const bool hasBmana  = botAI->HasStrategy("bmana",  BOT_STATE_NON_COMBAT);
+    const bool hasBstats = botAI->HasStrategy("bstats", BOT_STATE_NON_COMBAT);
+
+    if (hasBmana)
     {
-        Player* tp = target->ToPlayer();
-		if (!tp || !IsTankRole(tp))
+        if (!targetPlayer || !IsTankRole(targetPlayer))
         {
-            LOG_DEBUG("playerbots", "[PallyBuff][Kings/bmana] Skip non-tank {}", target->GetName());
+            LOG_DEBUG("playerbots", "[Kings/bmana] Skip non-tank {}", target->GetName());
             return false;
         }
     }
  
-    if (Player* tp = target->ToPlayer())
+    if (targetPlayer)
     {
-		const bool isTank = IsTankRole(tp);
+		const bool isTank = IsTankRole(targetPlayer);
         const bool hasSanctFromMe =
             target->HasAura(SPELL_BLESSING_OF_SANCTUARY, bot->GetGUID()) ||
             target->HasAura(SPELL_GREATER_BLESSING_OF_SANCTUARY, bot->GetGUID());
@@ -397,13 +404,13 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
 
         if (isTank && hasSanctFromMe)
         {
-            LOG_DEBUG("playerbots", "[PallyBuff][Kings] Skip: {} has my Sanctuary and is a tank", target->GetName());
+            LOG_DEBUG("playerbots", "[Kings] Skip: {} has my Sanctuary and is a tank", target->GetName());
             return false;
         }
 
-        if (botAI->HasStrategy("bstats", BOT_STATE_NON_COMBAT) && isTank && hasSanctAny)
+        if (hasBstats && isTank && hasSanctAny)
         {
-            LOG_DEBUG("playerbots", "[PallyBuff][Kings] Skip (bstats): {} already has Sanctuary and is a tank", target->GetName());
+            LOG_DEBUG("playerbots", "[Kings] Skip (bstats): {} already has Sanctuary and is a tank", target->GetName());
             return false;
         }
     }
@@ -412,24 +419,21 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
 
     bool allowGreater = true;
 
-    if (botAI->HasStrategy("bmana", BOT_STATE_NON_COMBAT))
+    if (hasBmana)
         allowGreater = false;
 
-    if (allowGreater && botAI->HasStrategy("bstats", BOT_STATE_NON_COMBAT))
+    if (allowGreater && hasBstats && targetPlayer)
     {
-        if (Player* tp = target->ToPlayer())
-        {
-            switch (tp->getClass())
-            {
-                case CLASS_WARRIOR:
-                case CLASS_PALADIN:
-                case CLASS_DRUID:
-                case CLASS_DEATH_KNIGHT:
-                    allowGreater = false;
-                    break;
-                default:
-                    break;
-            }
+        switch (targetPlayer->getClass())
+		{
+            case CLASS_WARRIOR:
+            case CLASS_PALADIN:
+            case CLASS_DRUID:
+            case CLASS_DEATH_KNIGHT:
+                allowGreater = false;
+                break;
+            default:
+                break;
         }
     }
 
