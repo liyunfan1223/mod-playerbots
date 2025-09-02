@@ -12,6 +12,8 @@
 
 
 extern const uint32 FISHING_SPELL = 7620;
+extern const uint32 FISHING_POLE = 6256;
+extern const uint32 FISHING_BOBBER = 35591;
 
 WorldPosition FindWater(Player* bot, float x, float y, float z, uint32 mapId, float distance, float increment, bool findLand)
 {
@@ -20,10 +22,9 @@ WorldPosition FindWater(Player* bot, float x, float y, float z, uint32 mapId, fl
         for (float checkY = y - distance; checkY <= y + distance; checkY += increment)
         {
             if (bot->GetMap()->IsInWater(mapId, checkX, checkY, z, DEFAULT_COLLISION_HEIGHT))
-                {
+            {
                 return WorldPosition(checkX, checkY, z);   
-                
-                }
+            }
         }
     }
     return nullptr;
@@ -121,7 +122,7 @@ bool FishingAction::Execute(Event event)
     {
         if (sRandomPlayerbotMgr->IsRandomBot(bot))
         {
-            bot->StoreNewItemInBestSlots(6256, 1);  // Try to get a fishing pole
+            bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
         }
         else
         {
@@ -177,7 +178,7 @@ bool UseBobber::Execute(Event event)
         {
             if (!go)
                 continue;
-            if (go->GetEntry() != 35591)
+            if (go->GetEntry() != FISHING_BOBBER)
                 continue;
             if (go->GetOwnerGUID() != bot->GetGUID())
                 continue;

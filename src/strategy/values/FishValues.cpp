@@ -18,9 +18,9 @@ bool CanFishValue::Calculate()
   int32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
 
   if (SkillFishing == 0)
-    {
-        return false;
-    }
+  {
+    return false;
+  }
 
   int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
   if (!zone_skill)
@@ -56,9 +56,9 @@ bool DoneFishingValue::Calculate()
   masterGUID = master->GetGUID();
   
   if (!masterGUID)
-    {
-      return false;// Need to add triggers for free fishing. 
-    }
+  {
+    return false;// Need to add triggers for free fishing. 
+  }
   bool distance = master->GetDistance(bot) < 10.0f;
   if (!distance)
   {
