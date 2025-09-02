@@ -61,7 +61,7 @@ namespace ai::buff
 
         if (SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId))
         {
-		    for (int i = 0; i < 8; ++i)
+		    for (int i = 0; i < MAX_SPELL_REAGENTS; ++i)
             {
                 if (info->Reagent[i] > 0)
                 {
