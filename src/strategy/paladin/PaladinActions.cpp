@@ -276,36 +276,36 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
             target = self;
     }
 
+    // Try to re-target a valid tank in group if needed
+    bool targetOk = false;
+    if (Player* tp = target->ToPlayer())
     {
-        bool targetOk = false;
-        if (Player* tp = target->ToPlayer())
+        bool hasSanct = botAI->HasAura("blessing of sanctuary", tp) ||
+                        botAI->HasAura("greater blessing of sanctuary", tp);
+        //targetOk = tp->HasTankSpec() && !hasSanct;
+        targetOk = IsTankRole(tp) && !hasSanct;
+    }
+    
+    if (!targetOk)
+    {
+        if (Group* g = bot->GetGroup())
         {
-            bool hasSanct = botAI->HasAura("blessing of sanctuary", tp) ||
-                            botAI->HasAura("greater blessing of sanctuary", tp);
-            //targetOk = tp->HasTankSpec() && !hasSanct;
-			targetOk = IsTankRole(tp) && !hasSanct;
-        }
-
-        if (!targetOk)
-        {
-            if (Group* g = bot->GetGroup())
+            for (auto const& slot : g->GetMemberSlots())
             {
-                for (auto const& slot : g->GetMemberSlots())
+                if (Player* p = ObjectAccessor::FindPlayer(slot.guid))
                 {
-                    if (Player* p = ObjectAccessor::FindPlayer(slot.guid))
+                    if (!g->IsMember(p->GetGUID())) continue;
+                    if (!p->IsInWorld() || !p->IsAlive()) continue;
+                    // if (!p->HasTankSpec()) continue;
+                    if (!IsTankRole(p)) continue;
+	
+                    bool hasSanct = botAI->HasAura("blessing of sanctuary", p) ||
+                                    botAI->HasAura("greater blessing of sanctuary", p);
+                    if (!hasSanct)
                     {
-                        if (!g->IsMember(p->GetGUID())) continue;
-                        if (!p->IsInWorld() || !p->IsAlive()) continue;
-                        // if (!p->HasTankSpec()) continue;
-						if (!IsTankRole(p)) continue;
-
-                        bool hasSanct = botAI->HasAura("blessing of sanctuary", p) ||
-                                        botAI->HasAura("greater blessing of sanctuary", p);
-                        if (!hasSanct)
-                        {
-                            target = p; // <- buffera ce tank en priorité
-                            break;
-                        }
+                        target = p; // prioritize this tank
+                        targetOk = true;
+                        break;
                     }
                 }
             }
@@ -322,18 +322,14 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
                  target->GetName(), hasKings, hasSanct, knowSanct);
     }
 
-    /*std::string castName = GetActualBlessingOfSanctuary(target, bot);
-    if (castName.empty())
-        return false;*/
-
     std::string castName = GetActualBlessingOfSanctuary(target, bot);
-    // Si la logique interne ne reconnaît pas le tank (ex: druide ours), on force Sanctuary mono
+    // If internal logic didn't recognize the tank (e.g., bear druid), force single-target Sanctuary
     if (castName.empty())
     {
         if (Player* tp = target->ToPlayer())
         {
             if (IsTankRole(tp))
-                castName = "blessing of sanctuary"; // force mono
+                castName = "blessing of sanctuary"; // force single-target
             else
                 return false;
         }
@@ -343,7 +339,6 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
 
     if (Player* tp = target->ToPlayer())
     {
-        // if (tp->HasTankSpec())
 		if (IsTankRole(tp))
         {
             castName = "blessing of sanctuary";
@@ -387,7 +382,6 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
     if (botAI->HasStrategy("bmana", BOT_STATE_NON_COMBAT))
     {
         Player* tp = target->ToPlayer();
-        // if (!tp || !tp->HasTankSpec())
 		if (!tp || !IsTankRole(tp))
         {
             LOG_DEBUG("playerbots", "[PallyBuff][Kings/bmana] Skip non-tank {}", target->GetName());
@@ -397,7 +391,6 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
  
     if (Player* tp = target->ToPlayer())
     {
-        // const bool isTank = tp->HasTankSpec();
 		const bool isTank = IsTankRole(tp);
         const bool hasSanctFromMe =
             target->HasAura(SPELL_BLESSING_OF_SANCTUARY, bot->GetGUID()) ||
