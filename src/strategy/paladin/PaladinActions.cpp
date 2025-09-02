@@ -41,9 +41,9 @@ static inline bool IsTankRole(Player* p)
 }
 
 
-static inline bool GroupHasTankOfClass(Group* g, uint8 klass)
+static inline bool GroupHasTankOfClass(Group* g, uint8 classId)
 {
-    return GroupHasTankOfClass(g, static_cast<Classes>(klass));
+    return GroupHasTankOfClass(g, static_cast<Classes>(classId));
 }
 
 inline std::string const GetActualBlessingOfMight(Unit* target)
