@@ -66,7 +66,7 @@ bool MountDrakeAction::Execute(Event event)
     for (auto& member : members)
     {
         Player* player = botAI->GetPlayer(member);
-        if (!player) { continue; }
+        if (!sPlayerbotsMgr->GetPlayerbotAI(player)) { continue; }
 
         for (int i = 0; i < composition.size(); i++)
         {
