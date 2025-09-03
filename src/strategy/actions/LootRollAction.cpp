@@ -23,6 +23,15 @@
 #include <initializer_list>
 #include <vector>
 
+// Encode "random enchant" parameter for CalculateRollVote / ItemUsage
+// >0 => randomPropertyId, <0 => randomSuffixId, 0 => none
+static inline int32 EncodeRandomEnchantParam(uint32 randomPropertyId, uint32 randomSuffix)
+{
+    if (randomPropertyId) return static_cast<int32>(randomPropertyId);
+    if (randomSuffix)     return -static_cast<int32>(randomSuffix);
+    return 0;
+}
+
 // Local helper: not a class member
 static bool HasAnyStat(ItemTemplate const* proto,
                        std::initializer_list<ItemModType> mods)
@@ -188,6 +197,17 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
         if (looksCaster) return false;
     }
 
+    // Global VETO global: a physical character should never NEED a caster-profile item.
+    if (sPlayerbotAIConfig->smartNeedBySpec)
+    {
+        const bool isPhysicalSpec = !(isPureCasterClass || isHolyPal || isEleSham || isRestoSh || isBalance || isRestoDr);
+        const bool hasMelee     = hasSTR || hasAGI || hasAP || hasARP || hasEXP;
+        const bool looksCaster2 = hasSP || hasSPI || hasMP5 || (hasINT && !hasMelee);
+    
+        if (isPhysicalSpec && looksCaster2)
+            return false;
+    }
+
     // Let the cross-armor rules (CrossArmorExtraMargin) decide for major off-armor upgrades.
     return true;
 }
@@ -306,12 +326,13 @@ bool LootRollAction::Execute(Event event)
         }
         ObjectGuid guid = roll->itemGUID;
         uint32 itemId = roll->itemid;
-        int32 randomProperty = 0;
+        /*int32 randomProperty = 0;
         if (roll->itemRandomPropId)
             randomProperty = roll->itemRandomPropId;
         else if (roll->itemRandomSuffix)
-            randomProperty = -((int)roll->itemRandomSuffix);
-
+            randomProperty = -((int)roll->itemRandomSuffix);*/
+        int32 randomProperty = EncodeRandomEnchantParam(roll->itemRandomPropId, roll->itemRandomSuffix);
+		
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
@@ -438,7 +459,7 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
             vote = PASS;
             break;
     }
-    // VETO “physical -> caster” (safety net):
+    /*// VETO “physical -> caster” (safety net):
     // even if ItemUsage returned EQUIP/REPLACE, a physical character should never NEED a caster-profile item.
     if (vote == NEED && sPlayerbotAIConfig->smartNeedBySpec)
     {
@@ -461,7 +482,7 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
 
         if (isPhysicalSpec && looksCaster)
             vote = GREED; // force GREED for rogue/hunter/warrior/DK/retribution/enhancement/feral/protection, etc.
-    }
+    }*/
 
     // Generic BoP rule: if the item is BoP, equippable, matches the spec
     // AND at least one relevant slot is empty -> allow NEED
@@ -554,11 +575,11 @@ void LootRollAction::AnnounceRollChoice(RollVote vote, uint32 itemId)
 
     std::ostringstream ss;
     if (ItemTemplate const* ip = sObjectMgr->GetItemTemplate(itemId))
-        ss << "[Loot] " << bot->GetName() << " choisit " << RollVoteToText(vote)
-           << " sur [" << ip->Name1 << "]";
+        ss << "[Loot] " << bot->GetName() << " choose " << RollVoteToText(vote)
+           << " on [" << ip->Name1 << "]";
     else
-        ss << "[Loot] " << bot->GetName() << " choisit " << RollVoteToText(vote)
-           << " sur item " << itemId;
+        ss << "[Loot] " << bot->GetName() << " choose " << RollVoteToText(vote)
+           << " on item " << itemId;
 
     // Message to Master
     botAI->TellMaster(ss.str());
@@ -618,7 +639,8 @@ bool MasterLootRollAction::Execute(Event event)
     }
     else
     {
-        vote = CalculateRollVote(proto, randomPropertyId ? (int32)randomPropertyId : (randomSuffix ? -(int32)randomSuffix : 0));
+        //vote = CalculateRollVote(proto, randomPropertyId ? (int32)randomPropertyId : (randomSuffix ? -(int32)randomSuffix : 0));
+		vote = CalculateRollVote(proto, EncodeRandomEnchantParam(randomPropertyId, randomSuffix));
     }
 
     // 2) Disenchant button in Need-Before-Greed if the usage is "DISENCHANT"

@@ -293,27 +293,27 @@ AiPlayerbot.LootRollLevel = 1
 
 # NEED only if the item matches the bot's MAIN spec (stats & armor/weapon type).
 # Off-spec upgrades are automatically downgraded to GREED.
-# Recommended default: 1 (enabled)
+# Default: 1 (enabled)
 AiPlayerbot.Roll.SmartNeedBySpec = 1
 
 # Bind-on-Equip etiquette: GREED by default to keep it tradeable.
 # Set to 1 to allow NEED on BoE if it's a clear upgrade.
-# Default: 0 (disabled)
-AiPlayerbot.Roll.AllowBoENeedIfUpgrade = 0
+# Default: 1 (enabled)
+AiPlayerbot.Roll.AllowBoENeedIfUpgrade = 1
 
 # Bind-on-Use etiquette: GREED by default to keep it tradeable.
 # Set to 1 to allow NEED on BoU if it's a clear upgrade.
-# Default: 0 (disabled)
-AiPlayerbot.Roll.AllowBoUNeedIfUpgrade = 0
+# Default:  (enabled)
+AiPlayerbot.Roll.AllowBoUNeedIfUpgrade = 1
 
 # Cross-armor rule (cloth/leather/mail on a plate user, etc.):
 # Allow NEED only if newScore >= CrossArmorExtraMargin * bestEquippedScore.
-# Recommended default: 1.20 (conservative). Use 9.99 to effectively forbid cross-armor NEED.
+# Default: 1.20 (conservative). Use 9.99 to effectively forbid cross-armor NEED.
 AiPlayerbot.Roll.CrossArmorExtraMargin = 1.20
 
 # If Need-Before-Greed is active and the item is only useful for disenchanting,
 # bots will press the "Disenchant" button instead of GREED.
-# Recommended default: 1 (enabled)
+# Default: 1 (enabled)
 AiPlayerbot.Roll.UseDEButton = 1
 
 # Minimum item level delta to treat a SET TOKEN as a real upgrade (0 means >=).
@@ -321,12 +321,12 @@ AiPlayerbot.Roll.UseDEButton = 1
 # Example: Paladin Prot with chest ilvl 232:
 #  - “Trophy of the Crusade” (ilvl 245) => NEED allowed.
 #  - Token ilvl 232 with TokenILevelMargin=0.1 => GREED (no same-tier NEED).
-# Recommended default: 0.1
+# Default: 0.1
 AiPlayerbot.Roll.TokenILevelMargin = 0.1
 
 # Announce each bot's roll choice to its master via private whisper.
 # Useful for debugging; can be noisy in large groups.
-# Recommended default: 0 (disabled)
+# Default: 0 (disabled)
 AiPlayerbot.Roll.AnnounceToMaster = 0
 
 #
