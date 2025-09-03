@@ -15,22 +15,32 @@ extern const uint32 FISHING_SPELL = 7620;
 extern const uint32 FISHING_POLE = 6256;
 extern const uint32 FISHING_BOBBER = 35591;
 
+static bool isFishingPole(const Item* item)
+{
+    if (!item)
+        return false;
+    const ItemTemplate* proto = item->GetTemplate();
+    return proto && proto->Class == ITEM_CLASS_WEAPON && 
+        proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE;
+}
+
 WorldPosition FindWater(Player* bot, float x, float y, float z, uint32 mapId, float distance, float increment, bool findLand)
 {
     for (float checkX = x - distance; checkX <= x + distance; checkX += increment)
     {
         for (float checkY = y - distance; checkY <= y + distance; checkY += increment)
         {
-            if (bot->GetMap()->IsInWater(mapId, checkX, checkY, z, DEFAULT_COLLISION_HEIGHT))
+            bool isWater = bot->GetMap()->IsInWater(mapId, checkX, checkY, z, DEFAULT_COLLISION_HEIGHT);
+            if (findLand ? !isWater : isWater)
             {
-                return WorldPosition(checkX, checkY, z);   
+                return WorldPosition(checkX, checkY, z);
             }
         }
     }
     return nullptr;
 }
 
-bool MovetoFish::Execute(Event event)
+bool MovetoFishAction::Execute(Event event)
 {
     if (qualifier == "travel")
     {
@@ -52,13 +62,94 @@ bool MovetoFish::Execute(Event event)
     }
     return false;
 }
-bool MovetoFish::isUseful()
+
+bool MovetoFishAction::isUseful()
 {
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
     {
         return false;
     }
     return true;
+}
+
+bool EquipFishingPoleAction::Execute(Event event)
+{
+    Player* bot = botAI->GetBot();
+    
+    if (Item* mainHandItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+    {
+        if (isFishingPole(mainHandItem))
+            return true;
+    }
+
+    // Find a fishing pole in other equipment slots or inventory.
+    Item* pole = nullptr;
+
+    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+    {
+        if (Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            if (isFishingPole(item))
+            {
+                pole = item;
+                break;
+            }
+    }
+        
+    if (!pole)
+    {
+        for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+        {
+            if (Bag* pBag = bot->GetBagByPos(bag))
+            {
+                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                    if (Item* item = pBag->GetItemByPos(j))
+                        if (isFishingPole(item))
+                        {
+                            pole = item;
+                            break;
+                        }
+            }
+            if (pole) //Break out if it finds the pole between bags
+                break;
+        }
+    }
+
+    if (!pole)
+    {
+        if (sRandomPlayerbotMgr->IsRandomBot(bot))
+        {
+            botAI->SetNextCheckDelay(50);
+            bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
+            return true;
+        }
+        else
+        {
+            botAI->TellError("I don't have a fishing pole");
+            return false;
+        }
+    }
+    
+    if (!bot->GetSession())
+        return false;
+    if (!pole)
+        return false;
+
+        return false;
+
+    WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
+    eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
+    bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
+
+    return true;
+}
+
+bool EquipFishingPoleAction::isUseful()
+{
+    if (!bot)
+        return false;
+    
+    Item* mainHand = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    return !isFishingPole(mainHand);
 }
 
 bool FishingAction::Execute(Event event)
@@ -79,69 +170,12 @@ bool FishingAction::Execute(Event event)
     }
     else
     {
-        return MovetoFish(botAI).Execute(event);
+        return MovetoFishAction(botAI).Execute(event);
     }
     
-    auto isFishingPole = [](Item* item) -> bool
-    {
-        if (!item)
-            return false;
-        ItemTemplate const* proto = item->GetTemplate();
-        return proto && proto->Class == ITEM_CLASS_WEAPON && proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE;
-    };
-    Item* pole = nullptr;
-    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END && !pole; ++slot)
-    {
-        pole = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-        if (!isFishingPole(pole))
-            pole = nullptr;
-    }
-    if (!pole)
-    {
-        for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END && !pole; ++slot)
-        {
-            Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-            if (isFishingPole(item))
-                pole = item;
-        }
-        for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END && !pole; ++bag)
-        {
-            Bag* pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
-            if (!pBag)
-                continue;
-            for (uint32 j = 0; j < pBag->GetBagSize() && !pole; ++j)
-            {
-                Item* item = pBag->GetItemByPos(j);
-                if (isFishingPole(item))
-                    pole = item;
-            }
-        }
-    }
-
-    if (!pole)
-    {
-        if (sRandomPlayerbotMgr->IsRandomBot(bot))
-        {
-            bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
-        }
-        else
-        {
-            botAI->TellError("I don't have a fishing pole");
-            return false;
-        }
-    }
-    if (!pole)
-        return false;
-
-    if (!bot->GetSession())
-        return false;
-
-    if (pole->GetSlot() != EQUIPMENT_SLOT_MAINHAND)
-    {
-        WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
-        eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
-        bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
-    }
+    EquipFishingPoleAction equipAction(botAI);
+    if (equipAction.isUseful())
+        return equipAction.Execute(event);
 
     botAI->SetNextCheckDelay(100);
     botAI->CastSpell(FISHING_SPELL, bot);
@@ -158,6 +192,7 @@ bool FishingAction::isUseful()
     }
     return true;
 }
+
 bool UseBobber::isUseful()
 {
     if (!AI_VALUE(bool, "can use fishing bobber"))
@@ -182,24 +217,18 @@ bool UseBobber::Execute(Event event)
                 continue;
             if (go->GetOwnerGUID() != bot->GetGUID())
                 continue;
-            if (go->getLootState() != GO_READY)
+            if (go->getLootState() == GO_READY)
             {
-                time_t bobberActiveTime = go->GetRespawnTime() - FISHING_BOBBER_READY_TIME;
-                if (bobberActiveTime > time(0))
-                    botAI->SetNextCheckDelay((bobberActiveTime - time(0)) * IN_MILLISECONDS + 500);
-                else
-                    botAI->SetNextCheckDelay(1000);
-                return false;
+                botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
+                go->Use(bot);
+                return true;
             }
-            botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
-            go->Use(bot);
-            return true;
 
         }
     }
-    botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
     return false;
 }
+
 bool EndFishing::Execute(Event event)
 {
     if (!bot || !botAI)
@@ -208,4 +237,14 @@ bool EndFishing::Execute(Event event)
     }
     botAI->ChangeStrategy("-masterfishing", BOT_STATE_NON_COMBAT);
     return true;
+}
+
+
+bool RemoveBobberStrategyAction::Execute(Event event)
+{
+  if (!botAI)
+    return false;
+
+  botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
+  return true;
 }

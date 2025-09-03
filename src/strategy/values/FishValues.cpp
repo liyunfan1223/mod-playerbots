@@ -33,6 +33,25 @@ bool CanFishValue::Calculate()
   }
   return true;
 }
+bool HasBobberValue::Calculate()
+{
+    if (!bot || !botAI)
+        return false;
+
+    GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
+    for (const auto& guid : gos)
+    {
+        if (GameObject* go = botAI->GetGameObject(guid))
+        {
+            if (go->GetEntry() != FISHING_BOBBER)
+                continue;
+            if (go->GetOwnerGUID() != bot->GetGUID())
+                continue;
+            return true; 
+        }
+    }
+    return false;
+}
 
 bool CanOpenBobberValue::Calculate()
 {
@@ -40,7 +59,29 @@ bool CanOpenBobberValue::Calculate()
   {
     return false;
   }
-  return true;
+    GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
+    for (const auto& guid : gos)
+    {
+        if (GameObject* go = botAI->GetGameObject(guid))
+        {
+            if (go->GetEntry() != FISHING_BOBBER)
+                continue;
+            if (go->GetOwnerGUID() != bot->GetGUID())
+                continue;
+
+            return go->getLootState() == GO_READY;
+
+            // Not ready yet → delay next check
+            time_t bobberActiveTime = go->GetRespawnTime() - FISHING_BOBBER_READY_TIME;
+            if (bobberActiveTime > time(0))
+                botAI->SetNextCheckDelay((bobberActiveTime - time(0)) * IN_MILLISECONDS + 500);
+            else
+                botAI->SetNextCheckDelay(1000);
+
+            return false;
+        }
+    }
+    return false;
 }
 
 bool DoneFishingValue::Calculate()
@@ -66,4 +107,3 @@ bool DoneFishingValue::Calculate()
   }
   return false;
 }
-

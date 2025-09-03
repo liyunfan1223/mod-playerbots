@@ -12,10 +12,10 @@
 #include "Playerbots.h"
 
 extern const uint32 FISHING_SPELL;
+extern const uint32 FISHING_POLE;
+extern const uint32 FISHING_BOBBER;
 
 class PlayerbotAI;
-
-static WorldPosition FindWater(Player* bot, float distance = 5.0f, float increment = 0.2f);
 
 class FishingAction : public Action, public Qualified
 {
@@ -33,10 +33,10 @@ public:
     bool isUseful() override;
 };
 
-class MovetoFish: public MovementAction, public Qualified
+class MovetoFishAction : public MovementAction, public Qualified
 {
 public:
-    MovetoFish(PlayerbotAI* botAI) : MovementAction(botAI, "move to fish") {}
+    MovetoFishAction(PlayerbotAI* botAI) : MovementAction(botAI, "move to fish") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -44,15 +44,22 @@ public:
 class UseBobber : public Action
 {
 public:
-    UseBobber(PlayerbotAI* botAI) : Action(botAI, "use fishing bobber"){}
+    UseBobber(PlayerbotAI* botAI) : Action(botAI, "use fishing bobber") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
 
 class EndFishing : public Action
 {
-    public:
-        EndFishing(PlayerbotAI* botAI) : Action(botAI, "end fishing") {}
-        bool Execute(Event event) override;
+public:
+    EndFishing(PlayerbotAI* botAI) : Action(botAI, "end fishing") {}
+    bool Execute(Event event) override;
+};
+
+class RemoveBobberStrategyAction : public Action
+{
+public:
+    RemoveBobberStrategyAction(PlayerbotAI* botAI) : Action(botAI, "remove bobber strategy") {}
+    bool Execute(Event event) override;
 };
 #endif
