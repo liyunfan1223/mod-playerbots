@@ -64,6 +64,6 @@ public:
     MasterFishStrategy(PlayerbotAI* botAI) : Strategy(botAI){}
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    std::string const getName(){return "masterfishing";}
+    std::string const getName() override {return "masterfishing";}
 };
 #endif
