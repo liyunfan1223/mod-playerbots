@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "LeaveGroupAction.h"
@@ -30,7 +30,7 @@ bool PartyCommandAction::Execute(Event event)
     Player* master = GetMaster();
     if (master && member == master->GetName())
         return Leave(bot);
-	
+
 	botAI->Reset();
 
     return false;
@@ -64,7 +64,7 @@ bool UninviteAction::Execute(Event event)
         if (bot->GetGUID() == guid)
             return Leave(bot);
     }
-	
+
 	botAI->Reset();
 
     return false;
@@ -162,7 +162,7 @@ bool LeaveFarAwayAction::isUseful()
     {
         return true;
     }
-	
+
 	botAI->Reset();
 
     return false;

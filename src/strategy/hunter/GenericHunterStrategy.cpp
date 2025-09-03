@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "GenericHunterStrategy.h"
@@ -123,7 +123,7 @@ void GenericHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // Ranged-based Triggers
     triggers.push_back(new TriggerNode("enemy within melee", NextAction::array(0,
                                                          new NextAction("explosive trap", 37.0f),
-                                                         new NextAction("mongoose bite", 22.0f),      
+                                                         new NextAction("mongoose bite", 22.0f),
                                                          new NextAction("wing clip", 21.0f), nullptr)));
 
     triggers.push_back(new TriggerNode("enemy too close for auto shot", NextAction::array(0,
@@ -147,11 +147,11 @@ void HunterBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void HunterCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("scare beast", NextAction::array(0, new NextAction("scare beast on cc", 23.0f), nullptr))); 
-    triggers.push_back(new TriggerNode("freezing trap", NextAction::array(0, new NextAction("freezing trap on cc", 23.0f), nullptr)));  
+    triggers.push_back(new TriggerNode("scare beast", NextAction::array(0, new NextAction("scare beast on cc", 23.0f), nullptr)));
+    triggers.push_back(new TriggerNode("freezing trap", NextAction::array(0, new NextAction("freezing trap on cc", 23.0f), nullptr)));
 }
 
 void HunterTrapWeaveStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("immolation trap no cd", NextAction::array(0, new NextAction("reach melee", 23.0f), nullptr))); 
+    triggers.push_back(new TriggerNode("immolation trap no cd", NextAction::array(0, new NextAction("reach melee", 23.0f), nullptr)));
 }

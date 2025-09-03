@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "ShamanActions.h"
@@ -47,7 +47,7 @@ bool CastMagmaTotemAction::isUseful() {
     if (!target || !bot->IsWithinMeleeRange(target))
         return false;
 
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name); 
+    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name);
 }
 
 bool CastFireNovaAction::isUseful() {
@@ -57,11 +57,11 @@ bool CastFireNovaAction::isUseful() {
     Creature* fireTotem = bot->GetMap()->GetCreature(bot->m_SummonSlot[1]);
     if (!fireTotem)
         return false;
-    
+
     if (target->GetDistance(fireTotem) > 8.0f)
         return false;
-    
-    return CastMeleeSpellAction::isUseful(); 
+
+    return CastMeleeSpellAction::isUseful();
 }
 
 bool CastCleansingTotemAction::isUseful()

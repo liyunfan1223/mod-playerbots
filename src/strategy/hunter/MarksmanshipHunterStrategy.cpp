@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "MarksmanshipHunterStrategy.h"
@@ -13,7 +13,7 @@ public:
     MarksmanshipHunterStrategyActionNodeFactory()
     {
         creators["auto shot"] = &auto_shot;
-        creators["silencing shot"] = &silencing_shot;   
+        creators["silencing shot"] = &silencing_shot;
         creators["kill command"] = &kill_command;
         creators["kill shot"] = &kill_shot;
         creators["viper sting"] = &viper_sting;
@@ -50,7 +50,7 @@ MarksmanshipHunterStrategy::MarksmanshipHunterStrategy(PlayerbotAI* botAI) : Gen
 // ===== Default Actions =====
 NextAction** MarksmanshipHunterStrategy::getDefaultActions()
 {
-    return NextAction::array(0, 
+    return NextAction::array(0,
                                 new NextAction("kill command", 5.8f),
                                 new NextAction("kill shot", 5.7f),
                                 new NextAction("serpent sting", 5.6f),
