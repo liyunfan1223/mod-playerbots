@@ -11,9 +11,9 @@
 #include "PlayerbotAI.h"
 
 
-extern const uint32 FISHING_SPELL = 7620;
-extern const uint32 FISHING_POLE = 6256;
-extern const uint32 FISHING_BOBBER = 35591;
+const uint32 FISHING_SPELL = 7620;
+const uint32 FISHING_POLE = 6256;
+const uint32 FISHING_BOBBER = 35591;
 
 static bool isFishingPole(const Item* item)
 {
@@ -130,8 +130,6 @@ bool EquipFishingPoleAction::Execute(Event event)
     }
     
     if (!bot->GetSession())
-        return false;
-    if (!pole)
         return false;
 
     WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
