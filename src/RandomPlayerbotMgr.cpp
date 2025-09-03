@@ -1660,11 +1660,6 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         return;
     }
 
-    if (tlocs.empty())
-    {
-        LOG_DEBUG("playerbots", "Cannot teleport bot {} - no locations available", bot->GetName().c_str());
-        return;
-    }
 
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "RandomTeleportByLocations");
 
@@ -2021,7 +2016,8 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
         "position_y, "
         "position_z, "
         "orientation, "
-        "t.minlevel "
+        "t.minlevel, "
+        "t.entry "
         "FROM "
         "creature c "
         "INNER JOIN creature_template t on c.id1 = t.entry "
@@ -2048,27 +2044,29 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
             float z = fields[3].Get<float>();
             float orient = fields[4].Get<float>();
             uint32 level = fields[5].Get<uint32>();
-            WorldLocation loc(mapId, x + cos(orient) * 6.0f, y + sin(orient) * 6.0f, z + 2.0f, orient + M_PI);
+            uint32 entry = fields[6].Get<uint32>();
+            BankerLocation bLoc;
+            bLoc.loc = WorldLocation(mapId, x + cos(orient) * 6.0f, y + sin(orient) * 6.0f, z + 2.0f, orient + M_PI);
+            bLoc.entry = entry;
             collected_locs++;
             for (int32 l = 1; l <= maxLevel; l++)
             {
-                if (l <= 60 && level >= 60)
+                // Bots 1-60 go to base game bankers (all have minlevel 30 or 45)
+                if (l <=60 && level > 45)
                 {
                     continue;
                 }
-                if (l <= 70 && level >= 70)
+                // Bots 61-70 go to Shattrath bankers (all have minlevel 60 or 70)
+                if ((l >=61 && l <=70) && (level < 60 || level > 70))
                 {
                     continue;
                 }
-                if (l >= 70 && level >= 60 && level <= 70)
+                // Bots 71+ go to Dalaran bankers (all have minlevel 75)
+                if ((l >=71) && level != 75)
                 {
                     continue;
                 }
-                if (l >= 30 && level <= 30)
-                {
-                    continue;
-                }
-                bankerLocsPerLevelCache[(uint8)l].push_back(loc);
+                bankerLocsPerLevelCache[(uint8)l].push_back(bLoc);
             }
         } while (results->NextRow());
     }
@@ -2138,11 +2136,137 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
         locs = IsAlliance(race) ? &allianceStarterPerLevelCache[level] : &hordeStarterPerLevelCache[level];
     else
         locs = &locsPerLevelCache[level];
-    LOG_DEBUG("playerbots", "Random teleporting bot {} for level {} ({} locations available)", bot->GetName().c_str(),
-              bot->GetLevel(), locs->size());
     if (level >= 10 && urand(0, 100) < sPlayerbotAIConfig->probTeleToBankers * 100)
     {
-        RandomTeleport(bot, bankerLocsPerLevelCache[level], true);
+        std::vector<WorldLocation> fallbackLocs;
+        for (auto& bLoc : bankerLocsPerLevelCache[level])
+            fallbackLocs.push_back(bLoc.loc);
+
+        if (!sPlayerbotAIConfig->enableWeightTeleToCityBankers)
+        {
+            RandomTeleport(bot, fallbackLocs, true);
+            return;
+        }
+
+        enum CityId : uint8 {
+            STORMWIND, IRONFORGE, DARNASSUS, EXODAR,
+            ORGRIMMAR, UNDERCITY, THUNDER_BLUFF, SILVERMOON_CITY,
+            SHATTRATH_CITY, DALARAN
+        };
+
+        enum FactionId : uint8 { ALLIANCE, HORDE, NEUTRAL };
+
+        // Map of banker entry → city + faction
+        const std::unordered_map<uint16, std::pair<CityId, FactionId>> bankerToCity = {
+            {2455,  {STORMWIND,       ALLIANCE}}, {2456,  {STORMWIND,       ALLIANCE}}, {2457,  {STORMWIND,       ALLIANCE}},
+            {2460,  {IRONFORGE,       ALLIANCE}}, {2461,  {IRONFORGE,       ALLIANCE}}, {5099,  {IRONFORGE,       ALLIANCE}},
+            {4155,  {DARNASSUS,       ALLIANCE}}, {4208,  {DARNASSUS,       ALLIANCE}}, {4209,  {DARNASSUS,       ALLIANCE}},
+            {17773, {EXODAR,          ALLIANCE}}, {18350, {EXODAR,          ALLIANCE}}, {16710, {EXODAR,          ALLIANCE}},
+            {3320,  {ORGRIMMAR,       HORDE}},    {3309,  {ORGRIMMAR,       HORDE}},    {3318,  {ORGRIMMAR,       HORDE}},
+            {4549,  {UNDERCITY,       HORDE}},    {2459,  {UNDERCITY,       HORDE}},    {2458,  {UNDERCITY,       HORDE}},    {4550, {UNDERCITY, HORDE}},
+            {2996,  {THUNDER_BLUFF,   HORDE}},    {8356,  {THUNDER_BLUFF,   HORDE}},    {8357,  {THUNDER_BLUFF,   HORDE}},
+            {17631, {SILVERMOON_CITY, HORDE}},    {17632, {SILVERMOON_CITY, HORDE}},    {17633, {SILVERMOON_CITY, HORDE}},
+            {16615, {SILVERMOON_CITY, HORDE}},    {16616, {SILVERMOON_CITY, HORDE}},    {16617, {SILVERMOON_CITY, HORDE}},
+            {19246, {SHATTRATH_CITY,  NEUTRAL}},  {19338, {SHATTRATH_CITY,  NEUTRAL}}, 
+            {19034, {SHATTRATH_CITY,  NEUTRAL}},  {19318, {SHATTRATH_CITY,  NEUTRAL}}, 
+            {30604, {DALARAN,         NEUTRAL}},  {30605, {DALARAN,         NEUTRAL}},  {30607, {DALARAN,         NEUTRAL}},
+            {28675, {DALARAN,         NEUTRAL}},  {28676, {DALARAN,         NEUTRAL}},  {28677, {DALARAN,         NEUTRAL}}
+        };
+
+        // Map of city → available banker entries
+        const std::unordered_map<uint8, std::vector<uint16>> cityToBankers = {
+            {STORMWIND,       {2455, 2456, 2457}},
+            {IRONFORGE,       {2460, 2461, 5099}},
+            {DARNASSUS,       {4155, 4208, 4209}},
+            {EXODAR,          {17773, 18350, 16710}},
+            {ORGRIMMAR,       {3320, 3309, 3318}},
+            {UNDERCITY,       {4549, 2459, 2458, 4550}},
+            {THUNDER_BLUFF,   {2996, 8356, 8357}},
+            {SILVERMOON_CITY, {17631, 17632, 17633, 16615, 16616, 16617}},
+            {SHATTRATH_CITY,  {19246, 19338, 19034, 19318}}, 
+            {DALARAN,         {30604, 30605, 30607, 28675, 28676, 28677, 29530}}
+        };
+
+        // Quick lookup map: banker entry → location
+        std::unordered_map<uint32, WorldLocation> bankerEntryToLocation;
+        std::unordered_set<CityId> validBankerCities;
+
+        // Collect valid cities based on bot faction.
+        // Also take advantage of the loop to build the bankerEntryToLocation map
+        for (auto& loc : bankerLocsPerLevelCache[level])
+        {
+            bankerEntryToLocation[loc.entry] = loc.loc;
+
+            auto cityIt = bankerToCity.find(loc.entry);
+            if (cityIt == bankerToCity.end()) continue;
+
+            CityId cityId = cityIt->second.first;
+            FactionId cityFactionId = cityIt->second.second;
+
+            if ((IsAlliance(bot->getRace()) && cityFactionId == ALLIANCE) ||
+                (!IsAlliance(bot->getRace()) && cityFactionId == HORDE) ||
+                (cityFactionId == NEUTRAL))
+            {
+                validBankerCities.insert(cityId);
+            }
+        }
+
+        // Fallback if no valid cities
+        if (validBankerCities.empty())
+        {
+            RandomTeleport(bot, fallbackLocs, true);
+            return;
+        }
+
+        // Apply weights to valid cities
+        std::vector<CityId> weightedCities;
+        for (CityId city : validBankerCities)
+        {
+            int weight = 0;
+            switch (city)
+            {
+                case STORMWIND:       weight = sPlayerbotAIConfig->weightTeleToStormwind; break;
+                case IRONFORGE:       weight = sPlayerbotAIConfig->weightTeleToIronforge; break;
+                case DARNASSUS:       weight = sPlayerbotAIConfig->weightTeleToDarnassus; break;
+                case EXODAR:          weight = sPlayerbotAIConfig->weightTeleToExodar; break;
+                case ORGRIMMAR:       weight = sPlayerbotAIConfig->weightTeleToOrgrimmar; break;
+                case UNDERCITY:       weight = sPlayerbotAIConfig->weightTeleToUndercity; break;
+                case THUNDER_BLUFF:   weight = sPlayerbotAIConfig->weightTeleToThunderBluff; break;
+                case SILVERMOON_CITY: weight = sPlayerbotAIConfig->weightTeleToSilvermoonCity; break;
+                case SHATTRATH_CITY:  weight = sPlayerbotAIConfig->weightTeleToShattrathCity; break;
+                case DALARAN:         weight = sPlayerbotAIConfig->weightTeleToDalaran; break;
+                default:              weight = 0; break;
+            }
+            if (weight <= 0) continue;
+
+            for (int i = 0; i < weight; ++i)
+            {
+                weightedCities.push_back(city);
+            }
+        }
+
+        // Fallback if no valid cities
+        if (weightedCities.empty())
+        {
+            RandomTeleport(bot, fallbackLocs, true);
+            return;
+        }
+
+        // Pick a weighted city randomly, then a random banker in that city
+        //   then teleport to that banker
+        CityId selectedCity = weightedCities[urand(0, weightedCities.size() - 1)];
+        const auto& bankers = cityToBankers.at(selectedCity);
+        uint32 selectedBankerEntry = bankers[urand(0, bankers.size() - 1)];
+        auto locIt = bankerEntryToLocation.find(selectedBankerEntry);
+        if (locIt != bankerEntryToLocation.end())
+        {
+            std::vector<WorldLocation> teleportTarget = { locIt->second };
+            RandomTeleport(bot, teleportTarget, true);
+            return;
+        }
+
+        // Fallback if something went wrong
+        RandomTeleport(bot, *locs);
     }
     else
     {
