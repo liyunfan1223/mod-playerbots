@@ -33,7 +33,7 @@ bool CanFishValue::Calculate()
   }
   return true;
 }
-bool HasBobberValue::Calculate()
+bool NoBobberValue::Calculate()
 {
     if (!bot || !botAI)
         return false;
@@ -47,10 +47,10 @@ bool HasBobberValue::Calculate()
                 continue;
             if (go->GetOwnerGUID() != bot->GetGUID())
                 continue;
-            return true; 
+            return false; 
         }
     }
-    return false;
+    return true;
 }
 
 bool CanOpenBobberValue::Calculate()
@@ -69,7 +69,8 @@ bool CanOpenBobberValue::Calculate()
             if (go->GetOwnerGUID() != bot->GetGUID())
                 continue;
 
-            return go->getLootState() == GO_READY;
+            if (go->getLootState() == GO_READY)
+                return true;
 
             // Not ready yet → delay next check
             time_t bobberActiveTime = go->GetRespawnTime() - FISHING_BOBBER_READY_TIME;
@@ -93,6 +94,7 @@ bool DoneFishingValue::Calculate()
   
   if (!master) // Check if master exists
     return false;
+    
   ObjectGuid masterGUID;
   masterGUID = master->GetGUID();
   

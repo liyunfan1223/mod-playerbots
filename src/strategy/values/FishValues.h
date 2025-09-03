@@ -17,10 +17,10 @@ class CanFishValue : public BoolCalculatedValue
         CanFishValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "can fish") {};
         bool Calculate() override;
 };
-class HasBobberValue : public BoolCalculatedValue
+class NoBobberValue : public BoolCalculatedValue
    {
     public:
-        HasBobberValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "has fishing bobber") {};
+        NoBobberValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "no fishing bobber") {};
             bool Calculate() override;
     };
 

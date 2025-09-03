@@ -16,10 +16,10 @@ class CanFishTrigger : public Trigger
         bool IsActive() override;
 };
 
-class HasFishingBobberTrigger : public Trigger
+class NoFishingBobberTrigger : public Trigger
 {
 public:
-    HasFishingBobberTrigger(PlayerbotAI* ai) : Trigger(ai, "has fishing bobber") {};
+    NoFishingBobberTrigger(PlayerbotAI* ai) : Trigger(ai, "no fishing bobber") {};
     bool IsActive() override;
 };
 

@@ -134,8 +134,6 @@ bool EquipFishingPoleAction::Execute(Event event)
     if (!pole)
         return false;
 
-        return false;
-
     WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
     eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
     bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
