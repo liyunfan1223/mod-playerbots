@@ -60,6 +60,48 @@ struct GuidClassRaceInfo
     uint32 rRace;
 };
 
+enum class CityId : uint8 {
+    STORMWIND, IRONFORGE, DARNASSUS, EXODAR,
+    ORGRIMMAR, UNDERCITY, THUNDER_BLUFF, SILVERMOON_CITY,
+    SHATTRATH_CITY, DALARAN
+};
+
+enum class FactionId : uint8 { ALLIANCE, HORDE, NEUTRAL };
+
+// Map of banker entry → city + faction
+static const std::unordered_map<uint16, std::pair<CityId, FactionId>> bankerToCity = {
+    {2455,  {CityId::STORMWIND,       FactionId::ALLIANCE}}, {2456,  {CityId::STORMWIND,       FactionId::ALLIANCE}}, {2457,  {CityId::STORMWIND,       FactionId::ALLIANCE}},
+    {2460,  {CityId::IRONFORGE,       FactionId::ALLIANCE}}, {2461,  {CityId::IRONFORGE,       FactionId::ALLIANCE}}, {5099,  {CityId::IRONFORGE,       FactionId::ALLIANCE}},
+    {4155,  {CityId::DARNASSUS,       FactionId::ALLIANCE}}, {4208,  {CityId::DARNASSUS,       FactionId::ALLIANCE}}, {4209,  {CityId::DARNASSUS,       FactionId::ALLIANCE}},
+    {17773, {CityId::EXODAR,          FactionId::ALLIANCE}}, {18350, {CityId::EXODAR,          FactionId::ALLIANCE}}, {16710, {CityId::EXODAR,          FactionId::ALLIANCE}},
+    {3320,  {CityId::ORGRIMMAR,       FactionId::HORDE}},    {3309,  {CityId::ORGRIMMAR,       FactionId::HORDE}},    {3318,  {CityId::ORGRIMMAR,       FactionId::HORDE}},
+    {4549,  {CityId::UNDERCITY,       FactionId::HORDE}},    {2459,  {CityId::UNDERCITY,       FactionId::HORDE}},    {2458,  {CityId::UNDERCITY,       FactionId::HORDE}},    {4550, {CityId::UNDERCITY, FactionId::HORDE}},
+    {2996,  {CityId::THUNDER_BLUFF,   FactionId::HORDE}},    {8356,  {CityId::THUNDER_BLUFF,   FactionId::HORDE}},    {8357,  {CityId::THUNDER_BLUFF,   FactionId::HORDE}},
+    {17631, {CityId::SILVERMOON_CITY, FactionId::HORDE}},    {17632, {CityId::SILVERMOON_CITY, FactionId::HORDE}},    {17633, {CityId::SILVERMOON_CITY, FactionId::HORDE}},
+    {16615, {CityId::SILVERMOON_CITY, FactionId::HORDE}},    {16616, {CityId::SILVERMOON_CITY, FactionId::HORDE}},    {16617, {CityId::SILVERMOON_CITY, FactionId::HORDE}},
+    {19246, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}},  {19338, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}}, 
+    {19034, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}},  {19318, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}}, 
+    {30604, {CityId::DALARAN,         FactionId::NEUTRAL}},  {30605, {CityId::DALARAN,         FactionId::NEUTRAL}},  {30607, {CityId::DALARAN,         FactionId::NEUTRAL}},
+    {28675, {CityId::DALARAN,         FactionId::NEUTRAL}},  {28676, {CityId::DALARAN,         FactionId::NEUTRAL}},  {28677, {CityId::DALARAN,         FactionId::NEUTRAL}}
+};
+
+// Map of city → available banker entries
+static const std::unordered_map<CityId, std::vector<uint16>> cityToBankers = {
+    {CityId::STORMWIND,       {2455, 2456, 2457}},
+    {CityId::IRONFORGE,       {2460, 2461, 5099}},
+    {CityId::DARNASSUS,       {4155, 4208, 4209}},
+    {CityId::EXODAR,          {17773, 18350, 16710}},
+    {CityId::ORGRIMMAR,       {3320, 3309, 3318}},
+    {CityId::UNDERCITY,       {4549, 2459, 2458, 4550}},
+    {CityId::THUNDER_BLUFF,   {2996, 8356, 8357}},
+    {CityId::SILVERMOON_CITY, {17631, 17632, 17633, 16615, 16616, 16617}},
+    {CityId::SHATTRATH_CITY,  {19246, 19338, 19034, 19318}}, 
+    {CityId::DALARAN,         {30604, 30605, 30607, 28675, 28676, 28677, 29530}}
+};
+
+// Quick lookup map: banker entry → location
+static std::unordered_map<uint32, WorldLocation> bankerEntryToLocation;
+
 void PrintStatsThread() { sRandomPlayerbotMgr->PrintStats(); }
 
 void activatePrintStatsThread()
@@ -2067,6 +2109,7 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
                     continue;
                 }
                 bankerLocsPerLevelCache[(uint8)l].push_back(bLoc);
+                bankerEntryToLocation[bLoc.entry] = bLoc.loc;
             }
         } while (results->NextRow());
     }
@@ -2147,65 +2190,20 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
             RandomTeleport(bot, fallbackLocs, true);
             return;
         }
-
-        enum CityId : uint8 {
-            STORMWIND, IRONFORGE, DARNASSUS, EXODAR,
-            ORGRIMMAR, UNDERCITY, THUNDER_BLUFF, SILVERMOON_CITY,
-            SHATTRATH_CITY, DALARAN
-        };
-
-        enum FactionId : uint8 { ALLIANCE, HORDE, NEUTRAL };
-
-        // Map of banker entry → city + faction
-        const std::unordered_map<uint16, std::pair<CityId, FactionId>> bankerToCity = {
-            {2455,  {STORMWIND,       ALLIANCE}}, {2456,  {STORMWIND,       ALLIANCE}}, {2457,  {STORMWIND,       ALLIANCE}},
-            {2460,  {IRONFORGE,       ALLIANCE}}, {2461,  {IRONFORGE,       ALLIANCE}}, {5099,  {IRONFORGE,       ALLIANCE}},
-            {4155,  {DARNASSUS,       ALLIANCE}}, {4208,  {DARNASSUS,       ALLIANCE}}, {4209,  {DARNASSUS,       ALLIANCE}},
-            {17773, {EXODAR,          ALLIANCE}}, {18350, {EXODAR,          ALLIANCE}}, {16710, {EXODAR,          ALLIANCE}},
-            {3320,  {ORGRIMMAR,       HORDE}},    {3309,  {ORGRIMMAR,       HORDE}},    {3318,  {ORGRIMMAR,       HORDE}},
-            {4549,  {UNDERCITY,       HORDE}},    {2459,  {UNDERCITY,       HORDE}},    {2458,  {UNDERCITY,       HORDE}},    {4550, {UNDERCITY, HORDE}},
-            {2996,  {THUNDER_BLUFF,   HORDE}},    {8356,  {THUNDER_BLUFF,   HORDE}},    {8357,  {THUNDER_BLUFF,   HORDE}},
-            {17631, {SILVERMOON_CITY, HORDE}},    {17632, {SILVERMOON_CITY, HORDE}},    {17633, {SILVERMOON_CITY, HORDE}},
-            {16615, {SILVERMOON_CITY, HORDE}},    {16616, {SILVERMOON_CITY, HORDE}},    {16617, {SILVERMOON_CITY, HORDE}},
-            {19246, {SHATTRATH_CITY,  NEUTRAL}},  {19338, {SHATTRATH_CITY,  NEUTRAL}}, 
-            {19034, {SHATTRATH_CITY,  NEUTRAL}},  {19318, {SHATTRATH_CITY,  NEUTRAL}}, 
-            {30604, {DALARAN,         NEUTRAL}},  {30605, {DALARAN,         NEUTRAL}},  {30607, {DALARAN,         NEUTRAL}},
-            {28675, {DALARAN,         NEUTRAL}},  {28676, {DALARAN,         NEUTRAL}},  {28677, {DALARAN,         NEUTRAL}}
-        };
-
-        // Map of city → available banker entries
-        const std::unordered_map<uint8, std::vector<uint16>> cityToBankers = {
-            {STORMWIND,       {2455, 2456, 2457}},
-            {IRONFORGE,       {2460, 2461, 5099}},
-            {DARNASSUS,       {4155, 4208, 4209}},
-            {EXODAR,          {17773, 18350, 16710}},
-            {ORGRIMMAR,       {3320, 3309, 3318}},
-            {UNDERCITY,       {4549, 2459, 2458, 4550}},
-            {THUNDER_BLUFF,   {2996, 8356, 8357}},
-            {SILVERMOON_CITY, {17631, 17632, 17633, 16615, 16616, 16617}},
-            {SHATTRATH_CITY,  {19246, 19338, 19034, 19318}}, 
-            {DALARAN,         {30604, 30605, 30607, 28675, 28676, 28677, 29530}}
-        };
-
-        // Quick lookup map: banker entry → location
-        std::unordered_map<uint32, WorldLocation> bankerEntryToLocation;
-        std::unordered_set<CityId> validBankerCities;
-
+        
         // Collect valid cities based on bot faction.
-        // Also take advantage of the loop to build the bankerEntryToLocation map
+        std::unordered_set<CityId> validBankerCities;
         for (auto& loc : bankerLocsPerLevelCache[level])
         {
-            bankerEntryToLocation[loc.entry] = loc.loc;
-
             auto cityIt = bankerToCity.find(loc.entry);
             if (cityIt == bankerToCity.end()) continue;
 
             CityId cityId = cityIt->second.first;
             FactionId cityFactionId = cityIt->second.second;
 
-            if ((IsAlliance(bot->getRace()) && cityFactionId == ALLIANCE) ||
-                (!IsAlliance(bot->getRace()) && cityFactionId == HORDE) ||
-                (cityFactionId == NEUTRAL))
+            if ((IsAlliance(bot->getRace()) && cityFactionId == FactionId::ALLIANCE) ||
+                (!IsAlliance(bot->getRace()) && cityFactionId == FactionId::HORDE) ||
+                (cityFactionId == FactionId::NEUTRAL))
             {
                 validBankerCities.insert(cityId);
             }
@@ -2225,16 +2223,16 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
             int weight = 0;
             switch (city)
             {
-                case STORMWIND:       weight = sPlayerbotAIConfig->weightTeleToStormwind; break;
-                case IRONFORGE:       weight = sPlayerbotAIConfig->weightTeleToIronforge; break;
-                case DARNASSUS:       weight = sPlayerbotAIConfig->weightTeleToDarnassus; break;
-                case EXODAR:          weight = sPlayerbotAIConfig->weightTeleToExodar; break;
-                case ORGRIMMAR:       weight = sPlayerbotAIConfig->weightTeleToOrgrimmar; break;
-                case UNDERCITY:       weight = sPlayerbotAIConfig->weightTeleToUndercity; break;
-                case THUNDER_BLUFF:   weight = sPlayerbotAIConfig->weightTeleToThunderBluff; break;
-                case SILVERMOON_CITY: weight = sPlayerbotAIConfig->weightTeleToSilvermoonCity; break;
-                case SHATTRATH_CITY:  weight = sPlayerbotAIConfig->weightTeleToShattrathCity; break;
-                case DALARAN:         weight = sPlayerbotAIConfig->weightTeleToDalaran; break;
+                case CityId::STORMWIND:       weight = sPlayerbotAIConfig->weightTeleToStormwind; break;
+                case CityId::IRONFORGE:       weight = sPlayerbotAIConfig->weightTeleToIronforge; break;
+                case CityId::DARNASSUS:       weight = sPlayerbotAIConfig->weightTeleToDarnassus; break;
+                case CityId::EXODAR:          weight = sPlayerbotAIConfig->weightTeleToExodar; break;
+                case CityId::ORGRIMMAR:       weight = sPlayerbotAIConfig->weightTeleToOrgrimmar; break;
+                case CityId::UNDERCITY:       weight = sPlayerbotAIConfig->weightTeleToUndercity; break;
+                case CityId::THUNDER_BLUFF:   weight = sPlayerbotAIConfig->weightTeleToThunderBluff; break;
+                case CityId::SILVERMOON_CITY: weight = sPlayerbotAIConfig->weightTeleToSilvermoonCity; break;
+                case CityId::SHATTRATH_CITY:  weight = sPlayerbotAIConfig->weightTeleToShattrathCity; break;
+                case CityId::DALARAN:         weight = sPlayerbotAIConfig->weightTeleToDalaran; break;
                 default:              weight = 0; break;
             }
             if (weight <= 0) continue;
