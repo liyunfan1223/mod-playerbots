@@ -288,8 +288,8 @@ AiPlayerbot.SayWhenCollectingItems = 1
 AiPlayerbot.FreeMethodLoot = 0
 
 # Bots' loot roll level (0 = pass, 1 = greed, 2 = need)
-# Default: 1 (greed), recommanded 2 with new loot AI 
-AiPlayerbot.LootRollLevel = 1
+# Default: 2 (need), recommanded 2 with new loot AI
+AiPlayerbot.LootRollLevel = 2
 
 # NEED only if the item matches the bot's MAIN spec (stats & armor/weapon type).
 # Off-spec upgrades are automatically downgraded to GREED.

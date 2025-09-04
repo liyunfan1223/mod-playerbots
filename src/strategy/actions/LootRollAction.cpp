@@ -23,13 +23,108 @@
 #include <initializer_list>
 #include <vector>
 
-// Encode "random enchant" parameter for CalculateRollVote / ItemUsage
-// >0 => randomPropertyId, <0 => randomSuffixId, 0 => none
-static inline int32 EncodeRandomEnchantParam(uint32 randomPropertyId, uint32 randomSuffix)
+// Groups the "class + archetype" info in the same place
+struct SpecTraits
 {
-    if (randomPropertyId) return static_cast<int32>(randomPropertyId);
-    if (randomSuffix)     return -static_cast<int32>(randomSuffix);
-    return 0;
+    uint8 cls = 0;
+    std::string spec;
+    bool isCaster     = false;  // everything that affects SP/INT/SPI/MP5
+    bool isHealer     = false;
+    bool isTank       = false;
+    bool isPhysical   = false;  // profiles STR/AGI/AP/ARP/EXP…
+    // Useful flags for fine rules
+    bool isDKTank     = false;
+    bool isWarProt    = false;
+    bool isEnhSham    = false;
+    bool isFeralTk    = false;
+    bool isFeralDps   = false;
+    bool isHunter     = false;
+    bool isRogue      = false;
+    bool isWarrior    = false;
+	bool isRetPal     = false;
+};
+
+static SpecTraits GetSpecTraits(Player* bot)
+{
+    SpecTraits t;
+    if (!bot) return t;
+    t.cls  = bot->getClass();
+    t.spec = AiFactory::GetPlayerSpecName(bot);
+
+    auto specIs = [&](char const* s){ return t.spec == s; };
+
+    // "Pure caster" classes
+    const bool pureCasterClass = (t.cls == CLASS_MAGE || t.cls == CLASS_WARLOCK || t.cls == CLASS_PRIEST);
+
+    // Paladin
+    const bool holyPal  = (t.cls == CLASS_PALADIN && specIs("holy"));
+    const bool protPal  = (t.cls == CLASS_PALADIN && (specIs("prot") || specIs("protection")));
+	t.isRetPal          = (t.cls == CLASS_PALADIN && !holyPal && !protPal);
+    // DK
+    const bool dk       = (t.cls == CLASS_DEATH_KNIGHT);
+    const bool dkBlood  = dk && specIs("blood");
+    const bool dkFrost  = dk && specIs("frost");
+    const bool dkUH     = dk && (specIs("unholy") || specIs("uh"));
+    t.isDKTank          = (dkBlood || dkFrost) && !dkUH;  // tanks “blood/frost”
+    // Warrior
+    t.isWarrior         = (t.cls == CLASS_WARRIOR);
+    t.isWarProt         = t.isWarrior && (specIs("prot") || specIs("protection"));
+    // Hunter & Rogue
+    t.isHunter          = (t.cls == CLASS_HUNTER);
+    t.isRogue           = (t.cls == CLASS_ROGUE);
+    // Shaman
+    const bool eleSham  = (t.cls == CLASS_SHAMAN && specIs("elemental"));
+    const bool restoSh  = (t.cls == CLASS_SHAMAN && (specIs("resto") || specIs("restoration")));
+    t.isEnhSham         = (t.cls == CLASS_SHAMAN && (specIs("enhance") || specIs("enhancement")));
+    // Druid
+    const bool balance  = (t.cls == CLASS_DRUID && specIs("balance"));
+    const bool restoDr  = (t.cls == CLASS_DRUID && (specIs("resto") || specIs("restoration")));
+    t.isFeralTk         = (t.cls == CLASS_DRUID && (specIs("feraltank") || specIs("bear")));
+    t.isFeralDps        = (t.cls == CLASS_DRUID && (specIs("feraldps") || specIs("cat") || specIs("kitty")));
+
+    // Roles
+    t.isHealer   = holyPal || restoSh || restoDr || (t.cls == CLASS_PRIEST && !specIs("shadow"));
+    t.isTank     = protPal || t.isWarProt || t.isFeralTk || t.isDKTank;
+    t.isCaster   = pureCasterClass || holyPal || eleSham || balance || restoDr || restoSh
+                   || (t.cls == CLASS_PRIEST && specIs("shadow")); // Shadow = caster DPS
+    t.isPhysical = !t.isCaster;
+    return t;
+}
+
+// Local helper: identifies classic lockboxes the Rogue can pick.
+// Heuristic: items with a LockID and “misc/junk” class often are lockboxes.
+// Also fall back to a name check (“lockbox”, “coffre”) to cover edge DBs.
+static bool IsLockbox(ItemTemplate const* proto)
+{
+    if (!proto) return false;
+    if (proto->LockID)
+    {
+        // Most lockboxes are misc/junk and openable.
+        if (proto->Class == ITEM_CLASS_MISC)
+            return true;
+    }
+    // Fallback on localized name check
+    static const std::vector<std::string> lockboxKeywords = {
+        "lockbox",      // English
+        "coffre",       // French
+        "schließkassette", // German
+        "caja fuerte",  // Spanish
+        "сундук",       // Russian
+        "잠긴",         // Korean
+        "锁箱",         // Simplified Chinese
+        "鎖箱"          // Traditional Chinese
+    };
+
+    std::string n = proto->Name1;
+    std::transform(n.begin(), n.end(), n.begin(),
+                   [](unsigned char c){ return (c >= 'A' && c <= 'Z') ? char(c + 32) : char(c); });
+    for (auto const& kw : lockboxKeywords)
+    {
+        const bool ascii = std::all_of(kw.begin(), kw.end(), [](unsigned char c){ return c < 0x80; });
+        if ((ascii && n.find(kw) != std::string::npos) || (!ascii && std::string(proto->Name1).find(kw) != std::string::npos))
+            return true;
+    }
+    return false;
 }
 
 // Local helper: not a class member
@@ -47,6 +142,117 @@ static bool HasAnyStat(ItemTemplate const* proto,
     return false;
 }
 
+// Encode "random enchant" parameter for CalculateRollVote / ItemUsage
+// >0 => randomPropertyId, <0 => randomSuffixId, 0 => none
+static inline int32 EncodeRandomEnchantParam(uint32 randomPropertyId, uint32 randomSuffix)
+{
+    if (randomPropertyId) return static_cast<int32>(randomPropertyId);
+    if (randomSuffix)     return -static_cast<int32>(randomSuffix);
+    return 0;
+}
+
+// Weapon/shield/relic whitelist per class.
+// Returns false when the item is a WEAPON / SHIELD / RELIC the class should NOT use.
+static bool IsWeaponOrShieldOrRelicAllowedForClass(SpecTraits const& T, ItemTemplate const* proto)
+{
+    if (!proto) return true; // non-weapon items handled elsewhere
+
+    // Shields (Armor + Shield): Paladin / Warrior / Shaman
+    if ((proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD) ||
+        proto->InventoryType == INVTYPE_SHIELD)
+        return T.cls == CLASS_PALADIN || T.cls == CLASS_WARRIOR || T.cls == CLASS_SHAMAN;
+
+     // Relics (Idol/Totem/Sigil/Libram)
+    if (proto->InventoryType == INVTYPE_RELIC)
+    {
+        // DK (Sigil), Druid (Idol), Paladin (Libram), Shaman (Totem)
+        return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_DRUID ||
+               T.cls == CLASS_PALADIN      || T.cls == CLASS_SHAMAN;
+    }
+
+    // Not a weapon: nothing to filter here
+    if (proto->Class != ITEM_CLASS_WEAPON)
+        return true;
+
+    switch (proto->SubClass)
+    {
+        // Axes
+        case ITEM_SUBCLASS_WEAPON_AXE:
+        case ITEM_SUBCLASS_WEAPON_AXE2:
+            // 1H axes allowed for Rogue; 2H axes not (but same SubClass enum, handled by InventoryType later if needed)
+            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_HUNTER  ||
+                   T.cls == CLASS_PALADIN      || T.cls == CLASS_SHAMAN  ||
+                   T.cls == CLASS_WARRIOR      || T.cls == CLASS_ROGUE;  // Rogue: 1H axes
+
+        // Swords
+        case ITEM_SUBCLASS_WEAPON_SWORD:   // 1H swords
+            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_HUNTER  ||
+                   T.cls == CLASS_MAGE         || T.cls == CLASS_PALADIN  ||
+                   T.cls == CLASS_ROGUE        || T.cls == CLASS_WARRIOR  ||
+                   T.cls == CLASS_WARLOCK; // Warlocks can use 1H swords
+        case ITEM_SUBCLASS_WEAPON_SWORD2:  // 2H swords
+            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_HUNTER  ||
+                   T.cls == CLASS_PALADIN      || T.cls == CLASS_WARRIOR;
+
+        // Maces
+        case ITEM_SUBCLASS_WEAPON_MACE:    // 1H maces
+            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_DRUID   ||
+                   T.cls == CLASS_PALADIN      || T.cls == CLASS_PRIEST  ||
+                   T.cls == CLASS_SHAMAN       || T.cls == CLASS_WARRIOR ||
+                   T.cls == CLASS_ROGUE; // Rogue: 1H maces in WotLK
+        case ITEM_SUBCLASS_WEAPON_MACE2:   // 2H maces
+            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_DRUID   ||
+                   T.cls == CLASS_PALADIN      || T.cls == CLASS_WARRIOR; // Shaman: no 2H maces
+
+        // Polearms
+        case ITEM_SUBCLASS_WEAPON_POLEARM:
+            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_DRUID   ||
+                   T.cls == CLASS_HUNTER       || T.cls == CLASS_PALADIN  ||
+                   T.cls == CLASS_WARRIOR; // Shaman: cannot use polearms
+
+        // Staves
+        case ITEM_SUBCLASS_WEAPON_STAFF:
+            return T.cls == CLASS_DRUID   || T.cls == CLASS_HUNTER  ||
+                   T.cls == CLASS_MAGE    || T.cls == CLASS_PRIEST  ||
+                   T.cls == CLASS_SHAMAN  || T.cls == CLASS_WARLOCK;
+
+        // Daggers
+        case ITEM_SUBCLASS_WEAPON_DAGGER:
+            return T.cls == CLASS_DRUID   || T.cls == CLASS_HUNTER  ||
+                   T.cls == CLASS_MAGE    || T.cls == CLASS_PRIEST  ||
+                   T.cls == CLASS_ROGUE   || T.cls == CLASS_WARLOCK ||
+                   T.cls == CLASS_WARRIOR; // Warriors can use daggers
+
+        // Fist weapons
+        case ITEM_SUBCLASS_WEAPON_FIST:
+            return T.cls == CLASS_DRUID   || T.cls == CLASS_HUNTER  ||
+                   T.cls == CLASS_ROGUE   || T.cls == CLASS_SHAMAN  ||
+                   T.cls == CLASS_WARRIOR;
+
+         // Ranged (bows / guns / crossbows) — Hunters primary; also usable by Warriors/Rogues
+        case ITEM_SUBCLASS_WEAPON_BOW:
+        case ITEM_SUBCLASS_WEAPON_GUN:
+        case ITEM_SUBCLASS_WEAPON_CROSSBOW:
+            return T.cls == CLASS_HUNTER || T.cls == CLASS_WARRIOR || T.cls == CLASS_ROGUE;
+
+        // Wands — only Mage/Priest/Warlock
+        case ITEM_SUBCLASS_WEAPON_WAND:
+            return T.cls == CLASS_MAGE || T.cls == CLASS_PRIEST || T.cls == CLASS_WARLOCK;
+
+        // Thrown — Warriors/Rogues (Hunters rarely need them; bows/guns/xbows preferred)
+        case ITEM_SUBCLASS_WEAPON_THROWN:
+            return T.cls == CLASS_WARRIOR || T.cls == CLASS_ROGUE;
+
+        // Exotic / fishing / misc — disallow
+         case ITEM_SUBCLASS_WEAPON_EXOTIC:
+         case ITEM_SUBCLASS_WEAPON_EXOTIC2:
+         case ITEM_SUBCLASS_WEAPON_MISC:
+         case ITEM_SUBCLASS_WEAPON_FISHING_POLE:
+         default:
+             return false;
+    }
+}
+
 static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
 {
     if (!bot || !proto) return false;
@@ -58,47 +264,18 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
         proto->InventoryType == INVTYPE_NECK    ||
         proto->InventoryType == INVTYPE_CLOAK;
 
-    const std::string spec = AiFactory::GetPlayerSpecName(bot);
-    const uint8 cls = bot->getClass();
+    const SpecTraits T = GetSpecTraits(bot);
 
-    auto specIs = [&](char const* s){ return spec == s; };
-    auto specIn = [&](std::initializer_list<char const*> names){
-        for (auto n : names) if (spec == n) return true;
+
+    // Hard filter first: do not NEED weapons/shields/relics the class shouldn't use.
+    // If this returns false, the caller will downgrade to GREED (off-spec/unsupported).
+    if (!IsWeaponOrShieldOrRelicAllowedForClass(T, proto))
         return false;
-    };
 
     // Flags class/spec
-    const bool isPureCasterClass = (cls == CLASS_MAGE || cls == CLASS_WARLOCK || cls == CLASS_PRIEST);
-    const bool isHolyPal = (cls == CLASS_PALADIN && spec == "holy");
-    const bool isProtPal = (cls == CLASS_PALADIN && (specIs("prot") || specIs("protection")));
-    const bool isRetPal  = (cls == CLASS_PALADIN && (specIs("retrib") || specIs("ret") || specIs("retribution")));
-
-    const bool isDK      = (cls == CLASS_DEATH_KNIGHT);
-    const bool isDKBlood = (isDK && specIs("blood"));
-    const bool isDKFrost = (isDK && specIs("frost"));
-    const bool isDKUH    = (isDK && (specIs("unholy") || specIs("uh")));
-    const bool isDKTank  = (isDKBlood || isDKFrost) && !isDKUH; // DK tank heuristic (Blood/Frost)
-
-    const bool isWarrior = (cls == CLASS_WARRIOR);
-    const bool isWarProt = (isWarrior && (specIs("prot") || specIs("protection")));
-
-    const bool isHunter  = (cls == CLASS_HUNTER); // // BM/MM/SV -> physical DPS
-    const bool isRogue   = (cls == CLASS_ROGUE);  // Assassination/Combat/Subtlety -> physical DPS
-
-    const bool isShaman  = (cls == CLASS_SHAMAN);
-    const bool isEleSham = (isShaman && specIs("elemental"));
-    const bool isRestoSh = (isShaman && (specIs("resto") || specIs("restoration")));
-    const bool isEnhSham = (isShaman && (specIs("enhance") || specIs("enhancement")));
-
-    const bool isDruid   = (cls == CLASS_DRUID);
-    const bool isBalance = (isDruid && specIs("balance"));
-    const bool isRestoDr = (isDruid && (specIs("resto") || specIs("restoration")));
-    const bool isFeralTk = (isDruid && (specIs("feraltank") || specIs("bear")));
-    const bool isFeralDps= (isDruid && (specIs("feraldps")  || specIs("cat")  || specIs("kitty")));
-
-    const bool isCasterSpec   = isPureCasterClass || isHolyPal || isEleSham || isRestoSh || isBalance || isRestoDr;
-    const bool isTankLikeSpec = isProtPal || isWarProt || isFeralTk || isDKTank;
-    const bool isPhysicalSpec = !isCasterSpec; // Everything that is not a caster -> physical profiles (DK/War/Rogue/Hunter/Ret/Enh/Feral/Prot…)
+    const bool isCasterSpec   = T.isCaster;
+    const bool isTankLikeSpec = T.isTank;
+    const bool isPhysicalSpec = T.isPhysical;
 
     // Loot Stats
     const bool hasINT   = HasAnyStat(proto, { ITEM_MOD_INTELLECT });
@@ -117,10 +294,19 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
     const bool hasDef   = HasAnyStat(proto, { ITEM_MOD_DEFENSE_SKILL_RATING });
     const bool hasAvoid = HasAnyStat(proto, { ITEM_MOD_DODGE_RATING, ITEM_MOD_PARRY_RATING, ITEM_MOD_BLOCK_RATING });
 
-    /// Quick profiles
+    // Quick profiles
     const bool looksCaster   = hasSP || hasSPI || hasMP5 || (hasINT && !hasSTR && !hasAGI && !hasAP);
     const bool looksPhysical = hasSTR || hasAGI || hasAP || hasARP || hasEXP;
     const bool hasDpsRatings = hasHIT || hasHASTE || hasCRIT; // Common to all DPS (physical & casters)
+
+    // Tank-only profile: Defense / Avoidance (dodge/parry/block rating) / Block value
+    // Do NOT tag all shields as "tank": there are caster shields (INT/SP/MP5)
+    const bool hasBlockValue = HasAnyStat(proto, { ITEM_MOD_BLOCK_VALUE });
+    const bool looksTank = hasDef || hasAvoid || hasBlockValue;
+
+    // Non-tanks (DPS, casters/heals) never NEED purely tank items
+    if (!isTankLikeSpec && looksTank)
+        return false;
 
     // Generic rules by role/family
     if (isPhysicalSpec)
@@ -148,20 +334,38 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
         // Druid Balance/Restoration (leather/cloth caster) → OK
     }
 
+    // Extra weapon sanity for Hunters/Ferals (avoid wrong stat-sticks):
+    // - Hunters: for melee weapons, require AGI (prevent Haste/AP-only daggers without AGI).
+    // - Feral (tank/DPS): for melee weapons, require AGI or STR.
+    if (proto->Class == ITEM_CLASS_WEAPON)
+    {
+        const bool meleeWeapon =
+            proto->InventoryType == INVTYPE_WEAPON ||
+            proto->InventoryType == INVTYPE_WEAPONMAINHAND ||
+            proto->InventoryType == INVTYPE_WEAPONOFFHAND ||
+            proto->InventoryType == INVTYPE_2HWEAPON;
+
+        if (meleeWeapon && T.isHunter && !hasAGI)
+            return false;
+
+        if (meleeWeapon && (T.isFeralTk || T.isFeralDps) && !hasAGI && !hasSTR)
+            return false;
+    }
+
     // Class/spec specific adjustments (readable)
     // DK Unholy (DPS): allows STR/HIT/HASTE/CRIT/ARP; rejects all caster items
-    if (isDKUH)
+    if (/* DK Unholy */ (T.cls == CLASS_DEATH_KNIGHT && (T.spec == "unholy" || T.spec == "uh")))
     {
         if (looksCaster) return false;
     }
     // DK Blood/Frost tanks: DEF/AVOID/STA/STR are useful; reject caster items
-    if (isDKTank)
+    if (T.isDKTank)
     {
         if (looksCaster) return false;
         // Pure caster DPS rings/trinkets already filtered above.
     }
     // Hunter (BM/MM/SV): agi/hit/haste/AP/crit/arp → OK; avoid STR-only or caster items
-    if (isHunter)
+    if (T.isHunter)
     {
         if (looksCaster) return false;
         // Avoid rings with "pure STR" without AGI/AP/DPS ratings
@@ -169,44 +373,61 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
             return false;
     }
     // Rogue (all specs): same strict physical filter (no caster items)
-    if (isRogue)
+    if (T.isRogue)
     {
         if (looksCaster) return false;
     }
     // Warrior Arms/Fury : no caster items
-    if (isWarrior && !isWarProt)
+    if (T.isWarrior && !T.isWarProt)
     {
         if (looksCaster) return false;
     }
     // Warrior Protection: DEF/AVOID/STA/STR are useful; no caster items
-    if (isWarProt)
+    if (T.isWarProt)
     {
         if (looksCaster) return false;
     }
     // Shaman Enhancement: no Spell Power weapons/shields, no pure INT/SP items
-    if (isEnhSham)
+    if (T.isEnhSham)
     {
         if (looksCaster) return false;
         if ((proto->Class == ITEM_CLASS_WEAPON || (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD))
             && hasSP)
             return false;
     }
-    // Druid Feral (tank/DPS): AGI/STA/AVOID/ARP/EXP → OK; no caster items
-    if (isFeralTk || isFeralDps)
+    // Druid Feral (tank/DPS): AGI/STA/AVOID/ARP/EXP -> OK; no caster items
+    if (T.isFeralTk || T.isFeralDps)
     {
         if (looksCaster) return false;
     }
 
-    // Global VETO global: a physical character should never NEED a caster-profile item.
-    if (sPlayerbotAIConfig->smartNeedBySpec)
+    // Paladin Retribution: physical DPS (no caster items; forbid SP weapons/shields; enforce 2H only)
+    if (T.isRetPal)
     {
-        const bool isPhysicalSpec = !(isPureCasterClass || isHolyPal || isEleSham || isRestoSh || isBalance || isRestoDr);
-        const bool hasMelee     = hasSTR || hasAGI || hasAP || hasARP || hasEXP;
-        const bool looksCaster2 = hasSP || hasSPI || hasMP5 || (hasINT && !hasMelee);
-    
-        if (isPhysicalSpec && looksCaster2)
+        if (looksCaster) return false;
+
+        // No Spell Power weapons or shields for Ret
+        if ((proto->Class == ITEM_CLASS_WEAPON ||
+             (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)) && hasSP)
             return false;
+
+        // Enforce 2H only (no 1H/off-hand/shields/holdables)
+        switch (proto->InventoryType)
+        {
+            case INVTYPE_WEAPON:         // generic 1H
+            case INVTYPE_WEAPONMAINHAND: // explicit main-hand 1H
+            case INVTYPE_WEAPONOFFHAND:  // off-hand weapon
+            case INVTYPE_SHIELD:         // shields
+            case INVTYPE_HOLDABLE:       // tomes/orbs
+                return false;            // never NEED for Ret
+            default:
+                break;                   // INVTYPE_2HWEAPON is allowed; others handled elsewhere
+        }
     }
+
+    // Global VETO: a "physical" spec never considers a caster profile as primary
+    if (sPlayerbotAIConfig->smartNeedBySpec && T.isPhysical && looksCaster)
+        return false;
 
     // Let the cross-armor rules (CrossArmorExtraMargin) decide for major off-armor upgrades.
     return true;
@@ -225,7 +446,7 @@ static uint8 EquipmentSlotByInvTypeSafe(uint8 invType)
         case INVTYPE_ROBE:       return EQUIPMENT_SLOT_CHEST;
         case INVTYPE_HANDS:      return EQUIPMENT_SLOT_HANDS;
         case INVTYPE_LEGS:       return EQUIPMENT_SLOT_LEGS;
-        default:                 return EQUIPMENT_SLOT_END; // inconnu/nonnull
+        default:                 return EQUIPMENT_SLOT_END; // unknown/not applicable
     }
 }
 
@@ -320,19 +541,17 @@ bool LootRollAction::Execute(Event event)
     std::vector<Roll*> rolls = group->GetRolls();
     for (Roll*& roll : rolls)
     {
-        if (roll->playerVote.find(bot->GetGUID())->second != NOT_EMITED_YET)
+        // Avoid server crash, key may not exit for the bot on login
+        auto it = roll->playerVote.find(bot->GetGUID());
+        if (it != roll->playerVote.end() && it->second != NOT_EMITED_YET)
         {
             continue;
         }
+		
         ObjectGuid guid = roll->itemGUID;
         uint32 itemId = roll->itemid;
-        /*int32 randomProperty = 0;
-        if (roll->itemRandomPropId)
-            randomProperty = roll->itemRandomPropId;
-        else if (roll->itemRandomSuffix)
-            randomProperty = -((int)roll->itemRandomSuffix);*/
         int32 randomProperty = EncodeRandomEnchantParam(roll->itemRandomPropId, roll->itemRandomSuffix);
-		
+
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
             continue;
@@ -459,30 +678,13 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
             vote = PASS;
             break;
     }
-    /*// VETO “physical -> caster” (safety net):
-    // even if ItemUsage returned EQUIP/REPLACE, a physical character should never NEED a caster-profile item.
-    if (vote == NEED && sPlayerbotAIConfig->smartNeedBySpec)
-    {
-        const std::string spec = AiFactory::GetPlayerSpecName(bot);
-        const uint8 cls = bot->getClass();
-        auto specIs = [&](char const* s){ return spec == s; };
-        const bool isPhysicalSpec =
-            !(cls == CLASS_MAGE || cls == CLASS_WARLOCK || cls == CLASS_PRIEST) &&
-            !(cls == CLASS_PALADIN && spec == "holy") &&
-            !(cls == CLASS_SHAMAN  && (specIs("elemental") || specIs("resto") || specIs("restoration"))) &&
-            !(cls == CLASS_DRUID   && (specIs("balance")   || specIs("resto") || specIs("restoration")));
-
-        const bool hasINT   = HasAnyStat(proto, { ITEM_MOD_INTELLECT });
-        const bool hasSPI   = HasAnyStat(proto, { ITEM_MOD_SPIRIT });
-        const bool hasMP5   = HasAnyStat(proto, { ITEM_MOD_MANA_REGENERATION });
-        const bool hasSP    = HasAnyStat(proto, { ITEM_MOD_SPELL_POWER });
-        const bool hasMelee = HasAnyStat(proto, { ITEM_MOD_STRENGTH, ITEM_MOD_AGILITY,
-                                                  ITEM_MOD_ATTACK_POWER, ITEM_MOD_RANGED_ATTACK_POWER });
-        const bool looksCaster = hasSP || hasSPI || hasMP5 || (hasINT && !hasMelee);
-
-        if (isPhysicalSpec && looksCaster)
-            vote = GREED; // force GREED for rogue/hunter/warrior/DK/retribution/enhancement/feral/protection, etc.
-    }*/
+	
+    // Lockboxes: if the item is a lockbox and the bot is a Rogue with Lockpicking, prefer NEED.
+    // (Handled before BoE/BoU etiquette; BoE/BoU checks below ignore lockboxes.)
+    const SpecTraits T = GetSpecTraits(bot);
+    const bool isLockbox = IsLockbox(proto);
+    if (isLockbox && T.isRogue && bot->HasSkill(SKILL_LOCKPICKING))
+        vote = NEED;
 
     // Generic BoP rule: if the item is BoP, equippable, matches the spec
     // AND at least one relevant slot is empty -> allow NEED
@@ -510,13 +712,22 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
     // BoE/BoU rule: by default, avoid NEED on Bind-on-Equip / Bind-on-Use (raid etiquette)
     constexpr uint32 BIND_WHEN_EQUIPPED = 2; // BoE
     constexpr uint32 BIND_WHEN_USE      = 3; // BoU
-    if (vote == NEED && proto->Bonding == BIND_WHEN_EQUIPPED && !sPlayerbotAIConfig->allowBoENeedIfUpgrade)
+    if (vote == NEED && !isLockbox && proto->Bonding == BIND_WHEN_EQUIPPED && !sPlayerbotAIConfig->allowBoENeedIfUpgrade)
     {
         vote = GREED;
     }
-    if (vote == NEED && proto->Bonding == BIND_WHEN_USE && !sPlayerbotAIConfig->allowBoUNeedIfUpgrade)
+    if (vote == NEED && !isLockbox && proto->Bonding == BIND_WHEN_USE && !sPlayerbotAIConfig->allowBoUNeedIfUpgrade)
     {
         vote = GREED;
+    }
+
+    // Duplicate soft rule (non-unique): if the bot already owns at least one copy in bags, downgrade NEED to GREED.
+    // This complements "unique-equip" and avoids ninja-need on duplicates that are not unique.
+    if (vote == NEED)
+    {
+        // includeBank=true to catch banked duplicates as well; adjust if undesired.
+        if (bot->GetItemCount(proto->ItemId, true) > 0)
+            vote = GREED;
     }
 
     // Unique-equip: never NEED a duplicate (already equipped/owned)
@@ -547,8 +758,11 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
             vote = NEED;
     }
 
-    // Final filter: loot strategy
-    return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? vote : PASS;
+    // return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? vote : PASS;
+    // Final filter: loot strategy (protect a potential nil AI earlier on login
+    if (PlayerbotAI* ai = GET_PLAYERBOT_AI(bot))
+        return StoreLootAction::IsLootAllowed(proto->ItemId, ai) ? vote : PASS;
+    return PASS;
 }
 
 // Helpers d'annonce
@@ -639,8 +853,7 @@ bool MasterLootRollAction::Execute(Event event)
     }
     else
     {
-        //vote = CalculateRollVote(proto, randomPropertyId ? (int32)randomPropertyId : (randomSuffix ? -(int32)randomSuffix : 0));
-		vote = CalculateRollVote(proto, EncodeRandomEnchantParam(randomPropertyId, randomSuffix));
+        vote = CalculateRollVote(proto, EncodeRandomEnchantParam(randomPropertyId, randomSuffix));
     }
 
     // 2) Disenchant button in Need-Before-Greed if the usage is "DISENCHANT"
@@ -722,7 +935,6 @@ bool RollAction::Execute(Event event)
     {
         case ITEM_CLASS_WEAPON:
         case ITEM_CLASS_ARMOR:
-        //if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
         if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE)
         {
             bot->DoRandomRoll(0,100);
