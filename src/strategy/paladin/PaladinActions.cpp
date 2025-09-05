@@ -40,6 +40,21 @@ static inline bool IsTankRole(Player* p)
     return false;
 }
 
+// Added for solo paladin patch : determine if he's the only paladin on party
+static inline bool IsOnlyPaladinInGroup(Player* bot)
+{
+    if (!bot) return false;
+    Group* g = bot->GetGroup();
+    if (!g) return true; // solo
+    uint32 pals = 0u;
+    for (GroupReference* r = g->GetFirstMember(); r; r = r->next())
+    {
+        Player* p = r->GetSource();
+        if (!p || !p->IsInWorld()) continue;
+        if (p->getClass() == CLASS_PALADIN) ++pals;
+    }
+    return pals == 1u;
+}
 
 static inline bool GroupHasTankOfClass(Group* g, uint8 classId)
 {
@@ -363,9 +378,13 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
 
 Value<Unit*>* CastBlessingOfKingsOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>(
+    /*return context->GetValue<Unit*>(
         "party member without aura",
         "blessing of kings,greater blessing of kings"
+    );*/ //old version before solo paladin patch
+    return context->GetValue<Unit*>(
+        "party member without aura",
+        "blessing of kings,greater blessing of kings,blessing of sanctuary,greater blessing of sanctuary"
     );
 }
 
@@ -378,6 +397,17 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
     Group* g = bot->GetGroup();
     if (!g)
         return false;
+
+    // Added for patch solo paladin, never buff itself to not remove his sanctuary buff
+    if (botAI->HasStrategy("bstats", BOT_STATE_NON_COMBAT) && IsOnlyPaladinInGroup(bot))
+    {
+        if (target->GetGUID() == bot->GetGUID())
+        {
+            LOG_DEBUG("playerbots", "[Kings/bstats-solo] Skip self to keep Sanctuary on {}", bot->GetName());
+            return false;
+        }
+    }
+    // End solo paladin patch
 
     Player* targetPlayer = target->ToPlayer();
     if (targetPlayer && !g->IsMember(targetPlayer->GetGUID()))
