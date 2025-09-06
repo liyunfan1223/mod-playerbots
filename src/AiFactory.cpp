@@ -91,6 +91,9 @@ uint8 AiFactory::GetPlayerSpecTab(Player* bot)
             case CLASS_WARLOCK:
                 tab = WARLOCK_TAB_DEMONOLOGY;
                 break;
+            case CLASS_SHAMAN:
+                tab = SHAMAN_TAB_ELEMENTAL;
+                break;
         }
 
         return tab;
@@ -304,9 +307,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategiesNoInit("dps assist", "cure", nullptr);
             break;
         case CLASS_MAGE:
-            if (tab == 0)
+            if (tab == 0) // Arcane
                 engine->addStrategiesNoInit("arcane", nullptr);
-            else if (tab == 1)
+            else if (tab == 1)  // Fire
             {
                 if (player->HasSpell(44614) /*Frostfire Bolt*/ && player->HasAura(15047) /*Ice Shards*/)
                 {
@@ -317,7 +320,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                     engine->addStrategiesNoInit("fire", nullptr);
                 }
             } 
-            else
+            else  // Frost
                 engine->addStrategiesNoInit("frost", nullptr);
 
             engine->addStrategiesNoInit("dps", "dps assist", "cure", "aoe", nullptr);
@@ -331,14 +334,14 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategiesNoInit("fury", "aoe", "dps assist", /*"behind",*/ nullptr);
             break;
         case CLASS_SHAMAN:
-            if (tab == 0)
-                engine->addStrategiesNoInit("caster", "caster aoe", "bmana", nullptr);
-            else if (tab == 2)
-                engine->addStrategiesNoInit("heal", "bmana", nullptr);
-            else
-                engine->addStrategiesNoInit("melee", "melee aoe", "bdps", nullptr);
+            if (tab == 0)  // Elemental
+                engine->addStrategiesNoInit("ele", "stoneskin", "wrath", "mana spring", "wrath of air", nullptr);
+            else if (tab == 2)  // Restoration
+                engine->addStrategiesNoInit("resto", "stoneskin", "flametongue", "mana spring", "wrath of air", nullptr);
+            else  // Enhancement
+                engine->addStrategiesNoInit("enh", "strength of earth", "magma", "healing stream", "windfury", nullptr);
 
-            engine->addStrategiesNoInit("dps assist", "cure", "totems", nullptr);
+            engine->addStrategiesNoInit("dps assist", "cure", "aoe", nullptr);
             break;
         case CLASS_PALADIN:
             if (tab == 1)
