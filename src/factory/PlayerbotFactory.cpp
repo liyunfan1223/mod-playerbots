@@ -126,6 +126,9 @@ void PlayerbotFactory::Init()
         if (id == 15463 || id == 15490) // Legendary Arcane Amalgamation
             continue;
 
+        if (id == 29467 || id == 29475 || id == 29480 || id == 29483) // Naxx40 Sapphiron Shoulder Enchants
+            continue;
+
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(id);
         if (!spellInfo)
             continue;
@@ -4362,10 +4365,10 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
             }
 
             // disable next expansion enchantments
-            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 60 && enchantSpell >= 25072)
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 60 && enchantSpell >= 27899)
                 continue;
 
-            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 70 && enchantSpell > 48557)
+            if (sPlayerbotAIConfig->limitEnchantExpansion && bot->GetLevel() <= 70 && enchantSpell >= 44483)
                 continue;
 
             for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)

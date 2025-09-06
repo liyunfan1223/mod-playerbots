@@ -659,7 +659,7 @@ AiPlayerbot.RandomGearScoreLimit = 0
 # Default: 1 (enabled)
 AiPlayerbot.IncrementalGearInit = 1
 
-# Set minimum level of bots that will enchant their equipment (Maxlevel + 1 to disable)
+# Set minimum level of bots that will enchant their equipment (if greater than RandomBotMaxlevel, bots will not enchant equipment)
 # Default: 60
 AiPlayerbot.MinEnchantingBotLevel = 60
 
