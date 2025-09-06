@@ -58,6 +58,7 @@
 #include "RtiAction.h"
 #include "SayAction.h"
 #include "StayActions.h"
+#include "StartDuelAction.h"
 #include "SuggestWhatToDoAction.h"
 #include "TravelAction.h"
 #include "VehicleActions.h"
@@ -142,6 +143,7 @@ public:
         creators["set facing"] = &ActionContext::set_facing;
         creators["set behind"] = &ActionContext::set_behind;
         creators["attack duel opponent"] = &ActionContext::attack_duel_opponent;
+        creators["start duel"] = &ActionContext::start_duel;
         creators["drop target"] = &ActionContext::drop_target;
         creators["check mail"] = &ActionContext::check_mail;
         creators["say"] = &ActionContext::say;
@@ -278,6 +280,7 @@ private:
     static Action* check_mail(PlayerbotAI* botAI) { return new CheckMailAction(botAI); }
     static Action* drop_target(PlayerbotAI* botAI) { return new DropTargetAction(botAI); }
     static Action* attack_duel_opponent(PlayerbotAI* botAI) { return new AttackDuelOpponentAction(botAI); }
+    static Action* start_duel(PlayerbotAI* botAI) { return new StartDuelAction(botAI); }
     static Action* guard(PlayerbotAI* botAI) { return new GuardAction(botAI); }
     static Action* return_to_stay_position(PlayerbotAI* botAI) { return new ReturnToStayPositionAction(botAI); }
     static Action* open_loot(PlayerbotAI* botAI) { return new OpenLootAction(botAI); }
