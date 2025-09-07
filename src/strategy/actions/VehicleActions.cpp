@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "VehicleActions.h"
@@ -23,7 +23,7 @@ bool EnterVehicleAction::Execute(Event event)
     // do not switch vehicles yet
     if (bot->GetVehicle())
         return false;
-    
+
     Player* master = botAI->GetMaster();
     // Triggered by a chat command
     if (event.getOwner() && master && master->GetTarget())
@@ -45,7 +45,7 @@ bool EnterVehicleAction::Execute(Event event)
         Unit* vehicleBase = botAI->GetUnit(*i);
         if (!vehicleBase)
             continue;
-        
+
         if (vehicleBase->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             continue;
 

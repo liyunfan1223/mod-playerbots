@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "DKTriggers.h"
@@ -73,6 +73,6 @@ bool DeathAndDecayCooldownTrigger::IsActive()
     uint32 spellId = AI_VALUE2(uint32, "spell id", name);
     if (!spellId)
         return true;
-    
+
     return bot->GetSpellCooldownDelay(spellId) >= 2000;
 }

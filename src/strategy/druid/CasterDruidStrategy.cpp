@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "CasterDruidStrategy.h"
@@ -133,7 +133,7 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                        NextAction::array(0, new NextAction("starfire", ACTION_DEFAULT + 0.2f), nullptr)));
     triggers.push_back(new TriggerNode("eclipse (solar) cooldown",
                                        NextAction::array(0, new NextAction("wrath", ACTION_DEFAULT + 0.2f), nullptr)));
-                                       
+
     triggers.push_back(new TriggerNode(
         "insect swarm", NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), nullptr)));
     triggers.push_back(
