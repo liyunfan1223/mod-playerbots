@@ -7,6 +7,7 @@
 
 #include "Event.h"
 #include "ItemCountValue.h"
+#include "ItemPackets.h"
 #include "Playerbots.h"
 
 std::vector<std::string> split(std::string const s, char delim);
@@ -70,7 +71,8 @@ void UnequipAction::UnequipItem(Item* item)
 
     WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
     packet << bagIndex << slot << dstBag;
-    bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
+    WorldPackets::Item::AutoStoreBagItem newpacket(std::move(packet));
+    bot->GetSession()->HandleAutoStoreBagItemOpcode(newpacket);
 
     std::ostringstream out;
     out << chat->FormatItem(item->GetTemplate()) << " unequipped";

@@ -7,6 +7,7 @@
 
 #include "Event.h"
 #include "ItemCountValue.h"
+#include "ItemPackets.h"
 #include "ItemUsageValue.h"
 #include "ItemVisitors.h"
 #include "Playerbots.h"
@@ -104,7 +105,8 @@ void EquipAction::EquipItem(Item* item)
             WorldPacket packet(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
             ObjectGuid itemguid = item->GetGUID();
             packet << itemguid << uint8(EQUIPMENT_SLOT_RANGED);
-            bot->GetSession()->HandleAutoEquipItemSlotOpcode(packet);
+            WorldPackets::Item::AutoEquipItemSlot specificPacket(std::move(packet));
+            bot->GetSession()->HandleAutoEquipItemSlotOpcode(specificPacket);
         
             std::ostringstream out;
             out << "Equipping " << chat->FormatItem(itemProto) << " in ranged slot";
@@ -199,7 +201,8 @@ void EquipAction::EquipItem(Item* item)
                     WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
                     ObjectGuid newItemGuid = item->GetGUID();
                     eqPacket << newItemGuid << uint8(EQUIPMENT_SLOT_MAINHAND);
-                    bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
+                    WorldPackets::Item::AutoEquipItemSlot newpacket(std::move(eqPacket));
+                    bot->GetSession()->HandleAutoEquipItemSlotOpcode(newpacket);
                 }
             
                 // Try moving old main hand weapon to offhand if beneficial
@@ -210,7 +213,8 @@ void EquipAction::EquipItem(Item* item)
                     WorldPacket offhandPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
                     ObjectGuid oldMHGuid = mainHandItem->GetGUID();
                     offhandPacket << oldMHGuid << uint8(EQUIPMENT_SLOT_OFFHAND);
-                    bot->GetSession()->HandleAutoEquipItemSlotOpcode(offhandPacket);
+                    WorldPackets::Item::AutoEquipItemSlot newpacket(std::move(offhandPacket));
+                    bot->GetSession()->HandleAutoEquipItemSlotOpcode(newpacket);
             
                     std::ostringstream moveMsg;
                     moveMsg << "Main hand upgrade found. Moving " << chat->FormatItem(oldMHProto) << " to offhand";
@@ -230,7 +234,8 @@ void EquipAction::EquipItem(Item* item)
                 WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
                 ObjectGuid newItemGuid = item->GetGUID();
                 eqPacket << newItemGuid << uint8(EQUIPMENT_SLOT_OFFHAND);
-                bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
+                WorldPackets::Item::AutoEquipItemSlot newpacket(std::move(eqPacket));
+                bot->GetSession()->HandleAutoEquipItemSlotOpcode(newpacket);
 
                 std::ostringstream out;
                 out << "Equipping " << chat->FormatItem(itemProto) << " in offhand";
@@ -287,7 +292,8 @@ void EquipAction::EquipItem(Item* item)
             WorldPacket packet(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
             ObjectGuid itemguid = item->GetGUID();
             packet << itemguid << dstSlot;
-            bot->GetSession()->HandleAutoEquipItemSlotOpcode(packet);
+            WorldPackets::Item::AutoEquipItemSlot newpacket(std::move(packet));
+            bot->GetSession()->HandleAutoEquipItemSlotOpcode(newpacket);
         }
     }
 

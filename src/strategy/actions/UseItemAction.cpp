@@ -7,6 +7,7 @@
 
 #include "ChatHelper.h"
 #include "Event.h"
+#include "ItemPackets.h"
 #include "ItemUsageValue.h"
 #include "Playerbots.h"
 
@@ -375,7 +376,8 @@ bool UseItemAction::SocketItem(Item* item, Item* gem, bool replace)
         out << " with " << chat->FormatItem(gem->GetTemplate());
         botAI->TellMaster(out);
 
-        bot->GetSession()->HandleSocketOpcode(*packet);
+        WorldPackets::Item::SocketGems newpacket(std::move(*packet));
+        bot->GetSession()->HandleSocketOpcode(newpacket);
     }
 
     return fits;

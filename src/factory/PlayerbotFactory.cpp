@@ -10,6 +10,7 @@
 
 #include "AccountMgr.h"
 #include "AiFactory.h"
+#include "AiObjectContext.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "DBCStores.h"
@@ -17,6 +18,7 @@
 #include "GuildMgr.h"
 #include "InventoryAction.h"
 #include "Item.h"
+#include "ItemPackets.h"
 #include "ItemTemplate.h"
 #include "ItemVisitors.h"
 #include "Log.h"
@@ -39,7 +41,6 @@
 #include "SpellAuraDefines.h"
 #include "StatsWeightCalculator.h"
 #include "World.h"
-#include "AiObjectContext.h"
 
 const uint64 diveMask = (1LL << 7) | (1LL << 44) | (1LL << 37) | (1LL << 38) | (1LL << 26) | (1LL << 30) | (1LL << 27) |
                         (1LL << 33) | (1LL << 24) | (1LL << 34);
@@ -1899,7 +1900,8 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
             WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
             packet << bagIndex << slot << dstBag;
-            bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
+            WorldPackets::Item::AutoStoreBagItem newpacket(std::move(packet));
+            bot->GetSession()->HandleAutoStoreBagItemOpcode(newpacket);
         }
 
         oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
