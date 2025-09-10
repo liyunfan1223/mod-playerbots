@@ -974,8 +974,8 @@ bool KarazhanPrinceMalchezaarRunAwayFromShadowNovaAction::Execute(Event event)
     float currentBossDistance = bot->GetDistance2d(boss);
     if (currentBossDistance < safeBossDistance)
     {
-        const float stepSize = 2.0f;
-        const int numAngles = 16;
+        const float stepSize = 0.5f;
+        const int numAngles = 64;
         for (int i = 0; i < numAngles; ++i)
         {
             float angle = (2 * M_PI * i) / numAngles;
@@ -1007,7 +1007,7 @@ bool KarazhanPrinceMalchezaarRunAwayFromShadowNovaAction::Execute(Event event)
                 bot->AttackStop();
                 bot->InterruptNonMeleeSpells(false);
                 if (karazhanHelper.IsSafePosition(destX, destY, destZ, infernals, 20.0f))
-                    return MoveTo(bot->GetMapId(), destX, destY, destZ, false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
+                    return MoveTo(bot->GetMapId(), destX, destY, destZ, false, false, false, true, MovementPriority::MOVEMENT_FORCED);
             }
         }
     }
@@ -1017,10 +1017,6 @@ bool KarazhanPrinceMalchezaarRunAwayFromShadowNovaAction::Execute(Event event)
 bool KarazhanPrinceMalchezaarRunAwayFromShadowNovaAction::isUseful()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "prince malchezaar");
-    RaidKarazhanHelpers karazhanHelper(botAI);
-    std::vector<Unit*> infernals = karazhanHelper.GetSpawnedInfernals();
-    if (infernals.empty())
-        return false;
 
     return boss && bot->HasAura(SPELL_ENFEEBLE);
 }
