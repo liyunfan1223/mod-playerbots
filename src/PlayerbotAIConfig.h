@@ -102,6 +102,17 @@ public:
     bool botAutologin;
     std::string randomBotMapsAsString;
     float probTeleToBankers;
+    bool enableWeightTeleToCityBankers;
+    int weightTeleToStormwind;
+    int weightTeleToIronforge;
+    int weightTeleToDarnassus;
+    int weightTeleToExodar;
+    int weightTeleToOrgrimmar;
+    int weightTeleToUndercity;
+    int weightTeleToThunderBluff;
+    int weightTeleToSilvermoonCity;
+    int weightTeleToShattrathCity;
+    int weightTeleToDalaran;
     std::vector<uint32> randomBotMaps;
     std::vector<uint32> randomBotQuestItems;
     std::vector<uint32> randomBotAccounts;
