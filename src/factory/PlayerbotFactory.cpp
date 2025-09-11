@@ -40,6 +40,7 @@
 #include "StatsWeightCalculator.h"
 #include "World.h"
 #include "AiObjectContext.h"
+#include "ItemPackets.h"
 
 const uint64 diveMask = (1LL << 7) | (1LL << 44) | (1LL << 37) | (1LL << 38) | (1LL << 26) | (1LL << 30) | (1LL << 27) |
                         (1LL << 33) | (1LL << 24) | (1LL << 34);
@@ -1899,7 +1900,9 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
             WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
             packet << bagIndex << slot << dstBag;
-            bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
+            WorldPackets::Item::AutoStoreBagItem nicePacket(std::move(packet));
+            nicePacket.Read();
+            bot->GetSession()->HandleAutoStoreBagItemOpcode(nicePacket);
         }
 
         oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
