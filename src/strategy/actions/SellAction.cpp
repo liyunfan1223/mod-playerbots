@@ -115,7 +115,7 @@ void SellAction::Sell(Item* item)
 
         uint32 botMoney = bot->GetMoney();
 
-        WorldPacket p;
+        WorldPacket p(CMSG_SELL_ITEM);
         p << vendorguid << itemguid << count;
 
         WorldPackets::Item::SellItem nicePacket(std::move(p));
