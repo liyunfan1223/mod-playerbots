@@ -9,6 +9,7 @@
 #include "GridNotifiersImpl.h"
 #include "MoveToTravelTargetAction.h"
 #include "PlayerbotAI.h"
+#include "ItemPackets.h"
 
 
 const uint32 FISHING_SPELL = 7620;
@@ -134,7 +135,9 @@ bool EquipFishingPoleAction::Execute(Event event)
 
     WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
     eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
-    bot->GetSession()->HandleAutoEquipItemSlotOpcode(eqPacket);
+    WorldPackets::Item::AutoEquipItemSlot nicePacket(std::move(eqPacket));
+    nicePacket.Read();
+    bot->GetSession()->HandleAutoEquipItemSlotOpcode(nicePacket);
 
     return true;
 }
