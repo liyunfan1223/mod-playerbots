@@ -1,10 +1,8 @@
 #ifndef _PLAYERBOT_RAIDKARAZHANACTIONS_CONTEXT_H
 #define _PLAYERBOT_RAIDKARAZHANACTIONS_CONTEXT_H
 
-#include "Action.h"
-#include "NamedObjectContext.h"
 #include "RaidKarazhanActions.h"
-
+#include "NamedObjectContext.h"
 
 class RaidKarazhanActionContext : public NamedObjectContext<Action>
 {
@@ -32,7 +30,7 @@ public:
         creators["karazhan terestian illhoof mark target"] = &RaidKarazhanActionContext::karazhan_terestian_illhoof_mark_target;
 
         creators["karazhan shade of aran arcane explosion run away"] = &RaidKarazhanActionContext::karazhan_shade_of_aran_arcane_explosion_run_away;
-        creators["karazhan shade of aran flame wreath stop bot"] = &RaidKarazhanActionContext::karazhan_shade_of_aran_flame_wreath_stop_bot;
+        creators["karazhan shade of aran flame wreath stop movement"] = &RaidKarazhanActionContext::karazhan_shade_of_aran_flame_wreath_stop_movement;
         creators["karazhan shade of aran mark conjured elemental"] = &RaidKarazhanActionContext::karazhan_shade_of_aran_mark_conjured_elemental;
         creators["karazhan shade of aran spread ranged"] = &RaidKarazhanActionContext::karazhan_shade_of_aran_spread_ranged;
 
@@ -42,8 +40,8 @@ public:
         creators["karazhan netherspite avoid beam and void zone"] = &RaidKarazhanActionContext::karazhan_netherspite_avoid_beam_and_void_zone;
         creators["karazhan netherspite banish phase avoid void zone"] = &RaidKarazhanActionContext::karazhan_netherspite_banish_phase_avoid_void_zone;
 
-        creators["karazhan prince malchezaar avoid infernal"] = &RaidKarazhanActionContext::karazhan_prince_malchezaar_avoid_infernal;
-        creators["karazhan prince malchezaar run away from shadow nova"] = &RaidKarazhanActionContext::karazhan_prince_malchezaar_run_away_from_shadow_nova;
+        creators["karazhan prince malchezaar non tank avoid hazard"] = &RaidKarazhanActionContext::karazhan_prince_malchezaar_non_tank_avoid_hazard;
+        creators["karazhan prince malchezaar tank avoid hazard"] = &RaidKarazhanActionContext::karazhan_prince_malchezaar_tank_avoid_hazard;
     }
 
 private:
@@ -68,7 +66,7 @@ private:
     static Action* karazhan_terestian_illhoof_mark_target(PlayerbotAI* botAI) { return new KarazhanTerestianIllhoofMarkTargetAction(botAI); }
 
     static Action* karazhan_shade_of_aran_arcane_explosion_run_away(PlayerbotAI* botAI) { return new KarazhanShadeOfAranArcaneExplosionRunAwayAction(botAI); }
-    static Action* karazhan_shade_of_aran_flame_wreath_stop_bot(PlayerbotAI* botAI) { return new KarazhanShadeOfAranFlameWreathStopBotAction(botAI); }
+    static Action* karazhan_shade_of_aran_flame_wreath_stop_movement(PlayerbotAI* botAI) { return new KarazhanShadeOfAranFlameWreathStopMovementAction(botAI); }
     static Action* karazhan_shade_of_aran_mark_conjured_elemental(PlayerbotAI* botAI) { return new KarazhanShadeOfAranMarkConjuredElementalAction(botAI); }
     static Action* karazhan_shade_of_aran_spread_ranged(PlayerbotAI* botAI) { return new KarazhanShadeOfAranSpreadRangedAction(botAI); }
 
@@ -78,8 +76,8 @@ private:
     static Action* karazhan_netherspite_avoid_beam_and_void_zone(PlayerbotAI* botAI) { return new KarazhanNetherspiteAvoidBeamAndVoidZoneAction(botAI); }
     static Action* karazhan_netherspite_banish_phase_avoid_void_zone(PlayerbotAI* botAI) { return new KarazhanNetherspiteBanishPhaseAvoidVoidZoneAction(botAI); }
 
-    static Action* karazhan_prince_malchezaar_avoid_infernal(PlayerbotAI* botAI) { return new KarazhanPrinceMalchezaarAvoidInfernalAction(botAI); }
-    static Action* karazhan_prince_malchezaar_run_away_from_shadow_nova(PlayerbotAI* botAI) { return new KarazhanPrinceMalchezaarRunAwayFromShadowNovaAction(botAI); }
+    static Action* karazhan_prince_malchezaar_non_tank_avoid_hazard(PlayerbotAI* botAI) { return new KarazhanPrinceMalchezaarNonTankAvoidHazardAction(botAI); }
+    static Action* karazhan_prince_malchezaar_tank_avoid_hazard(PlayerbotAI* botAI) { return new KarazhanPrinceMalchezaarTankAvoidHazardAction(botAI); }
 };
 
 #endif

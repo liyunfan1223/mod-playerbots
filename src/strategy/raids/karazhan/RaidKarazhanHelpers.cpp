@@ -1,12 +1,12 @@
-#include "RaidKarazhanActions.h"
-#include "RaidKarazhanHelpers.h"
-#include "PlayerbotMgr.h"
-#include "AiObjectContext.h"
-#include "Position.h"
-#include "Spell.h"
-
 #include <algorithm>
 #include <map>
+
+#include "RaidKarazhanHelpers.h"
+#include "RaidKarazhanActions.h"
+#include "AiObjectContext.h"
+#include "PlayerbotMgr.h"
+#include "Position.h"
+#include "Spell.h"
 
 void RaidKarazhanHelpers::MarkTargetWithSkull(Unit* target)
 {
@@ -71,7 +71,7 @@ bool RaidKarazhanHelpers::IsFlameWreathActive()
         return false;
 
     Spell* currentSpell = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-    if (currentSpell && currentSpell->m_spellInfo && currentSpell->m_spellInfo->Id == SPELL_FLAME_WREATH_CAST)
+    if (currentSpell && currentSpell->m_spellInfo && currentSpell->m_spellInfo->Id == SPELL_FLAME_WREATH)
     {
         bot->Yell("I will not move when Flame Wreath is cast or the raid blows up.", LANG_UNIVERSAL);
         return true;
@@ -84,7 +84,7 @@ bool RaidKarazhanHelpers::IsFlameWreathActive()
             Player* member = itr->GetSource();
             if (!member || !member->IsAlive())
                 continue;
-            if (member->HasAura(SPELL_FLAME_WREATH_AURA))
+            if (member->HasAura(SPELL_AURA_FLAME_WREATH))
                 return true;
         }
     }
@@ -259,4 +259,80 @@ std::vector<Unit*> RaidKarazhanHelpers::GetSpawnedInfernals() const
             infernals.push_back(unit);
     }
     return infernals;
+}
+
+bool RaidKarazhanHelpers::IsStraightPathSafe(const Position& start, const Position& target, const std::vector<Unit*>& hazards, float hazardRadius, float stepSize)
+{
+    float sx = start.GetPositionX();
+    float sy = start.GetPositionY();
+    float sz = start.GetPositionZ();
+    float tx = target.GetPositionX();
+    float ty = target.GetPositionY();
+    float tz = target.GetPositionZ();
+    float totalDist = std::sqrt(std::pow(tx - sx, 2) + std::pow(ty - sy, 2));
+    if (totalDist == 0.0f)
+        return true;
+    for (float checkDist = 0.0f; checkDist <= totalDist; checkDist += stepSize)
+    {
+        float t = checkDist / totalDist;
+        float checkX = sx + (tx - sx) * t;
+        float checkY = sy + (ty - sy) * t;
+        float checkZ = sz + (tz - sz) * t;
+        for (Unit* hazard : hazards)
+        {
+            float hazardDist = std::sqrt(std::pow(checkX - hazard->GetPositionX(), 2) + std::pow(checkY - hazard->GetPositionY(), 2));
+            if (hazardDist < hazardRadius)
+                return false;
+        }
+    }
+    return true;
+}
+
+Position RaidKarazhanHelpers::CalculateArcPoint(const Position& current, const Position& target, const Position& center)
+{
+    float arcFraction = 0.25f;
+    // Calculate vectors from center to current position and target
+    float currentX = current.GetPositionX() - center.GetPositionX();
+    float currentY = current.GetPositionY() - center.GetPositionY();
+    float targetX = target.GetPositionX() - center.GetPositionX();
+    float targetY = target.GetPositionY() - center.GetPositionY();
+
+    // Calculate distances
+    float currentDist = std::sqrt(currentX * currentX + currentY * currentY);
+    float targetDist = std::sqrt(targetX * targetX + targetY * targetY);
+    if (currentDist == 0.0f || targetDist == 0.0f)
+        return current;
+
+    // Normalize vectors
+    currentX /= currentDist;
+    currentY /= currentDist;
+    targetX /= targetDist;
+    targetY /= targetDist;
+
+    // Calculate dot product to find the angle between vectors
+    float dotProduct = currentX * targetX + currentY * targetY;
+    dotProduct = std::max(-1.0f, std::min(1.0f, dotProduct));  // Clamp to [-1, 1]
+    float angle = std::acos(dotProduct);
+
+    // Determine rotation direction (clockwise or counterclockwise)
+    float crossProduct = currentX * targetY - currentY * targetX;
+    float stepAngle = angle * arcFraction;  // Move arcFraction along the arc
+    if (crossProduct < 0)
+        stepAngle = -stepAngle;  // Clockwise
+
+    // Calculate rotation matrix components
+    float cos_a = std::cos(stepAngle);
+    float sin_a = std::sin(stepAngle);
+
+    // Rotate current vector
+    float rotatedX = currentX * cos_a - currentY * sin_a;
+    float rotatedY = currentX * sin_a + currentY * cos_a;
+
+    // Smoothing: blend current and target radius
+    float desiredDist = currentDist * 0.9f + targetDist * 0.1f;
+
+    // Calculate the new position
+    return Position(center.GetPositionX() + rotatedX * desiredDist,
+                    center.GetPositionY() + rotatedY * desiredDist,
+                    current.GetPositionZ());
 }

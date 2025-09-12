@@ -3,7 +3,6 @@
 
 #include "AiObject.h"
 #include "Playerbots.h"
-#include "MovementActions.h"
 
 enum KarazhanSpells
 {
@@ -15,8 +14,8 @@ enum KarazhanSpells
     SPELL_FEAR                      = 6215,  // Rank 3
 
     // Shade of Aran
-    SPELL_FLAME_WREATH_CAST         = 30004,
-    SPELL_FLAME_WREATH_AURA         = 29946,
+    SPELL_FLAME_WREATH              = 30004,
+    SPELL_AURA_FLAME_WREATH         = 29946,
     SPELL_ARCANE_EXPLOSION          = 29973,
     SPELL_WARLOCK_BANISH            = 18647, // Rank 2
 
@@ -100,6 +99,8 @@ public:
     bool IsSafePosition (float x, float y, float z,
          const std::vector<Unit*>& hazards, float hazardRadius);
     std::vector<Unit*> GetSpawnedInfernals() const;
+    bool IsStraightPathSafe(const Position& start, const Position& target, const std::vector<Unit*>& hazards, float hazardRadius, float stepSize);
+    Position CalculateArcPoint(const Position& current, const Position& target, const Position& center);
 };
 
 #endif

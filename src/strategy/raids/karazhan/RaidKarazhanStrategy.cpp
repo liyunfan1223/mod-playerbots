@@ -1,4 +1,5 @@
 #include "RaidKarazhanStrategy.h"
+#include "RaidKarazhanMultipliers.h"
 
 void RaidKarazhanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
@@ -48,7 +49,7 @@ void RaidKarazhanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "karazhan shade of aran", NextAction::array(0,
-        new NextAction("karazhan shade of aran flame wreath stop bot", ACTION_EMERGENCY + 7),
+        new NextAction("karazhan shade of aran flame wreath stop movement", ACTION_EMERGENCY + 7),
         new NextAction("karazhan shade of aran arcane explosion run away", ACTION_EMERGENCY + 6),
         new NextAction("karazhan shade of aran spread ranged", ACTION_RAID + 2),
         new NextAction("karazhan shade of aran mark conjured elemental", ACTION_RAID + 1),
@@ -65,12 +66,15 @@ void RaidKarazhanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "karazhan prince malchezaar", NextAction::array(0,
-        new NextAction("karazhan prince malchezaar run away from shadow nova", ACTION_EMERGENCY + 6),
-        new NextAction("karazhan prince malchezaar avoid infernal", ACTION_RAID + 1),
+        new NextAction("karazhan prince malchezaar non tank avoid hazard", ACTION_EMERGENCY + 6),
+        new NextAction("karazhan prince malchezaar tank avoid hazard", ACTION_EMERGENCY + 6),
         nullptr)));
 }
 
-void RaidKarazhanStrategy::InitMultipliers(std::vector<Multiplier*>& /*multipliers*/)
+void RaidKarazhanStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
-    // No multipliers for this strategy
+    multipliers.push_back(new KarazhanShadeOfAranMultiplier(botAI));
+    multipliers.push_back(new KarazhanNetherspiteBlueAndGreenBeamMultiplier(botAI));
+    multipliers.push_back(new KarazhanNetherspiteRedBeamMultiplier(botAI));
+    multipliers.push_back(new KarazhanPrinceMalchezaarMultiplier(botAI));
 }

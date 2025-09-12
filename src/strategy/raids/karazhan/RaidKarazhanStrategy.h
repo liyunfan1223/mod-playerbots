@@ -2,6 +2,7 @@
 #define _PLAYERBOT_RAIDKARAZHANSTRATEGY_H_
 
 #include "Strategy.h"
+#include "Multiplier.h"
 
 class RaidKarazhanStrategy : public Strategy
 {
@@ -10,8 +11,8 @@ public:
 
     std::string const getName() override { return "karazhan"; }
 
-    void InitTriggers(std::vector<TriggerNode*>& /*triggers*/) override;
-    void InitMultipliers(std::vector<Multiplier*>& /*multipliers*/) override;
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
 };
 
 #endif
