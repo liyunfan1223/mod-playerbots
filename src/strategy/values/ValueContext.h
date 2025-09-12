@@ -27,6 +27,7 @@
 #include "EnemyHealerTargetValue.h"
 #include "EnemyPlayerValue.h"
 #include "EstimatedLifetimeValue.h"
+#include "FishValues.h"
 #include "Formations.h"
 #include "GrindTargetValue.h"
 #include "GroupValues.h"
@@ -312,6 +313,11 @@ public:
         creators["last flee angle"] = &ValueContext::last_flee_angle;
         creators["last flee timestamp"] = &ValueContext::last_flee_timestamp;
         creators["recently flee info"] = &ValueContext::recently_flee_info;
+
+        creators["can fish"] = &ValueContext::can_fish;
+        creators["no fishing bobber"] = &ValueContext::no_fishing_bobber;
+        creators["can use fishing bobber"] = &ValueContext::can_use_fishing_bobber;
+        creators["done fishing"] = &ValueContext::done_fishing;
     }
 
 private:
@@ -555,7 +561,13 @@ private:
     static UntypedValue* last_flee_angle(PlayerbotAI* ai) { return new LastFleeAngleValue(ai); }
     static UntypedValue* last_flee_timestamp(PlayerbotAI* ai) { return new LastFleeTimestampValue(ai); }
     static UntypedValue* recently_flee_info(PlayerbotAI* ai) { return new RecentlyFleeInfo(ai); }
-	// -------------------------------------------------------
+
+    static UntypedValue* can_fish(PlayerbotAI* ai) { return new CanFishValue(ai); }
+    static UntypedValue* no_fishing_bobber(PlayerbotAI* ai) { return new NoBobberValue(ai); }
+    static UntypedValue* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenBobberValue(ai); }
+    static UntypedValue* done_fishing(PlayerbotAI* ai) { return new DoneFishingValue(ai); }
+
+    // -------------------------------------------------------
     // Flag for cutom glyphs : true when /w bot glyph equip
     // -------------------------------------------------------
     static UntypedValue* custom_glyphs(PlayerbotAI* ai)
