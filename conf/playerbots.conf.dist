@@ -660,7 +660,7 @@ AiPlayerbot.RandomGearScoreLimit = 0
 # Default: 1 (enabled)
 AiPlayerbot.IncrementalGearInit = 1
 
-# Set minimum level of bots that will enchant their equipment (Maxlevel + 1 to disable)
+# Set minimum level of bots that will enchant their equipment (if greater than RandomBotMaxlevel, bots will not enchant equipment)
 # Default: 60
 AiPlayerbot.MinEnchantingBotLevel = 60
 
@@ -1014,6 +1014,20 @@ AiPlayerbot.RandomBotMaps = 0,1,530,571
 # Probabilty bots teleport to banker (city)
 # Default: 0.25
 AiPlayerbot.ProbTeleToBankers = 0.25
+
+# Control probability weights for bots teleporting to Capital city bankers
+# Sum of weights need not be 100. Set to 0 to disable teleporting to the city.
+AiPlayerbot.EnableWeightTeleToCityBankers = 1
+AiPlayerbot.TeleToStormwindWeight = 2
+AiPlayerbot.TeleToIronforgeWeight = 1
+AiPlayerbot.TeleToDarnassusWeight = 1
+AiPlayerbot.TeleToExodarWeight = 1
+AiPlayerbot.TeleToOrgrimmarWeight = 2
+AiPlayerbot.TeleToUndercityWeight = 1
+AiPlayerbot.TeleToThunderBluffWeight = 1
+AiPlayerbot.TeleToSilvermoonCityWeight = 1
+AiPlayerbot.TeleToShattrathCityWeight = 1
+AiPlayerbot.TeleToDalaranWeight = 1
 
 # How far randombots are teleported after death
 AiPlayerbot.RandomBotTeleportDistance = 100
