@@ -72,7 +72,11 @@ bool GuidManageAction::Execute(Event event)
     return true;
 }
 
-bool GuidManageAction::PlayerIsValid(Player* member) { return !member->GetGuildId(); }
+bool GuildInviteAction::PlayerIsValid(Player* member)
+{
+    return !member->GetGuildId() && (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) ||
+                                     (bot->GetTeamId() == member->GetTeamId()));
+}
 
 uint8 GuidManageAction::GetRankId(Player* member)
 {
