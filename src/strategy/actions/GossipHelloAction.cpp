@@ -141,3 +141,36 @@ bool GossipHelloAction::ProcessGossip(int32 menuToSelect)
 
     return true;
 }
+
+bool GossipHelloAction::Execute(ObjectGuid guid, int32 menuToSelect)
+{
+    if (!guid)
+        return false;
+
+    Creature* pCreature = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
+    if (!pCreature)
+        return false;
+
+    GossipMenuItemsMapBounds pMenuItemBounds =
+        sObjectMgr->GetGossipMenuItemsMapBounds(pCreature->GetCreatureTemplate()->GossipMenuId);
+    if (pMenuItemBounds.first == pMenuItemBounds.second)
+        return false;
+
+    if (menuToSelect == -1)
+    {
+        WorldPacket p1;
+        p1 << guid;
+        bot->GetSession()->HandleGossipHelloOpcode(p1);
+        bot->SetFacingToObject(pCreature);
+    }
+    else
+    {
+        if (!bot->PlayerTalkClass)
+            return false;
+        if (!ProcessGossip(menuToSelect))
+            return false;
+    }
+
+    bot->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
+    return true;
+}

@@ -16,6 +16,7 @@ public:
     GossipHelloAction(PlayerbotAI* botAI) : Action(botAI, "gossip hello") {}
 
     bool Execute(Event event) override;
+    bool Execute(ObjectGuid guid, int32 menuToSelect = -1);
 
 private:
     void TellGossipMenus();
