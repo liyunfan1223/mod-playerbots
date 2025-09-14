@@ -167,7 +167,7 @@ bool PlayerbotAIConfig::Initialize()
         pvpProhibitedAreaIds);
     fastReactInBG = sConfigMgr->GetOption<bool>("AiPlayerbot.FastReactInBG", true);
     LoadList<std::vector<uint32>>(
-        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761"),
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761,10277,10285,11492,13188,13189,24499,24511,24710,24712"),
         randomBotQuestIds);
 
     LoadSet<std::set<uint32>>(
