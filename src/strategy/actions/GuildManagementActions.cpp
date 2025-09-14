@@ -72,11 +72,7 @@ bool GuidManageAction::Execute(Event event)
     return true;
 }
 
-bool GuildInviteAction::PlayerIsValid(Player* member)
-{
-    return !member->GetGuildId() && (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) ||
-                                     (bot->GetTeamId() == member->GetTeamId()));
-}
+bool GuidManageAction::PlayerIsValid(Player* member) { return !member->GetGuildId(); }
 
 uint8 GuidManageAction::GetRankId(Player* member)
 {
@@ -92,6 +88,12 @@ void GuildInviteAction::SendPacket(WorldPacket packet)
 {
     WorldPackets::Guild::GuildInviteByName data = WorldPacket(packet);
     bot->GetSession()->HandleGuildInviteOpcode(data);
+}
+
+bool GuildInviteAction::PlayerIsValid(Player* member)
+{
+    return !member->GetGuildId() && (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) ||
+                                     (bot->GetTeamId() == member->GetTeamId()));
 }
 
 bool GuildPromoteAction::isUseful()
