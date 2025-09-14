@@ -94,8 +94,6 @@ void GuildInviteAction::SendPacket(WorldPacket packet)
     bot->GetSession()->HandleGuildInviteOpcode(data);
 }
 
-bool GuildInviteAction::PlayerIsValid(Player* member) { return !member->GetGuildId(); }
-
 bool GuildPromoteAction::isUseful()
 {
     return bot->GetGuildId() && sGuildMgr->GetGuildById(bot->GetGuildId())->HasRankRight(bot, GR_RIGHT_PROMOTE);
