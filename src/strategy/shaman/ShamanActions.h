@@ -528,123 +528,135 @@ public:
 
 // Set Strategy Assigned Totems
 
-class SetStrengthOfEarthTotemAction : public Action
+class SetTotemAction : public Action
 {
 public:
-    SetStrengthOfEarthTotemAction(PlayerbotAI* ai) : Action(ai, "set strength of earth totem") {}
+    SetTotemAction(PlayerbotAI* botAI, std::string const totemName, static const uint32 totemSpellIds[], uint8 actionButtonId)
+        : Action(botAI, "set " + totemName), totemSpellIds(totemSpellIds), actionButtonId(actionButtonId)
+    {
+    }
     bool Execute(Event event) override;
+    uint32 const* totemSpellIds;
+    uint8 actionButtonId;
 };
 
-class SetStoneskinTotemAction : public Action
+class SetStrengthOfEarthTotemAction : public SetTotemAction
 {
 public:
-    SetStoneskinTotemAction(PlayerbotAI* ai) : Action(ai, "set stoneskin totem") {}
-    bool Execute(Event event) override;
+    SetStrengthOfEarthTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "strength of earth totem", STRENGTH_OF_EARTH_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
-class SetTremorTotemAction : public Action
+class SetStoneskinTotemAction : public SetTotemAction
 {
 public:
-    SetTremorTotemAction(PlayerbotAI* ai) : Action(ai, "set tremor totem") {}
-    bool Execute(Event event) override;
+    SetStoneskinTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "stoneskin totem", STONESKIN_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
-class SetEarthbindTotemAction : public Action
+class SetTremorTotemAction : public SetTotemAction
 {
 public:
-    SetEarthbindTotemAction(PlayerbotAI* ai) : Action(ai, "set earthbind totem") {}
-    bool Execute(Event event) override;
+    SetTremorTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "tremor totem", TREMOR_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
-class SetSearingTotemAction : public Action
+class SetEarthbindTotemAction : public SetTotemAction
 {
 public:
-    SetSearingTotemAction(PlayerbotAI* ai) : Action(ai, "set searing totem") {}
-    bool Execute(Event event) override;
+    SetEarthbindTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "earthbind totem", EARTHBIND_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
-class SetMagmaTotemAction : public Action
+class SetSearingTotemAction : public SetTotemAction
 {
 public:
-    SetMagmaTotemAction(PlayerbotAI* ai) : Action(ai, "set magma totem") {}
-    bool Execute(Event event) override;
+    SetSearingTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "searing totem", SEARING_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetFlametongueTotemAction : public Action
+class SetMagmaTotemAction : public SetTotemAction
 {
 public:
-    SetFlametongueTotemAction(PlayerbotAI* ai) : Action(ai, "set flametongue totem") {}
-    bool Execute(Event event) override;
+    SetMagmaTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "magma totem", MAGMA_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetTotemOfWrathAction : public Action
+class SetFlametongueTotemAction : public SetTotemAction
 {
 public:
-    SetTotemOfWrathAction(PlayerbotAI* ai) : Action(ai, "set totem of wrath") {}
-    bool Execute(Event event) override;
+    SetFlametongueTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "flametongue totem", FLAMETONGUE_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetFrostResistanceTotemAction : public Action
+class SetTotemOfWrathAction : public SetTotemAction
 {
 public:
-    SetFrostResistanceTotemAction(PlayerbotAI* ai) : Action(ai, "set frost resistance totem") {}
-    bool Execute(Event event) override;
+    SetTotemOfWrathAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "totem of wrath", TOTEM_OF_WRATH, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetHealingStreamTotemAction : public Action
+class SetFrostResistanceTotemAction : public SetTotemAction
 {
 public:
-    SetHealingStreamTotemAction(PlayerbotAI* ai) : Action(ai, "set healing stream totem") {}
-    bool Execute(Event event) override;
+    SetFrostResistanceTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "frost resistance totem", FROST_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetManaSpringTotemAction : public Action
+class SetHealingStreamTotemAction : public SetTotemAction
 {
 public:
-    SetManaSpringTotemAction(PlayerbotAI* ai) : Action(ai, "set mana spring totem") {}
-    bool Execute(Event event) override;
+    SetHealingStreamTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "healing stream totem", HEALING_STREAM_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
-class SetCleansingTotemAction : public Action
+class SetManaSpringTotemAction : public SetTotemAction
 {
 public:
-    SetCleansingTotemAction(PlayerbotAI* ai) : Action(ai, "set cleansing totem") {}
-    bool Execute(Event event) override;
+    SetManaSpringTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "mana spring totem", MANA_SPRING_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
-class SetFireResistanceTotemAction : public Action
+class SetCleansingTotemAction : public SetTotemAction
 {
 public:
-    SetFireResistanceTotemAction(PlayerbotAI* ai) : Action(ai, "set fire resistance totem") {}
-    bool Execute(Event event) override;
+    SetCleansingTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "cleansing totem", CLEANSING_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
-class SetWrathOfAirTotemAction : public Action
+class SetFireResistanceTotemAction : public SetTotemAction
 {
 public:
-    SetWrathOfAirTotemAction(PlayerbotAI* ai) : Action(ai, "set wrath of air totem") {}
-    bool Execute(Event event) override;
+    SetFireResistanceTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "fire resistance totem", FIRE_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
-class SetWindfuryTotemAction : public Action
+class SetWrathOfAirTotemAction : public SetTotemAction
 {
 public:
-    SetWindfuryTotemAction(PlayerbotAI* ai) : Action(ai, "set windfury totem") {}
-    bool Execute(Event event) override;
+    SetWrathOfAirTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "wrath of air totem", WRATH_OF_AIR_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
-class SetNatureResistanceTotemAction : public Action
+class SetWindfuryTotemAction : public SetTotemAction
 {
 public:
-    SetNatureResistanceTotemAction(PlayerbotAI* ai) : Action(ai, "set nature resistance totem") {}
-    bool Execute(Event event) override;
+    SetWindfuryTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "windfury totem", WINDFURY_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
-class SetGroundingTotemAction : public Action
+class SetNatureResistanceTotemAction : public SetTotemAction
 {
 public:
-    SetGroundingTotemAction(PlayerbotAI* ai) : Action(ai, "set grounding totem") {}
-    bool Execute(Event event) override;
+    SetNatureResistanceTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "nature resistance totem", NATURE_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_AIR) {}
+};
+
+class SetGroundingTotemAction : public SetTotemAction
+{
+public:
+    SetGroundingTotemAction(PlayerbotAI* ai)
+        : SetTotemAction(ai, "grounding totem", GROUNDING_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
 #endif

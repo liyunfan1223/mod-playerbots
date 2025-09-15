@@ -20,6 +20,25 @@ class PlayerbotAI;
 
 // Buff and Out of Combat Triggers
 
+const uint32 SPELL_EARTHBIND_TOTEM_RANK_1 = 2484;
+const uint32 SPELL_SEARING_TOTEM_RANK_1 = 3599;
+const uint32 SPELL_WRATH_OF_AIR_TOTEM_RANK_1 = 3738;
+const uint32 SPELL_HEALING_STREAM_TOTEM_RANK_1 = 5394;
+const uint32 SPELL_MANA_SPRING_TOTEM_RANK_1 = 5675;
+const uint32 SPELL_STONESKIN_TOTEM_RANK_1 = 8071;
+const uint32 SPELL_STRENGTH_OF_EARTH_TOTEM_RANK_1 = 8075;
+const uint32 SPELL_TREMOR_TOTEM_RANK_1 = 8143;
+const uint32 SPELL_CLEANSING_TOTEM_RANK_1 = 8170;
+const uint32 SPELL_GROUNDING_TOTEM_RANK_1 = 8177;
+const uint32 SPELL_FROST_RESISTANCE_TOTEM_RANK_1 = 8181;
+const uint32 SPELL_FIRE_RESISTANCE_TOTEM_RANK_1 = 8184;
+const uint32 SPELL_MAGMA_TOTEM_RANK_1 = 8190;
+const uint32 SPELL_FLAMETONGUE_TOTEM_RANK_1 = 8227;
+const uint32 SPELL_WINDFURY_TOTEM_RANK_1 = 8512;
+const uint32 SPELL_NATURE_RESISTANCE_TOTEM_RANK_1 = 10595;
+const uint32 SPELL_TOTEM_OF_WRATH_RANK_1 = 30706;
+const uint32 SPELL_TOTEMIC_RECALL = 36936;
+
 class MainHandWeaponNoImbueTrigger : public BuffTrigger
 {
 public:
@@ -336,123 +355,140 @@ public:
 
 // Set Strategy Assigned Totems
 
-class SetStrengthOfEarthTotemTrigger : public Trigger
+class SetTotemTrigger : public Trigger
 {
 public:
-    SetStrengthOfEarthTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set strength of earth totem") {}
+    SetTotemTrigger(PlayerbotAI* ai, std::string const spellName, const uint32 requiredSpellId,
+                    static const uint32 totemSpellIds[], uint8 actionButtonId)
+        : Trigger(ai, "set " + spellName),
+          requiredSpellId(requiredSpellId), 
+          totemSpellIds(totemSpellIds),
+          actionButtonId(actionButtonId) {}
     bool IsActive() override;
+
+private:
+    uint32 requiredSpellId;
+    uint32 const* totemSpellIds;
+    uint8 actionButtonId;
 };
 
-class SetStoneskinTotemTrigger : public Trigger
+class SetStrengthOfEarthTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetStoneskinTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set stoneskin totem") {}
-    bool IsActive() override;
+    SetStrengthOfEarthTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "strength of earth totem", SPELL_STRENGTH_OF_EARTH_TOTEM_RANK_1, STRENGTH_OF_EARTH_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
-class SetTremorTotemTrigger : public Trigger
+class SetStoneskinTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetTremorTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set tremor totem") {}
-    bool IsActive() override;
+    SetStoneskinTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "stoneskin totem", SPELL_STONESKIN_TOTEM_RANK_1, STONESKIN_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
-class SetEarthbindTotemTrigger : public Trigger
+class SetTremorTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetEarthbindTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set earthbind totem") {}
-    bool IsActive() override;
+    SetTremorTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "tremor totem", SPELL_TREMOR_TOTEM_RANK_1, TREMOR_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
-class SetSearingTotemTrigger : public Trigger
+class SetEarthbindTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetSearingTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set searing totem") {}
-    bool IsActive() override;
+    SetEarthbindTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "earthbind totem", SPELL_EARTHBIND_TOTEM_RANK_1, EARTHBIND_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
-class SetMagmaTotemTrigger : public Trigger
+class SetSearingTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetMagmaTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set magma totem") {}
-    bool IsActive() override;
+    SetSearingTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "searing totem", SPELL_SEARING_TOTEM_RANK_1, SEARING_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetFlametongueTotemTrigger : public Trigger
+class SetMagmaTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetFlametongueTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set flametongue totem") {}
-    bool IsActive() override;
+    SetMagmaTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "magma totem", SPELL_MAGMA_TOTEM_RANK_1, MAGMA_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetTotemOfWrathTrigger : public Trigger
+class SetFlametongueTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetTotemOfWrathTrigger(PlayerbotAI* ai) : Trigger(ai, "set totem of wrath") {}
-    bool IsActive() override;
+    SetFlametongueTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "flametongue totem", SPELL_FLAMETONGUE_TOTEM_RANK_1, FLAMETONGUE_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetFrostResistanceTotemTrigger : public Trigger
+class SetTotemOfWrathTrigger : public SetTotemTrigger
 {
 public:
-    SetFrostResistanceTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set frost resistance totem") {}
-    bool IsActive() override;
+    SetTotemOfWrathTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "totem of wrath", SPELL_TOTEM_OF_WRATH_RANK_1, TOTEM_OF_WRATH, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetHealingStreamTotemTrigger : public Trigger
+class SetFrostResistanceTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetHealingStreamTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set healing stream totem") {}
-    bool IsActive() override;
+    SetFrostResistanceTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "frost resistance totem", SPELL_FROST_RESISTANCE_TOTEM_RANK_1, FROST_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
-class SetManaSpringTotemTrigger : public Trigger
+class SetHealingStreamTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetManaSpringTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set mana spring totem") {}
-    bool IsActive() override;
+    SetHealingStreamTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "healing stream totem", SPELL_HEALING_STREAM_TOTEM_RANK_1, HEALING_STREAM_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
-class SetCleansingTotemTrigger : public Trigger
+class SetManaSpringTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetCleansingTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set cleansing totem") {}
-    bool IsActive() override;
+    SetManaSpringTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "mana spring totem", SPELL_MANA_SPRING_TOTEM_RANK_1, MANA_SPRING_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
-class SetFireResistanceTotemTrigger : public Trigger
+class SetCleansingTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetFireResistanceTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set fire resistance totem") {}
-    bool IsActive() override;
+    SetCleansingTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "cleansing totem", SPELL_CLEANSING_TOTEM_RANK_1, CLEANSING_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
-class SetWrathOfAirTotemTrigger : public Trigger
+class SetFireResistanceTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetWrathOfAirTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set wrath of air totem") {}
-    bool IsActive() override;
+    SetFireResistanceTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "fire resistance totem", SPELL_FIRE_RESISTANCE_TOTEM_RANK_1, FIRE_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
-class SetWindfuryTotemTrigger : public Trigger
+class SetWrathOfAirTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetWindfuryTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set windfury totem") {}
-    bool IsActive() override;
+    SetWrathOfAirTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "wrath of air totem", SPELL_WRATH_OF_AIR_TOTEM_RANK_1, WRATH_OF_AIR_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
-class SetNatureResistanceTotemTrigger : public Trigger
+class SetWindfuryTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetNatureResistanceTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set nature resistance totem") {}
-    bool IsActive() override;
+    SetWindfuryTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "windfury totem", SPELL_WINDFURY_TOTEM_RANK_1, WINDFURY_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
-class SetGroundingTotemTrigger : public Trigger
+class SetNatureResistanceTotemTrigger : public SetTotemTrigger
 {
 public:
-    SetGroundingTotemTrigger(PlayerbotAI* ai) : Trigger(ai, "set grounding totem") {}
-    bool IsActive() override;
+    SetNatureResistanceTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "nature resistance totem", SPELL_NATURE_RESISTANCE_TOTEM_RANK_1, NATURE_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_AIR) {}
+};
+
+class SetGroundingTotemTrigger : public SetTotemTrigger
+{
+public:
+    SetGroundingTotemTrigger(PlayerbotAI* ai)
+        : SetTotemTrigger(ai, "grounding totem", SPELL_GROUNDING_TOTEM_RANK_1, GROUNDING_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
 #endif

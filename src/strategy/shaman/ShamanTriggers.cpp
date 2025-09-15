@@ -158,7 +158,7 @@ bool TotemicRecallTrigger::IsActive()
 {
     Player* bot = botAI->GetBot();
 
-    if (!bot->HasSpell(36936))
+    if (!bot->HasSpell(SPELL_TOTEMIC_RECALL))
         return false;
 
     Map* map = bot->GetMap();
@@ -265,10 +265,8 @@ static uint32 GetSummonedTotemSpellId(Player* bot, uint8 slot)
 
 bool NoEarthTotemTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-
     // Check if the bot has Stoneskin Totem (required level 4) and prevents the trigger firing if it doesn't
-    if (!bot->HasSpell(8071))
+    if (!bot->HasSpell(SPELL_STONESKIN_TOTEM_RANK_1))
         return false;
 
     ObjectGuid guid = bot->m_SummonSlot[SUMMON_SLOT_TOTEM_EARTH];
@@ -304,10 +302,8 @@ bool NoEarthTotemTrigger::IsActive()
 
 bool NoFireTotemTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-
     // Check if the bot has Searing Totem (required level 10) and prevents the trigger firing if it doesn't
-    if (!bot->HasSpell(3599))
+    if (!bot->HasSpell(SPELL_SEARING_TOTEM_RANK_1))
         return false;
 
     ObjectGuid guid = bot->m_SummonSlot[SUMMON_SLOT_TOTEM_FIRE];
@@ -344,10 +340,8 @@ bool NoFireTotemTrigger::IsActive()
 
 bool NoWaterTotemTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-
     // Check if the bot has Healing Stream Totem (required level 20) and prevents the trigger firing if it doesn't
-    if (!bot->HasSpell(5394))
+    if (!bot->HasSpell(SPELL_HEALING_STREAM_TOTEM_RANK_1))
         return false;
 
     ObjectGuid guid = bot->m_SummonSlot[SUMMON_SLOT_TOTEM_WATER];
@@ -383,10 +377,8 @@ bool NoWaterTotemTrigger::IsActive()
 
 bool NoAirTotemTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-
     // Check if the bot has Nature Resistance Totem (required level 30) and prevents the trigger firing if it doesn't
-    if (!bot->HasSpell(10595))
+    if (!bot->HasSpell(SPELL_NATURE_RESISTANCE_TOTEM_RANK_1))
         return false;
 
     ObjectGuid guid = bot->m_SummonSlot[SUMMON_SLOT_TOTEM_AIR];
@@ -415,283 +407,24 @@ bool NoAirTotemTrigger::IsActive()
     return !currentSpell || currentSpell != requiredSpell || !totem || totem->GetDistance(bot) > 30.0f;
 }
 
-// Set Strategy Assigned Totems (Triggers) - First, it checks
-// if the bot knows Call of the Elements (33842), then it checks if the bot
-// knows the lowest rank spell of the requested strategy.
-// Then, it checks what spell is to the corresponding slot on the totem bar, then fires if the
-// totem slot is either empty, incorrectly set, or set to a totem spell other than the current strategy.
-
-bool SetStrengthOfEarthTotemTrigger::IsActive()
+bool SetTotemTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
     if (!bot->HasSpell(66842))
         return false;
-    if (!bot->HasSpell(8075))
+    if (!bot->HasSpell(requiredSpellId))
         return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_EARTH);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < STRENGTH_OF_EARTH_TOTEM_COUNT; ++i)
-        if (button->GetAction() == STRENGTH_OF_EARTH_TOTEM[i])
-            return false;
-    return true;
-}
 
-bool SetStoneskinTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8071))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_EARTH);
+    ActionButton const* button = bot->GetActionButton(actionButtonId);
     if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
         return true;
-    for (size_t i = 0; i < STONESKIN_TOTEM_COUNT; ++i)
-        if (button->GetAction() == STONESKIN_TOTEM[i])
-            return false;
-    return true;
-}
 
-bool SetTremorTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8143))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_EARTH);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < TREMOR_TOTEM_COUNT; ++i)
-        if (button->GetAction() == TREMOR_TOTEM[i])
+    size_t totemSpellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
+    for (size_t i = 0; i < totemSpellIdsCount; ++i)
+    {
+        if (button->GetAction() == totemSpellIds[i])
+        {
             return false;
-    return true;
-}
-
-bool SetEarthbindTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(2484))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_EARTH);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < EARTHBIND_TOTEM_COUNT; ++i)
-        if (button->GetAction() == EARTHBIND_TOTEM[i])
-            return false;
-    return true;
-}
-
-// Set Fire Totems
-bool SetSearingTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(3599))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_FIRE);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < SEARING_TOTEM_COUNT; ++i)
-        if (button->GetAction() == SEARING_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetMagmaTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8190))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_FIRE);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < MAGMA_TOTEM_COUNT; ++i)
-        if (button->GetAction() == MAGMA_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetFlametongueTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8227))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_FIRE);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < FLAMETONGUE_TOTEM_COUNT; ++i)
-        if (button->GetAction() == FLAMETONGUE_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetTotemOfWrathTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(30706))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_FIRE);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < TOTEM_OF_WRATH_COUNT; ++i)
-        if (button->GetAction() == TOTEM_OF_WRATH[i])
-            return false;
-    return true;
-}
-
-bool SetFrostResistanceTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8181))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_FIRE);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < FROST_RESISTANCE_TOTEM_COUNT; ++i)
-        if (button->GetAction() == FROST_RESISTANCE_TOTEM[i])
-            return false;
-    return true;
-}
-
-// Set Water Totems
-bool SetHealingStreamTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(5394))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_WATER);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < HEALING_STREAM_TOTEM_COUNT; ++i)
-        if (button->GetAction() == HEALING_STREAM_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetManaSpringTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(5675))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_WATER);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < MANA_SPRING_TOTEM_COUNT; ++i)
-        if (button->GetAction() == MANA_SPRING_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetCleansingTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8170))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_WATER);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < CLEANSING_TOTEM_COUNT; ++i)
-        if (button->GetAction() == CLEANSING_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetFireResistanceTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8184))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_WATER);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < FIRE_RESISTANCE_TOTEM_COUNT; ++i)
-        if (button->GetAction() == FIRE_RESISTANCE_TOTEM[i])
-            return false;
-    return true;
-}
-
-// Set Air Totems
-bool SetWrathOfAirTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(3738))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_AIR);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < WRATH_OF_AIR_TOTEM_COUNT; ++i)
-        if (button->GetAction() == WRATH_OF_AIR_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetWindfuryTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8512))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_AIR);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < WINDFURY_TOTEM_COUNT; ++i)
-        if (button->GetAction() == WINDFURY_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetNatureResistanceTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(10595))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_AIR);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < NATURE_RESISTANCE_TOTEM_COUNT; ++i)
-        if (button->GetAction() == NATURE_RESISTANCE_TOTEM[i])
-            return false;
-    return true;
-}
-
-bool SetGroundingTotemTrigger::IsActive()
-{
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
-        return false;
-    if (!bot->HasSpell(8177))
-        return false;
-    ActionButton const* button = bot->GetActionButton(TOTEM_BAR_SLOT_AIR);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
-    for (size_t i = 0; i < GROUNDING_TOTEM_COUNT; ++i)
-        if (button->GetAction() == GROUNDING_TOTEM[i])
-            return false;
+        }
+    }
     return true;
 }
