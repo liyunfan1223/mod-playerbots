@@ -174,7 +174,7 @@ bool PlayerbotAIConfig::Initialize()
         sConfigMgr->GetOption<std::string>("AiPlayerbot.DisallowedGameObjects",
                                            "176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,"
                                            "179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,"
-                                           "165739,165738,175245,175970,176325,176327,123329"),
+                                           "165739,165738,175245,175970,176325,176327,123329,2560"),
         disallowedGameObjects);
     botAutologin = sConfigMgr->GetOption<bool>("AiPlayerbot.BotAutologin", false);
     randomBotAutologin = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotAutologin", true);
