@@ -153,21 +153,21 @@ static inline int32 EncodeRandomEnchantParam(uint32 randomPropertyId, uint32 ran
 
 // Weapon/shield/relic whitelist per class.
 // Returns false when the item is a WEAPON / SHIELD / RELIC the class should NOT use.
-static bool IsWeaponOrShieldOrRelicAllowedForClass(SpecTraits const& T, ItemTemplate const* proto)
+static bool IsWeaponOrShieldOrRelicAllowedForClass(SpecTraits const& traits, ItemTemplate const* proto)
 {
     if (!proto) return true; // non-weapon items handled elsewhere
 
     // Shields (Armor + Shield): Paladin / Warrior / Shaman
     if ((proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD) ||
         proto->InventoryType == INVTYPE_SHIELD)
-        return T.cls == CLASS_PALADIN || T.cls == CLASS_WARRIOR || T.cls == CLASS_SHAMAN;
+        return traits.cls == CLASS_PALADIN || traits.cls == CLASS_WARRIOR || traits.cls == CLASS_SHAMAN;
 
      // Relics (Idol/Totem/Sigil/Libram)
     if (proto->InventoryType == INVTYPE_RELIC)
     {
         // DK (Sigil), Druid (Idol), Paladin (Libram), Shaman (Totem)
-        return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_DRUID ||
-               T.cls == CLASS_PALADIN      || T.cls == CLASS_SHAMAN;
+        return traits.cls == CLASS_DEATH_KNIGHT || traits.cls == CLASS_DRUID ||
+               traits.cls == CLASS_PALADIN      || traits.cls == CLASS_SHAMAN;
     }
 
     // Not a weapon: nothing to filter here
@@ -180,68 +180,68 @@ static bool IsWeaponOrShieldOrRelicAllowedForClass(SpecTraits const& T, ItemTemp
         case ITEM_SUBCLASS_WEAPON_AXE:
         case ITEM_SUBCLASS_WEAPON_AXE2:
             // 1H axes allowed for Rogue; 2H axes not (but same SubClass enum, handled by InventoryType later if needed)
-            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_HUNTER  ||
-                   T.cls == CLASS_PALADIN      || T.cls == CLASS_SHAMAN  ||
-                   T.cls == CLASS_WARRIOR      || T.cls == CLASS_ROGUE;  // Rogue: 1H axes
+            return traits.cls == CLASS_DEATH_KNIGHT || traits.cls == CLASS_HUNTER  ||
+                   traits.cls == CLASS_PALADIN      || traits.cls == CLASS_SHAMAN  ||
+                   traits.cls == CLASS_WARRIOR      || traits.cls == CLASS_ROGUE;  // Rogue: 1H axes
 
         // Swords
         case ITEM_SUBCLASS_WEAPON_SWORD:   // 1H swords
-            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_HUNTER  ||
-                   T.cls == CLASS_MAGE         || T.cls == CLASS_PALADIN  ||
-                   T.cls == CLASS_ROGUE        || T.cls == CLASS_WARRIOR  ||
-                   T.cls == CLASS_WARLOCK; // Warlocks can use 1H swords
+            return traits.cls == CLASS_DEATH_KNIGHT || traits.cls == CLASS_HUNTER  ||
+                   traits.cls == CLASS_MAGE         || traits.cls == CLASS_PALADIN  ||
+                   traits.cls == CLASS_ROGUE        || traits.cls == CLASS_WARRIOR  ||
+                   traits.cls == CLASS_WARLOCK; // Warlocks can use 1H swords
         case ITEM_SUBCLASS_WEAPON_SWORD2:  // 2H swords
-            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_HUNTER  ||
-                   T.cls == CLASS_PALADIN      || T.cls == CLASS_WARRIOR;
+            return traits.cls == CLASS_DEATH_KNIGHT || traits.cls == CLASS_HUNTER  ||
+                   traits.cls == CLASS_PALADIN      || traits.cls == CLASS_WARRIOR;
 
         // Maces
         case ITEM_SUBCLASS_WEAPON_MACE:    // 1H maces
-            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_DRUID   ||
-                   T.cls == CLASS_PALADIN      || T.cls == CLASS_PRIEST  ||
-                   T.cls == CLASS_SHAMAN       || T.cls == CLASS_WARRIOR ||
-                   T.cls == CLASS_ROGUE; // Rogue: 1H maces in WotLK
+            return traits.cls == CLASS_DEATH_KNIGHT || traits.cls == CLASS_DRUID   ||
+                   traits.cls == CLASS_PALADIN      || traits.cls == CLASS_PRIEST  ||
+                   traits.cls == CLASS_SHAMAN       || traits.cls == CLASS_WARRIOR ||
+                   traits.cls == CLASS_ROGUE; // Rogue: 1H maces in WotLK
         case ITEM_SUBCLASS_WEAPON_MACE2:   // 2H maces
-            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_DRUID   ||
-                   T.cls == CLASS_PALADIN      || T.cls == CLASS_WARRIOR; // Shaman: no 2H maces
+            return traits.cls == CLASS_DEATH_KNIGHT || traits.cls == CLASS_DRUID   ||
+                   traits.cls == CLASS_PALADIN      || traits.cls == CLASS_WARRIOR; // Shaman: no 2H maces
 
         // Polearms
         case ITEM_SUBCLASS_WEAPON_POLEARM:
-            return T.cls == CLASS_DEATH_KNIGHT || T.cls == CLASS_DRUID   ||
-                   T.cls == CLASS_HUNTER       || T.cls == CLASS_PALADIN  ||
-                   T.cls == CLASS_WARRIOR; // Shaman: cannot use polearms
+            return traits.cls == CLASS_DEATH_KNIGHT || traits.cls == CLASS_DRUID   ||
+                   traits.cls == CLASS_HUNTER       || traits.cls == CLASS_PALADIN  ||
+                   traits.cls == CLASS_WARRIOR; // Shaman: cannot use polearms
 
         // Staves
         case ITEM_SUBCLASS_WEAPON_STAFF:
-            return T.cls == CLASS_DRUID   || T.cls == CLASS_HUNTER  ||
-                   T.cls == CLASS_MAGE    || T.cls == CLASS_PRIEST  ||
-                   T.cls == CLASS_SHAMAN  || T.cls == CLASS_WARLOCK;
+            return traits.cls == CLASS_DRUID   || traits.cls == CLASS_HUNTER  ||
+                   traits.cls == CLASS_MAGE    || traits.cls == CLASS_PRIEST  ||
+                   traits.cls == CLASS_SHAMAN  || traits.cls == CLASS_WARLOCK;
 
         // Daggers
         case ITEM_SUBCLASS_WEAPON_DAGGER:
-            return T.cls == CLASS_DRUID   || T.cls == CLASS_HUNTER  ||
-                   T.cls == CLASS_MAGE    || T.cls == CLASS_PRIEST  ||
-                   T.cls == CLASS_ROGUE   || T.cls == CLASS_WARLOCK ||
-                   T.cls == CLASS_WARRIOR; // Warriors can use daggers
+            return traits.cls == CLASS_DRUID   || traits.cls == CLASS_HUNTER  ||
+                   traits.cls == CLASS_MAGE    || traits.cls == CLASS_PRIEST  ||
+                   traits.cls == CLASS_ROGUE   || traits.cls == CLASS_WARLOCK ||
+                   traits.cls == CLASS_WARRIOR; // Warriors can use daggers
 
         // Fist weapons
         case ITEM_SUBCLASS_WEAPON_FIST:
-            return T.cls == CLASS_DRUID   || T.cls == CLASS_HUNTER  ||
-                   T.cls == CLASS_ROGUE   || T.cls == CLASS_SHAMAN  ||
-                   T.cls == CLASS_WARRIOR;
+            return traits.cls == CLASS_DRUID   || traits.cls == CLASS_HUNTER  ||
+                   traits.cls == CLASS_ROGUE   || traits.cls == CLASS_SHAMAN  ||
+                   traits.cls == CLASS_WARRIOR;
 
          // Ranged (bows / guns / crossbows) — Hunters primary; also usable by Warriors/Rogues
         case ITEM_SUBCLASS_WEAPON_BOW:
         case ITEM_SUBCLASS_WEAPON_GUN:
         case ITEM_SUBCLASS_WEAPON_CROSSBOW:
-            return T.cls == CLASS_HUNTER || T.cls == CLASS_WARRIOR || T.cls == CLASS_ROGUE;
+            return traits.cls == CLASS_HUNTER || traits.cls == CLASS_WARRIOR || traits.cls == CLASS_ROGUE;
 
         // Wands — only Mage/Priest/Warlock
         case ITEM_SUBCLASS_WEAPON_WAND:
-            return T.cls == CLASS_MAGE || T.cls == CLASS_PRIEST || T.cls == CLASS_WARLOCK;
+            return traits.cls == CLASS_MAGE || traits.cls == CLASS_PRIEST || traits.cls == CLASS_WARLOCK;
 
         // Thrown — Warriors/Rogues (Hunters rarely need them; bows/guns/xbows preferred)
         case ITEM_SUBCLASS_WEAPON_THROWN:
-            return T.cls == CLASS_WARRIOR || T.cls == CLASS_ROGUE;
+            return traits.cls == CLASS_WARRIOR || traits.cls == CLASS_ROGUE;
 
         // Exotic / fishing / misc — disallow
          case ITEM_SUBCLASS_WEAPON_EXOTIC:
@@ -264,18 +264,17 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
         proto->InventoryType == INVTYPE_NECK    ||
         proto->InventoryType == INVTYPE_CLOAK;
 
-    const SpecTraits T = GetSpecTraits(bot);
-
+    const SpecTraits traits = GetSpecTraits(bot);
 
     // Hard filter first: do not NEED weapons/shields/relics the class shouldn't use.
     // If this returns false, the caller will downgrade to GREED (off-spec/unsupported).
-    if (!IsWeaponOrShieldOrRelicAllowedForClass(T, proto))
+    if (!IsWeaponOrShieldOrRelicAllowedForClass(traits, proto))
         return false;
 
     // Flags class/spec
-    const bool isCasterSpec   = T.isCaster;
-    const bool isTankLikeSpec = T.isTank;
-    const bool isPhysicalSpec = T.isPhysical;
+    const bool isCasterSpec   = traits.isCaster;
+    const bool isTankLikeSpec = traits.isTank;
+    const bool isPhysicalSpec = traits.isPhysical;
 
     // Loot Stats
     const bool hasINT   = HasAnyStat(proto, { ITEM_MOD_INTELLECT });
@@ -345,27 +344,27 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
             proto->InventoryType == INVTYPE_WEAPONOFFHAND ||
             proto->InventoryType == INVTYPE_2HWEAPON;
 
-        if (meleeWeapon && T.isHunter && !hasAGI)
+        if (meleeWeapon && traits.isHunter && !hasAGI)
             return false;
 
-        if (meleeWeapon && (T.isFeralTk || T.isFeralDps) && !hasAGI && !hasSTR)
+        if (meleeWeapon && (traits.isFeralTk || traits.isFeralDps) && !hasAGI && !hasSTR)
             return false;
     }
 
     // Class/spec specific adjustments (readable)
     // DK Unholy (DPS): allows STR/HIT/HASTE/CRIT/ARP; rejects all caster items
-    if (/* DK Unholy */ (T.cls == CLASS_DEATH_KNIGHT && (T.spec == "unholy" || T.spec == "uh")))
+    if (traits.cls == CLASS_DEATH_KNIGHT && (traits.spec == "unholy" || traits.spec == "uh"))
     {
         if (looksCaster) return false;
     }
     // DK Blood/Frost tanks: DEF/AVOID/STA/STR are useful; reject caster items
-    if (T.isDKTank)
+    if (traits.isDKTank)
     {
         if (looksCaster) return false;
         // Pure caster DPS rings/trinkets already filtered above.
     }
     // Hunter (BM/MM/SV): agi/hit/haste/AP/crit/arp → OK; avoid STR-only or caster items
-    if (T.isHunter)
+    if (traits.isHunter)
     {
         if (looksCaster) return false;
         // Avoid rings with "pure STR" without AGI/AP/DPS ratings
@@ -373,36 +372,36 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
             return false;
     }
     // Rogue (all specs): same strict physical filter (no caster items)
-    if (T.isRogue)
+    if (traits.isRogue)
     {
         if (looksCaster) return false;
     }
     // Warrior Arms/Fury : no caster items
-    if (T.isWarrior && !T.isWarProt)
+    if (traits.isWarrior && !traits.isWarProt)
     {
         if (looksCaster) return false;
     }
     // Warrior Protection: DEF/AVOID/STA/STR are useful; no caster items
-    if (T.isWarProt)
+    if (traits.isWarProt)
     {
         if (looksCaster) return false;
     }
     // Shaman Enhancement: no Spell Power weapons/shields, no pure INT/SP items
-    if (T.isEnhSham)
+    if (traits.isEnhSham)
     {
         if (looksCaster) return false;
         if ((proto->Class == ITEM_CLASS_WEAPON || (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD))
             && hasSP)
             return false;
     }
-    // Druid Feral (tank/DPS): AGI/STA/AVOID/ARP/EXP -> OK; no caster items
-    if (T.isFeralTk || T.isFeralDps)
+    // Druid Feral (tank/DPS): AGI/STA/AVOID/ARP/EXP → OK; no caster items
+    if (traits.isFeralTk || traits.isFeralDps)
     {
         if (looksCaster) return false;
     }
 
     // Paladin Retribution: physical DPS (no caster items; forbid SP weapons/shields; enforce 2H only)
-    if (T.isRetPal)
+    if (traits.isRetPal)
     {
         if (looksCaster) return false;
 
@@ -681,9 +680,9 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
 	
     // Lockboxes: if the item is a lockbox and the bot is a Rogue with Lockpicking, prefer NEED.
     // (Handled before BoE/BoU etiquette; BoE/BoU checks below ignore lockboxes.)
-    const SpecTraits T = GetSpecTraits(bot);
+    const SpecTraits traits = GetSpecTraits(bot);
     const bool isLockbox = IsLockbox(proto);
-    if (isLockbox && T.isRogue && bot->HasSkill(SKILL_LOCKPICKING))
+    if (isLockbox && traits.isRogue && bot->HasSkill(SKILL_LOCKPICKING))
         vote = NEED;
 
     // Generic BoP rule: if the item is BoP, equippable, matches the spec
@@ -758,23 +757,20 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
             vote = NEED;
     }
 
-    // return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? vote : PASS;
-    // Final filter: loot strategy (protect a potential nil AI earlier on login
-    if (PlayerbotAI* ai = GET_PLAYERBOT_AI(bot))
-        return StoreLootAction::IsLootAllowed(proto->ItemId, ai) ? vote : PASS;
-    return PASS;
+    // Final filter: loot strategy — Action has a valid AI in this context
+    return StoreLootAction::IsLootAllowed(proto->ItemId, this->ai) ? vote : PASS;
 }
 
 // Helpers d'annonce
-const char* LootRollAction::RollVoteToText(RollVote v) const
+const char* LootRollAction::RollVoteToText(RollVote vote) const
 {
-    switch (v)
+    switch (vote)
     {
-        case NEED:        return "NEED";
-        case GREED:       return "GREED";
-        case PASS:        return "PASS";
-        case DISENCHANT:  return "DISENCHANT";
-        default:          return "PASS";
+        case NEED:       return "NEED";
+        case GREED:      return "GREED";
+        case PASS:       return "PASS";
+        case DISENCHANT: return "DISENCHANT";
+        default:         return "UNKNOWN";
     }
 }
 

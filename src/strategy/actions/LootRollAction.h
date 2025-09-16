@@ -47,7 +47,7 @@ protected:
     
     // Announce the roll choice to the bot's master (if enabled in config)
     void AnnounceRollChoice(RollVote vote, uint32 itemId);
-    const char* RollVoteToText(RollVote v) const;
+    const char* RollVoteToText(RollVote vote) const;
 };
 
 class MasterLootRollAction : public LootRollAction
