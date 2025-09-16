@@ -16,10 +16,12 @@ public:
     GossipHelloAction(PlayerbotAI* botAI) : Action(botAI, "gossip hello") {}
 
     bool Execute(Event event) override;
+    // Overload for direct usage
+    bool Execute(ObjectGuid guid, int32 menuToSelect, bool silent = false);
 
 private:
     void TellGossipMenus();
-    bool ProcessGossip(int32 menuToSelect);
+    bool ProcessGossip(int32 menuToSelect, bool silent);
     void TellGossipText(uint32 textId);
 };
 
