@@ -261,19 +261,19 @@ Value<Unit*>* CastBlessingOfSanctuaryOnPartyAction::GetTargetValue()
 
 bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
 {
-    if (!bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY)) 
-		return false;
+    if (!bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY))
+        return false;
 
     Unit* target = GetTarget();
     if (!target)
     {
-        // Fallback : GetTarget() can be nul if no one need a buff.
+        // Fallback: GetTarget() can be null if no one needs a buff.
         // Keep a valid pointer for the checks/logs that follow.
         target = bot;
     }
 
     Player* targetPlayer = target ? target->ToPlayer() : nullptr;
-	
+
     // Small helpers to check relevant auras
     const auto HasKingsAura = [&](Unit* u) -> bool {
         return botAI->HasAura("blessing of kings", u) || botAI->HasAura("greater blessing of kings", u);
@@ -281,24 +281,24 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     const auto HasSanctAura = [&](Unit* u) -> bool {
         return botAI->HasAura("blessing of sanctuary", u) || botAI->HasAura("greater blessing of sanctuary", u);
     };
-	
+
     if (Group* g = bot->GetGroup())
     {
         if (targetPlayer && !g->IsMember(targetPlayer->GetGUID()))
-            {
-                LOG_DEBUG("playerbots", "[Sanct] Initial target not in group, ignoring");
-                target = bot;
-                targetPlayer = bot->ToPlayer();
-			}      
-	}
+        {
+            LOG_DEBUG("playerbots", "[Sanct] Initial target not in group, ignoring");
+            target = bot;
+            targetPlayer = bot->ToPlayer();
+        }
+    }
 
     if (Player* self = bot->ToPlayer())
     {
         bool selfHasSanct = HasSanctAura(self);
-		bool needSelf = IsTankRole(self) && !selfHasSanct;
+        bool needSelf = IsTankRole(self) && !selfHasSanct;
 
         LOG_DEBUG("playerbots", "[Sanct] {} isTank={} selfHasSanct={} needSelf={}",
-				 bot->GetName(), IsTankRole(self), selfHasSanct, needSelf);
+                  bot->GetName(), IsTankRole(self), selfHasSanct, needSelf);
 
         if (needSelf)
         {
@@ -314,7 +314,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
         bool hasSanct = HasSanctAura(targetPlayer);
         targetOk = IsTankRole(targetPlayer) && !hasSanct;
     }
-    
+
     if (!targetOk)
     {
         if (Group* g = bot->GetGroup())
@@ -330,7 +330,7 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
                 if (!hasSanct)
                 {
                     target = p; // prioritize this tank
-					targetPlayer = p;
+                    targetPlayer = p;
                     targetOk = true;
                     break;
                 }
@@ -360,23 +360,16 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
         else
             return false;
     }
-
-    if (targetPlayer)
+    if (targetPlayer && !IsTankRole(targetPlayer))
     {
-		if (IsTankRole(targetPlayer))
-        {
-            castName = "blessing of sanctuary";
-        }
-        else
-        {
-            auto RP = ai::chat::MakeGroupAnnouncer(bot);
-            castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
-        }
+        auto RP = ai::chat::MakeGroupAnnouncer(bot);
+        castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
     }
     else
     {
         castName = "blessing of sanctuary";
     }
+
     bool ok = botAI->CastSpell(castName, target);
     LOG_DEBUG("playerbots", "[Sanct] Cast {} on {} result={}", castName, target->GetName(), ok);
     return ok;
@@ -384,10 +377,6 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
 
 Value<Unit*>* CastBlessingOfKingsOnPartyAction::GetTargetValue()
 {
-    /*return context->GetValue<Unit*>(
-        "party member without aura",
-        "blessing of kings,greater blessing of kings"
-    );*/ //old version before solo paladin patch
     return context->GetValue<Unit*>(
         "party member without aura",
         "blessing of kings,greater blessing of kings,blessing of sanctuary,greater blessing of sanctuary"
