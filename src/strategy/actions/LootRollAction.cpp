@@ -425,7 +425,7 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
     }
 
     // Global VETO: a "physical" spec never considers a caster profile as primary
-    if (sPlayerbotAIConfig->smartNeedBySpec && T.isPhysical && looksCaster)
+    if (sPlayerbotAIConfig->smartNeedBySpec && traits.isPhysical && looksCaster)
         return false;
 
     // Let the cross-armor rules (CrossArmorExtraMargin) decide for major off-armor upgrades.
@@ -757,8 +757,8 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
             vote = NEED;
     }
 
-    // Final filter: loot strategy — Action has a valid AI in this context
-    return StoreLootAction::IsLootAllowed(proto->ItemId, this->ai) ? vote : PASS;
+    // Final filter: loot strategy — AI is valid here; use the standard accessor
+    return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? vote : PASS;
 }
 
 // Helpers d'annonce
