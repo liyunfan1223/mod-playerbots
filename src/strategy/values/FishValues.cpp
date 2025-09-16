@@ -18,9 +18,8 @@ bool CanFishValue::Calculate()
   int32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
 
   if (SkillFishing == 0)
-  {
     return false;
-  }
+
 
   int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
   if (!zone_skill)
@@ -56,9 +55,8 @@ bool NoBobberValue::Calculate()
 bool CanOpenBobberValue::Calculate()
 {
   if (!bot || !botAI)
-  {
     return false;
-  }
+
     GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
     for (const auto& guid : gos)
     {
