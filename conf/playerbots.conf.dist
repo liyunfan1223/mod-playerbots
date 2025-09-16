@@ -287,8 +287,14 @@ AiPlayerbot.SayWhenCollectingItems = 1
 # Default: 0 (disabled)
 AiPlayerbot.FreeMethodLoot = 0
 
-# Bots' loot roll level (0 = pass, 1 = greed, 2 = need)
-# Default: 2 (need), recommanded 2 with new loot AI
+# Bots' loot roll level:
+#   0 = always pass
+#   1 = always greed (legacy default, bots never roll "need")
+#   2 = allow need (recommended with new loot AI)
+#
+# With the new loot AI, bots can correctly decide when an item is really useful.
+# Setting this to 2 lets them use "need" appropriately. Value 1 only does greed,
+# which was the old safe default but bypasses the new decision-making.
 AiPlayerbot.LootRollLevel = 2
 
 # NEED only if the item matches the bot's MAIN spec (stats & armor/weapon type).
