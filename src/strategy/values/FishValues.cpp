@@ -12,7 +12,7 @@
 
 bool CanFishValue::Calculate()
 {
-  if (!bot ||!botAI)
+  if (!bot || !botAI)
     return false;
     
   int32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
@@ -85,7 +85,7 @@ bool CanOpenBobberValue::Calculate()
 
 bool DoneFishingValue::Calculate()
 {
-  if (!bot ||!botAI)
+  if (!bot || !botAI)
     return false;
   
   Player* master = botAI->GetMaster();
@@ -93,13 +93,6 @@ bool DoneFishingValue::Calculate()
   if (!master) // Check if master exists
     return false;
     
-  ObjectGuid masterGUID;
-  masterGUID = master->GetGUID();
-  
-  if (!masterGUID)
-  {
-    return false;// Need to add triggers for free fishing. 
-  }
   bool distance = master->GetDistance(bot) < 10.0f;
   if (!distance)
   {

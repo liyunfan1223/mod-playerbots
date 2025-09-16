@@ -52,7 +52,7 @@ WorldPosition FindWater(Player* bot, float x, float y, float z, uint32 mapId,
             dist += increment;
 
         if (dist > maxDistance)
-            return nullptr; 
+            return WorldPosition(); 
     }
     
     size_t midIndex = boundaryPoints.size() / 2;
@@ -105,15 +105,12 @@ bool MovetoFishAction::Execute(Event event)
         if (target->getStatus() != TravelStatus::TRAVEL_STATUS_TRAVEL)
             return false;
     }
-    WorldPosition nearwater = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 5.0f, 5.0f, 0.2f, false);
-    if (nearwater)
-        return false;
-        
+
     WorldPosition FishSpot = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 0.0f, sPlayerbotAIConfig->fishingDistance, 2.5f, false);
-    if (FishSpot)
+    if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
     {
         WorldPosition LandSpot = FindWater(bot, FishSpot.GetPositionX(), FishSpot.GetPositionY(), FishSpot.GetPositionZ(), FishSpot.GetMapId(), 0.0f, 3.0f, 0.2f, true);
-        if(LandSpot)
+        if(LandSpot.GetPositionX() != 0.0f && LandSpot.GetPositionY() != 0.0f)
             return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
     }
     return false;
@@ -122,9 +119,12 @@ bool MovetoFishAction::Execute(Event event)
 bool MovetoFishAction::isUseful()
 {
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
-    {
         return false;
-    }
+    
+        WorldPosition nearwater = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 5.0f, 5.0f, 0.2f, false);
+    if (nearwater.GetPositionX() != 0.0f && nearwater.GetPositionY() != 0.0f)
+        return false;
+        
     return true;
 }
 
@@ -217,7 +217,7 @@ bool FishingAction::Execute(Event event)
     }
     WorldPosition FishSpot = FindFishingSpot(botAI);
 
-    if (FishSpot)
+    if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
     {
         bot->SetFacingTo(FishSpot);
         bot->SendMovementFlagUpdate();
@@ -260,6 +260,7 @@ bool UseBobber::Execute(Event event)
 {
     if (!bot || !botAI)
         return false;
+
     GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
     for (const auto& guid : gos)
     {
@@ -286,9 +287,8 @@ bool UseBobber::Execute(Event event)
 bool EndFishing::Execute(Event event)
 {
     if (!bot || !botAI)
-    {
         return false;
-    }
+
     botAI->ChangeStrategy("-masterfishing", BOT_STATE_NON_COMBAT);
     return true;
 }
@@ -296,9 +296,9 @@ bool EndFishing::Execute(Event event)
 
 bool RemoveBobberStrategyAction::Execute(Event event)
 {
-  if (!botAI)
-    return false;
+    if (!botAI)
+        return false;
 
-  botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
-  return true;
+    botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
+    return true;
 }
