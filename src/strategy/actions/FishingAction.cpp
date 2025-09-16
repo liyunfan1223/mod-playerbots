@@ -175,9 +175,9 @@ bool FishingAction::Execute(Event event)
     EquipFishingPoleAction equipAction(botAI);
     if (equipAction.isUseful())
         return equipAction.Execute(event);
-
-    botAI->SetNextCheckDelay(100);
+   
     botAI->CastSpell(FISHING_SPELL, bot);
+    botAI->SetNextCheckDelay(100);
     botAI->ChangeStrategy("+usebobber", BOT_STATE_NON_COMBAT);
    
     return true;
@@ -218,8 +218,8 @@ bool UseBobber::Execute(Event event)
                 continue;
             if (go->getLootState() == GO_READY)
             {
-                botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
                 go->Use(bot);
+                botAI->ChangeStrategy("-usebobber", BOT_STATE_NON_COMBAT);
                 return true;
             }
 

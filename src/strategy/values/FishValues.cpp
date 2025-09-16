@@ -37,7 +37,7 @@ bool NoBobberValue::Calculate()
 {
     if (!bot || !botAI)
         return false;
-
+    
     GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
     for (const auto& guid : gos)
     {
