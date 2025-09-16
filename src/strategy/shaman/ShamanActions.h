@@ -531,13 +531,13 @@ public:
 class SetTotemAction : public Action
 {
 public:
-    SetTotemAction(PlayerbotAI* botAI, std::string const totemName, static const uint32 totemSpellIds[], uint8 actionButtonId)
+    SetTotemAction(PlayerbotAI* botAI, std::string const totemName, const uint32 totemSpellIds[], int actionButtonId)
         : Action(botAI, "set " + totemName), totemSpellIds(totemSpellIds), actionButtonId(actionButtonId)
     {
     }
     bool Execute(Event event) override;
     uint32 const* totemSpellIds;
-    uint8 actionButtonId;
+    int actionButtonId;
 };
 
 class SetStrengthOfEarthTotemAction : public SetTotemAction

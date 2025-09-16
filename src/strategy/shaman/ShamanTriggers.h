@@ -359,7 +359,7 @@ class SetTotemTrigger : public Trigger
 {
 public:
     SetTotemTrigger(PlayerbotAI* ai, std::string const spellName, const uint32 requiredSpellId,
-                    static const uint32 totemSpellIds[], uint8 actionButtonId)
+                    const uint32 totemSpellIds[], int actionButtonId)
         : Trigger(ai, "set " + spellName),
           requiredSpellId(requiredSpellId), 
           totemSpellIds(totemSpellIds),
@@ -369,7 +369,7 @@ public:
 private:
     uint32 requiredSpellId;
     uint32 const* totemSpellIds;
-    uint8 actionButtonId;
+    int actionButtonId;
 };
 
 class SetStrengthOfEarthTotemTrigger : public SetTotemTrigger
