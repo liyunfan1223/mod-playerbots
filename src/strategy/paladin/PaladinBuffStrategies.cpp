@@ -9,10 +9,6 @@
 
 void PaladinBuffManaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    /*triggers.push_back(
-        new TriggerNode("blessing of wisdom on party",
-                        NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), nullptr)));*/
-	
     triggers.push_back(new TriggerNode("blessing of wisdom on party",
         NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), NULL)));
 		

@@ -234,12 +234,12 @@ bool CastBlessingOfWisdomOnPartyAction::Execute(Event event)
         if (targetPlayer && !g->IsMember(targetPlayer->GetGUID()))
             return false;
 
-    if (botAI->HasStrategy("bmana", BOT_STATE_NON_COMBAT))
-        if (targetPlayer && IsTankRole(targetPlayer))
-        {
-            LOG_DEBUG("playerbots", "[Wisdom/bmana] Skip tank {} (Kings only)", target->GetName());
-            return false;
-        }
+    if (botAI->HasStrategy("bmana", BOT_STATE_NON_COMBAT) &&
+        targetPlayer && IsTankRole(targetPlayer))
+    {
+        LOG_DEBUG("playerbots", "[Wisdom/bmana] Skip tank {} (Kings only)", target->GetName());
+        return false;
+    }
 
     std::string castName = GetActualBlessingOfWisdom(target);
     if (castName.empty())
@@ -261,11 +261,16 @@ Value<Unit*>* CastBlessingOfSanctuaryOnPartyAction::GetTargetValue()
 
 bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
 {
-    if (!bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY)) return false;
+    if (!bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY)) 
+		return false;
 
     Unit* target = GetTarget();
     if (!target)
-    target = bot;
+    {
+        // Fallback : GetTarget() can be nul if no one need a buff.
+        // Keep a valid pointer for the checks/logs that follow.
+        target = bot;
+    }
 
     Player* targetPlayer = target ? target->ToPlayer() : nullptr;
 	
@@ -278,13 +283,14 @@ bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event event)
     };
 	
     if (Group* g = bot->GetGroup())
-        if (targetPlayer)
-            if (!g->IsMember(targetPlayer->GetGUID()))
+    {
+        if (targetPlayer && !g->IsMember(targetPlayer->GetGUID()))
             {
                 LOG_DEBUG("playerbots", "[Sanct] Initial target not in group, ignoring");
                 target = bot;
                 targetPlayer = bot->ToPlayer();
-            }
+			}      
+	}
 
     if (Player* self = bot->ToPlayer())
     {
