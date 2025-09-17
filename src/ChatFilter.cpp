@@ -9,7 +9,6 @@
 #include "Playerbots.h"
 #include "RtiTargetValue.h"
 #include "AiFactory.h"
-#include "Log.h"
 
 #include <algorithm>
 #include <cctype>
