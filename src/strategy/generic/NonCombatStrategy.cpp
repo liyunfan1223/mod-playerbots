@@ -40,7 +40,7 @@ void WorldBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void MasterFishStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("move to fish",  90.0f),
+    triggers.push_back(new TriggerNode("very often", NextAction::array(0, new NextAction("move to fish",  90.0f),
                                                             new NextAction("go fishing" , 90.0f), nullptr)));
     
     triggers.push_back(new TriggerNode("done fishing", NextAction::array(0, new NextAction("end fishing", 90.0f),

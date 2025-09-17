@@ -8,8 +8,6 @@
 
 bool CanFishTrigger::IsActive() { return AI_VALUE(bool, "can fish"); }
 
-bool NoFishingBobberTrigger::IsActive() { return AI_VALUE(bool, "no fishing bobber"); }
-
 bool CanUseFishingBobberTrigger::IsActive() { return AI_VALUE(bool, "can use fishing bobber");}
 
 bool DoneFishingTrigger::IsActive() { return AI_VALUE(bool, "done fishing");}

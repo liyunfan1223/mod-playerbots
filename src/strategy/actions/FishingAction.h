@@ -23,6 +23,7 @@ public:
     FishingAction(PlayerbotAI* botAI) : Action(botAI, "go fishing"){}
     bool Execute(Event event) override;
     bool isUseful() override;
+  
 };
 
 class EquipFishingPoleAction : public Action, public Qualified

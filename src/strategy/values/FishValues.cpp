@@ -32,25 +32,6 @@ bool CanFishValue::Calculate()
   }
   return true;
 }
-bool NoBobberValue::Calculate()
-{
-    if (!bot || !botAI)
-        return false;
-    
-    GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
-    for (const auto& guid : gos)
-    {
-        if (GameObject* go = botAI->GetGameObject(guid))
-        {
-            if (go->GetEntry() != FISHING_BOBBER)
-                continue;
-            if (go->GetOwnerGUID() != bot->GetGUID())
-                continue;
-            return false; 
-        }
-    }
-    return true;
-}
 
 bool CanOpenBobberValue::Calculate()
 {
