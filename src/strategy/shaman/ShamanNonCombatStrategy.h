@@ -13,7 +13,7 @@ class PlayerbotAI;
 class ShamanNonCombatStrategy : public NonCombatStrategy
 {
 public:
-    ShamanNonCombatStrategy(PlayerbotAI* botAI) : NonCombatStrategy(botAI) {}
+    ShamanNonCombatStrategy(PlayerbotAI* botAI);
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
