@@ -34,10 +34,10 @@ public:
     bool isUseful() override;
 };
 
-class MovetoFishAction : public MovementAction, public Qualified
+class MoveToFishAction : public MovementAction, public Qualified
 {
 public:
-    MovetoFishAction(PlayerbotAI* botAI) : MovementAction(botAI, "move to fish") {}
+    MoveToFishAction(PlayerbotAI* botAI) : MovementAction(botAI, "move to fish") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };

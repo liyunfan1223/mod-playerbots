@@ -107,7 +107,7 @@ WorldPosition FindFishingSpot(PlayerbotAI* botAI)
     return FindWater(player, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), 5.0f, 20.0f, 1.0f, false);
 }
 
-bool MovetoFishAction::Execute(Event event)
+bool MoveToFishAction::Execute(Event event)
 {
     WorldPosition FishSpot = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 0.0f, sPlayerbotAIConfig->fishingDistance, 2.5f, false);
     if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
@@ -119,7 +119,7 @@ bool MovetoFishAction::Execute(Event event)
     return false;
 }
 
-bool MovetoFishAction::isUseful()
+bool MoveToFishAction::isUseful()
 {
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
         return false;
@@ -243,7 +243,7 @@ bool FishingAction::Execute(Event event)
         }
         else
         {
-            return MovetoFishAction(botAI).Execute(event);
+            return MoveToFishAction(botAI).Execute(event);
         }
     }
 
@@ -282,8 +282,6 @@ bool UseBobber::Execute(Event event)
     {
         if (GameObject* go = botAI->GetGameObject(guid))
         {
-            if (!go)
-                continue;
             if (go->GetEntry() != FISHING_BOBBER)
                 continue;
             if (go->GetOwnerGUID() != bot->GetGUID())

@@ -315,7 +315,7 @@ public:
         creators["recently flee info"] = &ValueContext::recently_flee_info;
 
         creators["can fish"] = &ValueContext::can_fish;
-         creators["can use fishing bobber"] = &ValueContext::can_use_fishing_bobber;
+        creators["can use fishing bobber"] = &ValueContext::can_use_fishing_bobber;
         creators["done fishing"] = &ValueContext::done_fishing;
     }
 
