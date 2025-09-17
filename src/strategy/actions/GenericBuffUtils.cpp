@@ -17,6 +17,7 @@
 #include "AiObjectContext.h"
 #include "Value.h"
 #include "Config.h"
+#include "PlayerbotTextMgr.h"
 
 namespace ai::buff
 {
@@ -112,16 +113,38 @@ namespace ai::buff
            time_t& last = s_lastWarn[ std::make_pair(botLow, groupName) ];
            if (!last || now - last >= sPlayerbotAIConfig->rpWarningCooldown) // Configurable anti-spam
            {
-              std::string rp;
-              if (groupName.find("greater blessing") != std::string::npos)
-                  rp = "By the Light... I forgot my Symbols of Kings. We’ll make do with the simple blessings!";
-              else if (groupName == "gift of the wild")
-                  rp = "Nature is generous, my bags are not... out of herbs for Gift of the Wild. Take Mark of the Wild for now!";
-              else if (groupName == "arcane brilliance")
-                  rp = "Out of Arcane Powder... Brilliance will have to wait. Casting simple Intellect!";
-              else
-                  rp = "Oops, I’m out of components for the group version. We’ll go with the single one!";      
-              announce(rp);		   last = now;
+             // DB Key choice in regard of the buff
+             std::string key;
+             if (groupName.find("greater blessing") != std::string::npos)
+                 key = "rp_missing_reagent_greater_blessing";
+             else if (groupName == "gift of the wild")
+                 key = "rp_missing_reagent_gift_of_the_wild";
+             else if (groupName == "arcane brilliance")
+                 key = "rp_missing_reagent_arcane_brilliance";
+             else
+                 key = "rp_missing_reagent_generic";
+
+             // Placeholders
+             std::map<std::string, std::string> ph;
+             ph["%group_spell"] = groupName;
+             ph["%base_spell"]  = baseName;
+
+             // Respecte ai_playerbot_texts_chance if present
+             std::string rp;
+             bool got = sPlayerbotTextMgr->GetBotText(key, rp, ph);
+             if (got && !rp.empty())
+             {
+                 announce(rp);
+                 last = now;
+             }
+             else
+             {
+                 // Minimal Fallback
+                 std::ostringstream oss;
+                 oss << "Out of components for " << groupName << ". Using " << baseName << "!";
+                 announce(oss.str());
+                 last = now;
+             }
            }
          }   
      }
