@@ -92,39 +92,22 @@ static SpecTraits GetSpecTraits(Player* bot)
 }
 
 // Local helper: identifies classic lockboxes the Rogue can pick.
-// Heuristic: items with a LockID and “misc/junk” class often are lockboxes.
-// Also fall back to a name check (“lockbox”, “coffre”) to cover edge DBs.
+// Keep English-only fallback for name checks.
 static bool IsLockbox(ItemTemplate const* proto)
 {
     if (!proto) return false;
+    // Primary, data-driven detection
     if (proto->LockID)
     {
-        // Most lockboxes are misc/junk and openable.
+        // Most lockboxes are misc/junk and openable in WotLK
         if (proto->Class == ITEM_CLASS_MISC)
             return true;
     }
-    // Fallback on localized name check
-    static const std::vector<std::string> lockboxKeywords = {
-        "lockbox",      // English
-        "coffre",       // French
-        "schließkassette", // German
-        "caja fuerte",  // Spanish
-        "сундук",       // Russian
-        "잠긴",         // Korean
-        "锁箱",         // Simplified Chinese
-        "鎖箱"          // Traditional Chinese
-    };
-
+    // English-only fallback on name (align with TokenSlotFromName behavior)
     std::string n = proto->Name1;
     std::transform(n.begin(), n.end(), n.begin(),
-                   [](unsigned char c){ return (c >= 'A' && c <= 'Z') ? char(c + 32) : char(c); });
-    for (auto const& kw : lockboxKeywords)
-    {
-        const bool ascii = std::all_of(kw.begin(), kw.end(), [](unsigned char c){ return c < 0x80; });
-        if ((ascii && n.find(kw) != std::string::npos) || (!ascii && std::string(proto->Name1).find(kw) != std::string::npos))
-            return true;
-    }
-    return false;
+                   [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+    return n.find("lockbox") != std::string::npos;
 }
 
 // Local helper: not a class member
@@ -785,11 +768,15 @@ void LootRollAction::AnnounceRollChoice(RollVote vote, uint32 itemId)
 
     std::ostringstream ss;
     if (ItemTemplate const* ip = sObjectMgr->GetItemTemplate(itemId))
+    {
         ss << "[Loot] " << bot->GetName() << " choose " << RollVoteToText(vote)
            << " on [" << ip->Name1 << "]";
+    }
     else
+    {
         ss << "[Loot] " << bot->GetName() << " choose " << RollVoteToText(vote)
            << " on item " << itemId;
+    }
 
     // Message to Master
     botAI->TellMaster(ss.str());

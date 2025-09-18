@@ -309,7 +309,7 @@ AiPlayerbot.Roll.AllowBoENeedIfUpgrade = 1
 
 # Bind-on-Use etiquette: GREED by default to keep it tradeable.
 # Set to 1 to allow NEED on BoU if it's a clear upgrade.
-# Default:  (enabled)
+# Default: 1 (enabled)
 AiPlayerbot.Roll.AllowBoUNeedIfUpgrade = 1
 
 # Cross-armor rule (cloth/leather/mail on a plate user, etc.):

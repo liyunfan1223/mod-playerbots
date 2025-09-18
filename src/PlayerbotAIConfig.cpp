@@ -586,12 +586,12 @@ bool PlayerbotAIConfig::Initialize()
     autoPickReward = sConfigMgr->GetOption<std::string>("AiPlayerbot.AutoPickReward", "yes");
     autoEquipUpgradeLoot = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoEquipUpgradeLoot", true);
     equipUpgradeThreshold = sConfigMgr->GetOption<float>("AiPlayerbot.EquipUpgradeThreshold", 1.1f);
-    allowBoENeedIfUpgrade = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.AllowBoENeedIfUpgrade", false);
-    allowBoUNeedIfUpgrade = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.AllowBoUNeedIfUpgrade", false);
-    crossArmorExtraMargin = sConfigMgr->GetOption<float>("AiPlayerbot.Roll.CrossArmorExtraMargin", 1.15f);
+    allowBoENeedIfUpgrade = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.AllowBoENeedIfUpgrade", true);
+    allowBoUNeedIfUpgrade = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.AllowBoUNeedIfUpgrade", true);
+    crossArmorExtraMargin = sConfigMgr->GetOption<float>("AiPlayerbot.Roll.CrossArmorExtraMargin", 1.20f);
     useDEButton = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.UseDEButton", true);
-    tokenILevelMargin = sConfigMgr->GetOption<float>("AiPlayerbot.Roll.TokenILevelMargin", 0.0f);
-	announceLootRollsToMaster = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.AnnounceToMaster", true);
+    tokenILevelMargin = sConfigMgr->GetOption<float>("AiPlayerbot.Roll.TokenILevelMargin", 0.10f);
+	announceLootRollsToMaster = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.AnnounceToMaster", false);
 	smartNeedBySpec = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.SmartNeedBySpec", true);
     twoRoundsGearInit = sConfigMgr->GetOption<bool>("AiPlayerbot.TwoRoundsGearInit", false);
     syncQuestWithPlayer = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncQuestWithPlayer", true);
