@@ -21,6 +21,7 @@
 #        THRESHOLDS
 #        QUESTS
 #        COMBAT
+#        PALADIN BUFFS STRATEGIES
 #        CHEATS
 #        SPELLS
 #        FLIGHTPATH
@@ -495,6 +496,24 @@ AiPlayerbot.SaveManaThreshold = 60
 
 # Bots can flee from enemies
 AiPlayerbot.FleeingEnabled = 1
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
+# PALADIN BUFFS STRATEGIES
+#
+#
+
+# Min group size to use Greater buffs (Paladin, Mage, Druid)
+# Default: 3
+AiPlayerbot.MinBotsForGreaterBuff = 3
+
+# Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff
+# Default: 30
+AiPlayerbot.RPWarningCooldown = 30
 
 #
 #
