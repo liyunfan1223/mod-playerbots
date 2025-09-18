@@ -27,3 +27,12 @@ void RevealStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("often", NextAction::array(0, new NextAction("reveal gathering item", 50.0f), nullptr)));
 }
+
+void BobberStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+     triggers.push_back(
+        new TriggerNode("can use fishing bobber", NextAction::array(0, new NextAction("use fishing bobber", 75.0f), nullptr)));
+    
+    triggers.push_back(
+        new TriggerNode("random", NextAction::array(0, new NextAction("remove bobber strategy", 60.0f), nullptr)));
+}
