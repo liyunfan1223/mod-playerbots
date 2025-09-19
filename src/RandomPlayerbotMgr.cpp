@@ -717,14 +717,14 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 
     if (currentBots.size() < maxAllowedBotCount)
     {
-	    // Calculate how many bots to add
+        // Calculate how many bots to add
         maxAllowedBotCount -= currentBots.size();
         maxAllowedBotCount = std::min(sPlayerbotAIConfig->randomBotsPerInterval, maxAllowedBotCount);
 
-	    // Single RNG instance for all shuffling
+        // Single RNG instance for all shuffling
         std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 
-	    // Only need to track the Alliance count, as it's in Phase 1
+        // Only need to track the Alliance count, as it's in Phase 1
         uint32 totalRatio = sPlayerbotAIConfig->randomBotAllianceRatio + sPlayerbotAIConfig->randomBotHordeRatio;
         uint32 allowedAllianceCount = maxAllowedBotCount * (sPlayerbotAIConfig->randomBotAllianceRatio) / totalRatio;
 
@@ -877,17 +877,17 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
                 LOG_ERROR("playerbots",
                           "Can't log-in all the requested bots. Try increasing RandomBotAccountCount in your conf file.\n"
                           "{} more accounts needed.", moreAccountsNeeded);
-                missingBotsTimer = 0;	// Reset timer so error is not spammed every tick
+                missingBotsTimer = 0;    // Reset timer so error is not spammed every tick
             }
         }
         else
         {
-            missingBotsTimer = 0;   	// Reset timer if logins for this interval were successful
+            missingBotsTimer = 0;       // Reset timer if logins for this interval were successful
         }
     }
     else
     {
-        missingBotsTimer = 0;       	// Reset timer if there's enough bots
+        missingBotsTimer = 0;           // Reset timer if there's enough bots
     }
 
     return currentBots.size();

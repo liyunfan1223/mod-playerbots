@@ -77,7 +77,7 @@ uint32 LfgJoinAction::GetRoles()
 
         default:
             return PLAYER_ROLE_DAMAGE;
-			break;
+            break;
     }
 
     return PLAYER_ROLE_DAMAGE;
@@ -317,8 +317,8 @@ bool LfgJoinAction::isUseful()
 
     if (bot->GetLevel() < 15)
         return false;
-	
-	// don't use if active player master
+    
+    // don't use if active player master
     if (GET_PLAYERBOT_AI(bot)->IsRealPlayer())
         return false;
 

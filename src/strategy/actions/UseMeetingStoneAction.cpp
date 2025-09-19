@@ -49,7 +49,7 @@ bool UseMeetingStoneAction::Execute(Event event)
 
     GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
     if (!goInfo || goInfo->entry != 179944)
-		return false;
+        return false;
 
     return Teleport(master, bot);
 }

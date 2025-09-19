@@ -219,9 +219,9 @@ bool PlayerbotAIConfig::Initialize()
                                              "531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"),
         restrictedHealerDPSMaps);
 
-	//////////////////////////// ICC
+    //////////////////////////// ICC
 
-	EnableICCBuffs = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableICCBuffs", true);
+    EnableICCBuffs = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableICCBuffs", true);
 
     //////////////////////////// CHAT
     enableBroadcasts = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableBroadcasts", true);

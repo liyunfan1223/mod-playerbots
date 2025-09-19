@@ -151,9 +151,9 @@ bool EquipGlyphsAction::Execute(Event event)
 
     botAI->TellMaster("Glyphs updated.");
 
-	// Flag for custom glyphs
+    // Flag for custom glyphs
     botAI->GetAiObjectContext()->GetValue<bool>("custom_glyphs")->Set(true);
-	LOG_INFO("playerbots", "Custom Glyph Flag set to ON");
-	
+    LOG_INFO("playerbots", "Custom Glyph Flag set to ON");
+    
     return true;
 }

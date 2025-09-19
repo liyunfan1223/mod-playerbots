@@ -237,8 +237,8 @@ bool BuffOnPartyAction::Execute(Event event)
 {
     std::string castName = spell; // default = mono
 
-	auto SendGroupRP = ai::chat::MakeGroupAnnouncer(bot);
-	castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, SendGroupRP);
+    auto SendGroupRP = ai::chat::MakeGroupAnnouncer(bot);
+    castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, SendGroupRP);
 
     return botAI->CastSpell(castName, GetTarget());
 }
