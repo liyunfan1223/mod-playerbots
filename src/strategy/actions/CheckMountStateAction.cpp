@@ -66,7 +66,7 @@ bool CheckMountStateAction::isUseful()
 
     // Get shapeshift states, only applicable when there's a master
     if (master)
-    {   
+    {
         botInShapeshiftForm = bot->GetShapeshiftForm();
         masterInShapeshiftForm = master->GetShapeshiftForm();
     }

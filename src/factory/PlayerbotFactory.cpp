@@ -168,33 +168,33 @@ void PlayerbotFactory::Init()
         {
             continue;
         }
-        
+
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(gemId);
         if (!proto)
         {
             continue;
         }
-        
+
         if (proto->ItemLevel < 60)
         {
             continue;
         }
-        
+
         if (proto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
         {
             continue;
         }
-        
+
         if (sRandomItemMgr->IsTestItem(gemId))
         {
            continue;
         }
-            
+
         if (!sGemPropertiesStore.LookupEntry(proto->GemProperties))
         {
             continue;
         }
-        
+
         // LOG_INFO("playerbots", "Add {} to enchantment gems", gemId);
         enchantGemIdCache.push_back(gemId);
     }
@@ -736,7 +736,7 @@ void PlayerbotFactory::InitConsumables()
         int count = (int)item.second - (int)bot->GetItemCount(item.first);
         if (count > 0)
             StoreItem(item.first, count);
-    } 
+    }
 }
 
 void PlayerbotFactory::InitPetTalents()
@@ -1032,10 +1032,10 @@ void PlayerbotFactory::ClearSkills()
     }
     bot->SetUInt32Value(PLAYER_SKILL_INDEX(0), 0);
     bot->SetUInt32Value(PLAYER_SKILL_INDEX(1), 0);
-    
+
     // unlearn default race/class skills
     if (PlayerInfo const* info = sObjectMgr->GetPlayerInfo(bot->getRace(), bot->getClass()))
-    {    
+    {
         for (PlayerCreateInfoSkills::const_iterator itr = info->skills.begin(); itr != info->skills.end(); ++itr)
         {
             uint32 skillId = itr->SkillId;
@@ -1043,7 +1043,7 @@ void PlayerbotFactory::ClearSkills()
                 continue;
             bot->SetSkill(skillId, 0, 0, 0);
         }
-    }    
+    }
 }
 
 void PlayerbotFactory::ClearEverything()
@@ -1095,7 +1095,7 @@ void PlayerbotFactory::ResetQuests()
         uint32 entry = quest->GetQuestId();
         if (bot->GetQuestStatus(entry) == QUEST_STATUS_NONE)
             continue;
-        
+
         bot->RemoveRewardedQuest(entry);
         bot->RemoveActiveQuest(entry, false);
 
@@ -1171,7 +1171,7 @@ void PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_templa
 
     if (bot->GetFreeTalentPoints())
         InitTalents((specTab + 2) % 3);
-    
+
     bot->SendTalentsInfoData(false);
 }
 
@@ -1704,7 +1704,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 {
     if (incremental && !sPlayerbotAIConfig->incrementalGearInit)
         return;
-    
+
     if (level < 5) {
         // original items
         if (CharStartOutfitEntry const* oEntry = GetCharStartOutfitEntry(bot->getRace(), bot->getClass(), bot->getGender()))
@@ -1715,11 +1715,11 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                     continue;
 
                 uint32 itemId = oEntry->ItemId[j];
-                
+
                 // skip hearthstone
                 if (itemId == 6948)
                     continue;
-                
+
                 // just skip, reported in ObjectMgr::LoadItemTemplates
                 ItemTemplate const* iProto = sObjectMgr->GetItemTemplate(itemId);
                 if (!iProto)
@@ -1743,10 +1743,10 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
         }
         return;
     }
-    
+
     std::unordered_map<uint8, std::vector<uint32>> items;
     // int tab = AiFactory::GetPlayerSpecTab(bot);
-    
+
     uint32 blevel = bot->GetLevel();
     int32 delta = std::min(blevel, 10u);
 
@@ -1814,7 +1814,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
                         if (!proto)
                             continue;
-                        
+
                         bool shouldCheckGS = desiredQuality > ITEM_QUALITY_NORMAL;
 
                         if (shouldCheckGS && gearScoreLimit != 0 &&
@@ -2923,7 +2923,7 @@ void PlayerbotFactory::InitQuests(std::list<uint32>& questMap, bool withRewardIt
         // set reward to 5 to skip majority quest reward
         uint32 reward = withRewardItem ? 0 : 5;
         bot->RewardQuest(quest, reward, bot, false);
-        
+
         if (!withRewardItem)
         {
             // destroy the quest reward item
@@ -3010,10 +3010,10 @@ void PlayerbotFactory::InitAmmo()
         // disable next expansion ammo
         if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 60 && tEntry >= 23728)
             continue;
-        
+
         if (sPlayerbotAIConfig->limitGearExpansion && bot->GetLevel() <= 70 && tEntry >= 35570)
             continue;
-        
+
         entry = tEntry;
         break;
     }
@@ -3177,7 +3177,7 @@ void PlayerbotFactory::InitPotions()
 
         if (effect == SPELL_EFFECT_ENERGIZE && !bot->GetPower(POWER_MANA))
             continue;
-        
+
         FindPotionVisitor visitor(bot, effect);
         IterateItems(&visitor);
         if (!visitor.GetResult().empty())
@@ -3319,7 +3319,7 @@ void PlayerbotFactory::InitReagents()
     switch (bot->getClass())
     {
         case CLASS_DEATH_KNIGHT:
-        if (level >= 56)    
+        if (level >= 56)
                 items.push_back({37201, 40});   // Corpse Dust
             break;
         case CLASS_DRUID:
@@ -4345,7 +4345,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool destoryOld)
         {
             continue;
         }
-        
+
         if (item->GetTemplate() && item->GetTemplate()->Quality < ITEM_QUALITY_UNCOMMON)
             continue;
         int32 bestEnchantId = -1;
@@ -4661,12 +4661,12 @@ void PlayerbotFactory::InitKeyring()
 {
     if (!bot)
         return;
-    
+
     if (bot->GetLevel() < 70)
         return;
 
     ReputationMgr& repMgr = bot->GetReputationMgr(); // Reference, use . instead of ->
-    
+
     std::vector<std::pair<uint32, uint32>> keysToCheck;
 
     // Reputation-based Keys (Honored requirement)

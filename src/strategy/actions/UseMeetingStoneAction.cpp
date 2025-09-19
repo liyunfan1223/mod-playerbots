@@ -169,7 +169,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
     // Player* master = GetMaster();
     if (!summoner)
         return false;
-    
+
     if (player->GetVehicle())
     {
         botAI->TellError("You cannot summon me while I'm on a vehicle");

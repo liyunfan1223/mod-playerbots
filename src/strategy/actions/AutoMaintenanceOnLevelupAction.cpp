@@ -158,7 +158,7 @@ void AutoMaintenanceOnLevelupAction::AutoUpgradeEquip()
 {
     if (!sPlayerbotAIConfig->autoUpgradeEquip || !sRandomPlayerbotMgr->IsRandomBot(bot))
         return;
-    
+
     PlayerbotFactory factory(bot, bot->GetLevel());
 
     // Clean up old consumables before adding new ones

@@ -184,7 +184,7 @@ void GenericDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "horn of winter", NextAction::array(0, new NextAction("horn of winter", ACTION_NORMAL + 1), nullptr)));
     triggers.push_back(new TriggerNode("critical health",
                                        NextAction::array(0, new NextAction("death pact", ACTION_HIGH + 5), nullptr)));
-    
+
     triggers.push_back(
         new TriggerNode("low health", NextAction::array(0, new NextAction("icebound fortitude", ACTION_HIGH + 5),
                                                         new NextAction("rune tap", ACTION_HIGH + 4), nullptr)));

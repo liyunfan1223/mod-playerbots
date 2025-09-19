@@ -79,7 +79,7 @@ void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("target with combo points almost dead",
                                        NextAction::array(0, new NextAction("envenom", ACTION_HIGH + 4),
                                        new NextAction("eviscerate", ACTION_HIGH + 2), nullptr)));
-                                       
+
     triggers.push_back(
         new TriggerNode("expose armor", NextAction::array(0, new NextAction("expose armor", ACTION_HIGH + 3), NULL)));
 

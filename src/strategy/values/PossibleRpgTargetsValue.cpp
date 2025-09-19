@@ -130,7 +130,7 @@ GuidVector PossibleNewRpgTargetsValue::Calculate()
     std::sort(guidDistancePairs.begin(), guidDistancePairs.end(), [](const auto& a, const auto& b) {
         return a.second < b.second;
     });
-    
+
     for (const auto& pair : guidDistancePairs) {
         results.push_back(pair.first);
     }
@@ -170,7 +170,7 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
     Cell::VisitObjects(bot, searcher, range);
 
-    
+
     std::vector<std::pair<ObjectGuid, float>> guidDistancePairs;
     for (GameObject* go : targets)
     {
@@ -185,10 +185,10 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
         }
         if (!flagCheck)
             continue;
-        
+
         if (!ignoreLos && !bot->IsWithinLOSInMap(go))
             continue;
-        
+
         guidDistancePairs.push_back({go->GetGUID(), bot->GetExactDist(go)});
     }
     GuidVector results;
@@ -197,7 +197,7 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
     std::sort(guidDistancePairs.begin(), guidDistancePairs.end(), [](const auto& a, const auto& b) {
         return a.second < b.second;
     });
-    
+
     for (const auto& pair : guidDistancePairs) {
         results.push_back(pair.first);
     }

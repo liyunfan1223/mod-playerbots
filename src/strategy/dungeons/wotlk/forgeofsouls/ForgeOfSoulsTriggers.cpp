@@ -30,7 +30,7 @@ bool SwitchToSoulFragment::IsActive()
     if (!activeSoulExists)
         return false;
 
-    return true;   
+    return true;
 }
 
 bool BronjahmPositionTrigger::IsActive()

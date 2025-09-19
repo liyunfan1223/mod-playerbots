@@ -36,7 +36,7 @@ private:
     // Strength of Earth Totem -> Stoneskin Totem
     // Cleansing Totem -> Mana Spring Totem
     // Wrath of Air Totem -> Windfury Totem -> Grounding Totem
-    
+
     static ActionNode* totem_of_wrath([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("totem of wrath",
@@ -65,7 +65,7 @@ private:
                               /*P*/ nullptr,
                               /*A*/ NextAction::array(0, new NextAction("stoneskin totem"), nullptr),
                               /*C*/ nullptr);
-    } 
+    }
     static ActionNode* stoneskin_totem(PlayerbotAI*) { return new ActionNode("stoneskin totem", nullptr, nullptr, nullptr); }
     static ActionNode* cleansing_totem([[maybe_unused]] PlayerbotAI* botAI)
     {
@@ -108,7 +108,7 @@ void GenericShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("wind shear on enemy healer", NextAction::array(0, new NextAction("wind shear on enemy healer", 23.0f), nullptr)));
     triggers.push_back(new TriggerNode("purge", NextAction::array(0, new NextAction("purge", ACTION_DISPEL), nullptr)));
     triggers.push_back(new TriggerNode("medium mana", NextAction::array(0, new NextAction("mana potion", ACTION_DISPEL), nullptr)));
-    triggers.push_back(new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 65.0f), nullptr))); 
+    triggers.push_back(new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 65.0f), nullptr)));
 }
 
 void ShamanCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

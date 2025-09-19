@@ -8,7 +8,7 @@ void WotlkDungeonOccStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // TODO: May need work, TBA.
     triggers.push_back(new TriggerNode("unstable sphere",
         NextAction::array(0, new NextAction("avoid unstable sphere", ACTION_MOVE + 5), nullptr)));
-    
+
     // DRAKES
     triggers.push_back(new TriggerNode("drake mount",
         NextAction::array(0, new NextAction("mount drake", ACTION_RAID + 5), nullptr)));
@@ -29,7 +29,7 @@ void WotlkDungeonOccStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("avoid arcane explosion", ACTION_MOVE + 5), nullptr)));
     triggers.push_back(new TriggerNode("time bomb",
         NextAction::array(0, new NextAction("time bomb spread", ACTION_MOVE + 4), nullptr)));
-    
+
     // Ley-Guardian Eregos
 }
 

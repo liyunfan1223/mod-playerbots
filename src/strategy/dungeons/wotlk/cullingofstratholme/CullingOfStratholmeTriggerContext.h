@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "CullingOfStratholmeTriggers.h"
 
-class WotlkDungeonCoSTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonCoSTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonCoSTriggerContext()

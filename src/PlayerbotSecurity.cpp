@@ -164,7 +164,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
 
         if (reason)
             *reason = PLAYERBOT_DENY_INVITE;
-        
+
         return PLAYERBOT_SECURITY_INVITE;
     }
 

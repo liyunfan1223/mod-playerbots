@@ -10,7 +10,7 @@ float ErekemMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "erekem");
     if (!boss || !botAI->IsDps(bot)) { return 1.0f; }
-    
+
     if (dynamic_cast<DpsAssistAction*>(action))
     {
         return 0.0f;
@@ -48,7 +48,7 @@ float ZuramatMultiplier::GetValue(Action* action)
             return 0.0f;
         }
     }
-    
+
     if (boss->HasAura(SPELL_SHROUD_OF_DARKNESS) && dynamic_cast<AttackAction*>(action))
     {
         return 0.0f;

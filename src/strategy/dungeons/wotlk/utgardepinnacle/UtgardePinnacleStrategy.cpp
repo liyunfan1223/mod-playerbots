@@ -14,7 +14,7 @@ void WotlkDungeonUPStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("avoid freezing cloud", ACTION_RAID + 5), nullptr)));
     triggers.push_back(new TriggerNode("skadi whirlwind",
         NextAction::array(0, new NextAction("avoid skadi whirlwind", ACTION_RAID + 4), nullptr)));
-    
+
     // King Ymiron
     // May need to avoid orb.. unclear if the generic avoid AoE does this well
     triggers.push_back(new TriggerNode("ymiron bane",

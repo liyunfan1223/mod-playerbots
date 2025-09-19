@@ -17,7 +17,7 @@
 #include "Config.h"
 #include "Group.h"
 #include "ObjectAccessor.h"
-    
+
 using ai::buff::MakeAuraQualifierForBuff;
 using ai::buff::UpgradeToGroupIfAppropriate;
 
@@ -173,7 +173,7 @@ bool CastBlessingOfMightAction::Execute(Event event)
     if (!target)
         return false;
 
-    std::string castName = GetActualBlessingOfMight(target);    
+    std::string castName = GetActualBlessingOfMight(target);
     auto RP = ai::chat::MakeGroupAnnouncer(bot);
 
     castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
@@ -207,7 +207,7 @@ bool CastBlessingOfWisdomAction::Execute(Event event)
     if (!target)
         return false;
 
-    std::string castName = GetActualBlessingOfWisdom(target);    
+    std::string castName = GetActualBlessingOfWisdom(target);
     auto RP = ai::chat::MakeGroupAnnouncer(bot);
 
     castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
@@ -407,7 +407,7 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
     Player* targetPlayer = target->ToPlayer();
     if (targetPlayer && !g->IsMember(targetPlayer->GetGUID()))
         return false;
-        
+
     const bool hasBmana  = botAI->HasStrategy("bmana",  BOT_STATE_NON_COMBAT);
     const bool hasBstats = botAI->HasStrategy("bstats", BOT_STATE_NON_COMBAT);
 
@@ -419,7 +419,7 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
             return false;
         }
     }
- 
+
     if (targetPlayer)
     {
         const bool isTank = IsTankRole(targetPlayer);
@@ -470,7 +470,7 @@ bool CastBlessingOfKingsOnPartyAction::Execute(Event event)
         auto RP = ai::chat::MakeGroupAnnouncer(bot);
         castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, RP);
     }
-    
+
     return botAI->CastSpell(castName, target);
 }
 

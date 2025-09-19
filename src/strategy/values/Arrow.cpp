@@ -42,7 +42,7 @@ WorldLocation ArrowFormation::GetLocationInternal()
     offset += rangedLines * sPlayerbotAIConfig->followDistance;
     healers.PlaceUnits(&placer);
     healers.Move(-cos(orientation) * offset, -sin(orientation) * offset);
-    
+
     if (!masterUnit || !botUnit)
         return Formation::NullLocation;
 

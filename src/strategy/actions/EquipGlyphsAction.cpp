@@ -10,7 +10,7 @@
 #include "SpellMgr.h"
 #include "DBCStores.h"
 #include "AiObjectContext.h"
-#include "Log.h"  
+#include "Log.h"
 
 #include <unordered_map>
 #include <sstream>
@@ -154,6 +154,6 @@ bool EquipGlyphsAction::Execute(Event event)
     // Flag for custom glyphs
     botAI->GetAiObjectContext()->GetValue<bool>("custom_glyphs")->Set(true);
     LOG_INFO("playerbots", "Custom Glyph Flag set to ON");
-    
+
     return true;
 }

@@ -173,7 +173,7 @@ bool CastCreateSoulstoneAction::isUseful()
     // Check if the bot already has any soulstone
     for (uint32 id : soulstoneIds)
     {
-        if (bot->GetItemCount(id, false) > 0)  
+        if (bot->GetItemCount(id, false) > 0)
             return false;                      // Already has a soulstone
     }
 
@@ -330,7 +330,7 @@ bool UseSoulstoneTankAction::Execute(Event event)
                 {
                     chosenTank = member;
                     soulstoneReservations[chosenTank->GetGUID()] = now + 2500;  // Reserve for 2.5 seconds
-                    break;                                                      
+                    break;
                 }
             }
         }

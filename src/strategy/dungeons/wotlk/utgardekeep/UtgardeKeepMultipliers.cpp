@@ -72,7 +72,7 @@ float IngvarThePlundererMultiplier::GetValue(Action* action)
         }
         // Done with non-tank logic
         if (!isTank) { return 1.0f; }
-        
+
         // TANK ONLY
         if (boss->FindCurrentSpellBySpellId(SPELL_SMASH) ||
             boss->FindCurrentSpellBySpellId(SPELL_DARK_SMASH))

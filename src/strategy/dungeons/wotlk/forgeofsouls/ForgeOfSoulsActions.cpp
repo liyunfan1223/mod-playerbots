@@ -4,7 +4,7 @@
 #include "SharedDefines.h"
 
 bool MoveFromBronjahmAction::Execute(Event event)
-{    
+{
     Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
     if (!boss)
         return false;
@@ -46,10 +46,10 @@ bool AttackCorruptedSoulFragmentAction::Execute(Event event)
                 }
                 break;
         }
-        
+
     }
 
-    return false;   
+    return false;
 }
 
 
@@ -101,7 +101,7 @@ bool BronjahmGroupPositionAction::Execute(Event event)
                     // If soul is near boss, flee from boss
                     if (soulToBossDist < 10.0f)
                         return FleePosition(unit->GetPosition(), 13.0f, 1000U);
-               
+
                     // If soul exists but none of the above conditions, don't move to tank position yet
                     bot->SetFacingToObject(boss);
                     return true;

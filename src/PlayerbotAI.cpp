@@ -1051,7 +1051,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
                     default:
                         return;
                 }
-                
+
                 if (chanName == "World")
                     return;
 

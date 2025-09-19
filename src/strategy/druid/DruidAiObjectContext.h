@@ -14,7 +14,7 @@ class DruidAiObjectContext : public AiObjectContext
 {
 public:
     DruidAiObjectContext(PlayerbotAI* botAI);
-    
+
     static void BuildSharedContexts();
     static void BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts);
     static void BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts);

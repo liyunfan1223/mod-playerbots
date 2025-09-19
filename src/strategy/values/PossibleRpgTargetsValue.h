@@ -48,7 +48,7 @@ public:
             allowedGOFlags.push_back(GAMEOBJECT_TYPE_QUESTGIVER);
         }
     }
-    
+
     static std::vector<GameobjectTypes> allowedGOFlags;
     GuidVector Calculate() override;
 

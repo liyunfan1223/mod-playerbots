@@ -60,7 +60,7 @@ bool CastFrostNovaAction::isUseful()
 
     if (target->isFrozen())
         return false;
-    
+
     return sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", GetTargetName()), 10.f);
 }
 
@@ -104,7 +104,7 @@ Unit* CastFocusMagicOnPartyAction::GetTarget()
         Player* member = ref->GetSource();
         if (!member || member == bot || !member->IsAlive())
             continue;
-        
+
         if (member->GetMap() != bot->GetMap() || bot->GetDistance(member) > sPlayerbotAIConfig->spellDistance)
             continue;
 
@@ -116,14 +116,14 @@ Unit* CastFocusMagicOnPartyAction::GetTarget()
 
         if (!casterDps && botAI->IsCaster(member) && botAI->IsDps(member))
             casterDps = member;
-        
+
         if (!healer && botAI->IsHeal(member))
             healer = member;
 
         if (!target)
             target = member;
     }
-    
+
     if (casterDps)
         return casterDps;
 

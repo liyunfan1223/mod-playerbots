@@ -43,7 +43,7 @@ bool XpGainAction::Execute(Event event)
     // randomBotXPRate is now implemented in OnPlayerGiveXP script
     // if (!sRandomPlayerbotMgr->IsRandomBot(bot) || sPlayerbotAIConfig->randomBotXPRate == 1)
     //     return true;
-    
+
     // Unit* victim = nullptr;
     // if (guid)
     //     victim = botAI->GetUnit(guid);

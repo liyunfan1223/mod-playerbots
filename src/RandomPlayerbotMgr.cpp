@@ -79,8 +79,8 @@ static const std::unordered_map<uint16, std::pair<CityId, FactionId>> bankerToCi
     {2996,  {CityId::THUNDER_BLUFF,   FactionId::HORDE}},    {8356,  {CityId::THUNDER_BLUFF,   FactionId::HORDE}},    {8357,  {CityId::THUNDER_BLUFF,   FactionId::HORDE}},
     {17631, {CityId::SILVERMOON_CITY, FactionId::HORDE}},    {17632, {CityId::SILVERMOON_CITY, FactionId::HORDE}},    {17633, {CityId::SILVERMOON_CITY, FactionId::HORDE}},
     {16615, {CityId::SILVERMOON_CITY, FactionId::HORDE}},    {16616, {CityId::SILVERMOON_CITY, FactionId::HORDE}},    {16617, {CityId::SILVERMOON_CITY, FactionId::HORDE}},
-    {19246, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}},  {19338, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}}, 
-    {19034, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}},  {19318, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}}, 
+    {19246, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}},  {19338, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}},
+    {19034, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}},  {19318, {CityId::SHATTRATH_CITY,  FactionId::NEUTRAL}},
     {30604, {CityId::DALARAN,         FactionId::NEUTRAL}},  {30605, {CityId::DALARAN,         FactionId::NEUTRAL}},  {30607, {CityId::DALARAN,         FactionId::NEUTRAL}},
     {28675, {CityId::DALARAN,         FactionId::NEUTRAL}},  {28676, {CityId::DALARAN,         FactionId::NEUTRAL}},  {28677, {CityId::DALARAN,         FactionId::NEUTRAL}}
 };
@@ -95,7 +95,7 @@ static const std::unordered_map<CityId, std::vector<uint16>> cityToBankers = {
     {CityId::UNDERCITY,       {4549, 2459, 2458, 4550}},
     {CityId::THUNDER_BLUFF,   {2996, 8356, 8357}},
     {CityId::SILVERMOON_CITY, {17631, 17632, 17633, 16615, 16616, 16617}},
-    {CityId::SHATTRATH_CITY,  {19246, 19338, 19034, 19318}}, 
+    {CityId::SHATTRATH_CITY,  {19246, 19338, 19034, 19318}},
     {CityId::DALARAN,         {30604, 30605, 30607, 28675, 28676, 28677, 29530}}
 };
 
@@ -2190,7 +2190,7 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
             RandomTeleport(bot, fallbackLocs, true);
             return;
         }
-        
+
         // Collect valid cities based on bot faction.
         std::unordered_set<CityId> validBankerCities;
         for (auto& loc : bankerLocsPerLevelCache[level])
