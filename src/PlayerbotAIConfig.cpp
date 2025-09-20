@@ -219,9 +219,9 @@ bool PlayerbotAIConfig::Initialize()
                                              "531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"),
         restrictedHealerDPSMaps);
 
-	//////////////////////////// ICC
+    //////////////////////////// ICC
 
-	EnableICCBuffs = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableICCBuffs", true);
+    EnableICCBuffs = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableICCBuffs", true);
 
     //////////////////////////// CHAT
     enableBroadcasts = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableBroadcasts", true);
@@ -594,8 +594,10 @@ bool PlayerbotAIConfig::Initialize()
     crossArmorExtraMargin = sConfigMgr->GetOption<float>("AiPlayerbot.Roll.CrossArmorExtraMargin", 1.20f);
     useDEButton = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.UseDEButton", true);
     tokenILevelMargin = sConfigMgr->GetOption<float>("AiPlayerbot.Roll.TokenILevelMargin", 0.10f);
-	announceLootRollsToMaster = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.AnnounceToMaster", false);
-	smartNeedBySpec = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.SmartNeedBySpec", true);
+    announceLootRollsToMaster = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.AnnounceToMaster", false);
+    needOnProfessionRecipes = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.NeedOnProfessionRecipes", true);
+    recipesIgnoreSkillRank   = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.Recipes.IgnoreSkillRank", false);
+    smartNeedBySpec = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.SmartNeedBySpec", true);
     twoRoundsGearInit = sConfigMgr->GetOption<bool>("AiPlayerbot.TwoRoundsGearInit", false);
     syncQuestWithPlayer = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncQuestWithPlayer", true);
     syncQuestForPlayer = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncQuestForPlayer", false);

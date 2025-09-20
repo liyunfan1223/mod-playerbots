@@ -344,12 +344,14 @@ public:
     bool autoEquipUpgradeLoot;
     float equipUpgradeThreshold;
     bool allowBoENeedIfUpgrade; // Loot roll fine-tuning
-	bool allowBoUNeedIfUpgrade; // Allow NEED on BoU if upgrade
+    bool allowBoUNeedIfUpgrade; // Allow NEED on BoU if upgrade
     float crossArmorExtraMargin;
     bool useDEButton; // Allow "Disenchant" on NBG if available
     float tokenILevelMargin; // ilvl threshold to consider the token an upgrade
-	bool announceLootRollsToMaster; // ANotify the bot’s master of the roll choice
+    bool announceLootRollsToMaster; // ANotify the bot’s master of the roll choice
     bool smartNeedBySpec; // Intelligent NEED (based on stats/spec)
+    bool needOnProfessionRecipes; // If true, bots will roll NEED on profession recipes/patterns/books they can use & learn.
+    bool recipesIgnoreSkillRank;  // If true, ignore skill rank requirement when rolling on profession recipes
     bool twoRoundsGearInit;
     bool syncQuestWithPlayer;
     bool syncQuestForPlayer;

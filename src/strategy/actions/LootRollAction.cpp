@@ -22,6 +22,9 @@
 #include "AiFactory.h"
 #include <initializer_list>
 #include <vector>
+#include "SpellMgr.h"
+#include "SkillDiscovery.h" // present in AC; guards not needed, we only use SkillLine enums
+#include "Log.h"
 
 // Groups the "class + archetype" info in the same place
 struct SpecTraits
@@ -132,6 +135,175 @@ static inline int32 EncodeRandomEnchantParam(uint32 randomPropertyId, uint32 ran
     if (randomPropertyId) return static_cast<int32>(randomPropertyId);
     if (randomSuffix)     return -static_cast<int32>(randomSuffix);
     return 0;
+}
+
+// Professions helpers Returns true if the item is a Recipe/Pattern/Book (ITEM_CLASS_RECIPE)
+static inline bool IsRecipeItem(ItemTemplate const* proto)
+{
+    return proto && proto->Class == ITEM_CLASS_RECIPE;
+}
+
+// Try to detect the spell taught by a recipe and whether the bot already knows it. If we can’t resolve the taught spell reliably, we fall back to "has profession + skill rank OK".
+static bool BotAlreadyKnowsRecipeSpell(Player* bot, ItemTemplate const* proto)
+{
+    if (!bot || !proto) return false;
+    // Many recipes have a single spell that "teaches" another spell (learned spell in EffectTriggerSpell).
+    for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        uint32 teach = proto->Spells[i].SpellId;
+        if (!teach) continue;
+        SpellInfo const* si = sSpellMgr->GetSpellInfo(teach);
+        if (!si) continue;
+        for (int eff = 0; eff < MAX_SPELL_EFFECTS; ++eff)
+        {
+            if (si->Effects[eff].Effect == SPELL_EFFECT_LEARN_SPELL)
+            {
+                uint32 learned = si->Effects[eff].TriggerSpell;
+                if (learned && bot->HasSpell(learned))
+                    return true; // already knows the taught spell
+            }
+        }
+    }
+    return false;
+}
+
+/*// Special-case: Book of Glyph Mastery (can own several; do not downgrade NEED on duplicates)
+static bool IsGlyphMasteryBook(ItemTemplate const* proto)
+{
+    if (!proto) return false;
+    // Known WotLK entry (retail classic DBs use 45912 for Book of Glyph Mastery)
+    if (proto->ItemId == 45912)
+        return true;
+    // Fallback by name (handles localized DBs)
+    if (proto->Class == ITEM_CLASS_RECIPE && proto->SubClass == ITEM_SUBCLASS_BOOK)
+    {
+        std::string n = proto->Name1;
+        std::transform(n.begin(), n.end(), n.begin(),
+                       [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+        // English + French hints
+        if (n.find("glyph mastery") != std::string::npos ||
+            n.find("book of glyph mastery") != std::string::npos ||
+            n.find("maitrise des glyphes") != std::string::npos ||  // sans accent
+            n.find("maîtrise des glyphes") != std::string::npos)    // avec accent
+            return true;
+    }
+    return false;
+}*/
+
+// Special-case: Book of Glyph Mastery (can own several; do not downgrade NEED on duplicates)
+static bool IsGlyphMasteryBook(ItemTemplate const* proto)
+{
+    if (!proto) return false;
+
+    // 1) Type-safety: it must be a recipe book
+    if (proto->Class != ITEM_CLASS_RECIPE || proto->SubClass != ITEM_SUBCLASS_BOOK)
+        return false;
+
+    // 2) Primary signal: the on-use spell of the book on WotLK DBs
+    //    (Spell 64323: "Book of Glyph Mastery"). Use a named constant to avoid magic numbers.
+    constexpr uint32 SPELL_BOOK_OF_GLYPH_MASTERY = 64323; // WotLK 3.3.5a
+    for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (proto->Spells[i].SpellId == SPELL_BOOK_OF_GLYPH_MASTERY)
+            return true;
+    }
+
+    // 3) Fallback: Inscription recipe book + localized name tokens (covers DB forks/locales)
+    if (proto->RequiredSkill == SKILL_INSCRIPTION)
+    {
+        std::string n = proto->Name1;
+        std::transform(n.begin(), n.end(), n.begin(),
+                       [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
+        if (n.find("glyph mastery") != std::string::npos ||
+            n.find("book of glyph mastery") != std::string::npos)
+            return true;
+    }
+
+    return false;
+}
+
+// Pretty helper for RollVote name in logs
+static inline char const* VoteTxt(RollVote v) {
+    switch (v) { case NEED: return "NEED"; case GREED: return "GREED"; case PASS: return "PASS"; case DISENCHANT: return "DISENCHANT"; default: return "UNKNOWN"; }
+}
+
+// Centralised debug dump for recipe decisions
+static void DebugRecipeRoll(Player* bot, ItemTemplate const* proto, ItemUsage usage,
+                            bool recipeChecked, bool recipeUseful, bool recipeKnown,
+                            uint32 reqSkill, uint32 reqRank, uint32 botRank,
+                            RollVote before, RollVote after)
+{
+    LOG_INFO("playerbots",
+        "[LootDBG] {} JC:{} item:{} \"{}\" class={} sub={} bond={} usage={} "
+        "recipeChecked={} useful={} known={} reqSkill={} reqRank={} botRank={} vote:{} -> {} dupCount={}",
+        bot->GetName(), bot->GetSkillValue(SKILL_JEWELCRAFTING),
+        proto->ItemId, proto->Name1, proto->Class, proto->SubClass, proto->Bonding, (int)usage,
+        recipeChecked, recipeUseful, recipeKnown, reqSkill, reqRank, botRank,
+        VoteTxt(before), VoteTxt(after), bot->GetItemCount(proto->ItemId, true));
+}
+
+// Maps a RECIPE subclass & item metadata to the SkillLine needed (when RequiredSkill is not set). In DBs, recipes normally have RequiredSkill filled; we keep this as a fallback.
+static uint32 GuessRecipeSkill(ItemTemplate const* proto)
+{
+    if (!proto) return 0;
+    // If the core DB is sane, this is set and we can just return it in the caller.
+    // Fallback heuristic on SubClass (books used by professions)
+    switch (proto->SubClass)
+    {
+        case ITEM_SUBCLASS_BOOK:        // e.g. Book of Glyph Mastery
+            // If the name hints glyphs, assume Inscription
+            {
+                std::string n = proto->Name1;
+                std::transform(n.begin(), n.end(), n.begin(), [](unsigned char c){ return std::tolower(c); });
+                if (n.find("glyph") != std::string::npos)
+                    return SKILL_INSCRIPTION;
+            }
+            break;
+        case ITEM_SUBCLASS_LEATHERWORKING_PATTERN: return SKILL_LEATHERWORKING;
+        case ITEM_SUBCLASS_TAILORING_PATTERN:      return SKILL_TAILORING;
+        case ITEM_SUBCLASS_ENGINEERING_SCHEMATIC:  return SKILL_ENGINEERING;
+        case ITEM_SUBCLASS_BLACKSMITHING:          return SKILL_BLACKSMITHING;
+        case ITEM_SUBCLASS_COOKING_RECIPE:         return SKILL_COOKING;
+        case ITEM_SUBCLASS_ALCHEMY_RECIPE:         return SKILL_ALCHEMY;
+        case ITEM_SUBCLASS_FIRST_AID_MANUAL:       return SKILL_FIRST_AID;
+        case ITEM_SUBCLASS_ENCHANTING_FORMULA:     return SKILL_ENCHANTING;
+        case ITEM_SUBCLASS_JEWELCRAFTING_RECIPE:   return SKILL_JEWELCRAFTING;
+        default: break;
+    }
+    return 0;
+}
+
+// Returns true if this recipe/pattern/book is useful for one of the bot's professions and not already known.
+static bool IsProfessionRecipeUsefulForBot(Player* bot, ItemTemplate const* proto)
+{
+    if (!bot || !IsRecipeItem(proto)) return false;
+
+    // Primary path: DB usually sets RequiredSkill/RequiredSkillRank on recipe items.
+    uint32 reqSkill = proto->RequiredSkill;
+    uint32 reqRank  = proto->RequiredSkillRank;
+
+    if (!reqSkill)
+        reqSkill = GuessRecipeSkill(proto);
+
+    if (!reqSkill)
+        return false; // unknown profession, be conservative
+
+    // Bot must have the profession (or secondary skill like Cooking/First Aid)
+    if (!bot->HasSkill(reqSkill))
+        return false;
+
+    // Required rank check (can be disabled by config)
+    if (!sPlayerbotAIConfig->recipesIgnoreSkillRank)
+    {
+        if (reqRank && bot->GetSkillValue(reqSkill) < reqRank)
+            return false;
+    }
+
+    // Avoid NEED if the taught spell is already known
+    if (BotAlreadyKnowsRecipeSpell(bot, proto))
+        return false;
+
+    return true;
 }
 
 // Weapon/shield/relic whitelist per class.
@@ -624,7 +796,6 @@ bool LootRollAction::Execute(Event event)
     return false;
 }
 
-
 RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 randomProperty)
 {
     // Player mimic: upgrade => NEED; useful => GREED; otherwise => PASS
@@ -636,30 +807,62 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
 
 	RollVote vote = PASS;
-    switch (usage)
+ 
+    bool recipeChecked = false;
+    bool recipeNeed    = false;
+    bool recipeUseful  = false;
+    bool recipeKnown   = false;
+    uint32 reqSkillDbg = 0, reqRankDbg = 0, botRankDbg = 0;	
+	
+	// Professions early override
+    // If enabled, bots NEED on recipes/patterns/books useful to their professions,
+    // provided they can learn them and don't already know the taught spell.
+    if (sPlayerbotAIConfig->needOnProfessionRecipes && IsRecipeItem(proto))
     {
-        case ITEM_USAGE_EQUIP:
-        case ITEM_USAGE_REPLACE:
+       recipeChecked = true;
+       // Collect debug data (what the helper va décider)
+       reqSkillDbg = proto->RequiredSkill ? proto->RequiredSkill : GuessRecipeSkill(proto);
+       reqRankDbg  = proto->RequiredSkillRank;
+       botRankDbg  = reqSkillDbg ? bot->GetSkillValue(reqSkillDbg) : 0;
+       recipeKnown = BotAlreadyKnowsRecipeSpell(bot, proto);
+
+       recipeUseful = IsProfessionRecipeUsefulForBot(bot, proto);
+       if (recipeUseful) {
            vote = NEED;
-           // Downgrade to GREED if the item does not match the main spec
-           if (sPlayerbotAIConfig->smartNeedBySpec && !IsPrimaryForSpec(bot, proto))
-               vote = GREED;
-           break;
-        case ITEM_USAGE_BAD_EQUIP:
-        case ITEM_USAGE_GUILD_TASK:
-        case ITEM_USAGE_SKILL:
-        case ITEM_USAGE_USE:
-        case ITEM_USAGE_DISENCHANT:
-        case ITEM_USAGE_AH:
-        case ITEM_USAGE_VENDOR:
-        case ITEM_USAGE_KEEP:
-        case ITEM_USAGE_AMMO:
-            vote = GREED;
-            break;
-        default:
-            vote = PASS;
-            break;
+           recipeNeed = true;
+       } else {
+           vote = GREED; // recette pas pour nous -> GREED
+       }
     }
+
+    // Ne pas écraser le choix si on a déjà tranché via la logique "recette"
+    if (!recipeChecked)
+    {
+        switch (usage)
+        {
+            case ITEM_USAGE_EQUIP:
+            case ITEM_USAGE_REPLACE:
+               vote = NEED;
+               // Downgrade to GREED if the item does not match the main spec
+               if (sPlayerbotAIConfig->smartNeedBySpec && !IsPrimaryForSpec(bot, proto))
+                   vote = GREED;
+               break;
+            case ITEM_USAGE_BAD_EQUIP:
+            case ITEM_USAGE_GUILD_TASK:
+            case ITEM_USAGE_SKILL:
+            case ITEM_USAGE_USE:
+            case ITEM_USAGE_DISENCHANT:
+            case ITEM_USAGE_AH:
+            case ITEM_USAGE_VENDOR:
+            case ITEM_USAGE_KEEP:
+            case ITEM_USAGE_AMMO:
+                vote = GREED;
+                break;
+            default:
+                vote = PASS;
+                break;
+        }
+	}	
 	
     // Lockboxes: if the item is a lockbox and the bot is a Rogue with Lockpicking, prefer NEED.
     // (Handled before BoE/BoU etiquette; BoE/BoU checks below ignore lockboxes.)
@@ -692,24 +895,30 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
     }
 	
     // BoE/BoU rule: by default, avoid NEED on Bind-on-Equip / Bind-on-Use (raid etiquette)
+	// Exception: Profession recipes/patterns/books (ITEM_CLASS_RECIPE) keep NEED if they are useful.
     constexpr uint32 BIND_WHEN_EQUIPPED = 2; // BoE
     constexpr uint32 BIND_WHEN_USE      = 3; // BoU
-    if (vote == NEED && !isLockbox && proto->Bonding == BIND_WHEN_EQUIPPED && !sPlayerbotAIConfig->allowBoENeedIfUpgrade)
+
+    if (vote == NEED && !recipeNeed && !isLockbox && proto->Bonding == BIND_WHEN_EQUIPPED && !sPlayerbotAIConfig->allowBoENeedIfUpgrade)
     {
         vote = GREED;
     }
-    if (vote == NEED && !isLockbox && proto->Bonding == BIND_WHEN_USE && !sPlayerbotAIConfig->allowBoUNeedIfUpgrade)
+    if (vote == NEED && !recipeNeed && !isLockbox && proto->Bonding == BIND_WHEN_USE && !sPlayerbotAIConfig->allowBoUNeedIfUpgrade)
     {
         vote = GREED;
     }
 
-    // Duplicate soft rule (non-unique): if the bot already owns at least one copy in bags, downgrade NEED to GREED.
-    // This complements "unique-equip" and avoids ninja-need on duplicates that are not unique.
+    // Duplicate soft rule (non-unique):
+    // - Default: if the bot already owns at least one copy => NEED -> GREED.
+    // - Exception: Book of Glyph Mastery (you can own several) => keep NEED.
     if (vote == NEED)
     {
-        // includeBank=true to catch banked duplicates as well; adjust if undesired.
-        if (bot->GetItemCount(proto->ItemId, true) > 0)
-            vote = GREED;
+        if (!IsGlyphMasteryBook(proto))
+        {
+            // includeBank=true to catch banked duplicates as well.
+            if (bot->GetItemCount(proto->ItemId, true) > 0)
+                vote = GREED;
+        }
     }
 
     // Unique-equip: never NEED a duplicate (already equipped/owned)
@@ -740,11 +949,18 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
             vote = NEED;
     }
 
-    // Final filter: loot strategy — AI is valid here; use the standard accessor
-    return StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? vote : PASS;
+    // Final decision (with allow/deny from loot strategy)
+    RollVote finalVote = StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? vote : PASS;
+
+    // DEBUG: dump for recipes
+    if (IsRecipeItem(proto))
+        DebugRecipeRoll(bot, proto, usage, recipeChecked, recipeUseful, recipeKnown,
+                        reqSkillDbg, reqRankDbg, botRankDbg, /*before*/ (recipeNeed?NEED:PASS), /*after*/ finalVote);
+
+    return finalVote;
 }
 
-// Helpers d'annonce
+// Helpers announce
 const char* LootRollAction::RollVoteToText(RollVote vote) const
 {
     switch (vote)
