@@ -361,7 +361,7 @@ public:
     SetTotemTrigger(PlayerbotAI* ai, std::string const spellName, const uint32 requiredSpellId,
                     const uint32 totemSpellIds[], int actionButtonId)
         : Trigger(ai, "set " + spellName),
-          requiredSpellId(requiredSpellId), 
+          requiredSpellId(requiredSpellId),
           totemSpellIds(totemSpellIds),
           actionButtonId(actionButtonId) {}
     bool IsActive() override;

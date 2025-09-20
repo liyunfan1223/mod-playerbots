@@ -48,7 +48,7 @@ float BjarngrimMultiplier::GetValue(Action* action)
     {
         return 0.0f;
     }
-    
+
     return 1.0f;
 }
 
@@ -66,7 +66,7 @@ float VolkhanMultiplier::GetValue(Action* action)
     {
         return 0.0f;
     }
-    
+
     return 1.0f;
 }
 

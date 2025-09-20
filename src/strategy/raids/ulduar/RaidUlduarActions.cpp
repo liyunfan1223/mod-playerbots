@@ -3150,7 +3150,7 @@ bool YoggSaronIllusionRoomAction::SetBrainRtiTarget(YoggSaronTrigger yoggSaronTr
     group->SetTargetIcon(RtiTargetValue::squareIndex, bot->GetGUID(), brain->GetGUID());
 
     Position entrancePosition = yoggSaronTrigger.GetIllusionRoomEntrancePosition();
-    
+
     if (botAI->HasCheat(BotCheatMask::raid))
     {
         if (Unit const* master = botAI->GetMaster())

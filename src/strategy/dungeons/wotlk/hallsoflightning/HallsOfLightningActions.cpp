@@ -59,7 +59,7 @@ bool VolkhanTargetAction::Execute(Event event)
     {
         return false;
     }
-    
+
     return Attack(boss);
 }
 
@@ -148,7 +148,7 @@ bool LokenStackAction::Execute(Event event)
         // else
         return Move(bot->GetAngle(boss), fmin(bot->GetExactDist2d(boss), maxMovement));
     }
-    
+
     return false;
 }
 

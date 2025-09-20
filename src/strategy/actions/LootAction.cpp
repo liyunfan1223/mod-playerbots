@@ -19,7 +19,7 @@
 #include "BroadcastHelper.h"
 
 bool LootAction::Execute(Event /*event*/)
-{   
+{
     if (!AI_VALUE(bool, "has available loot"))
         return false;
 
@@ -156,7 +156,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     uint32 spellId = GetOpeningSpell(lootObject);
     if (!spellId)
         return false;
-    
+
     return botAI->CastSpell(spellId, bot);
 }
 

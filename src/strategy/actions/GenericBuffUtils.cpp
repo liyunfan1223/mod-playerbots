@@ -2,7 +2,7 @@
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
  * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
- 
+
 #include "GenericBuffUtils.h"
 #include "PlayerbotAIConfig.h"
 
@@ -33,7 +33,7 @@ namespace ai::buff
       // Mage
       if (name == "arcane intellect")         return "arcane intellect,arcane brilliance";
       // Priest
-      if (name == "power word: fortitude")    return "power word: fortitude,prayer of fortitude";	
+      if (name == "power word: fortitude")    return "power word: fortitude,prayer of fortitude";
       return name;
   }
 
@@ -60,7 +60,7 @@ namespace ai::buff
           return false;
 
       if (SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId))
-      {	    for (int i = 0; i < MAX_SPELL_REAGENTS; ++i)
+      {        for (int i = 0; i < MAX_SPELL_REAGENTS; ++i)
           {
               if (info->Reagent[i] > 0)
               {
@@ -83,7 +83,7 @@ namespace ai::buff
       bool announceOnMissing,
       std::function<void(std::string const&)> announce)
   {
-     std::string castName = baseName;		Group* g = bot->GetGroup();
+     std::string castName = baseName;        Group* g = bot->GetGroup();
      if (!g || g->GetMembersCount() < static_cast<uint32>(sPlayerbotAIConfig->minBotsForGreaterBuff))
          return castName; // Group too small: stay in solo mode
 
@@ -146,7 +146,7 @@ namespace ai::buff
                  last = now;
              }
            }
-         }   
+         }
      }
     return castName;
   }

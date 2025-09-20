@@ -9,7 +9,7 @@ float FactionCommanderMultiplier::GetValue(Action* action)
 {
     Unit* boss = nullptr;
     uint8 faction = bot->GetTeamId();
-    
+
     switch (bot->GetMap()->GetDifficulty())
     {
         case DUNGEON_DIFFICULTY_NORMAL:
@@ -78,7 +78,7 @@ float OrmorokMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ormorok the tree-shaper");
     if (!boss) { return 1.0f; }
-    
+
     // These are used for auto ranged repositioning, need to suppress so ranged dps don't ping-pong
     if (dynamic_cast<FleeAction*>(action))
     {

@@ -48,6 +48,6 @@ bool PowerSparkTrigger::IsActive()
             return true;
         }
     }
-    
+
     return false;
 }

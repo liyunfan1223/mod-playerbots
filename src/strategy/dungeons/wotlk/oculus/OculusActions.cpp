@@ -327,7 +327,7 @@ bool AvoidArcaneExplosionAction::Execute(Event event)
     }
 
     if (!closestPos) { return false; }
-    
+
     return MoveNear(bot->GetMapId(), closestPos->GetPositionX(), closestPos->GetPositionY(), closestPos->GetPositionZ(), 2.0f, MovementPriority::MOVEMENT_COMBAT);
 }
 

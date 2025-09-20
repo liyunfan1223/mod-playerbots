@@ -10,7 +10,7 @@ float NovosMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "novos the summoner");
     if (!boss) { return 1.0f; }
-    
+
     if (boss->FindCurrentSpellBySpellId(SPELL_ARCANE_FIELD) && bot->GetTarget())
     {
         if (dynamic_cast<DpsAssistAction*>(action)
@@ -25,7 +25,7 @@ float NovosMultiplier::GetValue(Action* action)
 float TharonjaMultiplier::GetValue(Action* action)
 {
     if (!bot->HasAura(SPELL_GIFT_OF_THARONJA)) { return 1.0f; }
-    
+
     // Suppress all skills that are not enabled in skeleton form.
     // Still allow non-ability actions such as movement
     if (dynamic_cast<CastSpellAction*>(action)

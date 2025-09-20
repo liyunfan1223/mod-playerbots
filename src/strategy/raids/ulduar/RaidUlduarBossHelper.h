@@ -62,7 +62,7 @@ public:
     static constexpr float RAZORSCALE_ARENA_RADIUS = 30.0f;
 
     // Harpoon cooldown (seconds)
-    static constexpr time_t HARPOON_COOLDOWN_DURATION = 5; 
+    static constexpr time_t HARPOON_COOLDOWN_DURATION = 5;
 
     // Structure for harpoon data
     struct HarpoonData
@@ -71,7 +71,7 @@ public:
         uint32 chainSpellId;
     };
 
-    explicit RazorscaleBossHelper(PlayerbotAI* botAI) 
+    explicit RazorscaleBossHelper(PlayerbotAI* botAI)
         : AiObject(botAI), _boss(nullptr) {}
 
     bool UpdateBossAI();
@@ -96,7 +96,7 @@ private:
 
     // A map to track the last role swap *per bot* by their GUID
     static std::unordered_map<ObjectGuid, std::time_t> _lastRoleSwapTime;
-    
+
     // The cooldown that applies to every bot
     static const std::time_t _roleSwapCooldown = 10;
 

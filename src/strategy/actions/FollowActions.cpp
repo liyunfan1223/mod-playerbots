@@ -30,13 +30,13 @@ bool FollowAction::Execute(Event event)
         WorldLocation loc = formation->GetLocation();
         if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
             return false;
-        
+
         MovementPriority priority = botAI->GetState() == BOT_STATE_COMBAT ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_NORMAL;
         moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), false, false, false,
                        true, priority, true);
     }
 
-    // This section has been commented out because it was forcing the pet to 
+    // This section has been commented out because it was forcing the pet to
     // follow the bot on every "follow" action tick, overriding any attack or
     // stay commands that might have been issued by the player.
     // if (Pet* pet = bot->GetPet())

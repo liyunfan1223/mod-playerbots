@@ -30,7 +30,7 @@ bool IccLmTrigger::IsActive()
 //Lady Deathwhisper
 bool IccDarkReckoningTrigger::IsActive()
 {
-    if (bot->HasAura(SPELL_DARK_RECKONING)) 
+    if (bot->HasAura(SPELL_DARK_RECKONING))
         return true;
 
     return false;
@@ -39,7 +39,7 @@ bool IccDarkReckoningTrigger::IsActive()
 bool IccLadyDeathwhisperTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "lady deathwhisper");
-    if (!boss) 
+    if (!boss)
         return false;
 
     if (bot->HasAura(SPELL_EXPERIENCED))
@@ -89,7 +89,7 @@ bool IccGunshipCannonNearTrigger::IsActive()
     // Player* master = botAI->GetMaster();
     // if (!master)
     //     return false;
-    
+
     // if (!master->GetVehicle())
     //     return false;
 
@@ -137,20 +137,20 @@ bool IccDbsMainTankRuneOfBloodTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "deathbringer saurfang");
 
-    if (!boss) 
+    if (!boss)
         return false;
-    
-    if (!botAI->IsAssistTankOfIndex(bot, 0)) 
+
+    if (!botAI->IsAssistTankOfIndex(bot, 0))
         return false;
 
     Unit* mt = AI_VALUE(Unit*, "main tank");
-    if (!mt) 
-        return false; 
-    
-    Aura* aura = botAI->GetAura("rune of blood", mt);
-    if (!aura) 
+    if (!mt)
         return false;
-    
+
+    Aura* aura = botAI->GetAura("rune of blood", mt);
+    if (!aura)
+        return false;
+
     return true;
 }
 
@@ -182,7 +182,7 @@ bool IccStinkyPreciousMainTankMortalWoundTrigger::IsActive()
 bool IccFestergutGroupPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "festergut");
-    if (!boss)  
+    if (!boss)
         return false;
 
     if (bot->HasAura(SPELL_EXPERIENCED))
@@ -194,7 +194,7 @@ bool IccFestergutGroupPositionTrigger::IsActive()
 bool IccFestergutMainTankGastricBloatTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "festergut");
-    if (!boss) 
+    if (!boss)
     {
         return false;
     }
@@ -218,7 +218,7 @@ bool IccFestergutMainTankGastricBloatTrigger::IsActive()
 bool IccFestergutSporeTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "festergut");
-    if (!boss || botAI->IsTank(bot)) 
+    if (!boss || botAI->IsTank(bot))
         return false;
 
     // Check for spore aura (ID: 69279) on any bot in the group
@@ -243,7 +243,7 @@ bool IccFestergutSporeTrigger::IsActive()
 bool IccRotfaceTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "rotface");
-    if (!boss || !(botAI->IsTank(bot) || botAI->IsMelee(bot))) 
+    if (!boss || !(botAI->IsTank(bot) || botAI->IsMelee(bot)))
         return false;
 
     if (bot->HasAura(SPELL_EXPERIENCED))
@@ -372,18 +372,18 @@ bool IccPutricideMainTankMutatedPlagueTrigger::IsActive()
 bool IccPutricideMalleableGooTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    if (!boss) 
+    if (!boss)
         return false;
 
     if (botAI->IsTank(bot))
         return true;
 
     Unit* boss1 = AI_VALUE2(Unit*, "find target", "volatile ooze");
-    if (boss1) 
+    if (boss1)
         return false;
 
     Unit* boss2 = AI_VALUE2(Unit*, "find target", "gas cloud");
-    if (boss2) 
+    if (boss2)
         return false;
 
     return true;
@@ -393,7 +393,7 @@ bool IccPutricideMalleableGooTrigger::IsActive()
 bool IccBpcKelesethTankTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "prince keleseth");
-    if (!boss) 
+    if (!boss)
         return false;
 
     if (bot->HasAura(SPELL_EXPERIENCED))
@@ -403,7 +403,7 @@ bool IccBpcKelesethTankTrigger::IsActive()
         return false;
 
     Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
-    if (aura) 
+    if (aura)
         if (aura->GetStackAmount() > 18)
             return false;
 
@@ -519,7 +519,7 @@ bool IccBpcBallOfFlameTrigger::IsActive()
 bool IccBqlGroupPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
-    if (!boss) 
+    if (!boss)
         return false;
 
     if (bot->HasAura(SPELL_EXPERIENCED))
@@ -535,7 +535,7 @@ bool IccBqlPactOfDarkfallenTrigger::IsActive()
         return false;
 
     Aura* aura = botAI->GetAura("Pact of the Darkfallen", bot);
-    if (!aura) 
+    if (!aura)
         return false;
 
     return true;
@@ -544,7 +544,7 @@ bool IccBqlPactOfDarkfallenTrigger::IsActive()
 bool IccBqlVampiricBiteTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "blood-queen lana'thel");
-    if (!boss) 
+    if (!boss)
         return false;
 
     Aura* aura = botAI->GetAura("Frenzied Bloodthirst", bot);
@@ -567,7 +567,7 @@ bool IccValkyreSpearTrigger::IsActive()
 bool IccSisterSvalnaTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "sister svalna");
-    if (!boss) 
+    if (!boss)
         return false;
 
     if (bot->GetExactDist2d(boss) > 30.0f)
@@ -893,7 +893,7 @@ bool IccSindragosaBlisteringColdTrigger::IsActive()
         return false;
 
     float dist = bot->GetExactDist2d(boss->GetPositionX(), boss->GetPositionY());
-    
+
     if (dist >= 33.0f)
         return false;
 
@@ -907,7 +907,7 @@ bool IccSindragosaBlisteringColdTrigger::IsActive()
                  boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD3) ||
                  boss->FindCurrentSpellBySpellId(SPELL_BLISTERING_COLD4)))
         isBlisteringCold = true;
-    
+
     return isCasting && isBlisteringCold;
 }
 
@@ -962,7 +962,7 @@ bool IccSindragosaMysticBuffetTrigger::IsActive()
     Unit* boss = AI_VALUE2(Unit*, "find target", "sindragosa");
     if (!boss)
         return false;
-    
+
     if (boss->GetVictim() == bot)
         return false;
 
@@ -1046,7 +1046,7 @@ bool IccSindragosaTankSwapPositionTrigger::IsActive()
 
     // Check if main tank has high stacks
     Unit* mt = AI_VALUE(Unit*, "main tank");
-    if (!mt)    
+    if (!mt)
         return false;
 
     Aura* mtAura = botAI->GetAura("mystic buffet", mt, false, true);
@@ -1126,9 +1126,9 @@ bool IccLichKingNecroticPlagueTrigger::IsActive()
 bool IccLichKingWinterTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
-    if (!boss) 
+    if (!boss)
         return false;
-    
+
     // Check for either Remorseless Winter
     bool hasWinterAura = false;
     if (boss && (boss->HasAura(SPELL_REMORSELESS_WINTER1) || boss->HasAura(SPELL_REMORSELESS_WINTER2) ||
@@ -1156,7 +1156,7 @@ bool IccLichKingWinterTrigger::IsActive()
         isWinter = true;
 
     if (hasWinterAura || hasWinter2Aura)
-        return true;   
+        return true;
 
     if (isCasting && isWinter)
         return true;
@@ -1174,14 +1174,14 @@ bool IccLichKingAddsTrigger::IsActive()
 
     Unit* terenasMenethilHC = bot->FindNearestCreature(NPC_TERENAS_MENETHIL_HC, 55.0f);
     Unit* terenasMenethil = bot->FindNearestCreature(NPC_TERENAS_MENETHIL, 55.0f);
-    
+
     if (terenasMenethilHC)
         return true;
 
      if (terenasMenethil)
         return true;
 
-    if (!boss) 
+    if (!boss)
         return false;
 
     return true;

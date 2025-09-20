@@ -68,7 +68,7 @@ const Position ICC_SINDRAGOSA_UNCHAINEDMAGIC2_POSITION = Position(4461.3945f, 24
 const Position ICC_SINDRAGOSA_UNCHAINEDMAGIC3_POSITION = Position(4473.6616f, 2484.8489f, 203.38258f);
 const Position ICC_SINDRAGOSA_UNCHAINEDMAGIC4_POSITION = Position(4459.9336f, 2507.409f, 203.38606f);
 const Position ICC_SINDRAGOSA_UNCHAINEDMAGIC5_POSITION = Position(4442.3096f, 2512.4688f, 203.38647f);
-const Position ICC_SINDRAGOSA_CENTER_POSITION = Position(4408.0464f, 2484.478f, 203.37529f);           
+const Position ICC_SINDRAGOSA_CENTER_POSITION = Position(4408.0464f, 2484.478f, 203.37529f);
 const Position ICC_SINDRAGOSA_THOMBMB2_POSITION = Position(4436.895f, 2498.1401f, 203.38133f);
 const Position ICC_SINDRAGOSA_FBOMB_POSITION = Position(4449.3647f, 2486.4524f, 203.379f);
 const Position ICC_SINDRAGOSA_FBOMB10_POSITION = Position(4449.3647f, 2486.4524f, 203.379f);
@@ -77,11 +77,11 @@ const Position ICC_LICH_KING_ADDS_POSITION = Position(476.7332f, -2095.3894f, 84
 const Position ICC_LICH_KING_MELEE_POSITION = Position(503.5546f, -2106.8213f, 840.857f);
 const Position ICC_LICH_KING_RANGED_POSITION = Position(501.3563f, -2085.1816f, 840.857f);
 const Position ICC_LICH_KING_ASSISTHC_POSITION = Position(517.2145f, -2125.0674f, 840.857f);
-const Position ICC_LK_FROST1_POSITION = Position(503.96548f, -2183.216f, 840.857f);           
-const Position ICC_LK_FROST2_POSITION = Position(563.07166f, -2125.7578f, 840.857f);           
-const Position ICC_LK_FROST3_POSITION = Position(503.40182f, -2067.3435f, 840.857f); 
-const Position ICC_LK_FROSTR1_POSITION = Position(481.168f, -2177.8723f, 840.857f); 
-const Position ICC_LK_FROSTR2_POSITION = Position(562.20807f, -2100.2393f, 840.857f); 
+const Position ICC_LK_FROST1_POSITION = Position(503.96548f, -2183.216f, 840.857f);
+const Position ICC_LK_FROST2_POSITION = Position(563.07166f, -2125.7578f, 840.857f);
+const Position ICC_LK_FROST3_POSITION = Position(503.40182f, -2067.3435f, 840.857f);
+const Position ICC_LK_FROSTR1_POSITION = Position(481.168f, -2177.8723f, 840.857f);
+const Position ICC_LK_FROSTR2_POSITION = Position(562.20807f, -2100.2393f, 840.857f);
 const Position ICC_LK_FROSTR3_POSITION = Position(526.35297f, -2071.0317f, 840.857f);
 
 //Lord Marrogwar
@@ -95,7 +95,7 @@ public:
     bool MoveTowardPosition(const Position& position, float incrementSize);
 };
 
-class IccSpikeAction : public AttackAction 
+class IccSpikeAction : public AttackAction
 {
 public:
     IccSpikeAction(PlayerbotAI* botAI) : AttackAction(botAI, "icc spike") {}
@@ -289,10 +289,10 @@ public:
     bool FindAndMoveFromClosestMember(Unit* boss, Unit* smallOoze);
 };
 
-class IccRotfaceMoveAwayFromExplosionAction : public MovementAction 
+class IccRotfaceMoveAwayFromExplosionAction : public MovementAction
 {
 public:
-    IccRotfaceMoveAwayFromExplosionAction(PlayerbotAI* botAI, std::string const name = "icc rotface move away from explosion") 
+    IccRotfaceMoveAwayFromExplosionAction(PlayerbotAI* botAI, std::string const name = "icc rotface move away from explosion")
         : MovementAction(botAI, name) {}
     bool Execute(Event event) override;
 
@@ -362,7 +362,7 @@ public:
 class IccBpcKelesethTankAction : public AttackAction
 {
 public:
-    IccBpcKelesethTankAction(PlayerbotAI* botAI) 
+    IccBpcKelesethTankAction(PlayerbotAI* botAI)
         : AttackAction(botAI, "icc bpc keleseth tank") {}
     bool Execute(Event event) override;
 };
@@ -370,7 +370,7 @@ public:
 class IccBpcMainTankAction : public AttackAction
 {
 public:
-    IccBpcMainTankAction(PlayerbotAI* botAI) 
+    IccBpcMainTankAction(PlayerbotAI* botAI)
         : AttackAction(botAI, "icc bpc main tank") {}
     bool Execute(Event event) override;
 
@@ -380,7 +380,7 @@ public:
 class IccBpcEmpoweredVortexAction : public MovementAction
 {
 public:
-    IccBpcEmpoweredVortexAction(PlayerbotAI* botAI) 
+    IccBpcEmpoweredVortexAction(PlayerbotAI* botAI)
         : MovementAction(botAI, "icc bpc empowered vortex") {}
     bool Execute(Event event) override;
 
@@ -391,7 +391,7 @@ public:
 class IccBpcKineticBombAction : public AttackAction
 {
 public:
-    IccBpcKineticBombAction(PlayerbotAI* botAI) 
+    IccBpcKineticBombAction(PlayerbotAI* botAI)
         : AttackAction(botAI, "icc bpc kinetic bomb") {}
     bool Execute(Event event) override;
 
@@ -411,7 +411,7 @@ public:
 class IccBqlGroupPositionAction : public AttackAction
 {
 public:
-    IccBqlGroupPositionAction(PlayerbotAI* botAI) 
+    IccBqlGroupPositionAction(PlayerbotAI* botAI)
         : AttackAction(botAI, "icc group tank position") {}
     bool Execute(Event event) override;
 
@@ -429,16 +429,16 @@ private:
         int curveIdx = 0;
         bool foundSafe = false;
         float minDist = 0.0f;
-        float score = 0.0f;  
+        float score = 0.0f;
         Position closestPoint;
         float t_closest = 0.0f;
     };
-};  
+};
 
 class IccBqlPactOfDarkfallenAction : public MovementAction
 {
 public:
-    IccBqlPactOfDarkfallenAction(PlayerbotAI* botAI) 
+    IccBqlPactOfDarkfallenAction(PlayerbotAI* botAI)
         : MovementAction(botAI, "icc bql pact of darkfallen") {}
     bool Execute(Event event) override;
 
@@ -449,7 +449,7 @@ public:
 class IccBqlVampiricBiteAction : public AttackAction
 {
 public:
-    IccBqlVampiricBiteAction(PlayerbotAI* botAI) 
+    IccBqlVampiricBiteAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc bql vampiric bite") {}
     bool Execute(Event event) override;
 
@@ -463,15 +463,15 @@ public:
 class IccValkyreSpearAction : public AttackAction
 {
 public:
-    IccValkyreSpearAction(PlayerbotAI* botAI) 
+    IccValkyreSpearAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc valkyre spear") {}
     bool Execute(Event event) override;
 };
-    
+
 class IccSisterSvalnaAction : public AttackAction
 {
 public:
-    IccSisterSvalnaAction(PlayerbotAI* botAI) 
+    IccSisterSvalnaAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc sister svalna") {}
     bool Execute(Event event) override;
 };
@@ -494,7 +494,7 @@ public:
 class IccValithriaPortalAction : public MovementAction
 {
 public:
-    IccValithriaPortalAction(PlayerbotAI* botAI) 
+    IccValithriaPortalAction(PlayerbotAI* botAI)
             : MovementAction(botAI, "icc valithria portal") {}
     bool Execute(Event event) override;
 };
@@ -502,7 +502,7 @@ public:
 class IccValithriaHealAction : public AttackAction
 {
 public:
-    IccValithriaHealAction(PlayerbotAI* botAI) 
+    IccValithriaHealAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc valithria heal") {}
     bool Execute(Event event) override;
 };
@@ -510,7 +510,7 @@ public:
 class IccValithriaDreamCloudAction : public MovementAction
 {
 public:
-    IccValithriaDreamCloudAction(PlayerbotAI* botAI) 
+    IccValithriaDreamCloudAction(PlayerbotAI* botAI)
             : MovementAction(botAI, "icc valithria dream cloud") {}
     bool Execute(Event event) override;
 };
@@ -519,7 +519,7 @@ public:
 class IccSindragosaGroupPositionAction : public AttackAction
 {
 public:
-    IccSindragosaGroupPositionAction(PlayerbotAI* botAI) 
+    IccSindragosaGroupPositionAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc sindragosa group position") {}
     bool Execute(Event event) override;
 
@@ -531,7 +531,7 @@ public:
 class IccSindragosaFrostBeaconAction : public MovementAction
 {
 public:
-    IccSindragosaFrostBeaconAction(PlayerbotAI* botAI) 
+    IccSindragosaFrostBeaconAction(PlayerbotAI* botAI)
             : MovementAction(botAI, "icc sindragosa frost beacon") {}
     bool Execute(Event event) override;
 
@@ -554,7 +554,7 @@ public:
 class IccSindragosaBlisteringColdAction : public MovementAction
 {
 public:
-    IccSindragosaBlisteringColdAction(PlayerbotAI* botAI) 
+    IccSindragosaBlisteringColdAction(PlayerbotAI* botAI)
             : MovementAction(botAI, "icc sindragosa blistering cold") {}
     bool Execute(Event event) override;
 };
@@ -562,7 +562,7 @@ public:
 class IccSindragosaUnchainedMagicAction : public AttackAction
 {
 public:
-    IccSindragosaUnchainedMagicAction(PlayerbotAI* botAI) 
+    IccSindragosaUnchainedMagicAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc sindragosa unchained magic") {}
     bool Execute(Event event) override;
 };
@@ -570,15 +570,15 @@ public:
 class IccSindragosaChilledToTheBoneAction : public AttackAction
 {
 public:
-    IccSindragosaChilledToTheBoneAction(PlayerbotAI* botAI) 
+    IccSindragosaChilledToTheBoneAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc sindragosa chilled to the bone") {}
     bool Execute(Event event) override;
-}; 
+};
 
 class IccSindragosaMysticBuffetAction : public MovementAction
 {
 public:
-    IccSindragosaMysticBuffetAction(PlayerbotAI* botAI) 
+    IccSindragosaMysticBuffetAction(PlayerbotAI* botAI)
             : MovementAction(botAI, "icc sindragosa mystic buffet") {}
     bool Execute(Event event) override;
 };
@@ -586,15 +586,15 @@ public:
 class IccSindragosaFrostBombAction : public MovementAction
 {
 public:
-    IccSindragosaFrostBombAction(PlayerbotAI* botAI) 
+    IccSindragosaFrostBombAction(PlayerbotAI* botAI)
             : MovementAction(botAI, "icc sindragosa frost bomb") {}
     bool Execute(Event event) override;
 };
 
-class IccSindragosaTankSwapPositionAction : public AttackAction 
+class IccSindragosaTankSwapPositionAction : public AttackAction
 {
     public:
-        IccSindragosaTankSwapPositionAction(PlayerbotAI* botAI) 
+        IccSindragosaTankSwapPositionAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "sindragosa tank swap position") {}
         bool Execute(Event event) override;
 };
@@ -604,7 +604,7 @@ class IccSindragosaTankSwapPositionAction : public AttackAction
 class IccLichKingShadowTrapAction : public MovementAction
 {
     public:
-        IccLichKingShadowTrapAction(PlayerbotAI* botAI) 
+        IccLichKingShadowTrapAction(PlayerbotAI* botAI)
             : MovementAction(botAI, "icc lich king shadow trap") {}
         bool Execute(Event event) override;
 };
@@ -612,7 +612,7 @@ class IccLichKingShadowTrapAction : public MovementAction
 class IccLichKingNecroticPlagueAction : public MovementAction
 {
     public:
-        IccLichKingNecroticPlagueAction(PlayerbotAI* botAI) 
+        IccLichKingNecroticPlagueAction(PlayerbotAI* botAI)
             : MovementAction(botAI, "icc lich king necrotic plague") {}
         bool Execute(Event event) override;
 };
@@ -620,7 +620,7 @@ class IccLichKingNecroticPlagueAction : public MovementAction
 class IccLichKingWinterAction : public AttackAction
 {
     public:
-        IccLichKingWinterAction(PlayerbotAI* botAI) 
+        IccLichKingWinterAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc lich king winter") {}
         bool Execute(Event event) override;
 
@@ -643,7 +643,7 @@ class IccLichKingWinterAction : public AttackAction
 class IccLichKingAddsAction : public AttackAction
 {
     public:
-        IccLichKingAddsAction(PlayerbotAI* botAI) 
+        IccLichKingAddsAction(PlayerbotAI* botAI)
             : AttackAction(botAI, "icc lich king adds") {}
         bool Execute(Event event) override;
 

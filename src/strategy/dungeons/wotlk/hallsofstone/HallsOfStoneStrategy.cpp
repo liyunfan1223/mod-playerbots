@@ -11,7 +11,7 @@ void WotlkDungeonHoSStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // TODO: I think bots need to dismiss pets on this, or they nuke players they are standing close to
     triggers.push_back(new TriggerNode("ground slam",
         NextAction::array(0, new NextAction("shatter spread", ACTION_RAID + 5), nullptr)));
-    
+
     // Tribunal of Ages
     // Seems fine, maybe add focus targeting strat if needed on heroic.
     // Main issue is dps will immediately rambo in and sometimes die before tank gets aggro,

@@ -571,7 +571,7 @@ void StatsWeightCalculator::CalculateItemTypePenalty(ItemTemplate const* proto)
         {
             weight_ *= 0.1;
         }
-        
+
         if (lvl >= 10 && cls == CLASS_ROGUE && (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY) &&
             proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
         {

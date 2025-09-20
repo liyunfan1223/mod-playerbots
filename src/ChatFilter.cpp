@@ -14,7 +14,7 @@
 #include <cctype>
 #include <string>
 
-static std::string ToLower(const std::string& str) 
+static std::string ToLower(const std::string& str)
 {
     std::string out = str;
     std::transform(out.begin(), out.end(), out.begin(), [](unsigned char c){ return std::tolower(c); });
@@ -393,12 +393,12 @@ private:
         int specTab = AiFactory::GetPlayerSpecTab(bot);
         std::string botSpecClass;
         // For druids, specTab==1 is always feral; distinguish bear/cat at runtime by role
-        if (cls == CLASS_DRUID && specTab == 1) 
+        if (cls == CLASS_DRUID && specTab == 1)
         {
             botSpecClass = botAI->IsTank(bot) ? "bear" : "cat";
         }
         // For death knights, specTab==0 is always blood; distinguish tank/dps at runtime by role
-        else if (cls == CLASS_DEATH_KNIGHT && specTab == 0) 
+        else if (cls == CLASS_DEATH_KNIGHT && specTab == 0)
         {
             botSpecClass = botAI->IsTank(bot) ? "bdkt" : "bdkd";
         }
@@ -482,7 +482,7 @@ public:
         std::string msgLower = ToLower(message);
         const std::string prefix = "@aggroby";
         size_t prefixLen = prefix.length();
-        if (msgLower.find(prefix) != 0) 
+        if (msgLower.find(prefix) != 0)
         {
             return message;
         }
@@ -601,12 +601,12 @@ CompositeChatFilter::~CompositeChatFilter()
 
 std::string const CompositeChatFilter::Filter(std::string& message)
 {
-    for (auto* filter : filters) 
+    for (auto* filter : filters)
     {
         message = filter->Filter(message);
         if (message.empty())
             break;
     }
-    
+
     return message;
 }

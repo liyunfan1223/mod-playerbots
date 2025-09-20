@@ -85,7 +85,7 @@ public:
     void InitKeyring();
     void InitReputation();
     void InitAttunementQuests();
-    
+
 private:
     void Prepare();
     // void InitSecondEquipmentSet();

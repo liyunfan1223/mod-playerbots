@@ -215,7 +215,7 @@ bool MalygosTargetAction::Execute(Event event)
 
 //     if (!spark->IsInWorld() || spark->GetMapId() != bot->GetMapId())
 //         return false;
-    
+
 //     return bot->GetDistance2d(MALYGOS_STACK_POSITION.first, MALYGOS_STACK_POSITION.second) < 3.0f;
 // }
 

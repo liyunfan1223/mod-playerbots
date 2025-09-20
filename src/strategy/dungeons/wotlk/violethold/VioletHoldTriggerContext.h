@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "VioletHoldTriggers.h"
 
-class WotlkDungeonVHTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonVHTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonVHTriggerContext()

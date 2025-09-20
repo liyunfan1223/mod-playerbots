@@ -90,7 +90,7 @@ void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericDKStrategy::InitTriggers(triggers);
     triggers.push_back(new TriggerNode(
-        "death and decay cooldown", NextAction::array(0, 
+        "death and decay cooldown", NextAction::array(0,
             new NextAction("ghoul frenzy", ACTION_DEFAULT + 0.9f),
             new NextAction("scourge strike", ACTION_DEFAULT + 0.8f),
             new NextAction("icy touch", ACTION_DEFAULT + 0.7f),
@@ -107,7 +107,7 @@ void UnholyDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     //     "plague strike", NextAction::array(0, new NextAction("plague strike", ACTION_HIGH + 1), nullptr)));
 
     triggers.push_back(new TriggerNode(
-        "high frost rune", NextAction::array(0, 
+        "high frost rune", NextAction::array(0,
         new NextAction("icy touch", ACTION_NORMAL + 3), nullptr)));
 
     triggers.push_back(new TriggerNode(

@@ -142,7 +142,7 @@ public:
 
     std::string const getName() override { return "blessing of kings on party"; }
     Value<Unit*>* GetTargetValue() override; // added for Sanctuary priority
-	bool Execute(Event event) override;      // added for 2 paladins logic
+    bool Execute(Event event) override;      // added for 2 paladins logic
 };
 
 class CastBlessingOfSanctuaryAction : public CastBuffSpellAction

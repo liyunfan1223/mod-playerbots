@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "DrakTharonKeepTriggers.h"
 
-class WotlkDungeonDTKTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonDTKTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonDTKTriggerContext()

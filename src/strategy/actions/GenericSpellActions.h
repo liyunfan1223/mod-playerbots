@@ -29,7 +29,7 @@ public:
 
     NextAction** getPrerequisites() override;
     std::string const getSpell() { return spell; }
-    
+
 protected:
     std::string spell;
     float range;

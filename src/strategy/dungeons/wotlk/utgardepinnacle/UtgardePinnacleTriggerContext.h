@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "UtgardePinnacleTriggers.h"
 
-class WotlkDungeonUPTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonUPTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonUPTriggerContext()

@@ -10,7 +10,7 @@ class RaidIccActionContext : public NamedObjectContext<Action>
 public:
     RaidIccActionContext()
     {
-        creators["icc lm tank position"] = &RaidIccActionContext::icc_lm_tank_position; 
+        creators["icc lm tank position"] = &RaidIccActionContext::icc_lm_tank_position;
         creators["icc spike"] = &RaidIccActionContext::icc_spike;
 
         creators["icc dark reckoning"] = &RaidIccActionContext::icc_dark_reckoning;
@@ -62,7 +62,7 @@ public:
         creators["icc sindragosa blistering cold"] = &RaidIccActionContext::icc_sindragosa_blistering_cold;
         creators["icc sindragosa unchained magic"] = &RaidIccActionContext::icc_sindragosa_unchained_magic;
         creators["icc sindragosa chilled to the bone"] = &RaidIccActionContext::icc_sindragosa_chilled_to_the_bone;
-        creators["icc sindragosa mystic buffet"] = &RaidIccActionContext::icc_sindragosa_mystic_buffet; 
+        creators["icc sindragosa mystic buffet"] = &RaidIccActionContext::icc_sindragosa_mystic_buffet;
         creators["icc sindragosa frost bomb"] = &RaidIccActionContext::icc_sindragosa_frost_bomb;
         creators["icc sindragosa tank swap position"] = &RaidIccActionContext::icc_sindragosa_tank_swap_position;
 
@@ -121,11 +121,11 @@ private:
     static Action* icc_valithria_dream_cloud(PlayerbotAI* ai) { return new IccValithriaDreamCloudAction(ai); }
 
     static Action* icc_sindragosa_group_position(PlayerbotAI* ai) { return new IccSindragosaGroupPositionAction(ai); }
-    static Action* icc_sindragosa_frost_beacon(PlayerbotAI* ai) { return new IccSindragosaFrostBeaconAction(ai); }  
+    static Action* icc_sindragosa_frost_beacon(PlayerbotAI* ai) { return new IccSindragosaFrostBeaconAction(ai); }
     static Action* icc_sindragosa_blistering_cold(PlayerbotAI* ai) { return new IccSindragosaBlisteringColdAction(ai); }
     static Action* icc_sindragosa_unchained_magic(PlayerbotAI* ai) { return new IccSindragosaUnchainedMagicAction(ai); }
     static Action* icc_sindragosa_chilled_to_the_bone(PlayerbotAI* ai) { return new IccSindragosaChilledToTheBoneAction(ai); }
-    static Action* icc_sindragosa_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMysticBuffetAction(ai); }    
+    static Action* icc_sindragosa_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMysticBuffetAction(ai); }
     static Action* icc_sindragosa_frost_bomb(PlayerbotAI* ai) { return new IccSindragosaFrostBombAction(ai); }
     static Action* icc_sindragosa_tank_swap_position(PlayerbotAI* ai) { return new IccSindragosaTankSwapPositionAction(ai); }
 

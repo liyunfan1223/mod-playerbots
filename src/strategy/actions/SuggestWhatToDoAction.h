@@ -28,7 +28,7 @@ protected:
     void toxicLinks();
     void somethingToxic();
     void thunderfury();
- 
+
     std::vector<uint32> GetIncompletedQuests();
 
 private:
