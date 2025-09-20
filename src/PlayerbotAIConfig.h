@@ -273,6 +273,7 @@ public:
     std::vector<uint32> pvpProhibitedZoneIds;
     std::vector<uint32> pvpProhibitedAreaIds;
     bool fastReactInBG;
+    float randomBotDuelChance;
 
     bool randombotsWalkingRPG;
     bool randombotsWalkingRPGInDoors;
