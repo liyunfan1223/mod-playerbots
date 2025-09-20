@@ -27,6 +27,27 @@
 #include "WarriorAiObjectContext.h"
 #include "WorldPacketActionContext.h"
 #include "WorldPacketTriggerContext.h"
+#include "raids/RaidStrategyContext.h"
+#include "raids/blackwinglair/RaidBwlActionContext.h"
+#include "raids/blackwinglair/RaidBwlTriggerContext.h"
+#include "raids/naxxramas/RaidNaxxActionContext.h"
+#include "raids/naxxramas/RaidNaxxTriggerContext.h"
+#include "raids/icecrown/RaidIccActionContext.h"
+#include "raids/icecrown/RaidIccTriggerContext.h"
+#include "raids/obsidiansanctum/RaidOsActionContext.h"
+#include "raids/obsidiansanctum/RaidOsTriggerContext.h"
+#include "raids/eyeofeternity/RaidEoEActionContext.h"
+#include "raids/vaultofarchavon/RaidVoATriggerContext.h"
+#include "raids/onyxia/RaidOnyxiaActionContext.h"
+#include "raids/onyxia/RaidOnyxiaTriggerContext.h"
+#include "raids/vaultofarchavon/RaidVoAActionContext.h"
+#include "raids/eyeofeternity/RaidEoETriggerContext.h"
+#include "raids/moltencore/RaidMcActionContext.h"
+#include "raids/moltencore/RaidMcTriggerContext.h"
+#include "raids/aq20/RaidAq20ActionContext.h"
+#include "raids/aq20/RaidAq20TriggerContext.h"
+#include "raids/karazhan/RaidKarazhanActionContext.h"
+#include "raids/karazhan/RaidKarazhanTriggerContext.h"
 #include "dungeons/DungeonStrategyContext.h"
 #include "dungeons/wotlk/WotlkDungeonActionContext.h"
 #include "dungeons/wotlk/WotlkDungeonTriggerContext.h"
@@ -115,6 +136,7 @@ void AiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Act
     actionContexts.Add(new RaidVoAActionContext());
     actionContexts.Add(new RaidUlduarActionContext());
     actionContexts.Add(new RaidIccActionContext());
+    actionContexts.Add(new RaidKarazhanActionContext());
     actionContexts.Add(new WotlkDungeonUKActionContext());
     actionContexts.Add(new WotlkDungeonNexActionContext());
     actionContexts.Add(new WotlkDungeonANActionContext());
@@ -147,6 +169,7 @@ void AiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Tr
     triggerContexts.Add(new RaidVoATriggerContext());
     triggerContexts.Add(new RaidUlduarTriggerContext());
     triggerContexts.Add(new RaidIccTriggerContext());
+    triggerContexts.Add(new RaidKarazhanTriggerContext());
     triggerContexts.Add(new WotlkDungeonUKTriggerContext());
     triggerContexts.Add(new WotlkDungeonNexTriggerContext());
     triggerContexts.Add(new WotlkDungeonANTriggerContext());
