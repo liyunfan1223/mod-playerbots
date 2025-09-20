@@ -23,7 +23,7 @@
 #include <initializer_list>
 #include <vector>
 #include "SpellMgr.h"
-#include "SkillDiscovery.h" // present in AC; guards not needed, we only use SkillLine enums
+#include "SkillDiscovery.h"
 #include "Log.h"
 
 // Groups the "class + archetype" info in the same place
@@ -167,29 +167,6 @@ static bool BotAlreadyKnowsRecipeSpell(Player* bot, ItemTemplate const* proto)
     return false;
 }
 
-/*// Special-case: Book of Glyph Mastery (can own several; do not downgrade NEED on duplicates)
-static bool IsGlyphMasteryBook(ItemTemplate const* proto)
-{
-    if (!proto) return false;
-    // Known WotLK entry (retail classic DBs use 45912 for Book of Glyph Mastery)
-    if (proto->ItemId == 45912)
-        return true;
-    // Fallback by name (handles localized DBs)
-    if (proto->Class == ITEM_CLASS_RECIPE && proto->SubClass == ITEM_SUBCLASS_BOOK)
-    {
-        std::string n = proto->Name1;
-        std::transform(n.begin(), n.end(), n.begin(),
-                       [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
-        // English + French hints
-        if (n.find("glyph mastery") != std::string::npos ||
-            n.find("book of glyph mastery") != std::string::npos ||
-            n.find("maitrise des glyphes") != std::string::npos ||  // sans accent
-            n.find("maîtrise des glyphes") != std::string::npos)    // avec accent
-            return true;
-    }
-    return false;
-}*/
-
 // Special-case: Book of Glyph Mastery (can own several; do not downgrade NEED on duplicates)
 static bool IsGlyphMasteryBook(ItemTemplate const* proto)
 {
@@ -233,7 +210,7 @@ static void DebugRecipeRoll(Player* bot, ItemTemplate const* proto, ItemUsage us
                             uint32 reqSkill, uint32 reqRank, uint32 botRank,
                             RollVote before, RollVote after)
 {
-    LOG_INFO("playerbots",
+    LOG_DEBUG("playerbots",
         "[LootDBG] {} JC:{} item:{} \"{}\" class={} sub={} bond={} usage={} "
         "recipeChecked={} useful={} known={} reqSkill={} reqRank={} botRank={} vote:{} -> {} dupCount={}",
         bot->GetName(), bot->GetSkillValue(SKILL_JEWELCRAFTING),
@@ -646,6 +623,15 @@ static void GetEquipSlotsForInvType(uint8 invType, std::vector<uint8>& out)
 static bool CanBotUseToken(ItemTemplate const* proto, Player* bot);
 static bool RollUniqueCheck(ItemTemplate const* proto, Player* bot);
 
+// WotLK Heuristic: We can only DE [UNCOMMON..EPIC] quality ARMOR/WEAPON
+static inline bool IsLikelyDisenchantable(ItemTemplate const* proto)
+{
+    if (!proto) return false;
+    if (proto->Class != ITEM_CLASS_ARMOR && proto->Class != ITEM_CLASS_WEAPON)
+        return false;
+    return proto->Quality >= ITEM_QUALITY_UNCOMMON && proto->Quality <= ITEM_QUALITY_EPIC;
+}
+
 // Internal helpers
 // Deduces the target slot from the token's name.
 // Returns an expected InventoryType (HEAD/SHOULDERS/CHEST/HANDS/LEGS) or -1 if unknown.
@@ -710,6 +696,10 @@ bool LootRollAction::Execute(Event event)
         if (!proto)
             continue;
 
+        LOG_DEBUG("playerbots", "[LootDBG] start bot={} item={} \"{}\" class={} q={} lootMethod={} enchSkill={} rp={}",
+                 bot->GetName(), itemId, proto->Name1, proto->Class, proto->Quality,
+                 (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING), randomProperty);
+        		 
         RollVote vote = PASS;
         std::string itemUsageParam;
 		
@@ -719,6 +709,8 @@ bool LootRollAction::Execute(Event event)
             itemUsageParam = std::to_string(itemId);
         }
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
+
+        LOG_DEBUG("playerbots", "[LootDBG] usage={} (EQUIP=1 REPLACE=2 BAD_EQUIP=8 DISENCHANT=13)", (int)usage);
         
         // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), but no other items have class bits and epic quality.
         // - CanBotUseToken(proto, bot) => NEED
@@ -750,15 +742,26 @@ bool LootRollAction::Execute(Event event)
         }
         else
         {
-            // Let CalculateRollVote decide (includes SmartNeedBySpec, BoE/BoU, unique, cross-armor)
+            // Lets CalculateRollVote decide (includes SmartNeedBySpec, BoE/BoU, unique, cross-armor)
             vote = CalculateRollVote(proto, randomProperty);
+			LOG_DEBUG("playerbots", "[LootDBG] after CalculateRollVote: vote={}", RollVoteToText(vote));
         }
-		
-        // Disenchant button (Need-Before-Greed): if useful for DE, prefer DE over Greed
-        if (vote == GREED && usage == ITEM_USAGE_DISENCHANT && sPlayerbotAIConfig->useDEButton)
+
+        // Disenchant (Need-Before-Greed):
+        // If the bot is ENCHANTING and the item is disenchantable, prefer DE to GREED
+        if (vote != NEED && sPlayerbotAIConfig->useDEButton &&
+            group && (group->GetLootMethod() == NEED_BEFORE_GREED || group->GetLootMethod() == GROUP_LOOT) &&			
+            bot->HasSkill(SKILL_ENCHANTING) && IsLikelyDisenchantable(proto))
         {
-            if (group && group->GetLootMethod() == NEED_BEFORE_GREED)
-                vote = DISENCHANT;
+            LOG_DEBUG("playerbots", "[LootDBG] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)",
+                     RollVoteToText(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING));
+			vote = DISENCHANT;
+        }
+        else
+        {
+            LOG_DEBUG("playerbots", "[LootDBG] no DE: vote={} lootMethod={} enchSkill={} deOK={}",
+                     RollVoteToText(vote), (int)group->GetLootMethod(),
+                     bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
         }
 
         if (sPlayerbotAIConfig->lootRollLevel == 0)
@@ -773,7 +776,7 @@ bool LootRollAction::Execute(Event event)
                     {
                         vote = PASS;
                     }
-                else
+                else 
                     {
                         vote = GREED;
                     }
@@ -787,6 +790,10 @@ bool LootRollAction::Execute(Event event)
         RollVote sent = vote;
         if (group->GetLootMethod() == MASTER_LOOT || group->GetLootMethod() == FREE_FOR_ALL)
             sent = PASS;
+		LOG_DEBUG("playerbots", "[LootDBG] send vote={} (lootMethod={} Lvl={}) -> guid={} itemId={}",
+                 RollVoteToText(sent), (int)group->GetLootMethod(),
+                 sPlayerbotAIConfig->lootRollLevel, guid.ToString(), itemId);
+		 
         AnnounceRollChoice(sent, itemId);
         group->CountRollVote(bot->GetGUID(), guid, sent);
         // One item at a time
@@ -831,11 +838,11 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
            vote = NEED;
            recipeNeed = true;
        } else {
-           vote = GREED; // recette pas pour nous -> GREED
+           vote = GREED; // recipe not for the bot -> GREED
        }
     }
 
-    // Ne pas écraser le choix si on a déjà tranché via la logique "recette"
+    // Do not overwrite the choice if we have already decided via the "recipe" logic
     if (!recipeChecked)
     {
         switch (usage)
@@ -1032,6 +1039,10 @@ bool MasterLootRollAction::Execute(Event event)
     Group* group = bot->GetGroup();
     if (!group)
         return false;
+	
+	LOG_DEBUG("playerbots", "[LootDBG][ML] start bot={} item={} \"{}\" class={} q={} lootMethod={} enchSkill={} rp={}",
+             bot->GetName(), itemId, proto->Name1, proto->Class, proto->Quality,
+             (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING), randomPropertyId);
 
     // 1) Token heuristic: ONLY NEED if the target slot is a likely upgrade
     RollVote vote = PASS;
@@ -1056,17 +1067,29 @@ bool MasterLootRollAction::Execute(Event event)
     }
 
     // 2) Disenchant button in Need-Before-Greed if the usage is "DISENCHANT"
-    if (vote == GREED && sPlayerbotAIConfig->useDEButton && group->GetLootMethod() == NEED_BEFORE_GREED)
+    if (vote != NEED && sPlayerbotAIConfig->useDEButton &&
+        (group->GetLootMethod() == NEED_BEFORE_GREED || group->GetLootMethod() == GROUP_LOOT) &&		
+        bot->HasSkill(SKILL_ENCHANTING) && IsLikelyDisenchantable(proto))
     {
-        std::ostringstream out; out << itemId;
-        ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", out.str());
-        if (usage == ITEM_USAGE_DISENCHANT)
-            vote = DISENCHANT;
+        LOG_DEBUG("playerbots", "[LootDBG][ML] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)",
+                 RollVoteToText(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING));
+		vote = DISENCHANT;
+    }
+    else
+    {
+        LOG_DEBUG("playerbots", "[LootDBG][ML] no DE: vote={} lootMethod={} enchSkill={} deOK={}",
+                 RollVoteToText(vote), (int)group->GetLootMethod(),
+                 bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
     }
 
     RollVote sent = vote;
     if (group->GetLootMethod() == MASTER_LOOT || group->GetLootMethod() == FREE_FOR_ALL)
         sent = PASS;
+	
+	LOG_DEBUG("playerbots", "[LootDBG][ML] vote={} -> sent={} lootMethod={} enchSkill={} deOK={}",
+             RollVoteToText(vote), RollVoteToText(sent), (int)group->GetLootMethod(),
+             bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
+		 
     AnnounceRollChoice(sent, itemId);
     group->CountRollVote(bot->GetGUID(), creatureGuid, sent);
 
@@ -1111,7 +1134,7 @@ static bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
 bool RollAction::Execute(Event event)
 {
     std::string link = event.getParam();
-
+    
     if (link.empty())
     {
         bot->DoRandomRoll(0,100);
@@ -1128,7 +1151,7 @@ bool RollAction::Execute(Event event)
     }
     std::string itemUsageParam;
     itemUsageParam = std::to_string(itemId);
-
+        
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
     switch (proto->Class)
     {
