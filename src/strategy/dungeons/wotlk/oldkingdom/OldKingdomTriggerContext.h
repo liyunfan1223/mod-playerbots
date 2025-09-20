@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "OldKingdomTriggers.h"
 
-class WotlkDungeonOKTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonOKTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonOKTriggerContext()

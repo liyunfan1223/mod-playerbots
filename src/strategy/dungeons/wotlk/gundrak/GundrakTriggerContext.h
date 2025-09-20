@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "GundrakTriggers.h"
 
-class WotlkDungeonGDTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonGDTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonGDTriggerContext()

@@ -12,7 +12,7 @@
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "AiObjectContext.h"
-#include "Log.h" 
+#include "Log.h"
 
 bool ChangeTalentsAction::Execute(Event event)
 {

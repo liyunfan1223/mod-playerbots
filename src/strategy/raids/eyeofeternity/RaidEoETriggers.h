@@ -12,7 +12,7 @@ enum EyeOfEternityIDs
     NPC_NEXUS_LORD                      = 30245,
     NPC_SCION_OF_ETERNITY               = 30249,
     NPC_WYRMREST_SKYTALON               = 30161,
-    
+
     SPELL_POWER_SPARK_VISUAL            = 55845,
     SPELL_POWER_SPARK_GROUND_BUFF       = 55852,
     SPELL_POWER_SPARK_MALYGOS_BUFF      = 56152,

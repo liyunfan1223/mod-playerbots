@@ -13,7 +13,7 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("icc dark reckoning",
         NextAction::array(0, new NextAction("icc dark reckoning", ACTION_MOVE + 5), nullptr)));
 
-    triggers.push_back(new TriggerNode("icc lady deathwhisper", 
+    triggers.push_back(new TriggerNode("icc lady deathwhisper",
         NextAction::array(0, new NextAction("icc ranged position lady deathwhisper", ACTION_MOVE + 2),
                              new NextAction("icc adds lady deathwhisper", ACTION_RAID + 3),
                              new NextAction("icc shade lady deathwhisper", ACTION_RAID + 4), nullptr)));
@@ -30,7 +30,7 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("icc gunship teleport ally",
         NextAction::array(0, new NextAction("icc gunship teleport ally", ACTION_RAID + 4), nullptr)));
-    
+
     triggers.push_back(new TriggerNode("icc gunship teleport horde",
         NextAction::array(0, new NextAction("icc gunship teleport horde", ACTION_RAID + 4), nullptr)));
 
@@ -38,24 +38,24 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("icc dbs",
         NextAction::array(0, new NextAction("icc dbs tank position", ACTION_RAID + 3),
                              new NextAction("icc adds dbs", ACTION_RAID + 5), nullptr)));
-    
+
     triggers.push_back(new TriggerNode("icc dbs main tank rune of blood",
         NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 4), nullptr)));
-    
+
     //DOGS
     triggers.push_back(new TriggerNode("icc stinky precious main tank mortal wound",
         NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 4), nullptr)));
-    
+
     //FESTERGUT
     triggers.push_back(new TriggerNode("icc festergut group position",
         NextAction::array(0, new NextAction("icc festergut group position", ACTION_MOVE + 4), nullptr)));
-    
+
     triggers.push_back(new TriggerNode("icc festergut main tank gastric bloat",
         NextAction::array(0, new NextAction("taunt spell", ACTION_EMERGENCY + 6), nullptr)));
 
     triggers.push_back(new TriggerNode("icc festergut spore",
         NextAction::array(0, new NextAction("icc festergut spore", ACTION_MOVE + 5), nullptr)));
-    
+
     //ROTFACE
     triggers.push_back(new TriggerNode("icc rotface tank position",
         NextAction::array(0, new NextAction("icc rotface tank position", ACTION_RAID + 5), nullptr)));
@@ -97,7 +97,7 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("icc bpc ball of flame",
                         NextAction::array(0, new NextAction("icc bpc ball of flame", ACTION_RAID + 7), nullptr)));
-    
+
     //BQL
     triggers.push_back(new TriggerNode("icc bql group position",
         NextAction::array(0, new NextAction("icc bql group position", ACTION_RAID), nullptr)));
@@ -123,7 +123,7 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("icc valithria portal",
         NextAction::array(0, new NextAction("icc valithria portal", ACTION_RAID + 5), nullptr)));
 
-    triggers.push_back(new TriggerNode("icc valithria heal", 
+    triggers.push_back(new TriggerNode("icc valithria heal",
         NextAction::array(0, new NextAction("icc valithria heal", ACTION_RAID+2), nullptr)));
 
     triggers.push_back(new TriggerNode("icc valithria dream cloud",
@@ -131,19 +131,19 @@ void RaidIccStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     //SINDRAGOSA
     triggers.push_back(new TriggerNode("icc sindragosa group position",
-        NextAction::array(0, new NextAction("icc sindragosa group position", ACTION_RAID + 1), nullptr)));   
+        NextAction::array(0, new NextAction("icc sindragosa group position", ACTION_RAID + 1), nullptr)));
 
     triggers.push_back(new TriggerNode("icc sindragosa frost beacon",
-        NextAction::array(0, new NextAction("icc sindragosa frost beacon", ACTION_RAID + 5), nullptr)));    
+        NextAction::array(0, new NextAction("icc sindragosa frost beacon", ACTION_RAID + 5), nullptr)));
 
     triggers.push_back(new TriggerNode("icc sindragosa blistering cold",
-        NextAction::array(0, new NextAction("icc sindragosa blistering cold", ACTION_EMERGENCY + 4), nullptr))); 
+        NextAction::array(0, new NextAction("icc sindragosa blistering cold", ACTION_EMERGENCY + 4), nullptr)));
 
     triggers.push_back(new TriggerNode("icc sindragosa unchained magic",
         NextAction::array(0, new NextAction("icc sindragosa unchained magic", ACTION_RAID + 2), nullptr)));
 
     triggers.push_back(new TriggerNode("icc sindragosa chilled to the bone",
-        NextAction::array(0, new NextAction("icc sindragosa chilled to the bone", ACTION_RAID + 2), nullptr))); 
+        NextAction::array(0, new NextAction("icc sindragosa chilled to the bone", ACTION_RAID + 2), nullptr)));
 
     triggers.push_back(new TriggerNode("icc sindragosa mystic buffet",
         NextAction::array(0, new NextAction("icc sindragosa mystic buffet", ACTION_RAID + 3), nullptr)));

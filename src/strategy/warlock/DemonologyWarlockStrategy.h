@@ -7,7 +7,7 @@
 #define _PLAYERBOT_DEMONOLOGYWARLOCKSTRATEGY_H
 
 #include "GenericWarlockStrategy.h"
-#include "CombatStrategy.h" 
+#include "CombatStrategy.h"
 
 class PlayerbotAI;
 

@@ -32,7 +32,7 @@ bool AttackDalronnAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "dalronn the controller");
     if (!boss) { return false; }
-    
+
     if (AI_VALUE(Unit*, "current target") == boss)
     {
         return false;
@@ -51,13 +51,13 @@ bool IngvarStopCastingAction::Execute(Event event)
     {
         return false;
     }
-    
+
     Spell* spell = bot->FindCurrentSpellBySpellId(my_spell_id);
     if (!spell) { return false; }
 
     // bot->Yell("cancelling spell="+std::to_string(my_spell_id), LANG_UNIVERSAL);
     bot->InterruptSpell(spell->GetCurrentContainer(), false, true, true);
-    
+
     // Can slightly optimise by allowing bot to keep casting if they will finish the cast
     // before boss spell goes off, however need to hook boss AI for cast remaining.
     return true;

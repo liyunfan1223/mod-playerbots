@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "HallsOfLightningTriggers.h"
 
-class WotlkDungeonHoLTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonHoLTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonHoLTriggerContext()

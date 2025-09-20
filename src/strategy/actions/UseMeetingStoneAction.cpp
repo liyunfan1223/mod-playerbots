@@ -49,7 +49,7 @@ bool UseMeetingStoneAction::Execute(Event event)
 
     GameObjectTemplate const* goInfo = gameObject->GetGOInfo();
     if (!goInfo || goInfo->entry != 179944)
-		return false;
+        return false;
 
     return Teleport(master, bot);
 }
@@ -169,7 +169,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
     // Player* master = GetMaster();
     if (!summoner)
         return false;
-    
+
     if (player->GetVehicle())
     {
         botAI->TellError("You cannot summon me while I'm on a vehicle");

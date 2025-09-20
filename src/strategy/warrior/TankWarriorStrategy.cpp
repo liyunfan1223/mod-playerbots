@@ -114,7 +114,7 @@ void TankWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction::array(0, new NextAction("heroic throw on snare target", ACTION_INTERRUPT), nullptr)));
     triggers.push_back(new TriggerNode(
         "low health", NextAction::array(0, new NextAction("shield wall", ACTION_MEDIUM_HEAL), nullptr)));
-    triggers.push_back(new TriggerNode("critical health", 
+    triggers.push_back(new TriggerNode("critical health",
         NextAction::array(0, new NextAction("last stand", ACTION_EMERGENCY + 3),
                              new NextAction("enraged regeneration", ACTION_EMERGENCY + 2),
                                 nullptr)));

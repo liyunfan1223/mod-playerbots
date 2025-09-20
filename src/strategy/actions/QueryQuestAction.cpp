@@ -113,7 +113,7 @@ bool QueryQuestAction::Execute(Event event)
 void QueryQuestAction::TellObjectives(uint32 questId)
 {
     Quest const* questTemplate = sObjectMgr->GetQuestTemplate(questId);
-    
+
     // Checks if the questTemplate is valid
     if (!questTemplate)
     {

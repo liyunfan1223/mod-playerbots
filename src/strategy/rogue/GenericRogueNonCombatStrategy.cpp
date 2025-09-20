@@ -51,8 +51,8 @@ void GenericRogueNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
                         NextAction::array(0, new NextAction("use deadly poison on off hand", 19.0f), NULL)));
 
     // triggers.push_back(new TriggerNode(
-    // 	"off hand weapon no enchant",
-    // 	NextAction::array(0, new NextAction("use instant poison", 18.0f), NULL)));
+    //     "off hand weapon no enchant",
+    //     NextAction::array(0, new NextAction("use instant poison", 18.0f), NULL)));
 
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("unstealth", 30.0f), NULL)));
 }

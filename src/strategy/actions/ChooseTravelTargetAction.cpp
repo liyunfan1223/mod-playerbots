@@ -16,7 +16,7 @@ bool ChooseTravelTargetAction::Execute(Event event)
     //Get the current travel target. This target is no longer active.
     TravelTarget* oldTarget = context->GetValue<TravelTarget*>("travel target")->Get();
 
-    //Select a new target to travel to. 
+    //Select a new target to travel to.
     TravelTarget newTarget = TravelTarget(botAI);
 
     if (!oldTarget) return false;
@@ -146,7 +146,7 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
             foundTarget = SetBossTarget(newTarget);
         }
     }
-    
+
     //Do quests (start, do, end) 95% chance
     if (!foundTarget && urand(1, 100) > 5)
     {

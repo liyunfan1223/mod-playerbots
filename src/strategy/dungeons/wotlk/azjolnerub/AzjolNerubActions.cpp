@@ -25,7 +25,7 @@ bool AttackWebWrapAction::Execute(Event event)
     {
         return false;
     }
-    
+
     return Attack(webWrap);
 }
 

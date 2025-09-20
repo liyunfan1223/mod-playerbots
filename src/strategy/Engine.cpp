@@ -88,7 +88,7 @@ Engine::~Engine(void)
 void Engine::Reset()
 {
     strategyTypeMask = 0;
-    
+
     ActionNode* action = nullptr;
 
     while ((action = queue.Pop()) != nullptr)
@@ -154,7 +154,7 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
 
     uint32 iterations = 0;
     uint32 iterationsPerTick = queue.Size() * (minimal ? 2 : sPlayerbotAIConfig->iterationsPerTick);
-    
+
     while (++iterations <= iterationsPerTick)
     {
         basket = queue.Peek();

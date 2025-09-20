@@ -773,7 +773,7 @@ bool LootRollAction::Execute(Event event)
                     {
                         vote = PASS;
                     }
-                else 
+                else
                     {
                         vote = GREED;
                     }
@@ -1111,7 +1111,7 @@ static bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
 bool RollAction::Execute(Event event)
 {
     std::string link = event.getParam();
-    
+
     if (link.empty())
     {
         bot->DoRandomRoll(0,100);
@@ -1128,7 +1128,7 @@ bool RollAction::Execute(Event event)
     }
     std::string itemUsageParam;
     itemUsageParam = std::to_string(itemId);
-        
+
     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
     switch (proto->Class)
     {

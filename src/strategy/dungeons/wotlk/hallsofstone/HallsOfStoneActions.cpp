@@ -9,7 +9,7 @@ bool ShatterSpreadAction::Execute(Event event)
 
     float radius = 40.0f;
     Unit* closestMember = nullptr;
-    
+
     GuidVector members = AI_VALUE(GuidVector, "group members");
     for (auto& member : members)
     {
@@ -31,7 +31,7 @@ bool ShatterSpreadAction::Execute(Event event)
         // return MoveAway(closestMember, radius - bot->GetExactDist2d(closestMember));
         return MoveAway(closestMember, 5.0f);
     }
-    
+
     return false;
 }
 

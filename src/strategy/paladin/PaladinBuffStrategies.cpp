@@ -11,7 +11,7 @@ void PaladinBuffManaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("blessing of wisdom on party",
         NextAction::array(0, new NextAction("blessing of wisdom on party", 11.0f), NULL)));
-		
+
     triggers.push_back(new TriggerNode("blessing of kings on party",
         NextAction::array(0, new NextAction("blessing of kings on party", 10.5f), NULL)));
 }
@@ -85,7 +85,7 @@ void PaladinBuffThreatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
 }
 
 void PaladinBuffStatsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
-{					
+{
     // First Sanctuary (prio > Kings)
     triggers.push_back(
         new TriggerNode("blessing of sanctuary on party",
