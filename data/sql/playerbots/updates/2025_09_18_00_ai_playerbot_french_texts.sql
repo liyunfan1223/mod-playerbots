@@ -180,7 +180,7 @@ UPDATE `ai_playerbot_texts` SET `text_loc2`='Envie de rejoindre une guilde qui f
 UPDATE `ai_playerbot_texts` SET `text_loc2`='Quelqu’un farm la réputation %faction ?' WHERE `id`=178;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='Quelqu’un peut m’aider pour %faction ?' WHERE `id`=179;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='On fait des quêtes pour %faction ?' WHERE `id`=180;
-UPDATE `ai_playerbot_texts` SET `text_loc2`='%faction, c’est la crème de la crème. Paraît-il.' WHERE `id`=181;
+UPDATE `ai_playerbot_texts` SET `text_loc2`='%faction est la meilleur' WHERE `id`=181;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='Il me manque juste un tout petit peu pour être %rep_level avec %faction.' WHERE `id`=182;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='Quelqu’un est %rep_level avec %faction ?' WHERE `id`=183;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='Qui veut devenir %rep_level avec %faction ?' WHERE `id`=184;
@@ -299,7 +299,7 @@ UPDATE `ai_playerbot_texts` SET `text_loc2`='Les pensées automatiques, c’est 
 UPDATE `ai_playerbot_texts` SET `text_loc2`='L’esprit est plus malléable qu’on aimerait le croire.' WHERE `id`=297;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='Y’a des guildes pour leveling ?' WHERE `id`=298;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='brb' WHERE `id`=299;
-UPDATE `ai_playerbot_texts` SET `text_loc2`='Pourquoi la neige est blanche mais la glace est transparente ? Mystère.' WHERE `id`=300;
+UPDATE `ai_playerbot_texts` SET `text_loc2`='Pourquoi la neige est-elle blanche alors que la glace est transparente, alors qu’elles sont faites de la même chose ?' WHERE `id`=300;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='Pourquoi la crème fouettée est fluffy, mais pas la normale ?' WHERE `id`=301;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='Pourquoi les pieds sentent alors qu’ils n’ont pas de nez ?' WHERE `id`=302;
 UPDATE `ai_playerbot_texts` SET `text_loc2`='On dirait que la boîte à noobs vient de s’ouvrir.' WHERE `id`=303;
