@@ -58,6 +58,7 @@ public:
     static uint32 CalculateAvailableCharsPerAccount();
 
 private:
+    static void FixEmptyGuildEmblems(); // Corrects existing guilds whose 5 tabard fields are at 0
     std::string const CreateRandomBotName(NameRaceAndGender raceAndGender);
     static std::string const CreateRandomArenaTeamName();
 

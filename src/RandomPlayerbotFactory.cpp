@@ -15,6 +15,9 @@
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "Timer.h"
+#include "Guild.h"            // EmblemInfo::SaveToDB
+#include "Log.h"
+#include "GuildMgr.h"
 
 std::map<uint8, std::vector<uint8>> RandomPlayerbotFactory::availableRaces;
 
@@ -889,8 +892,10 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
                 availableLeaders.push_back(leader);
         }
     }
-
-    for (; guildNumber < sPlayerbotAIConfig->randomBotGuildCount; ++guildNumber)
+	
+    // Create up to randomBotGuildCount by counting only EFFECTIVE creations
+    uint32 createdThisRun = 0;
+    for (; guildNumber < sPlayerbotAIConfig->randomBotGuildCount; /* ++guildNumber -> done only if creation */)
     {
         std::string const guildName = CreateRandomGuildName();
         if (guildName.empty())
@@ -902,21 +907,29 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         if (availableLeaders.empty())
         {
             LOG_ERROR("playerbots", "No leaders for random guilds available");
-            continue;
+            break; // no more leaders: we can no longer progress without distorting the counter
         }
 
         uint32 index = urand(0, availableLeaders.size() - 1);
         ObjectGuid leader = availableLeaders[index];
+        availableLeaders.erase(availableLeaders.begin() + index); // Removes the chosen leader to avoid re-selecting it repeatedly
+
         Player* player = ObjectAccessor::FindPlayer(leader);
         if (!player)
         {
             LOG_ERROR("playerbots", "ObjectAccessor Cannot find player to set leader for guild {} . Skipped...",
                     guildName.c_str());
+            // we will try with other leaders in the next round (guildNumber is not incremented)
             continue;
         }
 
         if (player->GetGuildId())
+        {
+            // leader already in guild -> we don't advance the counter, we move on to the next one
             continue;
+        }
+
+        LOG_DEBUG("playerbots", "Creating guild name='{}' leader='{}'...", guildName.c_str(), player->GetName().c_str());
 
         Guild* guild = new Guild();
         if (!guild->Create(player, guildName))
@@ -929,6 +942,8 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
 
         sGuildMgr->AddGuild(guild);
 
+        LOG_DEBUG("playerbots", "Guild created: id={} name='{}'", guild->GetId(), guildName.c_str());
+
         // create random emblem
         uint32 st, cl, br, bc, bg;
         bg = urand(0, 51);
@@ -936,13 +951,41 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         cl = urand(0, 17);
         br = urand(0, 7);
         st = urand(0, 180);
-        EmblemInfo emblemInfo(st, cl, br, bc, bg);
-        guild->HandleSetEmblem(emblemInfo);
+
+        LOG_DEBUG("playerbots",
+                 "[TABARD] new guild id={} random -> style={}, color={}, borderStyle={}, borderColor={}, bgColor={}",
+                 guild->GetId(), st, cl, br, bc, bg);
+
+        // populate guild table with a random tabard design
+        CharacterDatabase.Execute(
+            "UPDATE guild SET EmblemStyle={}, EmblemColor={}, BorderStyle={}, BorderColor={}, BackgroundColor={} "
+            "WHERE guildid={}",
+            st, cl, br, bc, bg, guild->GetId());
+        LOG_DEBUG("playerbots", "[TABARD] UPDATE done for guild id={}", guild->GetId());
+
+        // Immediate reading for log
+        if (QueryResult qr = CharacterDatabase.Query(
+                "SELECT EmblemStyle,EmblemColor,BorderStyle,BorderColor,BackgroundColor FROM guild WHERE guildid={}",
+                guild->GetId()))
+        {
+            Field* f = qr->Fetch();
+            LOG_DEBUG("playerbots",
+                     "[TABARD] DB check guild id={} => style={}, color={}, borderStyle={}, borderColor={}, bgColor={}",
+                     guild->GetId(), f[0].Get<uint8>(), f[1].Get<uint8>(), f[2].Get<uint8>(), f[3].Get<uint8>(), f[4].Get<uint8>());
+        }	
 
         sPlayerbotAIConfig->randomBotGuilds.push_back(guild->GetId());
+        // The guild is only counted if it is actually created
+        ++guildNumber;
+        ++createdThisRun;
     }
 
-    LOG_INFO("playerbots", "{} random bot guilds available", guildNumber);
+    // Shows the true total and how many were created during this run
+    LOG_INFO("playerbots", "{} random bot guilds available (created this run: {})",
+             uint32(sPlayerbotAIConfig->randomBotGuilds.size()), createdThisRun);
+
+    // Post-processing: Fix existing guilds whose tabard is entirely at 0
+    FixEmptyGuildEmblems();
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomGuildName()
@@ -1085,6 +1128,47 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams(ArenaType type, uint32 count
     }
 
     LOG_DEBUG("playerbots", "{} random bot {}vs{} arena teams available", arenaTeamNumber, type, type);
+}
+
+// Fixes guilds already in the base whose tabard is entirely at 0
+void RandomPlayerbotFactory::FixEmptyGuildEmblems()
+{
+    uint32 scanned = 0;
+    uint32 fixed   = 0;
+
+    // Selects only guilds whose 5 tabard fields are at 0
+    if (QueryResult qr = CharacterDatabase.Query(
+            "SELECT guildid FROM guild "
+            "WHERE EmblemStyle=0 AND EmblemColor=0 AND BorderStyle=0 AND BorderColor=0 AND BackgroundColor=0"))
+    {
+        do
+        {
+            Field* f   = qr->Fetch();
+            uint32 gId = f[0].Get<uint32>();
+            ++scanned;
+
+           // Generates a random design consistent with the rest of the module
+            uint32 bg = urand(0, 51);
+            uint32 bc = urand(0, 17);
+            uint32 cl = urand(0, 17);
+            uint32 br = urand(0, 7);
+            uint32 st = urand(0, 180);
+
+            // Direct update in DB
+            CharacterDatabase.Execute(
+                "UPDATE guild SET EmblemStyle={}, EmblemColor={}, BorderStyle={}, BorderColor={}, BackgroundColor={} "
+                "WHERE guildid={}",
+                st, cl, br, bc, bg, gId);
+
+            ++fixed;
+            LOG_INFO("playerbots",
+                     "[TABARD-FIX] guild id={} -> style={}, color={}, borderStyle={}, borderColor={}, bgColor={}",
+                     gId, st, cl, br, bc, bg);
+        }
+        while (qr->NextRow());
+    }
+
+    LOG_INFO("playerbots", "[TABARD-FIX] scanned: {}, fixed: {}", scanned, fixed);
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomArenaTeamName()
