@@ -219,7 +219,7 @@ static void DebugRecipeRoll(Player* bot, ItemTemplate const* proto, ItemUsage us
         VoteTxt(before), VoteTxt(after), bot->GetItemCount(proto->ItemId, true));
 }
 
-// Maps a RECIPE subclass & item metadata to the SkillLine needed (when RequiredSkill is not set). In DBs, recipes normally have RequiredSkill filled; we keep this as a fallback.
+// Maps a RECIPE subclass & item metadata to the SkillLine needed (when RequiredSkill is not set). In DBs, recipes normally have RequiredSkill filled; we keep this as a fallback
 static uint32 GuessRecipeSkill(ItemTemplate const* proto)
 {
     if (!proto) return 0;
