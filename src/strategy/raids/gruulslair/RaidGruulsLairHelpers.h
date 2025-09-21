@@ -48,10 +48,10 @@ struct TankSpot
 
 namespace GruulsLairTankSpots 
 {
-	static const TankSpot Maulgar  = { 90.686f, 167.047f, -13.234f, 3.009f };
-	static const TankSpot Olm      = { 99.392f, 192.834f, -10.883f, 6.265f };
-	static const TankSpot Blindeye = { 100.728f, 206.389f, -10.514f, 6.218f };
-	static const TankSpot Gruul    = { 241.238f, 365.025f, -4.220f, 4.071f};
+    extern const TankSpot Maulgar;
+    extern const TankSpot Olm;
+    extern const TankSpot Blindeye;
+    extern const TankSpot Gruul;
 }
 
 #endif

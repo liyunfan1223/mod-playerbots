@@ -5,6 +5,14 @@
 #include "GroupReference.h"
 #include "Unit.h"
 
+namespace GruulsLairTankSpots 
+{
+	const TankSpot Maulgar  = { 90.686f, 167.047f, -13.234f, 3.009f };
+	const TankSpot Olm      = { 99.392f, 192.834f, -10.883f, 6.265f };
+	const TankSpot Blindeye = { 100.728f, 206.389f, -10.514f, 6.218f };
+	const TankSpot Gruul    = { 241.238f, 365.025f, -4.220f, 4.071f};
+}
+
 bool IsMageTank(PlayerbotAI* botAI, Player* bot)
 {
     Group* group = bot->GetGroup();

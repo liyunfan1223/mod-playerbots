@@ -936,7 +936,7 @@ bool GruulTheDragonkillerSpreadRangedAction::Execute(Event event)
         return false;
     }
 
-    static const TankSpot& tankSpot = GruulsLairTankSpots::Gruul;
+    const TankSpot& tankSpot = GruulsLairTankSpots::Gruul;
 
     if (initialPositions.find(bot->GetGUID()) == initialPositions.end())
     {
