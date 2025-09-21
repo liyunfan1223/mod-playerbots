@@ -2,6 +2,7 @@
 #include "RaidKarazhanActions.h"
 #include "RaidKarazhanHelpers.h"
 #include "AiObjectContext.h"
+#include "AttackAction.h"
 #include "DruidBearActions.h"
 #include "DruidCatActions.h"
 #include "WarriorActions.h"
@@ -14,18 +15,33 @@ static bool IsChargeAction(Action* action)
            dynamic_cast<CastFeralChargeCatAction*>(action);
 }
 
+float KarazhanBigBadWolfMultiplier::GetValue(Action* action)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "the big bad wolf");
+    if (!boss)
+        return 1.0f;
+
+    if (bot->HasAura(SPELL_LITTLE_RED_RIDING_HOOD))
+    {
+        if ((dynamic_cast<MovementAction*>(action) && !dynamic_cast<KarazhanBigBadWolfRunAwayAction*>(action)) || 
+           (dynamic_cast<AttackAction*>(action)))
+            return 0.0f;
+    }
+    return 1.0f;
+}
+
 float KarazhanShadeOfAranMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "shade of aran");
     if (!boss)
         return 1.0f;
 
-    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_ARCANE_EXPLOSION)) 
+    if (boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_ARCANE_EXPLOSION)) 
     {
         if (IsChargeAction(action))
             return 0.0f;
 
-        if (dynamic_cast<MovementAction*>(action) || IsChargeAction(action))
+        if (dynamic_cast<MovementAction*>(action))
         {
             const float safeDistance = 20.0f;
             if (bot->GetDistance2d(boss) >= safeDistance)

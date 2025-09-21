@@ -39,6 +39,15 @@ public:
     bool isUseful() override;
 };
 
+class KarazhanBigBadWolfPositionBossAction : public MovementAction
+{
+public:
+    KarazhanBigBadWolfPositionBossAction(PlayerbotAI* botAI, std::string const name = "karazhan big bad wolf position boss") : MovementAction(botAI, name) {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 class KarazhanBigBadWolfRunAwayAction : public MovementAction
 {
 public:

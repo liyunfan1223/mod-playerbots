@@ -8,6 +8,30 @@
 #include "Position.h"
 #include "Spell.h"
 
+const Position KARAZHAN_MAIDEN_OF_VIRTUE_BOSS_POSITION = Position(-10945.881f, -2103.782f, 92.712f);
+const Position KARAZHAN_MAIDEN_OF_VIRTUE_RANGED_POSITION[8] =
+{
+    { -10931.178f, -2116.580f, 92.179f },
+    { -10925.828f, -2102.425f, 92.180f },
+    { -10933.089f, -2088.5017f, 92.180f },
+    { -10947.59f, -2082.8147f, 92.180f },
+    { -10960.912f, -2090.4368f, 92.179f },
+    { -10966.017f, -2105.288f, 92.175f },
+    { -10959.242f, -2119.6172f, 92.180f },
+    { -10944.495f, -2123.857f, 92.180f },
+};
+
+const Position KARAZHAN_BIG_BAD_WOLF_BOSS_POSITION = Position(-10913.391f, -1773.508f, 90.477f);
+const Position KARAZHAN_BIG_BAD_WOLF_RUN_POSITION[4] = 
+{
+    { -10875.456f, -1779.036f, 90.477f },
+    { -10872.281f, -1751.638f, 90.477f },
+    { -10910.492f, -1747.401f, 90.477f },    
+    { -10913.391f, -1773.508f, 90.477f },
+};
+
+const Position KARAZHAN_THE_CURATOR_BOSS_POSITION = Position(-11139.463f, -1884.645f, 165.765f);
+
 void RaidKarazhanHelpers::MarkTargetWithSkull(Unit* target)
 {
     if (!target)

@@ -16,6 +16,7 @@ public:
         creators["karazhan maiden of virtue position boss"] = &RaidKarazhanActionContext::karazhan_maiden_of_virtue_position_boss;
         creators["karazhan maiden of virtue position ranged"] = &RaidKarazhanActionContext::karazhan_maiden_of_virtue_position_ranged;
 
+        creators["karazhan big bad wolf position boss"] = &RaidKarazhanActionContext::karazhan_big_bad_wolf_position_boss;
         creators["karazhan big bad wolf run away"] = &RaidKarazhanActionContext::karazhan_big_bad_wolf_run_away;
 
         creators["karazhan romulo and julianne mark target"] = &RaidKarazhanActionContext::karazhan_romulo_and_julianne_mark_target;
@@ -52,6 +53,7 @@ private:
     static Action* karazhan_maiden_of_virtue_position_boss(PlayerbotAI* botAI) { return new KarazhanMaidenOfVirtuePositionBossAction(botAI); }
     static Action* karazhan_maiden_of_virtue_position_ranged(PlayerbotAI* botAI) { return new KarazhanMaidenOfVirtuePositionRangedAction(botAI); }
 
+    static Action* karazhan_big_bad_wolf_position_boss(PlayerbotAI* botAI) { return new KarazhanBigBadWolfPositionBossAction(botAI); }
     static Action* karazhan_big_bad_wolf_run_away(PlayerbotAI* botAI) { return new KarazhanBigBadWolfRunAwayAction(botAI); }
 
     static Action* karazhan_romulo_and_julianne_mark_target(PlayerbotAI* botAI) { return new KarazhanRomuloAndJulianneMarkTargetAction(botAI); }
