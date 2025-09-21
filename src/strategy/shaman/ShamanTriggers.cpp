@@ -121,9 +121,10 @@ bool SpiritWalkTrigger::IsActive()
 // Fires the trigger if at least 2 of the totem slots are empty or out of range.
 bool CallOfTheElementsTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    if (!bot->HasSpell(66842))
+    if (!botAI->CanCastSpell(SPELL_CALL_OF_THE_ELEMENTS, bot, true))
+    {
         return false;
+    }
 
     int emptyCount = 0;
     static const uint8 slots[] = {SUMMON_SLOT_TOTEM_EARTH, SUMMON_SLOT_TOTEM_FIRE, SUMMON_SLOT_TOTEM_WATER,
@@ -132,16 +133,32 @@ bool CallOfTheElementsTrigger::IsActive()
     for (uint8 slot : slots)
     {
         ObjectGuid guid = bot->m_SummonSlot[slot];
+        bool possibleEmpty = false;
+
         if (guid.IsEmpty())
         {
-            ++emptyCount;
+            possibleEmpty = true;
+        }
+        else
+        {
+            Creature* totem = bot->GetMap()->GetCreature(guid);
+            if (!totem || totem->GetDistance(bot) > 30.0f)
+            {
+                possibleEmpty = true;
+            }
+        }
+
+        if (!possibleEmpty)
+        {
             continue;
         }
 
-        Creature* totem = bot->GetMap()->GetCreature(guid);
-        if (!totem || totem->GetDistance(bot) > 30.0f)
+        if ((slot == SUMMON_SLOT_TOTEM_EARTH && bot->HasSpell(SPELL_STONESKIN_TOTEM_RANK_1)) ||
+            (slot == SUMMON_SLOT_TOTEM_FIRE && bot->HasSpell(SPELL_SEARING_TOTEM_RANK_1)) ||
+            (slot == SUMMON_SLOT_TOTEM_WATER && bot->HasSpell(SPELL_HEALING_STREAM_TOTEM_RANK_1)) ||
+            (slot == SUMMON_SLOT_TOTEM_AIR && bot->HasSpell(SPELL_NATURE_RESISTANCE_TOTEM_RANK_1)))
         {
-            ++emptyCount;
+            emptyCount++;
         }
     }
 
@@ -191,37 +208,33 @@ bool TotemicRecallTrigger::IsActive()
         }
     }
 
+    ObjectGuid guid = bot->m_SummonSlot[SUMMON_SLOT_TOTEM_WATER];
+    if (!guid.IsEmpty())
     {
-        ObjectGuid guid = bot->m_SummonSlot[SUMMON_SLOT_TOTEM_WATER];
-        if (!guid.IsEmpty())
-        {
-            Creature* totem = bot->GetMap()->GetCreature(guid);
-            uint32 currentSpell = 0;
-            if (totem)
-                currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        Creature* totem = bot->GetMap()->GetCreature(guid);
+        uint32 currentSpell = 0;
+        if (totem)
+            currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
 
-            for (size_t i = 0; i < MANA_TIDE_TOTEM_COUNT; ++i)
-            {
-                if (currentSpell == MANA_TIDE_TOTEM[i] && totem && totem->GetDistance(bot) <= 30.0f)
-                    return false;
-            }
+        for (size_t i = 0; i < MANA_TIDE_TOTEM_COUNT; ++i)
+        {
+            if (currentSpell == MANA_TIDE_TOTEM[i] && totem && totem->GetDistance(bot) <= 30.0f)
+                return false;
         }
     }
 
+    guid = bot->m_SummonSlot[SUMMON_SLOT_TOTEM_FIRE];
+    if (!guid.IsEmpty())
     {
-        ObjectGuid guid = bot->m_SummonSlot[SUMMON_SLOT_TOTEM_FIRE];
-        if (!guid.IsEmpty())
-        {
-            Creature* totem = bot->GetMap()->GetCreature(guid);
-            uint32 currentSpell = 0;
-            if (totem)
-                currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        Creature* totem = bot->GetMap()->GetCreature(guid);
+        uint32 currentSpell = 0;
+        if (totem)
+            currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
 
-            for (size_t i = 0; i < FIRE_ELEMENTAL_TOTEM_COUNT; ++i)
-            {
-                if (currentSpell == FIRE_ELEMENTAL_TOTEM[i] && totem && totem->GetDistance(bot) <= 30.0f)
-                    return false;
-            }
+        for (size_t i = 0; i < FIRE_ELEMENTAL_TOTEM_COUNT; ++i)
+        {
+            if (currentSpell == FIRE_ELEMENTAL_TOTEM[i] && totem && totem->GetDistance(bot) <= 30.0f)
+                return false;
         }
     }
 
@@ -409,7 +422,7 @@ bool NoAirTotemTrigger::IsActive()
 
 bool SetTotemTrigger::IsActive()
 {
-    if (!bot->HasSpell(66842))
+    if (!bot->HasSpell(SPELL_CALL_OF_THE_ELEMENTS))
         return false;
     if (!bot->HasSpell(requiredSpellId))
         return false;
