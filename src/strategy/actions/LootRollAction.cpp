@@ -25,6 +25,8 @@
 #include "SpellMgr.h"
 #include "SkillDiscovery.h"
 #include "Log.h"
+#include <array>
+#include "AiObjectContext.h"
 
 // Groups the "class + archetype" info in the same place
 struct SpecTraits
@@ -45,6 +47,7 @@ struct SpecTraits
     bool isRogue      = false;
     bool isWarrior    = false;
 	bool isRetPal     = false;
+	bool isProtPal    = false;
 };
 
 static SpecTraits GetSpecTraits(Player* bot)
@@ -62,6 +65,7 @@ static SpecTraits GetSpecTraits(Player* bot)
     // Paladin
     const bool holyPal  = (t.cls == CLASS_PALADIN && specIs("holy"));
     const bool protPal  = (t.cls == CLASS_PALADIN && (specIs("prot") || specIs("protection")));
+    t.isProtPal         = protPal;
 	t.isRetPal          = (t.cls == CLASS_PALADIN && !holyPal && !protPal);
     // DK
     const bool dk       = (t.cls == CLASS_DEATH_KNIGHT);
@@ -127,6 +131,150 @@ static bool HasAnyStat(ItemTemplate const* proto,
     }
     return false;
 }
+
+// SPECIAL ITEMS PRIORITY PATERNS //
+// "Priority" players for items example: Items with INT+AP (Ret / Hunter / Enh)
+static bool GroupHasPreferredIntApUser(Player* self)
+{
+    if (!self) return false;
+    Group* g = self->GetGroup();
+    if (!g) return false;
+    for (GroupReference* it = g->GetFirstMember(); it; it = it->next())
+    {
+        Player* p = it->GetSource();
+        if (!p || !p->IsInWorld() || p == self) continue;
+        if (!GET_PLAYERBOT_AI(p)) continue; // IGNORE humans: only bots are considered
+        SpecTraits t = GetSpecTraits(p);
+        const bool isProtPal = t.isProtPal || (t.cls == CLASS_PALADIN && t.isTank); // fallback
+        if (t.isRetPal || isProtPal || t.cls == CLASS_HUNTER || t.isEnhSham)
+        {
+            LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP group check: prioritaire présent -> {} (spec='{}')",
+                      p->GetName(), t.spec);
+            return true;
+        }
+    }
+    LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP group check: aucun prioritaire bot présent");	
+    return false;
+}
+
+// Helper: Is there a priority "likely" to NEED (upgrade/equipable)?
+static bool GroupHasPreferredIntApUserLikelyToNeed(Player* self, ItemTemplate const* proto)
+{
+    Group* g = self ? self->GetGroup() : nullptr;
+    if (!g || !proto) return false;
+
+    for (GroupReference* it = g->GetFirstMember(); it; it = it->next())
+    {
+        Player* p = it->GetSource();
+        if (!p || !p->IsInWorld() || p == self) continue;
+
+        // ignore all real player
+        PlayerbotAI* pai = GET_PLAYERBOT_AI(p);
+        if (!pai) continue;
+
+        SpecTraits t = GetSpecTraits(p);
+        const bool isProtPal   = t.isProtPal || (t.cls == CLASS_PALADIN && t.isTank);
+        const bool isPreferred = t.isRetPal || isProtPal || t.cls == CLASS_HUNTER || t.isEnhSham;
+        if (!isPreferred) continue;
+
+        // Estimate if the priority bot will NEED (plausible upgrade).
+        AiObjectContext* ctx = pai->GetAiObjectContext();
+        std::string param = std::to_string(proto->ItemId);
+        ItemUsage usage = ctx->GetValue<ItemUsage>("item usage", param)->Get();
+
+        LOG_DEBUG("playerbots",
+                  "[LootPaternDBG] INT+AP likely-to-need: {} (spec='{}') usage={} (EQUIP=1 REPLACE=2) itemId={}",
+                  p->GetName(), t.spec, (int)usage, proto->ItemId);
+
+        if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP)
+        {
+            LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP likely-to-need: {} -> TRUE", p->GetName());
+            return true;  // a priority bot will probably NEED
+        }
+    }
+    LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP likely-to-need: aucun prioritaire bot en position de NEED");
+    return false;
+}
+
+// --- Registry "stat patterns" (currently: INT+AP only)
+struct StatPattern
+{
+    const char* name;
+    bool (*matches)(ItemTemplate const* proto);
+    bool (*decide)(Player* bot, ItemTemplate const* proto, const SpecTraits& traits, bool& outPrimary);
+};
+
+// Pattern INT + AP
+static bool Match_IntAndAp(ItemTemplate const* proto)
+{
+    if (!proto) return false;
+    const bool hasINT = HasAnyStat(proto, { ITEM_MOD_INTELLECT });
+    const bool hasAP  = HasAnyStat(proto, { ITEM_MOD_ATTACK_POWER, ITEM_MOD_RANGED_ATTACK_POWER });
+    const bool match = hasINT && hasAP;
+    LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP match? {} -> item={} \"{}\"",
+              match ? "YES" : "NO", proto->ItemId, proto->Name1);
+    return match;
+}
+
+// Decision: Ret/Hunter/Enh -> primary; non-caster physiques -> not primary, casters -> primary only if no priority in the group.
+static bool Decide_IntAndAp(Player* bot, ItemTemplate const* proto, const SpecTraits& traits, bool& outPrimary)
+{
+    LOG_DEBUG("playerbots", "[LootPaternDBG] patterns: evaluation bot={} item={} \"{}\"",
+              bot->GetName(), proto->ItemId, proto->Name1);
+    const bool isProtPal = traits.isProtPal || (traits.cls == CLASS_PALADIN && traits.isTank); // fallback
+    if (traits.isRetPal || isProtPal || traits.cls == CLASS_HUNTER || traits.isEnhSham)
+    {
+        outPrimary = true;
+        LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP decide: {} (spec='{}') prioritaire -> primary=1",
+                  bot->GetName(), traits.spec);		
+        return true;
+    }
+    if (!traits.isCaster)
+    {
+        outPrimary = false;
+        LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP decide: {} (spec='{}') physique non-caster -> primary=0",
+                  bot->GetName(), traits.spec);		
+        return true;
+    }
+    // Casters: primary if no priority present
+    if (!GroupHasPreferredIntApUser(bot))
+    {
+        outPrimary = true;
+        LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP decide: {} (spec='{}') caster, aucun prioritaire -> primary=1",
+                  bot->GetName(), traits.spec);
+        return true;
+    }
+    // or if there are no "likely NEED" priorities
+    outPrimary = !GroupHasPreferredIntApUserLikelyToNeed(bot, proto);
+    LOG_DEBUG("playerbots", "[LootPaternDBG] INT+AP decide: {} (spec='{}') caster, prioritaires présents -> primary={}",
+              bot->GetName(), traits.spec, (int)outPrimary);	
+    return true;
+}
+
+// List of active patterns (only INT+AP for now)
+static const std::array<StatPattern, 1> kStatPatterns = { {
+    { "INT+AP", &Match_IntAndAp, &Decide_IntAndAp },
+} };
+
+static bool ApplyStatPatternsForPrimary(Player* bot, ItemTemplate const* proto, const SpecTraits& traits, bool& outPrimary)
+{
+    for (const auto& p : kStatPatterns)
+    {
+        if (p.matches(proto))
+        {
+            if (p.decide(bot, proto, traits, outPrimary))
+            {
+                LOG_DEBUG("playerbots", "[LootPaternDBG] pattern={} primary={} bot={} item={} \"{}\"",
+                          p.name, (int)outPrimary, bot->GetName(), proto->ItemId, proto->Name1);
+                return true;
+            }
+        }
+    }
+    LOG_DEBUG("playerbots", "[LootPaternDBG] patterns: aucun pattern applicable bot={} item={} \"{}\"",
+              bot->GetName(), proto->ItemId, proto->Name1);
+    return false;
+}
+// END SPECIAL STUFF //
 
 // Encode "random enchant" parameter for CalculateRollVote / ItemUsage
 // >0 => randomPropertyId, <0 => randomSuffixId, 0 => none
@@ -211,7 +359,7 @@ static void DebugRecipeRoll(Player* bot, ItemTemplate const* proto, ItemUsage us
                             RollVote before, RollVote after)
 {
     LOG_DEBUG("playerbots",
-        "[LootDBG] {} JC:{} item:{} \"{}\" class={} sub={} bond={} usage={} "
+        "[LootPaternDBG] {} JC:{} item:{} \"{}\" class={} sub={} bond={} usage={} "
         "recipeChecked={} useful={} known={} reqSkill={} reqRank={} botRank={} vote:{} -> {} dupCount={}",
         bot->GetName(), bot->GetSkillValue(SKILL_JEWELCRAFTING),
         proto->ItemId, proto->Name1, proto->Class, proto->SubClass, proto->Bonding, (int)usage,
@@ -219,7 +367,7 @@ static void DebugRecipeRoll(Player* bot, ItemTemplate const* proto, ItemUsage us
         VoteTxt(before), VoteTxt(after), bot->GetItemCount(proto->ItemId, true));
 }
 
-// Maps a RECIPE subclass & item metadata to the SkillLine needed (when RequiredSkill is not set). In DBs, recipes normally have RequiredSkill filled; we keep this as a fallback
+// Maps a RECIPE subclass & item metadata to the SkillLine needed (when RequiredSkill is not set). In DBs, recipes normally have RequiredSkill filled; we keep this as a fallback.
 static uint32 GuessRecipeSkill(ItemTemplate const* proto)
 {
     if (!proto) return 0;
@@ -434,6 +582,11 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
     // Do NOT tag all shields as "tank": there are caster shields (INT/SP/MP5)
     const bool hasBlockValue = HasAnyStat(proto, { ITEM_MOD_BLOCK_VALUE });
     const bool looksTank = hasDef || hasAvoid || hasBlockValue;
+
+    // ----- Modulable Hook for special patterns exemple: (Items with Inter+AP)
+    bool primaryByPattern = false;
+    if (ApplyStatPatternsForPrimary(bot, proto, traits, primaryByPattern))
+        return primaryByPattern;
 
     // Non-tanks (DPS, casters/heals) never NEED purely tank items
     if (!isTankLikeSpec && looksTank)
@@ -696,7 +849,7 @@ bool LootRollAction::Execute(Event event)
         if (!proto)
             continue;
 
-        LOG_DEBUG("playerbots", "[LootDBG] start bot={} item={} \"{}\" class={} q={} lootMethod={} enchSkill={} rp={}",
+        LOG_DEBUG("playerbots", "[LootRoolDBG] start bot={} item={} \"{}\" class={} q={} lootMethod={} enchSkill={} rp={}",
                  bot->GetName(), itemId, proto->Name1, proto->Class, proto->Quality,
                  (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING), randomProperty);
         		 
@@ -710,7 +863,7 @@ bool LootRollAction::Execute(Event event)
         }
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
 
-        LOG_DEBUG("playerbots", "[LootDBG] usage={} (EQUIP=1 REPLACE=2 BAD_EQUIP=8 DISENCHANT=13)", (int)usage);
+        LOG_DEBUG("playerbots", "[LootRoolDBG] usage={} (EQUIP=1 REPLACE=2 BAD_EQUIP=8 DISENCHANT=13)", (int)usage);
         
         // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), but no other items have class bits and epic quality.
         // - CanBotUseToken(proto, bot) => NEED
@@ -744,7 +897,7 @@ bool LootRollAction::Execute(Event event)
         {
             // Lets CalculateRollVote decide (includes SmartNeedBySpec, BoE/BoU, unique, cross-armor)
             vote = CalculateRollVote(proto, randomProperty);
-			LOG_DEBUG("playerbots", "[LootDBG] after CalculateRollVote: vote={}", RollVoteToText(vote));
+			LOG_DEBUG("playerbots", "[LootRoolDBG] after CalculateRollVote: vote={}", RollVoteToText(vote));
         }
 
         // Disenchant (Need-Before-Greed):
@@ -753,13 +906,13 @@ bool LootRollAction::Execute(Event event)
             group && (group->GetLootMethod() == NEED_BEFORE_GREED || group->GetLootMethod() == GROUP_LOOT) &&			
             bot->HasSkill(SKILL_ENCHANTING) && IsLikelyDisenchantable(proto))
         {
-            LOG_DEBUG("playerbots", "[LootDBG] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)",
+            LOG_DEBUG("playerbots", "[LootRoolDBG] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)",
                      RollVoteToText(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING));
 			vote = DISENCHANT;
         }
         else
         {
-            LOG_DEBUG("playerbots", "[LootDBG] no DE: vote={} lootMethod={} enchSkill={} deOK={}",
+            LOG_DEBUG("playerbots", "[LootRoolDBG] no DE: vote={} lootMethod={} enchSkill={} deOK={}",
                      RollVoteToText(vote), (int)group->GetLootMethod(),
                      bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
         }
@@ -790,7 +943,7 @@ bool LootRollAction::Execute(Event event)
         RollVote sent = vote;
         if (group->GetLootMethod() == MASTER_LOOT || group->GetLootMethod() == FREE_FOR_ALL)
             sent = PASS;
-		LOG_DEBUG("playerbots", "[LootDBG] send vote={} (lootMethod={} Lvl={}) -> guid={} itemId={}",
+		LOG_DEBUG("playerbots", "[LootPaternDBG] send vote={} (lootMethod={} Lvl={}) -> guid={} itemId={}",
                  RollVoteToText(sent), (int)group->GetLootMethod(),
                  sPlayerbotAIConfig->lootRollLevel, guid.ToString(), itemId);
 		 
@@ -1040,7 +1193,7 @@ bool MasterLootRollAction::Execute(Event event)
     if (!group)
         return false;
 	
-	LOG_DEBUG("playerbots", "[LootDBG][ML] start bot={} item={} \"{}\" class={} q={} lootMethod={} enchSkill={} rp={}",
+	LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] start bot={} item={} \"{}\" class={} q={} lootMethod={} enchSkill={} rp={}",
              bot->GetName(), itemId, proto->Name1, proto->Class, proto->Quality,
              (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING), randomPropertyId);
 
@@ -1071,13 +1224,13 @@ bool MasterLootRollAction::Execute(Event event)
         (group->GetLootMethod() == NEED_BEFORE_GREED || group->GetLootMethod() == GROUP_LOOT) &&		
         bot->HasSkill(SKILL_ENCHANTING) && IsLikelyDisenchantable(proto))
     {
-        LOG_DEBUG("playerbots", "[LootDBG][ML] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)",
+        LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)",
                  RollVoteToText(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING));
 		vote = DISENCHANT;
     }
     else
     {
-        LOG_DEBUG("playerbots", "[LootDBG][ML] no DE: vote={} lootMethod={} enchSkill={} deOK={}",
+        LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] no DE: vote={} lootMethod={} enchSkill={} deOK={}",
                  RollVoteToText(vote), (int)group->GetLootMethod(),
                  bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
     }
@@ -1086,7 +1239,7 @@ bool MasterLootRollAction::Execute(Event event)
     if (group->GetLootMethod() == MASTER_LOOT || group->GetLootMethod() == FREE_FOR_ALL)
         sent = PASS;
 	
-	LOG_DEBUG("playerbots", "[LootDBG][ML] vote={} -> sent={} lootMethod={} enchSkill={} deOK={}",
+	LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] vote={} -> sent={} lootMethod={} enchSkill={} deOK={}",
              RollVoteToText(vote), RollVoteToText(sent), (int)group->GetLootMethod(),
              bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
 		 
