@@ -116,18 +116,11 @@ bool SetTotemAction::isUseful()
         return true; // No totem assigned
 
     // Find the highest rank the bot knows
-    uint32 highestKnown = 0;
     for (int i = (int)totemSpellIdsCount - 1; i >= 0; --i)
     {
         if (bot->HasSpell(totemSpellIds[i]))
-        {
-            highestKnown = totemSpellIds[i];
-            break;
-        }
+            return button->GetAction() != totemSpellIds[i];
     }
-    if (!highestKnown)
-        return false; // Bot doesn't know any valid rank
-
-    // Only consider the bar set if the highest rank is assigned
-    return button->GetAction() != highestKnown;
+    // Bot doesn't know any valid rank
+    return false;
 }
