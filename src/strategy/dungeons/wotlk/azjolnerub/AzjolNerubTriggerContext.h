@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "AzjolNerubTriggers.h"
 
-class WotlkDungeonANTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonANTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonANTriggerContext()

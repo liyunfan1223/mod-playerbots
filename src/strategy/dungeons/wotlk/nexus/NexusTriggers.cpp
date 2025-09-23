@@ -7,7 +7,7 @@ bool FactionCommanderWhirlwindTrigger::IsActive()
 {
     Unit* boss = nullptr;
     uint8 faction = bot->GetTeamId();
-    
+
     switch (bot->GetMap()->GetDifficulty())
     {
         case DUNGEON_DIFFICULTY_NORMAL:

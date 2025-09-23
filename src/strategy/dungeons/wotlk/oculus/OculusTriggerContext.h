@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "OculusTriggers.h"
 
-class WotlkDungeonOccTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonOccTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonOccTriggerContext()

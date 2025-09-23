@@ -21,6 +21,7 @@
 #        THRESHOLDS
 #        QUESTS
 #        COMBAT
+#        PALADIN BUFFS STRATEGIES
 #        CHEATS
 #        SPELLS
 #        FLIGHTPATH
@@ -459,6 +460,24 @@ AiPlayerbot.FleeingEnabled = 1
 ####################################################################################################
 
 ####################################################################################################
+# PALADIN BUFFS STRATEGIES
+#
+#
+
+# Min group size to use Greater buffs (Paladin, Mage, Druid)
+# Default: 3
+AiPlayerbot.MinBotsForGreaterBuff = 3
+
+# Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff
+# Default: 30
+AiPlayerbot.RPWarningCooldown = 30
+
+#
+#
+#
+####################################################################################################
+
+####################################################################################################
 # CHEATS
 #
 #
@@ -488,21 +507,21 @@ AiPlayerbot.AutoGearQualityLimit = 3
 # Max iLVL Phase 1(Kara, Gruul, Mag) = 125 | Phase 1.5(ZA) = 138 | Phase 2(SC, TK) = 141 | Phase 3(Hyjal, BT) = 156 | Phase 4(Sunwell) = 164
 # Wotlk
 # Max iLVL Tier 7(10/25) = 200/213 | Tier 8(10/25) = 225/232 | Tier 9(10/25) = 232/245 | Tier 10(10/25/HC) = 251/264/290
-# Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290 
+# Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290
 # Default: 0 (no limit)
 AiPlayerbot.AutoGearScoreLimit = 0
 
 # Enable/Disable cheats for bots
 # "food" (bots eat or drink without using food or drinks from their inventory)
 # "gold" (bots have infinite gold)
-# "health" (bots have infinite health)
+# "health" (bots immediately regenerate lost health)
 # "mana" (bots have infinite mana)
 # "power" (bots have infinite energy, rage, and runic power)
-# "taxi" (bots may use all flight paths, though they will not actually learn them) 
-# "raid" (bots use cheats implemented into raid strategies) 
+# "taxi" (bots may use all flight paths, though they will not actually learn them)
+# "raid" (bots use cheats implemented into raid strategies)
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,raid,taxi")
 # Default: taxi and raid are enabled
-AiPlayerbot.BotCheats = "food,taxi,raid" 
+AiPlayerbot.BotCheats = "food,taxi,raid"
 
 #
 #
@@ -652,7 +671,7 @@ AiPlayerbot.RandomGearQualityLimit = 3
 # Max iLVL Phase 1(Kara, Gruul, Mag) = 125 | Phase 1.5(ZA) = 138 | Phase 2(SC, TK) = 141 | Phase 3(Hyjal, BT) = 156 | Phase 4(Sunwell) = 164
 # Wotlk
 # Max iLVL Tier 7(10/25) = 200/213 | Tier 8(10/25) = 225/232 | Tier 9(10/25) = 232/245 | Tier 10(10/25/HC) = 251/264/290
-# Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290 
+# Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290
 # Default: 0 (no limit)
 AiPlayerbot.RandomGearScoreLimit = 0
 
@@ -761,7 +780,7 @@ AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 #
 
 # Quest that will be completed and rewarded for all randombots
-AiPlayerbot.RandomBotQuestIds = "7848,3802,5505,6502,7761,10277,10285,11492,24499,24511,24710,24712"
+AiPlayerbot.RandomBotQuestIds = "7848,3802,5505,6502,7761,10277,10285,11492,13188,13189,24499,24511,24710,24712"
 
 # Randombots will group with nearby randombots to do shared quests
 AiPlayerbot.RandomBotGroupNearby = 0
@@ -1430,11 +1449,11 @@ AiPlayerbot.PremadeSpecGlyph.7.0 = 41536,43385,41532,43386,44923,45776
 AiPlayerbot.PremadeSpecLink.7.0.60 = 4530001520213351102301351
 AiPlayerbot.PremadeSpecLink.7.0.80 = 3530001523213351322301351-005050031
 AiPlayerbot.PremadeSpecName.7.1 = enh pve
-AiPlayerbot.PremadeSpecGlyph.7.1 = 41542,43385,41539,43386,44923,45771
-AiPlayerbot.PremadeSpecLink.7.1.60 = -30205033005001333031131131051
-AiPlayerbot.PremadeSpecLink.7.1.80 = 053030052-30205033005021333031131131051
+AiPlayerbot.PremadeSpecGlyph.7.1 = 41530,43385,41539,43386,44923,45771
+AiPlayerbot.PremadeSpecLink.7.1.60 = -30305003105021333031121131051
+AiPlayerbot.PremadeSpecLink.7.1.80 = 053030152-30305003105021333031131131051
 AiPlayerbot.PremadeSpecName.7.2 = resto pve
-AiPlayerbot.PremadeSpecGlyph.7.2 = 41517,43385,41527,43386,44923,45775
+AiPlayerbot.PremadeSpecGlyph.7.2 = 41527,43385,41517,43386,44923,45775
 AiPlayerbot.PremadeSpecLink.7.2.60 = --50005301235310501102321251
 AiPlayerbot.PremadeSpecLink.7.2.80 = -00502033-50005331335310501122331251
 AiPlayerbot.PremadeSpecName.7.3 = ele pvp
@@ -1998,11 +2017,11 @@ AiPlayerbot.AllowedLogFiles = ""
 ####################################################################################################
 # A list of gameObject GUID's that are not allowed for bots to interact with.
 #
-AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,165739,165738,175245,175970,176325,176327,123329
+AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,165739,165738,175245,175970,176325,176327,123329,2560
 #
 # List of GUID's:
 # QuestItems:
-# 176213 = Blood of Heroes, 17155 = Defias Gunpowder, 2656 = Waterlogged Envelope, 123329 = Baelogs Chest
+# 176213 = Blood of Heroes, 17155 = Defias Gunpowder, 2656 = Waterlogged Envelope, 123329 = Baelogs Chest, 2560 = Half-Buried Bottle
 # Chests:
 # Large Solid Chest = 74448, Box of Assorted Parts = 19020, Food Crate = 3719, Water Barrel = 3658, Barrel of Milk = 3705, Barrel of sweet Nectar = 3706, Tattered Chest = 105579, Large bettered Chest = 75293, Solid Chest = 2857, Battered Foodlocker = 179490, Witch Doctor's Chest = 141596, Relic Coffer = 160836, Dark Coffer = 160845, Fengus's Chest = 179516, Supply Crate = 176224/181085, Malor's Strongbox = 176112
 # Other:

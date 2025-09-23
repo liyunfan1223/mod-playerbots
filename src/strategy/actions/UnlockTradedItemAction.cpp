@@ -66,7 +66,7 @@ bool UnlockTradedItemAction::CanUnlockItem(Item* item)
             else
             {
                 std::ostringstream out;
-                out << "Lockpicking skill too low (" << botSkill << "/" << requiredSkill << ") to unlock: " 
+                out << "Lockpicking skill too low (" << botSkill << "/" << requiredSkill << ") to unlock: "
                     << item->GetTemplate()->Name1;
                 botAI->TellMaster(out.str());
             }

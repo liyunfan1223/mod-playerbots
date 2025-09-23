@@ -67,14 +67,14 @@ bool BuyAction::Execute(Event event)
             calculator.SetOverflowPenalty(false);
 
             std::sort(m_items_sorted.begin(), m_items_sorted.end(),
-                [&calculator](VendorItem* i, VendorItem* j) 
+                [&calculator](VendorItem* i, VendorItem* j)
                 {
                     ItemTemplate const* item1 = sObjectMgr->GetItemTemplate(i->item);
                     ItemTemplate const* item2 = sObjectMgr->GetItemTemplate(j->item);
-    
+
                     if (!item1 || !item2)
                         return false;
-                
+
                     float score1 = calculator.CalculateItem(item1->ItemId);
                     float score2 = calculator.CalculateItem(item2->ItemId);
 
@@ -88,19 +88,19 @@ bool BuyAction::Execute(Event event)
                 });
 
             std::unordered_map<uint32, float> bestPurchasedItemScore;  // Track best item score per InventoryType
-            
+
             for (auto& tItem : m_items_sorted)
             {
                 uint32 maxPurchases = 1;  // Default to buying once
                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
                 if (!proto)
                     continue;
-            
+
                 if (proto->Class == ITEM_CLASS_CONSUMABLE || proto->Class == ITEM_CLASS_PROJECTILE)
                 {
                     maxPurchases = 10;  // Allow up to 10 purchases if it's a consumable or projectile
                 }
-            
+
                 for (uint32 i = 0; i < maxPurchases; i++)
                 {
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);

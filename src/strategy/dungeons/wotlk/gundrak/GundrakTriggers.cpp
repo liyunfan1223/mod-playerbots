@@ -7,7 +7,7 @@ bool SladranPoisonNovaTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "slad'ran");
     if (!boss) { return false; }
-    
+
     return bool(boss->FindCurrentSpellBySpellId(SPELL_POISON_NOVA));
 }
 

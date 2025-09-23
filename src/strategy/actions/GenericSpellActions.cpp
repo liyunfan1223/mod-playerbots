@@ -5,6 +5,8 @@
 
 #include "GenericSpellActions.h"
 
+#include <ctime>
+
 #include "Event.h"
 #include "ItemTemplate.h"
 #include "ObjectDefines.h"
@@ -13,6 +15,14 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "WorldPacket.h"
+#include "Group.h"
+#include "Chat.h"
+#include "Language.h"
+#include "GenericBuffUtils.h"
+#include "PlayerbotAI.h"
+
+using ai::buff::MakeAuraQualifierForBuff;
+using ai::buff::UpgradeToGroupIfAppropriate;
 
 CastSpellAction::CastSpellAction(PlayerbotAI* botAI, std::string const spell)
     : Action(botAI, spell), range(botAI->GetRange("spell")), spell(spell)
@@ -216,10 +226,23 @@ Value<Unit*>* CurePartyMemberAction::GetTargetValue()
     return context->GetValue<Unit*>("party member to dispel", dispelType);
 }
 
+// Make Bots Paladin, druid, mage use the greater buff rank spell
+// TODO Priest doen't verify il he have components
 Value<Unit*>* BuffOnPartyAction::GetTargetValue()
 {
-    return context->GetValue<Unit*>("party member without aura", spell);
+    return context->GetValue<Unit*>("party member without aura", MakeAuraQualifierForBuff(spell));
 }
+
+bool BuffOnPartyAction::Execute(Event event)
+{
+    std::string castName = spell; // default = mono
+
+    auto SendGroupRP = ai::chat::MakeGroupAnnouncer(bot);
+    castName = ai::buff::UpgradeToGroupIfAppropriate(bot, botAI, castName, /*announceOnMissing=*/true, SendGroupRP);
+
+    return botAI->CastSpell(castName, GetTarget());
+}
+// End greater buff fix
 
 CastShootAction::CastShootAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shoot")
 {
@@ -299,14 +322,14 @@ bool CastVehicleSpellAction::Execute(Event event)
 bool UseTrinketAction::Execute(Event event)
 {
     Item* trinket1 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1);
-    
+
     if (trinket1 && UseTrinket(trinket1))
         return true;
 
     Item* trinket2 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2);
     if (trinket2 && UseTrinket(trinket2))
         return true;
-    
+
     return false;
 }
 
@@ -336,7 +359,7 @@ bool UseTrinketAction::UseTrinket(Item* item)
 
             if (!spellInfo || !spellInfo->IsPositive())
                 return false;
-            
+
             bool applyAura = false;
             for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
             {
@@ -346,12 +369,12 @@ bool UseTrinketAction::UseTrinket(Item* item)
                     break;
                 }
             }
-            
+
             if (!applyAura)
                 return false;
-            
+
             uint32 spellProcFlag = spellInfo->ProcFlags;
-            
+
             // Handle items with procflag "if you kill a target that grants honor or experience"
             // Bots will "learn" the trinket proc, so CanCastSpell() will be true
             // e.g. on Item https://www.wowhead.com/wotlk/item=44074/oracle-talisman-of-ablution leading to

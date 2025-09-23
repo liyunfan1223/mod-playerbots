@@ -64,7 +64,7 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(
         new TriggerNode("group heal setting",
-                        NextAction::array(0, 
+                        NextAction::array(0,
                             new NextAction("prayer of mending on party", ACTION_MEDIUM_HEAL + 9),
                             new NextAction("circle of healing on party", ACTION_MEDIUM_HEAL + 8), nullptr)));
 
@@ -77,7 +77,7 @@ void HolyHealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode(
         "party member critical health",
-        NextAction::array(0, 
+        NextAction::array(0,
                           new NextAction("guardian spirit on party", ACTION_CRITICAL_HEAL + 6),
                           new NextAction("power word: shield on party", ACTION_CRITICAL_HEAL + 5),
                           new NextAction("prayer of mending on party", ACTION_CRITICAL_HEAL + 3),

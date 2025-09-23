@@ -105,7 +105,7 @@ void DpsPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // nullptr)));
     triggers.push_back(
         new TriggerNode("low mana", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH + 5), nullptr)));
-    
+
     triggers.push_back(new TriggerNode(
         "avenging wrath", NextAction::array(0, new NextAction("avenging wrath", ACTION_HIGH + 2), nullptr)));
     // triggers.push_back(new TriggerNode("sanctity aura", NextAction::array(0, new NextAction("sanctity aura", 90.0f),

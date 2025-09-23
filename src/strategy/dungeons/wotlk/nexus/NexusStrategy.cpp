@@ -10,7 +10,7 @@ void WotlkDungeonNexStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode("faction commander whirlwind",
         NextAction::array(0, new NextAction("move from whirlwind", ACTION_MOVE + 5), nullptr)));
     // TODO: Handle fear? (tremor totems, fear ward etc.)
-    
+
     // Grand Magus Telestra
     triggers.push_back(new TriggerNode("telestra firebomb",
         NextAction::array(0, new NextAction("firebomb spread", ACTION_MOVE + 5), nullptr)));
@@ -21,7 +21,7 @@ void WotlkDungeonNexStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // Anomalus
     triggers.push_back(new TriggerNode("chaotic rift",
         NextAction::array(0, new NextAction("chaotic rift target", ACTION_RAID + 1), nullptr)));
-    
+
     // Ormorok the Tree-Shaper
     // Tank trigger to stack inside boss. Can also add return action to prevent boss repositioning
     // if it becomes too much of a problem. He usually dies before he's up against a wall though

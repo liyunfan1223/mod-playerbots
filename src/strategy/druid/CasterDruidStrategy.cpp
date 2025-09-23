@@ -133,7 +133,7 @@ void CasterDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                        NextAction::array(0, new NextAction("starfire", ACTION_DEFAULT + 0.2f), nullptr)));
     triggers.push_back(new TriggerNode("eclipse (solar) cooldown",
                                        NextAction::array(0, new NextAction("wrath", ACTION_DEFAULT + 0.2f), nullptr)));
-                                       
+
     triggers.push_back(new TriggerNode(
         "insect swarm", NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), nullptr)));
     triggers.push_back(

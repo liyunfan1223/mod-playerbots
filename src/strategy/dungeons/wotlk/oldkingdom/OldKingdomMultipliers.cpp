@@ -41,7 +41,7 @@ float JedogaShadowseekerMultiplier::GetValue(Action* action)
             break;
         }
     }
-    
+
     if (volunteer)
     {
         if (dynamic_cast<DpsAssistAction*>(action))

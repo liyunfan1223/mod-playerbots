@@ -69,7 +69,7 @@ class VigilanceTrigger : public BuffOnPartyTrigger
 public:
     VigilanceTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "vigilance") {}
 
-    bool IsActive() override; 
+    bool IsActive() override;
 };
 
 class ShatteringThrowTrigger : public Trigger

@@ -73,6 +73,6 @@ bool DeathAndDecayCooldownTrigger::IsActive()
     uint32 spellId = AI_VALUE2(uint32, "spell id", name);
     if (!spellId)
         return true;
-    
+
     return bot->GetSpellCooldownDelay(spellId) >= 2000;
 }

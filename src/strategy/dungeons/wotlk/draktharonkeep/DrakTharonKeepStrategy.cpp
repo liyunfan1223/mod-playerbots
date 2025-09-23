@@ -7,7 +7,7 @@ void WotlkDungeonDTKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // Trollgore
     triggers.push_back(new TriggerNode("corpse explode",
         NextAction::array(0, new NextAction("corpse explode spread", ACTION_MOVE + 5), nullptr)));
-    
+
     // Novos the Summoner
     // TODO: Can be improved - it's a pretty easy fight but complex to program, revisit if needed
     triggers.push_back(new TriggerNode("arcane field",
@@ -16,7 +16,7 @@ void WotlkDungeonDTKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("novos positioning", ACTION_MOVE + 4), nullptr)));
     triggers.push_back(new TriggerNode("arcane field",
         NextAction::array(0, new NextAction("novos target priority", ACTION_NORMAL + 1), nullptr)));
-    
+
     // King Dred
     // TODO: Fear ward / tremor totem, or general anti-fear strat development
 

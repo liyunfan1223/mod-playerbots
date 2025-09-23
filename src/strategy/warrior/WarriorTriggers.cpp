@@ -19,7 +19,7 @@ bool VigilanceTrigger::IsActive()
     {
         return false;
     }
-    
+
     Group* group = bot->GetGroup();
     if (!group)
     {

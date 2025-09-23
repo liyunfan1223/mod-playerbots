@@ -7,7 +7,7 @@
 #define _PLAYERBOT_BEASTMASTERYHUNTERSTRATEGY_H
 
 #include "GenericHunterStrategy.h"
-#include "CombatStrategy.h" 
+#include "CombatStrategy.h"
 
 class PlayerbotAI;
 

@@ -475,7 +475,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
 
     Player* master = botAI->GetMaster();
-	if (master)
+    if (master)
     {
         ObjectGuid masterGuid = master->GetGUID();
         if (master->GetGroup() && !master->GetGroup()->IsLeader(masterGuid))
@@ -499,7 +499,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
                 }
             }
 
-			// Don't disband alt groups when master goes away
+            // Don't disband alt groups when master goes away
             // Controlled by config
             if (sPlayerbotAIConfig->KeepAltsInGroup())
             {
@@ -1130,18 +1130,18 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         int8 gender = -1; // -1 = gender will be random
         if (genderArg)
         {
-        	std::string g = genderArg;
-        	std::transform(g.begin(), g.end(), g.begin(), ::tolower);
-        
-        	if (g == "male" || g == "0")
-        		gender = GENDER_MALE; // 0
-        	else if (g == "female" || g == "1")
-        		gender = GENDER_FEMALE; // 1
-        	else
-        	{
-        		messages.push_back("Unknown gender : " + g + " (male/female/0/1)");
-        		return messages;
-        	}
+            std::string g = genderArg;
+            std::transform(g.begin(), g.end(), g.begin(), ::tolower);
+
+            if (g == "male" || g == "0")
+                gender = GENDER_MALE; // 0
+            else if (g == "female" || g == "1")
+                gender = GENDER_FEMALE; // 1
+            else
+            {
+                messages.push_back("Unknown gender : " + g + " (male/female/0/1)");
+                return messages;
+            }
         } //end
 
         if (claz == 6 && master->GetLevel() < sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL))
@@ -1155,7 +1155,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         {
             // If the user requested a specific gender, skip any character that doesn't match.
             if (gender != -1 && GetOfflinePlayerGender(guid) != gender)
-                continue;			
+                continue;
             if (botLoading.find(guid) != botLoading.end())
                 continue;
             if (ObjectAccessor::FindConnectedPlayer(guid))
