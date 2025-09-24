@@ -9,6 +9,7 @@
 #include "Totem.h"
 #include "PlayerbotAI.h"
 #include "Action.h"
+#include <sstream>
 
 bool CastTotemAction::isUseful()
 {
@@ -87,13 +88,25 @@ bool CastSpiritWalkAction::Execute(Event event)
     return false;
 }
 
+bool CastCallOfTheElementsAction::Execute(Event event)
+{
+    const bool ok = CastSpellAction::Execute(event);
+    if (ok)
+    {
+        std::ostringstream msg;
+        msg << "[totem] Call of the Elements Launched";
+        botAI->TellMasterNoFacing(msg.str());
+    }
+    return ok;
+}
+
 // Set Strategy Assigned Totems (Actions) - First, it checks
 // the highest-rank spell the bot knows for each totem type,
 // then adds it to the Call of the Elements bar.
 
 bool SetTotemAction::Execute(Event event)
 {
-    size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
+    /*size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
 
     uint32 totemSpell = 0;
     for (int i = spellIdsCount - 1; i >= 0; --i)
@@ -107,5 +120,34 @@ bool SetTotemAction::Execute(Event event)
     if (!totemSpell)
         return false;
     bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
+    return true;*/
+	
+    // Pick the highest-rank spell the bot knows (arrays are sorted from highest to lowest rank)
+    uint32 totemSpell = 0;
+    for (size_t i = 0; i < totemSpellIdsCount; ++i)
+    {
+        if (bot->HasSpell(totemSpellIds[i]))
+        {
+            totemSpell = totemSpellIds[i];
+            break;
+        }
+    }
+    if (!totemSpell)
+    {
+        // Debug: no known rank for this totem family
+        std::ostringstream msg;
+        msg << "[totem] No known rank for " << getName()
+            << " among " << totemSpellIdsCount
+            << " ids; level=" << static_cast<uint32>(bot->GetLevel());
+        botAI->TellMasterNoFacing(msg.str());
+        return false;
+    }
+    bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
+    // Debug: report which spell id was assigned
+    {
+        std::ostringstream msg;
+        msg << "[totem] Affects to the bar (" << actionButtonId << ") -> spell id " << totemSpell;
+        botAI->TellMasterNoFacing(msg.str());
+    }
     return true;
 }

@@ -431,7 +431,8 @@ bool SetTotemTrigger::IsActive()
     if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
         return true;
 
-    size_t totemSpellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
+    /*size_t totemSpellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
+    for (size_t i = 0; i < totemSpellIdsCount; ++i)*/
     for (size_t i = 0; i < totemSpellIdsCount; ++i)
     {
         if (button->GetAction() == totemSpellIds[i])
