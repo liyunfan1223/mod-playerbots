@@ -10,7 +10,6 @@ public:
     RaidGruulsLairActionContext()
     {
         // High King Maulgar
-        creators["high king maulgar remove tank assist"] = &RaidGruulsLairActionContext::high_king_maulgar_remove_tank_assist;
         creators["high king maulgar maulgar tank"] = &RaidGruulsLairActionContext::high_king_maulgar_maulgar_tank;
         creators["high king maulgar olm tank"] = &RaidGruulsLairActionContext::high_king_maulgar_olm_tank;
         creators["high king maulgar blindeye tank"] = &RaidGruulsLairActionContext::high_king_maulgar_blindeye_tank;
@@ -30,7 +29,6 @@ public:
 
 private:
     // High King Maulgar
-    static Action* high_king_maulgar_remove_tank_assist(PlayerbotAI* botAI) { return new HighKingMaulgarRemoveTankAssistAction(botAI); }
     static Action* high_king_maulgar_maulgar_tank(PlayerbotAI* botAI) { return new HighKingMaulgarMaulgarTankAction(botAI); }
     static Action* high_king_maulgar_olm_tank(PlayerbotAI* botAI) { return new HighKingMaulgarOlmTankAction(botAI); }
     static Action* high_king_maulgar_blindeye_tank(PlayerbotAI* botAI) { return new HighKingMaulgarBlindeyeTankAction(botAI); }

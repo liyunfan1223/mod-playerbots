@@ -1,9 +1,10 @@
 #include "RaidGruulsLairMultipliers.h"
 #include "RaidGruulsLairActions.h"
 #include "RaidGruulsLairHelpers.h"
-#include "GenericSpellActions.h"
+#include "ChooseTargetActions.h"
 #include "DruidBearActions.h"
 #include "DruidCatActions.h"
+#include "GenericSpellActions.h"
 #include "HunterActions.h"
 #include "MageActions.h"
 #include "WarriorActions.h"
@@ -19,10 +20,15 @@ static bool IsChargeAction(Action* action)
 float HighKingMaulgarMultiplier::GetValue(Action* action)
 {
     Unit* maulgar = AI_VALUE2(Unit*, "find target", "high king maulgar");
+    if (IsAnyOgreBossAlive(botAI) && dynamic_cast<TankAssistAction*>(action))
+    {
+        return 0.0f;
+    }
     if (maulgar && maulgar->HasAura(SPELL_AURA_WHIRLWIND) && IsChargeAction(action))
     {
         return 0.0f;
     }
+
     Unit* krosh = AI_VALUE2(Unit*, "find target", "krosh firehand");
     Unit* target = AI_VALUE(Unit*, "current target");
     if (krosh && target && target->GetGUID() == krosh->GetGUID())

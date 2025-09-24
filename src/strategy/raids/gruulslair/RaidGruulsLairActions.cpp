@@ -4,35 +4,6 @@
 #include "SpellAuras.h"
 #include "Unit.h"
 
-bool HighKingMaulgarRemoveTankAssistAction::Execute(Event event)
-{
-    if (!botAI->IsTank(bot))
-    {
-        return false;
-    }
-
-    Unit* maulgar  = AI_VALUE2(Unit*, "find target", "high king maulgar");
-    Unit* kiggler  = AI_VALUE2(Unit*, "find target", "kiggler the crazed");
-    Unit* krosh    = AI_VALUE2(Unit*, "find target", "krosh firehand");
-    Unit* olm      = AI_VALUE2(Unit*, "find target", "olm the summoner");
-    Unit* blindeye = AI_VALUE2(Unit*, "find target", "blindeye the seer");
-
-    bool maulgarEncounterActive = (maulgar  && maulgar->IsInCombat()) ||
-                                  (kiggler  && kiggler->IsInCombat()) ||
-                                  (krosh    && krosh->IsInCombat()) ||
-                                  (olm      && olm->IsInCombat()) ||
-                                  (blindeye && blindeye->IsInCombat());
-
-    if (maulgarEncounterActive && botAI->HasStrategy("tank assist", BOT_STATE_COMBAT))
-    {
-        botAI->ChangeStrategy("-tank assist", BOT_STATE_COMBAT);
-        {
-        return true;
-        }
-    }
-    return false;
-}
-
 bool HighKingMaulgarMaulgarTankAction::Execute(Event event)
 {
     if (!IsMaulgarTank(botAI, bot))
@@ -812,10 +783,10 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
         return false;
     }
 
+    Unit* olm = AI_VALUE2(Unit*, "find target", "olm the summoner");
     Unit* kiggler = AI_VALUE2(Unit*, "find target", "kiggler the crazed");
-    Unit* krosh = AI_VALUE2(Unit*, "find target", "krosh firehand");
+    Player* olmTank = nullptr;
     Player* moonkinTank = nullptr;
-    Player* mageTank = nullptr;
 
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
@@ -824,13 +795,35 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
         {
             continue;
         }
+        if (IsOlmTank(botAI, member)) olmTank = member;
         if (IsMoonkinTank(botAI, member)) moonkinTank = member;
-        if (IsMageTank(botAI, member)) mageTank = member;
     }
 
     switch (hunterIndex)
     {
         case 0:
+        if (olm && olm->GetHealth() > 0.98f * olm->GetMaxHealth() && olmTank && olmTank->IsAlive())
+        {
+            if (botAI->CanCastSpell("misdirection", olmTank))
+            {
+                botAI->CastSpell("misdirection", olmTank);
+            }
+
+            if (!bot->HasAura(SPELL_AURA_MISDIRECTION))
+            {
+                return false;
+            }
+
+            if (botAI->CanCastSpell("steady shot", olm))
+            {
+                botAI->CastSpell("steady shot", olm);
+            }
+            
+            return false;
+        }
+        break;
+
+        case 1:
         if (kiggler && kiggler->GetHealth() > 0.98f * kiggler->GetMaxHealth() && moonkinTank && moonkinTank->IsAlive())
         {
             if (botAI->CanCastSpell("misdirection", moonkinTank))
@@ -843,24 +836,14 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
                 return false;
             }
 
-            botAI->CastSpell("steady shot", kiggler);
-            return true;
+            if (botAI->CanCastSpell("steady shot", kiggler))
+            {
+                botAI->CastSpell("steady shot", kiggler);
+            }
+            
+            return false;
         }
         break;
-
-        case 1:
-            if (krosh && krosh->IsAlive() && krosh->GetHealth() > 0.98f * krosh->GetMaxHealth() && mageTank && mageTank->IsAlive())
-            {
-                if (botAI->CanCastSpell("misdirection", mageTank))
-                    botAI->CastSpell("misdirection", mageTank);
-
-                if (!bot->HasAura(SPELL_AURA_MISDIRECTION))
-                    return false;
-
-                botAI->CastSpell("steady shot", krosh);
-                return true;
-            }
-            break;
             
         default:
             break;

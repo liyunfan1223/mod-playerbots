@@ -4,7 +4,6 @@
 void RaidGruulsLairStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("high king maulgar", NextAction::array(0,
-        new NextAction("high king maulgar remove tank assist", ACTION_RAID + 3),
         new NextAction("high king maulgar hunter misdirection", ACTION_RAID + 3),
         new NextAction("high king maulgar banish felstalker", ACTION_RAID + 3),
         new NextAction("high king maulgar maulgar tank", ACTION_RAID + 2),

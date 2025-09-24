@@ -1,16 +1,32 @@
 #include "RaidGruulsLairHelpers.h"
 #include "AiFactory.h"
-#include "PlayerbotAI.h"
+#include "AiObjectContext.h"
 #include "Group.h"
 #include "GroupReference.h"
+#include "PlayerbotAI.h"
 #include "Unit.h"
 
 namespace GruulsLairTankSpots 
 {
-	const TankSpot Maulgar  = { 90.686f, 167.047f, -13.234f, 3.009f };
-	const TankSpot Olm      = { 99.392f, 192.834f, -10.883f, 6.265f };
-	const TankSpot Blindeye = { 100.728f, 206.389f, -10.514f, 6.218f };
-	const TankSpot Gruul    = { 241.238f, 365.025f, -4.220f, 4.071f};
+	static const TankSpot Maulgar  = { 90.686f, 167.047f, -13.234f, 3.009f };
+	static const TankSpot Olm      = { 99.392f, 192.834f, -10.883f, 6.265f };
+	static const TankSpot Blindeye = { 100.728f, 206.389f, -10.514f, 6.218f };
+	static const TankSpot Gruul    = { 241.238f, 365.025f, -4.220f, 4.071f};
+}
+
+bool IsAnyOgreBossAlive(PlayerbotAI* botAI)
+{
+    Unit* maulgar = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "high king maulgar")->Get();
+    Unit* kiggler = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "kiggler the crazed")->Get();
+    Unit* krosh = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "krosh firehand")->Get();
+    Unit* olm = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "olm the summoner")->Get();
+    Unit* blindeye = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "blindeye the seer")->Get();
+
+    return (maulgar && maulgar->IsAlive()) ||
+           (kiggler && kiggler->IsAlive()) ||
+           (krosh && krosh->IsAlive()) ||
+           (olm && olm->IsAlive()) ||
+           (blindeye && blindeye->IsAlive());
 }
 
 bool IsMageTank(PlayerbotAI* botAI, Player* bot)

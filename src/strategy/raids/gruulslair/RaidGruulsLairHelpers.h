@@ -31,6 +31,7 @@ inline constexpr int8 circleIcon = RtiTargetValue::circleIndex;
 inline constexpr int8 diamondIcon = RtiTargetValue::diamondIndex;
 inline constexpr int8 triangleIcon = RtiTargetValue::triangleIndex;
 
+bool IsAnyOgreBossAlive(PlayerbotAI* botAI);
 bool IsMaulgarTank(PlayerbotAI* botAI, Player* bot);
 bool IsOlmTank(PlayerbotAI* botAI, Player* bot);
 bool IsBlindeyeTank(PlayerbotAI* botAI, Player* bot);
@@ -39,7 +40,6 @@ bool IsMoonkinTank(PlayerbotAI* botAI, Player* bot);
 bool IsPositionSafe(PlayerbotAI* botAI, Unit* bot, Position pos);
 Position FindSafePosition(PlayerbotAI* botAI, Unit* bot, Unit* target, float optimalDistance);
 
-// Gruul's Lair tanking spots (X, Y, Z)
 struct TankSpot 
 {
 	float x, y, z;

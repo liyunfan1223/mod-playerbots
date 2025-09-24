@@ -5,14 +5,6 @@
 #include "AttackAction.h"
 #include "MovementActions.h"
 
-class HighKingMaulgarRemoveTankAssistAction : public Action
-{
-public:
-    HighKingMaulgarRemoveTankAssistAction(PlayerbotAI* botAI, std::string const name = "high king maulgar remove tank assist") : Action(botAI, name) {};
-
-    bool Execute(Event event) override;
-};
-
 class HighKingMaulgarMaulgarTankAction : public AttackAction
 {
 public:
