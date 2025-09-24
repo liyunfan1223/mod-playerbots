@@ -847,8 +847,20 @@ void RandomPlayerbotFactory::CreateRandomBots()
             sPlayerbotAIConfig->randomBotAccounts.size(), totalRandomBotChars);
 }
 
+// Idempotence guard: ensure CreateRandomGuilds() runs only once per process
+namespace {
+    bool s_randomGuildsInitialized = false;
+}
+
 void RandomPlayerbotFactory::CreateRandomGuilds()
 {
+    // Early return to avoid re-running the routine
+    if (s_randomGuildsInitialized)
+    {
+        LOG_INFO("playerbots", "CreateRandomGuilds already executed once, skipping.");
+        return;
+    }
+
     std::vector<uint32> randomBots;
 
     PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_BOT);
@@ -986,6 +998,9 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
 
     // Post-processing: Fix existing guilds whose tabard is entirely at 0
     FixEmptyGuildEmblems();
+
+    // Mark as done once everything finished successfully
+    s_randomGuildsInitialized = true;
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomGuildName()
