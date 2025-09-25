@@ -10,6 +10,7 @@
 #include "PlayerbotAI.h"
 #include "Action.h"
 #include <sstream>
+#include "Log.h"
 
 bool CastTotemAction::isUseful()
 {
@@ -93,9 +94,7 @@ bool CastCallOfTheElementsAction::Execute(Event event)
     const bool ok = CastSpellAction::Execute(event);
     if (ok)
     {
-        std::ostringstream msg;
-        msg << "[totem] Call of the Elements Launched";
-        botAI->TellMasterNoFacing(msg.str());
+        LOG_DEBUG("playerbots", "[Totem] Call of the Elements cast");
     }
     return ok;
 }
@@ -105,23 +104,7 @@ bool CastCallOfTheElementsAction::Execute(Event event)
 // then adds it to the Call of the Elements bar.
 
 bool SetTotemAction::Execute(Event event)
-{
-    /*size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
-
-    uint32 totemSpell = 0;
-    for (int i = spellIdsCount - 1; i >= 0; --i)
-    {
-        if (bot->HasSpell(totemSpellIds[i]))
-        {
-            totemSpell = totemSpellIds[i];
-            break;
-        }
-    }
-    if (!totemSpell)
-        return false;
-    bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
-    return true;*/
-	
+{	
     // Pick the highest-rank spell the bot knows (arrays are sorted from highest to lowest rank)
     uint32 totemSpell = 0;
     for (size_t i = 0; i < totemSpellIdsCount; ++i)
@@ -134,20 +117,14 @@ bool SetTotemAction::Execute(Event event)
     }
     if (!totemSpell)
     {
-        // Debug: no known rank for this totem family
-        std::ostringstream msg;
-        msg << "[totem] No known rank for " << getName()
-            << " among " << totemSpellIdsCount
-            << " ids; level=" << static_cast<uint32>(bot->GetLevel());
-        botAI->TellMasterNoFacing(msg.str());
+        LOG_DEBUG("playerbots", "[Totem] No known rank for {} (count={}, level={})",
+                 getName(), totemSpellIdsCount, static_cast<uint32>(bot->GetLevel()));
         return false;
     }
     bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
     // Debug: report which spell id was assigned
     {
-        std::ostringstream msg;
-        msg << "[totem] Affects to the bar (" << actionButtonId << ") -> spell id " << totemSpell;
-        botAI->TellMasterNoFacing(msg.str());
+    LOG_DEBUG("playerbots", "[Totem] Bind slot {} -> spellId={}", actionButtonId, totemSpell);
     }
     return true;
 }
