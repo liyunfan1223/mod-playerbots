@@ -25,18 +25,60 @@ static bool isFishingPole(const Item* item)
         proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE;
 }
 
-bool HasWater(Player* bot, float x, float y, float z) 
+bool HasWater(float x, float y, float z Map* map, uint32 phaseMask) 
 {
-    Map* map = bot->GetMap();
-    uint32 phaseMask = bot->GetPhaseMask();
     if (!map)
         return false;
 
     LiquidData const& liq = map->GetLiquidData(phaseMask, x, y, z, DEFAULT_COLLISION_HEIGHT, MAP_ALL_LIQUIDS);
     return (liq.Entry != 0 && liq.Level > liq.DepthLevel);
 }
-WorldPosition FindWater(Player* bot, float x, float y, float z, uint32 mapId,
-                                       float minDistance, float maxDistance, float increment, bool findLand = false) 
+
+WorldPosition FindWaterLinear(Player* bot,   float startDistance, float endDsistance, float increment, bool findLand = false, WorldPosition targetPos = nullptr) 
+{
+    float orientation = bot->GetOrientation();
+    
+    if (targetPos)
+        orientation = bot->GetAngle(targetPos.GetPositionX(), targetPos.GetPositionY());
+
+    float x = bot->GetPositionX();
+    float y = bot->GetPositionY();
+    float z = bot->GetPositionZ();
+    Map* map = bot->GetMap();
+    uint32 phaseMask = bot->GetPhaseMask();
+    if (increment < 0.0f)
+    {
+        for (float dist = startDistance; dist >= endDsistance; dist += increment) 
+        {
+            float checkX = x + dist * cos(orientation);
+            float checkY = y + dist * sin(orientation);
+            bool isWater = HasWater(checkX, checkY, z, map, phaseMask);
+            if (findLand ? !isWater : isWater)
+            {
+                return WorldPosition(checkX, checkY, z);
+            }
+            
+        }
+    }
+    else
+    {
+        for (float dist = startDistance; dist <= endDsistance; dist += increment) 
+        {
+            float checkX = x + dist * cos(orientation);
+            float checkY = y + dist * sin(orientation);
+            bool isWater = HasWater(checkX, checkY, z, map, phaseMask);
+            if (findLand ? !isWater : isWater)
+            {
+                return WorldPosition(checkX, checkY, z);
+            }
+            
+        }
+    }
+
+    return WorldPosition();
+}
+
+WorldPosition FindWaterRadial(Player* bot, float x, float y, float z, Map* map, uint32 phaseMask, float minDistance, float maxDistance, float increment, bool findLand = false) 
 {
     const int numDirections = 16;
     std::vector<WorldPosition> boundaryPoints;
@@ -49,7 +91,7 @@ WorldPosition FindWater(Player* bot, float x, float y, float z, uint32 mapId,
             float checkX = x + cos(angle) * dist;
             float checkY = y + sin(angle) * dist;
                 
-            bool isWater = HasWater(bot, checkX, checkY, z);
+            bool isWater = HasWater(checkX, checkY, z, map, phaseMask);
             if (findLand ? !isWater : isWater)
             {
                 boundaryPoints.push_back(WorldPosition(checkX, checkY, z));
@@ -70,11 +112,8 @@ WorldPosition FindWater(Player* bot, float x, float y, float z, uint32 mapId,
     return boundaryPoints[midIndex];
 }
 
-
-WorldPosition FindFishingSpot(PlayerbotAI* botAI) 
+WorldPosition FindFishingNode(PlayerbotAI* botAI) 
 {
-    // Check for fishing Nodes first.
-    Player* player = botAI->GetBot();
     GuidVector gos = PAI_VALUE(GuidVector, "nearest game objects no los"); 
     for (const auto& guid : gos)
     {
@@ -86,33 +125,37 @@ WorldPosition FindFishingSpot(PlayerbotAI* botAI)
                 return WorldPosition(go->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ());
             }
     }
+    return WorldPosition();
+}
+
+
+WorldPosition FindFishingSpot(PlayerbotAI* botAI) 
+{
+    // Check for fishing Nodes first.
+    Player* player = botAI->GetBot();
 
     // Face the Master direction if facing water. 
     if (Player* master = botAI->GetMaster()) 
     {
-        float x = master->GetPositionX();
-        float y = master->GetPositionY();
-        float z = master->GetPositionZ();
-        uint32 mapId = master->GetMapId();
-        float orientation = master->GetOrientation();
-        for (float dist = 1.0f; dist <= 20.0f; dist += 1.0f) 
-        {
-            float checkX = x + dist * cos(orientation);
-            float checkY = y + dist * sin(orientation);
-            bool isWater = HasWater(player, checkX, checkY, z);
-            if (isWater)
-                return WorldPosition(checkX, checkY, z);
-        }
+        return FindWaterLinear(master, 1.0f, 20.0f, 1.0f, false);
     }
-    return FindWater(player, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), 5.0f, 20.0f, 1.0f, false);
+    return FindWaterRadial(player, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(), 5.0f, 20.0f, 1.0f, false);
 }
 
 bool MoveToFishAction::Execute(Event event)
 {
-    WorldPosition FishSpot = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 0.0f, sPlayerbotAIConfig->fishingDistance, 2.5f, false);
+    WorldPosition fishNode = FindFishingNode(botAI);
+    if (fishNode.GetPositionX() != 0.0f && fishNode.GetPositionY() != 0.0f)
+    {
+        WorldPosition LandSpot = FindWaterLinear(bot, 1.0f,20.0f, 2.5f, true, fishNode);
+        if(LandSpot.GetPositionX() != 0.0f && LandSpot.GetPositionY() != 0.0f)
+            return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
+    }
+    
+    WorldPosition FishSpot = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 0.0f, sPlayerbotAIConfig->fishingDistance, 2.5f, false);
     if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
     {
-        WorldPosition LandSpot = FindWater(bot, FishSpot.GetPositionX(), FishSpot.GetPositionY(), FishSpot.GetPositionZ(), FishSpot.GetMapId(), 0.0f,10.0f, 1.0f, true);
+        WorldPosition LandSpot = FindWaterLinear(bot, 1.0f,20.0f, 2.5f, true, FishSpot);
         if(LandSpot.GetPositionX() != 0.0f && LandSpot.GetPositionY() != 0.0f)
             return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
     }
@@ -124,7 +167,7 @@ bool MoveToFishAction::isUseful()
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
         return false;
     
-    WorldPosition nearwater = FindWater(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 5.0f, 20.0f, 2.5f, false);
+    WorldPosition nearwater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 5.0f, 20.0f, 2.5f, false);
     if (nearwater.GetPositionX() != 0.0f && nearwater.GetPositionY() != 0.0f)
         {
             return false;
@@ -213,40 +256,37 @@ bool EquipFishingPoleAction::isUseful()
 
 bool FishingAction::Execute(Event event)
 {
-
-    float orientation = bot->GetOrientation();
     bool facingWater = false;
-    float x = bot->GetPositionX();
-    float y = bot->GetPositionY();
-    float z = bot->GetPositionZ();
-    for (float dist = 1.0f; dist <= 20.0f; dist += 1.0f) 
+    WorldPosition fishingNode = FindFishingNode(botAI);
+    if (fishingNode.GetPositionX() != 0.0f && fishingNode.GetPositionY() != 0.0f)
     {
-        float checkX = x + dist * cos(orientation);
-        float checkY = y + dist * sin(orientation);
-        bool isWater = HasWater(bot, checkX, checkY, z);
-        if(isWater)
-        {
+        if (bot->HasInArc(3.0,fishingNode, 20.0))
             facingWater = true;
-            break;
-        }
-    }
-    if (!facingWater)
-    {
-        WorldPosition FishSpot = FindFishingSpot(botAI);
-
-        if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
+        else
         {
-            float angle = bot->GetAngle(FishSpot.GetPositionX(), FishSpot.GetPositionY());
+            float angle = bot->GetAngle(fishingNode.GetPositionX(), fishingNode.GetPositionY());
             bot->SetOrientation(angle);
             bot->SendMovementFlagUpdate();
             return false;
         }
-        else
+    else
+    {
+        if (FindWaterLinear(bot, 10.0f, 20.0f, 2.5f, false).GetPositionX() != 0.0f)
+            facingWater = true;
+
+        if (!facingWater)
         {
-            return MoveToFishAction(botAI).Execute(event);
+            WorldPosition FishSpot = FindFishingSpot(botAI);
+
+            if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
+            {
+                float angle = bot->GetAngle(FishSpot.GetPositionX(), FishSpot.GetPositionY());
+                bot->SetOrientation(angle);
+                bot->SendMovementFlagUpdate();
+                return false;
+            }
         }
     }
-
     EquipFishingPoleAction equipAction(botAI);
     if (equipAction.isUseful())
         return equipAction.Execute(event);
