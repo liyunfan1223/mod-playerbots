@@ -13,6 +13,10 @@ bool DrinkAction::Execute(Event event)
     if (bot->IsInCombat())
         return false;
 
+    // Don't drink while mounted
+    if (bot->IsMounted())
+        return false;
+
     bool hasMana = AI_VALUE2(bool, "has mana", "self target");
     if (!hasMana)
         return false;
@@ -64,6 +68,10 @@ bool DrinkAction::isPossible()
 bool EatAction::Execute(Event event)
 {
     if (bot->IsInCombat())
+        return false;
+
+    // Don't eat while mounted
+    if (bot->IsMounted())
         return false;
 
     if (botAI->HasCheat(BotCheatMask::food))
