@@ -18,6 +18,13 @@ public:
     bool Calculate() override;
 };
 
+class IsNearWaterValue : public BoolCalculatedValue
+{
+public:
+    IsNearWaterValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "is near water") {};
+    bool Calculate() override;
+};  
+
 class CanOpenBobberValue : public BoolCalculatedValue
 {
 public:

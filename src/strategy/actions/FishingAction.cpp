@@ -151,7 +151,7 @@ bool MoveToFishAction::Execute(Event event)
         if(LandSpot.GetPositionX() != 0.0f && LandSpot.GetPositionY() != 0.0f)
             return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
     }
-    
+
     WorldPosition FishSpot = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 0.0f, sPlayerbotAIConfig->fishingDistance, 2.5f, false);
     if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
     {
@@ -167,11 +167,8 @@ bool MoveToFishAction::isUseful()
     if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
         return false;
     
-    WorldPosition nearwater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 5.0f, 20.0f, 2.5f, false);
-    if (nearwater.GetPositionX() != 0.0f && nearwater.GetPositionY() != 0.0f)
-        {
-            return false;
-        }
+    if (AI_VALUE(bool, "is near water")) // verify near water
+        return false;
         
     return true;
 }

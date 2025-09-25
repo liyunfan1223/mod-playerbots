@@ -315,6 +315,7 @@ public:
         creators["recently flee info"] = &ValueContext::recently_flee_info;
 
         creators["can fish"] = &ValueContext::can_fish;
+        creators["is near water"] = &ValueContext::is_near_water;
         creators["can use fishing bobber"] = &ValueContext::can_use_fishing_bobber;
         creators["done fishing"] = &ValueContext::done_fishing;
     }
@@ -561,6 +562,7 @@ private:
     static UntypedValue* last_flee_timestamp(PlayerbotAI* ai) { return new LastFleeTimestampValue(ai); }
     static UntypedValue* recently_flee_info(PlayerbotAI* ai) { return new RecentlyFleeInfo(ai); }
     static UntypedValue* can_fish(PlayerbotAI* ai) { return new CanFishValue(ai); }
+    static UntypedValue* is_near_water(PlayerbotAI* ai) { return new IsNearWaterValue(ai); }
     static UntypedValue* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenBobberValue(ai); }
     static UntypedValue* done_fishing(PlayerbotAI* ai) { return new DoneFishingValue(ai); }
     // -------------------------------------------------------
