@@ -847,20 +847,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
             sPlayerbotAIConfig->randomBotAccounts.size(), totalRandomBotChars);
 }
 
-// Idempotence guard: ensure CreateRandomGuilds() runs only once per process
-namespace {
-    bool s_randomGuildsInitialized = false;
-}
-
 void RandomPlayerbotFactory::CreateRandomGuilds()
 {
-    // Early return to avoid re-running the routine
-    if (s_randomGuildsInitialized)
-    {
-        LOG_INFO("playerbots", "CreateRandomGuilds already executed once, skipping.");
-        return;
-    }
-
     std::vector<uint32> randomBots;
 
     PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_RANDOM_BOTS_BOT);
@@ -995,12 +983,6 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
     // Shows the true total and how many were created during this run
     LOG_INFO("playerbots", "{} random bot guilds available (created this run: {})",
              uint32(sPlayerbotAIConfig->randomBotGuilds.size()), createdThisRun);
-
-    // Post-processing: Fix existing guilds whose tabard is entirely at 0
-    FixEmptyGuildEmblems();
-
-    // Mark as done once everything finished successfully
-    s_randomGuildsInitialized = true;
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomGuildName()
@@ -1143,47 +1125,6 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams(ArenaType type, uint32 count
     }
 
     LOG_DEBUG("playerbots", "{} random bot {}vs{} arena teams available", arenaTeamNumber, type, type);
-}
-
-// Fixes guilds already in the base whose tabard is entirely at 0
-void RandomPlayerbotFactory::FixEmptyGuildEmblems()
-{
-    uint32 scanned = 0;
-    uint32 fixed   = 0;
-
-    // Selects only guilds whose 5 tabard fields are at 0
-    if (QueryResult qr = CharacterDatabase.Query(
-            "SELECT guildid FROM guild "
-            "WHERE EmblemStyle=0 AND EmblemColor=0 AND BorderStyle=0 AND BorderColor=0 AND BackgroundColor=0"))
-    {
-        do
-        {
-            Field* f   = qr->Fetch();
-            uint32 gId = f[0].Get<uint32>();
-            ++scanned;
-
-           // Generates a random design consistent with the rest of the module
-            uint32 bg = urand(0, 51);
-            uint32 bc = urand(0, 17);
-            uint32 cl = urand(0, 17);
-            uint32 br = urand(0, 7);
-            uint32 st = urand(0, 180);
-
-            // Direct update in DB
-            CharacterDatabase.Execute(
-                "UPDATE guild SET EmblemStyle={}, EmblemColor={}, BorderStyle={}, BorderColor={}, BackgroundColor={} "
-                "WHERE guildid={}",
-                st, cl, br, bc, bg, gId);
-
-            ++fixed;
-            LOG_INFO("playerbots",
-                     "[TABARD-FIX] guild id={} -> style={}, color={}, borderStyle={}, borderColor={}, bgColor={}",
-                     gId, st, cl, br, bc, bg);
-        }
-        while (qr->NextRow());
-    }
-
-    LOG_INFO("playerbots", "[TABARD-FIX] scanned: {}, fixed: {}", scanned, fixed);
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomArenaTeamName()
