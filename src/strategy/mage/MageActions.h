@@ -404,4 +404,22 @@ public:
     bool isUseful() override;
 };
 
+// Ritual Actions
+
+class CastRitualOfRefreshmentAction : public CastSpellAction
+{
+public:
+    CastRitualOfRefreshmentAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "ritual of refreshment") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+    std::string const GetTargetName() override { return "self target"; }
+    
+private:
+    uint32 GetBotRitualSpellId(Player* bot);
+};
+
+// InteractWithRefreshmentTableAction is now defined in RitualActions.h
+
+// MoveAwayFromSpawnAction is now defined in RitualActions.h
+
 #endif

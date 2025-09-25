@@ -4,6 +4,23 @@
  */
 
 #include "WarlockActions.h"
+#include "RitualActions.h"
+#include "MovementActions.h"
+#include "Battleground.h"
+#include "Log.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+
+// Function declared in RitualActions.cpp
+
+static std::unordered_map<ObjectGuid, uint32> lastRitualUsage;
+static std::unordered_map<ObjectGuid, bool> hasMovedForRitual;
+std::unordered_map<ObjectGuid, uint32> lastRitualCreation;
+// Track if bot has completed ritual interaction to avoid loops
+extern std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
+
 
 #include <string>
 #include <vector>
@@ -444,3 +461,280 @@ bool CastCreateFirestoneAction::isUseful()
     }
     return false;
 }
+
+// Ritual Actions Implementation
+
+bool CastRitualOfSoulsAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    
+    
+    if (!CanUseRituals(bot))
+    {
+        return false;
+    }
+    
+    if (!bot->HasSpell(29893) && !bot->HasSpell(58887)) // Ritual of Souls Rank 1 & 2
+    {
+        return false;
+    }
+    
+    if (bot->GetSpellCooldownDelay(29893) > 0 && bot->GetSpellCooldownDelay(58887) > 0)
+    {
+        return false;
+    }
+    
+    uint32 currentTime = time(nullptr);
+    auto it = lastRitualUsage.find(bot->GetGUID());
+    if (it != lastRitualUsage.end())
+    {
+        uint32 timeSinceLastUse = currentTime - it->second;
+        if (timeSinceLastUse < 900) // 15 minutes = 900 seconds
+        {
+            return false;
+        }
+    }
+    
+    // NEW FUNCTIONALITY: Coordination between multiple warlocks in party
+    // Only allows one warlock to perform the ritual if there are other warlocks in the group
+    if (Group* group = bot->GetGroup())
+    {
+        Player* selectedWarlock = nullptr;
+        uint32 lowestGuid = UINT32_MAX;
+        
+        // Find the warlock with the lowest GUID (priority by group entry order)
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* member = itr->GetSource())
+            {
+                if (member->getClass() == CLASS_WARLOCK && member->IsAlive())
+                {
+                    // In Battlegrounds, only consider same faction
+                    bool isSameFaction = (member->GetTeamId() == bot->GetTeamId());
+                    bool shouldConsider = bot->GetMap()->IsBattleground() ? isSameFaction : true;
+                    
+                    if (shouldConsider && member->GetGUID().GetCounter() < lowestGuid)
+                    {
+                        lowestGuid = member->GetGUID().GetCounter();
+                        selectedWarlock = member;
+                    }
+                }
+            }
+        }
+        
+        // Only the selected warlock can perform the ritual
+        if (selectedWarlock && selectedWarlock != bot)
+        {
+            return false; // Not the selected warlock
+        }
+    }
+    
+    if (!HasRitualComponent(bot, 29893))
+    {
+        // Give Soul Shard to bot (item ID 6265)
+        bot->AddItem(6265, 1);
+    }
+    
+    GameObject* existingSoulPortal = bot->FindNearestGameObject(181622, 30.0f); // Soul Portal Rank 1
+    if (!existingSoulPortal)
+        existingSoulPortal = bot->FindNearestGameObject(193168, 30.0f); // Soul Portal Rank 2
+    
+    if (existingSoulPortal)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+bool CastRitualOfSoulsAction::Execute(Event event)
+{
+    Player* bot = botAI->GetBot();
+
+    // Check if bot is currently channeling the ritual
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+    {
+        // Don't interrupt the channeling - wait for it to complete naturally
+        botAI->SetNextCheckDelay(2000); // Check again in 2 seconds
+        return false;
+    }
+    
+    // Check if there are portals very close before casting to avoid overlap
+    GameObject* nearbyPortal = bot->FindNearestGameObject(181622, 10.0f); // Portal Rank 1
+    if (!nearbyPortal)
+        nearbyPortal = bot->FindNearestGameObject(193168, 10.0f); // Portal Rank 2
+
+    // In Battlegrounds, also check if there are Mages of the SAME FACTION nearby
+    bool hasMageNearby = false;
+    if (bot->GetMap()->IsBattleground()) {
+        std::list<Player*> nearbyPlayers;
+        Acore::AnyPlayerInObjectRangeCheck check(bot, 50.0f);
+        Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(bot, nearbyPlayers, check);
+        Cell::VisitObjects(bot, searcher, 50.0f);
+        
+        for (Player* nearbyPlayer : nearbyPlayers) {
+            if (nearbyPlayer->getClass() == CLASS_MAGE && 
+                nearbyPlayer->GetTeamId() == bot->GetTeamId()) { // Only same faction in BG
+                hasMageNearby = true;
+                break;
+            }
+        }
+    }
+
+    if ((nearbyPortal && bot->GetDistance(nearbyPortal) < 8.0f) || hasMageNearby) {
+        // There is a portal very close or a Mage of the same faction (in BG), change orientation to avoid overlap
+        float currentOrientation = bot->GetOrientation();
+        float newOrientation = currentOrientation + (M_PI / 2); // 90 degrees
+        bot->SetOrientation(newOrientation);
+        bot->SetFacingTo(newOrientation);
+    }
+    
+    if (!bot->HasSpell(29893) && !bot->HasSpell(58887))
+    {
+        return false;
+    }
+    
+    if (bot->GetSpellCooldownDelay(29893) > 0 && bot->GetSpellCooldownDelay(58887) > 0)
+    {
+        return false;
+    }
+    
+    bool result = CastSpellAction::Execute(event);
+    
+    // If successful, add a long delay to prevent immediate re-casting
+    if (result)
+    {
+        // Mark that this bot has completed ritual interaction
+        uint64 botGuid = bot->GetGUID().GetRawValue();
+        hasCompletedRitualInteraction[botGuid] = true;
+        
+        // Set custom cooldown (15 minutes)
+        uint32 currentTime = time(nullptr);
+        lastRitualUsage[bot->GetGUID()] = currentTime;
+        // Reset movement state for next ritual
+        hasMovedForRitual[bot->GetGUID()] = false;
+        
+        // Record ritual creation time to prevent immediate re-triggering
+        lastRitualCreation[bot->GetGUID()] = currentTime;
+        
+        // Don't clear movement state immediately - let the ritual complete naturally
+        // The follow behavior will be restored by other actions if needed
+    }
+    
+    return result;
+}
+
+// InteractWithSoulPortalAction implementation moved to RitualActions.cpp
+
+bool LootSoulwellAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    
+    // Only useful in dungeons/raids
+    if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
+        return false;
+    
+    // Check if bot already has a healthstone
+    if (bot->GetItemCount(5512, false) > 0 || // Minor Healthstone
+        bot->GetItemCount(5511, false) > 0 || // Lesser Healthstone
+        bot->GetItemCount(9421, false) > 0 || // Major Healthstone
+        bot->GetItemCount(19004, false) > 0 || // Minor Healthstone
+        bot->GetItemCount(19005, false) > 0)   // Lesser Healthstone
+    {
+        return false; // Already has a healthstone
+    }
+    
+    // Check if there's a soulwell nearby
+    GameObject* soulwell = bot->FindNearestGameObject(181621, 30.0f); // Soul Well Rank 1
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193169, 30.0f); // Soul Well Rank 2
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193170, 30.0f); // Soul Well Rank 2 variant
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193171, 30.0f); // Soul Well Rank 2 variant
+    
+    if (!soulwell)
+        return false;
+    
+    return true;
+}
+
+bool LootSoulwellAction::Execute(Event event)
+{
+    Player* bot = botAI->GetBot();
+    
+    // Find the soulwell
+    GameObject* soulwell = bot->FindNearestGameObject(181621, 30.0f); // Soul Well Rank 1
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193169, 30.0f); // Soul Well Rank 2
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193170, 30.0f); // Soul Well Rank 2 variant
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193171, 30.0f); // Soul Well Rank 2 variant
+    
+    if (!soulwell)
+        return false;
+    
+    // Check if we're close enough to interact
+    if (bot->GetDistance(soulwell) > 5.0f)
+    {
+        // Move closer to the soulwell using unique movement ID
+        uint32 movementId = bot->GetGUID().GetCounter() + 2000; // Unique ID for soulwell movement
+        bot->GetMotionMaster()->MovePoint(movementId, soulwell->GetPositionX(), soulwell->GetPositionY(), soulwell->GetPositionZ());
+        return false;
+    }
+    
+    // Interact with the soulwell to get healthstone
+    soulwell->Use(bot);
+    
+    // Clear movement state after interaction to allow normal movement
+    bot->GetMotionMaster()->Clear();
+    bot->GetMotionMaster()->MoveIdle();
+    
+    // Add a delay to prevent spam
+    botAI->SetNextCheckDelay(5000); // 5 seconds delay
+    
+    return true;
+}
+
+// EnableSoulstoneDungeonAction implementation
+bool EnableSoulstoneDungeonAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+    
+    // Only useful for warlocks in dungeons or raids
+    if (bot->getClass() != CLASS_WARLOCK)
+        return false;
+    
+    // Check if we're in a dungeon or raid
+    if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid())
+        return false;
+    
+    // Check if we have soulstone strategy enabled
+    if (botAI->HasStrategy("ss healer", BOT_STATE_NON_COMBAT))
+        return false; // Already enabled
+    
+    return true;
+}
+
+bool EnableSoulstoneDungeonAction::Execute(Event event)
+{
+    Player* bot = botAI->GetBot();
+    if (!bot)
+        return false;
+    
+    // Enable the soulstone healer strategy
+    botAI->ChangeStrategy("+ss healer", BOT_STATE_NON_COMBAT);
+    
+    // Log the action for debugging
+    if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster()))
+    {
+        botAI->TellMaster("Soulstone healer strategy enabled for dungeon");
+    }
+    
+    return true;
+}
+
+// MoveAwayFromSpawnAction implementation moved to RitualActions.cpp

@@ -349,4 +349,30 @@ protected:
     static const std::set<uint32> RAIN_OF_FIRE_SPELL_IDS;
 };
 
+// Ritual Triggers
+
+// InDungeonOrRaidTrigger is now defined in RitualActions.h
+
+class NoSoulwellTrigger : public Trigger
+{
+public:
+    NoSoulwellTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no soulwell") {}
+    bool IsActive() override;
+};
+
+class RitualOfSoulsTrigger : public TwoTriggers
+{
+public:
+    RitualOfSoulsTrigger(PlayerbotAI* botAI) : TwoTriggers(botAI, "in dungeon or raid", "no soulwell") {}
+};
+
+class LootSoulwellTrigger : public Trigger
+{
+public:
+    LootSoulwellTrigger(PlayerbotAI* botAI) : Trigger(botAI, "loot soulwell") {}
+    bool IsActive() override;
+};
+
+// SoulPortalAvailableTrigger is now defined in RitualActions.h
+
 #endif

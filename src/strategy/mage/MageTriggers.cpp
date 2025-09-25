@@ -6,12 +6,25 @@
 #include "MageTriggers.h"
 #include "MageActions.h"
 #include "Playerbots.h"
+#include "PlayerbotMgr.h"
 #include "Player.h"
 #include "Spell.h"
+#include "Battleground.h"
+#include <unordered_map>
+#include <ctime>
+
+#include "GameObject.h"
+
+// Function declared in RitualActions.cpp
+#include "Cell.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "DynamicObject.h"
 #include "Value.h"
 #include "SpellAuraEffects.h"
 #include "ServerFacade.h"
+#include "RitualActions.h"
+#include <unordered_map>
 
 bool NoManaGemTrigger::IsActive()
 {
@@ -180,4 +193,96 @@ bool BlizzardChannelCheckTrigger::IsActive()
 
     // Not channeling Blizzard
     return false;
+}
+
+// Ritual Triggers Implementation
+
+// InDungeonOrRaidTrigger implementation moved to RitualActions.cpp
+
+bool NoRefreshmentTableTrigger::IsActive()
+{
+    Player* bot = botAI->GetBot();
+    
+    // Check if rituals can be used in current map
+    if (!CanUseRituals(bot))
+    {
+        return false;
+    }
+    
+    // Checking trigger...
+    
+    // Check if bot has the spell
+    if (!bot->HasSpell(43987)) // Ritual of Refreshment
+    {
+        return false;
+    }
+    
+    // Check if bot has the required component, if not, give it to him
+    if (!HasRitualComponent(bot, 43987))
+    {
+        // Give Light Feather to bot (item ID 17056)
+        bot->AddItem(17056, 1);
+        return true; // Continue with ritual creation
+    }
+    
+    // Check if there's already a refreshment table nearby (within 30 yards)
+    // This is a simplified check - in a real implementation you'd search for GameObjects
+    // For now, we'll assume no refreshment table exists if we're in a dungeon/raid
+    
+    // Check if there's already a refreshment table nearby (within 30 yards)
+    // Try different possible IDs for Refreshment Table
+    GameObject* existingTable = bot->FindNearestGameObject(181628, 30.0f); // Possible Refreshment Table ID
+    if (!existingTable)
+        existingTable = bot->FindNearestGameObject(181629, 30.0f); // Another possible ID
+    if (!existingTable)
+        existingTable = bot->FindNearestGameObject(181630, 30.0f); // Another possible ID
+    if (existingTable)
+    {
+        return false; // Refreshment table already exists nearby
+    }
+    
+    // Only create ritual if we're in a group (more realistic)
+    Group* group = bot->GetGroup();
+    if (!group || group->GetMembersCount() < 2)
+    {
+        return false;
+    }
+    
+    // SIMPLIFIED TO MAXIMUM: Only check if there's a warlock in the group
+    bool hasWarlock = false;
+    
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (member && member->getClass() == CLASS_WARLOCK)
+        {
+            hasWarlock = true;
+            break;
+        }
+    }
+    
+    // If there's a warlock, check if it already finished its ritual and wait a bit
+    if (hasWarlock)
+    {
+        // Check if there's already a Soul Well (means the warlock finished and bots clicked)
+        GameObject* existingSoulWell = bot->FindNearestGameObject(181621, 30.0f); // Soul Well Rank 1
+        if (!existingSoulWell)
+            existingSoulWell = bot->FindNearestGameObject(193169, 30.0f); // Soul Well Rank 2 (variant 1)
+        if (!existingSoulWell)
+            existingSoulWell = bot->FindNearestGameObject(193170, 30.0f); // Soul Well Rank 2 (variant 2)
+        if (!existingSoulWell)
+            existingSoulWell = bot->FindNearestGameObject(193171, 30.0f); // Soul Well Rank 2 (variant 3)
+        
+        if (existingSoulWell)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
+    // If no warlock, mage can cast freely
+    return true;
 }

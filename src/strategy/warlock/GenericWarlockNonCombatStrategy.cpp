@@ -88,6 +88,9 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
     triggers.push_back(new TriggerNode("no healthstone", NextAction::array(0, new NextAction("create healthstone", 26.0f), nullptr)));
     triggers.push_back(new TriggerNode("no soulstone", NextAction::array(0, new NextAction("create soulstone", 25.0f), nullptr)));
     triggers.push_back(new TriggerNode("life tap", NextAction::array(0, new NextAction("life tap", 23.0f), nullptr)));
+    triggers.push_back(new TriggerNode("in dungeon", NextAction::array(0, new NextAction("soulstone healer", 22.0f), nullptr)));
+    triggers.push_back(new TriggerNode("no soulwell", NextAction::array(0, new NextAction("ritual of souls", 5.0f), nullptr)));
+    triggers.push_back(new TriggerNode("loot soulwell", NextAction::array(0, new NextAction("loot soulwell", 8.0f), nullptr)));
 }
 
 // Non-combat strategy for summoning a Imp

@@ -56,6 +56,7 @@ void GenericMageNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trigg
     triggers.push_back(new TriggerNode("no focus magic", NextAction::array(0, new NextAction("focus magic on party", 19.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode("no mana gem", NextAction::array(0, new NextAction("conjure mana gem", 20.0f), nullptr)));
+    triggers.push_back(new TriggerNode("mage ritual with delay", NextAction::array(0, new NextAction("ritual of refreshment", 5.0f), nullptr)));
 }
 
 void MageBuffManaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

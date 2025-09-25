@@ -4,12 +4,29 @@
  */
 
 #include "MageActions.h"
+#include "MovementActions.h"
 #include <cmath>
 #include "UseItemAction.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "Battleground.h"
+#include "Log.h"
+
+// Function declared in RitualActions.cpp
+
+// Custom cooldown for rituals (15 minutes)
+static std::unordered_map<ObjectGuid, uint32> lastRefreshmentRitualUsage;
+// Movement state for rituals
+static std::unordered_map<ObjectGuid, bool> hasMovedForRefreshmentRitual;
+// Orientation state for rituals (to avoid overlap)
+static std::unordered_map<ObjectGuid, bool> hasChangedOrientationForRitual;
+// Track if bot has completed ritual interaction to avoid loops
+extern std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
+
 #include "ServerFacade.h"
 #include "SharedDefines.h"
+#include "RitualActions.h"
+
 
 Value<Unit*>* CastPolymorphAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", getName()); }
 
@@ -141,4 +158,189 @@ bool CastBlinkBackAction::Execute(Event event)
     // can cast spell check passed in isUseful()
     bot->SetOrientation(bot->GetAngle(target) + M_PI);
     return CastSpellAction::Execute(event);
+}
+
+// Ritual Actions Implementation
+
+// Helper function to detect which ritual spell the bot has
+uint32 CastRitualOfRefreshmentAction::GetBotRitualSpellId(Player* bot)
+{
+    uint32 spellId1 = 43987; // Ritual of Refreshment Rank 1
+    uint32 spellId2 = 58659; // Ritual of Refreshment Rank 2
+    
+    // Prefer higher rank if available
+    if (bot->HasSpell(spellId2)) {
+        return spellId2;
+    } else if (bot->HasSpell(spellId1)) {
+        return spellId1;
+    }
+    
+    return 0; // No ritual spell found
+}
+
+bool CastRitualOfRefreshmentAction::isUseful()
+{
+    Player* bot = botAI->GetBot();
+    
+    
+    // Detect which rank the bot has
+    uint32 botSpellId = GetBotRitualSpellId(bot);
+    std::string spellRank = (botSpellId == 58659) ? "Rank 2" : (botSpellId == 43987) ? "Rank 1" : "None";
+    
+    
+    // Check base class first
+    if (!CastSpellAction::isUseful())
+    {
+        return false;
+    }
+    
+    // Check if rituals can be used in current map
+    if (!CanUseRituals(bot))
+    {
+        return false;
+    }
+    
+    // Check if bot has the spell
+    if (botSpellId == 0)
+    {
+        return false;
+    }
+    
+    // Check if spell is on cooldown
+    if (bot->GetSpellCooldownDelay(botSpellId) > 0)
+    {
+        return false;
+    }
+    
+    // Check custom cooldown (2 minutes)
+    uint32 currentTime = time(nullptr);
+    auto it = lastRefreshmentRitualUsage.find(bot->GetGUID());
+    if (it != lastRefreshmentRitualUsage.end())
+    {
+        uint32 timeSinceLastUse = currentTime - it->second;
+        if (timeSinceLastUse < 120) // 2 minutes = 120 seconds
+        {
+            return false;
+        }
+    }
+    
+    // NEW FUNCTIONALITY: Coordination between multiple mages in party
+    // Only allows one mage to perform the ritual if there are other mages in the group
+    if (Group* group = bot->GetGroup())
+    {
+        Player* selectedMage = nullptr;
+        uint32 lowestGuid = UINT32_MAX;
+        
+        // Find the mage with the lowest GUID (priority by group entry order)
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* member = itr->GetSource())
+            {
+                if (member->getClass() == CLASS_MAGE && member->IsAlive())
+                {
+                    // In Battlegrounds, only consider same faction
+                    bool isSameFaction = (member->GetTeamId() == bot->GetTeamId());
+                    bool shouldConsider = bot->GetMap()->IsBattleground() ? isSameFaction : true;
+                    
+                    if (shouldConsider && member->GetGUID().GetCounter() < lowestGuid)
+                    {
+                        lowestGuid = member->GetGUID().GetCounter();
+                        selectedMage = member;
+                    }
+                }
+            }
+        }
+        
+        // Only the selected mage can perform the ritual
+        if (selectedMage && selectedMage != bot)
+        {
+            return false; // Not the selected mage
+        }
+    }
+    
+        if (!HasRitualComponent(bot, 43987))
+    {
+        // Give Arcane Powder to bot (item ID 17020) - 2 units required
+        bot->AddItem(17020, 2);
+    }
+    
+    // Check if already has refreshment table nearby
+    GameObject* existingTable = bot->FindNearestGameObject(186812, 30.0f); // Refreshment Table Rank 1
+    if (!existingTable)
+        existingTable = bot->FindNearestGameObject(193061, 30.0f); // Refreshment Table Rank 2
+    
+    if (existingTable)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+bool CastRitualOfRefreshmentAction::Execute(Event event)
+{
+    Player* bot = botAI->GetBot();
+    
+    // Check if bot is currently channeling the ritual
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+    {
+        // Don't interrupt the channeling - wait for it to complete naturally
+        botAI->SetNextCheckDelay(2000); // Check again in 2 seconds
+        return false;
+    }
+    
+    // Change mage orientation to avoid portal overlap
+    // Only do this once per ritual
+    auto orientationIt = hasChangedOrientationForRitual.find(bot->GetGUID());
+    if (orientationIt == hasChangedOrientationForRitual.end() || !orientationIt->second)
+    {
+        // Rotate mage 90 degrees to avoid overlap
+        float currentOrientation = bot->GetOrientation();
+        float newOrientation = currentOrientation + M_PI / 2; // 90 degrees
+        bot->SetOrientation(newOrientation);
+        bot->SetFacingTo(newOrientation);
+        
+        hasChangedOrientationForRitual[bot->GetGUID()] = true;
+        
+    }
+    
+    // Detect which rank the bot has
+    uint32 botSpellId = GetBotRitualSpellId(bot);
+    std::string spellRank = (botSpellId == 58659) ? "Rank 2" : (botSpellId == 43987) ? "Rank 1" : "None";
+    
+    if (botSpellId == 0)
+    {
+        return false;
+    }
+    
+    // Check cooldown for the detected spell
+    uint32 cooldown = bot->GetSpellCooldownDelay(botSpellId);
+    
+    if (cooldown > 0)
+    {
+        return false;
+    }
+    
+    bool result = CastSpellAction::Execute(event);
+    
+    if (result)
+    {
+        
+        // Mark that this bot has completed ritual interaction
+        uint64 botGuid = bot->GetGUID().GetRawValue();
+        hasCompletedRitualInteraction[botGuid] = true;
+        
+        // Set custom cooldown (2 minutes)
+        uint32 currentTime = time(nullptr);
+        lastRefreshmentRitualUsage[bot->GetGUID()] = currentTime;
+        // Reset movement and orientation state for next ritual
+        hasMovedForRefreshmentRitual[bot->GetGUID()] = false;
+        hasChangedOrientationForRitual[bot->GetGUID()] = false;
+        
+        // Record ritual creation time to prevent immediate re-triggering
+        static std::unordered_map<ObjectGuid, uint32> lastRefreshmentRitualCreation;
+        lastRefreshmentRitualCreation[bot->GetGUID()] = currentTime;
+    }
+    
+    return result;
 }

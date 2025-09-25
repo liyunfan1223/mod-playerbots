@@ -8,6 +8,19 @@
 #include "Playerbots.h"
 #include "PlayerbotAI.h"
 #include "Player.h"
+#include "Battleground.h"
+#include <unordered_map>
+#include <ctime>
+#include "Log.h"
+
+#include "GameObject.h"
+
+// Function declared in RitualActions.cpp
+#include "Cell.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "RitualActions.h"
+#include <unordered_map>
 
 static const uint32 SOUL_SHARD_ITEM_ID = 6265;
 
@@ -262,4 +275,109 @@ bool RainOfFireChannelCheckTrigger::IsActive()
 
     // Not channeling Rain of Fire
     return false;
+}
+
+// Ritual Triggers Implementation
+
+// InDungeonOrRaidTrigger implementation moved to RitualActions.cpp
+
+bool NoSoulwellTrigger::IsActive()
+{
+    Player* bot = botAI->GetBot();
+    
+    static uint32 lastLogTime = 0;
+    uint32 currentTime = time(nullptr);
+    if (currentTime - lastLogTime > 10)
+    {
+        lastLogTime = currentTime;
+    }
+    
+    if (!CanUseRituals(bot))
+    {
+        return false;
+    }
+    
+    if (!bot->HasSpell(29893)) // Ritual of Souls
+    {
+        return false;
+    }
+    
+    if (!HasRitualComponent(bot, 29893))
+    {
+        // Give Soul Shard to bot (item ID 6265)
+        bot->AddItem(6265, 1);
+        return true; // Continue with ritual creation
+    }
+    
+    // For now, we'll assume no soulwell exists if we're in a dungeon/raid
+    
+    // Check for existing soul portals (both ranks)
+    GameObject* existingSoulPortal = bot->FindNearestGameObject(181622, 30.0f); // Soul Portal Rank 1
+    if (!existingSoulPortal)
+        existingSoulPortal = bot->FindNearestGameObject(193168, 30.0f); // Soul Portal Rank 2
+    
+    if (existingSoulPortal)
+    {
+        return false; // Soul portal already exists nearby
+    }
+    
+    // Check if we recently created a ritual (within last 30 seconds)
+    extern std::unordered_map<ObjectGuid, uint32> lastRitualCreation;
+    auto it = lastRitualCreation.find(bot->GetGUID());
+    if (it != lastRitualCreation.end())
+    {
+        uint32 timeSinceCreation = currentTime - it->second;
+        if (timeSinceCreation < 30) // 30 seconds grace period
+        {
+            return false; // Recently created ritual, wait a bit
+        }
+    }
+    
+    // Only create ritual if we're in a group (more realistic)
+    Group* group = bot->GetGroup();
+    if (!group || group->GetMembersCount() < 2)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+// SoulPortalAvailableTrigger implementation moved to RitualActions.cpp
+
+bool LootSoulwellTrigger::IsActive()
+{
+    Player* bot = botAI->GetBot();
+    
+    // Warlock should NOT loot soulwell - they create it
+    if (bot->getClass() == CLASS_WARLOCK)
+    {
+        return false;
+    }
+    
+    // Only active in dungeons/raids
+    if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
+        return false;
+    
+    if (bot->GetItemCount(5512, false) > 0 || // Minor Healthstone
+        bot->GetItemCount(5511, false) > 0 || // Lesser Healthstone
+        bot->GetItemCount(9421, false) > 0 || // Major Healthstone
+        bot->GetItemCount(19004, false) > 0 || // Minor Healthstone
+        bot->GetItemCount(19005, false) > 0)   // Lesser Healthstone
+    {
+        return false; // Already has a healthstone
+    }
+    
+    GameObject* soulwell = bot->FindNearestGameObject(181621, 30.0f); // Soul Well Rank 1
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193169, 30.0f); // Soul Well Rank 2
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193170, 30.0f); // Soul Well Rank 2 variant
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(193171, 30.0f); // Soul Well Rank 2 variant
+    
+    if (!soulwell)
+        return false;
+    
+    return true;
 }
