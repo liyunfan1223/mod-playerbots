@@ -531,14 +531,12 @@ public:
 class SetTotemAction : public Action
 {
 public:
-    SetTotemAction(PlayerbotAI* botAI, std::string const totemName, const uint32 totemSpellIds[], size_t totemSpellIdsCount, int actionButtonId)
-        : Action(botAI, "set " + totemName), totemSpellIds(totemSpellIds), totemSpellIdsCount(totemSpellIdsCount), actionButtonId(actionButtonId)
+    SetTotemAction(PlayerbotAI* botAI, std::string const totemName, const uint32 totemSpellIds[], int actionButtonId)
+        : Action(botAI, "set " + totemName), totemSpellIds(totemSpellIds), actionButtonId(actionButtonId)
     {
     }
     bool Execute(Event event) override;
-    bool isUseful() override;
     uint32 const* totemSpellIds;
-    size_t totemSpellIdsCount;
     int actionButtonId;
 };
 
@@ -546,119 +544,119 @@ class SetStrengthOfEarthTotemAction : public SetTotemAction
 {
 public:
     SetStrengthOfEarthTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "strength of earth totem", STRENGTH_OF_EARTH_TOTEM, sizeof(STRENGTH_OF_EARTH_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_EARTH) {}
+        : SetTotemAction(ai, "strength of earth totem", STRENGTH_OF_EARTH_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
 class SetStoneskinTotemAction : public SetTotemAction
 {
 public:
     SetStoneskinTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "stoneskin totem", STONESKIN_TOTEM, sizeof(STONESKIN_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_EARTH) {}
+        : SetTotemAction(ai, "stoneskin totem", STONESKIN_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
 class SetTremorTotemAction : public SetTotemAction
 {
 public:
     SetTremorTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "tremor totem", TREMOR_TOTEM, sizeof(TREMOR_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_EARTH) {}
+        : SetTotemAction(ai, "tremor totem", TREMOR_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
 class SetEarthbindTotemAction : public SetTotemAction
 {
 public:
     SetEarthbindTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "earthbind totem", EARTHBIND_TOTEM, sizeof(EARTHBIND_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_EARTH) {}
+        : SetTotemAction(ai, "earthbind totem", EARTHBIND_TOTEM, TOTEM_BAR_SLOT_EARTH) {}
 };
 
 class SetSearingTotemAction : public SetTotemAction
 {
 public:
     SetSearingTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "searing totem", SEARING_TOTEM, sizeof(SEARING_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_FIRE) {}
+        : SetTotemAction(ai, "searing totem", SEARING_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
 class SetMagmaTotemAction : public SetTotemAction
 {
 public:
     SetMagmaTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "magma totem", MAGMA_TOTEM, sizeof(MAGMA_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_FIRE) {}
+        : SetTotemAction(ai, "magma totem", MAGMA_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
 class SetFlametongueTotemAction : public SetTotemAction
 {
 public:
     SetFlametongueTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "flametongue totem", FLAMETONGUE_TOTEM, sizeof(FLAMETONGUE_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_FIRE) {}
+        : SetTotemAction(ai, "flametongue totem", FLAMETONGUE_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
 class SetTotemOfWrathAction : public SetTotemAction
 {
 public:
     SetTotemOfWrathAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "totem of wrath", TOTEM_OF_WRATH, sizeof(TOTEM_OF_WRATH)/sizeof(uint32), TOTEM_BAR_SLOT_FIRE) {}
+        : SetTotemAction(ai, "totem of wrath", TOTEM_OF_WRATH, TOTEM_BAR_SLOT_FIRE) {}
 };
 
 class SetFrostResistanceTotemAction : public SetTotemAction
 {
 public:
     SetFrostResistanceTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "frost resistance totem", FROST_RESISTANCE_TOTEM, sizeof(FROST_RESISTANCE_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_FIRE) {}
+        : SetTotemAction(ai, "frost resistance totem", FROST_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_FIRE) {}
 };
 
 class SetHealingStreamTotemAction : public SetTotemAction
 {
 public:
     SetHealingStreamTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "healing stream totem", HEALING_STREAM_TOTEM, sizeof(HEALING_STREAM_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_WATER) {}
+        : SetTotemAction(ai, "healing stream totem", HEALING_STREAM_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
 class SetManaSpringTotemAction : public SetTotemAction
 {
 public:
     SetManaSpringTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "mana spring totem", MANA_SPRING_TOTEM, sizeof(MANA_SPRING_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_WATER) {}
+        : SetTotemAction(ai, "mana spring totem", MANA_SPRING_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
 class SetCleansingTotemAction : public SetTotemAction
 {
 public:
     SetCleansingTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "cleansing totem", CLEANSING_TOTEM, sizeof(CLEANSING_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_WATER) {}
+        : SetTotemAction(ai, "cleansing totem", CLEANSING_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
 class SetFireResistanceTotemAction : public SetTotemAction
 {
 public:
     SetFireResistanceTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "fire resistance totem", FIRE_RESISTANCE_TOTEM, sizeof(FIRE_RESISTANCE_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_WATER) {}
+        : SetTotemAction(ai, "fire resistance totem", FIRE_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_WATER) {}
 };
 
 class SetWrathOfAirTotemAction : public SetTotemAction
 {
 public:
     SetWrathOfAirTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "wrath of air totem", WRATH_OF_AIR_TOTEM, sizeof(WRATH_OF_AIR_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_AIR) {}
+        : SetTotemAction(ai, "wrath of air totem", WRATH_OF_AIR_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
 class SetWindfuryTotemAction : public SetTotemAction
 {
 public:
     SetWindfuryTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "windfury totem", WINDFURY_TOTEM, sizeof(WINDFURY_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_AIR) {}
+        : SetTotemAction(ai, "windfury totem", WINDFURY_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
 class SetNatureResistanceTotemAction : public SetTotemAction
 {
 public:
     SetNatureResistanceTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "nature resistance totem", NATURE_RESISTANCE_TOTEM, sizeof(NATURE_RESISTANCE_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_AIR) {}
+        : SetTotemAction(ai, "nature resistance totem", NATURE_RESISTANCE_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
 class SetGroundingTotemAction : public SetTotemAction
 {
 public:
     SetGroundingTotemAction(PlayerbotAI* ai)
-        : SetTotemAction(ai, "grounding totem", GROUNDING_TOTEM, sizeof(GROUNDING_TOTEM)/sizeof(uint32), TOTEM_BAR_SLOT_AIR) {}
+        : SetTotemAction(ai, "grounding totem", GROUNDING_TOTEM, TOTEM_BAR_SLOT_AIR) {}
 };
 
 #endif

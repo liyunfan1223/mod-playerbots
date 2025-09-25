@@ -93,8 +93,9 @@ bool CastSpiritWalkAction::Execute(Event event)
 
 bool SetTotemAction::Execute(Event event)
 {
+    size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
     uint32 totemSpell = 0;
-    for (int i = (int)totemSpellIdsCount - 1; i >= 0; --i)
+    for (int i = (int)spellIdsCount - 1; i >= 0; --i)
     {
         if (bot->HasSpell(totemSpellIds[i]))
         {
@@ -106,21 +107,4 @@ bool SetTotemAction::Execute(Event event)
         return false;
     bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
     return true;
-}
-
-bool SetTotemAction::isUseful()
-{
-    Player* bot = botAI->GetBot();
-    ActionButton const* button = bot->GetActionButton(actionButtonId);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true; // No totem assigned
-
-    // Find the highest rank the bot knows
-    for (int i = (int)totemSpellIdsCount - 1; i >= 0; --i)
-    {
-        if (bot->HasSpell(totemSpellIds[i]))
-            return button->GetAction() != totemSpellIds[i];
-    }
-    // Bot doesn't know any valid rank
-    return false;
 }
