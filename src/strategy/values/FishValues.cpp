@@ -20,16 +20,6 @@ bool CanFishValue::Calculate()
   if (SkillFishing == 0)
     return false;
 
-
-  int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetAreaId());
-  if (!zone_skill)
-    zone_skill = sObjectMgr->GetFishingBaseSkillLevel(bot->GetZoneId());
-
-  if (SkillFishing < zone_skill)
-  {
-    botAI->TellError("I don't have enough skill to fish here");
-    return false;
-  }
   return true;
 }
 
