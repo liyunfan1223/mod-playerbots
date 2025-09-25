@@ -73,15 +73,13 @@ bool DoneFishingValue::Calculate()
   if (!bot || !botAI)
     return false;
   
-  Player* master = botAI->GetMaster();
-  
-  if (!master) // Check if master exists
-    return false;
-    
-  bool distance = master->GetDistance(bot) < 10.0f;
-  if (!distance)
-  {
+  if(bot->IsInCombat())
     return true;
-  }
-  return false;
+  
+  WorldPosition nearwater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), 10.0f, 40.0f, 2.5f, false);
+  if (nearwater.GetPositionX() != 0.0f && nearwater.GetPositionY() != 0.0f)
+        {
+            return false;
+        }
+`  return false;
 }
