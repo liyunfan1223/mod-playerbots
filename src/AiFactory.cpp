@@ -353,25 +353,48 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
             break;
         case CLASS_DRUID:
-            if (tab == 0)
+        {
+            std::map<uint8, uint32> tabs = GetPlayerSpecTabs(player);
+            
+            if (tab == 0)  // Spec Balance
             {
                 engine->addStrategiesNoInit("caster", "cure", "caster aoe", "dps assist", nullptr);
                 engine->addStrategy("caster debuff", false);
             }
-            else if (tab == 2)
-                engine->addStrategiesNoInit("heal", "cure", "dps assist", nullptr);
-            else
+            else if (tab == 2)  // Spec Restoration
             {
-                if (player->HasSpell(768) /*cat form*/&& !player->HasAura(16931) /*thick hide*/)
+                engine->addStrategiesNoInit("heal", "cure", "dps assist", nullptr);
+            }
+            else if (tab == 1)  // Spec Feral - Verify it's really Feral
+            {
+                // Only use cat/bear if it's really Feral spec (tab == 1)
+                // Verify it has more talents in Feral than in other specs
+                if (tabs[1] > tabs[0] && tabs[1] > tabs[2])  // Feral has more talents
                 {
-                    engine->addStrategiesNoInit("cat", "dps assist", nullptr);
+                    if (player->HasSpell(768) /*cat form*/ && !player->HasAura(16931) /*thick hide*/)
+                    {
+                        engine->addStrategiesNoInit("cat", "dps assist", nullptr);
+                    }
+                    else
+                    {
+                        engine->addStrategiesNoInit("bear", "tank assist", nullptr);
+                    }
                 }
                 else
                 {
-                    engine->addStrategiesNoInit("bear", "tank assist", nullptr);
+                    // If not really Feral, use caster by default
+                    engine->addStrategiesNoInit("caster", "cure", "caster aoe", "dps assist", nullptr);
+                    engine->addStrategy("caster debuff", false);
                 }
             }
+            else  // Fallback for unexpected cases - use caster by default
+            {
+                // If spec cannot be determined correctly, use caster by default for druids
+                engine->addStrategiesNoInit("caster", "cure", "caster aoe", "dps assist", nullptr);
+                engine->addStrategy("caster debuff", false);
+            }
             break;
+        }
         case CLASS_HUNTER:
             if (tab == 0)  // Beast Mastery
                 engine->addStrategiesNoInit("bm", nullptr);
@@ -452,6 +475,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                         engine->addStrategiesNoInit("caster", "caster aoe", nullptr);
                         engine->addStrategy("caster debuff", false);
                     }
+                    else if (tab == DRUID_TAB_BALANCE)
+                    {
+                        engine->addStrategiesNoInit("caster", "caster aoe", nullptr);
+                        engine->addStrategy("caster debuff", false);
+                    }
                     break;
                 }
                 case CLASS_SHAMAN:
@@ -459,6 +487,14 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                     if (tab == SHAMAN_TAB_RESTORATION)
                     {
                         engine->addStrategiesNoInit("caster", "caster aoe", "bmana", nullptr);
+                    }
+                    else if (tab == SHAMAN_TAB_ELEMENTAL)
+                    {
+                        engine->addStrategiesNoInit("caster", "caster aoe", "bmana", nullptr);
+                    }
+                    else if (tab == SHAMAN_TAB_ENHANCEMENT)
+                    {
+                        engine->addStrategiesNoInit("melee", "melee aoe", "bdps", nullptr);
                     }
                     break;
                 }
@@ -475,13 +511,20 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             }
         }
     }
-    if (sRandomPlayerbotMgr->IsRandomBot(player))
+    // For classes with specific logic, don't override assigned strategies
+    if (player->getClass() != CLASS_DRUID && 
+        player->getClass() != CLASS_SHAMAN && 
+        player->getClass() != CLASS_PRIEST && 
+        player->getClass() != CLASS_PALADIN)
     {
-        engine->ChangeStrategy(sPlayerbotAIConfig->randomBotCombatStrategies);
-    }
-    else
-    {
-        engine->ChangeStrategy(sPlayerbotAIConfig->combatStrategies);
+        if (sRandomPlayerbotMgr->IsRandomBot(player))
+        {
+            engine->ChangeStrategy(sPlayerbotAIConfig->randomBotCombatStrategies);
+        }
+        else
+        {
+            engine->ChangeStrategy(sPlayerbotAIConfig->combatStrategies);
+        }
     }
 
     // Battleground switch
