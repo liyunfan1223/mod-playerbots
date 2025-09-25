@@ -119,6 +119,9 @@ bool HasManaValue::Calculate()
     Unit* target = GetTarget();
     if (!target)
         return false;
+    
+    if (target->HasAura(20711)) // Spirit of Redemption
+        return false;
 
     return target->GetPower(POWER_MANA);
 }
