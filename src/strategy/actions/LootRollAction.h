@@ -44,10 +44,6 @@ protected:
      
     // randomProperty: 0 (none) ; >0 = itemRandomPropId ; <0 = -itemRandomSuffix
     RollVote CalculateRollVote(ItemTemplate const* proto, int32 randomProperty = 0);
-    
-    // Announce the roll choice to the bot's master (if enabled in config)
-    void AnnounceRollChoice(RollVote vote, uint32 itemId);
-    const char* RollVoteToText(RollVote vote) const;
 };
 
 class MasterLootRollAction : public LootRollAction

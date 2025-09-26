@@ -897,7 +897,7 @@ bool LootRollAction::Execute(Event event)
         {
             // Lets CalculateRollVote decide (includes SmartNeedBySpec, BoE/BoU, unique, cross-armor)
             vote = CalculateRollVote(proto, randomProperty);
-			LOG_DEBUG("playerbots", "[LootRoolDBG] after CalculateRollVote: vote={}", RollVoteToText(vote));
+			LOG_DEBUG("playerbots", "[LootRoolDBG] after CalculateRollVote: vote={}", VoteTxt(vote));
         }
 
         // Disenchant (Need-Before-Greed):
@@ -907,13 +907,13 @@ bool LootRollAction::Execute(Event event)
             bot->HasSkill(SKILL_ENCHANTING) && IsLikelyDisenchantable(proto))
         {
             LOG_DEBUG("playerbots", "[LootRoolDBG] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)",
-                     RollVoteToText(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING));
+					 VoteTxt(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING));
 			vote = DISENCHANT;
         }
         else
         {
             LOG_DEBUG("playerbots", "[LootRoolDBG] no DE: vote={} lootMethod={} enchSkill={} deOK={}",
-                     RollVoteToText(vote), (int)group->GetLootMethod(),
+					 VoteTxt(vote), (int)group->GetLootMethod(),
                      bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
         }
 
@@ -943,11 +943,11 @@ bool LootRollAction::Execute(Event event)
         RollVote sent = vote;
         if (group->GetLootMethod() == MASTER_LOOT || group->GetLootMethod() == FREE_FOR_ALL)
             sent = PASS;
+
 		LOG_DEBUG("playerbots", "[LootPaternDBG] send vote={} (lootMethod={} Lvl={}) -> guid={} itemId={}",
-                 RollVoteToText(sent), (int)group->GetLootMethod(),
-                 sPlayerbotAIConfig->lootRollLevel, guid.ToString(), itemId);
+                 VoteTxt(sent), (int)group->GetLootMethod(), sPlayerbotAIConfig->lootRollLevel, guid.ToString(), itemId);
 		 
-        AnnounceRollChoice(sent, itemId);
+        //AnnounceRollChoice(sent, itemId);
         group->CountRollVote(bot->GetGUID(), guid, sent);
         // One item at a time
         return true;
@@ -1120,46 +1120,10 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
     return finalVote;
 }
 
-// Helpers announce
-const char* LootRollAction::RollVoteToText(RollVote vote) const
+bool MasterLootRollAction::isUseful() 
 {
-    switch (vote)
-    {
-        case NEED:       return "NEED";
-        case GREED:      return "GREED";
-        case PASS:       return "PASS";
-        case DISENCHANT: return "DISENCHANT";
-        default:         return "UNKNOWN";
-    }
+    return !botAI->HasActivePlayerMaster();
 }
-
-void LootRollAction::AnnounceRollChoice(RollVote vote, uint32 itemId)
-{
-    if (!sPlayerbotAIConfig->announceLootRollsToMaster)
-        return;
-
-    Player* master = botAI->GetMaster();
-    if (!master)
-        return;
-
-    std::ostringstream ss;
-    if (ItemTemplate const* ip = sObjectMgr->GetItemTemplate(itemId))
-    {
-        ss << "[Loot] " << bot->GetName() << " choose " << RollVoteToText(vote)
-           << " on [" << ip->Name1 << "]";
-    }
-    else
-    {
-        ss << "[Loot] " << bot->GetName() << " choose " << RollVoteToText(vote)
-           << " on item " << itemId;
-    }
-
-    // Message to Master
-    botAI->TellMaster(ss.str());
-}
-
-
-bool MasterLootRollAction::isUseful() { return !botAI->HasActivePlayerMaster(); }
 
 bool MasterLootRollAction::Execute(Event event)
 {
@@ -1224,15 +1188,14 @@ bool MasterLootRollAction::Execute(Event event)
         (group->GetLootMethod() == NEED_BEFORE_GREED || group->GetLootMethod() == GROUP_LOOT) &&		
         bot->HasSkill(SKILL_ENCHANTING) && IsLikelyDisenchantable(proto))
     {
-        LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)",
-                 RollVoteToText(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING));
+        LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] DE switch: {} -> DISENCHANT (lootMethod={}, enchSkill={}, deOK=1)", 
+		          VoteTxt(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING));
 		vote = DISENCHANT;
     }
     else
     {
-        LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] no DE: vote={} lootMethod={} enchSkill={} deOK={}",
-                 RollVoteToText(vote), (int)group->GetLootMethod(),
-                 bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
+        LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] no DE: vote={} lootMethod={} enchSkill={} deOK={}", 
+		          VoteTxt(vote), (int)group->GetLootMethod(), bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
     }
 
     RollVote sent = vote;
@@ -1240,10 +1203,10 @@ bool MasterLootRollAction::Execute(Event event)
         sent = PASS;
 	
 	LOG_DEBUG("playerbots", "[LootEnchantDBG][ML] vote={} -> sent={} lootMethod={} enchSkill={} deOK={}",
-             RollVoteToText(vote), RollVoteToText(sent), (int)group->GetLootMethod(),
+			 VoteTxt(vote), VoteTxt(sent), (int)group->GetLootMethod(),
              bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
 		 
-    AnnounceRollChoice(sent, itemId);
+    //AnnounceRollChoice(sent, itemId);
     group->CountRollVote(bot->GetGUID(), creatureGuid, sent);
 
     return true;

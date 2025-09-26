@@ -339,11 +339,6 @@ AiPlayerbot.Roll.CrossArmorExtraMargin = 1.20
 # Default: 0.1
 AiPlayerbot.Roll.TokenILevelMargin = 0.1
 
-# Announce each bot's roll choice to its master via private whisper.
-# Useful for debugging; can be noisy in large groups.
-# Default: 0 (disabled)
-AiPlayerbot.Roll.AnnounceToMaster = 0
-
 #
 #
 #
