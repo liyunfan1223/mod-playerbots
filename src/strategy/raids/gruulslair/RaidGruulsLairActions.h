@@ -75,7 +75,7 @@ public:
     HighKingMaulgarBanishFelstalkerAction(PlayerbotAI* botAI, std::string const name = "high king maulgar banish felstalker") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
-    bool isUseful();
+    bool isUseful() override;
 };
 
 class HighKingMaulgarHunterMisdirectionAction : public AttackAction
@@ -92,7 +92,7 @@ public:
     GruulTheDragonkillerPositionBossAction(PlayerbotAI* botAI, std::string const name = "gruul the dragonkiller position boss") : MovementAction(botAI, name) {};
 
     bool Execute(Event event) override;
-    bool isUseful();
+    bool isUseful() override;
 };
 
 class GruulTheDragonkillerSpreadRangedAction : public MovementAction
@@ -101,7 +101,7 @@ public:
     GruulTheDragonkillerSpreadRangedAction(PlayerbotAI* botAI, std::string const name = "gruul the dragonkiller spread ranged") : MovementAction(botAI, name) {};
 
     bool Execute(Event event) override;
-    bool isUseful();
+    bool isUseful() override;
 };
 
 class GruulTheDragonkillerShatterSpreadAction : public MovementAction
@@ -110,7 +110,7 @@ public:
     GruulTheDragonkillerShatterSpreadAction(PlayerbotAI* botAI, std::string const name = "gruul the dragonkiller shatter spread") : MovementAction(botAI, name) {};
 
     bool Execute(Event event) override;
-    bool isUseful();
+    bool isUseful() override;
 };
 
 #endif

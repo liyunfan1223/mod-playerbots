@@ -866,7 +866,7 @@ bool GruulTheDragonkillerPositionBossAction::Execute(Event event)
 
     if (distanceToTankSpot > positionLeeway)
     {
-        float step = std::min(maxStep, distanceToTankSpot); // Don't overshoot
+        float step = std::min(maxStep, distanceToTankSpot);
         float moveX = bot->GetPositionX() + (dX / distanceToTankSpot) * step;
         float moveY = bot->GetPositionY() + (dY / distanceToTankSpot) * step;
         float moveZ = tankSpot.z;
@@ -955,7 +955,7 @@ bool GruulTheDragonkillerSpreadRangedAction::Execute(Event event)
         }
 
         float angle = 2 * M_PI * botIndex / count;
-        float radius = minRadius + static_cast<float>(rand()) / RAND_MAX * (maxRadius - minRadius);
+        float radius = minRadius + static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (maxRadius - minRadius);
         float targetX = centerX + radius * cos(angle);
         float targetY = centerY + radius * sin(angle);
 
