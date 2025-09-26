@@ -418,8 +418,5 @@ private:
     uint32 GetBotRitualSpellId(Player* bot);
 };
 
-// InteractWithRefreshmentTableAction is now defined in RitualActions.h
-
-// MoveAwayFromSpawnAction is now defined in RitualActions.h
 
 #endif

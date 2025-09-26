@@ -351,8 +351,6 @@ protected:
 
 // Ritual Triggers
 
-// InDungeonOrRaidTrigger is now defined in RitualActions.h
-
 class NoSoulwellTrigger : public Trigger
 {
 public:
@@ -373,6 +371,5 @@ public:
     bool IsActive() override;
 };
 
-// SoulPortalAvailableTrigger is now defined in RitualActions.h
 
 #endif

@@ -27,6 +27,40 @@ extern std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
 #include "SharedDefines.h"
 #include "RitualActions.h"
 
+// Global constants for spells and items
+namespace MageRitualConstants
+{
+    // Ritual of Refreshment spells
+    const uint32 RITUAL_REFRESHMENT_RANK_1 = 43987;
+    const uint32 RITUAL_REFRESHMENT_RANK_2 = 58659;
+    
+    // Refreshment Table game objects
+    const uint32 REFRESHMENT_TABLE_RANK_1 = 186812;
+    const uint32 REFRESHMENT_TABLE_RANK_2 = 193061;
+    
+    // Refreshment Portal game objects
+    const uint32 REFRESHMENT_PORTAL_RANK_1 = 186811;
+    const uint32 REFRESHMENT_PORTAL_RANK_2 = 193062;
+    
+    // Arcane Powder item
+    const uint32 ARCANE_POWDER_ITEM = 17020;
+    
+    // Conjured food and drink items
+    const uint32 CONJURED_MANA_BISCUIT = 43523;
+    const uint32 CONJURED_MANA_STRUDEL = 43518;
+    const uint32 CONJURED_MANA_COOKIE = 43517;
+    const uint32 CONJURED_MANA_CAKE = 43516;
+    const uint32 CONJURED_MANA_PIE = 43515;
+    const uint32 CONJURED_MANA_BREAD = 43514;
+    const uint32 CONJURED_MANA_MUFFIN = 43513;
+    const uint32 CONJURED_MANA_DONUT = 43512;
+    const uint32 CONJURED_MANA_BAGEL = 43511;
+    const uint32 CONJURED_MANA_PRETZEL = 43510;
+    const uint32 CONJURED_MANA_WATER = 43519;
+    const uint32 CONJURED_MANA_JUICE = 43520;
+    const uint32 CONJURED_MANA_TEA = 43521;
+    const uint32 CONJURED_MANA_COFFEE = 43522;
+}
 
 Value<Unit*>* CastPolymorphAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", getName()); }
 
@@ -165,14 +199,12 @@ bool CastBlinkBackAction::Execute(Event event)
 // Helper function to detect which ritual spell the bot has
 uint32 CastRitualOfRefreshmentAction::GetBotRitualSpellId(Player* bot)
 {
-    uint32 spellId1 = 43987; // Ritual of Refreshment Rank 1
-    uint32 spellId2 = 58659; // Ritual of Refreshment Rank 2
     
     // Prefer higher rank if available
-    if (bot->HasSpell(spellId2)) {
-        return spellId2;
-    } else if (bot->HasSpell(spellId1)) {
-        return spellId1;
+    if (bot->HasSpell(MageRitualConstants::RITUAL_REFRESHMENT_RANK_2)) {
+        return MageRitualConstants::RITUAL_REFRESHMENT_RANK_2;
+    } else if (bot->HasSpell(MageRitualConstants::RITUAL_REFRESHMENT_RANK_1)) {
+        return MageRitualConstants::RITUAL_REFRESHMENT_RANK_1;
     }
     
     return 0; // No ritual spell found
@@ -180,12 +212,9 @@ uint32 CastRitualOfRefreshmentAction::GetBotRitualSpellId(Player* bot)
 
 bool CastRitualOfRefreshmentAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
-    
     // Detect which rank the bot has
     uint32 botSpellId = GetBotRitualSpellId(bot);
-    std::string spellRank = (botSpellId == 58659) ? "Rank 2" : (botSpellId == 43987) ? "Rank 1" : "None";
+    std::string spellRank = (botSpellId == MageRitualConstants::RITUAL_REFRESHMENT_RANK_2) ? "Rank 2" : (botSpellId == MageRitualConstants::RITUAL_REFRESHMENT_RANK_1) ? "Rank 1" : "None";
     
     
     // Check base class first
@@ -258,16 +287,16 @@ bool CastRitualOfRefreshmentAction::isUseful()
         }
     }
     
-        if (!HasRitualComponent(bot, 43987))
+    if (!HasRitualComponent(bot, MageRitualConstants::RITUAL_REFRESHMENT_RANK_1))
     {
-        // Give Arcane Powder to bot (item ID 17020) - 2 units required
-        bot->AddItem(17020, 2);
+        // Give Arcane Powder to bot - 2 units required
+        bot->AddItem(MageRitualConstants::ARCANE_POWDER_ITEM, 2);
     }
     
     // Check if already has refreshment table nearby
-    GameObject* existingTable = bot->FindNearestGameObject(186812, 30.0f); // Refreshment Table Rank 1
+    GameObject* existingTable = bot->FindNearestGameObject(MageRitualConstants::REFRESHMENT_TABLE_RANK_1, 30.0f);
     if (!existingTable)
-        existingTable = bot->FindNearestGameObject(193061, 30.0f); // Refreshment Table Rank 2
+        existingTable = bot->FindNearestGameObject(MageRitualConstants::REFRESHMENT_TABLE_RANK_2, 30.0f);
     
     if (existingTable)
     {

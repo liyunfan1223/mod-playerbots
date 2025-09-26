@@ -201,7 +201,6 @@ bool BlizzardChannelCheckTrigger::IsActive()
 
 bool NoRefreshmentTableTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
     
     // Check if rituals can be used in current map
     if (!CanUseRituals(bot))
@@ -273,14 +272,7 @@ bool NoRefreshmentTableTrigger::IsActive()
         if (!existingSoulWell)
             existingSoulWell = bot->FindNearestGameObject(193171, 30.0f); // Soul Well Rank 2 (variant 3)
         
-        if (existingSoulWell)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return existingSoulWell;
     }
     
     // If no warlock, mage can cast freely

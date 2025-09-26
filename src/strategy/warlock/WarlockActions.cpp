@@ -13,6 +13,61 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 
+// Global constants for spells and items
+namespace WarlockRitualConstants
+{
+    // Ritual of Souls spells
+    const uint32 RITUAL_OF_SOULS_RANK_1 = 29893;
+    const uint32 RITUAL_OF_SOULS_RANK_2 = 58887;
+    
+    // Soul Portal game objects
+    const uint32 SOUL_PORTAL_RANK_1 = 181622;
+    const uint32 SOUL_PORTAL_RANK_2 = 193168;
+    
+    // Soul Well game objects
+    const uint32 SOUL_WELL_RANK_1 = 181621;
+    const uint32 SOUL_WELL_RANK_2 = 193169;
+    const uint32 SOUL_WELL_RANK_2_VARIANT_1 = 193170;
+    const uint32 SOUL_WELL_RANK_2_VARIANT_2 = 193171;
+    
+    // Soul Shard item
+    const uint32 SOUL_SHARD_ITEM = 6265;
+    
+    // Healthstone items
+    const uint32 MINOR_HEALTHSTONE = 5512;
+    const uint32 LESSER_HEALTHSTONE = 5511;
+    const uint32 MAJOR_HEALTHSTONE = 9421;
+    const uint32 MINOR_HEALTHSTONE_ALT = 19004;
+    const uint32 LESSER_HEALTHSTONE_ALT = 19005;
+    const uint32 FEL_HEALTHSTONE = 36892;
+    
+    // Soulstone items
+    const uint32 MINOR_SOULSTONE = 5232;
+    const uint32 LESSER_SOULSTONE = 16892;
+    const uint32 SOULSTONE = 16893;
+    const uint32 GREATER_SOULSTONE = 16895;
+    const uint32 MAJOR_SOULSTONE = 16896;
+    const uint32 MASTER_SOULSTONE = 22116;
+    const uint32 DEMONIC_SOULSTONE = 36895;
+    
+    // Soulstone spells
+    const uint32 SOULSTONE_SPELL_MINOR = 20707;
+    const uint32 SOULSTONE_SPELL_LESSER = 20762;
+    const uint32 SOULSTONE_SPELL_NORMAL = 20763;
+    const uint32 SOULSTONE_SPELL_GREATER = 20764;
+    const uint32 SOULSTONE_SPELL_MAJOR = 20765;
+    const uint32 SOULSTONE_SPELL_MASTER = 27239;
+    const uint32 SOULSTONE_SPELL_DEMONIC = 47883;
+    
+    // Firestone spells
+    const uint32 CREATE_FIRESTONE_RANK_1 = 6366;
+    const uint32 CREATE_FIRESTONE_RANK_2 = 17951;
+    const uint32 CREATE_FIRESTONE_RANK_3 = 17952;
+    const uint32 CREATE_FIRESTONE_RANK_4 = 17953;
+    const uint32 CREATE_FIRESTONE_RANK_5 = 27250;
+    const uint32 CREATE_FIRESTONE_RANK_7 = 60220;
+}
+
 // Function declared in RitualActions.cpp
 
 static std::unordered_map<ObjectGuid, uint32> lastRitualUsage;
@@ -466,20 +521,17 @@ bool CastCreateFirestoneAction::isUseful()
 
 bool CastRitualOfSoulsAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
-    
     if (!CanUseRituals(bot))
     {
         return false;
     }
     
-    if (!bot->HasSpell(29893) && !bot->HasSpell(58887)) // Ritual of Souls Rank 1 & 2
+    if (!bot->HasSpell(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_1) && !bot->HasSpell(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_2))
     {
         return false;
     }
     
-    if (bot->GetSpellCooldownDelay(29893) > 0 && bot->GetSpellCooldownDelay(58887) > 0)
+    if (bot->GetSpellCooldownDelay(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_1) > 0 && bot->GetSpellCooldownDelay(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_2) > 0)
     {
         return false;
     }
@@ -529,15 +581,15 @@ bool CastRitualOfSoulsAction::isUseful()
         }
     }
     
-    if (!HasRitualComponent(bot, 29893))
+    if (!HasRitualComponent(bot, WarlockRitualConstants::RITUAL_OF_SOULS_RANK_1))
     {
-        // Give Soul Shard to bot (item ID 6265)
-        bot->AddItem(6265, 1);
+        // Give Soul Shard to bot
+        bot->AddItem(WarlockRitualConstants::SOUL_SHARD_ITEM, 1);
     }
     
-    GameObject* existingSoulPortal = bot->FindNearestGameObject(181622, 30.0f); // Soul Portal Rank 1
+    GameObject* existingSoulPortal = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_PORTAL_RANK_1, 30.0f);
     if (!existingSoulPortal)
-        existingSoulPortal = bot->FindNearestGameObject(193168, 30.0f); // Soul Portal Rank 2
+        existingSoulPortal = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_PORTAL_RANK_2, 30.0f);
     
     if (existingSoulPortal)
     {
@@ -560,9 +612,9 @@ bool CastRitualOfSoulsAction::Execute(Event event)
     }
     
     // Check if there are portals very close before casting to avoid overlap
-    GameObject* nearbyPortal = bot->FindNearestGameObject(181622, 10.0f); // Portal Rank 1
+    GameObject* nearbyPortal = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_PORTAL_RANK_1, 10.0f);
     if (!nearbyPortal)
-        nearbyPortal = bot->FindNearestGameObject(193168, 10.0f); // Portal Rank 2
+        nearbyPortal = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_PORTAL_RANK_2, 10.0f);
 
     // In Battlegrounds, also check if there are Mages of the SAME FACTION nearby
     bool hasMageNearby = false;
@@ -594,7 +646,7 @@ bool CastRitualOfSoulsAction::Execute(Event event)
         return false;
     }
     
-    if (bot->GetSpellCooldownDelay(29893) > 0 && bot->GetSpellCooldownDelay(58887) > 0)
+    if (bot->GetSpellCooldownDelay(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_1) > 0 && bot->GetSpellCooldownDelay(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_2) > 0)
     {
         return false;
     }
@@ -635,23 +687,24 @@ bool LootSoulwellAction::isUseful()
         return false;
     
     // Check if bot already has a healthstone
-    if (bot->GetItemCount(5512, false) > 0 || // Minor Healthstone
-        bot->GetItemCount(5511, false) > 0 || // Lesser Healthstone
-        bot->GetItemCount(9421, false) > 0 || // Major Healthstone
-        bot->GetItemCount(19004, false) > 0 || // Minor Healthstone
-        bot->GetItemCount(19005, false) > 0)   // Lesser Healthstone
+    if (bot->GetItemCount(WarlockRitualConstants::MINOR_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockRitualConstants::LESSER_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockRitualConstants::MAJOR_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockRitualConstants::MINOR_HEALTHSTONE_ALT, false) > 0 ||
+        bot->GetItemCount(WarlockRitualConstants::LESSER_HEALTHSTONE_ALT, false) > 0 ||
+        bot->GetItemCount(WarlockRitualConstants::FEL_HEALTHSTONE, false) > 0)
     {
         return false; // Already has a healthstone
     }
     
     // Check if there's a soulwell nearby
-    GameObject* soulwell = bot->FindNearestGameObject(181621, 30.0f); // Soul Well Rank 1
+    GameObject* soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193169, 30.0f); // Soul Well Rank 2
+        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193170, 30.0f); // Soul Well Rank 2 variant
+        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2_VARIANT_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193171, 30.0f); // Soul Well Rank 2 variant
+        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2_VARIANT_2, 30.0f);
     
     if (!soulwell)
         return false;
@@ -664,13 +717,13 @@ bool LootSoulwellAction::Execute(Event event)
     Player* bot = botAI->GetBot();
     
     // Find the soulwell
-    GameObject* soulwell = bot->FindNearestGameObject(181621, 30.0f); // Soul Well Rank 1
+    GameObject* soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193169, 30.0f); // Soul Well Rank 2
+        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193170, 30.0f); // Soul Well Rank 2 variant
+        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2_VARIANT_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193171, 30.0f); // Soul Well Rank 2 variant
+        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2_VARIANT_2, 30.0f);
     
     if (!soulwell)
         return false;
@@ -728,11 +781,6 @@ bool EnableSoulstoneDungeonAction::Execute(Event event)
     // Enable the soulstone healer strategy
     botAI->ChangeStrategy("+ss healer", BOT_STATE_NON_COMBAT);
     
-    // Log the action for debugging
-    if (!sPlayerbotAIConfig->logInGroupOnly || (bot->GetGroup() && botAI->HasRealPlayerMaster()))
-    {
-        botAI->TellMaster("Soulstone healer strategy enabled for dungeon");
-    }
     
     return true;
 }

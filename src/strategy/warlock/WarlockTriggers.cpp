@@ -15,6 +15,44 @@
 
 #include "GameObject.h"
 
+// Global constants for spells and items
+namespace WarlockTriggerConstants
+{
+    // Soul Shard item
+    const uint32 SOUL_SHARD_ITEM = 6265;
+    
+    // Ritual of Souls spells
+    const uint32 RITUAL_OF_SOULS_RANK_1 = 29893;
+    const uint32 RITUAL_OF_SOULS_RANK_2 = 58887;
+    
+    // Soul Portal game objects
+    const uint32 SOUL_PORTAL_RANK_1 = 181622;
+    const uint32 SOUL_PORTAL_RANK_2 = 193168;
+    
+    // Soul Well game objects
+    const uint32 SOUL_WELL_RANK_1 = 181621;
+    const uint32 SOUL_WELL_RANK_2 = 193169;
+    const uint32 SOUL_WELL_RANK_2_VARIANT_1 = 193170;
+    const uint32 SOUL_WELL_RANK_2_VARIANT_2 = 193171;
+    
+    // Healthstone items
+    const uint32 MINOR_HEALTHSTONE = 5512;
+    const uint32 LESSER_HEALTHSTONE = 5511;
+    const uint32 MAJOR_HEALTHSTONE = 9421;
+    const uint32 MINOR_HEALTHSTONE_ALT = 19004;
+    const uint32 LESSER_HEALTHSTONE_ALT = 19005;
+    const uint32 FEL_HEALTHSTONE = 36892;
+    
+    // Soulstone items
+    const uint32 MINOR_SOULSTONE = 5232;
+    const uint32 LESSER_SOULSTONE = 16892;
+    const uint32 SOULSTONE = 16893;
+    const uint32 GREATER_SOULSTONE = 16895;
+    const uint32 MAJOR_SOULSTONE = 16896;
+    const uint32 MASTER_SOULSTONE = 22116;
+    const uint32 DEMONIC_SOULSTONE = 36895;
+}
+
 // Function declared in RitualActions.cpp
 #include "Cell.h"
 #include "GridNotifiers.h"
@@ -359,25 +397,23 @@ bool LootSoulwellTrigger::IsActive()
     if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
         return false;
     
-    if (bot->GetItemCount(5512, false) > 0 || // Minor Healthstone
-        bot->GetItemCount(5511, false) > 0 || // Lesser Healthstone
-        bot->GetItemCount(9421, false) > 0 || // Major Healthstone
-        bot->GetItemCount(19004, false) > 0 || // Minor Healthstone
-        bot->GetItemCount(19005, false) > 0)   // Lesser Healthstone
+    if (bot->GetItemCount(WarlockTriggerConstants::MINOR_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::LESSER_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::MAJOR_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::MINOR_HEALTHSTONE_ALT, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::LESSER_HEALTHSTONE_ALT, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::FEL_HEALTHSTONE, false) > 0)
     {
         return false; // Already has a healthstone
     }
     
-    GameObject* soulwell = bot->FindNearestGameObject(181621, 30.0f); // Soul Well Rank 1
+    GameObject* soulwell = bot->FindNearestGameObject(WarlockTriggerConstants::SOUL_WELL_RANK_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193169, 30.0f); // Soul Well Rank 2
+        soulwell = bot->FindNearestGameObject(WarlockTriggerConstants::SOUL_WELL_RANK_2, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193170, 30.0f); // Soul Well Rank 2 variant
+        soulwell = bot->FindNearestGameObject(WarlockTriggerConstants::SOUL_WELL_RANK_2_VARIANT_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(193171, 30.0f); // Soul Well Rank 2 variant
+        soulwell = bot->FindNearestGameObject(WarlockTriggerConstants::SOUL_WELL_RANK_2_VARIANT_2, 30.0f);
     
-    if (!soulwell)
-        return false;
-    
-    return true;
+    return soulwell;
 }
