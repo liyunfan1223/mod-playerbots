@@ -417,11 +417,12 @@ static bool IsProfessionRecipeUsefulForBot(Player* bot, ItemTemplate const* prot
     if (!bot->HasSkill(reqSkill))
         return false;
 
-    // Required rank check (can be disabled by config)
-    if (!sPlayerbotAIConfig->recipesIgnoreSkillRank)
+    // Required rank check (can be disabled by config) — flatten nested if
+    if (!sPlayerbotAIConfig->recipesIgnoreSkillRank &&
+        reqRank &&
+        bot->GetSkillValue(reqSkill) < reqRank)
     {
-        if (reqRank && bot->GetSkillValue(reqSkill) < reqRank)
-            return false;
+        return false;
     }
 
     // Avoid NEED if the taught spell is already known
@@ -638,16 +639,20 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
 
     // Class/spec specific adjustments (readable)
     // DK Unholy (DPS): allows STR/HIT/HASTE/CRIT/ARP; rejects all caster items
-    if (traits.cls == CLASS_DEATH_KNIGHT && (traits.spec == "unholy" || traits.spec == "uh"))
+    if (traits.cls == CLASS_DEATH_KNIGHT &&
+        (traits.spec == "unholy" || traits.spec == "uh") &&
+        looksCaster)
     {
-        if (looksCaster) return false;
+        return false;
     }
+	
     // DK Blood/Frost tanks: DEF/AVOID/STA/STR are useful; reject caster items
-    if (traits.isDKTank)
+    if (traits.isDKTank && looksCaster)
     {
-        if (looksCaster) return false;
-        // Pure caster DPS rings/trinkets already filtered above.
+        return false;
     }
+    // Pure caster DPS rings/trinkets already filtered above.
+	
     // Hunter (BM/MM/SV): agi/hit/haste/AP/crit/arp → OK; avoid STR-only or caster items
     if (traits.isHunter)
     {
@@ -656,21 +661,25 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
         if (isJewelry && hasSTR && !hasAGI && !hasAP && !hasDpsRatings)
             return false;
     }
+
     // Rogue (all specs): same strict physical filter (no caster items)
-    if (traits.isRogue)
+    if (traits.isRogue && looksCaster)
     {
-        if (looksCaster) return false;
+        return false;
     }
+
     // Warrior Arms/Fury : no caster items
-    if (traits.isWarrior && !traits.isWarProt)
+    if (traits.isWarrior && !traits.isWarProt && looksCaster)
     {
-        if (looksCaster) return false;
+        return false;
     }
+
     // Warrior Protection: DEF/AVOID/STA/STR are useful; no caster items
-    if (traits.isWarProt)
+    if (traits.isWarProt && looksCaster)
     {
-        if (looksCaster) return false;
+        return false;
     }
+
     // Shaman Enhancement: no Spell Power weapons/shields, no pure INT/SP items
     if (traits.isEnhSham)
     {
@@ -679,10 +688,11 @@ static bool IsPrimaryForSpec(Player* bot, ItemTemplate const* proto)
             && hasSP)
             return false;
     }
+
     // Druid Feral (tank/DPS): AGI/STA/AVOID/ARP/EXP → OK; no caster items
-    if (traits.isFeralTk || traits.isFeralDps)
+    if ((traits.isFeralTk || traits.isFeralDps) && looksCaster)
     {
-        if (looksCaster) return false;
+        return false;
     }
 
     // Paladin Retribution: physical DPS (no caster items; forbid SP weapons/shields; enforce 2H only)
@@ -1113,9 +1123,12 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, int32 rand
     RollVote finalVote = StoreLootAction::IsLootAllowed(proto->ItemId, GET_PLAYERBOT_AI(bot)) ? vote : PASS;
 
     // DEBUG: dump for recipes
-    if (IsRecipeItem(proto))
+    if (IsRecipeItem(proto)) {
         DebugRecipeRoll(bot, proto, usage, recipeChecked, recipeUseful, recipeKnown,
-                        reqSkillDbg, reqRankDbg, botRankDbg, /*before*/ (recipeNeed?NEED:PASS), /*after*/ finalVote);
+                        reqSkillDbg, reqRankDbg, botRankDbg,
+                        /*before*/ (recipeNeed ? NEED : PASS),
+                        /*after*/  finalVote);
+    }
 
     return finalVote;
 }
