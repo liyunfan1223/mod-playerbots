@@ -750,7 +750,7 @@ bool HighKingMaulgarBanishFelstalkerAction::isUseful()
 {
     Unit* felStalker = AI_VALUE2(Unit*, "find target", "wild fel stalker");
 
-    return felStalker && felStalker->IsAlive() && bot->getClass() == CLASS_WARLOCK;
+    return felStalker && felStalker->IsAlive() && !felStalker->HasAura(SPELL_BANISH) && bot->getClass() == CLASS_WARLOCK;
 }
 
 bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
@@ -784,9 +784,9 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
     }
 
     Unit* olm = AI_VALUE2(Unit*, "find target", "olm the summoner");
-    Unit* kiggler = AI_VALUE2(Unit*, "find target", "kiggler the crazed");
+    Unit* blindeye = AI_VALUE2(Unit*, "find target", "blindeye the seer");
     Player* olmTank = nullptr;
-    Player* moonkinTank = nullptr;
+    Player* blindeyeTank = nullptr;
 
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
@@ -796,7 +796,7 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
             continue;
         }
         if (IsOlmTank(botAI, member)) olmTank = member;
-        if (IsMoonkinTank(botAI, member)) moonkinTank = member;
+        if (IsBlindeyeTank(botAI, member)) blindeyeTank = member;
     }
 
     switch (hunterIndex)
@@ -824,11 +824,11 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
         break;
 
         case 1:
-        if (kiggler && kiggler->GetHealth() > 0.98f * kiggler->GetMaxHealth() && moonkinTank && moonkinTank->IsAlive())
+        if (blindeye && blindeye->GetHealth() > 0.90f * blindeye->GetMaxHealth() && blindeyeTank && blindeyeTank->IsAlive())
         {
-            if (botAI->CanCastSpell("misdirection", moonkinTank))
+            if (botAI->CanCastSpell("misdirection", blindeyeTank))
             {
-                botAI->CastSpell("misdirection", moonkinTank);
+                botAI->CastSpell("misdirection", blindeyeTank);
             }
 
             if (!bot->HasAura(SPELL_AURA_MISDIRECTION))
@@ -836,9 +836,9 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
                 return false;
             }
 
-            if (botAI->CanCastSpell("steady shot", kiggler))
+            if (botAI->CanCastSpell("steady shot", blindeye))
             {
-                botAI->CastSpell("steady shot", kiggler);
+                botAI->CastSpell("steady shot", blindeye);
             }
             
             return false;
@@ -855,43 +855,47 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
 bool GruulTheDragonkillerPositionBossAction::Execute(Event event)
 {
     Unit* gruul = AI_VALUE2(Unit*, "find target", "gruul the dragonkiller");
-    
+
     const TankSpot& tankSpot = GruulsLairTankSpots::Gruul;
-    const float maxDistance = 5.0f;
-    float distanceToTankSpot = gruul->GetExactDist2d(tankSpot.x, tankSpot.y);
+    const float maxStep = 5.0f;
+    const float positionLeeway = 3.0f;
 
-    if (distanceToTankSpot > maxDistance)
+    float dX = tankSpot.x - bot->GetPositionX();
+    float dY = tankSpot.y - bot->GetPositionY();
+    float distanceToTankSpot = bot->GetExactDist2d(tankSpot.x, tankSpot.y);
+
+    if (distanceToTankSpot > positionLeeway)
     {
-        float dX = tankSpot.x - gruul->GetPositionX();
-        float dY = tankSpot.y - gruul->GetPositionY();
-        float moveX = tankSpot.x + (dX / distanceToTankSpot) * maxDistance;
-        float moveY = tankSpot.y + (dY / distanceToTankSpot) * maxDistance;
+        float step = std::min(maxStep, distanceToTankSpot); // Don't overshoot
+        float moveX = bot->GetPositionX() + (dX / distanceToTankSpot) * step;
+        float moveY = bot->GetPositionY() + (dY / distanceToTankSpot) * step;
+        float moveZ = tankSpot.z;
 
-        float moveDistance = bot->GetExactDist2d(moveX, moveY);
-        if (moveDistance < 0.5f)
+        float destX = moveX;
+        float destY = moveY;
+        float destZ = moveZ;
+        if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(),
+            bot->GetPositionY(), bot->GetPositionZ(), destX, destY, destZ))
         {
             return false;
         }
 
-        return MoveTo(bot->GetMapId(), moveX, moveY, tankSpot.z, false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
+        return MoveTo(bot->GetMapId(), destX, destY, destZ, false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
     }
-    
-    float desiredOrientation = atan2(gruul->GetPositionY() - bot->GetPositionY(), gruul->GetPositionX() - bot->GetPositionX());
-    float currentOrientation = bot->GetOrientation();
-    float delta = desiredOrientation - currentOrientation;
-    while (delta > M_PI)
-        delta -= 2 * M_PI;
-    while (delta < -M_PI)
-        delta += 2 * M_PI;
-    float orientationDifference = fabs(static_cast<double>(delta));
 
-    const float orientationLeeway = 30.0f * M_PI / 180.0f;
+    const float orientationLeeway = 15.0f * M_PI / 180.0f;
+    float desiredOrientation = atan2(gruul->GetPositionY() - bot->GetPositionY(), gruul->GetPositionX() - bot->GetPositionX());
+    float delta = desiredOrientation - bot->GetOrientation();
+    while (delta > M_PI) delta -= 2 * M_PI;
+    while (delta < -M_PI) delta += 2 * M_PI;
+    float orientationDifference = fabs(delta);
+
     if (orientationDifference > orientationLeeway)
     {
         bot->SetFacingTo(desiredOrientation);
     }
 
-    return false;   
+    return false;
 }
 
 bool GruulTheDragonkillerPositionBossAction::isUseful()
@@ -964,9 +968,16 @@ bool GruulTheDragonkillerSpreadRangedAction::Execute(Event event)
     {
         if (!bot->IsWithinDist2d(targetPosition.GetPositionX(), targetPosition.GetPositionY(), 2.0f))
         {
-            return MoveTo(bot->GetMapId(), targetPosition.GetPositionX(), targetPosition.GetPositionY(), targetPosition.GetPositionZ());
+            float destX = targetPosition.GetPositionX();
+            float destY = targetPosition.GetPositionY();
+            float destZ = targetPosition.GetPositionZ();
+            if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), 
+                bot->GetPositionY(), bot->GetPositionZ(), destX, destY, destZ))
+            {
+                return false;
+            }
+            return MoveTo(bot->GetMapId(), destX, destY, destZ);
         }
-
         hasReachedInitialPosition[bot->GetGUID()] = true;
     }
 
@@ -999,7 +1010,15 @@ bool GruulTheDragonkillerSpreadRangedAction::Execute(Event event)
     
     if (distanceToGruul < gruulRangedRadius - 3.0f - movementThreshold)
     {
-        return MoveTo(bot->GetMapId(), tankSpot.x, tankSpot.y, tankSpot.z);
+        float destX = tankSpot.x;
+        float destY = tankSpot.y;
+        float destZ = tankSpot.z;
+        if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), 
+            bot->GetPositionY(), bot->GetPositionZ(), destX, destY, destZ))
+        {
+            return false;
+        }
+        return MoveTo(bot->GetMapId(), destX, destY, destZ);
     }
 
     return false;
@@ -1045,5 +1064,5 @@ bool GruulTheDragonkillerShatterSpreadAction::isUseful()
     Unit* gruul = AI_VALUE2(Unit*, "find target", "gruul the dragonkiller");
 
     return gruul && gruul->IsAlive() && 
-           (bot->HasAura(SPELL_AURA_GROUND_SLAM_1) || bot->HasAura(SPELL_AURA_GROUND_SLAM_2));
+           (bot->HasAura(SPELL_GROUND_SLAM_1) || bot->HasAura(SPELL_GROUND_SLAM_2));
 }

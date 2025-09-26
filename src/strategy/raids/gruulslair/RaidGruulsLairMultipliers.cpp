@@ -24,7 +24,7 @@ float HighKingMaulgarMultiplier::GetValue(Action* action)
     {
         return 0.0f;
     }
-    if (maulgar && maulgar->HasAura(SPELL_AURA_WHIRLWIND) && IsChargeAction(action))
+    if (maulgar && maulgar->HasAura(SPELL_WHIRLWIND) && IsChargeAction(action))
     {
         return 0.0f;
     }
@@ -55,7 +55,7 @@ float GruulTheDragonkillerMultiplier::GetValue(Action* action)
         return 1.0f;
     }
 
-    if (bot->HasAura(SPELL_AURA_GROUND_SLAM_1) || bot->HasAura(SPELL_AURA_GROUND_SLAM_2))
+    if (bot->HasAura(SPELL_GROUND_SLAM_1) || bot->HasAura(SPELL_GROUND_SLAM_2))
     {
         if ((dynamic_cast<MovementAction*>(action) && !dynamic_cast<GruulTheDragonkillerShatterSpreadAction*>(action)) ||
             IsChargeAction(action))

@@ -11,7 +11,7 @@ namespace GruulsLairTankSpots
 	static const TankSpot Maulgar  = { 90.686f, 167.047f, -13.234f, 3.009f };
 	static const TankSpot Olm      = { 99.392f, 192.834f, -10.883f, 6.265f };
 	static const TankSpot Blindeye = { 100.728f, 206.389f, -10.514f, 6.218f };
-	static const TankSpot Gruul    = { 241.238f, 365.025f, -4.220f, 4.071f};
+	static const TankSpot Gruul    = { 241.238f, 365.025f, -4.220f, 0.0f };
 }
 
 bool IsAnyOgreBossAlive(PlayerbotAI* botAI)
@@ -180,7 +180,7 @@ bool IsPositionSafe(PlayerbotAI* botAI, Unit* bot, Position pos)
         }
     }
     Unit* maulgar = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "high king maulgar")->Get();
-    if (maulgar && maulgar->IsAlive() && maulgar->HasAura(SPELL_AURA_WHIRLWIND))
+    if (maulgar && maulgar->IsAlive() && maulgar->HasAura(SPELL_WHIRLWIND))
     {
         float dist = sqrt(pow(pos.GetPositionX() - maulgar->GetPositionX(), 2) + 
                           pow(pos.GetPositionY() - maulgar->GetPositionY(), 2));
@@ -205,7 +205,7 @@ Position FindSafePosition(PlayerbotAI* botAI, Unit* bot, Unit* target, float opt
     Unit* maulgar = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "high king maulgar")->Get();
 
     bool dangerousKrosh = krosh && krosh->IsAlive();
-    bool dangerousMaulgar = maulgar && maulgar->IsAlive() && maulgar->HasAura(SPELL_AURA_WHIRLWIND);
+    bool dangerousMaulgar = maulgar && maulgar->IsAlive() && maulgar->HasAura(SPELL_WHIRLWIND);
     
     if (!dangerousKrosh && !dangerousMaulgar)
     {
