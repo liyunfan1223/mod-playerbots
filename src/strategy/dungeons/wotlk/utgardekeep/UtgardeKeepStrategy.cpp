@@ -7,11 +7,11 @@ void WotlkDungeonUKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // Prince Keleseth
     triggers.push_back(new TriggerNode("keleseth frost tomb",
              NextAction::array(0, new NextAction("attack frost tomb", ACTION_RAID + 1), nullptr)));
-    
+
     // Skarvald the Constructor & Dalronn the Controller
     triggers.push_back(new TriggerNode("dalronn priority",
              NextAction::array(0, new NextAction("attack dalronn", ACTION_RAID + 1), nullptr)));
-    
+
     // Ingvar the Plunderer
 
     // Doesn't work yet, this action doesn't get processed until the existing cast finishes

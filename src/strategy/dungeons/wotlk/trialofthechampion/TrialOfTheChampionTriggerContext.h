@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "TrialOfTheChampionTriggers.h"
 
-class WotlkDungeonToCTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonToCTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonToCTriggerContext()

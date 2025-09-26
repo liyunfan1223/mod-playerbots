@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "NexusTriggers.h"
 
-class WotlkDungeonNexTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonNexTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonNexTriggerContext()

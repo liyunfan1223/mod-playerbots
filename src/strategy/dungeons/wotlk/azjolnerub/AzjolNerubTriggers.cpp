@@ -7,7 +7,7 @@
 bool KrikthirWebWrapTrigger::IsActive()
 {
     if (!botAI->IsDps(bot)) { return false; }
-    
+
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit name
     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");
@@ -51,7 +51,7 @@ bool KrikthirWatchersTrigger::IsActive()
 //     for (auto i = triggers.begin(); i != triggers.end(); i++)
 //     {
 //         Unit* unit = botAI->GetUnit(*i);
-        
+
 //         if (unit)
 //         {
 //             bot->Yell("TRIGGER="+unit->GetName(), LANG_UNIVERSAL);
@@ -64,6 +64,6 @@ bool AnubarakPoundTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "anub'arak");
     if (!boss) { return false; }
-    
+
     return boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_POUND);
 }

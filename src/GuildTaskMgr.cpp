@@ -590,7 +590,7 @@ uint32 GuildTaskMgr::GetTaskValue(uint32 owner, uint32 guildId, std::string cons
     {
         return 0;
     }
-    
+
     uint32 value = 0;
 
     PlayerbotsDatabasePreparedStatement* stmt =

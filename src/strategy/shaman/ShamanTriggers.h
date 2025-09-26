@@ -38,6 +38,7 @@ const uint32 SPELL_WINDFURY_TOTEM_RANK_1 = 8512;
 const uint32 SPELL_NATURE_RESISTANCE_TOTEM_RANK_1 = 10595;
 const uint32 SPELL_TOTEM_OF_WRATH_RANK_1 = 30706;
 const uint32 SPELL_TOTEMIC_RECALL = 36936;
+const uint32 SPELL_CALL_OF_THE_ELEMENTS = 66842;
 
 class MainHandWeaponNoImbueTrigger : public BuffTrigger
 {
@@ -361,7 +362,7 @@ public:
     SetTotemTrigger(PlayerbotAI* ai, std::string const spellName, const uint32 requiredSpellId,
                     const uint32 totemSpellIds[], int actionButtonId)
         : Trigger(ai, "set " + spellName),
-          requiredSpellId(requiredSpellId), 
+          requiredSpellId(requiredSpellId),
           totemSpellIds(totemSpellIds),
           actionButtonId(actionButtonId) {}
     bool IsActive() override;

@@ -209,7 +209,7 @@ bool GuildManageNearbyAction::Execute(Event event)
             if (botAi->GetGuilderType() == GuilderType::SOLO && !botAi->HasRealPlayerMaster()) //Do not invite solo players.
                 continue;
 
-            if (botAi->HasActivePlayerMaster() && !sRandomPlayerbotMgr->IsRandomBot(player)) //Do not invite alts of active players. 
+            if (botAi->HasActivePlayerMaster() && !sRandomPlayerbotMgr->IsRandomBot(player)) //Do not invite alts of active players.
                 continue;
         }
 

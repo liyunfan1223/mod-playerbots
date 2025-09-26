@@ -73,7 +73,7 @@ bool NoFocusMagicTrigger::IsActive()
 {
     if (!bot->HasSpell(54646))
         return false;
-    
+
     Group* group = bot->GetGroup();
     if (!group)
         return false;

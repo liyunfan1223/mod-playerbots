@@ -71,7 +71,7 @@ public:
 class IccBqlMultiplier : public Multiplier
 {
 public:
-    IccBqlMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc bql multiplier") {}    
+    IccBqlMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc bql multiplier") {}
     virtual float GetValue(Action* action) override;
 };
 

@@ -22,7 +22,7 @@ bool CastMagmaTotemAction::isUseful() {
     if (!target || !bot->IsWithinMeleeRange(target))
         return false;
 
-    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name); 
+    return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", name);
 }
 
 bool CastFireNovaAction::isUseful() {
@@ -32,11 +32,11 @@ bool CastFireNovaAction::isUseful() {
     Creature* fireTotem = bot->GetMap()->GetCreature(bot->m_SummonSlot[1]);
     if (!fireTotem)
         return false;
-    
+
     if (target->GetDistance(fireTotem) > 8.0f)
         return false;
-    
-    return CastMeleeSpellAction::isUseful(); 
+
+    return CastMeleeSpellAction::isUseful();
 }
 
 bool CastCleansingTotemAction::isUseful()

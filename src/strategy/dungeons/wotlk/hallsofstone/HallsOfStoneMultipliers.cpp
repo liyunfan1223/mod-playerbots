@@ -10,7 +10,7 @@ float KrystallusMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "krystallus");
     if (!boss) { return 1.0f; }
-    
+
     // Check both of these... the spell is applied first, debuff later.
     // Neither is active for the full duration so we need to trigger off both
     if (bot->HasAura(SPELL_GROUND_SLAM) || bot->HasAura(DEBUFF_GROUND_SLAM))

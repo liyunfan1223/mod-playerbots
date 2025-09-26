@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS `playerbots_rpg_races`;
-CREATE TABLE `playerbots_rpg_races` 
+CREATE TABLE `playerbots_rpg_races`
 (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `entry` int(11),

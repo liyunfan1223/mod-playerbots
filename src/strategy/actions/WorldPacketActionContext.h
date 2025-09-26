@@ -86,7 +86,7 @@ public:
         creators["quest update complete"] = &WorldPacketActionContext::quest_update_complete;
         creators["turn in query quest"] = &WorldPacketActionContext::turn_in_query_quest;
         creators["quest item push result"] = &WorldPacketActionContext::quest_item_push_result;
-        
+
         creators["party command"] = &WorldPacketActionContext::party_command;
         creators["tell cast failed"] = &WorldPacketActionContext::tell_cast_failed;
         creators["accept duel"] = &WorldPacketActionContext::accept_duel;

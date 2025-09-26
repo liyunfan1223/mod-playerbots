@@ -1560,7 +1560,7 @@ bool MimironCheatTrigger::IsActive()
         return false;
     }
 
-    if (!botAI->IsMainTank(bot)) 
+    if (!botAI->IsMainTank(bot))
     {
         return false;
     }

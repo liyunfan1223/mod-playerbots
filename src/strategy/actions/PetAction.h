@@ -23,7 +23,7 @@ public:
 
 private:
     bool warningEnabled = true;
-    std::string defaultCmd; 
+    std::string defaultCmd;
 };
 
 #endif

@@ -32,11 +32,11 @@ void RacialsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "low mana", NextAction::array(0, new NextAction("arcane torrent", ACTION_NORMAL + 5), nullptr)));
 
     triggers.push_back(new TriggerNode(
-        "generic boost", NextAction::array(0, new NextAction("blood fury", ACTION_NORMAL + 5), 
+        "generic boost", NextAction::array(0, new NextAction("blood fury", ACTION_NORMAL + 5),
         new NextAction("berserking", ACTION_NORMAL + 5),
         new NextAction("use trinket", ACTION_NORMAL + 4),
         nullptr)));
-    
+
 }
 
 RacialsStrategy::RacialsStrategy(PlayerbotAI* botAI) : Strategy(botAI)

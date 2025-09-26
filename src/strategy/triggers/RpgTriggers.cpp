@@ -298,7 +298,7 @@ bool RpgQueueBGTrigger::IsActive()
 
     if (!guidP.IsCreature())
         return false;
-    
+
     // if bot is not leader disallow tag bg
     if (bot->GetGroup() && !bot->GetGroup()->IsLeader(bot->GetGUID()))
         return false;

@@ -13,7 +13,7 @@ public:
     MarksmanshipHunterStrategyActionNodeFactory()
     {
         creators["auto shot"] = &auto_shot;
-        creators["silencing shot"] = &silencing_shot;   
+        creators["silencing shot"] = &silencing_shot;
         creators["kill command"] = &kill_command;
         creators["kill shot"] = &kill_shot;
         creators["viper sting"] = &viper_sting;
@@ -50,7 +50,7 @@ MarksmanshipHunterStrategy::MarksmanshipHunterStrategy(PlayerbotAI* botAI) : Gen
 // ===== Default Actions =====
 NextAction** MarksmanshipHunterStrategy::getDefaultActions()
 {
-    return NextAction::array(0, 
+    return NextAction::array(0,
                                 new NextAction("kill command", 5.8f),
                                 new NextAction("kill shot", 5.7f),
                                 new NextAction("serpent sting", 5.6f),

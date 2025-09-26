@@ -21,7 +21,7 @@ bool DalronnDpsTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "dalronn the controller");
     if (!boss || !boss->isTargetableForAttack()) { return false; }
-    
+
     // This doesn't cause issues with healers currently and they will continue to heal even when included here
     return !botAI->IsTank(bot);
 }
@@ -78,6 +78,6 @@ bool NotBehindIngvarTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
     if (!boss || botAI->IsTank(bot)) { return false; }
-    
+
     return AI_VALUE2(bool, "behind", "current target");
 }

@@ -169,7 +169,7 @@ bool ToCMountedAction::Execute(Event event)
             return true;
         }
     }
- 
+
     uint32 spellId = AI_VALUE2(uint32, "vehicle spell id", "Thrust");
     if (botAI->CanCastVehicleSpell(spellId, target) && botAI->CastVehicleSpell(spellId, target))
     {
