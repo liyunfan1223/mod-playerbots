@@ -19,13 +19,17 @@ float KarazhanBigBadWolfMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the big bad wolf");
     if (!boss)
+    {
         return 1.0f;
+    }
 
     if (bot->HasAura(SPELL_LITTLE_RED_RIDING_HOOD))
     {
         if ((dynamic_cast<MovementAction*>(action) && !dynamic_cast<KarazhanBigBadWolfRunAwayAction*>(action)) || 
            (dynamic_cast<AttackAction*>(action)))
-            return 0.0f;
+           {
+               return 0.0f;
+           }
     }
     return 1.0f;
 }
@@ -34,18 +38,24 @@ float KarazhanShadeOfAranMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "shade of aran");
     if (!boss)
+    {
         return 1.0f;
+    }
 
     if (boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_ARCANE_EXPLOSION)) 
     {
         if (IsChargeAction(action))
+        {
             return 0.0f;
+        }
 
         if (dynamic_cast<MovementAction*>(action))
         {
             const float safeDistance = 20.0f;
             if (bot->GetDistance2d(boss) >= safeDistance)
+            {
                 return 0.0f;
+            }
         }
     }
 
@@ -67,7 +77,9 @@ float KarazhanShadeOfAranMultiplier::GetValue(Action* action)
     if (flameWreathActive)
     {
         if (dynamic_cast<MovementAction*>(action) || IsChargeAction(action))
+        {
             return 0.0f;
+        }
     }
     return 1.0f;
 }
@@ -76,7 +88,9 @@ float KarazhanNetherspiteBlueAndGreenBeamMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "netherspite");
     if (!boss || !boss->IsAlive())
+    {
         return 1.0f;
+    }
 
     RaidKarazhanHelpers karazhanHelper(botAI);
     auto [redBlocker /*unused*/, greenBlocker, blueBlocker] = karazhanHelper.GetCurrentBeamBlockers();
@@ -88,18 +102,25 @@ float KarazhanNetherspiteBlueAndGreenBeamMultiplier::GetValue(Action* action)
 
         bool inBeam = false;
         for (Unit* portal : {bluePortal, greenPortal}) {
-            if (!portal) continue;
+            if (!portal)
+            {
+                continue;
+            }
             float bx = boss->GetPositionX(), by = boss->GetPositionY();
             float px = portal->GetPositionX(), py = portal->GetPositionY();
             float dx = px - bx, dy = py - by;
             float length = sqrt(dx*dx + dy*dy);
-            if (length == 0.0f) continue;
+            if (length == 0.0f)
+            {
+                continue;
+            }
             dx /= length; dy /= length;
             float botdx = bot->GetPositionX() - bx, botdy = bot->GetPositionY() - by;
             float t = (botdx * dx + botdy * dy);
             float beamX = bx + dx * t, beamY = by + dy * t;
             float distToBeam = sqrt(pow(bot->GetPositionX() - beamX, 2) + pow(bot->GetPositionY() - beamY, 2));
-            if (distToBeam < 5.0f && t > 0.0f && t < length) {
+            if (distToBeam < 5.0f && t > 0.0f && t < length) 
+            {
                 inBeam = true;
                 break;
             }
@@ -118,7 +139,9 @@ float KarazhanNetherspiteBlueAndGreenBeamMultiplier::GetValue(Action* action)
             if (!inVoidZone)
             {
                 if (dynamic_cast<MovementAction*>(action) || IsChargeAction(action))
+                {
                     return 0.0f;
+                }
             }
         }
     }
@@ -129,7 +152,9 @@ float KarazhanNetherspiteRedBeamMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "netherspite");
     if (!boss || !boss->IsAlive())
+    {
         return 1.0f;
+    }
 
     RaidKarazhanHelpers karazhanHelper(botAI);
     auto [redBlocker, greenBlocker /*unused*/, blueBlocker /*unused*/] = karazhanHelper.GetCurrentBeamBlockers();
@@ -177,7 +202,9 @@ float KarazhanNetherspiteRedBeamMultiplier::GetValue(Action* action)
             if (distToTarget < positionTolerance)
             {
                 if (dynamic_cast<MovementAction*>(action) || IsChargeAction(action))
+                {
                     return 0.0f;
+                }
             }
         }
     }
@@ -187,13 +214,14 @@ float KarazhanNetherspiteRedBeamMultiplier::GetValue(Action* action)
 float KarazhanPrinceMalchezaarMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "prince malchezaar");
-    if (!boss)
-        return 1.0f;
 
-    if (boss && bot->HasAura(SPELL_ENFEEBLE))
+    if (boss && botAI->IsMelee(bot) && bot->HasAura(SPELL_ENFEEBLE))
     {
-        if (IsChargeAction(action))
-            return 0.0f;
+        if (dynamic_cast<KarazhanPrinceMalchezaarNonTankAvoidHazardAction*>(action))
+        {
+            return 1.0f;
+        }
+        return 0.0f;
     }
     return 1.0f;
 }

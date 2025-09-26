@@ -6,8 +6,9 @@
 bool KarazhanAttumenTheHuntsmanTrigger::IsActive()
 {
     RaidKarazhanHelpers helpers(botAI);
-    Unit* boss = helpers.GetFirstAliveUnitByEntry(NPC_ATTUMEN_THE_HUNTSMAN);
-    return boss != nullptr;
+    Unit* boss = helpers.GetFirstAliveUnitByEntry(NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED);
+
+    return boss && boss->IsAlive();
 }
 
 bool KarazhanMoroesTrigger::IsActive()
@@ -20,36 +21,27 @@ bool KarazhanMoroesTrigger::IsActive()
     Unit* robin = AI_VALUE2(Unit*, "find target", "lord robin daris");
     Unit* crispin = AI_VALUE2(Unit*, "find target", "lord crispin ference");
 
-    if ((!moroes || !moroes->IsAlive()) &&
-        (!dorothea || !dorothea->IsAlive()) &&
-        (!catriona || !catriona->IsAlive()) &&
-        (!keira || !keira->IsAlive()) &&
-        (!rafe || !rafe->IsAlive()) &&
-        (!robin || !robin->IsAlive()) &&
-        (!crispin || !crispin->IsAlive()))
-        return false;
-
-    return true;
+    return ((moroes && moroes->IsAlive()) ||
+            (dorothea && dorothea->IsAlive()) ||
+            (catriona && catriona->IsAlive()) ||
+            (keira && keira->IsAlive()) ||
+            (rafe && rafe->IsAlive()) ||
+            (robin && robin->IsAlive()) ||
+            (crispin && crispin->IsAlive()));
 }
 
 bool KarazhanMaidenOfVirtueTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "maiden of virtue");
 
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    return true;
+    return boss && boss->IsAlive();
 }
 
 bool KarazhanBigBadWolfTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the big bad wolf");
 
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    return true;
+    return boss && boss->IsAlive();
 }
 
 bool KarazhanRomuloAndJulianneTrigger::IsActive()
@@ -57,10 +49,7 @@ bool KarazhanRomuloAndJulianneTrigger::IsActive()
     Unit* julianne = AI_VALUE2(Unit*, "find target", "julianne");
     Unit* romulo = AI_VALUE2(Unit*, "find target", "romulo");
 
-    if (!julianne || !julianne->IsAlive() || !romulo || !romulo->IsAlive())
-        return false;
-
-    return true;
+    return julianne && julianne->IsAlive() && romulo && romulo->IsAlive();
 }
 
 bool KarazhanWizardOfOzTrigger::IsActive()
@@ -72,63 +61,45 @@ bool KarazhanWizardOfOzTrigger::IsActive()
     Unit* tinhead = AI_VALUE2(Unit*, "find target", "tinhead");
     Unit* crone = AI_VALUE2(Unit*, "find target", "the crone");
 
-    if (( !dorothee || !dorothee->IsAlive() ) &&
-        ( !tito || !tito->IsAlive() ) &&
-        ( !roar || !roar->IsAlive() ) &&
-        ( !strawman || !strawman->IsAlive() ) &&
-        ( !tinhead || !tinhead->IsAlive() ) &&
-        ( !crone || !crone->IsAlive() ))
-        return false;
-
-    return true;
+    return ((dorothee && dorothee->IsAlive()) ||
+            (tito && tito->IsAlive()) ||
+            (roar && roar->IsAlive()) ||
+            (strawman && strawman->IsAlive()) ||
+            (tinhead && tinhead->IsAlive()) ||
+            (crone && crone->IsAlive()));
 }
 
 bool KarazhanTheCuratorTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the curator");
 
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    return true;
+    return boss && boss->IsAlive();
 }
 
 bool KarazhanTerestianIllhoofTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "terestian illhoof");
 
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    return true;
+    return boss && boss->IsAlive();
 }
 
 bool KarazhanShadeOfAranTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "shade of aran");
 
-    if (!boss)
-        return false;
-
-    return true;
+    return boss && boss->IsAlive();
 }
 
 bool KarazhanNetherspiteTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "netherspite");
 
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    return true;
+    return boss && boss->IsAlive();
 }
 
 bool KarazhanPrinceMalchezaarTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "prince malchezaar");
 
-    if (!boss || !boss->IsAlive())
-        return false;
-
-    return true;
+    return boss && boss->IsAlive();
 }

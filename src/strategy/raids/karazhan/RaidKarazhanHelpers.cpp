@@ -35,7 +35,9 @@ const Position KARAZHAN_THE_CURATOR_BOSS_POSITION = Position(-11139.463f, -1884.
 void RaidKarazhanHelpers::MarkTargetWithSkull(Unit* target)
 {
     if (!target)
+    {
         return;
+    }
 
     if (Group* group = bot->GetGroup())
     {
@@ -43,15 +45,21 @@ void RaidKarazhanHelpers::MarkTargetWithSkull(Unit* target)
         ObjectGuid skullGuid = group->GetTargetIcon(skullIconId);
 
         if (skullGuid != target->GetGUID())
+        {
             group->SetTargetIcon(skullIconId, bot->GetGUID(), target->GetGUID());
+        }
     }
 }
 
 Unit* RaidKarazhanHelpers::GetFirstAliveUnit(const std::vector<Unit*>& units)
 {
     for (Unit* unit : units)
+    {
         if (unit && unit->IsAlive())
+        {
             return unit;
+        }
+    }
 
     return nullptr;
 }
@@ -65,8 +73,11 @@ Unit* RaidKarazhanHelpers::GetFirstAliveUnitByEntry(uint32 entry)
         Unit* unit = botAI->GetUnit(npcGuid);
 
         if (unit && unit->IsAlive() && unit->GetEntry() == entry)
+        {
             return unit;
+        }
     }
+
     return nullptr;
 }
 
@@ -79,10 +90,14 @@ Unit* RaidKarazhanHelpers::GetNearestPlayerInRadius(float radius)
             Player* member = itr->GetSource();
 
             if (!member || !member->IsAlive() || member == bot)
+            {
                 continue;
+            }
 
             if (bot->GetExactDist2d(member) < radius)
+            {
                 return member;
+            }
         }
     }
     return nullptr;
@@ -92,12 +107,13 @@ bool RaidKarazhanHelpers::IsFlameWreathActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "shade of aran");
     if (!boss)
+    {
         return false;
+    }
 
     Spell* currentSpell = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
     if (currentSpell && currentSpell->m_spellInfo && currentSpell->m_spellInfo->Id == SPELL_FLAME_WREATH)
     {
-        bot->Yell("I will not move when Flame Wreath is cast or the raid blows up.", LANG_UNIVERSAL);
         return true;
     }
 
@@ -107,9 +123,13 @@ bool RaidKarazhanHelpers::IsFlameWreathActive()
         {
             Player* member = itr->GetSource();
             if (!member || !member->IsAlive())
+            {
                 continue;
+            }
             if (member->HasAura(SPELL_AURA_FLAME_WREATH))
+            {
                 return true;
+            }
         }
     }
     return false;
@@ -125,7 +145,9 @@ std::vector<Player*> RaidKarazhanHelpers::GetBlueBlockers()
         {
             Player* member = itr->GetSource();
             if (!member || !member->IsAlive() || !GET_PLAYERBOT_AI(member))
+            {
                 continue;
+            }
 
             bool isDps = botAI->IsDps(member);
             bool isWarrior = member->getClass() == CLASS_WARRIOR;
@@ -155,7 +177,9 @@ std::vector<Player*> RaidKarazhanHelpers::GetGreenBlockers()
         {
             Player* member = itr->GetSource();
             if (!member || !member->IsAlive() || !GET_PLAYERBOT_AI(member))
+            {
                 continue;
+            }
 
             bool hasExhaustion = member->HasAura(SPELL_NETHER_EXHAUSTION_GREEN);
             Aura* greenBuff = member->GetAura(SPELL_GREEN_BEAM_DEBUFF);
@@ -188,7 +212,9 @@ Position RaidKarazhanHelpers::GetPositionOnBeam(Unit* boss, Unit* portal, float 
     float length = sqrt(dx*dx + dy*dy);
 
     if (length == 0.0f)
+    {
         return Position(bx, by, bz);
+    }
 
     dx /= length;
     dy /= length;
@@ -213,26 +239,37 @@ std::tuple<Player*, Player*, Player*> RaidKarazhanHelpers::GetCurrentBeamBlocker
         {
             Player* member = itr->GetSource();
             if (!member || !member->IsAlive())
+            {
                 continue;
-            PlayerbotAI* memberAI = sPlayerbotsMgr->GetPlayerbotAI(member);
-            if (!memberAI || !memberAI->IsTank(member))
+            }
+            if (!botAI->IsTank(member))
+            {
                 continue;
+            }
             if (member->HasAura(SPELL_NETHER_EXHAUSTION_RED))
+            {
                 continue;
+            }
             redBlockers.push_back(member);
         }
     }
 
     if (!redBlockers.empty())
+    {
         redBlocker = redBlockers.front();
+    }
 
     std::vector<Player*> greenBlockers = GetGreenBlockers();
     if (!greenBlockers.empty())
+    {
         greenBlocker = greenBlockers.front();
+    }
 
     std::vector<Player*> blueBlockers = GetBlueBlockers();
     if (!blueBlockers.empty())
+    {
         blueBlocker = blueBlockers.front();
+    }
 
     return std::make_tuple(redBlocker, greenBlocker, blueBlocker);
 }
@@ -246,7 +283,9 @@ std::vector<Unit*> RaidKarazhanHelpers::GetAllVoidZones()
     {
         Unit* unit = botAI->GetUnit(npcGuid);
         if (!unit || unit->GetEntry() != NPC_VOID_ZONE)
+        {
             continue;
+        }
 
         float dist = bot->GetExactDist2d(unit);
         if (dist < radius)
@@ -265,7 +304,9 @@ bool RaidKarazhanHelpers::IsSafePosition(float x, float y, float z,
         float dist = std::sqrt(std::pow(x - hazard->GetPositionX(), 2) + std::pow(y - hazard->GetPositionY(), 2));
 
         if (dist < hazardRadius)
+        {
             return false;
+        }
     }
     return true;
 }
@@ -280,7 +321,9 @@ std::vector<Unit*> RaidKarazhanHelpers::GetSpawnedInfernals() const
         Unit* unit = botAI->GetUnit(npcGuid);
 
         if (unit && unit->GetEntry() == NPC_NETHERSPITE_INFERNAL)
+        {
             infernals.push_back(unit);
+        }
     }
     return infernals;
 }
@@ -295,7 +338,10 @@ bool RaidKarazhanHelpers::IsStraightPathSafe(const Position& start, const Positi
     float tz = target.GetPositionZ();
     float totalDist = std::sqrt(std::pow(tx - sx, 2) + std::pow(ty - sy, 2));
     if (totalDist == 0.0f)
+    {
         return true;
+    }
+
     for (float checkDist = 0.0f; checkDist <= totalDist; checkDist += stepSize)
     {
         float t = checkDist / totalDist;
@@ -306,56 +352,54 @@ bool RaidKarazhanHelpers::IsStraightPathSafe(const Position& start, const Positi
         {
             float hazardDist = std::sqrt(std::pow(checkX - hazard->GetPositionX(), 2) + std::pow(checkY - hazard->GetPositionY(), 2));
             if (hazardDist < hazardRadius)
+            {
                 return false;
+            }
         }
     }
+
     return true;
 }
 
 Position RaidKarazhanHelpers::CalculateArcPoint(const Position& current, const Position& target, const Position& center)
 {
     float arcFraction = 0.25f;
-    // Calculate vectors from center to current position and target
     float currentX = current.GetPositionX() - center.GetPositionX();
     float currentY = current.GetPositionY() - center.GetPositionY();
     float targetX = target.GetPositionX() - center.GetPositionX();
     float targetY = target.GetPositionY() - center.GetPositionY();
 
-    // Calculate distances
     float currentDist = std::sqrt(currentX * currentX + currentY * currentY);
     float targetDist = std::sqrt(targetX * targetX + targetY * targetY);
     if (currentDist == 0.0f || targetDist == 0.0f)
+    {
         return current;
+    }
 
-    // Normalize vectors
     currentX /= currentDist;
     currentY /= currentDist;
     targetX /= targetDist;
     targetY /= targetDist;
 
-    // Calculate dot product to find the angle between vectors
     float dotProduct = currentX * targetX + currentY * targetY;
-    dotProduct = std::max(-1.0f, std::min(1.0f, dotProduct));  // Clamp to [-1, 1]
+    dotProduct = std::max(-1.0f, std::min(1.0f, dotProduct));
     float angle = std::acos(dotProduct);
 
-    // Determine rotation direction (clockwise or counterclockwise)
     float crossProduct = currentX * targetY - currentY * targetX;
-    float stepAngle = angle * arcFraction;  // Move arcFraction along the arc
+    float stepAngle = angle * arcFraction;
     if (crossProduct < 0)
-        stepAngle = -stepAngle;  // Clockwise
+    {
+        stepAngle = -stepAngle;
+    }
 
-    // Calculate rotation matrix components
     float cos_a = std::cos(stepAngle);
     float sin_a = std::sin(stepAngle);
 
-    // Rotate current vector
     float rotatedX = currentX * cos_a - currentY * sin_a;
     float rotatedY = currentX * sin_a + currentY * cos_a;
 
-    // Smoothing: blend current and target radius
     float desiredDist = currentDist * 0.9f + targetDist * 0.1f;
 
-    // Calculate the new position
     return Position(center.GetPositionX() + rotatedX * desiredDist,
                     center.GetPositionY() + rotatedY * desiredDist,
                     current.GetPositionZ());
