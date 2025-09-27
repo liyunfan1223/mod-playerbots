@@ -13,8 +13,10 @@ bool DrinkAction::Execute(Event event)
     if (bot->IsInCombat())
         return false;
 
-    // Don't drink while mounted
     if (bot->IsMounted())
+        return false;
+
+    if (botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", "aquatic form","flight form", "swift flight form", nullptr)) 
         return false;
 
     if (botAI->HasCheat(BotCheatMask::food))
@@ -73,8 +75,10 @@ bool EatAction::Execute(Event event)
     if (bot->IsInCombat())
         return false;
 
-    // Don't eat while mounted
     if (bot->IsMounted())
+        return false;
+
+    if (botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", "aquatic form","flight form", "swift flight form", nullptr)) 
         return false;
 
     if (botAI->HasCheat(BotCheatMask::food))
