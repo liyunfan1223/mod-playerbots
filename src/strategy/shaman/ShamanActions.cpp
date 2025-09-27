@@ -93,18 +93,26 @@ bool CastSpiritWalkAction::Execute(Event event)
 
 bool SetTotemAction::Execute(Event event)
 {
-    size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
+    const size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
+    if (spellIdsCount == 0)
+        return false;  // early return
+
     uint32 totemSpell = 0;
-    for (int i = (int)spellIdsCount - 1; i >= 0; --i)
+
+    // Iterate backwards due signed/unsigned int
+    for (size_t i = spellIdsCount; i-- > 0;)
     {
-        if (bot->HasSpell(totemSpellIds[i]))
+        const uint32 spellId = totemSpellIds[i];
+        if (bot->HasSpell(spellId))
         {
-            totemSpell = totemSpellIds[i];
+            totemSpell = spellId;
             break;
         }
     }
-    if (!totemSpell)
+
+    if (totemSpell == 0)
         return false;
+
     bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
     return true;
 }

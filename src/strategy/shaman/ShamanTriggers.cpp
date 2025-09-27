@@ -424,6 +424,7 @@ bool SetTotemTrigger::IsActive()
 {
     if (!bot->HasSpell(SPELL_CALL_OF_THE_ELEMENTS))
         return false;
+
     if (!bot->HasSpell(requiredSpellId))
         return false;
 
@@ -431,14 +432,18 @@ bool SetTotemTrigger::IsActive()
     if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
         return true;
 
-    size_t totemSpellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
-    for (int i = (int)totemSpellIdsCount - 1; i >= 0; --i)
-
+    const size_t totemSpellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
+    if (totemSpellIdsCount == 0)
     {
-        if (bot->HasSpell(totemSpellIds[i]))
+        return false;
+    }
 
+    for (int i = (int)totemSpellIdsCount - 1; i >= 0; --i)
+    {
+        const uint32 spellId = totemSpellIds[i];
+        if (bot->HasSpell(spellId))
         {
-            return button->GetAction() != totemSpellIds[i];
+            return button->GetAction() != spellId;
         }
     }
 
