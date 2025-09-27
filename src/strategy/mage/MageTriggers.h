@@ -341,4 +341,23 @@ public:
         : TwoTriggers(botAI, "enemy too close for spell", "no firestarter strategy") {}
 };
 
+// Ritual Triggers
+
+// InDungeonOrRaidTrigger is now defined in RitualActions.h
+
+class NoRefreshmentTableTrigger : public Trigger
+{
+public:
+    NoRefreshmentTableTrigger(PlayerbotAI* botAI) : Trigger(botAI, "no refreshment table") {}
+    bool IsActive() override;
+};
+
+class RitualOfRefreshmentTrigger : public TwoTriggers
+{
+public:
+    RitualOfRefreshmentTrigger(PlayerbotAI* botAI) : TwoTriggers(botAI, "in dungeon or raid", "no refreshment table") {}
+};
+
+// RefreshmentTableAvailableTrigger is now defined in RitualActions.h
+
 #endif
