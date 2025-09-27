@@ -9,6 +9,8 @@
 #include "Totem.h"
 #include "PlayerbotAI.h"
 #include "Action.h"
+#include <sstream>
+#include "Log.h"
 
 bool CastTotemAction::isUseful()
 {
@@ -87,16 +89,25 @@ bool CastSpiritWalkAction::Execute(Event event)
     return false;
 }
 
+bool CastCallOfTheElementsAction::Execute(Event event)
+{
+    const bool ok = CastSpellAction::Execute(event);
+    if (ok)
+    {
+        LOG_DEBUG("playerbots", "[Totem] Call of the Elements cast");
+    }
+    return ok;
+}
+
 // Set Strategy Assigned Totems (Actions) - First, it checks
 // the highest-rank spell the bot knows for each totem type,
 // then adds it to the Call of the Elements bar.
 
 bool SetTotemAction::Execute(Event event)
-{
-    size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
-
+{	
+    // Pick the highest-rank spell the bot knows (arrays are sorted from highest to lowest rank)
     uint32 totemSpell = 0;
-    for (int i = spellIdsCount - 1; i >= 0; --i)
+    for (size_t i = 0; i < totemSpellIdsCount; ++i)
     {
         if (bot->HasSpell(totemSpellIds[i]))
         {
@@ -105,7 +116,15 @@ bool SetTotemAction::Execute(Event event)
         }
     }
     if (!totemSpell)
+    {
+        LOG_DEBUG("playerbots", "[Totem] No known rank for {} (count={}, level={})",
+                 getName(), totemSpellIdsCount, static_cast<uint32>(bot->GetLevel()));
         return false;
+    }
     bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
+    // Debug: report which spell id was assigned
+    {
+    LOG_DEBUG("playerbots", "[Totem] Bind slot {} -> spellId={}", actionButtonId, totemSpell);
+    }
     return true;
 }
