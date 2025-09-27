@@ -13,6 +13,12 @@ bool DrinkAction::Execute(Event event)
     if (bot->IsInCombat())
         return false;
 
+    if (bot->IsMounted())
+        return false;
+
+    if (botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", "aquatic form","flight form", "swift flight form", nullptr)) 
+        return false;
+
     if (botAI->HasCheat(BotCheatMask::food))
     {
         // if (bot->IsNonMeleeSpellCast(true))
@@ -67,6 +73,12 @@ bool DrinkAction::isPossible()
 bool EatAction::Execute(Event event)
 {
     if (bot->IsInCombat())
+        return false;
+
+    if (bot->IsMounted())
+        return false;
+
+    if (botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", "aquatic form","flight form", "swift flight form", nullptr)) 
         return false;
 
     if (botAI->HasCheat(BotCheatMask::food))
