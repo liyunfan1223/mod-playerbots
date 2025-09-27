@@ -176,8 +176,8 @@ float IccRotfaceMultiplier::GetValue(Action* action)
     if (dynamic_cast<CastBlinkBackAction*>(action))
         return 0.0f;
 
-    if (botAI->IsAssistTank(bot) && (dynamic_cast<AttackRtiTargetAction*>(action) || dynamic_cast<TankAssistAction*>(action))) 
-        return 0.0f; 
+    if (botAI->IsAssistTank(bot) && (dynamic_cast<AttackRtiTargetAction*>(action) || dynamic_cast<TankAssistAction*>(action)))
+        return 0.0f;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "big ooze");
     if (!boss)
@@ -185,7 +185,7 @@ float IccRotfaceMultiplier::GetValue(Action* action)
 
     static std::map<ObjectGuid, uint32> lastExplosionTimes;
     static std::map<ObjectGuid, bool> hasMoved;
-    
+
     ObjectGuid botGuid = bot->GetGUID();
 
     // When cast starts, record the time
@@ -313,7 +313,7 @@ float IccBpcAssistMultiplier::GetValue(Action* action)
         return 0.0f;
 
     Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
-    if (aura) 
+    if (aura)
     {
         if (aura->GetStackAmount() > 18 && botAI->IsTank(bot))
         {
@@ -642,8 +642,8 @@ float IccSindragosaMultiplier::GetValue(Action* action)
             return 1.0f;
 
         if (dynamic_cast<FollowAction*>(action) || dynamic_cast<IccSindragosaBlisteringColdAction*>(action) ||
-            dynamic_cast<IccSindragosaChilledToTheBoneAction*>(action) || dynamic_cast<IccSindragosaMysticBuffetAction*>(action) || 
-            dynamic_cast<IccSindragosaFrostBeaconAction*>(action) || dynamic_cast<IccSindragosaUnchainedMagicAction*>(action) || 
+            dynamic_cast<IccSindragosaChilledToTheBoneAction*>(action) || dynamic_cast<IccSindragosaMysticBuffetAction*>(action) ||
+            dynamic_cast<IccSindragosaFrostBeaconAction*>(action) || dynamic_cast<IccSindragosaUnchainedMagicAction*>(action) ||
             dynamic_cast<FleeAction*>(action) || dynamic_cast<CastDisengageAction*>(action) || dynamic_cast<PetAttackAction*>(action) ||
             dynamic_cast<IccSindragosaGroupPositionAction*>(action) || dynamic_cast<TankAssistAction*>(action) ||
             dynamic_cast<DpsAoeAction*>(action) || dynamic_cast<CastHurricaneAction*>(action) ||

@@ -26,55 +26,12 @@ bool GossipHelloAction::Execute(Event event)
         p >> guid;
     }
 
-    if (!guid)
-        return false;
-
-    Creature* pCreature = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
-    if (!pCreature)
-    {
-        LOG_DEBUG("playerbots",
-                  "[PlayerbotMgr]: HandleMasterIncomingPacket - Received  CMSG_GOSSIP_HELLO {} not found or you can't "
-                  "interact with him.",
-                  guid.ToString().c_str());
-        return false;
-    }
-
-    GossipMenuItemsMapBounds pMenuItemBounds =
-        sObjectMgr->GetGossipMenuItemsMapBounds(pCreature->GetCreatureTemplate()->GossipMenuId);
-    if (pMenuItemBounds.first == pMenuItemBounds.second)
-        return false;
-
     std::string const text = event.getParam();
     int32 menuToSelect = -1;
-    if (text.empty())
-    {
-        WorldPacket p1;
-        p1 << guid;
-        bot->GetSession()->HandleGossipHelloOpcode(p1);
-        bot->SetFacingToObject(pCreature);
-
-        std::ostringstream out;
-        out << "--- " << pCreature->GetName() << " ---";
-        botAI->TellMasterNoFacing(out.str());
-
-        TellGossipMenus();
-    }
-    else if (!bot->PlayerTalkClass)
-    {
-        botAI->TellError("I need to talk first");
-        return false;
-    }
-    else
-    {
+    if (!text.empty())
         menuToSelect = atoi(text.c_str());
-        // if (menuToSelect > 0)
-        //     menuToSelect--;
 
-        ProcessGossip(menuToSelect);
-    }
-
-    bot->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
-    return true;
+    return Execute(guid, menuToSelect, false);
 }
 
 void GossipHelloAction::TellGossipText(uint32 textId)
@@ -120,16 +77,16 @@ void GossipHelloAction::TellGossipMenus()
     }
 }
 
-bool GossipHelloAction::ProcessGossip(int32 menuToSelect)
+bool GossipHelloAction::ProcessGossip(int32 menuToSelect, bool silent)
 {
     GossipMenu& menu = bot->PlayerTalkClass->GetGossipMenu();
     if (menuToSelect != -1 && !menu.GetItem(menuToSelect))
     {
-        botAI->TellError("Unknown gossip option");
+        if (!silent)
+            botAI->TellError("Unknown gossip option");
         return false;
     }
 
-    // GossipMenuItem const* item = menu.GetItem(menuToSelect); //not used, line marked for removal.
     WorldPacket p;
     std::string code;
     p << GetMaster()->GetTarget();
@@ -137,7 +94,59 @@ bool GossipHelloAction::ProcessGossip(int32 menuToSelect)
     p << code;
     bot->GetSession()->HandleGossipSelectOptionOpcode(p);
 
-    TellGossipMenus();
+    if (!silent)
+        TellGossipMenus();
 
+    return true;
+}
+
+bool GossipHelloAction::Execute(ObjectGuid guid, int32 menuToSelect, bool silent)
+{
+    if (!guid)
+        return false;
+
+    Creature* pCreature = bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
+    if (!pCreature)
+    {
+        LOG_DEBUG("playerbots",
+                  "[PlayerbotMgr]: HandleMasterIncomingPacket - Received  CMSG_GOSSIP_HELLO {} not found or you can't "
+                  "interact with him.",
+                  guid.ToString().c_str());
+        return false;
+    }
+
+    GossipMenuItemsMapBounds pMenuItemBounds =
+        sObjectMgr->GetGossipMenuItemsMapBounds(pCreature->GetCreatureTemplate()->GossipMenuId);
+    if (pMenuItemBounds.first == pMenuItemBounds.second)
+        return false;
+
+    if (menuToSelect == -1)
+    {
+        WorldPacket p1;
+        p1 << guid;
+        bot->GetSession()->HandleGossipHelloOpcode(p1);
+        bot->SetFacingToObject(pCreature);
+
+        if (!silent)
+        {
+            std::ostringstream out;
+            out << "--- " << pCreature->GetName() << " ---";
+            botAI->TellMasterNoFacing(out.str());
+            TellGossipMenus();
+        }
+    }
+    else if (!bot->PlayerTalkClass)
+    {
+        if (!silent)
+            botAI->TellError("I need to talk first");
+        return false;
+    }
+    else
+    {
+        if (!ProcessGossip(menuToSelect, silent))
+            return false;
+    }
+
+    bot->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
     return true;
 }

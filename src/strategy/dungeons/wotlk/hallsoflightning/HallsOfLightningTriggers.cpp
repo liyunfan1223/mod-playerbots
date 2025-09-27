@@ -27,7 +27,7 @@ bool BjarngrimWhirlwindTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "general bjarngrim");
     if (!boss) { return false; }
-    
+
     return boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_WHIRLWIND_BJARNGRIM);
 }
 
@@ -57,7 +57,7 @@ bool IonarBallLightningTrigger::IsActive()
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "ionar");
     if (!boss) { return false; }
-    
+
     return boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_BALL_LIGHTNING);
 }
 
@@ -67,7 +67,7 @@ bool IonarTankAggroTrigger::IsActive()
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "ionar");
     if (!boss) { return false; }
-    
+
     return AI_VALUE2(bool, "has aggro", "current target");
 }
 
@@ -88,6 +88,6 @@ bool LokenLightningNovaTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "loken");
     if (!boss) { return false; }
-    
+
     return boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_LIGHTNING_NOVA);
 }

@@ -30,8 +30,8 @@ bool PartyCommandAction::Execute(Event event)
     Player* master = GetMaster();
     if (master && member == master->GetName())
         return Leave(bot);
-	
-	botAI->Reset();
+
+    botAI->Reset();
 
     return false;
 }
@@ -64,8 +64,8 @@ bool UninviteAction::Execute(Event event)
         if (bot->GetGUID() == guid)
             return Leave(bot);
     }
-	
-	botAI->Reset();
+
+    botAI->Reset();
 
     return false;
 }
@@ -162,8 +162,8 @@ bool LeaveFarAwayAction::isUseful()
     {
         return true;
     }
-	
-	botAI->Reset();
+
+    botAI->Reset();
 
     return false;
 }

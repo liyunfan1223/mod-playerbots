@@ -55,7 +55,7 @@ public:
         sValueContexts.Add(this);
         NamedObjectContextList<UntypedValue> valueContexts(sValueContexts);
         PlayerbotAI* botAI = new PlayerbotAI();
-        
+
         UntypedValue* value = valueContexts.GetContextObject(name, botAI);
         delete botAI;
         return dynamic_cast<Value<T>*>(value);

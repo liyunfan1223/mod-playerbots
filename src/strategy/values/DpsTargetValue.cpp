@@ -297,7 +297,7 @@ Unit* DpsTargetValue::Calculate()
         return rti;
 
     float dps = AI_VALUE(float, "estimated group dps");
-    
+
     if (botAI->GetNearGroupMemberCount() > 3)
     {
         if (botAI->IsCaster(bot))

@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS `updates_include` (
 DELETE FROM `updates_include`;
 /*!40000 ALTER TABLE `updates_include` DISABLE KEYS */;
 INSERT INTO `updates_include` (`path`, `state`) VALUES
-	('$/data/sql/playerbots/updates', 'RELEASED'),
-	('$/data/sql/playerbots/custom', 'CUSTOM'),
-	('$/data/sql/playerbots/archive', 'ARCHIVED');
+    ('$/data/sql/playerbots/updates', 'RELEASED'),
+    ('$/data/sql/playerbots/custom', 'CUSTOM'),
+    ('$/data/sql/playerbots/archive', 'ARCHIVED');
 /*!40000 ALTER TABLE `updates_include` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

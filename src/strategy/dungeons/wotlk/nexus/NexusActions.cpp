@@ -41,7 +41,7 @@ bool MoveFromWhirlwindAction::Execute(Event event)
     }
 
     float bossDistance = bot->GetExactDist2d(boss->GetPosition());
-    
+
     // Check if the bot is already at a safe distance
     if (bossDistance > targetDist)
     {
@@ -156,7 +156,7 @@ bool DodgeSpikesAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ormorok the tree-shaper");
     if (!boss) { return false; }
-    
+
     return Move(bot->GetAngle(boss), bot->GetExactDist2d(boss) - 0.3f);
 }
 

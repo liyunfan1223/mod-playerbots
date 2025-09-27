@@ -102,6 +102,17 @@ public:
     bool botAutologin;
     std::string randomBotMapsAsString;
     float probTeleToBankers;
+    bool enableWeightTeleToCityBankers;
+    int weightTeleToStormwind;
+    int weightTeleToIronforge;
+    int weightTeleToDarnassus;
+    int weightTeleToExodar;
+    int weightTeleToOrgrimmar;
+    int weightTeleToUndercity;
+    int weightTeleToThunderBluff;
+    int weightTeleToSilvermoonCity;
+    int weightTeleToShattrathCity;
+    int weightTeleToDalaran;
     std::vector<uint32> randomBotMaps;
     std::vector<uint32> randomBotQuestItems;
     std::vector<uint32> randomBotAccounts;
@@ -127,6 +138,12 @@ public:
     uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
     uint32 disabledWithoutRealPlayerLoginDelay, disabledWithoutRealPlayerLogoutDelay;
     bool randomBotJoinLfg;
+
+    // Buff system
+    // Min group size to use Greater buffs (Paladin, Mage, Druid). Default: 3
+    int32 minBotsForGreaterBuff;
+    // Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff. Default: 30
+    int32 rpWarningCooldown;
 
     // chat
     bool randomBotTalk;

@@ -25,7 +25,7 @@ public:
         // creators["icy clutch"] = &icy_clutch;
         creators["horn of winter"] = &horn_of_winter;
         creators["killing machine"] = &killing_machine;  // buff
-        // creators["deathchill"] = &deathchill;		//boost
+        // creators["deathchill"] = &deathchill;        //boost
         creators["icebound fortitude"] = &icebound_fortitude;
         // creators["mind freeze"] = &mind_freeze; interrupt
         // creators["empower rune weapon"] = &empower_rune_weapon; boost
@@ -184,7 +184,7 @@ void GenericDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "horn of winter", NextAction::array(0, new NextAction("horn of winter", ACTION_NORMAL + 1), nullptr)));
     triggers.push_back(new TriggerNode("critical health",
                                        NextAction::array(0, new NextAction("death pact", ACTION_HIGH + 5), nullptr)));
-    
+
     triggers.push_back(
         new TriggerNode("low health", NextAction::array(0, new NextAction("icebound fortitude", ACTION_HIGH + 5),
                                                         new NextAction("rune tap", ACTION_HIGH + 4), nullptr)));
@@ -193,8 +193,8 @@ void GenericDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                                         new NextAction("pestilence", ACTION_NORMAL + 4),
                                                         new NextAction("blood boil", ACTION_NORMAL + 3), nullptr)));
     // triggers.push_back(new TriggerNode("light aoe", NextAction::array(0,
-    // 	new NextAction("pestilence", ACTION_NORMAL + 4),
-    // 	nullptr)));
+    //     new NextAction("pestilence", ACTION_NORMAL + 4),
+    //     nullptr)));
     triggers.push_back(
         new TriggerNode("pestilence glyph", NextAction::array(0, new NextAction("pestilence", ACTION_HIGH + 9), NULL)));
 }

@@ -6,7 +6,7 @@ bool SartharionTankTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "sartharion");
     if (!boss) { return false; }
-    
+
     return botAI->IsTank(bot);
 }
 
@@ -97,7 +97,7 @@ bool TwilightPortalEnterTrigger::IsActive()
     //         return false;
     //     }
     // }
-    
+
 
     // Don't enter portal until drakes are dead
     if (bot->HasAura(SPELL_POWER_OF_SHADRON) ||

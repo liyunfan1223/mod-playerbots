@@ -1690,7 +1690,7 @@ bool IccRotfaceTankPositionAction::PositionMainTankAndMelee(Unit* boss)
     if (!isBossCasting && (bot->GetExactDist2d(ICC_ROTFACE_CENTER_POSITION) < 2.0f || bot->GetExactDist2d(ICC_ROTFACE_CENTER_POSITION) > 7.0f) && !botAI->IsTank(bot))
     {
        MoveTo(bot->GetMapId(), ICC_ROTFACE_CENTER_POSITION.GetPositionX(), ICC_ROTFACE_CENTER_POSITION.GetPositionY(),
-              bot->GetPositionZ(),  false, false, false, true, MovementPriority::MOVEMENT_COMBAT);                 
+              bot->GetPositionZ(),  false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
     }
 
     return false;
@@ -2047,7 +2047,7 @@ bool IccRotfaceGroupPositionAction::PositionRangedAndHealers(Unit* boss,Unit *sm
          bot->GetExactDist2d(boss->GetPositionX(), boss->GetPositionY()) > 5.0f))
     {
         MoveTo(bot->GetMapId(), boss->GetPositionX(), boss->GetPositionY(),
-                      bot->GetPositionZ(),  false, false, false, true, MovementPriority::MOVEMENT_COMBAT);                 
+                      bot->GetPositionZ(),  false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
     }
 
     if (!isHeroic)
@@ -5168,7 +5168,7 @@ bool IccValithriaGroupAction::Handle25ManGroupLogic()
     if (botAI->IsTank(bot) || botAI->IsDps(bot))
         HandleMarkingLogic(inGroup1, inGroup2, group1Pos, group2Pos);
 
-    
+
     // Movement logic for non-healers
     if (!botAI->IsHeal(bot))
     {
@@ -5190,7 +5190,7 @@ bool IccValithriaGroupAction::Handle25ManGroupLogic()
             }
         }
     }
-    
+
     return false;
 }
 
@@ -5615,7 +5615,7 @@ bool IccValithriaDreamCloudAction::Execute(Event event)
         }
     }
 
-    
+
     // All stacked: leader (lowest guid) moves to next cloud, others follow and stack at leader's new position
     // Find all dream and nightmare clouds
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
@@ -6104,7 +6104,7 @@ bool IccSindragosaTankSwapPositionAction::Execute(Event event)
         return false;
 
     float distToTankPos = bot->GetExactDist2d(ICC_SINDRAGOSA_TANK_POSITION);
-    
+
     // Move to tank position
     if (distToTankPos > 3.0f)  // Tighter tolerance for tank swap
     {
@@ -6305,7 +6305,7 @@ bool IccSindragosaFrostBeaconAction::HandleNonBeaconedPlayer(const Unit* boss)
     const bool isRanged = botAI->IsRanged(bot) || (bot->GetExactDist2d(ICC_SINDRAGOSA_RANGED_POSITION.GetPositionX(),ICC_SINDRAGOSA_RANGED_POSITION.GetPositionY()) <
                           bot->GetExactDist2d(ICC_SINDRAGOSA_MELEE_POSITION.GetPositionX(),ICC_SINDRAGOSA_MELEE_POSITION.GetPositionY()));
 
-    const Position& targetPosition = isRanged ? ICC_SINDRAGOSA_RANGED_POSITION : ICC_SINDRAGOSA_MELEE_POSITION; 
+    const Position& targetPosition = isRanged ? ICC_SINDRAGOSA_RANGED_POSITION : ICC_SINDRAGOSA_MELEE_POSITION;
 
     const float deltaX = std::abs(targetPosition.GetPositionX() - bot->GetPositionX());
     const float deltaY = std::abs(targetPosition.GetPositionY() - bot->GetPositionY());
@@ -6374,7 +6374,7 @@ bool IccSindragosaBlisteringColdAction::Execute(Event event)
 
         float const STEP_SIZE = 15.0f;
         float distToTarget = bot->GetDistance2d(targetPos.GetPositionX(), targetPos.GetPositionY());
-        
+
         if (distToTarget > 0.1f)  // Avoid division by zero
         {
             if (!bot->HasAura(SPELL_NITRO_BOOSTS))
@@ -6382,12 +6382,12 @@ bool IccSindragosaBlisteringColdAction::Execute(Event event)
             // Calculate direction vector
             float dirX = targetPos.GetPositionX() - bot->GetPositionX();
             float dirY = targetPos.GetPositionY() - bot->GetPositionY();
-            
+
             // Normalize direction vector
             float length = sqrt(dirX * dirX + dirY * dirY);
             dirX /= length;
             dirY /= length;
-            
+
             // Move STEP_SIZE yards in that direction
             float moveX = bot->GetPositionX() + dirX * STEP_SIZE;
             float moveY = bot->GetPositionY() + dirY * STEP_SIZE;
@@ -6441,7 +6441,7 @@ bool IccSindragosaChilledToTheBoneAction::Execute(Event event)
         }
     }
 
-    return false;  
+    return false;
 }
 
 bool IccSindragosaMysticBuffetAction::Execute(Event event)
@@ -6517,7 +6517,7 @@ bool IccSindragosaMysticBuffetAction::Execute(Event event)
         {
             return true;
         }
-                
+
 
         botAI->Reset();
         // Move to LOS2 position
@@ -7874,7 +7874,7 @@ bool IccLichKingAddsAction::Execute(Event event)
         }
     }
     //-----------Valkyr bot suicide if group fails to kill Valkyr in time------------- comment out if you dont want it
-    
+
     // Handle teleportation fixes
     HandleTeleportationFixes(diff, terenasMenethilHC);
 

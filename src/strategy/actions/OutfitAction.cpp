@@ -8,6 +8,7 @@
 #include "Event.h"
 #include "ItemVisitors.h"
 #include "Playerbots.h"
+#include "ItemPackets.h"
 
 bool OutfitAction::Execute(Event event)
 {
@@ -70,7 +71,9 @@ bool OutfitAction::Execute(Event event)
 
                 WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
                 packet << bagIndex << slot << dstBag;
-                bot->GetSession()->HandleAutoStoreBagItemOpcode(packet);
+                WorldPackets::Item::AutoStoreBagItem nicePacket(std::move(packet));
+                nicePacket.Read();
+                bot->GetSession()->HandleAutoStoreBagItemOpcode(nicePacket);
             }
 
             EquipItems(outfit);
@@ -183,7 +186,7 @@ void OutfitAction::Update(std::string const name)
 {
     ListItemsVisitor visitor;
     IterateItems(&visitor, ITERATE_ITEMS_IN_EQUIP);
-    
+
     ItemIds items;
     for (std::map<uint32, uint32>::iterator i = visitor.items.begin(); i != visitor.items.end(); ++i)
         items.insert(i->first);

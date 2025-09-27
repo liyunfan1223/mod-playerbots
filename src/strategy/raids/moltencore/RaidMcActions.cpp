@@ -36,7 +36,7 @@ bool McMoveFromBaronGeddonAction::Execute(Event event)
         {
             // float angle = bot->GetAngle(boss) + M_PI;
             // return Move(angle, distToTravel);
-            return MoveAway(boss, distToTravel); 
+            return MoveAway(boss, distToTravel);
         }
     }
     return false;

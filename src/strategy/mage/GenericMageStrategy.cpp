@@ -214,13 +214,13 @@ void MageBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     }
     else if (tab == 1)
     {
-        if (bot->HasSpell(44614) /*Frostfire Bolt*/ && bot->HasAura(15047) /*Ice Shards*/) 
+        if (bot->HasSpell(44614) /*Frostfire Bolt*/ && bot->HasAura(15047) /*Ice Shards*/)
         { // Frostfire
             triggers.push_back(new TriggerNode("combustion", NextAction::array(0, new NextAction("combustion", 18.0f), nullptr)));
             triggers.push_back(new TriggerNode("icy veins", NextAction::array(0, new NextAction("icy veins", 17.5f), nullptr)));
             triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 17.0f), nullptr)));
         }
-        else 
+        else
         { // Fire
             triggers.push_back(new TriggerNode("combustion", NextAction::array(0, new NextAction("combustion", 18.0f), nullptr)));
             triggers.push_back(new TriggerNode("mirror image", NextAction::array(0, new NextAction("mirror image", 17.5f), nullptr)));

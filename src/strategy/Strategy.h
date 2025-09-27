@@ -26,18 +26,18 @@ enum StrategyType : uint32
 
 // enum ActionPriority
 // {
-// 	ACTION_IDLE = 0,
-// 	ACTION_DEFAULT = 5,
-// 	ACTION_NORMAL = 10,
-// 	ACTION_HIGH = 20,
-// 	ACTION_MOVE = 30,
-// 	ACTION_INTERRUPT = 40,
-// 	ACTION_DISPEL = 50,
-// 	ACTION_RAID = 60,
-// 	ACTION_LIGHT_HEAL = 10,
-// 	ACTION_MEDIUM_HEAL = 20,
-// 	ACTION_CRITICAL_HEAL = 30,
-// 	ACTION_EMERGENCY = 90
+//     ACTION_IDLE = 0,
+//     ACTION_DEFAULT = 5,
+//     ACTION_NORMAL = 10,
+//     ACTION_HIGH = 20,
+//     ACTION_MOVE = 30,
+//     ACTION_INTERRUPT = 40,
+//     ACTION_DISPEL = 50,
+//     ACTION_RAID = 60,
+//     ACTION_LIGHT_HEAL = 10,
+//     ACTION_MEDIUM_HEAL = 20,
+//     ACTION_CRITICAL_HEAL = 30,
+//     ACTION_EMERGENCY = 90
 // };
 
 static float ACTION_IDLE = 0.0f;

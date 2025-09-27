@@ -9,6 +9,7 @@
 #include "ItemUsageValue.h"
 #include "ItemVisitors.h"
 #include "Playerbots.h"
+#include "ItemPackets.h"
 
 class SellItemsVisitor : public IterateItemsVisitor
 {
@@ -114,9 +115,12 @@ void SellAction::Sell(Item* item)
 
         uint32 botMoney = bot->GetMoney();
 
-        WorldPacket p;
+        WorldPacket p(CMSG_SELL_ITEM);
         p << vendorguid << itemguid << count;
-        bot->GetSession()->HandleSellItemOpcode(p);
+
+        WorldPackets::Item::SellItem nicePacket(std::move(p));
+        nicePacket.Read();
+        bot->GetSession()->HandleSellItemOpcode(nicePacket);
 
         if (botAI->HasCheat(BotCheatMask::gold))
         {

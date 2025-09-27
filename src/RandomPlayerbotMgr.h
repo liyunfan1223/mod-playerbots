@@ -183,7 +183,11 @@ public:
         bool InsideBracket(uint32 val) { return val >= low && val <= high; }
     };
     std::map<uint32, LevelBracket> zone2LevelBracket;
-    std::map<uint8, std::vector<WorldLocation>> bankerLocsPerLevelCache;
+    struct BankerLocation {
+        WorldLocation loc;
+        uint32 entry;
+    };
+    std::map<uint8, std::vector<BankerLocation>> bankerLocsPerLevelCache;
 
     // Account type management
     void AssignAccountTypes();

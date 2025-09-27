@@ -51,7 +51,7 @@ Unit* MeleeAttackerWithoutAuraTargetValue::Calculate()
 
         if (!bot->IsWithinMeleeRange(unit))
             continue;
-        
+
         if (checkArc && !bot->HasInArc(CAST_ANGLE_IN_FRONT, unit))
             continue;
 

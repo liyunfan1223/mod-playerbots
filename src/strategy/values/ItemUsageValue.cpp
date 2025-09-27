@@ -75,8 +75,8 @@ ItemUsage ItemUsageValue::Calculate()
 
     if (proto->Class == ITEM_CLASS_KEY)
         return ITEM_USAGE_USE;
-    
-    if (proto->Class == ITEM_CLASS_CONSUMABLE && 
+
+    if (proto->Class == ITEM_CLASS_CONSUMABLE &&
         (proto->MaxCount == 0 || AI_VALUE2(uint32, "item count", proto->Name1) < proto->MaxCount))
     {
         std::string const foodType = GetConsumableType(proto, bot->GetPower(POWER_MANA));
@@ -127,34 +127,34 @@ ItemUsage ItemUsageValue::Calculate()
     bool isSelfBot = (master == bot);
     bool botNeedsItemForQuest = IsItemUsefulForQuest(bot, proto);
     bool masterNeedsItemForQuest = master && sPlayerbotAIConfig->syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
-    
+
     // Identify the source of loot
     LootObject lootObject = AI_VALUE(LootObject, "loot target");
-    
+
     // Get GUID of loot source
     ObjectGuid lootGuid = lootObject.guid;
-    
+
     // Check if loot source is an item
     bool isLootFromItem = lootGuid.IsItem();
-    
+
     // If the loot is from an item in the bot’s bags, ignore syncQuestWithPlayer
     if (isLootFromItem && botNeedsItemForQuest)
     {
         return ITEM_USAGE_QUEST;
     }
-    
+
     // If the bot is NOT acting alone and the master needs this quest item, defer to the master
     if (!isSelfBot && masterNeedsItemForQuest)
     {
         return ITEM_USAGE_NONE;
     }
-    
+
     // If the bot itself needs the item for a quest, allow looting
     if (botNeedsItemForQuest)
     {
         return ITEM_USAGE_QUEST;
     }
-    
+
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
     {
         if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE || bot->getClass() == CLASS_WARRIOR)
@@ -194,7 +194,7 @@ ItemUsage ItemUsageValue::Calculate()
                 {
                     uint32 currentAmmoDPS = (currentAmmoProto->Damage[0].DamageMin + currentAmmoProto->Damage[0].DamageMax) * 1000 / 2;
                     uint32 newAmmoDPS = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2;
-    
+
                     if (newAmmoDPS > currentAmmoDPS) // New ammo meets upgrade condition
                     {
                         return ITEM_USAGE_EQUIP;
@@ -208,7 +208,7 @@ ItemUsage ItemUsageValue::Calculate()
                 if (ammoCount < requiredAmmo)
                 {
                     ammoCount += CurrentStacks(proto);
-    
+
                     if (ammoCount < requiredAmmo)  // Buy ammo to reach the proper supply
                         return ITEM_USAGE_AMMO;
                     else if (ammoCount < requiredAmmo + 1)
@@ -265,18 +265,18 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
     {
         needToCheckUnique = true;
     }
-    
+
     if (needToCheckUnique)
     {
         // Count the total number of the item (equipped + in bags)
         uint32 totalItemCount = bot->GetItemCount(itemProto->ItemId, true);
-        
+
         // Count the number of the item in bags only
         uint32 bagItemCount = bot->GetItemCount(itemProto->ItemId, false);
-        
+
         // Determine if the unique item is already equipped
         bool isEquipped = (totalItemCount > bagItemCount);
-        
+
         if (isEquipped)
         {
             return ITEM_USAGE_NONE;  // Item is already equipped
@@ -305,9 +305,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
     StatsWeightCalculator calculator(bot);
     calculator.SetItemSetBonus(false);
     calculator.SetOverflowPenalty(false);
-    
+
     float itemScore = calculator.CalculateItem(itemProto->ItemId, randomPropertyId);
-    
+
     if (itemScore)
         shouldEquip = true;
 
@@ -343,12 +343,12 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
     {
         Item* currentWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
         have2HWeapon = currentWeapon && currentWeapon->GetTemplate()->InventoryType == INVTYPE_2HWEAPON;
-    
+
         // Determine if the new weapon is a valid Titan Grip weapon
         isValidTGWeapon = (itemProto->SubClass == ITEM_SUBCLASS_WEAPON_AXE2 ||
                            itemProto->SubClass == ITEM_SUBCLASS_WEAPON_MACE2 ||
                            itemProto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2);
-    
+
         // If the bot can Titan Grip, ignore any 2H weapon that isn't a 2H sword, mace, or axe.
         if (bot->CanTitanGrip())
         {
@@ -358,15 +358,15 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
                 return ITEM_USAGE_NONE;
             }
         }
-    
+
         // Now handle the logic for equipping and possible offhand slots
         // If the bot can Dual Wield and:
         // - The weapon is not 2H and we currently don't have a 2H weapon equipped
         // OR
         // - The bot can Titan Grip and it is a valid TG weapon
         // Then we can consider the offhand slot as well.
-        if (bot->CanDualWield() && 
-            ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) || 
+        if (bot->CanDualWield() &&
+            ((itemProto->InventoryType != INVTYPE_2HWEAPON && !have2HWeapon) ||
              (bot->CanTitanGrip() && isValidTGWeapon)))
         {
             possibleSlots = 2;
@@ -440,7 +440,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
             item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
         bool oldItemIsBroken =
             oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
-        
+
         if (itemProto->ItemId != oldItemProto->ItemId && (shouldEquipInSlot || !existingShouldEquip) && isBetter)
         {
             switch (itemProto->Class)
