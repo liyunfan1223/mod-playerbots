@@ -79,5 +79,5 @@ void FrostMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("frost nova on target", NextAction::array(0,
                                                            new NextAction("deep freeze", 19.0f),
                                                            new NextAction("frostbolt", 18.0f), nullptr)));
-      
+
 }

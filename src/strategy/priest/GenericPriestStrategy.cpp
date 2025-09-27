@@ -34,7 +34,7 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(
     //     new TriggerNode("inner focus", NextAction::array(0, new NextAction("inner focus", 42.0f), nullptr)));
     triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("desperate prayer",
-        ACTION_HIGH + 5), nullptr))); 
+        ACTION_HIGH + 5), nullptr)));
     // triggers.push_back(new TriggerNode("enemy is close", NextAction::array(0, new
     // NextAction("elune's grace", ACTION_EMERGENCY), nullptr))); triggers.push_back(new TriggerNode("chastise",
     // NextAction::array(0, new NextAction("chastise", ACTION_INTERRUPT), nullptr)));
@@ -45,8 +45,8 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("low health", NextAction::array(0, new NextAction("power word: shield", ACTION_HIGH), NULL)));
 
     triggers.push_back(
-        new TriggerNode("medium mana", 
-            NextAction::array(0, 
+        new TriggerNode("medium mana",
+            NextAction::array(0,
                 new NextAction("shadowfiend", ACTION_HIGH + 2),
                 new NextAction("inner focus", ACTION_HIGH + 1), nullptr)));
 
@@ -102,7 +102,7 @@ void PriestHealerDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                             new NextAction("mind blast", ACTION_DEFAULT + 0.2f),
                             new NextAction("shoot", ACTION_DEFAULT),
                             nullptr)));
-    
+
     triggers.push_back(
         new TriggerNode("medium aoe and healer should attack",
                         NextAction::array(0,

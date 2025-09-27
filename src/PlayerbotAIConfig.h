@@ -139,6 +139,12 @@ public:
     uint32 disabledWithoutRealPlayerLoginDelay, disabledWithoutRealPlayerLogoutDelay;
     bool randomBotJoinLfg;
 
+    // Buff system
+    // Min group size to use Greater buffs (Paladin, Mage, Druid). Default: 3
+    int32 minBotsForGreaterBuff;
+    // Cooldown (seconds) between reagent-missing RP warnings, per bot & per buff. Default: 30
+    int32 rpWarningCooldown;
+
     // chat
     bool randomBotTalk;
     bool randomBotEmote;

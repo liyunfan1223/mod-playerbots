@@ -195,7 +195,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
                 }
             }
         }
-        
+
         // if (possiblePlayers.size() > 200 || HasSameTarget(guidP, urand(5, 15), possiblePlayers))
         //     continue;
 

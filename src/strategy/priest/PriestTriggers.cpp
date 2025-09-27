@@ -49,7 +49,7 @@ bool PrayerOfSpiritTrigger::IsActive()
     Unit* target = GetTarget();
     if (!target || !target->IsPlayer())
         return false;
-    
+
     return BuffOnPartyTrigger::IsActive() && !botAI->HasAura("prayer of spirit", GetTarget()) &&
            botAI->GetBot()->IsInSameGroupWith((Player*)GetTarget()) &&
            // botAI->GetManaPercent() > 50 &&

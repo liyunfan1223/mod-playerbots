@@ -115,7 +115,7 @@ public:
                 roundedTime = roundedTime.substr(0, roundedTime.find('.') + 2);
 
                 ChatHandler(player->GetSession()).SendSysMessage(
-                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '" 
+                    "|cff00ff00Playerbots:|r bot initialization at server startup takes about '"
                     + roundedTime + "' minutes.");
             }
         }
@@ -217,16 +217,20 @@ public:
         if (!player->GetSession()->IsBot() || !sRandomPlayerbotMgr->IsRandomBot(player))
             return;
 
-        // no XP multiplier, when bot has group where leader is a real player.
+        // no XP multiplier, when bot is in a group with a real player.
         if (Group* group = player->GetGroup())
         {
-            Player* leader = group->GetLeader();
-            if (leader && leader != player)
+            for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
             {
-                if (PlayerbotAI* leaderBotAI = GET_PLAYERBOT_AI(leader))
+                Player* member = gref->GetSource();
+                if (!member)
                 {
-                    if (leaderBotAI->HasRealPlayerMaster())
-                        return;
+                    continue;
+                }
+
+                if (!member->GetSession()->IsBot())
+                {
+                    return;
                 }
             }
         }
@@ -295,7 +299,7 @@ public:
         LOG_INFO("server.loading", "╚══════════════════════════════════════════════════════════╝");
 
         uint32 oldMSTime = getMSTime();
-        
+
         LOG_INFO("server.loading", " ");
         LOG_INFO("server.loading", "Load Playerbots Config...");
 

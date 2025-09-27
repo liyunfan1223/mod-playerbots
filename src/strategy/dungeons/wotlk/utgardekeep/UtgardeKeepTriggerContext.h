@@ -5,7 +5,7 @@
 #include "AiObjectContext.h"
 #include "UtgardeKeepTriggers.h"
 
-class WotlkDungeonUKTriggerContext : public NamedObjectContext<Trigger> 
+class WotlkDungeonUKTriggerContext : public NamedObjectContext<Trigger>
 {
     public:
         WotlkDungeonUKTriggerContext()

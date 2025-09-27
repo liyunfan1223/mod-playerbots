@@ -2360,7 +2360,7 @@ void RandomItemMgr::BuildPotionCache()
                     (proto->SubClass != ITEM_SUBCLASS_POTION && proto->SubClass != ITEM_SUBCLASS_FLASK) ||
                     proto->Bonding != NO_BIND)
                     continue;
-                
+
                 uint32 requiredLevel = proto->RequiredLevel;
                 if (requiredLevel > level || (level > 13 && requiredLevel < level - 13))
                     continue;
@@ -2374,10 +2374,10 @@ void RandomItemMgr::BuildPotionCache()
                 if (proto->Duration & 0x80000000)
                     continue;
 
-                
+
                 if (proto->AllowableClass != -1)
                     continue;
-                
+
                 bool hybrid = false;
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[0].SpellId);
                 if (!spellInfo)

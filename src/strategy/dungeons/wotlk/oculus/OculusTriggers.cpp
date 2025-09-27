@@ -27,7 +27,7 @@ bool DrakeMountTrigger::IsActive()
 {
     Player* master = botAI->GetMaster();
     if (!master) { return false; }
-    
+
     return master->GetVehicleBase() && !bot->GetVehicleBase();
 }
 
@@ -65,7 +65,7 @@ bool UromArcaneExplosionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "mage-lord urom");
     if (!boss) { return false; }
-    
+
     return bool(boss->FindCurrentSpellBySpellId(SPELL_EMPOWERED_ARCANE_EXPLOSION));
 }
 

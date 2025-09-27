@@ -58,9 +58,9 @@ public:
         creators["icc valithria heal"] = &RaidIccTriggerContext::icc_valithria_heal;
         creators["icc valithria dream cloud"] = &RaidIccTriggerContext::icc_valithria_dream_cloud;
 
-        creators["icc sindragosa group position"] = &RaidIccTriggerContext::icc_sindragosa_group_position;    
+        creators["icc sindragosa group position"] = &RaidIccTriggerContext::icc_sindragosa_group_position;
         creators["icc sindragosa frost beacon"] = &RaidIccTriggerContext::icc_sindragosa_frost_beacon;
-        creators["icc sindragosa blistering cold"] = &RaidIccTriggerContext::icc_sindragosa_blistering_cold;    
+        creators["icc sindragosa blistering cold"] = &RaidIccTriggerContext::icc_sindragosa_blistering_cold;
         creators["icc sindragosa unchained magic"] = &RaidIccTriggerContext::icc_sindragosa_unchained_magic;
         creators["icc sindragosa chilled to the bone"] = &RaidIccTriggerContext::icc_sindragosa_chilled_to_the_bone;
         creators["icc sindragosa mystic buffet"] = &RaidIccTriggerContext::icc_sindragosa_mystic_buffet;
@@ -99,7 +99,7 @@ private:
     static Trigger* icc_rotface_group_position(PlayerbotAI* ai) { return new IccRotfaceGroupPositionTrigger(ai); }
     static Trigger* icc_rotface_move_away_from_explosion(PlayerbotAI* ai) { return new IccRotfaceMoveAwayFromExplosionTrigger(ai); }
 
-    static Trigger* icc_putricide_volatile_ooze(PlayerbotAI* ai) { return new IccPutricideVolatileOozeTrigger(ai); }   
+    static Trigger* icc_putricide_volatile_ooze(PlayerbotAI* ai) { return new IccPutricideVolatileOozeTrigger(ai); }
     static Trigger* icc_putricide_gas_cloud(PlayerbotAI* ai) { return new IccPutricideGasCloudTrigger(ai); }
     static Trigger* icc_putricide_growing_ooze_puddle(PlayerbotAI* ai) { return new IccPutricideGrowingOozePuddleTrigger(ai); }
     static Trigger* icc_putricide_main_tank_mutated_plague(PlayerbotAI* ai) { return new IccPutricideMainTankMutatedPlagueTrigger(ai); }
@@ -123,9 +123,9 @@ private:
     static Trigger* icc_valithria_heal(PlayerbotAI* ai) { return new IccValithriaHealTrigger(ai); }
     static Trigger* icc_valithria_dream_cloud(PlayerbotAI* ai) { return new IccValithriaDreamCloudTrigger(ai); }
 
-    static Trigger* icc_sindragosa_group_position(PlayerbotAI* ai) { return new IccSindragosaGroupPositionTrigger(ai); }  
-    static Trigger* icc_sindragosa_frost_beacon(PlayerbotAI* ai) { return new IccSindragosaFrostBeaconTrigger(ai); }    
-    static Trigger* icc_sindragosa_blistering_cold(PlayerbotAI* ai) { return new IccSindragosaBlisteringColdTrigger(ai); }  
+    static Trigger* icc_sindragosa_group_position(PlayerbotAI* ai) { return new IccSindragosaGroupPositionTrigger(ai); }
+    static Trigger* icc_sindragosa_frost_beacon(PlayerbotAI* ai) { return new IccSindragosaFrostBeaconTrigger(ai); }
+    static Trigger* icc_sindragosa_blistering_cold(PlayerbotAI* ai) { return new IccSindragosaBlisteringColdTrigger(ai); }
     static Trigger* icc_sindragosa_unchained_magic(PlayerbotAI* ai) { return new IccSindragosaUnchainedMagicTrigger(ai); }
     static Trigger* icc_sindragosa_chilled_to_the_bone(PlayerbotAI* ai) { return new IccSindragosaChilledToTheBoneTrigger(ai); }
     static Trigger* icc_sindragosa_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMysticBuffetTrigger(ai); }
@@ -137,7 +137,7 @@ private:
     static Trigger* icc_lich_king_necrotic_plague(PlayerbotAI* ai) { return new IccLichKingNecroticPlagueTrigger(ai); }
     static Trigger* icc_lich_king_winter(PlayerbotAI* ai) { return new IccLichKingWinterTrigger(ai); }
     static Trigger* icc_lich_king_adds(PlayerbotAI* ai) { return new IccLichKingAddsTrigger(ai); }
-    
+
 };
 
 #endif

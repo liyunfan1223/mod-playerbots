@@ -12,7 +12,7 @@ enum GundrakIDs
     SPELL_POISON_NOVA_N             = 55081,
     SPELL_POISON_NOVA_H             = 59842,
     NPC_SNAKE_WRAP                  = 29742,
-    
+
     // Gal'darah
     SPELL_WHIRLING_SLASH_N          = 55250,
     SPELL_WHIRLING_SLASH_H          = 59824,
