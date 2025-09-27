@@ -99,7 +99,7 @@ bool SetTotemAction::Execute(Event event)
 
     uint32 totemSpell = 0;
 
-    // Iterate backwards due signed/unsigned int
+    // Iterate backwards to prioritize the highest-rank totem spell the bot knows
     for (size_t i = spellIdsCount; i-- > 0;)
     {
         const uint32 spellId = totemSpellIds[i];
