@@ -29,8 +29,8 @@ public:
 class PullPowerSparkAction : public CastSpellAction
 {
 public:
-    PullPowerSparkAction(PlayerbotAI* botAI, [[maybe_unused]] std::string const name = "pull power spark")
-        : CastSpellAction(botAI, "death grip") {}
+    PullPowerSparkAction(PlayerbotAI* botAI, std::string const name = "pull power spark")
+        : CastSpellAction(botAI, name) {}
     bool Execute(Event event) override;
     bool isPossible() override;
     bool isUseful() override;

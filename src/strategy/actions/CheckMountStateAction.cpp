@@ -152,13 +152,9 @@ bool CheckMountStateAction::Execute(Event /*event*/)
 
     bool inBattleground = bot->InBattleground();
 
-    // If there is a master and bot not in BG
+    // If there is a master and bot not in BG, follow master's mount state regardless of group leader
     if (master && !inBattleground)
     {
-        Group* group = bot->GetGroup();
-        if (!group || group->GetLeaderGUID() != master->GetGUID())
-            return false;
-
         if (ShouldFollowMasterMountState(master, noAttackers, shouldMount))
             return Mount();
 
