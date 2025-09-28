@@ -488,6 +488,29 @@ AiPlayerbot.RPWarningCooldown = 30
 # Default: 1 (enabled)
 AiPlayerbot.MaintenanceCommand = 1
 
+# Enable/Disable specific maintenance command functionality for alt bots
+# prevent players from getting free spells, bags, mounts, etc
+# Default: 0 (disabled)
+AiPlayerbot.AltMaintenanceAttunementQuests = 0
+AiPlayerbot.AltMaintenanceBags = 0
+AiPlayerbot.AltMaintenanceAmmo = 0
+AiPlayerbot.AltMaintenanceFood = 0
+AiPlayerbot.AltMaintenanceReagents = 0
+AiPlayerbot.AltMaintenanceConsumables = 0
+AiPlayerbot.AltMaintenancePotions = 0
+AiPlayerbot.AltMaintenanceTalentTree = 0
+AiPlayerbot.AltMaintenancePet = 0
+AiPlayerbot.AltMaintenancePetTalents = 0
+AiPlayerbot.AltMaintenanceClassSpells = 0
+AiPlayerbot.AltMaintenanceAvailableSpells = 0
+AiPlayerbot.AltMaintenanceSkills = 0
+AiPlayerbot.AltMaintenanceReputation = 0
+AiPlayerbot.AltMaintenanceSpecialSpells = 0
+AiPlayerbot.AltMaintenanceMounts = 0
+AiPlayerbot.AltMaintenanceGlyphs = 0
+AiPlayerbot.AltMaintenanceKeyring = 0
+AiPlayerbot.AltMaintenanceGemsEnchants = 0
+
 # Enable/Disable autogear command, which automatically upgrades bots' gear; the quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
 # Default: 1 (enabled)
 AiPlayerbot.AutoGearCommand = 1
