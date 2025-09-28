@@ -31,6 +31,7 @@ float KarazhanBigBadWolfMultiplier::GetValue(Action* action)
                return 0.0f;
            }
     }
+
     return 1.0f;
 }
 
@@ -81,6 +82,7 @@ float KarazhanShadeOfAranMultiplier::GetValue(Action* action)
             return 0.0f;
         }
     }
+
     return 1.0f;
 }
 
@@ -125,6 +127,7 @@ float KarazhanNetherspiteBlueAndGreenBeamMultiplier::GetValue(Action* action)
                 break;
             }
         }
+
         if (inBeam)
         {
             std::vector<Unit*> voidZones = karazhanHelper.GetAllVoidZones();
@@ -145,6 +148,7 @@ float KarazhanNetherspiteBlueAndGreenBeamMultiplier::GetValue(Action* action)
             }
         }
     }
+
     return 1.0f;
 }
 
@@ -208,6 +212,7 @@ float KarazhanNetherspiteRedBeamMultiplier::GetValue(Action* action)
             }
         }
     }
+    
     return 1.0f;
 }
 
@@ -215,13 +220,11 @@ float KarazhanPrinceMalchezaarMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "prince malchezaar");
 
-    if (boss && botAI->IsMelee(bot) && bot->HasAura(SPELL_ENFEEBLE))
+    if (boss && botAI->IsMelee(bot) && bot->HasAura(SPELL_ENFEEBLE) &&
+        !dynamic_cast<KarazhanPrinceMalchezaarNonTankAvoidHazardAction*>(action))
     {
-        if (dynamic_cast<KarazhanPrinceMalchezaarNonTankAvoidHazardAction*>(action))
-        {
-            return 1.0f;
-        }
         return 0.0f;
     }
+
     return 1.0f;
 }
