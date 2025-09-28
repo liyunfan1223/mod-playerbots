@@ -83,6 +83,8 @@ public:
     std::string GetBotText(ChatReplyType replyType, std::string name);
     bool GetBotText(std::string name, std::string& text);
     bool GetBotText(std::string name, std::string& text, std::map<std::string, std::string> placeholders);
+    std::string GetBotTextOrDefault(std::string name, std::string defaultText,
+                                    std::map<std::string, std::string> placeholders);
     void LoadBotTexts();
     void LoadBotTextChance();
     static void replaceAll(std::string& str, const std::string& from, const std::string& to);
