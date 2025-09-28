@@ -9,7 +9,7 @@
 #include "LastMovementValue.h"
 #include "Playerbots.h"
 
-bool TeleportAction::Execute(Event event)
+bool TeleportAction::Execute(Event [[maybe_unused]] event)
 {
     /*
     // List of allowed portal entries (you can populate this dynamically)

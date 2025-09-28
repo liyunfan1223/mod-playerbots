@@ -60,7 +60,7 @@ public:
 class AllLootStrategy : public LootStrategy
 {
 public:
-    bool CanLoot(ItemTemplate const* proto, AiObjectContext* context) override { return true; }
+    bool CanLoot(ItemTemplate const* [[maybe_unused]] proto, AiObjectContext* context) override { return true; }
 
     std::string const GetName() override { return "all"; }
 };

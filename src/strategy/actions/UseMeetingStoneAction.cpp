@@ -72,7 +72,7 @@ private:
     float i_range;
 };
 
-bool SummonAction::Execute(Event event)
+bool SummonAction::Execute(Event [[maybe_unused]] event)
 {
     Player* master = GetMaster();
     if (!master)

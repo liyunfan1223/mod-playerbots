@@ -8,7 +8,7 @@
 #include "SharedDefines.h"
 #include "BroadcastHelper.h"
 
-bool AutoMaintenanceOnLevelupAction::Execute(Event event)
+bool AutoMaintenanceOnLevelupAction::Execute(Event [[maybe_unused]] event)
 {
     AutoPickTalents();
     AutoLearnSpell();
@@ -72,7 +72,7 @@ void AutoMaintenanceOnLevelupAction::LearnSpells(std::ostringstream* out)
         LearnQuestSpells(out);
 }
 
-void AutoMaintenanceOnLevelupAction::LearnTrainerSpells(std::ostringstream* out)
+void AutoMaintenanceOnLevelupAction::LearnTrainerSpells(std::ostringstream* [[maybe_unused]] out)
 {
     PlayerbotFactory factory(bot, bot->GetLevel());
     factory.InitClassSpells();
@@ -176,4 +176,3 @@ void AutoMaintenanceOnLevelupAction::AutoUpgradeEquip()
             factory.InitEquipment(true);
     }
 }
-

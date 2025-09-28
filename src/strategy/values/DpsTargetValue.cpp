@@ -53,7 +53,7 @@ public:
         result = nullptr;
     }
 
-    void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
+    void CheckAttacker(Unit* attacker, ThreatMgr* [[maybe_unused]] threatMgr) override
     {
         if (Group* group = botAI->GetBot()->GetGroup())
         {
@@ -144,7 +144,7 @@ public:
     {
     }
 
-    void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
+    void CheckAttacker(Unit* attacker, ThreatMgr* [[maybe_unused]] threatMgr) override
     {
         if (Group* group = botAI->GetBot()->GetGroup())
         {
@@ -218,7 +218,7 @@ public:
     {
     }
 
-    void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
+    void CheckAttacker(Unit* attacker, ThreatMgr* [[maybe_unused]] threatMgr) override
     {
         if (Group* group = botAI->GetBot()->GetGroup())
         {
@@ -322,7 +322,7 @@ class FindMaxHpTargetStrategy : public FindTargetStrategy
 public:
     FindMaxHpTargetStrategy(PlayerbotAI* botAI) : FindTargetStrategy(botAI), maxHealth(0) {}
 
-    void CheckAttacker(Unit* attacker, ThreatMgr* threatMgr) override
+    void CheckAttacker(Unit* attacker, ThreatMgr* [[maybe_unused]] threatMgr) override
     {
         if (Group* group = botAI->GetBot()->GetGroup())
         {

@@ -39,6 +39,6 @@ NextAction** TankWarlockStrategy::getDefaultActions()
     return NextAction::array(0, new NextAction("shadow ward", 27.5f), new NextAction("searing pain", 27.0f), nullptr);
 }
 
-void TankWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void TankWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers)
 {
 }

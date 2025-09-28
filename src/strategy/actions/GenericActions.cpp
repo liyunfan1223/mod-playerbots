@@ -54,7 +54,7 @@ bool MeleeAction::isUseful()
     return true;
 }
 
-bool TogglePetSpellAutoCastAction::Execute(Event event)
+bool TogglePetSpellAutoCastAction::Execute(Event [[maybe_unused]] event)
 {
     Pet* pet = bot->GetPet();
     if (!pet)
@@ -119,7 +119,7 @@ bool TogglePetSpellAutoCastAction::Execute(Event event)
     return toggled;
 }
 
-bool PetAttackAction::Execute(Event event)
+bool PetAttackAction::Execute(Event [[maybe_unused]] event)
 {
     Guardian* pet = bot->GetGuardianPet();
     if (!pet)

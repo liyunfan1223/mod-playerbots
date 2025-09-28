@@ -60,7 +60,7 @@ bool AttackAnythingAction::isUseful()
     return true;
 }
 
-bool DropTargetAction::Execute(Event event)
+bool DropTargetAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* target = context->GetValue<Unit*>("current target")->Get();
     if (target && target->isDead())
@@ -138,7 +138,7 @@ bool DpsAssistAction::isUseful()
     return true;
 }
 
-bool AttackRtiTargetAction::Execute(Event event)
+bool AttackRtiTargetAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* rtiTarget = AI_VALUE(Unit*, "rti target");
 

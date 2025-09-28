@@ -15,7 +15,7 @@
 #include "ServerFacade.h"
 #include "SharedDefines.h"
 
-bool FollowAction::Execute(Event event)
+bool FollowAction::Execute(Event [[maybe_unused]] event)
 {
     Formation* formation = AI_VALUE(Formation*, "formation");
     std::string const target = formation->GetTargetName();
@@ -114,7 +114,7 @@ bool FollowAction::CanDeadFollow(Unit* target)
     return true;
 }
 
-bool FleeToMasterAction::Execute(Event event)
+bool FleeToMasterAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* fTarget = AI_VALUE(Unit*, "master target");
     bool canFollow = Follow(fTarget);

@@ -10,7 +10,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-bool ReachTargetAction::Execute(Event event) { return ReachCombatTo(AI_VALUE(Unit*, GetTargetName()), distance); }
+bool ReachTargetAction::Execute(Event [[maybe_unused]] event) { return ReachCombatTo(AI_VALUE(Unit*, GetTargetName()), distance); }
 
 bool ReachTargetAction::isUseful()
 {

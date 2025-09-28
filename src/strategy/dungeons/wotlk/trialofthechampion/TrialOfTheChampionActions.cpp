@@ -10,7 +10,7 @@
 #include <fstream>
 
 
-bool ToCLanceAction::Execute(Event event)
+bool ToCLanceAction::Execute(Event [[maybe_unused]] event)
 {
     // If already has lance equipped, do nothing
     if (bot->HasItemOrGemWithIdEquipped(ITEM_LANCE, 1))
@@ -106,7 +106,7 @@ bool ToCUELanceAction::Execute(Event event)
     return false;
 }
 
-bool ToCMountedAction::Execute(Event event)
+bool ToCMountedAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* vehicleBase = bot->GetVehicleBase();
     Vehicle* vehicle = bot->GetVehicle();
@@ -180,7 +180,7 @@ bool ToCMountedAction::Execute(Event event)
     return false;
 }
 
-bool ToCMountAction::Execute(Event event)
+bool ToCMountAction::Execute(Event [[maybe_unused]] event)
 {
     // do not switch vehicles yet
     if (bot->GetVehicle())
@@ -245,7 +245,7 @@ bool ToCMountAction::EnterVehicle(Unit* vehicleBase, bool moveIfFar)
     return true;
 }
 
-bool ToCEadricAction::Execute(Event event)
+bool ToCEadricAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "eadric the pure");
     if (!boss)

@@ -142,7 +142,7 @@ bool AttackersValue::hasRealThreat(Unit* attacker)
     (attacker->GetThreatMgr().getCurrentVictim() || dynamic_cast<Player*>(attacker));
 }
 
-bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
+bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float [[maybe_unused]] range)
 {
     Creature* c = attacker->ToCreature();
     bool rti = false;

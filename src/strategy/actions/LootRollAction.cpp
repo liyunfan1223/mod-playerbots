@@ -13,7 +13,7 @@
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
-bool LootRollAction::Execute(Event event)
+bool LootRollAction::Execute(Event [[maybe_unused]] event)
 {
     Group* group = bot->GetGroup();
     if (!group)

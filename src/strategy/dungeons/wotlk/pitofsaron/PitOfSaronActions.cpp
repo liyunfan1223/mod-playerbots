@@ -3,7 +3,7 @@
 #include "PitOfSaronStrategy.h"
 #include "SharedDefines.h"
 
-bool IckAndKrickAction::Execute(Event event)
+bool IckAndKrickAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "Ick");
     if (!boss)
@@ -137,7 +137,7 @@ bool IckAndKrickAction::PoisonNova(bool poisonNova, Unit* boss)
 }
 
 
-bool IckAndKrickAction::ExplosiveBarrage(bool explosiveBarrage, Unit* boss)
+bool IckAndKrickAction::ExplosiveBarrage(bool [[maybe_unused]] explosiveBarrage, Unit* boss)
 {
     std::vector<Unit*> orbs;
     Unit* closestOrb = nullptr;
@@ -270,7 +270,7 @@ bool IckAndKrickAction::ExplosiveBarrage(bool explosiveBarrage, Unit* boss)
     return false;
 }
 
-bool TyrannusAction::Execute(Event event)
+bool TyrannusAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "scourgelord tyrannus");
     if (!boss)

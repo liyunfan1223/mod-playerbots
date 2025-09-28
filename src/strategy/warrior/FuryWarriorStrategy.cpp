@@ -29,7 +29,7 @@ private:
     // ACTION_NODE_A(bloodthirst, "bloodthirst", "melee");
     ACTION_NODE_A(pummel, "pummel", "intercept");
 
-    static ActionNode* enraged_regeneration(PlayerbotAI* botAI)
+    static ActionNode* enraged_regeneration(PlayerbotAI* [[maybe_unused]] botAI)
     {
         return new ActionNode("enraged regeneration",
                               /*P*/ nullptr,

@@ -116,7 +116,7 @@ bool CastSoulshatterAction::isUseful()
 }
 
 // Checks if the bot has enough bag space to create a soul shard, then does so
-bool CreateSoulShardAction::Execute(Event event)
+bool CreateSoulShardAction::Execute(Event [[maybe_unused]] event)
 {
     Player* bot = botAI->GetBot();
     if (!bot)
@@ -188,7 +188,7 @@ bool CastCreateSoulstoneAction::isUseful()
     return hasSpace;
 }
 
-bool DestroySoulShardAction::Execute(Event event)
+bool DestroySoulShardAction::Execute(Event [[maybe_unused]] event)
 {
     // Look for the first soul shard in any bag and destroy it
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
@@ -234,7 +234,7 @@ static bool HasSoulstoneAura(Unit* unit)
 }
 
 // Use the soulstone item on the bot itself with nc strategy "ss self"
-bool UseSoulstoneSelfAction::Execute(Event event)
+bool UseSoulstoneSelfAction::Execute(Event [[maybe_unused]] event)
 {
     std::vector<Item*> items = AI_VALUE2(std::vector<Item*>, "inventory items", "soulstone");
     if (items.empty())
@@ -266,7 +266,7 @@ void CleanupSoulstoneReservations()
 }
 
 // Use the soulstone item on the bot's master with nc strategy "ss master"
-bool UseSoulstoneMasterAction::Execute(Event event)
+bool UseSoulstoneMasterAction::Execute(Event [[maybe_unused]] event)
 {
     CleanupSoulstoneReservations();
 
@@ -300,7 +300,7 @@ bool UseSoulstoneMasterAction::Execute(Event event)
 }
 
 // Use the soulstone item on a tank in the group with nc strategy "ss tank"
-bool UseSoulstoneTankAction::Execute(Event event)
+bool UseSoulstoneTankAction::Execute(Event [[maybe_unused]] event)
 {
     CleanupSoulstoneReservations();
 
@@ -368,7 +368,7 @@ bool UseSoulstoneTankAction::Execute(Event event)
 }
 
 // Use the soulstone item on a healer in the group with nc strategy "ss healer"
-bool UseSoulstoneHealerAction::Execute(Event event)
+bool UseSoulstoneHealerAction::Execute(Event [[maybe_unused]] event)
 {
     CleanupSoulstoneReservations();
 
@@ -425,7 +425,7 @@ CastCreateFirestoneAction::CastCreateFirestoneAction(PlayerbotAI* botAI)
 {
 }
 
-bool CastCreateFirestoneAction::Execute(Event event)
+bool CastCreateFirestoneAction::Execute(Event [[maybe_unused]] event)
 {
     for (uint32 spellId : firestoneSpellIds)
     {

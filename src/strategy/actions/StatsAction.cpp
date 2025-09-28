@@ -9,7 +9,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool StatsAction::Execute(Event event)
+bool StatsAction::Execute(Event [[maybe_unused]] event)
 {
     std::ostringstream out;
 

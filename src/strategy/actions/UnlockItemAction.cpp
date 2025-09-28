@@ -8,7 +8,7 @@
 
 #define PICK_LOCK_SPELL_ID 1804
 
-bool UnlockItemAction::Execute(Event event)
+bool UnlockItemAction::Execute(Event [[maybe_unused]] event)
 {
     bool foundLockedItem = false;
 

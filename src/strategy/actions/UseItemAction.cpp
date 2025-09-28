@@ -421,7 +421,7 @@ bool UseRandomRecipe::isUseful()
 
 bool UseRandomRecipe::isPossible() { return AI_VALUE2(uint32, "item count", "recipe") > 0; }
 
-bool UseRandomRecipe::Execute(Event event)
+bool UseRandomRecipe::Execute(Event [[maybe_unused]] event)
 {
     std::vector<Item*> recipes = AI_VALUE2(std::vector<Item*>, "inventory items", "recipe");
 
@@ -450,7 +450,7 @@ bool UseRandomQuestItem::isUseful()
 
 bool UseRandomQuestItem::isPossible() { return AI_VALUE2(uint32, "item count", "quest") > 0; }
 
-bool UseRandomQuestItem::Execute(Event event)
+bool UseRandomQuestItem::Execute(Event [[maybe_unused]] event)
 {
     Unit* unitTarget = nullptr;
     ObjectGuid goTarget;

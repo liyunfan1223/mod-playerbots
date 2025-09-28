@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool AcceptBgInvitationAction::Execute(Event event)
+bool AcceptBgInvitationAction::Execute(Event [[maybe_unused]] event)
 {
     uint8 type = 0;                      // arenatype if arena
     uint8 unk2 = 0;                      // unk, can be 0x0 (may be if was invited?) and 0x1

@@ -67,7 +67,7 @@ bool CastLavaBurstAction::isUseful()
 
 // Logic for making a guardian (spirit wolf) use a spell (spirit walk)
 // There is no existing code for guardians casting spells in the AC/Playerbots repo.
-bool CastSpiritWalkAction::Execute(Event event)
+bool CastSpiritWalkAction::Execute(Event [[maybe_unused]] event)
 {
     Player* bot = botAI->GetBot();
     constexpr uint32 SPIRIT_WOLF = 29264;
@@ -91,7 +91,7 @@ bool CastSpiritWalkAction::Execute(Event event)
 // the highest-rank spell the bot knows for each totem type,
 // then adds it to the Call of the Elements bar.
 
-bool SetTotemAction::Execute(Event event)
+bool SetTotemAction::Execute(Event [[maybe_unused]] event)
 {
     const size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
     if (spellIdsCount == 0)

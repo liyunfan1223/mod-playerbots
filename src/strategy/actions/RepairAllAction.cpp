@@ -9,7 +9,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool RepairAllAction::Execute(Event event)
+bool RepairAllAction::Execute(Event [[maybe_unused]] event)
 {
     GuidVector npcs = AI_VALUE(GuidVector, "nearest npcs");
     for (ObjectGuid const guid : npcs)

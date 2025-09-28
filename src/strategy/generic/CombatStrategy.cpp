@@ -76,11 +76,11 @@ NextAction** AvoidAoeStrategy::getDefaultActions()
     return NextAction::array(0, new NextAction("avoid aoe", ACTION_EMERGENCY), nullptr);
 }
 
-void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void AvoidAoeStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers)
 {
 }
 
-void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+void AvoidAoeStrategy::InitMultipliers(std::vector<Multiplier*>& [[maybe_unused]] multipliers)
 {
     // multipliers.push_back(new AvoidAoeStrategyMultiplier(botAI));
 }
@@ -92,7 +92,7 @@ NextAction** TankFaceStrategy::getDefaultActions()
     return NextAction::array(0, new NextAction("tank face", ACTION_MOVE), nullptr);
 }
 
-void TankFaceStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void TankFaceStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers)
 {
 }
 

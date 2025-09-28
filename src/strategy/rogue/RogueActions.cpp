@@ -26,7 +26,7 @@ bool CastStealthAction::isPossible()
     return !botAI->HasAura(23333, bot) && !botAI->HasAura(23335, bot) && !botAI->HasAura(34976, bot);
 }
 
-bool UnstealthAction::Execute(Event event)
+bool UnstealthAction::Execute(Event [[maybe_unused]] event)
 {
     botAI->RemoveAura("stealth");
     // botAI->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
@@ -34,7 +34,7 @@ bool UnstealthAction::Execute(Event event)
     return true;
 }
 
-bool CheckStealthAction::Execute(Event event)
+bool CheckStealthAction::Execute(Event [[maybe_unused]] event)
 {
     if (botAI->HasAura("stealth", bot))
     {
@@ -70,7 +70,7 @@ bool CastTricksOfTheTradeOnMainTankAction::isUseful()
     return CastSpellAction::isUseful() && AI_VALUE2(float, "distance", GetTargetName()) < 20.0f;
 }
 
-bool UseDeadlyPoisonAction::Execute(Event event)
+bool UseDeadlyPoisonAction::Execute(Event [[maybe_unused]] event)
 {
     std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item*> items;
@@ -110,7 +110,7 @@ bool UseDeadlyPoisonAction::isPossible()
     return !items.empty();
 }
 
-bool UseInstantPoisonAction::Execute(Event event)
+bool UseInstantPoisonAction::Execute(Event [[maybe_unused]] event)
 {
     std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item*> items;
@@ -149,7 +149,7 @@ bool UseInstantPoisonAction::isPossible()
     return !items.empty();
 }
 
-bool UseInstantPoisonOffHandAction::Execute(Event event)
+bool UseInstantPoisonOffHandAction::Execute(Event [[maybe_unused]] event)
 {
     std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
     std::vector<Item*> items;

@@ -21,7 +21,7 @@ public:
     }
 
     bool Execute(Event event) override;
-    virtual std::string const castString(WorldObject* target) { return "cast"; }
+    virtual std::string const castString(WorldObject* [[maybe_unused]] target) { return "cast"; }
 
 protected:
     bool ncCast = false;
@@ -49,7 +49,7 @@ public:
 
     bool isUseful() override { return false; }
     virtual bool AcceptSpell(SpellInfo const* spellInfo);
-    virtual uint32 GetSpellPriority(SpellInfo const* spellInfo) { return 1; }
+    virtual uint32 GetSpellPriority(SpellInfo const* [[maybe_unused]] spellInfo) { return 1; }
     virtual bool castSpell(uint32 spellId, WorldObject* wo);
     bool Execute(Event event) override;
 

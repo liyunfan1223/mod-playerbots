@@ -15,7 +15,7 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 
-bool AttackAction::Execute(Event event)
+bool AttackAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* target = GetTarget();
     if (!target)
@@ -28,7 +28,7 @@ bool AttackAction::Execute(Event event)
     return Attack(target);
 }
 
-bool AttackMyTargetAction::Execute(Event event)
+bool AttackMyTargetAction::Execute(Event [[maybe_unused]] event)
 {
     Player* master = GetMaster();
     if (!master)
@@ -51,7 +51,7 @@ bool AttackMyTargetAction::Execute(Event event)
     return result;
 }
 
-bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
+bool AttackAction::Attack(Unit* target, bool [[maybe_unused]] with_pet /*true*/)
 {
     Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
     bool shouldMelee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
@@ -182,4 +182,4 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
 
 bool AttackDuelOpponentAction::isUseful() { return AI_VALUE(Unit*, "duel target"); }
 
-bool AttackDuelOpponentAction::Execute(Event event) { return Attack(AI_VALUE(Unit*, "duel target")); }
+bool AttackDuelOpponentAction::Execute(Event [[maybe_unused]] event) { return Attack(AI_VALUE(Unit*, "duel target")); }

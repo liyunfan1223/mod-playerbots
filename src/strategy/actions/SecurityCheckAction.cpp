@@ -14,7 +14,7 @@ bool SecurityCheckAction::isUseful()
            botAI->GetMaster()->GetSession()->GetSecurity() < SEC_GAMEMASTER && !GET_PLAYERBOT_AI(botAI->GetMaster());
 }
 
-bool SecurityCheckAction::Execute(Event event)
+bool SecurityCheckAction::Execute(Event [[maybe_unused]] event)
 {
     if (Group* group = bot->GetGroup())
     {

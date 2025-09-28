@@ -52,7 +52,7 @@ bool GuildBankAction::Execute(std::string const text, GameObject* bank)
     return result;
 }
 
-bool GuildBankAction::MoveFromCharToBank(Item* item, GameObject* bank)
+bool GuildBankAction::MoveFromCharToBank(Item* item, GameObject* [[maybe_unused]] bank)
 {
     uint32 playerSlot = item->GetSlot();
     uint32 playerBag = item->GetBagSlot();

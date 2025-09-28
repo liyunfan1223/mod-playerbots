@@ -334,7 +334,7 @@ bool CastRandomSpellAction::castSpell(uint32 spellId, WorldObject* wo)
         return botAI->CastSpell(spellId, wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ());
 }
 
-bool DisEnchantRandomItemAction::Execute(Event event)
+bool DisEnchantRandomItemAction::Execute(Event [[maybe_unused]] event)
 {
     std::vector<Item*> items =
         AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(ITEM_USAGE_DISENCHANT));

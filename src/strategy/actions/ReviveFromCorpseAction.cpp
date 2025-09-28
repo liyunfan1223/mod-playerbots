@@ -74,7 +74,7 @@ bool ReviveFromCorpseAction::Execute(Event event)
     return true;
 }
 
-bool FindCorpseAction::Execute(Event event)
+bool FindCorpseAction::Execute(Event [[maybe_unused]] event)
 {
     if (bot->InBattleground())
         return false;
@@ -292,7 +292,7 @@ GraveyardStruct const* SpiritHealerAction::GetGrave(bool startZone)
     return ClosestGrave;
 }
 
-bool SpiritHealerAction::Execute(Event event)
+bool SpiritHealerAction::Execute(Event [[maybe_unused]] event)
 {
     Corpse* corpse = bot->GetCorpse();
     if (!corpse)

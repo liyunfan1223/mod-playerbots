@@ -2,7 +2,7 @@
 #include "HallsOfLightningActions.h"
 #include "HallsOfLightningStrategy.h"
 
-bool BjarngrimTargetAction::Execute(Event event)
+bool BjarngrimTargetAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* target = nullptr;
 
@@ -35,7 +35,7 @@ bool BjarngrimTargetAction::Execute(Event event)
     return Attack(target);
 }
 
-bool AvoidWhirlwindAction::Execute(Event event)
+bool AvoidWhirlwindAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "general bjarngrim");
     if (!boss) { return false; }
@@ -52,7 +52,7 @@ bool AvoidWhirlwindAction::Execute(Event event)
     return false;
 }
 
-bool VolkhanTargetAction::Execute(Event event)
+bool VolkhanTargetAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "volkhan");
     if (!boss || AI_VALUE(Unit*, "current target") == boss)
@@ -63,7 +63,7 @@ bool VolkhanTargetAction::Execute(Event event)
     return Attack(boss);
 }
 
-bool StaticOverloadSpreadAction::Execute(Event event)
+bool StaticOverloadSpreadAction::Execute(Event [[maybe_unused]] event)
 {
     float radius = 8.0f;
     float distanceExtra = 2.0f;
@@ -86,7 +86,7 @@ bool StaticOverloadSpreadAction::Execute(Event event)
     return false;
 }
 
-bool BallLightningSpreadAction::Execute(Event event)
+bool BallLightningSpreadAction::Execute(Event [[maybe_unused]] event)
 {
     float radius = 6.0f;
     float distanceExtra = 1.0f;
@@ -108,14 +108,14 @@ bool BallLightningSpreadAction::Execute(Event event)
 }
 
 bool IonarTankPositionAction::isUseful() { return bot->GetExactDist2d(IONAR_TANK_POSITION) > 10.0f; }
-bool IonarTankPositionAction::Execute(Event event)
+bool IonarTankPositionAction::Execute(Event [[maybe_unused]] event)
 {
     return MoveTo(bot->GetMapId(), IONAR_TANK_POSITION.GetPositionX(), IONAR_TANK_POSITION.GetPositionY(), IONAR_TANK_POSITION.GetPositionZ(),
                   false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
 }
 
 bool DispersePositionAction::isUseful() { return bot->GetExactDist2d(DISPERSE_POSITION) > 8.0f; }
-bool DispersePositionAction::Execute(Event event)
+bool DispersePositionAction::Execute(Event [[maybe_unused]] event)
 {
     return MoveTo(bot->GetMapId(), DISPERSE_POSITION.GetPositionX(), DISPERSE_POSITION.GetPositionY(), DISPERSE_POSITION.GetPositionZ(),
                   false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
@@ -133,7 +133,7 @@ bool LokenStackAction::isUseful()
     // else
     return AI_VALUE2(float, "distance", "current target") > 2.0f;
 }
-bool LokenStackAction::Execute(Event event)
+bool LokenStackAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "loken");
     if (!boss) { return false; }
@@ -153,7 +153,7 @@ bool LokenStackAction::Execute(Event event)
 }
 
 
-bool AvoidLightningNovaAction::Execute(Event event)
+bool AvoidLightningNovaAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "loken");
     if (!boss) { return false; }

@@ -25,7 +25,7 @@ public:
     bool isUseful() override { return false; }
 
 protected:
-    virtual void SendPacket(WorldPacket data){};
+    virtual void SendPacket(WorldPacket [[maybe_unused]] data){};
     virtual Player* GetPlayer(Event event);
     virtual bool PlayerIsValid(Player* member);
     virtual uint8 GetRankId(Player* member);

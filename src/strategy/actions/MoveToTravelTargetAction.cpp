@@ -10,7 +10,7 @@
 #include "PathGenerator.h"
 #include "Playerbots.h"
 
-bool MoveToTravelTargetAction::Execute(Event event)
+bool MoveToTravelTargetAction::Execute(Event [[maybe_unused]] event)
 {
     TravelTarget* target = AI_VALUE(TravelTarget*, "travel target");
 

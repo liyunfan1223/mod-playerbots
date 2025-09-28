@@ -38,7 +38,7 @@ void NewRpgStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("travel flight status", NextAction::array(0, new NextAction("new rpg travel flight", 3.0f), nullptr)));
 }
 
-void NewRpgStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+void NewRpgStrategy::InitMultipliers(std::vector<Multiplier*>& [[maybe_unused]] multipliers)
 {
     // multipliers.push_back(new RpgActionMultiplier(botAI));
 }

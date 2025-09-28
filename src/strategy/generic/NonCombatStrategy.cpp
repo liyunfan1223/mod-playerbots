@@ -25,7 +25,7 @@ void CollisionStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("collision", NextAction::array(0, new NextAction("move out of collision", 2.0f), nullptr)));
 }
 
-void MountStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void MountStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers)
 {
     /*triggers.push_back(new TriggerNode("no possible targets", NextAction::array(0, new NextAction("mount", 1.0f),
     nullptr))); triggers.push_back(new TriggerNode("no rpg target", NextAction::array(0, new NextAction("mount", 1.0f),

@@ -29,7 +29,7 @@ CastSpellAction::CastSpellAction(PlayerbotAI* botAI, std::string const spell)
 {
 }
 
-bool CastSpellAction::Execute(Event event)
+bool CastSpellAction::Execute(Event [[maybe_unused]] event)
 {
     if (spell == "conjure food" || spell == "conjure water")
     {
@@ -233,7 +233,7 @@ Value<Unit*>* BuffOnPartyAction::GetTargetValue()
     return context->GetValue<Unit*>("party member without aura", MakeAuraQualifierForBuff(spell));
 }
 
-bool BuffOnPartyAction::Execute(Event event)
+bool BuffOnPartyAction::Execute(Event [[maybe_unused]] event)
 {
     std::string castName = spell; // default = mono
 
@@ -295,7 +295,7 @@ Value<Unit*>* CastSnareSpellAction::GetTargetValue() { return context->GetValue<
 
 Value<Unit*>* CastCrowdControlSpellAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", getName()); }
 
-bool CastCrowdControlSpellAction::Execute(Event event) { return botAI->CastSpell(getName(), GetTarget()); }
+bool CastCrowdControlSpellAction::Execute(Event [[maybe_unused]] event) { return botAI->CastSpell(getName(), GetTarget()); }
 
 bool CastCrowdControlSpellAction::isPossible() { return botAI->CanCastSpell(getName(), GetTarget()); }
 
@@ -313,13 +313,13 @@ bool CastVehicleSpellAction::isPossible()
 
 bool CastVehicleSpellAction::isUseful() { return botAI->IsInVehicle(false, true); }
 
-bool CastVehicleSpellAction::Execute(Event event)
+bool CastVehicleSpellAction::Execute(Event [[maybe_unused]] event)
 {
     uint32 spellId = AI_VALUE2(uint32, "vehicle spell id", spell);
     return botAI->CastVehicleSpell(spellId, GetTarget());
 }
 
-bool UseTrinketAction::Execute(Event event)
+bool UseTrinketAction::Execute(Event [[maybe_unused]] event)
 {
     Item* trinket1 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1);
 

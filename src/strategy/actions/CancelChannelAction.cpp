@@ -7,7 +7,7 @@
 #include "Player.h"
 #include "PlayerbotAI.h"
 
-bool CancelChannelAction::Execute(Event event)
+bool CancelChannelAction::Execute(Event [[maybe_unused]] event)
 {
     if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
     {

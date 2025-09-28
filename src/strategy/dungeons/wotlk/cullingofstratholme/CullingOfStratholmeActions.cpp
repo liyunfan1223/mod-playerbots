@@ -3,7 +3,7 @@
 #include "CullingOfStratholmeStrategy.h"
 
 
-bool ExplodeGhoulSpreadAction::Execute(Event event)
+bool ExplodeGhoulSpreadAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "salramm the fleshcrafter");
     if (!boss) { return false; }
@@ -39,7 +39,7 @@ bool EpochStackAction::isUseful()
     // else
     return !(bot->getClass() == CLASS_HUNTER) && AI_VALUE2(float, "distance", "current target") > 5.0f;
 }
-bool EpochStackAction::Execute(Event event)
+bool EpochStackAction::Execute(Event [[maybe_unused]] event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "chrono-lord epoch");
     if (!boss) { return false; }

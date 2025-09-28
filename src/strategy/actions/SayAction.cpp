@@ -56,7 +56,7 @@ static const std::unordered_set<std::string> noReplyMsgStarts = {"e ", "accept "
 
 SayAction::SayAction(PlayerbotAI* botAI) : Action(botAI, "say"), Qualified() {}
 
-bool SayAction::Execute(Event event)
+bool SayAction::Execute(Event [[maybe_unused]] event)
 {
     std::string text = "";
     std::map<std::string, std::string> placeholders;
@@ -157,7 +157,7 @@ bool SayAction::isUseful()
     return (time(nullptr) - lastSaid) > 30;
 }
 
-void ChatReplyAction::ChatReplyDo(Player* bot, uint32& type, uint32& guid1, uint32& guid2, std::string& msg, std::string& chanName, std::string& name)
+void ChatReplyAction::ChatReplyDo(Player* bot, uint32& type, uint32& guid1, uint32& [[maybe_unused]] guid2, std::string& msg, std::string& chanName, std::string& name)
 {
     ChatReplyType replyType = REPLY_NOT_UNDERSTAND;  // default not understand
     std::string respondsText = "";
@@ -224,7 +224,7 @@ void ChatReplyAction::ChatReplyDo(Player* bot, uint32& type, uint32& guid1, uint
     SendGeneralResponse(bot, chatChannelSource, messageRepy, name);
 }
 
-bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name)
+bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chatChannelSource, std::string& [[maybe_unused]] msg, std::string& name)
 {
     std::map<std::string, std::string> placeholders;
     const auto thunderfury = sObjectMgr->GetItemTemplate(19019);
@@ -252,7 +252,7 @@ bool ChatReplyAction::HandleThunderfuryReply(Player* bot, ChatChannelSource chat
     return true;
 }
 
-bool ChatReplyAction::HandleToxicLinksReply(Player* bot, ChatChannelSource chatChannelSource, std::string& msg, std::string& name)
+bool ChatReplyAction::HandleToxicLinksReply(Player* bot, ChatChannelSource chatChannelSource, std::string& [[maybe_unused]] msg, std::string& name)
 {
     //quests
     std::vector<uint32> incompleteQuests;

@@ -18,7 +18,7 @@ public:
     }
 
 public:
-    void CheckAttacker(Unit* creature, ThreatMgr* threatMgr) override
+    void CheckAttacker(Unit* creature, ThreatMgr* [[maybe_unused]] threatMgr) override
     {
         Player* bot = botAI->GetBot();
         if (!botAI->CanCastSpell(spell, creature))

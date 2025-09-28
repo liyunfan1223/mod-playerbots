@@ -1554,7 +1554,7 @@ bool BGTactics::eyJumpDown()
 //
 // actual bg tactics below
 //
-bool BGTactics::Execute(Event event)
+bool BGTactics::Execute(Event [[maybe_unused]] event)
 {
     Battleground* bg = bot->GetBattleground();
     if (!bg)
@@ -4126,7 +4126,7 @@ bool BGTactics::IsLockedInsideKeep()
     return false;
 }
 
-bool ArenaTactics::Execute(Event event)
+bool ArenaTactics::Execute(Event [[maybe_unused]] event)
 {
     if (!bot->InBattleground())
     {

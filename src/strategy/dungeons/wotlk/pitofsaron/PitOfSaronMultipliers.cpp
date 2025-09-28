@@ -29,7 +29,7 @@ float IckAndKrickMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
-float GarfrostMultiplier::GetValue(Action* action)
+float GarfrostMultiplier::GetValue(Action* [[maybe_unused]] action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "garfrost");
     if (!boss)

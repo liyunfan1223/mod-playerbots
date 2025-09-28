@@ -78,7 +78,7 @@ private:
 class TakeMailProcessor : public MailProcessor
 {
 public:
-    bool Process(uint32 index, Mail* mail, PlayerbotAI* botAI) override
+    bool Process(uint32 [[maybe_unused]] index, Mail* mail, PlayerbotAI* botAI) override
     {
         Player* bot = botAI->GetBot();
         if (!CheckBagSpace(bot))
@@ -157,7 +157,7 @@ private:
 class DeleteMailProcessor : public MailProcessor
 {
 public:
-    bool Process(uint32 index, Mail* mail, PlayerbotAI* botAI) override
+    bool Process(uint32 [[maybe_unused]] index, Mail* mail, PlayerbotAI* botAI) override
     {
         std::ostringstream out;
         out << "|cffffffff" << mail->subject << "|cffff0000 deleted";
@@ -172,7 +172,7 @@ public:
 class ReadMailProcessor : public MailProcessor
 {
 public:
-    bool Process(uint32 index, Mail* mail, PlayerbotAI* botAI) override
+    bool Process(uint32 [[maybe_unused]] index, Mail* mail, PlayerbotAI* botAI) override
     {
         std::ostringstream out, body;
         out << "|cffffffff" << mail->subject;

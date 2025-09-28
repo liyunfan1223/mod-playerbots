@@ -477,7 +477,7 @@ std::string const WorldPosition::getAreaName(bool fullName, bool zoneName)
     return std::move(areaName);
 }
 
-std::set<Transport*> WorldPosition::getTransports(uint32 entry)
+std::set<Transport*> WorldPosition::getTransports(uint32 [[maybe_unused]] entry)
 {
     /*
     if(!entry)
@@ -3781,7 +3781,7 @@ uint32 TravelMgr::getDialogStatus(Player* pPlayer, int32 questgiver, Quest const
 
 // Selects a random WorldPosition from a list. Use a distance weighted distribution.
 std::vector<WorldPosition*> TravelMgr::getNextPoint(WorldPosition* center, std::vector<WorldPosition*> points,
-                                                    uint32 amount)
+                                                    uint32 [[maybe_unused]] amount)
 {
     std::vector<WorldPosition*> retVec;
 
