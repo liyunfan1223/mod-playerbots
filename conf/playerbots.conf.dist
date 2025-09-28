@@ -519,7 +519,7 @@ AiPlayerbot.AutoGearScoreLimit = 0
 # "taxi" (bots may use all flight paths, though they will not actually learn them)
 # "raid" (bots use cheats implemented into raid strategies)
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,raid,taxi")
-# Default: taxi and raid are enabled
+# Default: food, taxi, and raid are enabled
 AiPlayerbot.BotCheats = "food,taxi,raid"
 
 #
@@ -1603,10 +1603,10 @@ AiPlayerbot.PremadeSpecLink.11.6.80 = 05320021--230033312031500531353013251
 #
 #
 
-# Applies a permanent buff to all bots simulating effects of spells, flasks, food, runes, etc.
+# Applies automatically refreshing buffs to bots simulating effects of spells, flasks, food, runes, etc.
 # Requires sending the command "nc +worldbuff" in chat to a bot (or a group of bots) to enable
 # Each entry in the matrix should be formatted as follows: Entry:FactionID,ClassID,SpecID,MinimumLevel,MaximumLevel:SpellID1,SpellID2,etc.;
-# Use 0 for any field to make it agnostic (e.g., 0 for FactionID means the entry will apply buffs to either faction)
+# FactionID may be set to 0 for the entry to apply buffs to bots of either faction
 # The default entries create a cross-faction list of level 80 buffs for each implemented pve spec from the "Premade Specs" section
 # The default entries may be deleted or modified, and new custom entries may be added
 
