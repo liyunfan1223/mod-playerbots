@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool DelayAction::Execute(Event [[maybe_unused]] event)
+bool DelayAction::Execute([[maybe_unused]] Event event)
 {
     uint32 delay = sPlayerbotAIConfig->passiveDelay + sPlayerbotAIConfig->globalCoolDown;
 

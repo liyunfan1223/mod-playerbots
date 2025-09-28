@@ -9,7 +9,7 @@
 #include "GuildTaskMgr.h"
 #include "Playerbots.h"
 
-bool CheckMailAction::Execute(Event [[maybe_unused]] event)
+bool CheckMailAction::Execute([[maybe_unused]] Event event)
 {
     WorldPacket p;
     bot->GetSession()->HandleQueryNextMailTime(p);

@@ -27,7 +27,7 @@ bool BankAction::Execute(Event event)
     return false;
 }
 
-bool BankAction::ExecuteBank(std::string const text, Unit* [[maybe_unused]] bank)
+bool BankAction::ExecuteBank(std::string const text, [[maybe_unused]] Unit* bank)
 {
     if (text.empty() || text == "?")
     {

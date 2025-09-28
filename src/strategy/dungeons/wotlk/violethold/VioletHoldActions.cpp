@@ -3,7 +3,7 @@
 #include "VioletHoldStrategy.h"
 
 
-bool AttackErekemAction::Execute(Event [[maybe_unused]] event)
+bool AttackErekemAction::Execute([[maybe_unused]] Event event)
 {
     // Focus boss first, adds after
     Unit* boss = AI_VALUE2(Unit*, "find target", "erekem");
@@ -16,7 +16,7 @@ bool AttackErekemAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool AttackIchorGlobuleAction::Execute(Event [[maybe_unused]] event)
+bool AttackIchorGlobuleAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ichoron");
     if (!boss) { return false; }
@@ -61,7 +61,7 @@ bool AttackIchorGlobuleAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool AttackVoidSentryAction::Execute(Event [[maybe_unused]] event)
+bool AttackVoidSentryAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "zuramat the obliterator");
     if (!boss) { return false; }
@@ -97,7 +97,7 @@ bool AttackVoidSentryAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool StopAttackAction::Execute(Event [[maybe_unused]] event)
+bool StopAttackAction::Execute([[maybe_unused]] Event event)
 {
     return bot->AttackStop();
 }

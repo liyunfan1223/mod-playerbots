@@ -352,7 +352,7 @@ class CastExplosiveShotRank4Action : public CastDebuffSpellAction
 public:
     CastExplosiveShotRank4Action(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "explosive shot", true, 0.0f) {}
 
-    bool Execute(Event [[maybe_unused]] event) override { return botAI->CastSpell(60053, GetTarget()); }
+    bool Execute([[maybe_unused]] Event event) override { return botAI->CastSpell(60053, GetTarget()); }
     bool isUseful() override
     {
         Unit* target = GetTarget();
@@ -368,7 +368,7 @@ class CastExplosiveShotRank3Action : public CastDebuffSpellAction
 public:
     CastExplosiveShotRank3Action(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "explosive shot", true, 0.0f) {}
 
-    bool Execute(Event [[maybe_unused]] event) override { return botAI->CastSpell(60052, GetTarget()); }
+    bool Execute([[maybe_unused]] Event event) override { return botAI->CastSpell(60052, GetTarget()); }
     bool isUseful() override
     {
         Unit* target = GetTarget();
@@ -384,7 +384,7 @@ class CastExplosiveShotRank2Action : public CastDebuffSpellAction
 public:
     CastExplosiveShotRank2Action(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "explosive shot", true, 0.0f) {}
 
-    bool Execute(Event [[maybe_unused]] event) override { return botAI->CastSpell(60051, GetTarget()); }
+    bool Execute([[maybe_unused]] Event event) override { return botAI->CastSpell(60051, GetTarget()); }
     bool isUseful() override
     {
         Unit* target = GetTarget();
@@ -400,7 +400,7 @@ class CastExplosiveShotRank1Action : public CastDebuffSpellAction
 public:
     CastExplosiveShotRank1Action(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "explosive shot", true, 0.0f) {}
 
-    bool Execute(Event [[maybe_unused]] event) override { return botAI->CastSpell(53301, GetTarget()); }
+    bool Execute([[maybe_unused]] Event event) override { return botAI->CastSpell(53301, GetTarget()); }
     bool isUseful() override
     {
         Unit* target = GetTarget();

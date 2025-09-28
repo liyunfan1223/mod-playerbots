@@ -63,12 +63,12 @@ void AoEWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("rain of fire channel check", NextAction::array(0, new NextAction("cancel channel", 21.5f), nullptr)));
 }
 
-void WarlockBoostStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers)
+void WarlockBoostStrategy::InitTriggers([[maybe_unused]] std::vector<TriggerNode*>& triggers)
 {
     // Placeholder for future boost triggers
 }
 
-void WarlockPetStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers)
+void WarlockPetStrategy::InitTriggers([[maybe_unused]] std::vector<TriggerNode*>& triggers)
 {
     // Placeholder for future pet triggers
 }

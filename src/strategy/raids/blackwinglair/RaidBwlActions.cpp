@@ -2,7 +2,7 @@
 
 #include "Playerbots.h"
 
-bool BwlOnyxiaScaleCloakAuraCheckAction::Execute(Event [[maybe_unused]] event)
+bool BwlOnyxiaScaleCloakAuraCheckAction::Execute([[maybe_unused]] Event event)
 {
     bot->AddAura(22683, bot);
     return true;
@@ -10,7 +10,7 @@ bool BwlOnyxiaScaleCloakAuraCheckAction::Execute(Event [[maybe_unused]] event)
 
 bool BwlOnyxiaScaleCloakAuraCheckAction::isUseful() { return !bot->HasAura(22683); }
 
-bool BwlTurnOffSuppressionDeviceAction::Execute(Event [[maybe_unused]] event)
+bool BwlTurnOffSuppressionDeviceAction::Execute([[maybe_unused]] Event event)
 {
     GuidVector gos = AI_VALUE(GuidVector, "nearest game objects");
     for (GuidVector::iterator i = gos.begin(); i != gos.end(); i++)
@@ -29,4 +29,4 @@ bool BwlTurnOffSuppressionDeviceAction::Execute(Event [[maybe_unused]] event)
     return true;
 }
 
-bool BwlUseHourglassSandAction::Execute(Event [[maybe_unused]] event) { return botAI->CastSpell(23645, bot); }
+bool BwlUseHourglassSandAction::Execute([[maybe_unused]] Event event) { return botAI->CastSpell(23645, bot); }

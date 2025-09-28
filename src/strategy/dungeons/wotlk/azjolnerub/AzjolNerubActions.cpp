@@ -4,7 +4,7 @@
 
 
 bool AttackWebWrapAction::isUseful() { return !botAI->IsHeal(bot); }
-bool AttackWebWrapAction::Execute(Event [[maybe_unused]] event)
+bool AttackWebWrapAction::Execute([[maybe_unused]] Event event)
 {
     Unit* webWrap = nullptr;
 
@@ -30,7 +30,7 @@ bool AttackWebWrapAction::Execute(Event [[maybe_unused]] event)
 }
 
 bool WatchersTargetAction::isUseful() { return !botAI->IsHeal(bot); }
-bool WatchersTargetAction::Execute(Event [[maybe_unused]] event)
+bool WatchersTargetAction::Execute([[maybe_unused]] Event event)
 {
     // Always prioritise web wraps
     Unit* currTarget = AI_VALUE(Unit*, "current target");
@@ -96,7 +96,7 @@ bool WatchersTargetAction::Execute(Event [[maybe_unused]] event)
 }
 
 bool AnubarakDodgePoundAction::isUseful() { return !AI_VALUE2(bool, "behind", "current target"); }
-bool AnubarakDodgePoundAction::Execute(Event [[maybe_unused]] event)
+bool AnubarakDodgePoundAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "anub'arak");
     if (!boss) { return false; }

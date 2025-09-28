@@ -141,7 +141,7 @@ void AoEHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("multi-shot", 21.0f), nullptr)));
 }
 
-void HunterBoostStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers)
+void HunterBoostStrategy::InitTriggers([[maybe_unused]] std::vector<TriggerNode*>& triggers)
 {
 }
 

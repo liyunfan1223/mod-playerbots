@@ -160,7 +160,7 @@ void TrainerAction::TellFooter(uint32 totalCost)
     }
 }
 
-bool MaintenanceAction::Execute(Event [[maybe_unused]] event)
+bool MaintenanceAction::Execute([[maybe_unused]] Event event)
 {
     if (!sPlayerbotAIConfig->maintenanceCommand)
     {
@@ -197,7 +197,7 @@ bool MaintenanceAction::Execute(Event [[maybe_unused]] event)
     return true;
 }
 
-bool RemoveGlyphAction::Execute(Event [[maybe_unused]] event)
+bool RemoveGlyphAction::Execute([[maybe_unused]] Event event)
 {
     for (uint32 slotIndex = 0; slotIndex < MAX_GLYPH_SLOT_INDEX; ++slotIndex)
     {
@@ -207,7 +207,7 @@ bool RemoveGlyphAction::Execute(Event [[maybe_unused]] event)
     return true;
 }
 
-bool AutoGearAction::Execute(Event [[maybe_unused]] event)
+bool AutoGearAction::Execute([[maybe_unused]] Event event)
 {
     if (!sPlayerbotAIConfig->autoGearCommand)
     {

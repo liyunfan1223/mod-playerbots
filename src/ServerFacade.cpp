@@ -39,7 +39,7 @@ bool ServerFacade::IsDistanceGreaterOrEqualThan(float dist1, float dist2) { retu
 
 bool ServerFacade::IsDistanceLessOrEqualThan(float dist1, float dist2) { return !IsDistanceGreaterThan(dist1, dist2); }
 
-void ServerFacade::SetFacingTo(Player* bot, WorldObject* wo, bool [[maybe_unused]] force)
+void ServerFacade::SetFacingTo(Player* bot, WorldObject* wo, [[maybe_unused]] bool force)
 {
     float angle = bot->GetAngle(wo);
     // if (!force && bot->isMoving())

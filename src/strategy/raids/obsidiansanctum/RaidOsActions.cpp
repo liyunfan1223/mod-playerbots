@@ -3,7 +3,7 @@
 
 #include "Playerbots.h"
 
-bool SartharionTankPositionAction::Execute(Event [[maybe_unused]] event)
+bool SartharionTankPositionAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "sartharion");
     if (!boss) { return false; }
@@ -84,7 +84,7 @@ bool SartharionTankPositionAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool AvoidTwilightFissureAction::Execute(Event [[maybe_unused]] event)
+bool AvoidTwilightFissureAction::Execute([[maybe_unused]] Event event)
 {
     const float radius = 5.0f;
 
@@ -104,7 +104,7 @@ bool AvoidTwilightFissureAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool AvoidFlameTsunamiAction::Execute(Event [[maybe_unused]] event)
+bool AvoidFlameTsunamiAction::Execute([[maybe_unused]] Event event)
 {
     // Adjustable, this is the acceptable distance to stack point that will be accepted as "safe"
     float looseDistance = 4.0f;
@@ -167,7 +167,7 @@ bool AvoidFlameTsunamiAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool SartharionAttackPriorityAction::Execute(Event [[maybe_unused]] event)
+bool SartharionAttackPriorityAction::Execute([[maybe_unused]] Event event)
 {
     Unit* sartharion = AI_VALUE2(Unit*, "find target", "sartharion");
     Unit* shadron = AI_VALUE2(Unit*, "find target", "shadron");
@@ -206,7 +206,7 @@ bool SartharionAttackPriorityAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool EnterTwilightPortalAction::Execute(Event [[maybe_unused]] event)
+bool EnterTwilightPortalAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "sartharion");
     if (!boss || !boss->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE)) { return false; }
@@ -227,7 +227,7 @@ bool EnterTwilightPortalAction::Execute(Event [[maybe_unused]] event)
     return true;
 }
 
-bool ExitTwilightPortalAction::Execute(Event [[maybe_unused]] event)
+bool ExitTwilightPortalAction::Execute([[maybe_unused]] Event event)
 {
     GameObject* portal = bot->FindNearestGameObject(GO_NORMAL_PORTAL, 100.0f);
     if (!portal) { return false; }

@@ -9,4 +9,4 @@
 
 RTSCStrategy::RTSCStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-void RTSCStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers) {}
+void RTSCStrategy::InitTriggers([[maybe_unused]] std::vector<TriggerNode*>& triggers) {}

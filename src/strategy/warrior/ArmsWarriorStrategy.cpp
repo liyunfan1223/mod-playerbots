@@ -29,7 +29,7 @@ private:
     ACTION_NODE_A(mocking_blow, "mocking blow", "hamstring");
     ACTION_NODE_A(heroic_strike, "heroic strike", "melee");
 
-    static ActionNode* enraged_regeneration(PlayerbotAI* [[maybe_unused]] botAI)
+    static ActionNode* enraged_regeneration([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("enraged regeneration",
                               /*P*/ nullptr,
@@ -37,7 +37,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* retaliation(PlayerbotAI* [[maybe_unused]] botAI)
+    static ActionNode* retaliation([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("retaliation",
                               /*P*/ nullptr,
@@ -45,7 +45,7 @@ private:
                               /*C*/ nullptr);
     }
 
-    static ActionNode* shattering_throw(PlayerbotAI* [[maybe_unused]] botAI)
+    static ActionNode* shattering_throw([[maybe_unused]] PlayerbotAI* botAI)
     {
         return new ActionNode("shattering throw",
                               /*P*/ nullptr,

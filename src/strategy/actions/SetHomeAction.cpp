@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool SetHomeAction::Execute(Event [[maybe_unused]] event)
+bool SetHomeAction::Execute([[maybe_unused]] Event event)
 {
     Player* master = GetMaster();
 

@@ -140,7 +140,7 @@ bool TalentSpec::CheckTalents(uint32 level, std::ostringstream* out)
 }
 
 // Set the talents for the bots to the current spec.
-void TalentSpec::ApplyTalents(Player* bot, std::ostringstream* [[maybe_unused]] out)
+void TalentSpec::ApplyTalents(Player* bot, [[maybe_unused]] std::ostringstream* out)
 {
     for (auto& entry : talents)
     {
@@ -395,7 +395,7 @@ uint32 TalentSpec::highestTree()
     return 0;
 }
 
-std::string const TalentSpec::FormatSpec(Player* [[maybe_unused]] bot)
+std::string const TalentSpec::FormatSpec([[maybe_unused]] Player* bot)
 {
     // uint8 cls = bot->getClass(); //not used, (used in lined 403), line marked for removal.
 

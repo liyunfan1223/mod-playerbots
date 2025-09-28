@@ -9,7 +9,7 @@
 #include "Playerbots.h"
 #include "ReputationMgr.h"
 
-bool TellReputationAction::Execute(Event [[maybe_unused]] event)
+bool TellReputationAction::Execute([[maybe_unused]] Event event)
 {
     Player* master = GetMaster();
     if (!master)

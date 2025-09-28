@@ -2,7 +2,7 @@
 #include "GundrakActions.h"
 #include "GundrakStrategy.h"
 
-bool AvoidPoisonNovaAction::Execute(Event [[maybe_unused]] event)
+bool AvoidPoisonNovaAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "slad'ran");
     if (!boss) { return false; }
@@ -19,7 +19,7 @@ bool AvoidPoisonNovaAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool AttackSnakeWrapAction::Execute(Event [[maybe_unused]] event)
+bool AttackSnakeWrapAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "slad'ran");
     if (!boss) { return false; }
@@ -45,7 +45,7 @@ bool AttackSnakeWrapAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool AvoidWhirlingSlashAction::Execute(Event [[maybe_unused]] event)
+bool AvoidWhirlingSlashAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "gal'darah");
     if (!boss) { return false; }

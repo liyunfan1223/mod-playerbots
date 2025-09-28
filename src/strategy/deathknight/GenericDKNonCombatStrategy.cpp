@@ -55,7 +55,7 @@ void GenericDKNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
         new TriggerNode("new pet", NextAction::array(0, new NextAction("set pet stance", 60.0f), NULL)));
 }
 
-void DKBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers)
+void DKBuffDpsStrategy::InitTriggers([[maybe_unused]] std::vector<TriggerNode*>& triggers)
 {
     // triggers.push_back(new TriggerNode("improved icy talons", NextAction::array(0, new NextAction("improved icy
     // talons", 19.0f), nullptr)));

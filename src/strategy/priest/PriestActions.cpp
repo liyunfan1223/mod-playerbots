@@ -12,7 +12,7 @@ bool CastRemoveShadowformAction::isUseful() { return botAI->HasAura("shadowform"
 
 bool CastRemoveShadowformAction::isPossible() { return true; }
 
-bool CastRemoveShadowformAction::Execute(Event [[maybe_unused]] event)
+bool CastRemoveShadowformAction::Execute([[maybe_unused]] Event event)
 {
     botAI->RemoveAura("shadowform");
     return true;

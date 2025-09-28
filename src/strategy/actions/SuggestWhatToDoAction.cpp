@@ -62,7 +62,7 @@ bool SuggestWhatToDoAction::isUseful()
     return (time(0) - lastSaid) > 30;
 }
 
-bool SuggestWhatToDoAction::Execute(Event [[maybe_unused]] event)
+bool SuggestWhatToDoAction::Execute([[maybe_unused]] Event event)
 {
     uint32 index = rand() % suggestions.size();
     auto fnct_ptr = suggestions[index];
@@ -257,7 +257,7 @@ private:
 
 SuggestDungeonAction::SuggestDungeonAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest dungeon") {}
 
-bool SuggestDungeonAction::Execute(Event [[maybe_unused]] event)
+bool SuggestDungeonAction::Execute([[maybe_unused]] Event event)
 {
     // TODO: use sPlayerbotDungeonSuggestionMgr
 
@@ -324,7 +324,7 @@ bool SuggestDungeonAction::Execute(Event [[maybe_unused]] event)
 
 SuggestTradeAction::SuggestTradeAction(PlayerbotAI* botAI) : SuggestWhatToDoAction(botAI, "suggest trade") {}
 
-bool SuggestTradeAction::Execute(Event [[maybe_unused]] event)
+bool SuggestTradeAction::Execute([[maybe_unused]] Event event)
 {
     uint32 quality = urand(0, 100);
     if (quality > 95)

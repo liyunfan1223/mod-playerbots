@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool PassLeadershipToMasterAction::Execute(Event [[maybe_unused]] event)
+bool PassLeadershipToMasterAction::Execute([[maybe_unused]] Event event)
 {
     if (Player* master = GetMaster())
         if (master && master != bot && bot->GetGroup() && bot->GetGroup()->IsMember(master->GetGUID()))

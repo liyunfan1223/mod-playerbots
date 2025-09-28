@@ -25,11 +25,11 @@ Value<Unit*>* CastEntanglingRootsCcAction::GetTargetValue()
     return context->GetValue<Unit*>("cc target", "entangling roots");
 }
 
-bool CastEntanglingRootsCcAction::Execute(Event [[maybe_unused]] event) { return botAI->CastSpell("entangling roots", GetTarget()); }
+bool CastEntanglingRootsCcAction::Execute([[maybe_unused]] Event event) { return botAI->CastSpell("entangling roots", GetTarget()); }
 
 Value<Unit*>* CastHibernateCcAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", "hibernate"); }
 
-bool CastHibernateCcAction::Execute(Event [[maybe_unused]] event) { return botAI->CastSpell("hibernate", GetTarget()); }
+bool CastHibernateCcAction::Execute([[maybe_unused]] Event event) { return botAI->CastSpell("hibernate", GetTarget()); }
 
 NextAction** CastReviveAction::getPrerequisites()
 {

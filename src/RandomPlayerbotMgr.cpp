@@ -354,7 +354,7 @@ void RandomPlayerbotMgr::LogPlayerLocation()
     }
 }
 
-void RandomPlayerbotMgr::UpdateAIInternal(uint32 [[maybe_unused]] elapsed, bool /*minimal*/)
+void RandomPlayerbotMgr::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool /*minimal*/)
 {
     if (totalPmo)
         totalPmo->finish();
@@ -2512,7 +2512,7 @@ void RandomPlayerbotMgr::Clear(Player* bot)
     factory.ClearEverything();
 }
 
-uint32 RandomPlayerbotMgr::GetZoneLevel(uint16 mapId, float teleX, float teleY, float [[maybe_unused]] teleZ)
+uint32 RandomPlayerbotMgr::GetZoneLevel(uint16 mapId, float teleX, float teleY, [[maybe_unused]] float teleZ)
 {
     uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
@@ -2827,7 +2827,7 @@ void RandomPlayerbotMgr::SetValue(Player* bot, std::string const type, uint32 va
     SetValue(bot->GetGUID().GetCounter(), type, value, data);
 }
 
-bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* [[maybe_unused]] handler, char const* args)
+bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand([[maybe_unused]] ChatHandler* handler, char const* args)
 {
     if (!sPlayerbotAIConfig->enabled)
     {

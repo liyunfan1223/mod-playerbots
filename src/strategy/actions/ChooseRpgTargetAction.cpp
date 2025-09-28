@@ -115,7 +115,7 @@ float ChooseRpgTargetAction::getMaxRelevance(GuidPosition guidP)
     return floor((maxRelevance - 1.0) * 1000.0f);
 }
 
-bool ChooseRpgTargetAction::Execute(Event [[maybe_unused]] event)
+bool ChooseRpgTargetAction::Execute([[maybe_unused]] Event event)
 {
     //TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target"); //not used, line marked for removal.
     Player* master = botAI->GetMaster();

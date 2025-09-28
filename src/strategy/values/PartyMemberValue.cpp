@@ -23,7 +23,7 @@ Unit* PartyMemberValue::FindPartyMember(std::vector<Player*>* party, FindPlayerP
     return nullptr;
 }
 
-Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, bool [[maybe_unused]] ignoreOutOfGroup)
+Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate& predicate, [[maybe_unused]] bool ignoreOutOfGroup)
 {
     Player* master = GetMaster();
     // GuidVector nearestPlayers;

@@ -39,7 +39,7 @@ void DestroyItemAction::DestroyItem(FindItemVisitor* visitor)
 
 bool SmartDestroyItemAction::isUseful() { return !botAI->HasActivePlayerMaster(); }
 
-bool SmartDestroyItemAction::Execute(Event [[maybe_unused]] event)
+bool SmartDestroyItemAction::Execute([[maybe_unused]] Event event)
 {
     uint8 bagSpace = AI_VALUE(uint8, "bag space");
 

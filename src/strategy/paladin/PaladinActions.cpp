@@ -167,7 +167,7 @@ Value<Unit*>* CastBlessingOnPartyAction::GetTargetValue()
     return context->GetValue<Unit*>("party member without aura", MakeAuraQualifierForBuff(spell));
 }
 
-bool CastBlessingOfMightAction::Execute(Event [[maybe_unused]] event)
+bool CastBlessingOfMightAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = GetTarget();
     if (!target)
@@ -188,7 +188,7 @@ Value<Unit*>* CastBlessingOfMightOnPartyAction::GetTargetValue()
     );
 }
 
-bool CastBlessingOfMightOnPartyAction::Execute(Event [[maybe_unused]] event)
+bool CastBlessingOfMightOnPartyAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = GetTarget();
     if (!target)
@@ -201,7 +201,7 @@ bool CastBlessingOfMightOnPartyAction::Execute(Event [[maybe_unused]] event)
     return botAI->CastSpell(castName, target);
 }
 
-bool CastBlessingOfWisdomAction::Execute(Event [[maybe_unused]] event)
+bool CastBlessingOfWisdomAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = GetTarget();
     if (!target)
@@ -222,7 +222,7 @@ Value<Unit*>* CastBlessingOfWisdomOnPartyAction::GetTargetValue()
     );
 }
 
-bool CastBlessingOfWisdomOnPartyAction::Execute(Event [[maybe_unused]] event)
+bool CastBlessingOfWisdomOnPartyAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = GetTarget();
     if (!target)
@@ -259,7 +259,7 @@ Value<Unit*>* CastBlessingOfSanctuaryOnPartyAction::GetTargetValue()
     );
 }
 
-bool CastBlessingOfSanctuaryOnPartyAction::Execute(Event [[maybe_unused]] event)
+bool CastBlessingOfSanctuaryOnPartyAction::Execute([[maybe_unused]] Event event)
 {
     if (!bot->HasSpell(SPELL_BLESSING_OF_SANCTUARY))
         return false;
@@ -383,7 +383,7 @@ Value<Unit*>* CastBlessingOfKingsOnPartyAction::GetTargetValue()
     );
 }
 
-bool CastBlessingOfKingsOnPartyAction::Execute(Event [[maybe_unused]] event)
+bool CastBlessingOfKingsOnPartyAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = GetTarget();
     if (!target)
@@ -495,7 +495,7 @@ bool CastDivineSacrificeAction::isUseful()
            !botAI->HasAura("divine guardian", GetTarget(), false, false, -1, true);
 }
 
-bool CastCancelDivineSacrificeAction::Execute(Event [[maybe_unused]] event)
+bool CastCancelDivineSacrificeAction::Execute([[maybe_unused]] Event event)
 {
     botAI->RemoveAura("divine sacrifice");
     return true;

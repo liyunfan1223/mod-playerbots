@@ -95,7 +95,7 @@ bool EnterVehicleAction::EnterVehicle(Unit* vehicleBase, bool moveIfFar)
     return true;
 }
 
-bool LeaveVehicleAction::Execute(Event [[maybe_unused]] event)
+bool LeaveVehicleAction::Execute([[maybe_unused]] Event event)
 {
     Vehicle* myVehicle = bot->GetVehicle();
     if (!myVehicle)

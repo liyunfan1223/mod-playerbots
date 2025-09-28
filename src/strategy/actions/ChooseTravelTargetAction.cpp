@@ -9,7 +9,7 @@
 #include "LootObjectStack.h"
 #include "Playerbots.h"
 
-bool ChooseTravelTargetAction::Execute(Event [[maybe_unused]] event)
+bool ChooseTravelTargetAction::Execute([[maybe_unused]] Event event)
 {
     // Player* requester = event.getOwner() ? event.getOwner() : GetMaster(); //not used, line marked for removal.
 
@@ -479,7 +479,7 @@ bool ChooseTravelTargetAction::SetCurrentTarget(TravelTarget* target, TravelTarg
     return target->isActive();
 }
 
-bool ChooseTravelTargetAction::SetQuestTarget(TravelTarget* target, bool [[maybe_unused]] onlyCompleted, bool newQuests, bool activeQuests, bool completedQuests)
+bool ChooseTravelTargetAction::SetQuestTarget(TravelTarget* target, [[maybe_unused]] bool onlyCompleted, bool newQuests, bool activeQuests, bool completedQuests)
 {
     std::vector<TravelDestination*> activeDestinations;
     std::vector<WorldPosition*> activePoints;

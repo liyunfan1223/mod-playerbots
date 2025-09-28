@@ -18,7 +18,7 @@ bool BossFireResistanceAction::isUseful()
     return bossFireResistanceTrigger.IsActive();
 }
 
-bool BossFireResistanceAction::Execute(Event [[maybe_unused]] event)
+bool BossFireResistanceAction::Execute([[maybe_unused]] Event event)
 {
     PaladinFireResistanceStrategy paladinFireResistanceStrategy(botAI);
     botAI->ChangeStrategy(ADD_STRATEGY_CHAR + paladinFireResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
@@ -32,7 +32,7 @@ bool BossFrostResistanceAction::isUseful()
     return bossFrostResistanceTrigger.IsActive();
 }
 
-bool BossFrostResistanceAction::Execute(Event [[maybe_unused]] event)
+bool BossFrostResistanceAction::Execute([[maybe_unused]] Event event)
 {
     PaladinFrostResistanceStrategy paladinFrostResistanceStrategy(botAI);
     botAI->ChangeStrategy(ADD_STRATEGY_CHAR + paladinFrostResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
@@ -46,7 +46,7 @@ bool BossNatureResistanceAction::isUseful()
     return bossNatureResistanceTrigger.IsActive();
 }
 
-bool BossNatureResistanceAction::Execute(Event [[maybe_unused]] event)
+bool BossNatureResistanceAction::Execute([[maybe_unused]] Event event)
 {
     HunterNatureResistanceStrategy hunterNatureResistanceStrategy(botAI);
     botAI->ChangeStrategy(ADD_STRATEGY_CHAR + hunterNatureResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);
@@ -60,7 +60,7 @@ bool BossShadowResistanceAction::isUseful()
     return bossShadowResistanceTrigger.IsActive();
 }
 
-bool BossShadowResistanceAction::Execute(Event [[maybe_unused]] event)
+bool BossShadowResistanceAction::Execute([[maybe_unused]] Event event)
 {
     PaladinShadowResistanceStrategy paladinShadowResistanceStrategy(botAI);
     botAI->ChangeStrategy(ADD_STRATEGY_CHAR + paladinShadowResistanceStrategy.getName(), BotState::BOT_STATE_COMBAT);

@@ -787,7 +787,7 @@ bool EmoteAction::isUseful()
     return time(nullptr) >= lastEmote;
 }
 
-bool TalkAction::Execute(Event [[maybe_unused]] event)
+bool TalkAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = botAI->GetUnit(AI_VALUE(ObjectGuid, "talk target"));
     if (!target)

@@ -55,7 +55,7 @@ void RtiAction::AppendRti(std::ostringstream& out, std::string const type)
         out << " (" << target->GetName() << ")";
 }
 
-bool MarkRtiAction::Execute(Event [[maybe_unused]] event)
+bool MarkRtiAction::Execute([[maybe_unused]] Event event)
 {
     Group* group = bot->GetGroup();
     if (!group)

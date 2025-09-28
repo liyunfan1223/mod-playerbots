@@ -10,7 +10,7 @@
 
 const Position VOA_EMALON_RESTORE_POSITION = Position(-221.8f, -243.8f, 96.8f, 4.7f);
 
-bool EmalonMarkBossAction::Execute(Event [[maybe_unused]] event)
+bool EmalonMarkBossAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "emalon the storm watcher");
     if (!boss || !boss->IsAlive())
@@ -72,7 +72,7 @@ bool EmalonMarkBossAction::isUseful()
     return emalonMarkBossTrigger.IsActive();
 }
 
-bool EmalonLightingNovaAction::Execute(Event [[maybe_unused]] event)
+bool EmalonLightingNovaAction::Execute([[maybe_unused]] Event event)
 {
     const float radius = 25.0f;  // 20 yards + 5 yard for safety for 10 man. For 25man there is no maximum range but 25 yards should be ok
 
@@ -96,7 +96,7 @@ bool EmalonLightingNovaAction::isUseful()
     return emalonLightingNovaTrigger.IsActive();
 }
 
-bool EmalonOverchargeAction::Execute(Event [[maybe_unused]] event)
+bool EmalonOverchargeAction::Execute([[maybe_unused]] Event event)
 {
     // Check if there is any overcharged minion
     Unit* minion = nullptr;
@@ -173,7 +173,7 @@ bool EmalonOverchargeAction::isUseful()
     return emalonOverchargeTrigger.IsActive();
 }
 
-bool EmalonFallFromFloorAction::Execute(Event [[maybe_unused]] event)
+bool EmalonFallFromFloorAction::Execute([[maybe_unused]] Event event)
 {
     return bot->TeleportTo(bot->GetMapId(), VOA_EMALON_RESTORE_POSITION.GetPositionX(),
                            VOA_EMALON_RESTORE_POSITION.GetPositionY(), VOA_EMALON_RESTORE_POSITION.GetPositionZ(),

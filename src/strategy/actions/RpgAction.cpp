@@ -16,7 +16,7 @@
 #include "ServerFacade.h"
 #include "RpgSubActions.h"
 
-bool RpgAction::Execute(Event [[maybe_unused]] event)
+bool RpgAction::Execute([[maybe_unused]] Event event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
     if (!guidP && botAI->GetMaster())

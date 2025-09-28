@@ -9,7 +9,7 @@
 #include "Playerbots.h"
 #include "ThreatMgr.h"
 
-bool TellTargetAction::Execute(Event [[maybe_unused]] event)
+bool TellTargetAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = context->GetValue<Unit*>("current target")->Get();
     if (target)
@@ -24,7 +24,7 @@ bool TellTargetAction::Execute(Event [[maybe_unused]] event)
     return true;
 }
 
-bool TellAttackersAction::Execute(Event [[maybe_unused]] event)
+bool TellAttackersAction::Execute([[maybe_unused]] Event event)
 {
     botAI->TellMaster("--- Attackers ---");
 

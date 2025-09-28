@@ -2,7 +2,7 @@
 #include "HallsOfStoneActions.h"
 #include "HallsOfStoneStrategy.h"
 
-bool ShatterSpreadAction::Execute(Event [[maybe_unused]] event)
+bool ShatterSpreadAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "krystallus");
     if (!boss) { return false; }
@@ -35,7 +35,7 @@ bool ShatterSpreadAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool AvoidLightningRingAction::Execute(Event [[maybe_unused]] event)
+bool AvoidLightningRingAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "sjonnir the ironshaper");
     if (!boss) { return false; }

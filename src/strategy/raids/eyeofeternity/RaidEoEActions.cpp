@@ -2,7 +2,7 @@
 #include "RaidEoEActions.h"
 #include "RaidEoETriggers.h"
 
-bool MalygosPositionAction::Execute(Event [[maybe_unused]] event)
+bool MalygosPositionAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "malygos");
     if (!boss) { return false; }
@@ -65,7 +65,7 @@ bool MalygosPositionAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool MalygosTargetAction::Execute(Event [[maybe_unused]] event)
+bool MalygosTargetAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "malygos");
     if (!boss) { return false; }
@@ -229,7 +229,7 @@ bool EoEFlyDrakeAction::isPossible()
     Unit* vehicleBase = bot->GetVehicleBase();
     return (vehicleBase && vehicleBase->GetEntry() == NPC_WYRMREST_SKYTALON);
 }
-bool EoEFlyDrakeAction::Execute(Event [[maybe_unused]] event)
+bool EoEFlyDrakeAction::Execute([[maybe_unused]] Event event)
 {
     Player* master = botAI->GetMaster();
     if (!master) { return false; }
@@ -279,7 +279,7 @@ bool EoEDrakeAttackAction::isPossible()
     return (vehicleBase && vehicleBase->GetEntry() == NPC_WYRMREST_SKYTALON);
 }
 
-bool EoEDrakeAttackAction::Execute(Event [[maybe_unused]] event)
+bool EoEDrakeAttackAction::Execute([[maybe_unused]] Event event)
 {
     vehicleBase = bot->GetVehicleBase();
     if (!vehicleBase)

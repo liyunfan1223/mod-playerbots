@@ -61,7 +61,7 @@ bool StartRpgDoQuestAction::Execute(Event event)
     return false;
 }
 
-bool NewRpgStatusUpdateAction::Execute(Event [[maybe_unused]] event)
+bool NewRpgStatusUpdateAction::Execute([[maybe_unused]] Event event)
 {
     NewRpgInfo& info = botAI->rpgInfo;
     switch (info.status)
@@ -150,7 +150,7 @@ bool NewRpgStatusUpdateAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool NewRpgGoGrindAction::Execute(Event [[maybe_unused]] event)
+bool NewRpgGoGrindAction::Execute([[maybe_unused]] Event event)
 {
     if (SearchQuestGiverAndAcceptOrReward())
         return true;
@@ -158,7 +158,7 @@ bool NewRpgGoGrindAction::Execute(Event [[maybe_unused]] event)
     return MoveFarTo(botAI->rpgInfo.go_grind.pos);
 }
 
-bool NewRpgGoCampAction::Execute(Event [[maybe_unused]] event)
+bool NewRpgGoCampAction::Execute([[maybe_unused]] Event event)
 {
     if (SearchQuestGiverAndAcceptOrReward())
         return true;
@@ -166,7 +166,7 @@ bool NewRpgGoCampAction::Execute(Event [[maybe_unused]] event)
     return MoveFarTo(botAI->rpgInfo.go_camp.pos);
 }
 
-bool NewRpgWanderRandomAction::Execute(Event [[maybe_unused]] event)
+bool NewRpgWanderRandomAction::Execute([[maybe_unused]] Event event)
 {
     if (SearchQuestGiverAndAcceptOrReward())
         return true;
@@ -174,7 +174,7 @@ bool NewRpgWanderRandomAction::Execute(Event [[maybe_unused]] event)
     return MoveRandomNear();
 }
 
-bool NewRpgWanderNpcAction::Execute(Event [[maybe_unused]] event)
+bool NewRpgWanderNpcAction::Execute([[maybe_unused]] Event event)
 {
     NewRpgInfo& info = botAI->rpgInfo;
     if (!info.wander_npc.npcOrGo)
@@ -216,7 +216,7 @@ bool NewRpgWanderNpcAction::Execute(Event [[maybe_unused]] event)
     return true;
 }
 
-bool NewRpgDoQuestAction::Execute(Event [[maybe_unused]] event)
+bool NewRpgDoQuestAction::Execute([[maybe_unused]] Event event)
 {
     if (SearchQuestGiverAndAcceptOrReward())
         return true;
@@ -408,7 +408,7 @@ bool NewRpgDoQuestAction::DoCompletedQuest()
     return false;
 }
 
-bool NewRpgTravelFlightAction::Execute(Event [[maybe_unused]] event)
+bool NewRpgTravelFlightAction::Execute([[maybe_unused]] Event event)
 {
     if (bot->IsInFlight())
     {

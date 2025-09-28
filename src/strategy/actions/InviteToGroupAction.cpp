@@ -39,7 +39,7 @@ bool InviteToGroupAction::Invite(Player* inviter, Player* player)
     return true;
 }
 
-bool InviteNearbyToGroupAction::Execute(Event [[maybe_unused]] event)
+bool InviteNearbyToGroupAction::Execute([[maybe_unused]] Event event)
 {
     GuidVector nearGuids = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get();
     for (auto& i : nearGuids)
@@ -158,7 +158,7 @@ std::vector<Player*> InviteGuildToGroupAction::getGuildMembers()
     return worker.GetResult();
 }
 
-bool InviteGuildToGroupAction::Execute(Event [[maybe_unused]] event)
+bool InviteGuildToGroupAction::Execute([[maybe_unused]] Event event)
 {
     Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
 

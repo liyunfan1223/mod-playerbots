@@ -11,7 +11,7 @@
 #include "LastMovementValue.h"
 #include "Playerbots.h"
 
-bool MoveToRpgTargetAction::Execute(Event [[maybe_unused]] event)
+bool MoveToRpgTargetAction::Execute([[maybe_unused]] Event event)
 {
     GuidPosition guidP = AI_VALUE(GuidPosition, "rpg target");
     Unit* unit = botAI->GetUnit(guidP);

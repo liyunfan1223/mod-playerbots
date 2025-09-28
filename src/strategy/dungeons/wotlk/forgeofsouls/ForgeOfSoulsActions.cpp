@@ -3,7 +3,7 @@
 #include "ForgeOfSoulsStrategy.h"
 #include "SharedDefines.h"
 
-bool MoveFromBronjahmAction::Execute(Event [[maybe_unused]] event)
+bool MoveFromBronjahmAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
     if (!boss)
@@ -18,7 +18,7 @@ bool MoveFromBronjahmAction::Execute(Event [[maybe_unused]] event)
 }
 
 
-bool AttackCorruptedSoulFragmentAction::Execute(Event [[maybe_unused]] event)
+bool AttackCorruptedSoulFragmentAction::Execute([[maybe_unused]] Event event)
 {
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
@@ -53,7 +53,7 @@ bool AttackCorruptedSoulFragmentAction::Execute(Event [[maybe_unused]] event)
 }
 
 
-bool BronjahmGroupPositionAction::Execute(Event [[maybe_unused]] event)
+bool BronjahmGroupPositionAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "bronjahm");
     if (!boss)
@@ -143,7 +143,7 @@ bool BronjahmGroupPositionAction::Execute(Event [[maybe_unused]] event)
 
 bool BronjahmGroupPositionAction::isUseful() { return true; }
 
-bool DevourerOfSoulsAction::Execute(Event [[maybe_unused]] event)
+bool DevourerOfSoulsAction::Execute([[maybe_unused]] Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "devourer of souls");
     if (!boss)
@@ -165,3 +165,5 @@ bool DevourerOfSoulsAction::Execute(Event [[maybe_unused]] event)
 
     return false;
 }
+
+

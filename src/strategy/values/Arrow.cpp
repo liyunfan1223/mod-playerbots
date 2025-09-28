@@ -148,7 +148,7 @@ UnitPosition MultiLineUnitPlacer::Place(FormationUnit* unit, uint32 index, uint3
     return placer.Place(unit, indexInLine, lineSize);
 }
 
-UnitPosition SingleLineUnitPlacer::Place(FormationUnit* [[maybe_unused]] unit, uint32 index, uint32 count)
+UnitPosition SingleLineUnitPlacer::Place([[maybe_unused]] FormationUnit* unit, uint32 index, uint32 count)
 {
     float angle = orientation - M_PI / 2.0f;
     float x = cos(angle) * sPlayerbotAIConfig->followDistance * ((float)index - (float)count / 2);

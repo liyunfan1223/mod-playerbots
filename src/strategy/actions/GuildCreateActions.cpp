@@ -14,7 +14,7 @@
 #include "ServerFacade.h"
 #include "SharedDefines.h" // GOLD
 
-bool BuyPetitionAction::Execute(Event [[maybe_unused]] event)
+bool BuyPetitionAction::Execute([[maybe_unused]] Event event)
 {
     GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();
     bool vendored = false, result = false;
@@ -152,7 +152,7 @@ bool PetitionOfferAction::Execute(Event event)
 
 bool PetitionOfferAction::isUseful() { return !bot->GetGuildId(); }
 
-bool PetitionOfferNearbyAction::Execute(Event [[maybe_unused]] event)
+bool PetitionOfferNearbyAction::Execute([[maybe_unused]] Event event)
 {
     uint32 found = 0;
 
@@ -209,7 +209,7 @@ bool PetitionOfferNearbyAction::isUseful()
            AI_VALUE(uint8, "petition signs") < sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS);
 }
 
-bool PetitionTurnInAction::Execute(Event [[maybe_unused]] event)
+bool PetitionTurnInAction::Execute([[maybe_unused]] Event event)
 {
     GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();
     bool vendored = false, result = false;
@@ -297,7 +297,7 @@ bool PetitionTurnInAction::isUseful()
            !context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
 }
 
-bool BuyTabardAction::Execute(Event [[maybe_unused]] event)
+bool BuyTabardAction::Execute([[maybe_unused]] Event event)
 {
     bool canBuy = botAI->DoSpecificAction("buy", Event("buy tabard", "Hitem:5976:"));
     if (canBuy && AI_VALUE2(uint32, "item count", chat->FormatQItem(5976)))

@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool RandomBotUpdateAction::Execute(Event [[maybe_unused]] event)
+bool RandomBotUpdateAction::Execute([[maybe_unused]] Event event)
 {
     if (!sRandomPlayerbotMgr->IsRandomBot(bot))
         return false;

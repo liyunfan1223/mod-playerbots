@@ -8,7 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 
-bool HireAction::Execute(Event [[maybe_unused]] event)
+bool HireAction::Execute([[maybe_unused]] Event event)
 {
     Player* master = GetMaster();
     if (!master)

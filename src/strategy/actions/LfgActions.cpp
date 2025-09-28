@@ -17,7 +17,7 @@
 using namespace lfg;
 
 
-bool LfgJoinAction::Execute(Event [[maybe_unused]] event) { return JoinLFG(); }
+bool LfgJoinAction::Execute([[maybe_unused]] Event event) { return JoinLFG(); }
 
 uint32 LfgJoinAction::GetRoles()
 {
@@ -171,7 +171,7 @@ bool LfgJoinAction::JoinLFG()
     return true;
 }
 
-bool LfgRoleCheckAction::Execute(Event [[maybe_unused]] event)
+bool LfgRoleCheckAction::Execute([[maybe_unused]] Event event)
 {
     if (Group* group = bot->GetGroup())
     {
@@ -268,7 +268,7 @@ bool LfgAcceptAction::Execute(Event event)
 }
 
 
-bool LfgLeaveAction::Execute(Event [[maybe_unused]] event)
+bool LfgLeaveAction::Execute([[maybe_unused]] Event event)
 {
     // Don't leave if lfg strategy enabled
     // if (botAI->HasStrategy("lfg", BOT_STATE_NON_COMBAT))

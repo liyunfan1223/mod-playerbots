@@ -5,7 +5,7 @@
 
 #define PICK_LOCK_SPELL_ID 1804
 
-bool UnlockTradedItemAction::Execute(Event [[maybe_unused]] event)
+bool UnlockTradedItemAction::Execute([[maybe_unused]] Event event)
 {
     Player* trader = bot->GetTrader();
     if (!trader)

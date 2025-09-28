@@ -17,7 +17,7 @@ class PartyMemberWithoutAuraValue : public PartyMemberValue, public Qualified
 {
 public:
     PartyMemberWithoutAuraValue(PlayerbotAI* botAI, std::string const name = "party member without aura",
-                                float [[maybe_unused]] range = sPlayerbotAIConfig->sightDistance)
+                                float range = sPlayerbotAIConfig->sightDistance)
         : PartyMemberValue(botAI, name)
     {
     }

@@ -13,7 +13,7 @@
 #include "RtscAction.h"
 #include "PositionValue.h"
 
-Creature* SeeSpellAction::CreateWps(Player* wpOwner, float x, float y, float z, float o, uint32 entry, Creature* [[maybe_unused]] lastWp,
+Creature* SeeSpellAction::CreateWps(Player* wpOwner, float x, float y, float z, float o, uint32 entry, [[maybe_unused]] Creature* lastWp,
                                     bool important)
 {
     float dist = wpOwner->GetDistance(x, y, z);

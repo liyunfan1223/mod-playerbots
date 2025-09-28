@@ -2,7 +2,7 @@
 
 #include "Playerbots.h"
 
-bool McCheckShouldMoveFromGroupAction::Execute(Event [[maybe_unused]] event)
+bool McCheckShouldMoveFromGroupAction::Execute([[maybe_unused]] Event event)
 {
     if (bot->HasAura(20475))  // barron geddon's living bomb
     {
@@ -26,7 +26,7 @@ bool McCheckShouldMoveFromGroupAction::Execute(Event [[maybe_unused]] event)
     return false;
 }
 
-bool McMoveFromBaronGeddonAction::Execute(Event [[maybe_unused]] event)
+bool McMoveFromBaronGeddonAction::Execute([[maybe_unused]] Event event)
 {
     const float radius = 25.0f;  // more than should be needed but bots keep trying to run back in
     if (Unit* boss = AI_VALUE2(Unit*, "find target", "baron geddon"))

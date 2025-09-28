@@ -11,7 +11,7 @@
 
 std::vector<std::string> split(std::string const s, char delim);
 
-bool GiveItemAction::Execute(Event [[maybe_unused]] event)
+bool GiveItemAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = GetTarget();
     if (!target)

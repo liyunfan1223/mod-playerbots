@@ -10,7 +10,7 @@
 #include "GridNotifiersImpl.h"
 #include "Playerbots.h"
 
-bool TravelAction::Execute(Event [[maybe_unused]] event)
+bool TravelAction::Execute([[maybe_unused]] Event event)
 {
     TravelTarget* target = AI_VALUE(TravelTarget*, "travel target");
 
@@ -60,7 +60,7 @@ bool TravelAction::isUseful()
            (!AI_VALUE(GuidPosition, "rpg target") || !AI_VALUE(ObjectGuid, "pull target"));
 }
 
-bool MoveToDarkPortalAction::Execute(Event [[maybe_unused]] event)
+bool MoveToDarkPortalAction::Execute([[maybe_unused]] Event event)
 {
     if (bot->GetGroup())
         if (bot->GetGroup()->GetLeaderGUID() != bot->GetGUID() &&
@@ -111,7 +111,7 @@ bool MoveToDarkPortalAction::Execute(Event [[maybe_unused]] event)
 
 bool MoveToDarkPortalAction::isUseful() { return bot->GetLevel() > 54; }
 
-bool DarkPortalAzerothAction::Execute(Event [[maybe_unused]] event)
+bool DarkPortalAzerothAction::Execute([[maybe_unused]] Event event)
 {
     if (bot->GetLevel() > 57)
     {
@@ -126,7 +126,7 @@ bool DarkPortalAzerothAction::Execute(Event [[maybe_unused]] event)
 
 bool DarkPortalAzerothAction::isUseful() { return bot->GetLevel() > 57; }
 
-bool MoveFromDarkPortalAction::Execute(Event [[maybe_unused]] event)
+bool MoveFromDarkPortalAction::Execute([[maybe_unused]] Event event)
 {
     RESET_AI_VALUE(GuidPosition, "rpg target");
 

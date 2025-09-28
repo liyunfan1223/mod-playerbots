@@ -100,7 +100,7 @@ bool LeaveGroupAction::Leave(Player* player)
     return true;
 }
 
-bool LeaveFarAwayAction::Execute(Event [[maybe_unused]] event)
+bool LeaveFarAwayAction::Execute([[maybe_unused]] Event event)
 {
     // allow bot to leave party when they want
     return Leave(botAI->GetGroupMaster());

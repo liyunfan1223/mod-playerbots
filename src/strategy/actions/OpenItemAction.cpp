@@ -7,7 +7,7 @@
 #include "LootObjectStack.h"
 #include "AiObjectContext.h"
 
-bool OpenItemAction::Execute(Event [[maybe_unused]] event)
+bool OpenItemAction::Execute([[maybe_unused]] Event event)
 {
     bool foundOpenable = false;
 

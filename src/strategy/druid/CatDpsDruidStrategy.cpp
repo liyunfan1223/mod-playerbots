@@ -176,4 +176,4 @@ void CatDpsDruidStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("dash", ACTION_HIGH + 8), nullptr)));
 }
 
-void CatAoeDruidStrategy::InitTriggers(std::vector<TriggerNode*>& [[maybe_unused]] triggers) {}
+void CatAoeDruidStrategy::InitTriggers([[maybe_unused]] std::vector<TriggerNode*>& triggers) {}

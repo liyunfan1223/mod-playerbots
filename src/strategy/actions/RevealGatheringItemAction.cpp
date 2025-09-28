@@ -31,7 +31,7 @@ private:
     float i_range;
 };
 
-bool RevealGatheringItemAction::Execute(Event [[maybe_unused]] event)
+bool RevealGatheringItemAction::Execute([[maybe_unused]] Event event)
 {
     if (!bot->GetGroup())
         return false;

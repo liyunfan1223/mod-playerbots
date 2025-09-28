@@ -432,7 +432,7 @@ bool QuestItemPushResultAction::Execute(Event event)
     return false;
 }
 
-bool QuestUpdateFailedAction::Execute(Event [[maybe_unused]] event)
+bool QuestUpdateFailedAction::Execute([[maybe_unused]] Event event)
 {
     //opcode SMSG_QUESTUPDATE_FAILED is never sent...(yet?)
     return false;

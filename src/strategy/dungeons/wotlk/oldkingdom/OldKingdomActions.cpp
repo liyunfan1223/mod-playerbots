@@ -3,7 +3,7 @@
 #include "OldKingdomStrategy.h"
 
 
-bool AttackNadoxGuardianAction::Execute(Event [[maybe_unused]] event)
+bool AttackNadoxGuardianAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = AI_VALUE2(Unit*, "find target", "ahn'kahar guardian");
     if (!target || AI_VALUE(Unit*, "current target") == target)
@@ -13,7 +13,7 @@ bool AttackNadoxGuardianAction::Execute(Event [[maybe_unused]] event)
     return Attack(target);
 }
 
-bool AttackJedogaVolunteerAction::Execute(Event [[maybe_unused]] event)
+bool AttackJedogaVolunteerAction::Execute([[maybe_unused]] Event event)
 {
     Unit* target = nullptr;
     // Target is not findable from threat table using AI_VALUE2(),
@@ -41,7 +41,7 @@ bool AttackJedogaVolunteerAction::Execute(Event [[maybe_unused]] event)
     return Attack(target);
 }
 
-bool AvoidShadowCrashAction::Execute(Event [[maybe_unused]] event)
+bool AvoidShadowCrashAction::Execute([[maybe_unused]] Event event)
 {
     // Could check all enemy units in range as it's possible to pull multiple of these mobs.
     // They should really be killed 1 by 1, multipulls are messy so we just handle singles for now
