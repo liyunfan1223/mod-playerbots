@@ -10,10 +10,6 @@
 
 bool DrinkAction::Execute(Event event)
 {
-    // gatekeeper
-    if (!isPossible())
-        return false;
-
     if (botAI->HasCheat(BotCheatMask::food))
     {
         // if (bot->IsNonMeleeSpellCast(true))
@@ -53,14 +49,15 @@ bool DrinkAction::Execute(Event event)
 
 bool DrinkAction::isUseful() 
 { 
-    return UseItemAction::isUseful() && AI_VALUE2(uint8, "mana", "self target") < 100; 
+    return UseItemAction::isUseful() && 
+        AI_VALUE2(bool, "has mana", "self target") &&
+        AI_VALUE2(uint8, "mana", "self target") < 100; 
 }
 
 bool DrinkAction::isPossible()
 {
     return !bot->IsInCombat() && 
         !bot->IsMounted() &&
-        AI_VALUE2(bool, "has mana", "self target") &&
         !botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", 
             "aquatic form","flight form", "swift flight form", nullptr) &&
         (botAI->HasCheat(BotCheatMask::food) || UseItemAction::isPossible());
@@ -68,10 +65,6 @@ bool DrinkAction::isPossible()
 
 bool EatAction::Execute(Event event)
 {
-    // gatekeeper
-    if (!isPossible())
-        return false;
-
     if (botAI->HasCheat(BotCheatMask::food))
     {
         // if (bot->IsNonMeleeSpellCast(true))
@@ -111,7 +104,8 @@ bool EatAction::Execute(Event event)
 
 bool EatAction::isUseful() 
 { 
-    return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < 100; 
+    return UseItemAction::isUseful() && 
+        AI_VALUE2(uint8, "health", "self target") < 100; 
 }
 
 bool EatAction::isPossible()
