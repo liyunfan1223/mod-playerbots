@@ -51,15 +51,15 @@ bool DrinkAction::isUseful()
 { 
     return UseItemAction::isUseful() && 
         AI_VALUE2(bool, "has mana", "self target") &&
-        AI_VALUE2(uint8, "mana", "self target") < 100; 
+        AI_VALUE2(uint8, "mana", "self target") < 100 &&
+        !botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form",
+            "aquatic form","flight form", "swift flight form", nullptr) &&
 }
 
 bool DrinkAction::isPossible()
 {
     return !bot->IsInCombat() && 
         !bot->IsMounted() &&
-        !botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", 
-            "aquatic form","flight form", "swift flight form", nullptr) &&
         (botAI->HasCheat(BotCheatMask::food) || UseItemAction::isPossible());
 }
 
@@ -105,14 +105,14 @@ bool EatAction::Execute(Event event)
 bool EatAction::isUseful() 
 { 
     return UseItemAction::isUseful() && 
-        AI_VALUE2(uint8, "health", "self target") < 100; 
+        AI_VALUE2(uint8, "health", "self target") < 100 &&
+        !botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form",
+            "aquatic form","flight form", "swift flight form", nullptr) &&
 }
 
 bool EatAction::isPossible()
 {
     return !bot->IsInCombat() && 
         !bot->IsMounted() &&
-        !botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", 
-            "aquatic form","flight form", "swift flight form", nullptr) &&
         (botAI->HasCheat(BotCheatMask::food) || UseItemAction::isPossible());
 }
