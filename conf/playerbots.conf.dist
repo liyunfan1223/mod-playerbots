@@ -159,6 +159,9 @@ AiPlayerbot.RandomBotGuildNearby = 0
 # Number of guilds created by randombots
 AiPlayerbot.RandomBotGuildCount = 20
 
+# Maximum number of members in randombot guilds (minimum is hardcoded to 10)
+AiPlayerbot.RandomBotGuildSizeMax = 15
+
 # Delete all randombot guilds if set to 1
 AiPlayerbot.DeleteRandomBotGuilds = 0
 

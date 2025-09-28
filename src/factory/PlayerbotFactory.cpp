@@ -3992,7 +3992,7 @@ void PlayerbotFactory::InitGuild()
         return;
     }
 
-    if (guild->GetMemberSize() < urand(10, 15))
+    if (guild->GetMemberSize() < urand(10, sPlayerbotAIConfig->randomBotGuildSizeMax))
         guild->AddMember(bot->GetGUID(), urand(GR_OFFICER, GR_INITIATE));
 
     // add guild tabard

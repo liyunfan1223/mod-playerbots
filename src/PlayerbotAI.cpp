@@ -2088,7 +2088,7 @@ bool PlayerbotAI::IsHeal(Player* player, bool bySpec)
     switch (player->getClass())
     {
         case CLASS_PRIEST:
-            if (tab == PRIEST_TAB_DISIPLINE || tab == PRIEST_TAB_HOLY)
+            if (tab == PRIEST_TAB_DISCIPLINE || tab == PRIEST_TAB_HOLY)
             {
                 return true;
             }
