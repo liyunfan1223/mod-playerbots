@@ -672,7 +672,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     if (!sPlayerbotAIConfig->enabled || guid.IsEmpty())
         return "bot system is disabled";
 
-    uint32 botAccount = sCharacterCache->GetCharacterAccountIdByGuid(guid);
+    [[maybe_unused]] uint32 botAccount = sCharacterCache->GetCharacterAccountIdByGuid(guid);
     //bool isRandomBot = sRandomPlayerbotMgr->IsRandomBot(guid.GetCounter()); //not used, line marked for removal.
     //bool isRandomAccount = sPlayerbotAIConfig->IsInRandomAccountList(botAccount); //not used, shadowed, line marked for removal.
     //bool isMasterAccount = (masterAccountId == botAccount); //not used, line marked for removal.

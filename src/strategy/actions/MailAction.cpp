@@ -134,7 +134,7 @@ public:
 private:
     bool CheckBagSpace(Player* bot)
     {
-        uint32 totalused = 0, total = 16;
+        [[maybe_unused]] uint32 totalused = 0, total = 16;
         for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; slot++)
             if (bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
                 ++totalused;

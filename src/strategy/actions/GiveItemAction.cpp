@@ -28,7 +28,7 @@ bool GiveItemAction::Execute([[maybe_unused]] Event event)
     if (receiverAi->GetAiObjectContext()->GetValue<uint32>("item count", item)->Get())
         return true;
 
-    bool moved = false;
+    [[maybe_unused]] bool moved = false;
     std::vector<Item*> items = InventoryAction::parseItems(item, ITERATE_ITEMS_IN_BAGS);
     for (Item* item : items)
     {

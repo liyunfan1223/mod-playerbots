@@ -28,7 +28,7 @@ bool RememberTaxiAction::Execute(Event event)
         case CMSG_ACTIVATETAXIEXPRESS:
         {
             ObjectGuid guid;
-            uint32 node_count, totalcost;
+            [[maybe_unused]] uint32 node_count, totalcost;
             p >> guid >> node_count;
 
             LastMovement& movement = context->GetValue<LastMovement&>("last taxi")->Get();

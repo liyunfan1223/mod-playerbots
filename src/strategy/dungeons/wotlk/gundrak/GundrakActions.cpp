@@ -24,7 +24,7 @@ bool AttackSnakeWrapAction::Execute([[maybe_unused]] Event event)
     Unit* boss = AI_VALUE2(Unit*, "find target", "slad'ran");
     if (!boss) { return false; }
 
-    Unit* snakeWrap = nullptr;
+    [[maybe_unused]] Unit* snakeWrap = nullptr;
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit name
     GuidVector targets = AI_VALUE(GuidVector, "possible targets no los");

@@ -350,7 +350,7 @@ bool KologarnMarkDpsTargetTrigger::IsActive()
         if (!target)
             continue;
 
-        uint32 creatureId = target->GetEntry();
+        [[maybe_unused]] uint32 creatureId = target->GetEntry();
         if (target->GetEntry() == NPC_RUBBLE && target->IsAlive())
         {
             return true;  // Found a rubble to mark
@@ -846,8 +846,8 @@ bool ThorimMarkDpsTargetTrigger::IsActive()
 
         Unit* runicColossus = AI_VALUE2(Unit*, "find target", "runic colossus");
         Unit* ancientRuneGiant = AI_VALUE2(Unit*, "find target", "ancient rune giant");
-        Unit* ironHonorGuard = AI_VALUE2(Unit*, "find target", "iron ring guard");
-        Unit* ironRingGuard = AI_VALUE2(Unit*, "find target", "iron honor guard");
+        [[maybe_unused]] Unit* ironHonorGuard = AI_VALUE2(Unit*, "find target", "iron ring guard");
+        [[maybe_unused]] Unit* ironRingGuard = AI_VALUE2(Unit*, "find target", "iron honor guard");
 
         if (acolyte && acolyte->IsAlive() && (!currentCrossUnit || currentCrossUnit->GetEntry() != acolyte->GetEntry()))
             return true;
@@ -1165,8 +1165,8 @@ bool MimironPhase1PositioningTrigger::IsActive()
     }
 
     Unit* leviathanMkII = nullptr;
-    Unit* vx001 = nullptr;
-    Unit* aerialCommandUnit = nullptr;
+    [[maybe_unused]] Unit* vx001 = nullptr;
+    [[maybe_unused]] Unit* aerialCommandUnit = nullptr;
 
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
     Unit* target = nullptr;

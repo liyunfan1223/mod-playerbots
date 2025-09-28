@@ -516,7 +516,7 @@ bool DebugAction::Execute(Event event)
                 botPos.setY(botPos.getY() + (dy - 5) * 5);
                 botPos.setZ(botPos.getHeight());
 
-                Creature* wpCreature = bot->SummonCreature(effect, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
+                [[maybe_unused]] Creature* wpCreature = bot->SummonCreature(effect, botPos.getX(), botPos.getY(), botPos.getZ(), 0,
                                                            TEMPSUMMON_TIMED_DESPAWN, 10000.0f);
             }
         }

@@ -24,7 +24,7 @@ bool MoveToRpgTargetAction::Execute([[maybe_unused]] Event event)
     {
         return false;
     }
-    Player* player = guidP.GetPlayer();
+    [[maybe_unused]] Player* player = guidP.GetPlayer();
 
     WorldObject* wo = nullptr;
     if (unit)

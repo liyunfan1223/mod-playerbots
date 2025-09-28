@@ -29,7 +29,7 @@ public:
             foundHighPriority = true;
             return;
         }
-        Unit* victim = attacker->GetVictim();
+        [[maybe_unused]] Unit* victim = attacker->GetVictim();
         if (!result || CalcThreatGap(attacker, threatMgr) > CalcThreatGap(result, &result->GetThreatMgr()))
             result = attacker;
     }
@@ -195,7 +195,7 @@ public:
     }
     int32_t GetIntervalLevel(Unit* unit)
     {
-        float time = unit->GetHealth() / dps_;
+        [[maybe_unused]] float time = unit->GetHealth() / dps_;
         float dis = unit->GetDistance(botAI->GetBot());
         float attackRange =
             botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance : sPlayerbotAIConfig->meleeDistance;
@@ -276,7 +276,7 @@ public:
     }
     int32_t GetIntervalLevel(Unit* unit)
     {
-        float time = unit->GetHealth() / dps_;
+        [[maybe_unused]] float time = unit->GetHealth() / dps_;
         float dis = unit->GetDistance(botAI->GetBot());
         float attackRange =
             botAI->IsRanged(botAI->GetBot()) ? sPlayerbotAIConfig->spellDistance : sPlayerbotAIConfig->meleeDistance;

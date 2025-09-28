@@ -107,7 +107,7 @@ void AttackersValue::AddAttackersOf(Player* player, std::unordered_set<Unit*>& t
     {
         ThreatMgr* threatMgr = ref->GetSource();
         Unit* attacker = threatMgr->GetOwner();
-        Unit* victim = attacker->GetVictim();
+        [[maybe_unused]] Unit* victim = attacker->GetVictim();
 
         if (player->IsValidAttackTarget(attacker) &&
             player->GetDistance2d(attacker) < sPlayerbotAIConfig->sightDistance)
@@ -145,7 +145,7 @@ bool AttackersValue::hasRealThreat(Unit* attacker)
 bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, [[maybe_unused]] float range)
 {
     Creature* c = attacker->ToCreature();
-    bool rti = false;
+    [[maybe_unused]] bool rti = false;
     if (attacker && bot->GetGroup())
         rti = bot->GetGroup()->GetTargetIcon(7) == attacker->GetGUID();
 

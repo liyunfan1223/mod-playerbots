@@ -27,7 +27,7 @@ bool LootRollAction::Execute([[maybe_unused]] Event event)
             continue;
         }
         ObjectGuid guid = roll->itemGUID;
-        uint32 slot = roll->itemSlot;
+        [[maybe_unused]] uint32 slot = roll->itemSlot;
         uint32 itemId = roll->itemid;
         int32 randomProperty = 0;
         if (roll->itemRandomPropId)
@@ -184,7 +184,7 @@ bool MasterLootRollAction::Execute(Event event)
     if (!group)
         return false;
 
-    RollVote vote = CalculateRollVote(proto);
+    [[maybe_unused]] RollVote vote = CalculateRollVote(proto);
     group->CountRollVote(bot->GetGUID(), creatureGuid, CalculateRollVote(proto));
 
     return true;

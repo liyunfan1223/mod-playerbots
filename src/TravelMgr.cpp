@@ -643,7 +643,7 @@ void WorldPosition::loadMapAndVMap(uint32 mapId, uint8 x, uint8 y)
             if (!sTravelMgr->isBadVmap(mapId, x, y))
             {
                 // load VMAPs for current map/grid...
-                const MapEntry* i_mapEntry = sMapStore.LookupEntry(mapId);
+                [[maybe_unused]] const MapEntry* i_mapEntry = sMapStore.LookupEntry(mapId);
                 //const char* mapName = i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0"; //not used, (usage are commented out below), line marked for removal.
 
                 int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapMgr()->loadMap(

@@ -69,7 +69,7 @@ bool SuggestWhatToDoAction::Execute([[maybe_unused]] Event event)
     fnct_ptr();
 
     std::string const qualifier = "suggest what to do";
-    time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
+    [[maybe_unused]] time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
     botAI->GetAiObjectContext()->GetValue<time_t>("last said", qualifier)->Set(time(nullptr) + urand(1, 60));
 
     return true;

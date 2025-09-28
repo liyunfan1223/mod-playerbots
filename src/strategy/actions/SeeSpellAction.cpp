@@ -48,7 +48,7 @@ bool SeeSpellAction::Execute(Event event)
     if (spellId != RTSC_MOVE_SPELL)
         return false;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    [[maybe_unused]] SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
     SpellCastTargets targets;
     targets.Read(p, botAI->GetMaster());

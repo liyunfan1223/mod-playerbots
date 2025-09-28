@@ -200,7 +200,7 @@ bool PartyMemberToHealOutOfSpellRangeTrigger::IsActive()
     if (!target)
         return false;
 
-    float combatReach = bot->GetCombatReach() + target->GetCombatReach();
+    [[maybe_unused]] float combatReach = bot->GetCombatReach() + target->GetCombatReach();
     return target && (sServerFacade->GetDistance2d(bot, target) > (distance + sPlayerbotAIConfig->contactDistance) ||
                       !bot->IsWithinLOSInMap(target));
 }

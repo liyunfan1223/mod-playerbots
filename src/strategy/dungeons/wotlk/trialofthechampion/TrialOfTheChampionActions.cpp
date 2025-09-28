@@ -60,8 +60,8 @@ bool ToCLanceAction::Execute([[maybe_unused]] Event event)
     if (lanceItem)
     {
         // Store the lance's current position
-        uint8 srcBag = lanceItem->GetBagSlot();
-        uint8 srcSlot = lanceItem->GetSlot();
+        [[maybe_unused]] uint8 srcBag = lanceItem->GetBagSlot();
+        [[maybe_unused]] uint8 srcSlot = lanceItem->GetSlot();
 
         // First unequip current weapon if it exists
         if (oldWeapon)

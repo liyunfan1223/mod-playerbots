@@ -367,7 +367,7 @@ bool EoEDrakeAttackAction::DrakeDpsAction(Unit* target)
     Unit* vehicleBase = bot->GetVehicleBase();
     if (!vehicleBase) { return false; }
 
-    Vehicle* veh = bot->GetVehicle();
+    [[maybe_unused]] Vehicle* veh = bot->GetVehicle();
 
     uint8 comboPoints = vehicleBase->GetComboPoints(target);
     if (comboPoints >= 2)

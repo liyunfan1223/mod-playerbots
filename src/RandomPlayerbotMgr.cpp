@@ -3155,10 +3155,10 @@ void RandomPlayerbotMgr::PrintStats()
     uint32 heal = 0;
     uint32 tank = 0;
     uint32 active = 0;
-    uint32 update = 0;
-    uint32 randomize = 0;
-    uint32 teleport = 0;
-    uint32 changeStrategy = 0;
+    [[maybe_unused]] uint32 update = 0;
+    [[maybe_unused]] uint32 randomize = 0;
+    [[maybe_unused]] uint32 teleport = 0;
+    [[maybe_unused]] uint32 changeStrategy = 0;
     uint32 dead = 0;
     uint32 combat = 0;
     // uint32 revive = 0; //not used, line marked for removal.

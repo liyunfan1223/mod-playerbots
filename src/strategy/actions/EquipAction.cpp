@@ -85,7 +85,7 @@ void EquipAction::EquipItem(Item* item)
     if (itemProto->Class == ITEM_CLASS_CONTAINER)
     {
         // Attempt to equip as a bag
-        Bag* pBag = reinterpret_cast<Bag*>(item);
+        [[maybe_unused]] Bag* pBag = reinterpret_cast<Bag*>(item);
         uint8 newBagSlot = GetSmallestBagSlot();
         if (newBagSlot > 0)
         {

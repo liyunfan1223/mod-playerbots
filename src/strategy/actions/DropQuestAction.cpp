@@ -80,7 +80,7 @@ bool CleanQuestLogAction::Execute(Event event)
     }
 
     uint8 botLevel = bot->GetLevel();  // Get bot's level
-    uint8 numQuest = 0;
+    [[maybe_unused]] uint8 numQuest = 0;
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
         if (bot->GetQuestSlotQuestId(slot))

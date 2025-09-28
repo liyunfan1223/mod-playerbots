@@ -53,7 +53,7 @@ bool TameAction::Execute(Event event)
     {
         std::set<std::string> normalFamilies;
         std::set<std::string> exoticFamilies;
-        Player* bot = botAI->GetBot();
+        [[maybe_unused]] Player* bot = botAI->GetBot();
 
         // Loop over all creature templates and collect tameable families
         CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates();

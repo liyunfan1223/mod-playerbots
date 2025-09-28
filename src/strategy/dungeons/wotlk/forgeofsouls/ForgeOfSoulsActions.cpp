@@ -20,11 +20,11 @@ bool MoveFromBronjahmAction::Execute([[maybe_unused]] Event event)
 
 bool AttackCorruptedSoulFragmentAction::Execute([[maybe_unused]] Event event)
 {
-    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+    [[maybe_unused]] Unit* currentTarget = AI_VALUE(Unit*, "current target");
     GuidVector targets = AI_VALUE(GuidVector, "possible targets");
 
     // If no valid skull target, search for corrupted soul fragment
-    Unit* empoweredPrince = nullptr;
+    [[maybe_unused]] Unit* empoweredPrince = nullptr;
     for (auto i = targets.begin(); i != targets.end(); ++i)
     {
         Unit* unit = botAI->GetUnit(*i);

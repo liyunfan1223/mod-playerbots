@@ -25,8 +25,8 @@ bool BGJoinAction::Execute([[maybe_unused]] Event event)
 
         BattlegroundQueueTypeId queueTypeId = (BattlegroundQueueTypeId)bgList[urand(0, bgList.size() - 1)];
         BattlegroundTypeId bgTypeId = BattlegroundMgr::BGTemplateId(queueTypeId);
-        BattlegroundBracketId bracketId;
-        bool isArena = false;
+        [[maybe_unused]] BattlegroundBracketId bracketId;
+        [[maybe_unused]] bool isArena = false;
         bool isRated = false;
 
         Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(bgTypeId);
@@ -408,8 +408,8 @@ bool BGJoinAction::JoinQueue(uint32 type)
 
     bracketId = pvpDiff->GetBracketId();
 
-    uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
-    uint32 TeamSize = bg->GetMaxPlayersPerTeam();
+    [[maybe_unused]] uint32 BracketSize = bg->GetMaxPlayersPerTeam() * 2;
+    [[maybe_unused]] uint32 TeamSize = bg->GetMaxPlayersPerTeam();
     TeamId teamId = bot->GetTeamId();
 
     // check if already in queue

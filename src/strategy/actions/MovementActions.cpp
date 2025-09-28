@@ -78,7 +78,7 @@ bool MovementAction::JumpTo(uint32 mapId, float x, float y, float z, MovementPri
     {
         return false;
     }
-    float botZ = bot->GetPositionZ();
+    [[maybe_unused]] float botZ = bot->GetPositionZ();
     float speed = bot->GetSpeed(MOVE_RUN);
     MotionMaster& mm = *bot->GetMotionMaster();
     mm.Clear();
@@ -100,9 +100,9 @@ bool MovementAction::MoveNear(WorldObject* target, float distance, MovementPrior
 
     distance += target->GetCombatReach();
 
-    float x = target->GetPositionX();
-    float y = target->GetPositionY();
-    float z = target->GetPositionZ();
+    [[maybe_unused]] float x = target->GetPositionX();
+    [[maybe_unused]] float y = target->GetPositionY();
+    [[maybe_unused]] float z = target->GetPositionZ();
     float followAngle = GetFollowAngle();
 
     for (float angle = followAngle; angle <= followAngle + static_cast<float>(2 * M_PI);
@@ -283,7 +283,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, [[maybe_unu
             //     botAI->InterruptSpell();
             // }
             MotionMaster& mm = *bot->GetMotionMaster();
-            G3D::Vector3 endP = path.back();
+            [[maybe_unused]] G3D::Vector3 endP = path.back();
             mm.Clear();
             if (!backwards)
             {
@@ -807,8 +807,8 @@ bool MovementAction::MoveTo(WorldObject* target, float distance, MovementPriorit
     float by = bot->GetPositionY();
     float bz = bot->GetPositionZ();
 
-    float tx = target->GetPositionX();
-    float ty = target->GetPositionY();
+    [[maybe_unused]] float tx = target->GetPositionX();
+    [[maybe_unused]] float ty = target->GetPositionY();
     float tz = target->GetPositionZ();
 
     float distanceToTarget = bot->GetDistance(target);
@@ -840,9 +840,9 @@ bool MovementAction::ReachCombatTo(Unit* target, float distance)
     if (!IsMovingAllowed(target))
         return false;
 
-    float bx = bot->GetPositionX();
-    float by = bot->GetPositionY();
-    float bz = bot->GetPositionZ();
+    [[maybe_unused]] float bx = bot->GetPositionX();
+    [[maybe_unused]] float by = bot->GetPositionY();
+    [[maybe_unused]] float bz = bot->GetPositionZ();
 
     float tx = target->GetPositionX();
     float ty = target->GetPositionY();
@@ -1421,7 +1421,7 @@ bool MovementAction::Flee(Unit* target)
                 if (botAI->IsTank(player))
                 {
                     float distanceToTank = sServerFacade->GetDistance2d(bot, player);
-                    float distanceToTarget = sServerFacade->GetDistance2d(bot, target);
+                    [[maybe_unused]] float distanceToTarget = sServerFacade->GetDistance2d(bot, target);
                     if (distanceToTank < fleeDistance)
                     {
                         fleeTarget = player;
@@ -1442,8 +1442,8 @@ bool MovementAction::Flee(Unit* target)
     else  // bot is not targeted, try to flee dps/healers
     {
         bool isHealer = botAI->IsHeal(bot);
-        bool isDps = !isHealer && !botAI->IsTank(bot);
-        bool isTank = botAI->IsTank(bot);
+        [[maybe_unused]] bool isDps = !isHealer && !botAI->IsTank(bot);
+        [[maybe_unused]] bool isTank = botAI->IsTank(bot);
         bool needHealer = !isHealer && AI_VALUE2(uint8, "health", "self target") < 50;
         bool isRanged = botAI->IsRanged(bot);
 
@@ -2727,9 +2727,9 @@ bool MoveRandomAction::Execute([[maybe_unused]] Event event)
         float angle = (float)rand_norm() * static_cast<float>(M_PI);
         x += urand(0, distance) * cos(angle);
         y += urand(0, distance) * sin(angle);
-        float ox = x;
-        float oy = y;
-        float oz = z;
+        [[maybe_unused]] float ox = x;
+        [[maybe_unused]] float oy = y;
+        [[maybe_unused]] float oz = z;
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
                                                             bot->GetPositionZ(), x, y, z))
             continue;
@@ -2771,7 +2771,7 @@ bool MoveFromGroupAction::Execute(Event event)
 bool MoveAwayFromCreatureAction::Execute([[maybe_unused]] Event event)
 {
     GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
-    Creature* nearestCreature = bot->FindNearestCreature(creatureId, range, alive);
+    [[maybe_unused]] Creature* nearestCreature = bot->FindNearestCreature(creatureId, range, alive);
 
     // Find all creatures with the specified Id
     std::vector<Unit*> creatures;
@@ -2854,8 +2854,8 @@ bool MoveAwayFromCreatureAction::isPossible()
 
 bool MoveAwayFromPlayerWithDebuffAction::Execute([[maybe_unused]] Event event)
 {
-    Player* closestPlayer = nullptr;
-    float minDistance = 0.0f;
+    [[maybe_unused]] Player* closestPlayer = nullptr;
+    [[maybe_unused]] float minDistance = 0.0f;
 
     Group* group = bot->GetGroup();
     if (!group)

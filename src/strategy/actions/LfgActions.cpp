@@ -175,7 +175,7 @@ bool LfgRoleCheckAction::Execute([[maybe_unused]] Event event)
 {
     if (Group* group = bot->GetGroup())
     {
-        uint32 currentRoles = sLFGMgr->GetRoles(bot->GetGUID());
+        [[maybe_unused]] uint32 currentRoles = sLFGMgr->GetRoles(bot->GetGUID());
         uint32 newRoles = GetRoles();
         // if (currentRoles == newRoles)
         //     return false;

@@ -50,7 +50,7 @@ float HeiganDanceMultiplier::GetValue(Action* action)
     uint32 curr_phase = boss_ai->currentPhase;
     uint32 curr_dance = eventMap->GetNextEventTime(4);
     uint32 curr_timer = eventMap->GetTimer();
-    uint32 curr_erupt = eventMap->GetNextEventTime(3);
+    [[maybe_unused]] uint32 curr_erupt = eventMap->GetNextEventTime(3);
     if (dynamic_cast<CombatFormationMoveAction*>(action) ||
         dynamic_cast<CastDisengageAction*>(action) ||
         dynamic_cast<CastBlinkBackAction*>(action) )

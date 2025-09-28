@@ -30,7 +30,7 @@ public:
     float minDistance;
 
 private:
-    PlayerbotAI* botAI;
+    [[maybe_unused]] PlayerbotAI* botAI;
 };
 
 class FleeManager

@@ -165,7 +165,7 @@ bool GuildManageNearbyAction::Execute([[maybe_unused]] Event event)
         // Promote or demote nearby members based on chance.
         if (player->GetGuildId() && player->GetGuildId() == bot->GetGuildId())
         {
-            Guild::Member* member = guild->GetMember(player->GetGUID());
+            [[maybe_unused]] Guild::Member* member = guild->GetMember(player->GetGUID());
             uint32 dCount = AI_VALUE(uint32, "death count");
 
             if (!urand(0, 30) && dCount < 2 && guild->GetRankRights(botMember->GetRankId()) & GR_RIGHT_PROMOTE)

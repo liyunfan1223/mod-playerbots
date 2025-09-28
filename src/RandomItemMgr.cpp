@@ -1832,7 +1832,7 @@ std::vector<uint32> RandomItemMgr::GetUpgradeList(Player* player, std::string sp
     // get old item statWeight
     uint32 oldStatWeight = 0;
     uint32 specId = 0;
-    uint32 closestUpgrade = 0;
+    [[maybe_unused]] uint32 closestUpgrade = 0;
     uint32 closestUpgradeWeight = 0;
     std::vector<uint32> classspecs;
 

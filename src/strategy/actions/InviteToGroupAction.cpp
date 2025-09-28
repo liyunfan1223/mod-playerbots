@@ -160,7 +160,7 @@ std::vector<Player*> InviteGuildToGroupAction::getGuildMembers()
 
 bool InviteGuildToGroupAction::Execute([[maybe_unused]] Event event)
 {
-    Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
+    [[maybe_unused]] Guild* guild = sGuildMgr->GetGuildById(bot->GetGuildId());
 
     for (auto& member : getGuildMembers())
     {

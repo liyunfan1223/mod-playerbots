@@ -1249,7 +1249,7 @@ bool KologarnMarkDpsTargetAction::Execute([[maybe_unused]] Event event)
         if (!target)
             continue;
 
-        uint32 creatureId = target->GetEntry();
+        [[maybe_unused]] uint32 creatureId = target->GetEntry();
         if (target->GetEntry() == NPC_RUBBLE && target->IsAlive())
         {
             targetToMark = target;
@@ -2481,7 +2481,7 @@ bool MimironRocketStrikeAction::isUseful()
 
 bool MimironRocketStrikeAction::Execute([[maybe_unused]] Event event)
 {
-    Unit* leviathanMkII = nullptr;
+    [[maybe_unused]] Unit* leviathanMkII = nullptr;
     Unit* vx001 = nullptr;
     Unit* aerialCommandUnit = nullptr;
 

@@ -88,7 +88,7 @@ public:
     bool isUseful() override;
 
 private:
-    float distance;
+    [[maybe_unused]] float distance;
 };
 
 class FleeWithPetAction : public MovementAction
@@ -321,7 +321,7 @@ public:
 private:
     uint32 spellId;
     float range;
-    bool alive;
+    [[maybe_unused]] bool alive;
 };
 
 #endif

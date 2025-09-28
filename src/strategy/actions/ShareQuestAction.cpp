@@ -42,7 +42,7 @@ bool ShareQuestAction::Execute(Event event)
 
 bool AutoShareQuestAction::Execute(Event event)
 {
-    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+    [[maybe_unused]] Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
     bool shared = false;
 
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)

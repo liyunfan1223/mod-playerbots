@@ -1101,7 +1101,7 @@ bool IccLichKingShadowTrapTrigger::IsActive()
     // search for all nearby traps
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
     std::vector<Unit*> nearbyTraps;
-    bool needToMove = false;
+    [[maybe_unused]] bool needToMove = false;
 
     for (auto& npc : npcs)
     {

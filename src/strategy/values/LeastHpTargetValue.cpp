@@ -15,7 +15,7 @@ public:
 
     void CheckAttacker(Unit* attacker, [[maybe_unused]] ThreatMgr* threatMgr) override
     {
-        Player* bot = botAI->GetBot();
+        [[maybe_unused]] Player* bot = botAI->GetBot();
         if (IsCcTarget(attacker))
             return;
 

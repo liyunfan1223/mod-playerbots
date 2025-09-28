@@ -350,7 +350,7 @@ bool QuestUpdateAddItemAction::Execute(Event event)
     uint32 itemId, count;
     p >> itemId >> count;
 
-    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+    [[maybe_unused]] Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
     auto const* itemPrototype = sObjectMgr->GetItemTemplate(itemId);
     if (itemPrototype)
     {
@@ -405,7 +405,7 @@ bool QuestItemPushResultAction::Execute(Event event)
         if (!quest)
             return false;
 
-        const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
+        [[maybe_unused]] const QuestStatusData& q_status = bot->getQuestStatusMap().at(questId);
 
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
         {
@@ -446,7 +446,7 @@ bool QuestUpdateFailedTimerAction::Execute(Event event)
     uint32 questId;
     p >> questId;
 
-    Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
+    [[maybe_unused]] Player* requester = event.getOwner() ? event.getOwner() : GetMaster();
 
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId);
 

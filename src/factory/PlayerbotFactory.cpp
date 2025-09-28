@@ -949,8 +949,8 @@ void PlayerbotFactory::InitPet()
                 continue;
             if (co->Name.size() > 21)
                 continue;
-            uint32 guid = map->GenerateLowGuid<HighGuid::Pet>();
-            uint32 pet_number = sObjectMgr->GeneratePetNumber();
+            [[maybe_unused]] uint32 guid = map->GenerateLowGuid<HighGuid::Pet>();
+            [[maybe_unused]] uint32 pet_number = sObjectMgr->GeneratePetNumber();
             if (bot->GetPetStable() && bot->GetPetStable()->CurrentPet)
             {
                 auto petGuid = bot->GetPetStable()->CurrentPet.value(); // To correct the build warnin in VS
@@ -1910,7 +1910,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
         if (oldItem)
             continue;
 
-        Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);
+        [[maybe_unused]] Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);
         bot->AutoUnequipOffhandIfNeed();
         // if (newItem)
         // {
@@ -1979,7 +1979,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             {
                 continue;
             }
-            Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);
+            [[maybe_unused]] Item* newItem = bot->EquipNewItem(dest, bestItemForSlot, true);
             bot->AutoUnequipOffhandIfNeed();
             // if (newItem)
             // {
@@ -2156,7 +2156,7 @@ void PlayerbotFactory::InitBags(bool destroyOld)
         {
             continue;
         }
-        Item* newItem = bot->EquipNewItem(dest, newItemId, true);
+        [[maybe_unused]] Item* newItem = bot->EquipNewItem(dest, newItemId, true);
         // if (newItem)
         // {
         //     newItem->AddToWorld();
@@ -2909,7 +2909,7 @@ void PlayerbotFactory::AddPrevQuests(uint32 questId, std::list<uint32>& questIds
 
 void PlayerbotFactory::InitQuests(std::list<uint32>& questMap, bool withRewardItem)
 {
-    uint32 count = 0;
+    [[maybe_unused]] uint32 count = 0;
     for (std::list<uint32>::iterator i = questMap.begin(); i != questMap.end(); ++i)
     {
         uint32 questId = *i;
@@ -3314,7 +3314,7 @@ void PlayerbotFactory::InitFood()
 
 void PlayerbotFactory::InitReagents()
 {
-    int specTab = AiFactory::GetPlayerSpecTab(bot);
+    [[maybe_unused]] int specTab = AiFactory::GetPlayerSpecTab(bot);
     std::vector<std::pair<uint32, uint32>> items;
     switch (bot->getClass())
     {
@@ -4424,7 +4424,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew([[maybe_unused]] bool destoryOld)
                 continue;
             }
             int32 enchantIdChosen = -1;
-            int32 colorChosen;
+            [[maybe_unused]] int32 colorChosen;
             bool jewelersGemChosen;
             float bestGemScore = -1;
             for (uint32& enchantGem : availableGems)

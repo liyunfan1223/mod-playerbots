@@ -304,7 +304,7 @@ public:
     bool Accept(ItemTemplate const* proto) override;
 
 private:
-    uint32 effectId;
+    [[maybe_unused]] uint32 effectId;
 };
 
 class FindPetVisitor : public FindUsableItemVisitor

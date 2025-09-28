@@ -545,7 +545,7 @@ bool SapphironFlightPositionAction::MoveToNearestIcebolt()
     {
         return false;
     }
-    Group::MemberSlotList const& slots = group->GetMemberSlots();
+    [[maybe_unused]] Group::MemberSlotList const& slots = group->GetMemberSlots();
     Player* playerWithIcebolt = nullptr;
     float minDistance;
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())

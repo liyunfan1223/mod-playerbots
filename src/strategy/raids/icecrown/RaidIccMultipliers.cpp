@@ -25,8 +25,8 @@
 // LK global variables
 namespace
 {
-uint32 g_lastPlagueTime = 0;
-bool g_plagueAllowedToCure = false;
+[[maybe_unused]] uint32 g_lastPlagueTime = 0;
+[[maybe_unused]] bool g_plagueAllowedToCure = false;
 std::map<ObjectGuid, uint32> g_plagueTimes;
 std::map<ObjectGuid, bool> g_allowCure;
 std::mutex g_plagueMutex;  // Lock before accessing shared variables

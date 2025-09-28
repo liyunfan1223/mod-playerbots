@@ -300,7 +300,7 @@ bool ListSpellsAction::Execute(Event event)
 
     std::sort(spells.begin(), spells.end(), CompareSpells);
 
-    uint32 count = 0;
+    [[maybe_unused]] uint32 count = 0;
     for (std::vector<std::pair<uint32, std::string>>::iterator i = spells.begin(); i != spells.end(); ++i)
     {
         botAI->TellMasterNoFacing(i->second);

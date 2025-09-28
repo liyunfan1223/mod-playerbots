@@ -221,9 +221,9 @@ bool NewRpgDoQuestAction::Execute([[maybe_unused]] Event event)
     if (SearchQuestGiverAndAcceptOrReward())
         return true;
 
-    NewRpgInfo& info = botAI->rpgInfo;
+    [[maybe_unused]] NewRpgInfo& info = botAI->rpgInfo;
     uint32 questId = RPG_INFO(quest, questId);
-    const Quest* quest = RPG_INFO(quest, quest);
+    [[maybe_unused]] const Quest* quest = RPG_INFO(quest, quest);
     uint8 questStatus = bot->GetQuestStatus(questId);
     switch (questStatus)
     {
@@ -421,7 +421,7 @@ bool NewRpgTravelFlightAction::Execute([[maybe_unused]] Event event)
         botAI->rpgInfo.ChangeToIdle();
         return true;
     }
-    const TaxiNodesEntry* entry = sTaxiNodesStore.LookupEntry(botAI->rpgInfo.flight.toNode);
+    [[maybe_unused]] const TaxiNodesEntry* entry = sTaxiNodesStore.LookupEntry(botAI->rpgInfo.flight.toNode);
     if (bot->GetDistance(flightMaster) > INTERACTION_DISTANCE)
     {
         return MoveFarTo(flightMaster);

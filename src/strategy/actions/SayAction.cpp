@@ -92,7 +92,7 @@ bool SayAction::Execute([[maybe_unused]] Event event)
     }
 
     // set delay before next say
-    time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
+    [[maybe_unused]] time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
     uint32 nextTime = time(nullptr) + urand(1, 30);
     botAI->GetAiObjectContext()->GetValue<time_t>("last said", qualifier)->Set(nextTime);
 
@@ -159,7 +159,7 @@ bool SayAction::isUseful()
 
 void ChatReplyAction::ChatReplyDo(Player* bot, uint32& type, uint32& guid1, [[maybe_unused]] uint32& guid2, std::string& msg, std::string& chanName, std::string& name)
 {
-    ChatReplyType replyType = REPLY_NOT_UNDERSTAND;  // default not understand
+    [[maybe_unused]] ChatReplyType replyType = REPLY_NOT_UNDERSTAND;  // default not understand
     std::string respondsText = "";
 
     // if we're just commanding bots around, don't respond...

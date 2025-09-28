@@ -201,7 +201,7 @@ uint8 BagSpaceValue::Calculate()
             ++totalused;
     }
 
-    uint32 totalfree = 16 - totalused;
+    [[maybe_unused]] uint32 totalfree = 16 - totalused;
     for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
     {
         const Bag* const pBag = (Bag*)bot->GetItemByPos(INVENTORY_SLOT_BAG_0, bag);
