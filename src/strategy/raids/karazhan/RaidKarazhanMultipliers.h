@@ -3,6 +3,13 @@
 
 #include "Multiplier.h"
 
+class KarazhanAttumenTheHuntsmanMultiplier : public Multiplier
+{
+public:
+    KarazhanAttumenTheHuntsmanMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "karazhan attumen the huntsman multiplier") {}
+    virtual float GetValue(Action* action);
+};
+
 class KarazhanBigBadWolfMultiplier : public Multiplier
 {
 public:

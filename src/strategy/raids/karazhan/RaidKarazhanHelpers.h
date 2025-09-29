@@ -70,6 +70,7 @@ public:
     Unit* GetNearestPlayerInRadius(float /*radius*/ = 5.0f);
     bool IsFlameWreathActive();
     Position GetPositionOnBeam(Unit* boss, Unit* portal, float distanceFromBoss);
+    std::vector<Player*> GetRedBlockers();
     std::vector<Player*> GetBlueBlockers();
     std::vector<Player*> GetGreenBlockers();
     std::tuple<Player*, Player*, Player*> GetCurrentBeamBlockers();
@@ -79,7 +80,6 @@ public:
     std::vector<Unit*> GetSpawnedInfernals() const;
     bool IsStraightPathSafe(const Position& start, const Position& target, 
          const std::vector<Unit*>& hazards, float hazardRadius, float stepSize);
-    Position CalculateArcPoint(const Position& current, const Position& target, const Position& center);
 };
 
 #endif
