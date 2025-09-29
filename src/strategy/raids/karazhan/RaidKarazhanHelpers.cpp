@@ -132,7 +132,7 @@ bool RaidKarazhanHelpers::IsFlameWreathActive()
     return false;
 }
 
-// Blue beam blockers: non-Rogue/Warrior DPS, no Nether Exhaustion Blue and <25 stacks of Blue Beam debuff
+// Blue beam blockers: non-Rogue/Warrior DPS bots, no Nether Exhaustion Blue and <25 stacks of Blue Beam debuff
 std::vector<Player*> RaidKarazhanHelpers::GetBlueBlockers()
 {
     std::vector<Player*> blueBlockers;
@@ -162,8 +162,8 @@ std::vector<Player*> RaidKarazhanHelpers::GetBlueBlockers()
 }
 
 // Green beam blockers:
-// (1) Rogues and non-tank Warriors, no Nether Exhaustion Green
-// (2) Healers, no Nether Exhaustion Green and <25 stacks of Green Beam debuff
+// (1) Rogue and non-tank Warrior bots, no Nether Exhaustion Green
+// (2) Healer bots, no Nether Exhaustion Green and <25 stacks of Green Beam debuff
 std::vector<Player*> RaidKarazhanHelpers::GetGreenBlockers()
 {
     std::vector<Player*> greenBlockers;
@@ -226,20 +226,19 @@ std::tuple<Player*, Player*, Player*> RaidKarazhanHelpers::GetCurrentBeamBlocker
     Player* blueBlocker = nullptr;
     std::vector<Player*> redBlockers;
 
-if (Group* group = bot->GetGroup())
-{
-    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+    if (Group* group = bot->GetGroup())
     {
-        Player* member = itr->GetSource();
-        PlayerbotAI* memberAI = sPlayerbotsMgr->GetPlayerbotAI(member);
-        if (!member || !member->IsAlive() || !memberAI || !memberAI->IsTank(member) || 
-            member->HasAura(SPELL_NETHER_EXHAUSTION_RED))
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
-            continue;
+            Player* member = itr->GetSource();
+            if (!member || !member->IsAlive() || !botAI->IsTank(member) || !GET_PLAYERBOT_AI(member) ||
+                member->HasAura(SPELL_NETHER_EXHAUSTION_RED))
+            {
+                continue;
+            }
+            redBlockers.push_back(member);
         }
-        redBlockers.push_back(member);
     }
-}
     if (!redBlockers.empty())
     {
         redBlocker = redBlockers.front();

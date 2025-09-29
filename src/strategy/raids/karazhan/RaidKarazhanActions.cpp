@@ -1,9 +1,10 @@
 #include "RaidKarazhanActions.h"
 #include "RaidKarazhanHelpers.h"
 #include "AiObjectContext.h"
-#include "Playerbots.h"
-#include "PlayerbotMgr.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotMgr.h"
+#include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
 #include "Position.h"
 
 namespace 
@@ -261,26 +262,16 @@ bool KarazhanWizardOfOzMarkTargetAction::Execute(Event event)
 bool KarazhanWizardOfOzScorchStrawmanAction::Execute(Event event)
 {
     Unit* strawman = AI_VALUE2(Unit*, "find target", "strawman");
-    Group* group = bot->GetGroup();
-    if (!strawman || !strawman->IsAlive() || !group)
+    if (!strawman || !strawman->IsAlive() || bot->getClass() != CLASS_MAGE)
     {
         return false;
     }
 
-    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+    if (botAI->CanCastSpell("scorch", strawman))
     {
-        Player* member = itr->GetSource();
-        PlayerbotAI* mageAI = sPlayerbotsMgr->GetPlayerbotAI(member);
-        if (!member || !member->IsAlive() || member->getClass() != CLASS_MAGE || !mageAI)
-        {
-            continue;
-        }
-        if (mageAI->CanCastSpell("scorch", strawman))
-        {
-            mageAI->CastSpell("scorch", strawman);
-        }
+        botAI->CastSpell("scorch", strawman);
     }
-    
+
     return false;
 }
 
@@ -471,8 +462,8 @@ bool KarazhanShadeOfAranSpreadRangedAction::isUseful()
            !(boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_ARCANE_EXPLOSION));
 }
 
-// One tank per phase will dance in and out of the red beam (5 seconds in, 5 seconds out)
-// Tanks will ignore void zones--their positioning is too important
+// One tank bot per phase will dance in and out of the red beam (5 seconds in, 5 seconds out)
+// Tank bots will ignore void zones--their positioning is too important
 bool KarazhanNetherspiteBlockRedBeamAction::Execute(Event event)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "netherspite");
@@ -488,8 +479,7 @@ bool KarazhanNetherspiteBlockRedBeamAction::Execute(Event event)
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
-        PlayerbotAI* memberAI = sPlayerbotsMgr->GetPlayerbotAI(member);
-        if (!member || !member->IsAlive() || !memberAI || !memberAI->IsTank(member) || 
+        if (!member || !member->IsAlive() || !botAI->IsTank(member) || !GET_PLAYERBOT_AI(member) ||
             member->HasAura(SPELL_NETHER_EXHAUSTION_RED))
         {
             continue;
@@ -502,18 +492,11 @@ bool KarazhanNetherspiteBlockRedBeamAction::Execute(Event event)
 
     if (bot == eligibleTank)
     {
-        std::string msg;
         std::map<std::string, std::string> ph;
         ph["%player"] = bot->GetName();
-        bool got = sPlayerbotTextMgr->GetBotText("netherspite_beam_blocking_red", msg, ph);
-        if (got && !msg.empty())
-        {
-            bot->Yell(msg, LANG_UNIVERSAL);
-        }
-        else
-        {
-            bot->Yell(bot->GetName() + " is moving to block the red beam!", LANG_UNIVERSAL);
-        }
+        std::string text = sPlayerbotTextMgr->GetBotTextOrDefault(
+            "netherspite_beam_blocking_red", "%player is moving to block the red beam!", ph);
+        bot->Yell(text, LANG_UNIVERSAL);
 
         ObjectGuid botGuid = bot->GetGUID();
         uint32 intervalSecs = 5;
@@ -591,7 +574,7 @@ bool KarazhanNetherspiteBlockRedBeamAction::isUseful()
     return true;
 }
 
-// Two non-Rogue/Warrior DPS will block the blue beam for each phase (swap at 25 debuff stacks)
+// Two non-Rogue/Warrior DPS bots will block the blue beam for each phase (swap at 25 debuff stacks)
 // When avoiding void zones, blocking bots will move along the beam to continue blocking
 bool KarazhanNetherspiteBlockBlueBeamAction::Execute(Event event)
 {
@@ -608,18 +591,11 @@ bool KarazhanNetherspiteBlockBlueBeamAction::Execute(Event event)
 
     if (wasBlocking && !isBlockingNow)
     {
-        std::string msg;
         std::map<std::string, std::string> ph;
         ph["%player"] = bot->GetName();
-        bool got = sPlayerbotTextMgr->GetBotText("netherspite_beam_leaving_blue", msg, ph);
-        if (got && !msg.empty())
-        {
-            bot->Yell(msg, LANG_UNIVERSAL);
-        }
-        else
-        {
-            bot->Yell(bot->GetName() + " is leaving the blue beam--next blocker up!", LANG_UNIVERSAL);
-        }
+        std::string text = sPlayerbotTextMgr->GetBotTextOrDefault(
+            "netherspite_beam_leaving_blue", "%player is leaving the blue beam--next blocker up!", ph);
+        bot->Yell(text, LANG_UNIVERSAL);
 
         wasBlockingBlueBeam[botGuid] = false;
         return false;
@@ -629,18 +605,11 @@ bool KarazhanNetherspiteBlockBlueBeamAction::Execute(Event event)
     {
         if (!wasBlocking)
         {
-            std::string msg;
             std::map<std::string, std::string> ph;
             ph["%player"] = bot->GetName();
-            bool got = sPlayerbotTextMgr->GetBotText("netherspite_beam_blocking_blue", msg, ph);
-            if (got && !msg.empty())
-            {
-                bot->Yell(msg, LANG_UNIVERSAL);
-            }
-            else
-            {
-                bot->Yell(bot->GetName() + " is moving to block the blue beam!", LANG_UNIVERSAL);
-            }
+            std::string text = sPlayerbotTextMgr->GetBotTextOrDefault(
+                "netherspite_beam_blocking_blue", "%player is moving to block the blue beam!", ph);
+            bot->Yell(text, LANG_UNIVERSAL);
         }
         wasBlockingBlueBeam[botGuid] = true;
 
@@ -712,8 +681,8 @@ bool KarazhanNetherspiteBlockBlueBeamAction::isUseful()
     return boss && bluePortal && !boss->HasAura(SPELL_NETHERSPITE_BANISHED);
 }
 
-// Two healers will block the green beam for each phase (swap at 25 debuff stacks)
-// OR one rogue or DPS warrior will block the green beam for an entire phase (if they begin the phase as the blocker)
+// Two healer bots will block the green beam for each phase (swap at 25 debuff stacks)
+// OR one rogue or DPS warrior bot will block the green beam for an entire phase (if they begin the phase as the blocker)
 // When avoiding void zones, blocking bots will move along the beam to continue blocking
 bool KarazhanNetherspiteBlockGreenBeamAction::Execute(Event event)
 {
@@ -730,18 +699,11 @@ bool KarazhanNetherspiteBlockGreenBeamAction::Execute(Event event)
 
     if (wasBlocking && !isBlockingNow)
     {
-        std::string msg;
         std::map<std::string, std::string> ph;
         ph["%player"] = bot->GetName();
-        bool got = sPlayerbotTextMgr->GetBotText("netherspite_beam_leaving_green", msg, ph);
-        if (got && !msg.empty())
-        {
-            bot->Yell(msg, LANG_UNIVERSAL);
-        }
-        else
-        {
-            bot->Yell(bot->GetName() + " TESTRUN is leaving the green beam--next blocker up!", LANG_UNIVERSAL);
-        }
+        std::string text = sPlayerbotTextMgr->GetBotTextOrDefault(
+            "netherspite_beam_leaving_green", "%player is leaving the green beam--next blocker up!", ph);
+        bot->Yell(text, LANG_UNIVERSAL);
 
         wasBlockingGreenBeam[botGuid] = false;
         return false;
@@ -751,18 +713,11 @@ bool KarazhanNetherspiteBlockGreenBeamAction::Execute(Event event)
     {
         if (!wasBlocking)
         {
-            std::string msg;
             std::map<std::string, std::string> ph;
             ph["%player"] = bot->GetName();
-            bool got = sPlayerbotTextMgr->GetBotText("netherspite_beam_blocking_green", msg, ph);
-            if (got && !msg.empty())
-            {
-                bot->Yell(msg, LANG_UNIVERSAL);
-            }
-            else
-            {
-                bot->Yell(bot->GetName() + " TESTRUN is moving to block the green beam!", LANG_UNIVERSAL);
-            }
+            std::string text = sPlayerbotTextMgr->GetBotTextOrDefault(
+                "netherspite_beam_blocking_green", "%player is moving to block the green beam!", ph);
+            bot->Yell(text, LANG_UNIVERSAL);
         }
         wasBlockingGreenBeam[botGuid] = true;
 

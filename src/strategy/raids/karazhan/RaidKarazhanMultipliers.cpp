@@ -27,9 +27,9 @@ float KarazhanBigBadWolfMultiplier::GetValue(Action* action)
     {
         if ((dynamic_cast<MovementAction*>(action) && !dynamic_cast<KarazhanBigBadWolfRunAwayAction*>(action)) || 
            (dynamic_cast<AttackAction*>(action)))
-           {
-               return 0.0f;
-           }
+        {
+            return 0.0f;
+        }
     }
 
     return 1.0f;
