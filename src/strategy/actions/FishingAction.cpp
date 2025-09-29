@@ -113,7 +113,7 @@ WorldPosition FindWaterRadial(Player* bot, float x, float y, float z, Map* map, 
     return boundaryPoints[midIndex];
 }
 
-WorldPosition FindFishingNode(PlayerbotAI* botAI) 
+WorldPosition FindFishingHole(PlayerbotAI* botAI) 
 {
     Player* player = botAI->GetBot();
     GuidVector gos = PAI_VALUE(GuidVector, "nearest game objects no los"); 
@@ -122,7 +122,7 @@ WorldPosition FindFishingNode(PlayerbotAI* botAI)
         GameObject* go = botAI->GetGameObject(guid);
         if (!go)
             continue;
-        if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE)
+        if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
             {
                 return WorldPosition(go->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ());
             }
@@ -133,7 +133,7 @@ WorldPosition FindFishingNode(PlayerbotAI* botAI)
 
 WorldPosition FindFishingSpot(PlayerbotAI* botAI) 
 {
-    // Check for fishing Nodes first.
+    // Check for fishing Holes first.
     Player* player = botAI->GetBot();
 
     // Face the Master direction if facing water. 
@@ -146,10 +146,10 @@ WorldPosition FindFishingSpot(PlayerbotAI* botAI)
 
 bool MoveToFishAction::Execute(Event event)
 {
-    WorldPosition fishNode = FindFishingNode(botAI);
-    if (fishNode.GetPositionX() != 0.0f && fishNode.GetPositionY() != 0.0f)
+    WorldPosition fishHole = FindFishingHole(botAI);
+    if (fishHole.GetPositionX() != 0.0f && fishHole.GetPositionY() != 0.0f)
     {
-        WorldPosition LandSpot = FindWaterLinear(bot, 1.0f,20.0f, 2.5f, true, fishNode);
+        WorldPosition LandSpot = FindWaterLinear(bot, 1.0f,20.0f, 2.5f, true, fishHole);
         if(LandSpot.GetPositionX() != 0.0f && LandSpot.GetPositionY() != 0.0f)
             return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
     }
@@ -256,15 +256,15 @@ bool EquipFishingPoleAction::isUseful()
 bool FishingAction::Execute(Event event)
 {
     bool facingWater = false;
-    WorldPosition fishingNode = FindFishingNode(botAI);
-    if (fishingNode.GetPositionX() != 0.0f && fishingNode.GetPositionY() != 0.0f)
+    WorldPosition fishingHole = FindFishingHole(botAI);
+    if (fishingHole.GetPositionX() != 0.0f && fishingHole.GetPositionY() != 0.0f)
     {
-        Position pos = fishingNode.getPosition(); 
+        Position pos = fishingHole.getPosition(); 
         if (bot->HasInArc(3.0, &pos, 20.0))
             facingWater = true;
         else
         {
-            float angle = bot->GetAngle(fishingNode.GetPositionX(), fishingNode.GetPositionY());
+            float angle = bot->GetAngle(fishingHole.GetPositionX(), fishingHole.GetPositionY());
             bot->SetOrientation(angle);
             bot->SendMovementFlagUpdate();
             return false;
