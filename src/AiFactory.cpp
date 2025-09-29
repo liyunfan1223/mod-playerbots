@@ -295,7 +295,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             {
                 engine->addStrategiesNoInit("dps", "shadow debuff", "shadow aoe", nullptr);
             }
-            else if (tab == PRIEST_TAB_DISIPLINE)
+            else if (tab == PRIEST_TAB_DISCIPLINE)
             {
                 engine->addStrategiesNoInit("heal", nullptr);
             }
@@ -607,7 +607,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 nonCombatEngine->addStrategy("dps assist", false);
             break;
         case CLASS_WARLOCK:
-            if (tab == WARLOCK_TAB_AFFLICATION)
+            if (tab == WARLOCK_TAB_AFFLICTION)
             {
                 nonCombatEngine->addStrategiesNoInit("felhunter", "spellstone", nullptr);
             }

@@ -688,7 +688,7 @@ bool BGLeaveAction::Execute(Event event)
 
     WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
     packet << type << unk2 << (uint32)_bgTypeId << unk << uint8(0);
-    bot->GetSession()->HandleBattleFieldPortOpcode(packet);
+    bot->GetSession()->QueuePacket(new WorldPacket(packet));
 
     if (IsRandomBot)
         botAI->SetMaster(nullptr);
@@ -917,7 +917,7 @@ bool BGStatusAction::Execute(Event event)
 
                     WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
                     packet << type << unk2 << (uint32)_bgTypeId << unk << action;
-                    bot->GetSession()->HandleBattleFieldPortOpcode(packet);
+                    bot->GetSession()->QueuePacket(new WorldPacket(packet));
 
                     botAI->ResetStrategies(false);
                     if (!bot->GetBattleground())
@@ -972,7 +972,7 @@ bool BGStatusAction::Execute(Event event)
             WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
             action = 0;
             packet << type << unk2 << (uint32)_bgTypeId << unk << action;
-            bot->GetSession()->HandleBattleFieldPortOpcode(packet);
+            bot->GetSession()->QueuePacket(new WorldPacket(packet));
 
             botAI->ResetStrategies(!IsRandomBot);
             botAI->GetAiObjectContext()->GetValue<uint32>("bg type")->Set(0);
@@ -1039,7 +1039,7 @@ bool BGStatusAction::Execute(Event event)
 
         WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
         packet << type << unk2 << (uint32)_bgTypeId << unk << action;
-        bot->GetSession()->HandleBattleFieldPortOpcode(packet);
+        bot->GetSession()->QueuePacket(new WorldPacket(packet));
 
         botAI->ResetStrategies(false);
         if (!bot->GetBattleground())

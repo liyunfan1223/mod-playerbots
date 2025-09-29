@@ -20,7 +20,7 @@ public:
 class AutoShareQuestAction : public ShareQuestAction
 {
 public:
-    AutoShareQuestAction(PlayerbotAI* ai) : ShareQuestAction(botAI, "auto share quest") {}
+    AutoShareQuestAction(PlayerbotAI* botAI) : ShareQuestAction(botAI, "auto share quest") {}
     bool Execute(Event event) override;
 
     bool isUseful() override;

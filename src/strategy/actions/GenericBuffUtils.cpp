@@ -125,26 +125,15 @@ namespace ai::buff
                  key = "rp_missing_reagent_generic";
 
              // Placeholders
-             std::map<std::string, std::string> ph;
-             ph["%group_spell"] = groupName;
-             ph["%base_spell"]  = baseName;
+             std::map<std::string, std::string> placeholders;
+             placeholders["%group_spell"] = groupName;
+             placeholders["%base_spell"] = baseName;
 
-             // Respecte ai_playerbot_texts_chance if present
-             std::string rp;
-             bool got = sPlayerbotTextMgr->GetBotText(key, rp, ph);
-             if (got && !rp.empty())
-             {
-                 announce(rp);
-                 last = now;
-             }
-             else
-             {
-                 // Minimal Fallback
-                 std::ostringstream oss;
-                 oss << "Out of components for " << groupName << ". Using " << baseName << "!";
-                 announce(oss.str());
-                 last = now;
-             }
+             std::string announceText = sPlayerbotTextMgr->GetBotTextOrDefault(key,
+                 "Out of components for %group_spell. Using %base_spell!", placeholders);
+
+             announce(announceText);
+             last = now;
            }
          }
      }
