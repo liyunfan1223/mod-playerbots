@@ -957,7 +957,6 @@ bool LootRollAction::Execute(Event event)
 		LOG_DEBUG("playerbots", "[LootPaternDBG] send vote={} (lootMethod={} Lvl={}) -> guid={} itemId={}",
                  VoteTxt(sent), (int)group->GetLootMethod(), sPlayerbotAIConfig->lootRollLevel, guid.ToString(), itemId);
 		 
-        //AnnounceRollChoice(sent, itemId);
         group->CountRollVote(bot->GetGUID(), guid, sent);
         // One item at a time
         return true;
@@ -1219,7 +1218,6 @@ bool MasterLootRollAction::Execute(Event event)
 			 VoteTxt(vote), VoteTxt(sent), (int)group->GetLootMethod(),
              bot->HasSkill(SKILL_ENCHANTING), IsLikelyDisenchantable(proto));
 		 
-    //AnnounceRollChoice(sent, itemId);
     group->CountRollVote(bot->GetGUID(), creatureGuid, sent);
 
     return true;
