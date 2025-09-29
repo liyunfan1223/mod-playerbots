@@ -102,7 +102,7 @@ std::string PlayerbotTextMgr::GetBotText(std::string name, std::map<std::string,
 }
 
 std::string PlayerbotTextMgr::GetBotTextOrDefault(std::string name, std::string defaultText,
-std::map<std::string, std::string> placeholders)
+    std::map<std::string, std::string> placeholders)
 {
     std::string botText = GetBotText(name, placeholders);
     if (botText.empty())

@@ -79,11 +79,11 @@ namespace ai::buff
     }
 
     std::string UpgradeToGroupIfAppropriate(
-    Player* bot,
-    PlayerbotAI* botAI,
-    std::string const& baseName,
-    bool announceOnMissing,
-    std::function<void(std::string const&)> announce)
+        Player* bot,
+        PlayerbotAI* botAI,
+        std::string const& baseName,
+        bool announceOnMissing,
+        std::function<void(std::string const&)> announce)
     {
         std::string castName = baseName;
         Group* g = bot->GetGroup();
