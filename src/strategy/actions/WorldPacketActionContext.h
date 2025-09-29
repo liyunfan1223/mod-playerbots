@@ -41,7 +41,6 @@
 #include "UseMeetingStoneAction.h"
 #include "NamedObjectContext.h"
 #include "ReleaseSpiritAction.h"
-#include "FishWithMasterAction.h"
 #include "PetAction.h"
 
 class PlayerbotAI;
@@ -110,7 +109,6 @@ public:
         creators["lfg leave"] = &WorldPacketActionContext::lfg_leave;
         creators["lfg teleport"] = &WorldPacketActionContext::lfg_teleport;
         creators["see spell"] = &WorldPacketActionContext::see_spell;
-        creators["fish with master"] = &WorldPacketActionContext::fish_with_master;
         creators["arena team accept"] = &WorldPacketActionContext::arena_team_accept;
     }
 
@@ -176,7 +174,6 @@ private:
     static Action* lfg_role_check(PlayerbotAI* botAI) { return new LfgRoleCheckAction(botAI); }
     static Action* lfg_join(PlayerbotAI* botAI) { return new LfgJoinAction(botAI); }
     static Action* see_spell(PlayerbotAI* botAI) { return new SeeSpellAction(botAI); }
-    static Action* fish_with_master(PlayerbotAI* botAI) { return new FishWithMasterAction(botAI); }
     static Action* arena_team_accept(PlayerbotAI* botAI) { return new ArenaTeamAcceptAction(botAI); }
 };
 
