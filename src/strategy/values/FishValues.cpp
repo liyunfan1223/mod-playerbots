@@ -73,13 +73,10 @@ bool DoneFishingValue::Calculate()
     if (!bot || !botAI)
         return false;
     
-    if(bot->IsInCombat())
-        return true;
-    
     WorldPosition nearwater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), 10.0f, 40.0f, 2.5f, false);
-    if (nearwater.GetPositionX() != 0.0f && nearwater.GetPositionY() != 0.0f)
+    if (nearwater.GetPositionX() == 0.0f && nearwater.GetPositionY() == 0.0f)
     {
-        return false;
+        return true;
     }
     return false;
 }
