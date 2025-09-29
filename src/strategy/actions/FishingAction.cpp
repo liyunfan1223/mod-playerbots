@@ -260,8 +260,10 @@ bool FishingAction::Execute(Event event)
     if (fishingHole.GetPositionX() != 0.0f && fishingHole.GetPositionY() != 0.0f)
     {
         Position pos = fishingHole.getPosition(); 
-        if (bot->HasInArc(3.0, &pos, 20.0))
+        if (bot->HasInArc(1.0, &pos, 1.0))
+        {
             facingWater = true;
+        }
         else
         {
             float angle = bot->GetAngle(fishingHole.GetPositionX(), fishingHole.GetPositionY());
