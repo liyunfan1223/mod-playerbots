@@ -101,6 +101,22 @@ std::string PlayerbotTextMgr::GetBotText(std::string name, std::map<std::string,
     return botText;
 }
 
+std::string PlayerbotTextMgr::GetBotTextOrDefault(std::string name, std::string defaultText,
+    std::map<std::string, std::string> placeholders)
+{
+    std::string botText = GetBotText(name, placeholders);
+    if (botText.empty())
+    {
+        for (std::map<std::string, std::string>::iterator i = placeholders.begin(); i != placeholders.end(); ++i)
+        {
+            replaceAll(defaultText, i->first, i->second);
+        }
+        return defaultText;
+    }
+
+    return botText;
+}
+
 // chat replies
 
 std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::map<std::string, std::string> placeholders)
