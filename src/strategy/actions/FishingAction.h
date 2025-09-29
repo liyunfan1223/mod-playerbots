@@ -15,6 +15,10 @@ extern const uint32 FISHING_SPELL;
 extern const uint32 FISHING_POLE;
 extern const uint32 FISHING_BOBBER;
 
+WorldPosition FindWaterLinear(Player* bot, float startDistance, float endDsistance, float increment, bool findLand = false, WorldPosition targetPos = nullptr);
+WorldPosition FindWaterRadial(Player* bot, float x, float y, float z, Map* map, uint32 phaseMask, float minDistance, float maxDistance, float increment, bool findLand = false);
+WorldPosition FindFishingNode(PlayerbotAI* botAI);
+
 class PlayerbotAI;
 
 class FishingAction : public Action, public Qualified
