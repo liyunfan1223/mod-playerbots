@@ -3,10 +3,11 @@
  * and/or modify it under version 2 of the License, or (at your option), any later version.
  */
 #include "FishWithMasterAction.h"
-#include "FishingAction.h"
 #include "Event.h"
 #include "Playerbots.h"
 #include "Common.h"
+
+const std::set<uint32> FISHING_SPELLS = {7620, 7731, 7732, 18248, 33095, 51294};
 
 bool FishWithMasterAction::Execute(Event event)
 {
@@ -19,7 +20,7 @@ bool FishWithMasterAction::Execute(Event event)
     uint32 spellId = 0; 
     p >> castcount >> spellId;
     
-    if (spellId == FISHING_SPELL)
+    if (FISHING_SPELLS.find(spellId) != FISHING_SPELLS.end())
     {
         if (AI_VALUE(bool, "can fish"))
         {
