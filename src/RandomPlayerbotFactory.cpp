@@ -892,7 +892,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
                 availableLeaders.push_back(leader);
         }
     }
-	
+
     // Create up to randomBotGuildCount by counting only EFFECTIVE creations
     uint32 createdThisRun = 0;
     for (; guildNumber < sPlayerbotAIConfig->randomBotGuildCount; /* ++guildNumber -> done only if creation */)
@@ -972,7 +972,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
             LOG_DEBUG("playerbots",
                      "[TABARD] DB check guild id={} => style={}, color={}, borderStyle={}, borderColor={}, bgColor={}",
                      guild->GetId(), f[0].Get<uint8>(), f[1].Get<uint8>(), f[2].Get<uint8>(), f[3].Get<uint8>(), f[4].Get<uint8>());
-        }	
+        }
 
         sPlayerbotAIConfig->randomBotGuilds.push_back(guild->GetId());
         // The guild is only counted if it is actually created
