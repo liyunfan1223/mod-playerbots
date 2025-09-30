@@ -8,10 +8,16 @@
 
 namespace GruulsLairTankSpots 
 {
-	const TankSpot Maulgar  = { 90.686f, 167.047f, -13.234f, 3.009f };
-	const TankSpot Olm      = { 99.392f, 192.834f, -10.883f, 6.265f };
-	const TankSpot Blindeye = { 100.728f, 206.389f, -10.514f, 6.218f };
-	const TankSpot Gruul    = { 241.238f, 365.025f, -4.220f, 0.0f };
+	const TankSpot Maulgar           = { 90.686f, 167.047f, -13.234f };
+    // Olm does not chase properly due to the Core's caster movement issues
+    // Thus, the below "TankSpot" is beyond the actual desired tanking location
+    // It is the spot to which the OlmTank runs to to pull Olm to a decent tanking location
+    const TankSpot Olm               = { 87.485f, 234.942f, -3.635f };
+    const TankSpot Blindeye          = { 99.681f, 213.989f, -10.345f };
+    const TankSpot Krosh             = { 116.880f, 166.208f, -14.231f };
+    // "MaulgarRoomCenter" is to keep healers from getting too far away
+    const TankSpot MaulgarRoomCenter = { 88.754f, 150.759f, -11.569f };
+	const TankSpot Gruul             = { 241.238f, 365.025f, -4.220f };
 }
 
 bool IsAnyOgreBossAlive(PlayerbotAI* botAI)
@@ -29,7 +35,7 @@ bool IsAnyOgreBossAlive(PlayerbotAI* botAI)
            (blindeye && blindeye->IsAlive());
 }
 
-bool IsMageTank(PlayerbotAI* botAI, Player* bot)
+bool IsKroshMageTank(PlayerbotAI* botAI, Player* bot)
 {
     Group* group = bot->GetGroup();
     if (!group)
@@ -39,11 +45,10 @@ bool IsMageTank(PlayerbotAI* botAI, Player* bot)
 
     Player* highestHpMage = nullptr;
     uint32 highestHp = 0;
-
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member)
+        if (!member || !member->IsAlive() || !GET_PLAYERBOT_AI(member))
         {
             continue;
         }
@@ -57,10 +62,11 @@ bool IsMageTank(PlayerbotAI* botAI, Player* bot)
             }
         }
     }
+
     return highestHpMage == bot;
 }
 
-bool IsMoonkinTank(PlayerbotAI* botAI, Player* bot)
+bool IsKigglerMoonkinTank(PlayerbotAI* botAI, Player* bot)
 {
     Group* group = bot->GetGroup();
     if (!group)
@@ -74,11 +80,10 @@ bool IsMoonkinTank(PlayerbotAI* botAI, Player* bot)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member)
+        if (!member || !member->IsAlive() || !GET_PLAYERBOT_AI(member))
         {
             continue;
         }
-
         if (member->getClass() == CLASS_DRUID)
         {
             int tab = AiFactory::GetPlayerSpecTab(member);
@@ -93,6 +98,7 @@ bool IsMoonkinTank(PlayerbotAI* botAI, Player* bot)
             }
         }
     }
+
     return highestHpMoonkin == bot;
 }
 
@@ -103,15 +109,20 @@ bool IsMaulgarTank(PlayerbotAI* botAI, Player* bot)
     {
         return false;
     }
+
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member) continue;
+        if (!member) 
+        {
+            continue;
+        }
         if (botAI->IsTank(member))
         {
             return member == bot;
         }
     }
+
     return false;
 }
 
@@ -122,11 +133,15 @@ bool IsOlmTank(PlayerbotAI* botAI, Player* bot)
     {
         return false;
     }
+
     int tankIndex = 0;
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member) continue;
+        if (!member || !member->IsAlive() || !GET_PLAYERBOT_AI(member))
+        {
+            continue;
+        }
         if (botAI->IsTank(member))
         {
             if (tankIndex == 1)
@@ -136,6 +151,7 @@ bool IsOlmTank(PlayerbotAI* botAI, Player* bot)
             ++tankIndex;
         }
     }
+
     return false;
 }
 
@@ -146,11 +162,15 @@ bool IsBlindeyeTank(PlayerbotAI* botAI, Player* bot)
     {
         return false;
     }
+
     int tankIndex = 0;
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member) continue;
+        if (!member || !member->IsAlive() || !GET_PLAYERBOT_AI(member))
+        {
+            continue;
+        }
         if (botAI->IsTank(member))
         {
             if (tankIndex == 2)
@@ -160,13 +180,14 @@ bool IsBlindeyeTank(PlayerbotAI* botAI, Player* bot)
             ++tankIndex;
         }
     }
+
     return false;
 }
 
-bool IsPositionSafe(PlayerbotAI* botAI, Unit* bot, Position pos)
+bool IsPositionSafe(PlayerbotAI* botAI, Player* bot, Position pos)
 {
-    const float KROSH_SAFE_DISTANCE = 21.0f;
-    const float MAULGAR_WHIRLWIND_DISTANCE = 10.0f;
+    const float KROSH_SAFE_DISTANCE = 20.0f;
+    const float MAULGAR_SAFE_DISTANCE = 10.0f;
     bool isSafe = true;
 
     Unit* krosh = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "krosh firehand")->Get();
@@ -179,97 +200,72 @@ bool IsPositionSafe(PlayerbotAI* botAI, Unit* bot, Position pos)
             isSafe = false;
         }
     }
-    Unit* maulgar = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "high king maulgar")->Get();
-    if (maulgar && maulgar->IsAlive() && maulgar->HasAura(SPELL_WHIRLWIND))
-    {
-        float dist = sqrt(pow(pos.GetPositionX() - maulgar->GetPositionX(), 2) + 
-                          pow(pos.GetPositionY() - maulgar->GetPositionY(), 2));
 
-        if (dist < MAULGAR_WHIRLWIND_DISTANCE)
+    if (botAI->IsRanged(bot))
+    {
+        Unit* maulgar = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "high king maulgar")->Get();
+        if (maulgar && maulgar->IsAlive())
         {
-            isSafe = false;
+            float dist = sqrt(pow(pos.GetPositionX() - maulgar->GetPositionX(), 2) + 
+                              pow(pos.GetPositionY() - maulgar->GetPositionY(), 2));
+            if (dist < MAULGAR_SAFE_DISTANCE)
+            {
+                isSafe = false;
+            }
         }
     }
-    
+
     return isSafe;
 }
 
-Position FindSafePosition(PlayerbotAI* botAI, Unit* bot, Unit* target, float optimalDistance)
+bool FindSafePosition(PlayerbotAI* botAI, Player* bot, Position& outPos)
 {
-    Position bestPos;
-    bestPos.m_positionX = bot->GetPositionX();
-    bestPos.m_positionY = bot->GetPositionY();
-    bestPos.m_positionZ = bot->GetPositionZ();
-    
-    Unit* krosh = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "krosh firehand")->Get();
-    Unit* maulgar = botAI->GetAiObjectContext()->GetValue<Unit*>("find target", "high king maulgar")->Get();
-
-    bool dangerousKrosh = krosh && krosh->IsAlive();
-    bool dangerousMaulgar = maulgar && maulgar->IsAlive() && maulgar->HasAura(SPELL_WHIRLWIND);
-    
-    if (!dangerousKrosh && !dangerousMaulgar)
-    {
-        return bestPos;
-    }
-
-    if (IsPositionSafe(botAI, bot, bestPos))
-    {
-        return bestPos;
-    }
-
+    const float SEARCH_RADIUS = 30.0f;
     const int NUM_POSITIONS = 32;
-    float bestScore = 99999.0f;
+    outPos = { bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ() };
+
+    if (IsPositionSafe(botAI, bot, outPos))
+    {
+        return false;
+    }
+
+    float bestScore = std::numeric_limits<float>::max();
     bool foundSafeSpot = false;
-    
-    for (int i = 0; i < NUM_POSITIONS; i++)
+
+    for (int i = 0; i < NUM_POSITIONS; ++i)
     {
         float angle = 2 * M_PI * i / NUM_POSITIONS;
         Position candidatePos;
-        candidatePos.m_positionX = target->GetPositionX() + optimalDistance * cos(angle);
-        candidatePos.m_positionY = target->GetPositionY() + optimalDistance * sin(angle);
-        candidatePos.m_positionZ = target->GetPositionZ();
-        
+        candidatePos.m_positionX = bot->GetPositionX() + SEARCH_RADIUS * cos(angle);
+        candidatePos.m_positionY = bot->GetPositionY() + SEARCH_RADIUS * sin(angle);
+        candidatePos.m_positionZ = bot->GetPositionZ();
+
+        float destX = candidatePos.m_positionX, destY = candidatePos.m_positionY, destZ = candidatePos.m_positionZ;
+        if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+            bot->GetPositionZ(), destX, destY, destZ, true))
+        {
+            continue;
+        }
+        if (destX != candidatePos.m_positionX || destY != candidatePos.m_positionY)
+        {
+            continue;
+        }
+
+        candidatePos.m_positionX = destX;
+        candidatePos.m_positionY = destY;
+        candidatePos.m_positionZ = destZ;
+
         if (IsPositionSafe(botAI, bot, candidatePos))
         {
-            float movementDistance = sqrt(pow(candidatePos.GetPositionX() - bot->GetPositionX(), 2) + 
-                                         pow(candidatePos.GetPositionY() - bot->GetPositionY(), 2));
-            
+            float movementDistance = sqrt(pow(destX - bot->GetPositionX(), 2) + pow(destY - bot->GetPositionY(), 2));
             if (movementDistance < bestScore)
             {
                 bestScore = movementDistance;
-                bestPos = candidatePos;
+                outPos = candidatePos;
                 foundSafeSpot = true;
             }
         }
     }
 
-    if (foundSafeSpot)
-    {
-        return bestPos;
-    }
-
-    float dx = 0, dy = 0;
-
-    if (dangerousKrosh && bot->GetDistance(krosh) < 30.0f)
-    {
-        dx += bot->GetPositionX() - krosh->GetPositionX();
-        dy += bot->GetPositionY() - krosh->GetPositionY();
-    }
-    
-    if (dangerousMaulgar && bot->GetDistance(maulgar) < 50.0f)
-    {
-        dx += bot->GetPositionX() - maulgar->GetPositionX();
-        dy += bot->GetPositionY() - maulgar->GetPositionY();
-    }
-
-    float dist = sqrt(dx*dx + dy*dy);
-    if (dist > 0.1f)
-    {
-        float escapeDistance = 20.0f;
-        bestPos.m_positionX = bot->GetPositionX() + (dx/dist) * escapeDistance;
-        bestPos.m_positionY = bot->GetPositionY() + (dy/dist) * escapeDistance;
-        bestPos.m_positionZ = bot->GetPositionZ();
-    }
-
-    return bestPos;
+    return foundSafeSpot;
 }
