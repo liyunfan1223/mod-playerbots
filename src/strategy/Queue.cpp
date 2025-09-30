@@ -88,6 +88,11 @@ ActionBasket* Queue::findHighestRelevanceBasket() const
 
     for (ActionBasket* basket : actions)
     {
+        if (!basket)
+        {
+            continue;
+        }
+
         if (basket->getRelevance() > maxRelevance)
         {
             maxRelevance = basket->getRelevance();
