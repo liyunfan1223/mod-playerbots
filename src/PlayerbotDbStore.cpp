@@ -82,7 +82,7 @@ void PlayerbotDbStore::Reset(PlayerbotAI* botAI)
 {
     ObjectGuid::LowType guid = botAI->GetBot()->GetGUID().GetCounter();
 
-    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_CUSTOM_STRATEGY);
+    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_DB_STORE);
     stmt->SetData(0, guid);
     PlayerbotsDatabase.Execute(stmt);
 }
