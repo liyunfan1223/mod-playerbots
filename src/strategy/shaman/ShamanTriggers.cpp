@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "ShamanTriggers.h"
@@ -424,6 +424,7 @@ bool SetTotemTrigger::IsActive()
 {
     if (!bot->HasSpell(SPELL_CALL_OF_THE_ELEMENTS))
         return false;
+
     if (!bot->HasSpell(requiredSpellId))
         return false;
 
@@ -431,13 +432,20 @@ bool SetTotemTrigger::IsActive()
     if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
         return true;
 
-    size_t totemSpellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
-    for (size_t i = 0; i < totemSpellIdsCount; ++i)
+    const size_t totemSpellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
+    if (totemSpellIdsCount == 0)
     {
-        if (button->GetAction() == totemSpellIds[i])
+        return false;
+    }
+
+    for (int i = (int)totemSpellIdsCount - 1; i >= 0; --i)
+    {
+        const uint32 spellId = totemSpellIds[i];
+        if (bot->HasSpell(spellId))
         {
-            return false;
+            return button->GetAction() != spellId;
         }
     }
-    return true;
+
+    return false;
 }

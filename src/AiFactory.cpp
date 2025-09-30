@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "AiFactory.h"
@@ -295,7 +295,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             {
                 engine->addStrategiesNoInit("dps", "shadow debuff", "shadow aoe", nullptr);
             }
-            else if (tab == PRIEST_TAB_DISIPLINE)
+            else if (tab == PRIEST_TAB_DISCIPLINE)
             {
                 engine->addStrategiesNoInit("heal", nullptr);
             }
@@ -607,7 +607,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 nonCombatEngine->addStrategy("dps assist", false);
             break;
         case CLASS_WARLOCK:
-            if (tab == WARLOCK_TAB_AFFLICATION)
+            if (tab == WARLOCK_TAB_AFFLICTION)
             {
                 nonCombatEngine->addStrategiesNoInit("felhunter", "spellstone", nullptr);
             }

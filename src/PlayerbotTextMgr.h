@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_PLAYERBOTTEXTMGR_H
@@ -83,6 +83,8 @@ public:
     std::string GetBotText(ChatReplyType replyType, std::string name);
     bool GetBotText(std::string name, std::string& text);
     bool GetBotText(std::string name, std::string& text, std::map<std::string, std::string> placeholders);
+    std::string GetBotTextOrDefault(std::string name, std::string defaultText,
+                                    std::map<std::string, std::string> placeholders);
     void LoadBotTexts();
     void LoadBotTextChance();
     static void replaceAll(std::string& str, const std::string& from, const std::string& to);

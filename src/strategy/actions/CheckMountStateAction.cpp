@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "CheckMountStateAction.h"
@@ -152,13 +152,9 @@ bool CheckMountStateAction::Execute(Event /*event*/)
 
     bool inBattleground = bot->InBattleground();
 
-    // If there is a master and bot not in BG
+    // If there is a master and bot not in BG, follow master's mount state regardless of group leader
     if (master && !inBattleground)
     {
-        Group* group = bot->GetGroup();
-        if (!group || group->GetLeaderGUID() != master->GetGUID())
-            return false;
-
         if (ShouldFollowMasterMountState(master, noAttackers, shouldMount))
             return Mount();
 
