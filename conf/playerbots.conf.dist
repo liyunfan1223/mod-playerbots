@@ -569,9 +569,20 @@ AiPlayerbot.RandomBotRandomPassword = 0
 # Prefix for account names to create for randombots
 AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 
-# Minimum and maximum levels for randombots
+# Minimum and maximum initialization levels for randombots
 AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
+
+# Minimum and maximum level range for randombots allowed to login
+# If level filtration is used, minRandomBots and maxRandomBots might be automatically adjusted to lower values,
+# depending on available eligible bots in the database
+# Default Min,Max: 1,80 (no level filtration)
+AiPlayerbot.RandomBotMinLoginLevel = 1
+AiPlayerbot.RandomBotMaxLoginLevel = 80
+
+# log-out randombots if they they level outside the allowed login range
+# Default: 0 (disabled)
+AiPlayerbot.RandomBotLogoutOutsideLoginRange = 0
 
 # Sync max randombot level with max level of online players
 # Default: 0 (disabled)
