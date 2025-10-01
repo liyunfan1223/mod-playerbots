@@ -877,7 +877,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
 
     // Check how many randomBot guilds are in the guild table in the characterDB
     uint32 guildNumber = 0;
-    QueryResult guildTableResults = CharacterDatabase.Query("SELECT guildid, leaderguid FROM guid");
+    QueryResult guildTableResults = CharacterDatabase.Query("SELECT guildid, leaderguid FROM guild");
     if (guildTableResults)
     {
         do
@@ -887,7 +887,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
             uint32 leaderGuid = fields[1].Get<uint32>();
 
             // check the accountID of the guild leader against the list of randomBot accounts to determine if this is a player guild or a bot guild
-            QueryResult charactersTableResults = CharacterDatabase.Query("SELECT account FROM characters WHERE guid = ({})", leaderGuid);
+            QueryResult charactersTableResults = CharacterDatabase.Query("SELECT account FROM characters WHERE guid = {}", leaderGuid);
             if (charactersTableResults)
             {
                 Field* fields2 = charactersTableResults->Fetch();
