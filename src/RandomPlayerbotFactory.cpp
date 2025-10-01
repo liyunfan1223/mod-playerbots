@@ -902,6 +902,18 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         } while (guildTableResults->NextRow());
     }
 
+    // Is it worth continuing?
+    LOG_INFO("playerbots", "{}/{} random bot guilds exist in guild table)", guildNumber, sPlayerbotAIConfig->randomBotGuildCount);
+    if (guildNumber >= sPlayerbotAIConfig->randomBotGuildCount)
+    {
+        LOG_INFO("playerbots", "No new random guilds required");
+        return;
+    }
+    else
+    {
+        LOG_INFO("playerbots", "Creating {} new random guilds...", sPlayerbotAIConfig->randomBotGuildCount - guildNumber);
+    }
+
     // Get a list of bots that are logged in and available to lead new guilds
     GuidVector availableLeaders;
     for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
@@ -918,7 +930,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
                 availableLeaders.push_back(leader);
         }
     }
-    LOG_INFO("playerbots", "randomBotGuilds - {} available leaders for new guilds found", availableLeaders.size());
+    LOG_INFO("playerbots", "{} available leaders for new guilds found", availableLeaders.size());
 
     // Create up to randomBotGuildCount by counting only EFFECTIVE creations
     uint32 createdThisRun = 0;
@@ -1008,8 +1020,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
     }
 
     // Shows the true total and how many were created during this run
-    LOG_INFO("playerbots", "{} random bot guilds available (created this run: {})",
-             uint32(sPlayerbotAIConfig->randomBotGuilds.size()), createdThisRun);
+    LOG_INFO("playerbots", "{} random bot guilds created this run)", createdThisRun);
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomGuildName()
