@@ -29,6 +29,7 @@ bool CastFireNovaAction::isUseful() {
     Unit* target = AI_VALUE(Unit*, "current target");
     if (!target)
         return false;
+    
     Creature* fireTotem = bot->GetMap()->GetCreature(bot->m_SummonSlot[1]);
     if (!fireTotem)
         return false;
@@ -45,7 +46,10 @@ bool CastCleansingTotemAction::isUseful()
 }
 
 // Will only cast Stoneclaw Totem if low on health and not in a group
-bool CastStoneclawTotemAction::isUseful() { return !botAI->GetBot()->GetGroup(); }
+bool CastStoneclawTotemAction::isUseful() 
+{ 
+    return !bot->GetGroup(); 
+}
 
 // Will only cast Lava Burst if Flame Shock is on the target
 bool CastLavaBurstAction::isUseful()
@@ -54,10 +58,10 @@ bool CastLavaBurstAction::isUseful()
     if (!target)
         return false;
 
-    static const uint32 FLAME_SHOCK_IDS[] = {8050, 8052, 8053, 10447, 10448, 29228, 25457, 49232, 49233};
+    static const uint32 FLAME_SHOCK_SPELL_IDS[] = {8050, 8052, 8053, 10447, 10448, 29228, 25457, 49232, 49233};
 
-    ObjectGuid botGuid = botAI->GetBot()->GetGUID();
-    for (uint32 spellId : FLAME_SHOCK_IDS)
+    ObjectGuid botGuid = bot->GetGUID();
+    for (uint32 spellId : FLAME_SHOCK_SPELL_IDS)
     {
         if (target->HasAura(spellId, botGuid))
             return true;
@@ -69,7 +73,6 @@ bool CastLavaBurstAction::isUseful()
 // There is no existing code for guardians casting spells in the AC/Playerbots repo.
 bool CastSpiritWalkAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
     constexpr uint32 SPIRIT_WOLF = 29264;
     constexpr uint32 SPIRIT_WALK_SPELL = 58875;
 
