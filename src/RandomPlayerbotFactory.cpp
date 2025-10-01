@@ -902,25 +902,14 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         } while (guildTableResults->NextRow());
     }
 
+    // Get a list of bots that are logged in and available to lead new guilds
     GuidVector availableLeaders;
     for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
     {
         ObjectGuid leader = ObjectGuid::Create<HighGuid::Player>(*i);
         if (Guild* guild = sGuildMgr->GetGuildByLeader(leader))
         {
-            uint32 guildID = guild->GetId();
-            if(std::find(sPlayerbotAIConfig->randomBotGuilds.begin(), sPlayerbotAIConfig->randomBotGuilds.end(), guildID) !=sPlayerbotAIConfig->randomBotGuilds.end())
-            {
-                // this randombot guild has already been counted, the leader is not availble
-            }
-            else
-            {
-                // somehow we missed this guild when checking the guild table
-                // THIS SHOULDN'T RUN.
-                // THIS ENTIRE FIND() IS A WASTE OF RESOURCES (in theory)
-                ++guildNumber;
-                sPlayerbotAIConfig->randomBotGuilds.push_back(guildID);
-            }
+            // Bot is already a GM
         }
         else
         {
@@ -929,6 +918,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
                 availableLeaders.push_back(leader);
         }
     }
+    LOG_INFO("playerbots", "randomBotGuilds - {} available leaders for new guilds found", availableLeaders.size());
 
     // Create up to randomBotGuildCount by counting only EFFECTIVE creations
     uint32 createdThisRun = 0;
@@ -936,10 +926,10 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
     {
         std::string const guildName = CreateRandomGuildName();
         if (guildName.empty())
-            continue;
+            break; // no more names available in playerbots_guild_names
 
         if (sGuildMgr->GetGuildByName(guildName))
-            continue;
+            continue; // name already taken, skip
 
         if (availableLeaders.empty())
         {
