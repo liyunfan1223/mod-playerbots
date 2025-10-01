@@ -13,6 +13,7 @@
 #include <ctime>
 #include <iomanip>
 #include <random>
+#include <climits>
 
 #include "AccountMgr.h"
 #include "AiFactory.h"
@@ -426,7 +427,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
         {
             LOG_ERROR("playerbots", "No eligible bots found with level filter {}-{}. Change the level range.",
                     sPlayerbotAIConfig->randomBotMinLoginLevel, sPlayerbotAIConfig->randomBotMaxLoginLevel);
-            SetEventValue(0, "bot_count", 0, 999999999);
+            SetEventValue(0, "bot_count", 0, INT_MAX);
             maxAllowedBotCount = 0;
             currentBots.clear();
             levelFilterAdjusted = true;
