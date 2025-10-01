@@ -875,15 +875,52 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         LOG_INFO("playerbots", "Random bot guilds deleted");
     }
 
+    // Check how many randomBot guilds are in the guild table in the characterDB
     uint32 guildNumber = 0;
+    QueryResult guildTableResults = CharacterDatabase.Query("SELECT guildid, leaderguid FROM guid");
+    if (guildTableResults)
+    {
+        do
+        {
+            Field* fields = guildTableResults->Fetch();
+            uint32 guildID = fields[0].Get<uint32>();
+            uint32 leaderGuid = fields[1].Get<uint32>();
+
+            // check the accountID of the guild leader against the list of randomBot accounts to determine if this is a player guild or a bot guild
+            QueryResult charactersTableResults = CharacterDatabase.Query("SELECT account FROM characters WHERE guid = ({})", leaderGuid);
+            if (charactersTableResults)
+            {
+                Field* fields2 = charactersTableResults->Fetch();
+                uint32 accountID = fields2[0].Get<uint32>();
+
+                if(std::find(sPlayerbotAIConfig->randomBotAccounts.begin(),sPlayerbotAIConfig->randomBotAccounts.end(), accountID) != sPlayerbotAIConfig->randomBotAccounts.end())
+                {
+                    guildNumber++;
+                    sPlayerbotAIConfig->randomBotGuilds.push_back(guildID);
+                }
+            }
+        } while (guildTableResults->NextRow());
+    }
+
     GuidVector availableLeaders;
     for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
     {
         ObjectGuid leader = ObjectGuid::Create<HighGuid::Player>(*i);
         if (Guild* guild = sGuildMgr->GetGuildByLeader(leader))
         {
-            ++guildNumber;
-            sPlayerbotAIConfig->randomBotGuilds.push_back(guild->GetId());
+            uint32 guildID = guild->GetId();
+            if(std::find(sPlayerbotAIConfig->randomBotGuilds.begin(), sPlayerbotAIConfig->randomBotGuilds.end(), guildID) !=sPlayerbotAIConfig->randomBotGuilds.end())
+            {
+                // this randombot guild has already been counted, the leader is not availble
+            }
+            else
+            {
+                // somehow we missed this guild when checking the guild table
+                // THIS SHOULDN'T RUN.
+                // THIS ENTIRE FIND() IS A WASTE OF RESOURCES (in theory)
+                ++guildNumber;
+                sPlayerbotAIConfig->randomBotGuilds.push_back(guildID);
+            }
         }
         else
         {
