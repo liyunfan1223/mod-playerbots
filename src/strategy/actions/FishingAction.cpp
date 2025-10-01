@@ -111,6 +111,9 @@ WorldPosition FindWaterRadial(Player* bot, float x, float y, float z, Map* map, 
     if (boundaryPoints.empty())
         return WorldPosition();
 
+    if (boundaryPoints.size() == 1)
+        return boundaryPoints[0];   
+        
     size_t midIndex = boundaryPoints.size() / 2;
     return boundaryPoints[midIndex];
 }
