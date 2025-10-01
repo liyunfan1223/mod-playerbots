@@ -422,9 +422,6 @@ bool NoAirTotemTrigger::IsActive()
 
 bool SetTotemTrigger::IsActive()
 {
-   Player* bot = botAI->GetBot();
-
-   // Find the known highest rank for this family
    uint32 highestKnownSpell = 0;
    for (size_t i = 0; i < totemSpellIdsCount; ++i)
    {
@@ -432,25 +429,20 @@ bool SetTotemTrigger::IsActive()
        if (bot->HasSpell(spellId))
        {
            highestKnownSpell = spellId;
-           break; // First known => highest rank known
+           break;
        }
    }
 
-   // if no rank known do nothing
    if (!highestKnownSpell)
        return false;
 
-   // Check the state of the slot
    ActionButton const* button = bot->GetActionButton(actionButtonId);
 
-   // No button, no spell, empty button -> we put a toem
    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
        return true;
 
-   // If the spell in button is not the highest known rank -> we update
    if (button->GetAction() != highestKnownSpell)
        return true;
 
-   // already greatest rank -> do nothing
    return false;
 }

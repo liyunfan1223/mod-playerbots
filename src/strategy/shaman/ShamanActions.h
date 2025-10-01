@@ -382,7 +382,6 @@ class CastCallOfTheElementsAction : public CastSpellAction
 {
 public:
     CastCallOfTheElementsAction(PlayerbotAI* ai) : CastSpellAction(ai, "call of the elements") {}
-	bool Execute(Event event) override; // debug-only whisper of the 4 mapped totems
 };
 
 class CastTotemicRecallAction : public CastSpellAction
