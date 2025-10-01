@@ -108,8 +108,10 @@ WorldPosition FindWaterRadial(Player* bot, float x, float y, float z, Map* map, 
             
     }
     
+    if (boundaryPoints.empty())
+        return WorldPosition();
+
     size_t midIndex = boundaryPoints.size() / 2;
-    
     return boundaryPoints[midIndex];
 }
 
@@ -141,7 +143,7 @@ WorldPosition FindFishingSpot(PlayerbotAI* botAI)
     {
         return FindWaterLinear(master, 1.0f, 20.0f, 1.0f, false);
     }
-    return FindWaterRadial(player, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMap(), 5.0f, 20.0f, 1.0f, false);
+    return FindWaterRadial(player, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMap(), player->GetPhaseMask(), 5.0f, 20.0f, 1.0f, false);
 }
 
 bool MoveToFishAction::Execute(Event event)
@@ -154,7 +156,7 @@ bool MoveToFishAction::Execute(Event event)
             return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
     }
 
-    WorldPosition FishSpot = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), 0.0f, sPlayerbotAIConfig->fishingDistance, 2.5f, false);
+    WorldPosition FishSpot = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 0.0f, sPlayerbotAIConfig->fishingDistance, 2.5f, false);
     if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
     {
         WorldPosition LandSpot = FindWaterLinear(bot, 1.0f,20.0f, 2.5f, true, FishSpot);

@@ -28,7 +28,7 @@ bool IsNearWaterValue::Calculate()
     if (!bot || !botAI)
         return false;
 
-    WorldPosition nearwater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), 10.0f, 20.0f, 2.5f, false);
+    WorldPosition nearwater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 20.0f, 2.5f, false);
     if (nearwater.GetPositionX() != 0.0f && nearwater.GetPositionY() != 0.0f)
         {
             return true;
