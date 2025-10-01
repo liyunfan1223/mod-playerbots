@@ -7,10 +7,6 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
-namespace {
-    constexpr uint32 PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID = 20711u; 
-}
-
 Unit* HealthValue::GetTarget()
 {
     AiObjectContext* ctx = AiObject::context;
@@ -122,7 +118,8 @@ bool HasManaValue::Calculate()
     Unit* target = GetTarget();
     if (!target)
         return false;
-    
+
+    constexpr uint32 PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID = 20711u;
     if (target->HasAura(PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID))
         return false;
 
