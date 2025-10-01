@@ -4,9 +4,12 @@
  */
 
 #include "StatsValues.h"
-
 #include "Playerbots.h"
 #include "ServerFacade.h"
+
+namespace {
+    constexpr uint32 PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID = 20711u; 
+}
 
 Unit* HealthValue::GetTarget()
 {
@@ -120,7 +123,7 @@ bool HasManaValue::Calculate()
     if (!target)
         return false;
     
-    if (target->HasAura(20711)) // Spirit of Redemption
+    if (target->HasAura(PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID))
         return false;
 
     return target->GetPower(POWER_MANA);
