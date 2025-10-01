@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotAIConfig.h"
@@ -86,6 +86,9 @@ bool PlayerbotAIConfig::Initialize()
     rpWarningCooldown     = sConfigMgr->GetOption<int32>("AiPlayerbot.RPWarningCooldown", 30);
     disabledWithoutRealPlayerLoginDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLoginDelay", 30);
     disabledWithoutRealPlayerLogoutDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay", 300);
+    randomBotMinLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMinLoginLevel", 1);
+    randomBotMaxLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMaxLoginLevel", 80);
+    randomBotLogoutOutsideLoginRange = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotLogoutOutsideLoginRange", false);
 
     farDistance = sConfigMgr->GetOption<float>("AiPlayerbot.FarDistance", 20.0f);
     sightDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SightDistance", 75.0f);

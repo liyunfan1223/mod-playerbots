@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_PLAYERbotAICONFIG_H
@@ -247,6 +247,8 @@ public:
     std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
     bool applyInstanceStrategies;
     uint32 randomBotMinLevel, randomBotMaxLevel;
+    uint32 randomBotMinLoginLevel, randomBotMaxLoginLevel;
+    bool randomBotLogoutOutsideLoginRange;
     float randomChangeMultiplier;
 
     // std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100

@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "RandomPlayerbotMgr.h"
@@ -13,6 +13,7 @@
 #include <ctime>
 #include <iomanip>
 #include <random>
+#include <climits>
 
 #include "AccountMgr.h"
 #include "AiFactory.h"
@@ -374,13 +375,76 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
     }*/
 
     uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
-    if (!maxAllowedBotCount || (maxAllowedBotCount < sPlayerbotAIConfig->minRandomBots ||
-                                maxAllowedBotCount > sPlayerbotAIConfig->maxRandomBots))
+
+    // Check if level filtering is active and populate eligible bots
+    if (!levelFilterAdjusted && IsLevelFilterActive())
     {
-        maxAllowedBotCount = urand(sPlayerbotAIConfig->minRandomBots, sPlayerbotAIConfig->maxRandomBots);
-        SetEventValue(0, "bot_count", maxAllowedBotCount,
-                      urand(sPlayerbotAIConfig->randomBotCountChangeMinInterval,
-                            sPlayerbotAIConfig->randomBotCountChangeMaxInterval));
+        PopulateEligibleBots();
+
+        // Count total eligible bots from RNDbot accounts
+        uint32 eligibleBotCount = 0;
+
+        for (uint32 accountId : rndBotTypeAccounts)
+        {
+            QueryResult result = CharacterDatabase.Query(
+                "SELECT COUNT(*) FROM characters WHERE account = {} AND level >= {} AND level <= {}",
+                accountId, sPlayerbotAIConfig->randomBotMinLoginLevel, sPlayerbotAIConfig->randomBotMaxLoginLevel
+            );
+
+            if (result)
+            {
+                Field* fields = result->Fetch();
+                eligibleBotCount += fields[0].Get<uint32>();
+            }
+        }
+
+        if (eligibleBotCount > 0)
+        {
+            // Cap eligible bots by maxRandomBots
+            uint32 effectiveMaxBots = std::min(eligibleBotCount, sPlayerbotAIConfig->maxRandomBots);
+
+            LOG_INFO("playerbots", "Level filter active: {} eligible bots found in range {}-{}. Effective maximum: {} bots.",
+                    eligibleBotCount, sPlayerbotAIConfig->randomBotMinLoginLevel,
+                    sPlayerbotAIConfig->randomBotMaxLoginLevel, effectiveMaxBots);
+
+            if (effectiveMaxBots >= sPlayerbotAIConfig->minRandomBots)
+            {
+                maxAllowedBotCount = urand(sPlayerbotAIConfig->minRandomBots, effectiveMaxBots);
+            }
+            else
+            {
+                maxAllowedBotCount = effectiveMaxBots;
+            }
+
+            SetEventValue(0, "bot_count", maxAllowedBotCount,
+                        urand(sPlayerbotAIConfig->randomBotCountChangeMinInterval,
+                                sPlayerbotAIConfig->randomBotCountChangeMaxInterval));
+
+            currentBots.clear();
+            levelFilterAdjusted = true;
+        }
+        else
+        {
+            LOG_ERROR("playerbots", "No eligible bots found with level filter {}-{}. Change the level range.",
+                    sPlayerbotAIConfig->randomBotMinLoginLevel, sPlayerbotAIConfig->randomBotMaxLoginLevel);
+            SetEventValue(0, "bot_count", 0, INT_MAX);
+            maxAllowedBotCount = 0;
+            currentBots.clear();
+            levelFilterAdjusted = true;
+        }
+    }
+    else if (!levelFilterAdjusted)
+    {
+        // Normal bot count logic (no level filtering)
+        if (!maxAllowedBotCount || (maxAllowedBotCount < sPlayerbotAIConfig->minRandomBots ||
+                                    maxAllowedBotCount > sPlayerbotAIConfig->maxRandomBots))
+        {
+            maxAllowedBotCount = urand(sPlayerbotAIConfig->minRandomBots, sPlayerbotAIConfig->maxRandomBots);
+            SetEventValue(0, "bot_count", maxAllowedBotCount,
+                        urand(sPlayerbotAIConfig->randomBotCountChangeMinInterval,
+                                sPlayerbotAIConfig->randomBotCountChangeMaxInterval));
+        }
+        levelFilterAdjusted = true;
     }
 
     GetBots();
@@ -772,23 +836,41 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 
         for (uint32 accountId : accountsToUse)
         {
-            CharacterDatabasePreparedStatement* stmt =
-                CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
-            stmt->SetData(0, accountId);
-            PreparedQueryResult result = CharacterDatabase.Query(stmt);
-            if (!result)
-                continue;
-
-            do
+            // Lambda to process results regardless of query type
+            auto processResults = [&](auto result)
             {
-                Field* fields = result->Fetch();
-                CharacterInfo info;
-                info.guid = fields[0].Get<uint32>();
-                info.rClass = fields[1].Get<uint8>();
-                info.rRace = fields[2].Get<uint8>();
-                info.accountId = accountId;
-                allCharacters.push_back(info);
-            } while (result->NextRow());
+                if (!result)
+                    return;
+
+                do
+                {
+                    Field* fields = result->Fetch();
+                    CharacterInfo info;
+                    info.guid = fields[0].Get<uint32>();
+                    info.rClass = fields[1].Get<uint8>();
+                    info.rRace = fields[2].Get<uint8>();
+                    info.accountId = accountId;
+                    allCharacters.push_back(info);
+                } while (result->NextRow());
+            };
+
+            if (IsLevelFilterActive())
+            {
+                // Custom query with level filtering
+                auto result = CharacterDatabase.Query(
+                    "SELECT guid, class, race FROM characters WHERE account = {} AND level >= {} AND level <= {}",
+                    accountId, sPlayerbotAIConfig->randomBotMinLoginLevel, sPlayerbotAIConfig->randomBotMaxLoginLevel
+                );
+                processResults(result);
+            }
+            else
+            {
+                CharacterDatabasePreparedStatement* stmt =
+                    CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
+                stmt->SetData(0, accountId);
+                auto result = CharacterDatabase.Query(stmt);
+                processResults(result);
+            }
         }
 
         // Shuffle for class balance
@@ -2670,17 +2752,55 @@ void RandomPlayerbotMgr::GetBots()
     stmt->SetData(0, 0);
     stmt->SetData(1, "add");
     uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
+
     if (PreparedQueryResult result = PlayerbotsDatabase.Query(stmt))
     {
         do
         {
             Field* fields = result->Fetch();
             uint32 bot = fields[0].Get<uint32>();
+
             if (GetEventValue(bot, "add"))
+            {
+                // Single query to get both account and level
+                QueryResult charResult = CharacterDatabase.Query("SELECT account, level FROM characters WHERE guid = {}", bot);
+                if (!charResult)
+                    continue;
+
+                Field* charFields = charResult->Fetch();
+                uint32 botAccountId = charFields[0].Get<uint32>();
+                uint32 botLevel = charFields[1].Get<uint32>();
+
+                // Skip if not an RNDbot account
+                bool isRndBotAccount = false;
+                for (uint32 accountId : rndBotTypeAccounts)
+                {
+                    if (accountId == botAccountId)
+                    {
+                        isRndBotAccount = true;
+                        break;
+                    }
+                }
+
+                if (!isRndBotAccount)
+                    continue;
+
+                // If level filtering is active, check bot level
+                if (IsLevelFilterActive())
+                {
+                    // Skip bots outside the allowed level range
+                    if (botLevel < sPlayerbotAIConfig->randomBotMinLoginLevel ||
+                        botLevel > sPlayerbotAIConfig->randomBotMaxLoginLevel)
+                    {
+                        continue;
+                    }
+                }
+
                 currentBots.push_back(bot);
 
-            if (currentBots.size() >= maxAllowedBotCount)
-                break;
+                if (currentBots.size() >= maxAllowedBotCount)
+                    break;
+            }
         } while (result->NextRow());
     }
 }
@@ -2706,6 +2826,51 @@ std::vector<uint32> RandomPlayerbotMgr::GetBgBots(uint32 bracket)
     }
 
     return std::move(BgBots);
+}
+
+void RandomPlayerbotMgr::PopulateEligibleBots()
+{
+    if (!sPlayerbotAIConfig || !(sPlayerbotAIConfig->randomBotMinLoginLevel > 1 ||
+        sPlayerbotAIConfig->randomBotMaxLoginLevel < 80))
+        return;
+
+    LOG_INFO("playerbots", "Populating eligible bots for level filter ({}-{})...",
+             sPlayerbotAIConfig->randomBotMinLoginLevel, sPlayerbotAIConfig->randomBotMaxLoginLevel);
+
+    bool botsAdded = false;
+
+    // Use only RNDbot type accounts (type 1)
+    for (uint32 accountId : rndBotTypeAccounts)
+    {
+        QueryResult result = CharacterDatabase.Query(
+            "SELECT guid, level, online FROM characters WHERE account = {} AND level >= {} AND level <= {}",
+            accountId, sPlayerbotAIConfig->randomBotMinLoginLevel, sPlayerbotAIConfig->randomBotMaxLoginLevel
+        );
+
+        if (result)
+        {
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 botGuid = fields[0].Get<uint32>();
+                bool isOnline = fields[2].Get<bool>();
+
+                // Skip bots that are already online or already have "add" event
+                if (isOnline || GetEventValue(botGuid, "add"))
+                    continue;
+
+                uint32 add_time = urand(sPlayerbotAIConfig->minRandomBotInWorldTime,
+                                    sPlayerbotAIConfig->maxRandomBotInWorldTime);
+                SetEventValue(botGuid, "add", 1, add_time);
+                botsAdded = true;
+            } while (result->NextRow());
+        }
+    }
+
+    if (botsAdded)
+    {
+        currentBots.clear(); // Force reload
+    }
 }
 
 uint32 RandomPlayerbotMgr::GetEventValue(uint32 bot, std::string const event)
@@ -2735,23 +2900,13 @@ uint32 RandomPlayerbotMgr::GetEventValue(uint32 bot, std::string const event)
     }
 
     CachedEvent& e = eventCache[bot][event];
-    /*if (e.IsEmpty())
-    {
-        QueryResult results = PlayerbotsDatabase.Query("SELECT `value`, `time`, validIn, `data` FROM
-    playerbots_random_bots WHERE owner = 0 AND bot = {} AND event = {}", bot, event.c_str());
 
-        if (results)
-        {
-            Field* fields = results->Fetch();
-            e.value = fields[0].Get<uint32>();
-            e.lastChangeTime = fields[1].Get<uint32>();
-            e.validIn = fields[2].Get<uint32>();
-            e.data = fields[3].Get<std::string>();
-        }
-    }
-    */
+    bool shouldExpire = (time(0) - e.lastChangeTime) >= e.validIn &&
+                       event != "specNo" &&
+                       event != "specLink" &&
+                       !(event == "bot_count" && IsLevelFilterActive());  // Don't expire bot_count when level filtering is active
 
-    if ((time(0) - e.lastChangeTime) >= e.validIn && event != "specNo" && event != "specLink")
+    if (shouldExpire)
         e.value = 0;
 
     return e.value;
