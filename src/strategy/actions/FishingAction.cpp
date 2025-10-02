@@ -172,12 +172,24 @@ bool MoveToFishAction::isUseful()
 
 bool EquipFishingPoleAction::Execute(Event event)
 {
-    if (isFishingPole(bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND)))
-            return true;
+    if (!pole)
+        return false;
 
-    // Find a fishing pole in other equipment slots or inventory.
-    Item* pole = nullptr;
+    WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
+    eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
+    WorldPackets::Item::AutoEquipItemSlot nicePacket(std::move(eqPacket));
+    nicePacket.Read();
+    bot->GetSession()->HandleAutoEquipItemSlotOpcode(nicePacket);
 
+    return true;
+}
+
+bool EquipFishingPoleAction::isUseful()
+{
+    Item* mainHand = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    if (isFishingPole(mainHand));
+        return false;
+    
     for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
     {
         if (Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
@@ -212,35 +224,17 @@ bool EquipFishingPoleAction::Execute(Event event)
                 break;
         }
     }
+    if (pole)
+        return true;
 
-    if (!pole)
+    if (sRandomPlayerbotMgr->IsRandomBot(bot))
     {
-        if (sRandomPlayerbotMgr->IsRandomBot(bot))
-        {
-            botAI->SetNextCheckDelay(50);
-            bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
-            return true;
-        }
-        else
-        {
-            botAI->TellError("I don't have a fishing pole");
-            return false;
-        }
+        bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
+        return true;
     }
     
-    WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
-    eqPacket << pole->GetGUID() << uint8(EQUIPMENT_SLOT_MAINHAND);
-    WorldPackets::Item::AutoEquipItemSlot nicePacket(std::move(eqPacket));
-    nicePacket.Read();
-    bot->GetSession()->HandleAutoEquipItemSlotOpcode(nicePacket);
-
-    return true;
-}
-
-bool EquipFishingPoleAction::isUseful()
-{
-    Item* mainHand = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-    return !isFishingPole(mainHand);
+    botAI->TellError("I don't have a fishing pole");
+    return false;
 }
 
 bool FishingAction::Execute(Event event)
@@ -249,7 +243,7 @@ bool FishingAction::Execute(Event event)
     WorldPosition fishingHole = findFishingHole(botAI);
     if (fishingHole.GetPositionX() != 0.0f && fishingHole.GetPositionY() != 0.0f)
     {
-        Position pos = fishingHole.getPosition(); 
+        Position pos = fishingHole; 
         float distance = bot->GetExactDist2d(&pos);
 
         if (distance > 20.0f || distance < 10.0f)
@@ -273,7 +267,7 @@ bool FishingAction::Execute(Event event)
         WorldPosition FishSpot = findWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 20.0f, 5.0f, false);
         if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
         {
-            Position pos = FishSpot.getPosition(); 
+            Position pos = FishSpot; 
             if (bot->HasInArc(1.0, &pos, 1.0))
             {
                 facingWater = true;

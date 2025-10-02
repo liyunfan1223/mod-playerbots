@@ -15,7 +15,6 @@
 #include "GameObject.h"
 #include "GridDefines.h"
 #include "PlayerbotAIConfig.h"
-#include "Position.h"
 
 class GuidPosition;
 class ObjectGuid;
@@ -328,11 +327,6 @@ public:
 
     // GameObjects
     std::vector<GameObjectData const*> getGameObjectsNear(float radius = 0, uint32 entry = 0);
-
-    Position getPosition()
-    {
-        return Position(getX(), getY(), getZ(), getO());
-    }
 
 private:
     uint32 visitors = 0;
