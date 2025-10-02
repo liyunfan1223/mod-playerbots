@@ -29,6 +29,7 @@ bool CastFireNovaAction::isUseful() {
     Unit* target = AI_VALUE(Unit*, "current target");
     if (!target)
         return false;
+    
     Creature* fireTotem = bot->GetMap()->GetCreature(bot->m_SummonSlot[1]);
     if (!fireTotem)
         return false;
@@ -45,7 +46,10 @@ bool CastCleansingTotemAction::isUseful()
 }
 
 // Will only cast Stoneclaw Totem if low on health and not in a group
-bool CastStoneclawTotemAction::isUseful() { return !botAI->GetBot()->GetGroup(); }
+bool CastStoneclawTotemAction::isUseful() 
+{ 
+    return !bot->GetGroup(); 
+}
 
 // Will only cast Lava Burst if Flame Shock is on the target
 bool CastLavaBurstAction::isUseful()
@@ -54,10 +58,10 @@ bool CastLavaBurstAction::isUseful()
     if (!target)
         return false;
 
-    static const uint32 FLAME_SHOCK_IDS[] = {8050, 8052, 8053, 10447, 10448, 29228, 25457, 49232, 49233};
+    static const uint32 FLAME_SHOCK_SPELL_IDS[] = {8050, 8052, 8053, 10447, 10448, 29228, 25457, 49232, 49233};
 
-    ObjectGuid botGuid = botAI->GetBot()->GetGUID();
-    for (uint32 spellId : FLAME_SHOCK_IDS)
+    ObjectGuid botGuid = bot->GetGUID();
+    for (uint32 spellId : FLAME_SHOCK_SPELL_IDS)
     {
         if (target->HasAura(spellId, botGuid))
             return true;
@@ -69,7 +73,6 @@ bool CastLavaBurstAction::isUseful()
 // There is no existing code for guardians casting spells in the AC/Playerbots repo.
 bool CastSpiritWalkAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
     constexpr uint32 SPIRIT_WOLF = 29264;
     constexpr uint32 SPIRIT_WALK_SPELL = 58875;
 
@@ -90,28 +93,30 @@ bool CastSpiritWalkAction::Execute(Event event)
 // Set Strategy Assigned Totems (Actions) - First, it checks
 // the highest-rank spell the bot knows for each totem type,
 // then adds it to the Call of the Elements bar.
-
 bool SetTotemAction::Execute(Event event)
 {
-    const size_t spellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
-    if (spellIdsCount == 0)
-        return false;  // early return
-
     uint32 totemSpell = 0;
-
-    // Iterate backwards to prioritize the highest-rank totem spell the bot knows
-    for (size_t i = spellIdsCount; i-- > 0;)
+    for (size_t i = 0; i < totemSpellIdsCount; ++i)
     {
-        const uint32 spellId = totemSpellIds[i];
-        if (bot->HasSpell(spellId))
+        if (bot->HasSpell(totemSpellIds[i]))
         {
-            totemSpell = spellId;
+            totemSpell = totemSpellIds[i];
             break;
         }
     }
 
-    if (totemSpell == 0)
+    if (!totemSpell)
+    {
         return false;
+    }
+
+    if (const ActionButton* button = bot->GetActionButton(actionButtonId))
+    {
+        if (button->GetType() == ACTION_BUTTON_SPELL && button->GetAction() == totemSpell)
+        {
+            return false;
+        }
+    }
 
     bot->addActionButton(actionButtonId, totemSpell, ACTION_BUTTON_SPELL);
     return true;
