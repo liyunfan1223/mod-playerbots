@@ -51,7 +51,7 @@ bool SeeSpellAction::Execute(Event event)
     {
         if (AI_VALUE(bool, "can fish"))
         {
-            botAI->ChangeStrategy("+masterfishing", BOT_STATE_NON_COMBAT);
+            botAI->ChangeStrategy("+master fishing", BOT_STATE_NON_COMBAT);
             return true;
         }
     }

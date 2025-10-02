@@ -25,10 +25,10 @@ public:
     bool Calculate() override;
 };  
 
-class CanOpenBobberValue : public BoolCalculatedValue
+class CanUseFishingBobberValue : public BoolCalculatedValue
 {
 public:
-    CanOpenBobberValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "can use fishing bobber") {};
+    CanUseFishingBobberValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "can use fishing bobber") {};
     bool Calculate() override;
 };
 

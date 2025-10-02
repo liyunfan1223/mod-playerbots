@@ -37,10 +37,10 @@ public:
     std::string const getName() override { return "reveal"; }
 };
 
-class BobberStrategy : public Strategy
+class UseBobberStrategy : public Strategy
 {
 public:
-    BobberStrategy(PlayerbotAI* botAI) : Strategy(botAI){}
+    UseBobberStrategy(PlayerbotAI* botAI) : Strategy(botAI){}
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override {return "usebobber";}

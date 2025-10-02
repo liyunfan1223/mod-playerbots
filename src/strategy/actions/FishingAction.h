@@ -15,9 +15,9 @@ extern const uint32 FISHING_SPELL;
 extern const uint32 FISHING_POLE;
 extern const uint32 FISHING_BOBBER;
 
-WorldPosition FindWaterLinear(Player* bot, float startDistance, float endDsistance, float increment, bool findLand = false, WorldPosition targetPos = nullptr);
-WorldPosition FindWaterRadial(Player* bot, float x, float y, float z, Map* map, uint32 phaseMask, float minDistance, float maxDistance, float increment, bool findLand = false);
-WorldPosition FindFishingNode(PlayerbotAI* botAI);
+WorldPosition findWaterLinear(Player* bot, float startDistance, float endDsistance, float increment, bool findLand = false, WorldPosition targetPos = nullptr);
+WorldPosition findWaterRadial(Player* bot, float x, float y, float z, Map* map, uint32 phaseMask, float minDistance, float maxDistance, float increment, bool findLand = false);
+WorldPosition findFishingNode(PlayerbotAI* botAI);
 
 class PlayerbotAI;
 
@@ -27,7 +27,6 @@ public:
     FishingAction(PlayerbotAI* botAI) : Action(botAI, "go fishing"){}
     bool Execute(Event event) override;
     bool isUseful() override;
-  
 };
 
 class EquipFishingPoleAction : public Action, public Qualified

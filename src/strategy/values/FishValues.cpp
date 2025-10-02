@@ -12,36 +12,31 @@
 
 bool CanFishValue::Calculate()
 {
-    if (!bot || !botAI)
-        return false;
-        
     int32 SkillFishing = bot->GetSkillValue(SKILL_FISHING);
 
     if (SkillFishing == 0)
         return false;
 
+    if (bot->isSwimming())
+        return false;
+    if (bot->IsInCombat())
+        return false;
+        
     return true;
 }
 
 bool IsNearWaterValue::Calculate()
 {
-    if (!bot || !botAI)
-        return false;
-
-    WorldPosition nearwater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 20.0f, 2.5f, false);
+    WorldPosition nearwater = findWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 20.0f, 2.5f, false);
     if (nearwater.GetPositionX() != 0.0f && nearwater.GetPositionY() != 0.0f)
         {
             return true;
         }
-        
     return false;
 }
 
-bool CanOpenBobberValue::Calculate()
+bool CanUseFishingBobberValue::Calculate()
 {
-  if (!bot || !botAI)
-    return false;
-
     GuidVector gos = AI_VALUE(GuidVector, "nearest game objects no los");
     for (const auto& guid : gos)
     {
@@ -70,13 +65,6 @@ bool CanOpenBobberValue::Calculate()
 
 bool DoneFishingValue::Calculate()
 {
-    if (!bot || !botAI)
-        return false;
-    
-    WorldPosition nearwater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 40.0f, 2.5f, false);
-    if (nearwater.GetPositionX() == 0.0f && nearwater.GetPositionY() == 0.0f)
-    {
-        return true;
-    }
-    return false;
+    WorldPosition nearwater = findWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 40.0f, 2.5f, false);
+    return (nearwater.GetPositionX() == 0.0f && nearwater.GetPositionY() == 0.0f);
 }

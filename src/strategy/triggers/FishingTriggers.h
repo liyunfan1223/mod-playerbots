@@ -11,9 +11,9 @@
 
 class CanFishTrigger : public Trigger
 {
-    public:
+public:
     CanFishTrigger(PlayerbotAI* ai) : Trigger(ai, "can fish") {};
-        bool IsActive() override;
+    bool IsActive() override;
 };
 
 class CanUseFishingBobberTrigger : public Trigger

@@ -193,7 +193,7 @@ public:
         creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
         creators["clean quest log"] = &ActionContext::clean_quest_log;
         creators["move to fish"] = &ActionContext::move_to_fish;
-        creators["go fishing"] = &ActionContext::fishing_action;
+        creators["go fishing"] = &ActionContext::go_fishing;
         creators["use fishing bobber"] = &ActionContext::use_fishing_bobber;
         creators["end fishing"] = &ActionContext::end_fishing;
         creators["remove bobber strategy"] = &ActionContext::remove_bobber_strategy;
@@ -387,7 +387,7 @@ private:
     static Action* guild_manage_nearby(PlayerbotAI* botAI) { return new GuildManageNearbyAction(botAI); }
     static Action* clean_quest_log(PlayerbotAI* botAI) { return new CleanQuestLogAction(botAI); }
     static Action* move_to_fish(PlayerbotAI* botAI) { return new MoveToFishAction(botAI); }
-    static Action* fishing_action(PlayerbotAI* botAI) { return new FishingAction(botAI);}
+    static Action* go_fishing(PlayerbotAI* botAI) { return new FishingAction(botAI);}
     static Action* use_fishing_bobber(PlayerbotAI* botAI) { return new UseBobber(botAI);}
     static Action* end_fishing(PlayerbotAI* botAI) { return new EndFishing(botAI); }
     static Action* remove_bobber_strategy(PlayerbotAI* botAI) { return new RemoveBobberStrategyAction(botAI); }

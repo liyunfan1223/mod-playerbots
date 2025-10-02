@@ -563,7 +563,7 @@ private:
     static UntypedValue* recently_flee_info(PlayerbotAI* ai) { return new RecentlyFleeInfo(ai); }
     static UntypedValue* can_fish(PlayerbotAI* ai) { return new CanFishValue(ai); }
     static UntypedValue* is_near_water(PlayerbotAI* ai) { return new IsNearWaterValue(ai); }
-    static UntypedValue* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanOpenBobberValue(ai); }
+    static UntypedValue* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanUseFishingBobberValue(ai); }
     static UntypedValue* done_fishing(PlayerbotAI* ai) { return new DoneFishingValue(ai); }
     // -------------------------------------------------------
     // Flag for cutom glyphs : true when /w bot glyph equip
