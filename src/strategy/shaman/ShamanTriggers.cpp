@@ -261,9 +261,10 @@ bool TotemicRecallTrigger::IsActive()
 }
 
 // Find the active totem strategy for this slot, and return the highest-rank spellId the bot knows for it
-static uint32 GetRequiredTotemSpellId(Player* bot, const char* strategies[], 
+static uint32 GetRequiredTotemSpellId(PlayerbotAI* ai, const char* strategies[], 
     const uint32* spellList[], const size_t spellCounts[], size_t numStrategies)
 {
+    Player* bot = ai->GetBot();
     for (size_t i = 0; i < numStrategies; ++i)
     {
         if (ai->HasStrategy(strategies[i], BOT_STATE_COMBAT))
@@ -320,7 +321,7 @@ bool NoEarthTotemTrigger::IsActive()
     static const size_t counts[] = {STRENGTH_OF_EARTH_TOTEM_COUNT, STONESKIN_TOTEM_COUNT, TREMOR_TOTEM_COUNT,
                                     EARTHBIND_TOTEM_COUNT};
     
-    uint32 requiredSpell = GetRequiredTotemSpellId(bot, names, spells, counts, 4);
+    uint32 requiredSpell = GetRequiredTotemSpellId(botAI, names, spells, counts, 4);
 
     // EXCEPTION: If Stoneclaw Totem is out and in range, consider the slot "occupied" (do not fire the trigger)
     for (size_t i = 0; i < STONECLAW_TOTEM_COUNT; ++i) 
@@ -362,7 +363,7 @@ bool NoFireTotemTrigger::IsActive()
     static const size_t counts[] = {SEARING_TOTEM_COUNT, MAGMA_TOTEM_COUNT, FLAMETONGUE_TOTEM_COUNT, TOTEM_OF_WRATH_COUNT,
                                     FROST_RESISTANCE_TOTEM_COUNT};
 
-    uint32 requiredSpell = GetRequiredTotemSpellId(bot, names, spells, counts, 5);
+    uint32 requiredSpell = GetRequiredTotemSpellId(botAI, names, spells, counts, 5);
 
     // EXCEPTION: If Fire Elemental is out and in range, consider the slot "occupied" (do not fire the trigger)
     for (size_t i = 0; i < FIRE_ELEMENTAL_TOTEM_COUNT; ++i) 
@@ -403,7 +404,7 @@ bool NoWaterTotemTrigger::IsActive()
     static const size_t counts[] = {HEALING_STREAM_TOTEM_COUNT, MANA_SPRING_TOTEM_COUNT, CLEANSING_TOTEM_COUNT,
                                     FIRE_RESISTANCE_TOTEM_COUNT};
 
-    uint32 requiredSpell = GetRequiredTotemSpellId(bot, names, spells, counts, 4);
+    uint32 requiredSpell = GetRequiredTotemSpellId(botAI, names, spells, counts, 4);
 
     // EXCEPTION: If Mana Tide is out and in range, consider the slot "occupied" (do not fire the trigger)
     for (size_t i = 0; i < MANA_TIDE_TOTEM_COUNT; ++i) 
@@ -446,7 +447,7 @@ bool NoAirTotemTrigger::IsActive()
     static const size_t counts[] = {WRATH_OF_AIR_TOTEM_COUNT, WINDFURY_TOTEM_COUNT, NATURE_RESISTANCE_TOTEM_COUNT,
                                     GROUNDING_TOTEM_COUNT};
 
-    uint32 requiredSpell = GetRequiredTotemSpellId(bot, names, spells, counts, 3);
+    uint32 requiredSpell = GetRequiredTotemSpellId(botAI, names, spells, counts, 3);
 
     // If no relevant strategy, only care if the slot is empty or totem is too far away
     if (!requiredSpell)
