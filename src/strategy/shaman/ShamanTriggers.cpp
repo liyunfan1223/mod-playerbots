@@ -19,6 +19,7 @@ bool MainHandWeaponNoImbueTrigger::IsActive()
     Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
     if (!itemForSpell || itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
         return false;
+    
     return true;
 }
 
@@ -27,18 +28,20 @@ bool OffHandWeaponNoImbueTrigger::IsActive()
     Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
     if (!itemForSpell)
         return false;
+    
     uint32 invType = itemForSpell->GetTemplate()->InventoryType;
     bool allowedType = (invType == INVTYPE_WEAPON) || (invType == INVTYPE_WEAPONOFFHAND);
-    if (itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) ||
-        !allowedType)
+    if (itemForSpell->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) || !allowedType)
         return false;
+    
     return true;
 }
 
 bool ShockTrigger::IsActive()
 {
-    return SpellTrigger::IsActive() && !botAI->HasAura("flame shock", GetTarget(), false, true) &&
-           !botAI->HasAura("frost shock", GetTarget(), false, true);
+    return SpellTrigger::IsActive() && 
+        !botAI->HasAura("flame shock", GetTarget(), false, true) &&
+        !botAI->HasAura("frost shock", GetTarget(), false, true);
 }
 
 // Checks if the target's health is above 25%/1500 hp. Returns false if either are true.
@@ -61,13 +64,20 @@ bool EarthShockExecuteTrigger::IsActive()
 
 bool TotemTrigger::IsActive()
 {
-    return AI_VALUE(uint8, "attacker count") >= attackerCount && !AI_VALUE2(bool, "has totem", name) &&
-           !botAI->HasAura(name, bot);
+    return AI_VALUE(uint8, "attacker count") >= attackerCount && 
+        !AI_VALUE2(bool, "has totem", name) &&
+        !botAI->HasAura(name, bot);
 }
 
-bool WaterWalkingTrigger::IsActive() { return BuffTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target"); }
+bool WaterWalkingTrigger::IsActive() 
+{ 
+    return BuffTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target"); 
+}
 
-bool WaterBreathingTrigger::IsActive() { return BuffTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target"); }
+bool WaterBreathingTrigger::IsActive() 
+{ 
+    return BuffTrigger::IsActive() && AI_VALUE2(bool, "swimming", "self target"); 
+}
 
 bool WaterWalkingOnPartyTrigger::IsActive()
 {
@@ -92,14 +102,13 @@ bool ElementalMasteryTrigger::IsActive()
 // code exists in the AC/Playerbots repo for checking if a guardian's spell is on cooldown.
 bool SpiritWalkTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    constexpr uint32 SPIRIT_WOLF = 29264;
-    constexpr uint32 SPIRIT_WALK = 58875;
-    constexpr int COOLDOWN_SECONDS = 32;
+    constexpr uint32 SPIRIT_WOLF = 29264u;
+    constexpr uint32 SPIRIT_WALK_SPELL_ID = 58875u;
+    constexpr int COOLDOWN_IN_SECONDS = 32;
 
     time_t now = time(nullptr);
 
-    if ((now - lastSpiritWalkTime) < COOLDOWN_SECONDS)
+    if ((now - lastSpiritWalkTime) < COOLDOWN_IN_SECONDS)
         return false;
 
     for (Unit* unit : bot->m_Controlled)
@@ -107,13 +116,14 @@ bool SpiritWalkTrigger::IsActive()
         Creature* wolf = dynamic_cast<Creature*>(unit);
         if (wolf && wolf->GetEntry() == SPIRIT_WOLF && wolf->IsAlive())
         {
-            if (!bot->HasAura(SPIRIT_WALK))
+            if (!bot->HasAura(SPIRIT_WALK_SPELL_ID))
             {
                 lastSpiritWalkTime = now;
                 return true;
             }
         }
     }
+    
     return false;
 }
 
@@ -127,8 +137,10 @@ bool CallOfTheElementsTrigger::IsActive()
     }
 
     int emptyCount = 0;
-    static const uint8 slots[] = {SUMMON_SLOT_TOTEM_EARTH, SUMMON_SLOT_TOTEM_FIRE, SUMMON_SLOT_TOTEM_WATER,
-                                  SUMMON_SLOT_TOTEM_AIR};
+    static const uint8 slots[] = {
+        SUMMON_SLOT_TOTEM_EARTH, SUMMON_SLOT_TOTEM_FIRE, 
+        SUMMON_SLOT_TOTEM_WATER, SUMMON_SLOT_TOTEM_AIR
+    };
 
     for (uint8 slot : slots)
     {
@@ -173,13 +185,11 @@ bool CallOfTheElementsTrigger::IsActive()
 // 5. Finally, if any totem summon slot is not empty, the trigger will fire.
 bool TotemicRecallTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-
     if (!bot->HasSpell(SPELL_TOTEMIC_RECALL))
         return false;
 
     Map* map = bot->GetMap();
-    if (map->IsDungeon())
+    if (map && map->IsDungeon())
     {
         InstanceScript* instance = ((InstanceMap*)map)->GetInstanceScript();
         if (instance)
@@ -200,8 +210,10 @@ bool TotemicRecallTrigger::IsActive()
             Player* member = ref->GetSource();
             if (!member)
                 continue;
+            
             if (member->IsInCombat())
                 return false;
+            
             Pet* pet = member->GetPet();
             if (pet && pet->IsInCombat())
                 return false;
@@ -214,7 +226,9 @@ bool TotemicRecallTrigger::IsActive()
         Creature* totem = bot->GetMap()->GetCreature(guid);
         uint32 currentSpell = 0;
         if (totem)
+        {
             currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        }
 
         for (size_t i = 0; i < MANA_TIDE_TOTEM_COUNT; ++i)
         {
@@ -229,7 +243,9 @@ bool TotemicRecallTrigger::IsActive()
         Creature* totem = bot->GetMap()->GetCreature(guid);
         uint32 currentSpell = 0;
         if (totem)
+        {
             currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        }
 
         for (size_t i = 0; i < FIRE_ELEMENTAL_TOTEM_COUNT; ++i)
         {
@@ -245,8 +261,8 @@ bool TotemicRecallTrigger::IsActive()
 }
 
 // Find the active totem strategy for this slot, and return the highest-rank spellId the bot knows for it
-static uint32 GetRequiredTotemSpellId(PlayerbotAI* ai, const char* strategies[], const uint32* spellList[],
-                                      const size_t spellCounts[], size_t numStrategies)
+static uint32 GetRequiredTotemSpellId(PlayerbotAI* ai, const char* strategies[], 
+    const uint32* spellList[], const size_t spellCounts[], size_t numStrategies)
 {
     Player* bot = ai->GetBot();
     for (size_t i = 0; i < numStrategies; ++i)
@@ -257,10 +273,13 @@ static uint32 GetRequiredTotemSpellId(PlayerbotAI* ai, const char* strategies[],
             for (size_t j = 0; j < spellCounts[i]; ++j)
             {
                 if (bot->HasSpell(spellList[i][j]))
+                {
                     return spellList[i][j];
+                }
             }
         }
     }
+    
     return 0;  // No relevant strategy active, or bot doesn't know any rank
 }
 
@@ -270,9 +289,11 @@ static uint32 GetSummonedTotemSpellId(Player* bot, uint8 slot)
     ObjectGuid guid = bot->m_SummonSlot[slot];
     if (guid.IsEmpty())
         return 0;
+    
     Creature* totem = bot->GetMap()->GetCreature(guid);
     if (!totem)
         return 0;
+    
     return totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
 }
 
@@ -288,8 +309,10 @@ bool NoEarthTotemTrigger::IsActive()
     if (!guid.IsEmpty())
     {
         totem = bot->GetMap()->GetCreature(guid);
-        if (totem)
+        if (totem) 
+        {
             currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        }
     }
 
     // Define supported earth totem strategies for this slot:
@@ -297,16 +320,18 @@ bool NoEarthTotemTrigger::IsActive()
     static const uint32* spells[] = {STRENGTH_OF_EARTH_TOTEM, STONESKIN_TOTEM, TREMOR_TOTEM, EARTHBIND_TOTEM};
     static const size_t counts[] = {STRENGTH_OF_EARTH_TOTEM_COUNT, STONESKIN_TOTEM_COUNT, TREMOR_TOTEM_COUNT,
                                     EARTHBIND_TOTEM_COUNT};
-
+    
     uint32 requiredSpell = GetRequiredTotemSpellId(botAI, names, spells, counts, 4);
 
     // EXCEPTION: If Stoneclaw Totem is out and in range, consider the slot "occupied" (do not fire the trigger)
-    for (size_t i = 0; i < STONECLAW_TOTEM_COUNT; ++i)
+    for (size_t i = 0; i < STONECLAW_TOTEM_COUNT; ++i) 
+    {
         if (currentSpell == STONECLAW_TOTEM[i] && totem && totem->GetDistance(bot) <= 30.0f)
             return false;
+    }
 
     // If no relevant strategy, only care if the slot is empty or totem is too far away
-    if (!requiredSpell)
+    if (!requiredSpell) 
         return guid.IsEmpty() || !totem || totem->GetDistance(bot) > 30.0f;
 
     // Fire if slot is empty or wrong totem or totem is too far away
@@ -325,8 +350,10 @@ bool NoFireTotemTrigger::IsActive()
     if (!guid.IsEmpty())
     {
         totem = bot->GetMap()->GetCreature(guid);
-        if (totem)
+        if (totem) 
+        {
             currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        }
     }
 
     // Define supported fire totem strategies for this slot:
@@ -339,9 +366,11 @@ bool NoFireTotemTrigger::IsActive()
     uint32 requiredSpell = GetRequiredTotemSpellId(botAI, names, spells, counts, 5);
 
     // EXCEPTION: If Fire Elemental is out and in range, consider the slot "occupied" (do not fire the trigger)
-    for (size_t i = 0; i < FIRE_ELEMENTAL_TOTEM_COUNT; ++i)
+    for (size_t i = 0; i < FIRE_ELEMENTAL_TOTEM_COUNT; ++i) 
+    {
         if (currentSpell == FIRE_ELEMENTAL_TOTEM[i] && totem && totem->GetDistance(bot) <= 30.0f)
             return false;
+    }
 
     // If no relevant strategy, only care if the slot is empty or totem is too far away
     if (!requiredSpell)
@@ -364,7 +393,9 @@ bool NoWaterTotemTrigger::IsActive()
     {
         totem = bot->GetMap()->GetCreature(guid);
         if (totem)
+        {
             currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        }
     }
 
     // Define supported water totem strategies for this slot:
@@ -376,13 +407,17 @@ bool NoWaterTotemTrigger::IsActive()
     uint32 requiredSpell = GetRequiredTotemSpellId(botAI, names, spells, counts, 4);
 
     // EXCEPTION: If Mana Tide is out and in range, consider the slot "occupied" (do not fire the trigger)
-    for (size_t i = 0; i < MANA_TIDE_TOTEM_COUNT; ++i)
+    for (size_t i = 0; i < MANA_TIDE_TOTEM_COUNT; ++i) 
+    {
         if (currentSpell == MANA_TIDE_TOTEM[i] && totem && totem->GetDistance(bot) <= 30.0f)
             return false;
+    }
 
     // If no relevant strategy, only care if the slot is empty or totem is too far away
-    if (!requiredSpell)
+    if (!requiredSpell) 
+    {
         return guid.IsEmpty() || !totem || totem->GetDistance(bot) > 30.0f;
+    }
 
     // Fire if slot is empty or wrong totem or totem is too far away
     return !currentSpell || currentSpell != requiredSpell || !totem || totem->GetDistance(bot) > 30.0f;
@@ -401,7 +436,9 @@ bool NoAirTotemTrigger::IsActive()
     {
         totem = bot->GetMap()->GetCreature(guid);
         if (totem)
+        {
             currentSpell = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
+        }
     }
 
     // Define supported air totem strategies for this slot:
@@ -414,7 +451,9 @@ bool NoAirTotemTrigger::IsActive()
 
     // If no relevant strategy, only care if the slot is empty or totem is too far away
     if (!requiredSpell)
+    {
         return guid.IsEmpty() || !totem || totem->GetDistance(bot) > 30.0f;
+    }
 
     // Fire if slot is empty or wrong totem or totem is too far away
     return !currentSpell || currentSpell != requiredSpell || !totem || totem->GetDistance(bot) > 30.0f;
@@ -422,30 +461,26 @@ bool NoAirTotemTrigger::IsActive()
 
 bool SetTotemTrigger::IsActive()
 {
-    if (!bot->HasSpell(SPELL_CALL_OF_THE_ELEMENTS))
-        return false;
+   uint32 highestKnownSpell = 0;
+   for (size_t i = 0; i < totemSpellIdsCount; ++i)
+   {
+       const uint32 spellId = totemSpellIds[i];
+       if (bot->HasSpell(spellId))
+       {
+           highestKnownSpell = spellId;
+           break;
+       }
+   }
 
-    if (!bot->HasSpell(requiredSpellId))
-        return false;
+   if (!highestKnownSpell)
+       return false;
 
-    ActionButton const* button = bot->GetActionButton(actionButtonId);
-    if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
-        return true;
+   ActionButton const* button = bot->GetActionButton(actionButtonId);
+   if (!button || button->GetType() != ACTION_BUTTON_SPELL || button->GetAction() == 0)
+       return true;
 
-    const size_t totemSpellIdsCount = sizeof(totemSpellIds) / sizeof(uint32);
-    if (totemSpellIdsCount == 0)
-    {
-        return false;
-    }
+   if (button->GetAction() != highestKnownSpell)
+       return true;
 
-    for (int i = (int)totemSpellIdsCount - 1; i >= 0; --i)
-    {
-        const uint32 spellId = totemSpellIds[i];
-        if (bot->HasSpell(spellId))
-        {
-            return button->GetAction() != spellId;
-        }
-    }
-
-    return false;
+   return false;
 }
