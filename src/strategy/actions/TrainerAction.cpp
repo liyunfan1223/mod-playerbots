@@ -197,10 +197,10 @@ bool MaintenanceAction::Execute(Event event)
     else 
     {
         if (sPlayerbotAIConfig->altMaintenanceAttunementQs)
-            factory.InitAttunementQuests(); // no free attunement (for now, see how this works out when you hit 60 with IP installed)
+            factory.InitAttunementQuests();
 
         if (sPlayerbotAIConfig->altMaintenanceBags)
-            factory.InitBags(false); //no free 24 slot bags
+            factory.InitBags(false);
 
         if (sPlayerbotAIConfig->altMaintenanceAmmo)
             factory.InitAmmo();
@@ -212,10 +212,10 @@ bool MaintenanceAction::Execute(Event event)
             factory.InitReagents();
 
         if (sPlayerbotAIConfig->altMaintenanceConsumables)
-            factory.InitConsumables(); // craft and distribute these yourself
+            factory.InitConsumables();
 
         if (sPlayerbotAIConfig->altMaintenancePotions)
-            factory.InitPotions(); // craft and distribute these yourself
+            factory.InitPotions();
 
         if (sPlayerbotAIConfig->altMaintenanceTalentTree)
             factory.InitTalentsTree(true);
@@ -230,27 +230,27 @@ bool MaintenanceAction::Execute(Event event)
             factory.InitClassSpells();
 
         if (sPlayerbotAIConfig->altMaintenanceAvailableSpells)
-            factory.InitAvailableSpells(); // no free spells for alts
+            factory.InitAvailableSpells();
 
         if (sPlayerbotAIConfig->altMaintenanceSkills)
-            factory.InitSkills(); // no free tradeskill progress for alts
+            factory.InitSkills();
 
         if (sPlayerbotAIConfig->altMaintenanceReputation)
-            factory.InitReputation(); // no free rep progress for alts
+            factory.InitReputation();
 
         if (sPlayerbotAIConfig->altMaintenanceSpecialSpells)
             factory.InitSpecialSpells();
 
         if (sPlayerbotAIConfig->altMaintenanceMounts)
-            factory.InitMounts(); // no free mounts for alts
+            factory.InitMounts();
 
         if (sPlayerbotAIConfig->altMaintenanceGlyphs)
-            factory.InitGlyphs(false); // craft/buy/choose glyphs manually
+            factory.InitGlyphs(false);
 
         if (sPlayerbotAIConfig->altMaintenanceKeyring)
-            factory.InitKeyring(); // no free keys
+            factory.InitKeyring();
 
-        if (sPlayerbotAIConfig->altMaintenanceGemsEnchants && bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel) //no free enchants & gems for alts
+        if (sPlayerbotAIConfig->altMaintenanceGemsEnchants && bot->GetLevel() >= sPlayerbotAIConfig->minEnchantingBotLevel)
             factory.ApplyEnchantAndGemsNew();
     }
 
