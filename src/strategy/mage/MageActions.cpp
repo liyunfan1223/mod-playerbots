@@ -66,37 +66,31 @@ Value<Unit*>* CastPolymorphAction::GetTargetValue() { return context->GetValue<U
 
 bool UseManaSapphireAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(33312, false) > 0;  // Mana Sapphire
 }
 
 bool UseManaEmeraldAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(22044, false) > 0;  // Mana Emerald
 }
 
 bool UseManaRubyAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(8008, false) > 0;  // Mana Ruby
 }
 
 bool UseManaCitrineAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(8007, false) > 0;  // Mana Citrine
 }
 
 bool UseManaJadeAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(5513, false) > 0;  // Mana Jade
 }
 
 bool UseManaAgateAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(5514, false) > 0;  // Mana Agate
 }
 
@@ -127,6 +121,7 @@ bool CastDragonsBreathAction::isUseful()
     Unit* target = AI_VALUE(Unit*, "current target");
     if (!target)
         return false;
+    
     bool facingTarget = AI_VALUE2(bool, "facing", "current target");
     bool targetClose = bot->IsWithinCombatRange(target, 10.0f);
     return facingTarget && targetClose;
@@ -137,6 +132,7 @@ bool CastBlastWaveAction::isUseful()
     Unit* target = AI_VALUE(Unit*, "current target");
     if (!target)
         return false;
+    
     bool targetClose = bot->IsWithinCombatRange(target, 10.0f);
     return targetClose;
 }
@@ -189,6 +185,7 @@ bool CastBlinkBackAction::Execute(Event event)
     Unit* target = AI_VALUE(Unit*, "current target");
     if (!target)
         return false;
+    
     // can cast spell check passed in isUseful()
     bot->SetOrientation(bot->GetAngle(target) + M_PI);
     return CastSpellAction::Execute(event);
@@ -198,8 +195,7 @@ bool CastBlinkBackAction::Execute(Event event)
 
 // Helper function to detect which ritual spell the bot has
 uint32 CastRitualOfRefreshmentAction::GetBotRitualSpellId(Player* bot)
-{
-    
+{    
     // Prefer higher rank if available
     if (bot->HasSpell(MageRitualConstants::RITUAL_REFRESHMENT_RANK_2)) {
         return MageRitualConstants::RITUAL_REFRESHMENT_RANK_2;
@@ -215,7 +211,6 @@ bool CastRitualOfRefreshmentAction::isUseful()
     // Detect which rank the bot has
     uint32 botSpellId = GetBotRitualSpellId(bot);
     std::string spellRank = (botSpellId == MageRitualConstants::RITUAL_REFRESHMENT_RANK_2) ? "Rank 2" : (botSpellId == MageRitualConstants::RITUAL_REFRESHMENT_RANK_1) ? "Rank 1" : "None";
-    
     
     // Check base class first
     if (!CastSpellAction::isUseful())
@@ -308,8 +303,6 @@ bool CastRitualOfRefreshmentAction::isUseful()
 
 bool CastRitualOfRefreshmentAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    
     // Check if bot is currently channeling the ritual
     if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
     {
@@ -329,14 +322,12 @@ bool CastRitualOfRefreshmentAction::Execute(Event event)
         bot->SetOrientation(newOrientation);
         bot->SetFacingTo(newOrientation);
         
-        hasChangedOrientationForRitual[bot->GetGUID()] = true;
-        
+        hasChangedOrientationForRitual[bot->GetGUID()] = true;     
     }
     
     // Detect which rank the bot has
     uint32 botSpellId = GetBotRitualSpellId(bot);
     std::string spellRank = (botSpellId == 58659) ? "Rank 2" : (botSpellId == 43987) ? "Rank 1" : "None";
-    
     if (botSpellId == 0)
     {
         return false;
@@ -344,17 +335,14 @@ bool CastRitualOfRefreshmentAction::Execute(Event event)
     
     // Check cooldown for the detected spell
     uint32 cooldown = bot->GetSpellCooldownDelay(botSpellId);
-    
     if (cooldown > 0)
     {
         return false;
     }
     
     bool result = CastSpellAction::Execute(event);
-    
     if (result)
-    {
-        
+    {        
         // Mark that this bot has completed ritual interaction
         uint64 botGuid = bot->GetGUID().GetRawValue();
         hasCompletedRitualInteraction[botGuid] = true;
