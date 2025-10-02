@@ -393,31 +393,6 @@ public:
     int32 addClassCommand;
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
-
-    // do-able with a calc, but too many values to do intuitivly.
-    /*
-    uint32 altMaintenanceBitmask;
-    #define MASK_ALTMAINTENANCE_ATTUNEMENT_QUESTS 1
-    #define MASK_ALTMAINTENANCE_BAGS    2
-    #define MASK_ALTMAINTENANCE_AMMO    4
-    #define MASK_ALTMAINTENANCE_FOOD    8
-    #define MASK_ALTMAINTENANCE_REAGENTS    16
-    #define MASK_ALTMAINTENANCE_CONSUMABLES 32
-    #define MASK_ALTMAINTENANCE_POTIONS 64
-    #define MASK_ALTMAINTENANCE_TALENT_TREE 128
-    #define MASK_ALTMAINTENANCE_PET 256
-    #define MASK_ALTMAINTENANCE_PET_TALENTS 512
-    #define MASK_ALTMAINTENANCE_CLASS_SPELLS    1024
-    #define MASK_ALTMAINTENANCE_AVAILABLE_SPELLS    2048
-    #define MASK_ALTMAINTENANCE_SKILLS  4096
-    #define MASK_ALTMAINTENANCE_REPUTATION  8192
-    #define MASK_ALTMAINTENANCE_SPECIAL_SPELLS  16384
-    #define MASK_ALTMAINTENANCE_MOUNTS  32768
-    #define MASK_ALTMAINTENANCE_GLYPHS  65536
-    #define MASK_ALTMAINTENANCE_KEYRING 131072
-    #define MASK_ALTMAINTENANCE_GEMS_ENCHANTS   262144
-    */
-    //This is more user-friendly
     bool altMaintenanceAttunementQs,
             altMaintenanceBags,
             altMaintenanceAmmo,
