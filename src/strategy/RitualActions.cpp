@@ -580,7 +580,7 @@ bool MageRitualWithDelayTrigger::IsActive()
         
         // Check if enough time has passed (approximately 1 second delay)
         uint32 timePassed = detectionCounter - it->second;
-        return timePassed >= 10 // Delay completed, allow ritual casting
+        return timePassed >= 10; // Delay completed, allow ritual casting
     }
     else
     {
