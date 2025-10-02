@@ -13,6 +13,20 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 
+#include <string>
+#include <vector>
+#include "Event.h"
+#include "Item.h"
+#include "ObjectGuid.h"
+#include "Player.h"
+#include "PlayerbotAI.h"
+#include "Playerbots.h"
+#include "ServerFacade.h"
+#include "Unit.h"
+#include "Timer.h"
+#include <unordered_map>
+#include <mutex>
+
 // Global constants for spells and items
 namespace WarlockRitualConstants
 {
@@ -69,35 +83,30 @@ namespace WarlockRitualConstants
 }
 
 // Function declared in RitualActions.cpp
-
 static std::unordered_map<ObjectGuid, uint32> lastRitualUsage;
 static std::unordered_map<ObjectGuid, bool> hasMovedForRitual;
 std::unordered_map<ObjectGuid, uint32> lastRitualCreation;
+
 // Track if bot has completed ritual interaction to avoid loops
 extern std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
 
-
-#include <string>
-#include <vector>
-#include "Event.h"
-#include "Item.h"
-#include "ObjectGuid.h"
-#include "Player.h"
-#include "PlayerbotAI.h"
-#include "Playerbots.h"
-#include "ServerFacade.h"
-#include "Unit.h"
-#include "Timer.h"
-#include <unordered_map>
-#include <mutex>
+// Reservation map for soulstone targets (GUID -> reservation expiry in ms)
+static std::unordered_map<ObjectGuid, uint32> soulstoneReservations;
+static std::mutex soulstoneReservationsMutex;
 
 const int ITEM_SOUL_SHARD = 6265;
 
 // Checks if the bot has less than 26 soul shards, and if so, allows casting Drain Soul
-bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 26; }
+bool CastDrainSoulAction::isUseful() 
+{ 
+    return AI_VALUE2(uint32, "item count", "soul shard") < 26; 
+}
 
 // Checks if the bot's health is above a certain threshold, and if so, allows casting Life Tap
-bool CastLifeTapAction::isUseful() { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->lowHealth; }
+bool CastLifeTapAction::isUseful() 
+{ 
+    return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig->lowHealth; 
+}
 
 // Checks if the target marked with the moon icon can be banished
 bool CastBanishOnCcAction::isPossible()
@@ -137,6 +146,7 @@ bool CastShadowflameAction::isUseful()
     Unit* target = AI_VALUE(Unit*, "current target");
     if (!target)
         return false;
+    
     bool facingTarget = AI_VALUE2(bool, "facing", "current target");
     bool targetClose = bot->IsWithinCombatRange(target, 7.0f);  // 7 yard cone
     return facingTarget && targetClose;
@@ -148,8 +158,10 @@ bool CastRainOfFireAction::isUseful()
     Unit* target = GetTarget();
     if (!target)
         return false;
+    
     if (bot->HasSpell(27243) || bot->HasSpell(47835) || bot->HasSpell(47836)) // Seed of Corruption spell IDs
         return false;
+    
     return true;
 }
 
@@ -190,7 +202,6 @@ bool CastSoulshatterAction::isUseful()
 // Checks if the bot has enough bag space to create a soul shard, then does so
 bool CreateSoulShardAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
     if (!bot)
         return false;
 
@@ -210,7 +221,6 @@ bool CreateSoulShardAction::Execute(Event event)
 // Checks if the bot has less than 6 soul shards, allowing the creation of a new one
 bool CreateSoulShardAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     if (!bot)
         return false;
 
@@ -227,7 +237,6 @@ bool CreateSoulShardAction::isUseful()
 
 bool CastCreateSoulstoneAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     if (!bot)
         return false;
 
@@ -256,7 +265,6 @@ bool CastCreateSoulstoneAction::isUseful()
     uint32 soulstoneToCreate = soulstoneIds.back();
 
     bool hasSpace = (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, soulstoneToCreate, count) == EQUIP_ERR_OK);
-
     return hasSpace;
 }
 
@@ -280,6 +288,7 @@ bool DestroySoulShardAction::Execute(Event event)
             }
         }
     }
+    
     // Also check main inventory slots (not in bags)
     for (int i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
     {
@@ -300,8 +309,10 @@ static bool HasSoulstoneAura(Unit* unit)
 {
     static const std::vector<uint32> soulstoneAuraIds = {20707, 20762, 20763, 20764, 20765, 27239, 47883};
     for (uint32 spellId : soulstoneAuraIds)
+    {
         if (unit->HasAura(spellId))
             return true;
+    }
     return false;
 }
 
@@ -319,10 +330,6 @@ bool UseSoulstoneSelfAction::Execute(Event event)
     return UseItem(items[0], ObjectGuid::Empty, nullptr, bot);
 }
 
-// Reservation map for soulstone targets (GUID -> reservation expiry in ms)
-static std::unordered_map<ObjectGuid, uint32> soulstoneReservations;
-static std::mutex soulstoneReservationsMutex;
-
 // Helper to clean up expired reservations
 void CleanupSoulstoneReservations()
 {
@@ -331,9 +338,13 @@ void CleanupSoulstoneReservations()
     for (auto it = soulstoneReservations.begin(); it != soulstoneReservations.end();)
     {
         if (it->second <= now)
+        {
             it = soulstoneReservations.erase(it);
+        }
         else
+        {
             ++it;
+        }
     }
 }
 
@@ -352,6 +363,7 @@ bool UseSoulstoneMasterAction::Execute(Event event)
 
     uint32 now = getMSTime();
 
+    // local scope so that std::lock_guard scope will be destroyed as soon as the closing brace is hit
     {
         std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
         if (soulstoneReservations.count(master->GetGUID()) && soulstoneReservations[master->GetGUID()] > now)
@@ -390,8 +402,8 @@ bool UseSoulstoneTankAction::Execute(Event event)
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (member && member->IsAlive() && botAI->IsTank(member) && botAI->IsMainTank(member) &&
-                !HasSoulstoneAura(member))
+            if (member && member->IsAlive() && 
+                botAI->IsTank(member) && botAI->IsMainTank(member) && !HasSoulstoneAura(member))
             {
                 std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
                 if (soulstoneReservations.count(member->GetGUID()) && soulstoneReservations[member->GetGUID()] > now)
@@ -601,8 +613,6 @@ bool CastRitualOfSoulsAction::isUseful()
 
 bool CastRitualOfSoulsAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-
     // Check if bot is currently channeling the ritual
     if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
     {
@@ -618,15 +628,19 @@ bool CastRitualOfSoulsAction::Execute(Event event)
 
     // In Battlegrounds, also check if there are Mages of the SAME FACTION nearby
     bool hasMageNearby = false;
-    if (bot->GetMap()->IsBattleground()) {
+    if (bot->GetMap()->IsBattleground()) 
+    {
         std::list<Player*> nearbyPlayers;
         Acore::AnyPlayerInObjectRangeCheck check(bot, 50.0f);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(bot, nearbyPlayers, check);
         Cell::VisitObjects(bot, searcher, 50.0f);
         
-        for (Player* nearbyPlayer : nearbyPlayers) {
+        for (Player* nearbyPlayer : nearbyPlayers) 
+        {
             if (nearbyPlayer->getClass() == CLASS_MAGE && 
-                nearbyPlayer->GetTeamId() == bot->GetTeamId()) { // Only same faction in BG
+                nearbyPlayer->GetTeamId() == bot->GetTeamId()) 
+            { 
+                // Only same faction in BG
                 hasMageNearby = true;
                 break;
             }
@@ -680,8 +694,6 @@ bool CastRitualOfSoulsAction::Execute(Event event)
 
 bool LootSoulwellAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
     // Only useful in dungeons/raids
     if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
         return false;
@@ -714,8 +726,6 @@ bool LootSoulwellAction::isUseful()
 
 bool LootSoulwellAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    
     // Find the soulwell
     GameObject* soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_1, 30.0f);
     if (!soulwell)
@@ -753,7 +763,6 @@ bool LootSoulwellAction::Execute(Event event)
 // EnableSoulstoneDungeonAction implementation
 bool EnableSoulstoneDungeonAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
     if (!bot)
         return false;
     
@@ -774,15 +783,11 @@ bool EnableSoulstoneDungeonAction::isUseful()
 
 bool EnableSoulstoneDungeonAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
     if (!bot)
         return false;
     
     // Enable the soulstone healer strategy
     botAI->ChangeStrategy("+ss healer", BOT_STATE_NON_COMBAT);
-    
-    
+       
     return true;
 }
-
-// MoveAwayFromSpawnAction implementation moved to RitualActions.cpp
