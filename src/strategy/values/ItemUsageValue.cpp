@@ -59,7 +59,7 @@ ItemUsage ItemUsageValue::Calculate()
                 if (bot->HasSpell(proto->Spells[2].SpellId))
                     needItem = false;
                 else
-                    needItem = bot->CanUseItem(proto) == EQUIP_ERR_OK;
+                    needItem = bot->BotCanUseItem(proto) == EQUIP_ERR_OK;
             }
         }
 
