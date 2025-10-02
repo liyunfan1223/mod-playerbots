@@ -36,7 +36,7 @@ bool NoManaGemTrigger::IsActive()
         5513,   // Mana Jade
         5514    // Mana Agate
     };
-    Player* bot = botAI->GetBot();
+
     for (uint32 gemId : gemIds)
     {
         if (bot->GetItemCount(gemId, false) > 0)  // false = only in bags
@@ -105,7 +105,6 @@ bool NoFocusMagicTrigger::IsActive()
 
 bool DeepFreezeCooldownTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
     static const uint32 DEEP_FREEZE_SPELL_ID = 44572;
 
     // If the bot does NOT have Deep Freeze, treat as "on cooldown"
@@ -121,8 +120,6 @@ const std::set<uint32> FlamestrikeNearbyTrigger::FLAMESTRIKE_SPELL_IDS = {2120, 
 
 bool FlamestrikeNearbyTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-
     for (uint32 spellId : FLAMESTRIKE_SPELL_IDS)
     {
         Aura* aura = bot->GetAura(spellId, bot->GetGUID());
@@ -147,12 +144,11 @@ bool ImprovedScorchTrigger::IsActive()
         return false;
 
     // List of all spell IDs for Improved Scorch, Winter's Chill, and Shadow Mastery
-    static const uint32 ImprovedScorchExclusiveDebuffs[] = {// Shadow Mastery
-                                                            17794, 17797, 17798, 17799, 17800,
-                                                            // Winter's Chill
-                                                            12579,
-                                                            // Improved Scorch
-                                                            22959};
+    static const uint32 ImprovedScorchExclusiveDebuffs[] = {
+        17794, 17797, 17798, 17799, 17800, // Shadow Mastery
+        12579, // Winter's Chill
+        22959 // Improved Scorch
+    };
 
     for (uint32 spellId : ImprovedScorchExclusiveDebuffs)
     {
@@ -178,8 +174,6 @@ const std::set<uint32> BlizzardChannelCheckTrigger::BLIZZARD_SPELL_IDS = {
 
 bool BlizzardChannelCheckTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-
     // Check if the bot is channeling a spell
     if (Spell* spell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
     {
@@ -200,8 +194,7 @@ bool BlizzardChannelCheckTrigger::IsActive()
 // InDungeonOrRaidTrigger implementation moved to RitualActions.cpp
 
 bool NoRefreshmentTableTrigger::IsActive()
-{
-    
+{ 
     // Check if rituals can be used in current map
     if (!CanUseRituals(bot))
     {
@@ -249,7 +242,6 @@ bool NoRefreshmentTableTrigger::IsActive()
     
     // SIMPLIFIED TO MAXIMUM: Only check if there's a warlock in the group
     bool hasWarlock = false;
-    
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
