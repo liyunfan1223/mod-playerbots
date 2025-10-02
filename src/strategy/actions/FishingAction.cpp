@@ -187,9 +187,10 @@ bool EquipFishingPoleAction::Execute(Event event)
 bool EquipFishingPoleAction::isUseful()
 {
     Item* mainHand = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-    if (isFishingPole(mainHand));
+    if (isFishingPole(mainHand))
+    {
         return false;
-    
+    }
     for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
     {
         if (Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
@@ -197,36 +198,30 @@ bool EquipFishingPoleAction::isUseful()
             if (isFishingPole(item))
             {
                 pole = item;
-                break;
+                return true;
             }
         }
     }
         
-    if (!pole)
+    for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
     {
-        for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+        if (Bag* pBag = bot->GetBagByPos(bag))
         {
-            if (Bag* pBag = bot->GetBagByPos(bag))
+            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
             {
-                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                if (Item* item = pBag->GetItemByPos(j))
                 {
-                    if (Item* item = pBag->GetItemByPos(j))
+                    if (isFishingPole(item))
                     {
-                        if (isFishingPole(item))
-                        {
-                            pole = item;
-                            break;
-                        }
+                        pole = item;
+                        return true;
                     }
                 }
             }
-            if (pole) //Break out if it finds the pole between bags
-                break;
         }
     }
-    if (pole)
-        return true;
-
+    
+    
     if (sRandomPlayerbotMgr->IsRandomBot(bot))
     {
         bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
@@ -284,9 +279,7 @@ bool FishingAction::Execute(Event event)
     EquipFishingPoleAction equipAction(botAI);
     if (equipAction.isUseful())
         return equipAction.Execute(event);
-
     botAI->CastSpell(FISHING_SPELL, bot);
-    botAI->SetNextCheckDelay(500);
     botAI->ChangeStrategy("+use bobber", BOT_STATE_NON_COMBAT);
    
     return true;
