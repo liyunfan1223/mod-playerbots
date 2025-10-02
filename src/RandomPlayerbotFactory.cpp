@@ -875,59 +875,64 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         LOG_INFO("playerbots", "Random bot guilds deleted");
     }
 
-    // Check how many randomBot guilds are in the guild table in the characterDB
+    std::unordered_set<uint32> botAccounts;
+    botAccounts.reserve(sPlayerbotAIConfig->randomBotAccounts.size());
+    for (uint32 acc : sPlayerbotAIConfig->randomBotAccounts)
+        botAccounts.insert(acc);
+
+    // Recount bot guilds directly from the database (does not depend on connected bots)
     uint32 guildNumber = 0;
-    QueryResult guildTableResults = CharacterDatabase.Query("SELECT guildid, leaderguid FROM guild");
-    if (guildTableResults)
+    sPlayerbotAIConfig->randomBotGuilds.clear();
+    sPlayerbotAIConfig->randomBotGuilds.shrink_to_fit(); // avoids accumulating old capacity
+
+    if (!botAccounts.empty())
     {
-        do
+        if (QueryResult res = CharacterDatabase.Query(
+                // We only retrieve what is necessary (guildid, leader account)
+                "SELECT g.guildid, c.account "
+                "FROM guild g JOIN characters c ON g.leaderguid = c.guid"))
         {
-            Field* fields = guildTableResults->Fetch();
-            uint32 guildID = fields[0].Get<uint32>();
-            uint32 leaderGuid = fields[1].Get<uint32>();
-
-            // check the accountID of the guild leader against the list of randomBot accounts to determine if this is a player guild or a bot guild
-            QueryResult charactersTableResults = CharacterDatabase.Query("SELECT account FROM characters WHERE guid = {}", leaderGuid);
-            if (charactersTableResults)
+            do
             {
-                Field* fields2 = charactersTableResults->Fetch();
-                uint32 accountID = fields2[0].Get<uint32>();
+                Field* f = res->Fetch();
+                const uint32 guildId   = f[0].Get<uint32>();
+                const uint32 accountId = f[1].Get<uint32>();
 
-                if(std::find(sPlayerbotAIConfig->randomBotAccounts.begin(),sPlayerbotAIConfig->randomBotAccounts.end(), accountID) != sPlayerbotAIConfig->randomBotAccounts.end())
+                // Boss considered 'bot' if his account is in botAccounts
+                if (botAccounts.find(accountId) != botAccounts.end())
                 {
-                    guildNumber++;
-                    sPlayerbotAIConfig->randomBotGuilds.push_back(guildID);
+                    ++guildNumber;
+                    sPlayerbotAIConfig->randomBotGuilds.push_back(guildId);
                 }
-            }
-        } while (guildTableResults->NextRow());
+            } while (res->NextRow());
+        }
     }
 
-    // Is it worth continuing?
-    LOG_INFO("playerbots", "{}/{} random bot guilds exist in guild table)", guildNumber, sPlayerbotAIConfig->randomBotGuildCount);
+    LOG_INFO("playerbots", "{}/{} random bot guilds exist in guild table",guildNumber, sPlayerbotAIConfig->randomBotGuildCount);
     if (guildNumber >= sPlayerbotAIConfig->randomBotGuildCount)
     {
         LOG_INFO("playerbots", "No new random guilds required");
         return;
     }
-    else
-    {
-        LOG_INFO("playerbots", "Creating {} new random guilds...", sPlayerbotAIConfig->randomBotGuildCount - guildNumber);
-    }
 
-    // Get a list of bots that are logged in and available to lead new guilds
+    // We list the available leaders (online bots, not in guilds)
     GuidVector availableLeaders;
-    for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
+    availableLeaders.reserve(randomBots.size()); // limit reallocs
+    for (const uint32 botLowGuid : randomBots)
     {
-        ObjectGuid leader = ObjectGuid::Create<HighGuid::Player>(*i);
-        if (Guild* guild = sGuildMgr->GetGuildByLeader(leader))
+        ObjectGuid leader = ObjectGuid::Create<HighGuid::Player>(botLowGuid);
+        if (sGuildMgr->GetGuildByLeader(leader))
         {
-            // Bot is already a GM
+            // already GuildLeader -> ignored
+            continue;
         }
         else
         {
-            Player* player = ObjectAccessor::FindPlayer(leader);
-            if (player && !player->GetGuildId())
-                availableLeaders.push_back(leader);
+            if (Player* player = ObjectAccessor::FindPlayer(leader))
+            {
+                if (!player->GetGuildId())
+                    availableLeaders.push_back(leader);
+            }
         }
     }
     LOG_INFO("playerbots", "{} available leaders for new guilds found", availableLeaders.size());
