@@ -23,13 +23,14 @@ static std::unordered_map<uint64, uint32> lastSoulwellInteraction;
 // Cooldown to avoid repeated follow restoration
 static std::unordered_map<uint64, uint32> lastFollowRestoration;
 
+// Track if bot has completed ritual interaction to avoid loops
+std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
+
 // Helper function to get appropriate search range based on map type
 static float GetRitualSearchRange(Player* bot)
 {
     return bot->GetMap()->IsBattleground() ? 100.0f : 30.0f;
 }
-// Track if bot has completed ritual interaction to avoid loops
-std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
 
 // Helper function to check if rituals can be used in current map
 bool CanUseRituals(Player* bot)
@@ -53,8 +54,6 @@ bool CanUseRituals(Player* bot)
 
 bool MoveAwayFromSpawnAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
     if (!CanUseRituals(bot))
         return false;
     
@@ -63,8 +62,6 @@ bool MoveAwayFromSpawnAction::isUseful()
 
 bool MoveAwayFromSpawnAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    
     float x = bot->GetPositionX() + (rand() % 20 - 10);
     float y = bot->GetPositionY() + (rand() % 20 - 10);
     float z = bot->GetPositionZ();
@@ -76,8 +73,6 @@ bool MoveAwayFromSpawnAction::Execute(Event event)
 // InteractWithSoulPortalAction - Interact with Soul Portal to create Soul Well and get Healthstone
 bool InteractWithSoulPortalAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
     // Check if rituals can be used in current map
     if (!CanUseRituals(bot))
         return false;
@@ -96,7 +91,9 @@ bool InteractWithSoulPortalAction::isUseful()
     // Try correct Soul Portal IDs from user
     GameObject* soulPortal = bot->FindNearestGameObject(181622, GetRitualSearchRange(bot)); // Soul Portal Rank 1
     if (!soulPortal)
+    {
         soulPortal = bot->FindNearestGameObject(193168, GetRitualSearchRange(bot)); // Soul Portal Rank 2
+    }
     
     if (!soulPortal)
     {
@@ -108,13 +105,13 @@ bool InteractWithSoulPortalAction::isUseful()
 
 bool InteractWithSoulPortalAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-
     // Search for soul portal nearby (within 30 yards)
     // Try correct Soul Portal IDs from user
     GameObject* soulPortal = bot->FindNearestGameObject(181622, GetRitualSearchRange(bot)); // Soul Portal Rank 1
     if (!soulPortal)
+    {
         soulPortal = bot->FindNearestGameObject(193168, GetRitualSearchRange(bot)); // Soul Portal Rank 2
+    }
     
     if (!soulPortal)
     {
@@ -126,8 +123,7 @@ bool InteractWithSoulPortalAction::Execute(Event event)
     {
         // Move closer to the soul portal using unique movement ID
         uint32 movementId = bot->GetGUID().GetCounter() + 4000; // Unique ID for soul portal movement
-        bot->GetMotionMaster()->MovePoint(movementId, soulPortal->GetPositionX(), soulPortal->GetPositionY(), soulPortal->GetPositionZ());
-        
+        bot->GetMotionMaster()->MovePoint(movementId, soulPortal->GetPositionX(), soulPortal->GetPositionY(), soulPortal->GetPositionZ());      
         return false;
     }
     
@@ -147,8 +143,6 @@ bool InteractWithSoulPortalAction::Execute(Event event)
 // InteractWithRefreshmentPortalAction - Interact with Refreshment Portal to create Refreshment Table
 bool InteractWithRefreshmentPortalAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
     // Check if rituals can be used in current map
     if (!CanUseRituals(bot))
         return false;
@@ -168,13 +162,12 @@ bool InteractWithRefreshmentPortalAction::isUseful()
 
 bool InteractWithRefreshmentPortalAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    
-    
     // Find refreshment portal nearby (both ranks)
     GameObject* refreshmentPortal = bot->FindNearestGameObject(186811, GetRitualSearchRange(bot)); // Refreshment Portal Rank 1
     if (!refreshmentPortal)
+    {
         refreshmentPortal = bot->FindNearestGameObject(193062, GetRitualSearchRange(bot)); // Refreshment Portal Rank 2
+    }
     
     if (!refreshmentPortal)
     {
@@ -198,16 +191,13 @@ bool InteractWithRefreshmentPortalAction::Execute(Event event)
     bot->GetMotionMaster()->Clear();
     bot->GetMotionMaster()->MoveIdle();
     
-        // Don't restore follow behavior immediately - let the ritual complete naturally
-    
+    // Don't restore follow behavior immediately - let the ritual complete naturally
     return true;
 }
 
 // InteractWithRefreshmentTableAction - Interact with Refreshment Table to get food/drink
 bool InteractWithRefreshmentTableAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
     // Check if rituals can be used in current map
     if (!CanUseRituals(bot))
         return false;
@@ -235,7 +225,9 @@ bool InteractWithRefreshmentTableAction::isUseful()
     // Find refreshment table nearby
     GameObject* refreshmentTable = bot->FindNearestGameObject(186812, GetRitualSearchRange(bot)); // Refreshment Table ID
     if (!refreshmentTable)
+    {
         refreshmentTable = bot->FindNearestGameObject(193061, GetRitualSearchRange(bot)); // Refreshment Table Rank 2
+    }
     
     if (!refreshmentTable)
     {
@@ -247,12 +239,12 @@ bool InteractWithRefreshmentTableAction::isUseful()
 
 bool InteractWithRefreshmentTableAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    
     // Find refreshment table nearby (both ranks)
     GameObject* refreshmentTable = bot->FindNearestGameObject(186812, GetRitualSearchRange(bot)); // Refreshment Table Rank 1
     if (!refreshmentTable)
+    {
         refreshmentTable = bot->FindNearestGameObject(193061, GetRitualSearchRange(bot)); // Refreshment Table Rank 2
+    }
     
     if (!refreshmentTable)
     {
@@ -281,7 +273,6 @@ bool InteractWithRefreshmentTableAction::Execute(Event event)
     bot->GetMotionMaster()->MoveIdle();
     
     // Don't restore follow behavior immediately - let the ritual complete naturally
-    
     // Add a delay to prevent spam
     botAI->SetNextCheckDelay(3000); // 3 seconds delay (reduced from 5)
     
@@ -292,9 +283,6 @@ bool InteractWithRefreshmentTableAction::Execute(Event event)
 // SoulPortalAvailableTrigger - Detect if Soul Portal is available (no delay)
 bool SoulPortalAvailableTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    
-    
     if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
     {
         return false;
@@ -346,8 +334,6 @@ bool SoulPortalAvailableTrigger::IsActive()
 // InteractWithSoulwellAction - Interact with Soulwell to get healthstones
 bool InteractWithSoulwellAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
     // Check if rituals can be used in current map
     if (!CanUseRituals(bot))
     {
@@ -385,9 +371,6 @@ bool InteractWithSoulwellAction::isUseful()
 
 bool InteractWithSoulwellAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    
-    
     // Find soulwell nearby (both ranks)
     GameObject* soulwell = bot->FindNearestGameObject(181621, GetRitualSearchRange(bot)); // Soul Well Rank 1
     if (!soulwell)
@@ -436,9 +419,6 @@ bool InteractWithSoulwellAction::Execute(Event event)
 // SoulwellAvailableTrigger - Detect if Soulwell is available to get healthstones
 bool SoulwellAvailableTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    
-    
     // Warlock and Mage should NOT interact with soulwell - they create it
     if (bot->getClass() == CLASS_WARLOCK || bot->getClass() == CLASS_MAGE)
     {
@@ -451,12 +431,13 @@ bool SoulwellAvailableTrigger::IsActive()
     }
     
     // Check if bot needs healthstone
-    bool needsHealthstone = (bot->GetItemCount(5512) == 0 && // Minor Healthstone
-                            bot->GetItemCount(5511) == 0 && // Lesser Healthstone
-                            bot->GetItemCount(9421) == 0 && // Major Healthstone
-                            bot->GetItemCount(19004) == 0 && // Minor Healthstone
-                            bot->GetItemCount(19005) == 0 && // Lesser Healthstone
-                            bot->GetItemCount(36892) == 0);  // Fel Healthstone
+    bool needsHealthstone =
+        bot->GetItemCount(5512) == 0 &&   // Minor Healthstone
+        bot->GetItemCount(5511) == 0 &&   // Lesser Healthstone
+        bot->GetItemCount(9421) == 0 &&   // Major Healthstone
+        bot->GetItemCount(19004) == 0 &&  // Minor Healthstone
+        bot->GetItemCount(19005) == 0 &&  // Lesser Healthstone
+        bot->GetItemCount(36892) == 0;   // Fel Healthstone
 
     if (!needsHealthstone)
     {
@@ -496,28 +477,20 @@ bool SoulwellAvailableTrigger::IsActive()
 // MageRitualWithDelayTrigger - Trigger for mage ritual with delay after detecting soul portal
 bool MageRitualWithDelayTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    
-    
     // Only for mages
     if (bot->getClass() != CLASS_MAGE)
     {
-        {
-        }
         return false;
     }
     
     if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
     {
-        {
-        }
         return false;
     }
     
     // Check if mage has the ritual spell (either rank)
     bool hasSpell1 = bot->HasSpell(43987); // Ritual of Refreshment Rank 1
     bool hasSpell2 = bot->HasSpell(58659); // Ritual of Refreshment Rank 2
-    
     if (!hasSpell1 && !hasSpell2)
     {
         return false;
@@ -537,18 +510,24 @@ bool MageRitualWithDelayTrigger::IsActive()
     bool hasWarlockInGroup = false;
     bool hasWarlockNearby = false;
 
-    if (Group* group = bot->GetGroup()) {
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next()) {
-            if (Player* member = itr->GetSource()) {
-                if (member->getClass() == CLASS_WARLOCK) {
+    if (Group* group = bot->GetGroup()) 
+    {
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next()) 
+        {
+            if (Player* member = itr->GetSource()) 
+            {
+                if (member->getClass() == CLASS_WARLOCK)
+                {
                     // In Battlegrounds, only consider same faction. In dungeons, consider all
                     bool isSameFaction = (member->GetTeamId() == bot->GetTeamId());
                     bool shouldConsider = bot->GetMap()->IsBattleground() ? isSameFaction : true;
                     
-                    if (shouldConsider) {
+                    if (shouldConsider) 
+                    {
                         hasWarlockInGroup = true;
                         // Check if the Warlock is nearby (same area)
-                        if (bot->GetDistance(member) < 100.0f) {
+                        if (bot->GetDistance(member) < 100.0f) 
+                        {
                             hasWarlockNearby = true;
                         }
                     }
@@ -564,9 +543,12 @@ bool MageRitualWithDelayTrigger::IsActive()
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(bot, nearbyPlayers, check);
         Cell::VisitObjects(bot, searcher, 150.0f);
         
-        for (Player* nearbyPlayer : nearbyPlayers) {
+        for (Player* nearbyPlayer : nearbyPlayers) 
+        {
             if (nearbyPlayer->getClass() == CLASS_WARLOCK && 
-                nearbyPlayer->GetTeamId() == bot->GetTeamId()) { // Only same faction in BG
+                nearbyPlayer->GetTeamId() == bot->GetTeamId()) 
+            { 
+                // Only same faction in BG
                 hasWarlockNearby = true;
                 break;
             }
@@ -598,13 +580,7 @@ bool MageRitualWithDelayTrigger::IsActive()
         
         // Check if enough time has passed (approximately 1 second delay)
         uint32 timePassed = detectionCounter - it->second;
-        
-        if (timePassed >= 10) // Approximately 1 second with 10 calls per second
-        {
-            return true; // Delay completed, allow ritual casting
-        }
-        
-        return false; // Still waiting for delay
+        return timePassed >= 10 // Delay completed, allow ritual casting
     }
     else
     {
@@ -626,8 +602,6 @@ bool MageRitualWithDelayTrigger::IsActive()
 // RefreshmentPortalAvailableTrigger - Detect if Refreshment Portal is available
 bool RefreshmentPortalAvailableTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    
     if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
         return false;
     
@@ -641,14 +615,11 @@ bool RefreshmentPortalAvailableTrigger::IsActive()
         return true;
     }
     
-    
     return false;
 }
 
 bool RefreshmentTableAvailableTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    
     // Warlock and Mage should NOT interact with refreshment table - they create it
     if (bot->getClass() == CLASS_WARLOCK || bot->getClass() == CLASS_MAGE)
     {
@@ -673,14 +644,11 @@ bool RefreshmentTableAvailableTrigger::IsActive()
 
 bool InDungeonOrRaidTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
     return CanUseRituals(bot);
 }
 
 bool NeedsConjuredItemsTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    
     // Warlock and Mage should NOT check for conjured items - they create them
     if (bot->getClass() == CLASS_WARLOCK || bot->getClass() == CLASS_MAGE)
     {
@@ -692,36 +660,40 @@ bool NeedsConjuredItemsTrigger::IsActive()
         return false;
     
     // Check if bot needs healthstone
-    bool needsHealthstone = (bot->GetItemCount(5512) == 0 && // Minor Healthstone
-                            bot->GetItemCount(5511) == 0 && // Lesser Healthstone
-                            bot->GetItemCount(9421) == 0 && // Major Healthstone
-                            bot->GetItemCount(19004) == 0 && // Minor Healthstone
-                            bot->GetItemCount(19005) == 0);  // Lesser Healthstone
+    bool needsHealthstone = 
+        bot->GetItemCount(5512) == 0 && // Minor Healthstone
+        bot->GetItemCount(5511) == 0 && // Lesser Healthstone
+        bot->GetItemCount(9421) == 0 && // Major Healthstone
+        bot->GetItemCount(19004) == 0 && // Minor Healthstone
+        bot->GetItemCount(19005) == 0;  // Lesser Healthstone
     
     // Check if bot needs food/drink
-    bool needsFoodDrink = (bot->GetItemCount(43523) < 20 && // Conjured Mana Biscuit
-                          bot->GetItemCount(43518) < 20 && // Conjured Mana Strudel
-                          bot->GetItemCount(43517) < 20 && // Conjured Mana Cookie
-                          bot->GetItemCount(43516) < 20 && // Conjured Mana Cake
-                          bot->GetItemCount(43515) < 20 && // Conjured Mana Pie
-                          bot->GetItemCount(43514) < 20 && // Conjured Mana Bread
-                          bot->GetItemCount(43513) < 20 && // Conjured Mana Muffin
-                          bot->GetItemCount(43512) < 20 && // Conjured Mana Donut
-                          bot->GetItemCount(43511) < 20 && // Conjured Mana Bagel
-                          bot->GetItemCount(43510) < 20 && // Conjured Mana Pretzel
-                          bot->GetItemCount(43519) < 20 && // Conjured Mana Water
-                          bot->GetItemCount(43520) < 20 && // Conjured Mana Juice
-                          bot->GetItemCount(43521) < 20 && // Conjured Mana Tea
-                          bot->GetItemCount(43522) < 20);  // Conjured Mana Coffee
+    bool needsFoodDrink = 
+        bot->GetItemCount(43523) < 20 && // Conjured Mana Biscuit
+        bot->GetItemCount(43518) < 20 && // Conjured Mana Strudel
+        bot->GetItemCount(43517) < 20 && // Conjured Mana Cookie
+        bot->GetItemCount(43516) < 20 && // Conjured Mana Cake
+        bot->GetItemCount(43515) < 20 && // Conjured Mana Pie
+        bot->GetItemCount(43514) < 20 && // Conjured Mana Bread
+        bot->GetItemCount(43513) < 20 && // Conjured Mana Muffin
+        bot->GetItemCount(43512) < 20 && // Conjured Mana Donut
+        bot->GetItemCount(43511) < 20 && // Conjured Mana Bagel
+        bot->GetItemCount(43510) < 20 && // Conjured Mana Pretzel
+        bot->GetItemCount(43519) < 20 && // Conjured Mana Water
+        bot->GetItemCount(43520) < 20 && // Conjured Mana Juice
+        bot->GetItemCount(43521) < 20 && // Conjured Mana Tea
+        bot->GetItemCount(43522) < 20;  // Conjured Mana Coffee
     
     // Check if there are conjured objects nearby that we can interact with
-    bool hasSoulwell = (bot->FindNearestGameObject(181621, GetRitualSearchRange(bot)) || // Soul Well Rank 1
-                       bot->FindNearestGameObject(193169, GetRitualSearchRange(bot)) || // Soul Well Rank 2
-                       bot->FindNearestGameObject(193170, GetRitualSearchRange(bot)) || // Soul Well Rank 2 variant
-                       bot->FindNearestGameObject(193171, GetRitualSearchRange(bot)));  // Soul Well Rank 2 variant
+    bool hasSoulwell = 
+        bot->FindNearestGameObject(181621, GetRitualSearchRange(bot)) || // Soul Well Rank 1
+        bot->FindNearestGameObject(193169, GetRitualSearchRange(bot)) || // Soul Well Rank 2
+        bot->FindNearestGameObject(193170, GetRitualSearchRange(bot)) || // Soul Well Rank 2 variant
+        bot->FindNearestGameObject(193171, GetRitualSearchRange(bot));  // Soul Well Rank 2 variant
     
-    bool hasRefreshmentTable = (bot->FindNearestGameObject(186812, GetRitualSearchRange(bot)) || // Refreshment Table Rank 1
-                               bot->FindNearestGameObject(193061, GetRitualSearchRange(bot)));   // Refreshment Table Rank 2
+    bool hasRefreshmentTable =
+        bot->FindNearestGameObject(186812, GetRitualSearchRange(bot)) || // Refreshment Table Rank 1
+        bot->FindNearestGameObject(193061, GetRitualSearchRange(bot));   // Refreshment Table Rank 2
     
     // Return true if bot needs items and there are objects to interact with
     return (needsHealthstone && hasSoulwell) || (needsFoodDrink && hasRefreshmentTable);
@@ -730,43 +702,45 @@ bool NeedsConjuredItemsTrigger::IsActive()
 // CheckConjuredItemsAction - Check if bot needs conjured items and re-interact if necessary
 bool CheckConjuredItemsAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
     // Check if rituals can be used in current map
     if (!CanUseRituals(bot))
         return false;
     
     // Check if bot needs healthstone
-    bool needsHealthstone = (bot->GetItemCount(5512) == 0 && // Minor Healthstone
-                            bot->GetItemCount(5511) == 0 && // Lesser Healthstone
-                            bot->GetItemCount(9421) == 0 && // Major Healthstone
-                            bot->GetItemCount(19004) == 0 && // Minor Healthstone
-                            bot->GetItemCount(19005) == 0);  // Lesser Healthstone
+    bool needsHealthstone = 
+        bot->GetItemCount(5512) == 0 && // Minor Healthstone
+        bot->GetItemCount(5511) == 0 && // Lesser Healthstone
+        bot->GetItemCount(9421) == 0 && // Major Healthstone
+        bot->GetItemCount(19004) == 0 && // Minor Healthstone
+        bot->GetItemCount(19005) == 0;  // Lesser Healthstone
     
     // Check if bot needs food/drink
-    bool needsFoodDrink = (bot->GetItemCount(43523) < 20 && // Conjured Mana Biscuit
-                          bot->GetItemCount(43518) < 20 && // Conjured Mana Strudel
-                          bot->GetItemCount(43517) < 20 && // Conjured Mana Cookie
-                          bot->GetItemCount(43516) < 20 && // Conjured Mana Cake
-                          bot->GetItemCount(43515) < 20 && // Conjured Mana Pie
-                          bot->GetItemCount(43514) < 20 && // Conjured Mana Bread
-                          bot->GetItemCount(43513) < 20 && // Conjured Mana Muffin
-                          bot->GetItemCount(43512) < 20 && // Conjured Mana Donut
-                          bot->GetItemCount(43511) < 20 && // Conjured Mana Bagel
-                          bot->GetItemCount(43510) < 20 && // Conjured Mana Pretzel
-                          bot->GetItemCount(43519) < 20 && // Conjured Mana Water
-                          bot->GetItemCount(43520) < 20 && // Conjured Mana Juice
-                          bot->GetItemCount(43521) < 20 && // Conjured Mana Tea
-                          bot->GetItemCount(43522) < 20);  // Conjured Mana Coffee
+    bool needsFoodDrink =
+        bot->GetItemCount(43523) < 20 && // Conjured Mana Biscuit
+        bot->GetItemCount(43518) < 20 && // Conjured Mana Strudel
+        bot->GetItemCount(43517) < 20 && // Conjured Mana Cookie
+        bot->GetItemCount(43516) < 20 && // Conjured Mana Cake
+        bot->GetItemCount(43515) < 20 && // Conjured Mana Pie
+        bot->GetItemCount(43514) < 20 && // Conjured Mana Bread
+        bot->GetItemCount(43513) < 20 && // Conjured Mana Muffin
+        bot->GetItemCount(43512) < 20 && // Conjured Mana Donut
+        bot->GetItemCount(43511) < 20 && // Conjured Mana Bagel
+        bot->GetItemCount(43510) < 20 && // Conjured Mana Pretzel
+        bot->GetItemCount(43519) < 20 && // Conjured Mana Water
+        bot->GetItemCount(43520) < 20 && // Conjured Mana Juice
+        bot->GetItemCount(43521) < 20 && // Conjured Mana Tea
+        bot->GetItemCount(43522) < 20;  // Conjured Mana Coffee
     
     // Check if there are conjured objects nearby that we can interact with
-    bool hasSoulwell = (bot->FindNearestGameObject(181621, GetRitualSearchRange(bot)) || // Soul Well Rank 1
-                       bot->FindNearestGameObject(193169, GetRitualSearchRange(bot)) || // Soul Well Rank 2
-                       bot->FindNearestGameObject(193170, GetRitualSearchRange(bot)) || // Soul Well Rank 2 variant
-                       bot->FindNearestGameObject(193171, GetRitualSearchRange(bot)));  // Soul Well Rank 2 variant
+    bool hasSoulwell =
+        bot->FindNearestGameObject(181621, GetRitualSearchRange(bot)) || // Soul Well Rank 1
+        bot->FindNearestGameObject(193169, GetRitualSearchRange(bot)) || // Soul Well Rank 2
+        bot->FindNearestGameObject(193170, GetRitualSearchRange(bot)) || // Soul Well Rank 2 variant
+        bot->FindNearestGameObject(193171, GetRitualSearchRange(bot));  // Soul Well Rank 2 variant
     
-    bool hasRefreshmentTable = (bot->FindNearestGameObject(186812, GetRitualSearchRange(bot)) || // Refreshment Table Rank 1
-                               bot->FindNearestGameObject(193061, GetRitualSearchRange(bot)));   // Refreshment Table Rank 2
+    bool hasRefreshmentTable = 
+        bot->FindNearestGameObject(186812, GetRitualSearchRange(bot)) || // Refreshment Table Rank 1
+        bot->FindNearestGameObject(193061, GetRitualSearchRange(bot));   // Refreshment Table Rank 2
     
     // Return true if bot needs items and there are objects to interact with
     return (needsHealthstone && hasSoulwell) || (needsFoodDrink && hasRefreshmentTable);
@@ -774,15 +748,14 @@ bool CheckConjuredItemsAction::isUseful()
 
 bool CheckConjuredItemsAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    
     // Check if bot needs healthstone and there's a soulwell nearby
-    bool needsHealthstone = (bot->GetItemCount(5512) == 0 && // Minor Healthstone
-                            bot->GetItemCount(5511) == 0 && // Lesser Healthstone
-                            bot->GetItemCount(9421) == 0 && // Major Healthstone
-                            bot->GetItemCount(19004) == 0 && // Minor Healthstone
-                            bot->GetItemCount(19005) == 0 && // Lesser Healthstone
-                            bot->GetItemCount(36892) == 0);  // Fel Healthstone
+    bool needsHealthstone =
+        bot->GetItemCount(5512) == 0 && // Minor Healthstone
+        bot->GetItemCount(5511) == 0 && // Lesser Healthstone
+        bot->GetItemCount(9421) == 0 && // Major Healthstone
+        bot->GetItemCount(19004) == 0 && // Minor Healthstone
+        bot->GetItemCount(19005) == 0 && // Lesser Healthstone
+        bot->GetItemCount(36892) == 0;  // Fel Healthstone
     
     if (needsHealthstone)
     {
@@ -813,27 +786,30 @@ bool CheckConjuredItemsAction::Execute(Event event)
     }
     
     // Check if bot needs food/drink and there's a refreshment table nearby
-    bool needsFoodDrink = (bot->GetItemCount(43523) < 20 && // Conjured Mana Biscuit
-                          bot->GetItemCount(43518) < 20 && // Conjured Mana Strudel
-                          bot->GetItemCount(43517) < 20 && // Conjured Mana Cookie
-                          bot->GetItemCount(43516) < 20 && // Conjured Mana Cake
-                          bot->GetItemCount(43515) < 20 && // Conjured Mana Pie
-                          bot->GetItemCount(43514) < 20 && // Conjured Mana Bread
-                          bot->GetItemCount(43513) < 20 && // Conjured Mana Muffin
-                          bot->GetItemCount(43512) < 20 && // Conjured Mana Donut
-                          bot->GetItemCount(43511) < 20 && // Conjured Mana Bagel
-                          bot->GetItemCount(43510) < 20 && // Conjured Mana Pretzel
-                          bot->GetItemCount(43519) < 20 && // Conjured Mana Water
-                          bot->GetItemCount(43520) < 20 && // Conjured Mana Juice
-                          bot->GetItemCount(43521) < 20 && // Conjured Mana Tea
-                          bot->GetItemCount(43522) < 20);  // Conjured Mana Coffee
+    bool needsFoodDrink = 
+        bot->GetItemCount(43523) < 20 && // Conjured Mana Biscuit
+        bot->GetItemCount(43518) < 20 && // Conjured Mana Strudel
+        bot->GetItemCount(43517) < 20 && // Conjured Mana Cookie
+        bot->GetItemCount(43516) < 20 && // Conjured Mana Cake
+        bot->GetItemCount(43515) < 20 && // Conjured Mana Pie
+        bot->GetItemCount(43514) < 20 && // Conjured Mana Bread
+        bot->GetItemCount(43513) < 20 && // Conjured Mana Muffin
+        bot->GetItemCount(43512) < 20 && // Conjured Mana Donut
+        bot->GetItemCount(43511) < 20 && // Conjured Mana Bagel
+        bot->GetItemCount(43510) < 20 && // Conjured Mana Pretzel
+        bot->GetItemCount(43519) < 20 && // Conjured Mana Water
+        bot->GetItemCount(43520) < 20 && // Conjured Mana Juice
+        bot->GetItemCount(43521) < 20 && // Conjured Mana Tea
+        bot->GetItemCount(43522) < 20;  // Conjured Mana Coffee
     
     if (needsFoodDrink)
     {
-    // Find refreshment table nearby
-    GameObject* refreshmentTable = bot->FindNearestGameObject(186812, GetRitualSearchRange(bot)); // Refreshment Table Rank 1
-    if (!refreshmentTable)
-        refreshmentTable = bot->FindNearestGameObject(193061, GetRitualSearchRange(bot)); // Refreshment Table Rank 2
+        // Find refreshment table nearby
+        GameObject* refreshmentTable = bot->FindNearestGameObject(186812, GetRitualSearchRange(bot)); // Refreshment Table Rank 1
+        if (!refreshmentTable)
+        {
+            refreshmentTable = bot->FindNearestGameObject(193061, GetRitualSearchRange(bot)); // Refreshment Table Rank 2
+        }
         
         if (refreshmentTable)
         {
@@ -882,11 +858,13 @@ bool HasRitualComponent(Player* bot, uint32 spellId)
 // NeedsFollowRestorationTrigger - Detects when a bot needs to restore follow behavior
 bool NeedsFollowRestorationTrigger::IsActive()
 {
-    Player* bot = botAI->GetBot();
-    
     // Only active in dungeons/raids/bgs
-    if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
+    if (!bot->GetMap()->IsDungeon() && 
+        !bot->GetMap()->IsRaid() && 
+        !bot->GetMap()->IsBattleground())
+    {
         return false;
+    }
     
     // Only active if bot has follow strategy
     if (!botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))
@@ -926,8 +904,13 @@ bool NeedsFollowRestorationTrigger::IsActive()
     }
     
     // Check if bot already has necessary items (indicating it completed the interaction)
-    bool hasHealthstone = bot->HasItemCount(5512, 1) || bot->HasItemCount(5511, 1) || bot->HasItemCount(9421, 1) || 
-                         bot->HasItemCount(19004, 1) || bot->HasItemCount(19005, 1) || bot->HasItemCount(36892, 1);
+    bool hasHealthstone = 
+        bot->HasItemCount(5512, 1) || 
+        bot->HasItemCount(5511, 1) || 
+        bot->HasItemCount(9421, 1) || 
+        bot->HasItemCount(19004, 1) || 
+        bot->HasItemCount(19005, 1) || 
+        bot->HasItemCount(36892, 1);
     
     bool hasRefreshment = bot->HasItemCount(43523, 1); // Conjured Mana Strudel
     
@@ -943,8 +926,6 @@ bool NeedsFollowRestorationTrigger::IsActive()
 // RestoreFollowBehaviorAction - Restore follow behavior
 bool RestoreFollowBehaviorAction::isUseful()
 {
-    Player* bot = botAI->GetBot();
-    
     // Only useful in dungeons/raids/bgs
     if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
         return false;
@@ -967,9 +948,6 @@ bool RestoreFollowBehaviorAction::isUseful()
 
 bool RestoreFollowBehaviorAction::Execute(Event event)
 {
-    Player* bot = botAI->GetBot();
-    
-    
     // Record restoration time to avoid loops
     uint32 currentTime = time(nullptr);
     uint64 botGuid = bot->GetGUID().GetCounter();
@@ -981,16 +959,13 @@ bool RestoreFollowBehaviorAction::Execute(Event event)
     // Try to find master to follow
     Unit* master = botAI->GetGroupMaster();
     if (master && master != bot)
-    {
-        
+    {        
         // Use direct follow approach
-        bot->GetMotionMaster()->MoveFollow(master, sPlayerbotAIConfig->followDistance, 0.0f);
-        
+        bot->GetMotionMaster()->MoveFollow(master, sPlayerbotAIConfig->followDistance, 0.0f);    
         return true;
     }
     else
-    {
-        
+    {        
         // Fallback to DoSpecificAction
         bool followResult = botAI->DoSpecificAction("follow", Event(), true);
         
