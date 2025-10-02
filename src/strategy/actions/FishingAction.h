@@ -35,6 +35,8 @@ public:
     EquipFishingPoleAction(PlayerbotAI* botAI) : Action(botAI, "equip fishing pole") {}
     bool Execute(Event event) override;
     bool isUseful() override;
+private:
+    Item* pole = nullptr;
 };
 
 class MoveToFishAction : public MovementAction, public Qualified
