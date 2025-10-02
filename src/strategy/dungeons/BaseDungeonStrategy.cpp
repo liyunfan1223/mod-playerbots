@@ -1,6 +1,7 @@
 #include "BaseDungeonStrategy.h"
 #include "GenericWarlockNonCombatStrategy.h"
 #include "GenericTriggers.h"
+#include "PlayerbotAI.h"
 
 void BaseDungeonStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 {
