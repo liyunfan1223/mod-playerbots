@@ -236,7 +236,7 @@ ItemUsage ItemUsageValue::Calculate()
 
 ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, int32 randomPropertyId)
 {
-    if (bot->CanUseItem(itemProto) != EQUIP_ERR_OK)
+    if (bot->BotCanUseItem(itemProto) != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
 
     if (itemProto->InventoryType == INVTYPE_NON_EQUIP)
