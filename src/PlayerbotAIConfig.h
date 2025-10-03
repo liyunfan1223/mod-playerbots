@@ -247,8 +247,6 @@ public:
     std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
     bool applyInstanceStrategies;
     uint32 randomBotMinLevel, randomBotMaxLevel;
-    uint32 randomBotMinLoginLevel, randomBotMaxLoginLevel;
-    bool randomBotLogoutOutsideLoginRange;
     float randomChangeMultiplier;
 
     // std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
