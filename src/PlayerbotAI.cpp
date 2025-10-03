@@ -1513,19 +1513,22 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
     switch (mapId)
     {
         case 249:
-            strategyName = "onyxia";
+			strategyName = "onyxia";  // Onyxia's Lair
             break;
         case 409:
-            strategyName = "mc";
+			strategyName = "mc";  // Molten Core
             break;
         case 469:
-            strategyName = "bwl";
+			strategyName = "bwl";  // Blackwing Lair
             break;
         case 509:
-            strategyName = "aq20";
+			strategyName = "aq20";  // Ruins of Ahn'Qiraj
+            break;
+        case 532:
+            strategyName = "karazhan";  // Karazhan
             break;
         case 533:
-            strategyName = "naxx";
+			strategyName = "naxx";  // Naxxramas
             break;
         case 574:
             strategyName = "wotlk-uk";  // Utgarde Keep

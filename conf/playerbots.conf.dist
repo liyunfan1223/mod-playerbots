@@ -443,7 +443,7 @@ AiPlayerbot.AutoAvoidAoe = 1
 AiPlayerbot.MaxAoeAvoidRadius = 15.0
 
 # A whitelist of aoe spell IDs that should not be avoided
-AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810
+AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810,29946
 
 # Enable healer bot save mana strategy
 # Default: 1 (enabled)
