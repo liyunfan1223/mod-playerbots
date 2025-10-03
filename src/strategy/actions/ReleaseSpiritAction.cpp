@@ -147,6 +147,7 @@ bool AutoReleaseSpiritAction::HandleBattlegroundSpiritHealer()
         // and in IOC it's not within clicking range when they res in own base
 
         // Teleport to nearest friendly Spirit Healer when not currently in range of one.
+        bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
         bot->TeleportTo(bot->GetMapId(), spiritHealer->GetPositionX(), spiritHealer->GetPositionY(), spiritHealer->GetPositionZ(), 0.f);
         RESET_AI_VALUE(bool, "combat::self target");
         RESET_AI_VALUE(WorldPosition, "current position");
@@ -244,6 +245,7 @@ int64 RepopAction::CalculateDeadTime() const
 
 void RepopAction::PerformGraveyardTeleport(const GraveyardStruct* graveyard) const
 {
+    bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
     bot->TeleportTo(graveyard->Map, graveyard->x, graveyard->y, graveyard->z, 0.f);
     RESET_AI_VALUE(bool, "combat::self target");
     RESET_AI_VALUE(WorldPosition, "current position");

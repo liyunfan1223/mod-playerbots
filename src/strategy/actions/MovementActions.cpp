@@ -1148,6 +1148,7 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
             if ((target->GetMap() && target->GetMap()->IsBattlegroundOrArena()) || (bot->GetMap() &&
     bot->GetMap()->IsBattlegroundOrArena())) return false;
 
+            bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
             bot->TeleportTo(target->GetMapId(), x, y, z, bot->GetOrientation());
         }
         else
@@ -1175,6 +1176,7 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
 
         bot->CombatStop(true);
         botAI->TellMasterNoFacing("I will there soon.");
+        bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
         bot->TeleportTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),
     target->GetOrientation()); return false;
     }
