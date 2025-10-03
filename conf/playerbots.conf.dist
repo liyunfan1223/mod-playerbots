@@ -501,9 +501,9 @@ AiPlayerbot.AltMaintenanceBags = 1
 AiPlayerbot.AltMaintenanceMounts = 1
 AiPlayerbot.AltMaintenanceSkills = 1
 
-AiPlayerbot.AltMaintenanceClassSpells = 1	# Spells from quests (tame/summon pets, totems, druid forms, etc)
-AiPlayerbot.AltMaintenanceAvailableSpells = 1	# Spells learnable from trainer
-AiPlayerbot.AltMaintenanceSpecialSpells = 1	# Leave DK starting area
+AiPlayerbot.AltMaintenanceClassSpells = 1        # Spells from quests (tame/summon pets, totems, druid forms, etc)
+AiPlayerbot.AltMaintenanceAvailableSpells = 1    # Spells learnable from trainer
+AiPlayerbot.AltMaintenanceSpecialSpells = 1      # Leave DK starting area
 AiPlayerbot.AltMaintenanceTalentTree = 1
 AiPlayerbot.AltMaintenanceGlyphs = 1
 AiPlayerbot.AltMaintenanceGemsEnchants = 1
@@ -514,7 +514,6 @@ AiPlayerbot.AltMaintenancePetTalents = 1
 AiPlayerbot.AltMaintenanceReputation = 1
 AiPlayerbot.AltMaintenanceAttunementQuests = 1
 AiPlayerbot.AltMaintenanceKeyring = 1
-
 
 # Enable/Disable autogear command, which automatically upgrades bots' gear; the quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
 # Default: 1 (enabled)
