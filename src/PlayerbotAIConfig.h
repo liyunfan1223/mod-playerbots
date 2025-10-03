@@ -393,6 +393,25 @@ public:
     int32 addClassCommand;
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
+    bool altMaintenanceAttunementQs,
+            altMaintenanceBags,
+            altMaintenanceAmmo,
+            altMaintenanceFood,
+            altMaintenanceReagents,
+            altMaintenanceConsumables,
+            altMaintenancePotions,
+            altMaintenanceTalentTree,
+            altMaintenancePet,
+            altMaintenancePetTalents,
+            altMaintenanceClassSpells,
+            altMaintenanceAvailableSpells,
+            altMaintenanceSkills,
+            altMaintenanceReputation,
+            altMaintenanceSpecialSpells,
+            altMaintenanceMounts,
+            altMaintenanceGlyphs,
+            altMaintenanceKeyring,
+            altMaintenanceGemsEnchants;
     int32 autoGearCommand, autoGearCommandAltBots, autoGearQualityLimit, autoGearScoreLimit;
 
     uint32 useGroundMountAtMinLevel;
