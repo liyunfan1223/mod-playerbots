@@ -193,14 +193,6 @@ public:
     void AssignAccountTypes();
     bool IsAccountType(uint32 accountId, uint8 accountType);
 
-    // Allowed login range management
-    void ForceRecount() { SetEventValue(0, "bot_count", 0, 0); }
-    void MarkBotForLogout(uint32 bot)
-    {
-        SetEventValue(bot, "add", 0, 0);        // Clear the "add" event to trigger logout
-        SetEventValue(bot, "logout", 1, 1);     // Also set logout for clarity
-    }
-
 protected:
     void OnBotLoginInternal(Player* const bot) override;
 
@@ -244,16 +236,6 @@ private:
     // Account lists
     std::vector<uint32> rndBotTypeAccounts;             // Accounts marked as RNDbot (type 1)
     std::vector<uint32> addClassTypeAccounts;           // Accounts marked as AddClass (type 2)
-
-    // Login level filtering
-    bool levelFilterAdjusted = false;
-    void PopulateEligibleBots();
-    bool IsLevelFilterActive() const
-    {
-        return sPlayerbotAIConfig &&
-               (sPlayerbotAIConfig->randomBotMinLoginLevel > 1 ||
-                sPlayerbotAIConfig->randomBotMaxLoginLevel < 80);
-    }
 
     //void ScaleBotActivity();      // Deprecated function
 };
