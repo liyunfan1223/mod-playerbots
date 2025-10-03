@@ -5,6 +5,7 @@
 #include "RaidAq20Strategy.h"
 #include "RaidMcStrategy.h"
 #include "RaidBwlStrategy.h"
+#include "RaidKarazhanStrategy.h"
 #include "RaidGruulsLairStrategy.h"
 #include "RaidNaxxStrategy.h"
 #include "RaidOsStrategy.h"
@@ -22,6 +23,7 @@ public:
         creators["aq20"] = &RaidStrategyContext::aq20;
         creators["mc"] = &RaidStrategyContext::mc;
         creators["bwl"] = &RaidStrategyContext::bwl;
+        creators["karazhan"] = &RaidStrategyContext::karazhan;
         creators["gruulslair"] = &RaidStrategyContext::gruulslair;
         creators["naxx"] = &RaidStrategyContext::naxx;
         creators["wotlk-os"] = &RaidStrategyContext::wotlk_os;
@@ -36,6 +38,7 @@ private:
     static Strategy* aq20(PlayerbotAI* botAI) { return new RaidAq20Strategy(botAI); }
     static Strategy* mc(PlayerbotAI* botAI) { return new RaidMcStrategy(botAI); }
     static Strategy* bwl(PlayerbotAI* botAI) { return new RaidBwlStrategy(botAI); }
+    static Strategy* karazhan(PlayerbotAI* botAI) { return new RaidKarazhanStrategy(botAI); }
     static Strategy* gruulslair(PlayerbotAI* botAI) { return new RaidGruulsLairStrategy(botAI); }
     static Strategy* naxx(PlayerbotAI* botAI) { return new RaidNaxxStrategy(botAI); }
     static Strategy* wotlk_os(PlayerbotAI* botAI) { return new RaidOsStrategy(botAI); }

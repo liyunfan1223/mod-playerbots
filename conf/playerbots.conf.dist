@@ -443,7 +443,7 @@ AiPlayerbot.AutoAvoidAoe = 1
 AiPlayerbot.MaxAoeAvoidRadius = 15.0
 
 # A whitelist of aoe spell IDs that should not be avoided
-AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810
+AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810,29946
 
 # Enable healer bot save mana strategy
 # Default: 1 (enabled)
@@ -569,9 +569,20 @@ AiPlayerbot.RandomBotRandomPassword = 0
 # Prefix for account names to create for randombots
 AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 
-# Minimum and maximum levels for randombots
+# Minimum and maximum initialization levels for randombots
 AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
+
+# Minimum and maximum level range for randombots allowed to login
+# If level filtration is used, minRandomBots and maxRandomBots might be automatically adjusted to lower values,
+# depending on available eligible bots in the database
+# Default Min,Max: 1,80 (no level filtration)
+AiPlayerbot.RandomBotMinLoginLevel = 1
+AiPlayerbot.RandomBotMaxLoginLevel = 80
+
+# log-out randombots if they they level outside the allowed login range
+# Default: 0 (disabled)
+AiPlayerbot.RandomBotLogoutOutsideLoginRange = 0
 
 # Sync max randombot level with max level of online players
 # Default: 0 (disabled)

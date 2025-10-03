@@ -37,6 +37,8 @@
 #include "raids/moltencore/RaidMcTriggerContext.h"
 #include "raids/blackwinglair/RaidBwlActionContext.h"
 #include "raids/blackwinglair/RaidBwlTriggerContext.h"
+#include "raids/karazhan/RaidKarazhanActionContext.h"
+#include "raids/karazhan/RaidKarazhanTriggerContext.h"
 #include "raids/gruulslair/RaidGruulsLairActionContext.h"
 #include "raids/gruulslair/RaidGruulsLairTriggerContext.h"
 #include "raids/naxxramas/RaidNaxxActionContext.h"
@@ -110,6 +112,7 @@ void AiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Act
     actionContexts.Add(new RaidAq20ActionContext());
     actionContexts.Add(new RaidMcActionContext());
     actionContexts.Add(new RaidBwlActionContext());
+    actionContexts.Add(new RaidKarazhanActionContext());
     actionContexts.Add(new RaidGruulsLairActionContext());
     actionContexts.Add(new RaidNaxxActionContext());
     actionContexts.Add(new RaidOsActionContext());
@@ -140,6 +143,18 @@ void AiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Tr
     triggerContexts.Add(new TriggerContext());
     triggerContexts.Add(new ChatTriggerContext());
     triggerContexts.Add(new WorldPacketTriggerContext());
+    triggerContexts.Add(new RaidAq20TriggerContext());
+    triggerContexts.Add(new RaidMcTriggerContext());
+    triggerContexts.Add(new RaidBwlTriggerContext());
+    triggerContexts.Add(new RaidKarazhanTriggerContext());
+    triggerContexts.Add(new RaidGruulsLairTriggerContext());
+    triggerContexts.Add(new RaidNaxxTriggerContext());
+    triggerContexts.Add(new RaidOsTriggerContext());
+    triggerContexts.Add(new RaidEoETriggerContext());
+    triggerContexts.Add(new RaidVoATriggerContext());
+    triggerContexts.Add(new RaidUlduarTriggerContext());
+    triggerContexts.Add(new RaidOnyxiaTriggerContext());
+    triggerContexts.Add(new RaidIccTriggerContext());
     triggerContexts.Add(new WotlkDungeonUKTriggerContext());
     triggerContexts.Add(new WotlkDungeonNexTriggerContext());
     triggerContexts.Add(new WotlkDungeonANTriggerContext());
