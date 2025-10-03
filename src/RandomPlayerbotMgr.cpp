@@ -53,6 +53,7 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "World.h"
+#include "Group.h"
 
 struct GuidClassRaceInfo
 {
@@ -1636,8 +1637,17 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
     Group* group = player->GetGroup();
     if (group && !group->isLFGGroup() && IsRandomBot(group->GetLeader()))
     {
-        player->RemoveFromGroup();
-        LOG_INFO("playerbots", "Bot {} remove from group since leader is random bot.", player->GetName().c_str());
+        if (group->IsMember(player->GetGUID()))
+        {
+            LOG_DEBUG("playerbots", "RandomPlayerbotMgr: {} leaving group (leader is random bot, members before: {}).",
+                     player->GetName().c_str(), uint32(group->GetMembersCount()));
+            player->RemoveFromGroup();
+            LOG_DEBUG("playerbots", "RandomPlayerbotMgr: {} left group successfully.", player->GetName().c_str());
+        }
+        else
+        {
+            LOG_DEBUG("playerbots", "RandomPlayerbotMgr: {} not a member anymore, skip removal.", player->GetName().c_str());
+        }
     }
 
     // only randomize and teleport idle bots
@@ -2540,8 +2550,13 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     if (GET_PLAYERBOT_AI(bot))
         GET_PLAYERBOT_AI(bot)->Reset(true);
 
-    if (bot->GetGroup())
-        bot->RemoveFromGroup();
+    if (Group* g = bot->GetGroup())
+    {
+        if (g->IsMember(bot->GetGUID()))
+        {
+            bot->RemoveFromGroup();
+        }
+    }
 
     if (pmo)
         pmo->finish();
@@ -2581,8 +2596,13 @@ void RandomPlayerbotMgr::RandomizeMin(Player* bot)
     if (GET_PLAYERBOT_AI(bot))
         GET_PLAYERBOT_AI(bot)->Reset(true);
 
-    if (bot->GetGroup())
-        bot->RemoveFromGroup();
+    if (Group* g = bot->GetGroup())
+    {
+        if (g->IsMember(bot->GetGUID()))
+        {
+            bot->RemoveFromGroup();
+        }
+    }
 
     if (pmo)
         pmo->finish();
@@ -2663,8 +2683,13 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
     uint32 money = bot->GetMoney();
     bot->SetMoney(money + 500 * sqrt(urand(1, bot->GetLevel() * 5)));
 
-    if (bot->GetGroup())
-        bot->RemoveFromGroup();
+    if (Group* g = bot->GetGroup())
+    {
+        if (g->IsMember(bot->GetGUID()))
+        {
+            bot->RemoveFromGroup();
+        }
+    }
 
     if (pmo)
         pmo->finish();

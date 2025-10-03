@@ -8,6 +8,7 @@
 #include "Event.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "Group.h"
 
 bool LeaveGroupAction::Execute(Event event)
 {
@@ -84,7 +85,13 @@ bool LeaveGroupAction::Leave(Player* player)
     bool shouldStay = randomBot && bot->GetGroup() && player == bot;
     if (!shouldStay)
     {
-        bot->RemoveFromGroup();
+        if (Group* g = bot->GetGroup())
+        {
+            if (g->IsMember(bot->GetGUID()))
+            {
+                bot->RemoveFromGroup();
+            }
+        }
     }
 
     if (randomBot)

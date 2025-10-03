@@ -38,6 +38,7 @@
 #include "WorldSessionMgr.h"
 #include "DatabaseEnv.h"        // Added for gender choice
 #include <algorithm>            // Added for gender choice
+#include "Group.h"
 
 class BotInitGuard
 {
@@ -512,10 +513,16 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
             }
         }
 
-        if (!groupValid)
+    if (!groupValid)
+    {
+        if (Group* g = bot->GetGroup())
         {
-            bot->RemoveFromGroup();
+            if (g->IsMember(bot->GetGUID()))
+            {
+                bot->RemoveFromGroup();
+            }
         }
+    }
     }
 
     group = bot->GetGroup();
