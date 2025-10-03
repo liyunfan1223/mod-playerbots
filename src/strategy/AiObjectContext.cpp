@@ -170,17 +170,6 @@ void AiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Tr
     triggerContexts.Add(new WotlkDungeonFoSTriggerContext());
     triggerContexts.Add(new WotlkDungeonPoSTriggerContext());
     triggerContexts.Add(new WotlkDungeonToCTriggerContext());
-    triggerContexts.Add(new RaidAq20TriggerContext());
-    triggerContexts.Add(new RaidMcTriggerContext());
-    triggerContexts.Add(new RaidBwlTriggerContext());
-    triggerContexts.Add(new RaidGruulsLairTriggerContext());
-    triggerContexts.Add(new RaidNaxxTriggerContext());
-    triggerContexts.Add(new RaidOsTriggerContext());
-    triggerContexts.Add(new RaidEoETriggerContext());
-    triggerContexts.Add(new RaidVoATriggerContext());
-    triggerContexts.Add(new RaidUlduarTriggerContext());
-    triggerContexts.Add(new RaidOnyxiaTriggerContext());
-    triggerContexts.Add(new RaidIccTriggerContext());
 }
 
 void AiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
