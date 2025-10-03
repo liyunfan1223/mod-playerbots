@@ -3810,32 +3810,52 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                     return MoveTo(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ());
                 }
             }
+
             case BATTLEGROUND_EY:
-            { // Issue: Currently bots in EY take flag instantly without casttime
+            {
                 if (dist < INTERACTION_DISTANCE)
                 {
                     // Dismount before interacting
                     if (bot->IsMounted())
+                    {
                         bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
+                    }
 
                     if (bot->IsInDisallowedMountForm())
+                    {
                         bot->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+                    }
 
                     // Handle center flag differently (requires spell cast)
                     if (atBase)
                     {
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_CAPTURE_BANNER);
                         if (!spellInfo)
+                        {
+                            LOG_DEBUG("playerbots",
+                                "EotS: {} SpellInfo not found for SPELL_CAPTURE_BANNER, we do not interact instantly",
+                                bot->GetName());
                             return false;
+                        }
 
+                        // Cast the capture spell on the GameObject
                         Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
                         spell->m_targets.SetGOTarget(go);
+                        LOG_DEBUG("playerbots", "EotS: {} lance SPELL_CAPTURE_BANNER sur GO guid={}", bot->GetName(), go->GetGUID().ToString());
                         spell->prepare(&spell->m_targets);
-                        botAI->WaitForSpellCast(spell);
-                        //return true; Intended to make a bot cast SPELL_CAPTURE_BANNER and wait for spell finish, but doesn't work and causes infinite loop
+
+                        // Set the wait to the actual duration of the spell
+                        int32 castMs = spellInfo->IsChanneled() ? spellInfo->GetDuration() : spellInfo->CalcCastTime(bot);
+                        if (castMs < 0) castMs = 0;
+                        botAI->SetNextCheckDelay(uint32(castMs));
+                        LOG_DEBUG("playerbots",
+                            "EotS: {} are capturing the flag wait {} ms ({})",
+                            bot->GetName(), castMs, spellInfo->IsChanneled() ? "channeled duration" : "cast time");
+                        return true;
                     }
 
                     // Pick up dropped flag
+                        bot->GetName(), go->GetGUID().ToString());
                     WorldPacket data(CMSG_GAMEOBJ_USE);
                     data << go->GetGUID();
                     bot->GetSession()->HandleGameObjectUseOpcode(data);
@@ -3848,7 +3868,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                     // Move to flag if not in range
                     return MoveTo(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ());
                 }
-            }
+             }
         default:
             break;
         }
