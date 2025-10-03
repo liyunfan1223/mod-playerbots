@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "StatsWeightCalculator.h"
@@ -184,7 +184,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
     stats_weights_[STATS_TYPE_MELEE_DPS] += 0.01f;
     stats_weights_[STATS_TYPE_RANGED_DPS] += 0.01f;
 
-    if (cls == CLASS_HUNTER && (tab == HUNTER_TAB_BEASTMASTER || tab == HUNTER_TAB_SURVIVAL))
+    if (cls == CLASS_HUNTER && (tab == HUNTER_TAB_BEASTMASTERY || tab == HUNTER_TAB_SURVIVAL))
     {
         stats_weights_[STATS_TYPE_AGILITY] += 2.5f;
         stats_weights_[STATS_TYPE_ATTACK_POWER] += 1.0f;

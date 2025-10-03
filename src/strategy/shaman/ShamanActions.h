@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_SHAMANACTIONS_H
@@ -531,12 +531,18 @@ public:
 class SetTotemAction : public Action
 {
 public:
-    SetTotemAction(PlayerbotAI* botAI, std::string const totemName, const uint32 totemSpellIds[], int actionButtonId)
-        : Action(botAI, "set " + totemName), totemSpellIds(totemSpellIds), actionButtonId(actionButtonId)
-    {
-    }
+    // Template constructor: infers N (size of the id array) at compile time
+    template <size_t N>
+    SetTotemAction(PlayerbotAI* botAI, std::string const& totemName, const uint32 (&ids)[N], int actionButtonId)
+        : Action(botAI, "set " + totemName)
+        , totemSpellIds(ids)
+        , totemSpellIdsCount(N)
+        , actionButtonId(actionButtonId)
+    {}
+
     bool Execute(Event event) override;
     uint32 const* totemSpellIds;
+    size_t totemSpellIdsCount;
     int actionButtonId;
 };
 

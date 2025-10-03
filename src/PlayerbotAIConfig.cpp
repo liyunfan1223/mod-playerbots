@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "PlayerbotAIConfig.h"
@@ -86,6 +86,9 @@ bool PlayerbotAIConfig::Initialize()
     rpWarningCooldown     = sConfigMgr->GetOption<int32>("AiPlayerbot.RPWarningCooldown", 30);
     disabledWithoutRealPlayerLoginDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLoginDelay", 30);
     disabledWithoutRealPlayerLogoutDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay", 300);
+    randomBotMinLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMinLoginLevel", 1);
+    randomBotMaxLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMaxLoginLevel", 80);
+    randomBotLogoutOutsideLoginRange = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotLogoutOutsideLoginRange", false);
 
     farDistance = sConfigMgr->GetOption<float>("AiPlayerbot.FarDistance", 20.0f);
     sightDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SightDistance", 75.0f);
@@ -509,6 +512,7 @@ bool PlayerbotAIConfig::Initialize()
     randomBotAccountCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotAccountCount", 0);
     deleteRandomBotAccounts = sConfigMgr->GetOption<bool>("AiPlayerbot.DeleteRandomBotAccounts", false);
     randomBotGuildCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotGuildCount", 20);
+    randomBotGuildSizeMax = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotGuildSizeMax", 15);
     deleteRandomBotGuilds = sConfigMgr->GetOption<bool>("AiPlayerbot.DeleteRandomBotGuilds", false);
 
     guildTaskEnabled = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableGuildTasks", true);
@@ -549,6 +553,27 @@ bool PlayerbotAIConfig::Initialize()
     addClassCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.AddClassCommand", 1);
     addClassAccountPoolSize = sConfigMgr->GetOption<int32>("AiPlayerbot.AddClassAccountPoolSize", 50);
     maintenanceCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.MaintenanceCommand", 1);
+
+    altMaintenanceAttunementQs = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceAttunementQuests", true);
+    altMaintenanceBags = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceBags", true);
+    altMaintenanceAmmo = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceAmmo", true);
+    altMaintenanceFood = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceFood", true);
+    altMaintenanceReagents = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceReagents", true);
+    altMaintenanceConsumables = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceConsumables", true);
+    altMaintenancePotions = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenancePotions", true);
+    altMaintenanceTalentTree = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceTalentTree", true);
+    altMaintenancePet = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenancePet", true);
+    altMaintenancePetTalents = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenancePetTalents", true);
+    altMaintenanceClassSpells = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceClassSpells", true);
+    altMaintenanceAvailableSpells = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceAvailableSpells", true);
+    altMaintenanceSkills = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceSkills", true);
+    altMaintenanceReputation = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceReputation", true);
+    altMaintenanceSpecialSpells = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceSpecialSpells", true);
+    altMaintenanceMounts = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceMounts", true);
+    altMaintenanceGlyphs = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceGlyphs", true);
+    altMaintenanceKeyring = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceKeyring", true);
+    altMaintenanceGemsEnchants = sConfigMgr->GetOption<bool>("AiPlayerbot.AltMaintenanceGemsEnchants", true);
+
     autoGearCommand = sConfigMgr->GetOption<int32>("AiPlayerbot.AutoGearCommand", 1);
     autoGearCommandAltBots = sConfigMgr->GetOption<int32>("AiPlayerbot.AutoGearCommandAltBots", 1);
     autoGearQualityLimit = sConfigMgr->GetOption<int32>("AiPlayerbot.AutoGearQualityLimit", 3);

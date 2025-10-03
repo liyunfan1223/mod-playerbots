@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_PLAYERbotAICONFIG_H
@@ -247,6 +247,8 @@ public:
     std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
     bool applyInstanceStrategies;
     uint32 randomBotMinLevel, randomBotMaxLevel;
+    uint32 randomBotMinLoginLevel, randomBotMaxLoginLevel;
+    bool randomBotLogoutOutsideLoginRange;
     float randomChangeMultiplier;
 
     // std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
@@ -267,7 +269,7 @@ public:
     uint32 randomBotAccountCount;
     bool randomBotRandomPassword;
     bool deleteRandomBotAccounts;
-    uint32 randomBotGuildCount;
+    uint32 randomBotGuildCount, randomBotGuildSizeMax;
     bool deleteRandomBotGuilds;
     std::vector<uint32> randomBotGuilds;
     std::vector<uint32> pvpProhibitedZoneIds;
@@ -391,6 +393,25 @@ public:
     int32 addClassCommand;
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
+    bool altMaintenanceAttunementQs,
+            altMaintenanceBags,
+            altMaintenanceAmmo,
+            altMaintenanceFood,
+            altMaintenanceReagents,
+            altMaintenanceConsumables,
+            altMaintenancePotions,
+            altMaintenanceTalentTree,
+            altMaintenancePet,
+            altMaintenancePetTalents,
+            altMaintenanceClassSpells,
+            altMaintenanceAvailableSpells,
+            altMaintenanceSkills,
+            altMaintenanceReputation,
+            altMaintenanceSpecialSpells,
+            altMaintenanceMounts,
+            altMaintenanceGlyphs,
+            altMaintenanceKeyring,
+            altMaintenanceGemsEnchants;
     int32 autoGearCommand, autoGearCommandAltBots, autoGearQualityLimit, autoGearScoreLimit;
 
     uint32 useGroundMountAtMinLevel;

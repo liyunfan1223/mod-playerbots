@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "NonCombatActions.h"
@@ -10,9 +10,6 @@
 
 bool DrinkAction::Execute(Event event)
 {
-    if (bot->IsInCombat())
-        return false;
-
     if (botAI->HasCheat(BotCheatMask::food))
     {
         // if (bot->IsNonMeleeSpellCast(true))
@@ -52,23 +49,22 @@ bool DrinkAction::Execute(Event event)
 
 bool DrinkAction::isUseful() 
 { 
-    // check class uses mana
-    if (!AI_VALUE2(bool, "has mana", "self target"))
-        return false;
-
-    return UseItemAction::isUseful() && AI_VALUE2(uint8, "mana", "self target") < 100; 
+    return UseItemAction::isUseful() && 
+        AI_VALUE2(bool, "has mana", "self target") &&
+        AI_VALUE2(uint8, "mana", "self target") < 100;
 }
 
 bool DrinkAction::isPossible()
 {
-    return !bot->IsInCombat() && (botAI->HasCheat(BotCheatMask::food) || UseItemAction::isPossible());
+    return !bot->IsInCombat() && 
+        !bot->IsMounted() &&
+        !botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form",
+            "aquatic form","flight form", "swift flight form", nullptr) &&
+        (botAI->HasCheat(BotCheatMask::food) || UseItemAction::isPossible());
 }
 
 bool EatAction::Execute(Event event)
 {
-    if (bot->IsInCombat())
-        return false;
-
     if (botAI->HasCheat(BotCheatMask::food))
     {
         // if (bot->IsNonMeleeSpellCast(true))
@@ -106,9 +102,17 @@ bool EatAction::Execute(Event event)
     return UseItemAction::Execute(event);
 }
 
-bool EatAction::isUseful() { return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < 85; }
+bool EatAction::isUseful() 
+{ 
+    return UseItemAction::isUseful() && 
+        AI_VALUE2(uint8, "health", "self target") < 100;
+}
 
 bool EatAction::isPossible()
 {
-    return !bot->IsInCombat() && (botAI->HasCheat(BotCheatMask::food) || UseItemAction::isPossible());
+    return !bot->IsInCombat() && 
+        !bot->IsMounted() &&
+        !botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form",
+            "aquatic form","flight form", "swift flight form", nullptr) &&
+        (botAI->HasCheat(BotCheatMask::food) || UseItemAction::isPossible());
 }

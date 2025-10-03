@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "StatsValues.h"
-
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -118,6 +117,10 @@ bool HasManaValue::Calculate()
 {
     Unit* target = GetTarget();
     if (!target)
+        return false;
+
+    constexpr uint32 PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID = 20711u;
+    if (target->HasAura(PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID))
         return false;
 
     return target->GetPower(POWER_MANA);
