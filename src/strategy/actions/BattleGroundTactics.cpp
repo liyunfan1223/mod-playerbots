@@ -3855,7 +3855,6 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                     }
 
                     // Pick up dropped flag
-                        bot->GetName(), go->GetGUID().ToString());
                     WorldPacket data(CMSG_GAMEOBJ_USE);
                     data << go->GetGUID();
                     bot->GetSession()->HandleGameObjectUseOpcode(data);
