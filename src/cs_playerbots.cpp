@@ -20,6 +20,7 @@
 #include "PlayerbotMgr.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
+#include "RaidBuilderCommand.h"
 
 using namespace Acore::ChatCommands;
 
@@ -46,6 +47,7 @@ public:
             {"gtask", HandleGuildTaskCommand, SEC_GAMEMASTER, Console::Yes},
             {"pmon", HandlePerfMonCommand, SEC_GAMEMASTER, Console::Yes},
             {"rndbot", HandleRandomPlayerbotCommand, SEC_GAMEMASTER, Console::Yes},
+            {"raid", HandleRaidBuilderCommand, SEC_PLAYER, Console::No},
             {"debug", playerbotsDebugCommandTable},
             {"account", playerbotsAccountCommandTable},
         };
@@ -65,6 +67,16 @@ public:
     static bool HandleRandomPlayerbotCommand(ChatHandler* handler, char const* args)
     {
         return RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(handler, args);
+    }
+
+    static bool HandleRaidBuilderCommand(ChatHandler* handler, char const* args)
+    {
+        std::vector<std::string> messages = RaidBuilderCommand::HandleRaidBuilderCommand(handler, args);
+        for (const std::string& message : messages)
+        {
+            handler->SendSysMessage(message.c_str());
+        }
+        return true;
     }
 
     static bool HandleGuildTaskCommand(ChatHandler* handler, char const* args)
