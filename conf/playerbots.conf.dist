@@ -490,7 +490,7 @@ AiPlayerbot.AutoAvoidAoe = 1
 AiPlayerbot.MaxAoeAvoidRadius = 15.0
 
 # A whitelist of aoe spell IDs that should not be avoided
-AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810
+AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810,29946
 
 # Enable healer bot save mana strategy
 # Default: 1 (enabled)
@@ -534,6 +534,34 @@ AiPlayerbot.RPWarningCooldown = 30
 # Enable/Disable maintenance command (learn all available spells and skills, supplement consumables, repair, enchant equipment if bot's level is above AiPlayerbot.MinEnchantingBotLevel)
 # Default: 1 (enabled)
 AiPlayerbot.MaintenanceCommand = 1
+
+# Enable/Disable specific maintenance command functionality for alt bots
+# Disable to prevent players from giving free bags, spells, skill levels etc to their alt bots
+# Default: 1 (enabled)
+AiPlayerbot.AltMaintenanceAmmo = 1
+AiPlayerbot.AltMaintenanceFood = 1
+AiPlayerbot.AltMaintenanceReagents = 1
+AiPlayerbot.AltMaintenanceConsumables = 1
+AiPlayerbot.AltMaintenancePotions = 1
+
+AiPlayerbot.AltMaintenanceBags = 1
+AiPlayerbot.AltMaintenanceMounts = 1
+AiPlayerbot.AltMaintenanceSkills = 1
+
+AiPlayerbot.AltMaintenanceClassSpells = 1	# Spells from quests (tame/summon pets, totems, druid forms, etc)
+AiPlayerbot.AltMaintenanceAvailableSpells = 1	# Spells learnable from trainer
+AiPlayerbot.AltMaintenanceSpecialSpells = 1	# Leave DK starting area
+AiPlayerbot.AltMaintenanceTalentTree = 1
+AiPlayerbot.AltMaintenanceGlyphs = 1
+AiPlayerbot.AltMaintenanceGemsEnchants = 1
+
+AiPlayerbot.AltMaintenancePet = 1
+AiPlayerbot.AltMaintenancePetTalents = 1
+
+AiPlayerbot.AltMaintenanceReputation = 1
+AiPlayerbot.AltMaintenanceAttunementQuests = 1
+AiPlayerbot.AltMaintenanceKeyring = 1
+
 
 # Enable/Disable autogear command, which automatically upgrades bots' gear; the quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
 # Default: 1 (enabled)
