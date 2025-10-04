@@ -247,8 +247,6 @@ public:
     std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
     bool applyInstanceStrategies;
     uint32 randomBotMinLevel, randomBotMaxLevel;
-    uint32 randomBotMinLoginLevel, randomBotMaxLoginLevel;
-    bool randomBotLogoutOutsideLoginRange;
     float randomChangeMultiplier;
 
     // std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
@@ -393,6 +391,25 @@ public:
     int32 addClassCommand;
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
+    bool altMaintenanceAttunementQs,
+            altMaintenanceBags,
+            altMaintenanceAmmo,
+            altMaintenanceFood,
+            altMaintenanceReagents,
+            altMaintenanceConsumables,
+            altMaintenancePotions,
+            altMaintenanceTalentTree,
+            altMaintenancePet,
+            altMaintenancePetTalents,
+            altMaintenanceClassSpells,
+            altMaintenanceAvailableSpells,
+            altMaintenanceSkills,
+            altMaintenanceReputation,
+            altMaintenanceSpecialSpells,
+            altMaintenanceMounts,
+            altMaintenanceGlyphs,
+            altMaintenanceKeyring,
+            altMaintenanceGemsEnchants;
     int32 autoGearCommand, autoGearCommandAltBots, autoGearQualityLimit, autoGearScoreLimit;
 
     uint32 useGroundMountAtMinLevel;

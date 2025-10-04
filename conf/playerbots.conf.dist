@@ -488,6 +488,34 @@ AiPlayerbot.RPWarningCooldown = 30
 # Default: 1 (enabled)
 AiPlayerbot.MaintenanceCommand = 1
 
+# Enable/Disable specific maintenance command functionality for alt bots
+# Disable to prevent players from giving free bags, spells, skill levels etc to their alt bots
+# Default: 1 (enabled)
+AiPlayerbot.AltMaintenanceAmmo = 1
+AiPlayerbot.AltMaintenanceFood = 1
+AiPlayerbot.AltMaintenanceReagents = 1
+AiPlayerbot.AltMaintenanceConsumables = 1
+AiPlayerbot.AltMaintenancePotions = 1
+
+AiPlayerbot.AltMaintenanceBags = 1
+AiPlayerbot.AltMaintenanceMounts = 1
+AiPlayerbot.AltMaintenanceSkills = 1
+
+AiPlayerbot.AltMaintenanceClassSpells = 1
+AiPlayerbot.AltMaintenanceAvailableSpells = 1
+AiPlayerbot.AltMaintenanceSpecialSpells = 1
+AiPlayerbot.AltMaintenanceTalentTree = 1
+AiPlayerbot.AltMaintenanceGlyphs = 1
+AiPlayerbot.AltMaintenanceGemsEnchants = 1
+
+AiPlayerbot.AltMaintenancePet = 1
+AiPlayerbot.AltMaintenancePetTalents = 1
+
+AiPlayerbot.AltMaintenanceReputation = 1
+AiPlayerbot.AltMaintenanceAttunementQuests = 1
+AiPlayerbot.AltMaintenanceKeyring = 1
+
+
 # Enable/Disable autogear command, which automatically upgrades bots' gear; the quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
 # Default: 1 (enabled)
 AiPlayerbot.AutoGearCommand = 1
@@ -569,20 +597,9 @@ AiPlayerbot.RandomBotRandomPassword = 0
 # Prefix for account names to create for randombots
 AiPlayerbot.RandomBotAccountPrefix = "rndbot"
 
-# Minimum and maximum initialization levels for randombots
+# Minimum and maximum levels for randombots
 AiPlayerbot.RandomBotMinLevel = 1
 AiPlayerbot.RandomBotMaxLevel = 80
-
-# Minimum and maximum level range for randombots allowed to login
-# If level filtration is used, minRandomBots and maxRandomBots might be automatically adjusted to lower values,
-# depending on available eligible bots in the database
-# Default Min,Max: 1,80 (no level filtration)
-AiPlayerbot.RandomBotMinLoginLevel = 1
-AiPlayerbot.RandomBotMaxLoginLevel = 80
-
-# log-out randombots if they they level outside the allowed login range
-# Default: 0 (disabled)
-AiPlayerbot.RandomBotLogoutOutsideLoginRange = 0
 
 # Sync max randombot level with max level of online players
 # Default: 0 (disabled)
