@@ -377,6 +377,7 @@ AiPlayerbot.ContactDistance = 0.45
 AiPlayerbot.AoeRadius = 10
 AiPlayerbot.RpgDistance = 200
 AiPlayerbot.AggroDistance = 22
+AiPlayerbot.FishingDistance = 40.0
 
 #
 #

@@ -13,6 +13,8 @@
 #include "RtscAction.h"
 #include "PositionValue.h"
 
+const std::set<uint32> FISHING_SPELLS = {7620, 7731, 7732, 18248, 33095, 51294};
+
 Creature* SeeSpellAction::CreateWps(Player* wpOwner, float x, float y, float z, float o, uint32 entry, Creature* lastWp,
                                     bool important)
 {
@@ -44,6 +46,15 @@ bool SeeSpellAction::Execute(Event event)
 
     // if (!botAI->HasStrategy("RTSC", botAI->GetState()))
     //     return false;
+
+    if (FISHING_SPELLS.find(spellId) != FISHING_SPELLS.end())
+    {
+        if (AI_VALUE(bool, "can fish"))
+        {
+            botAI->ChangeStrategy("+master fishing", BOT_STATE_NON_COMBAT);
+            return true;
+        }
+    }
 
     if (spellId != RTSC_MOVE_SPELL)
         return false;
