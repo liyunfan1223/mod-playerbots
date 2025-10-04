@@ -526,4 +526,36 @@ class ShadowCleaveAction : public CastMeleeSpellAction
 public:
     ShadowCleaveAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "shadow cleave") {}
 };
+
+// Ritual Actions
+
+class CastRitualOfSoulsAction : public CastSpellAction
+{
+public:
+    CastRitualOfSoulsAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "ritual of souls") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+    std::string const GetTargetName() override { return "self target"; }
+};
+
+// InteractWithSoulPortalAction is now defined in RitualActions.h
+
+class LootSoulwellAction : public Action
+{
+public:
+    LootSoulwellAction(PlayerbotAI* botAI) : Action(botAI, "loot soulwell") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+// MoveAwayFromSpawnAction is now defined in RitualActions.h
+
+class EnableSoulstoneDungeonAction : public Action
+{
+public:
+    EnableSoulstoneDungeonAction(PlayerbotAI* botAI) : Action(botAI, "enable soulstone dungeon") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
 #endif

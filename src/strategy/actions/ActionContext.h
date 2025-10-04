@@ -65,6 +65,7 @@
 #include "XpGainAction.h"
 #include "NewRpgAction.h"
 #include "CancelChannelAction.h"
+#include "RitualActions.h"
 
 class PlayerbotAI;
 
@@ -256,6 +257,13 @@ public:
         creators["new rpg wander npc"] = &ActionContext::new_rpg_wander_npc;
         creators["new rpg do quest"] = &ActionContext::new_rpg_do_quest;
         creators["new rpg travel flight"] = &ActionContext::new_rpg_travel_flight;
+        
+        // Universal ritual interactions
+        creators["interact with soul portal"] = &ActionContext::interact_with_soul_portal;
+        creators["interact with refreshment portal"] = &ActionContext::interact_with_refreshment_portal;
+        creators["interact with refreshment table"] = &ActionContext::interact_with_refreshment_table;
+        creators["interact with soulwell"] = &ActionContext::interact_with_soulwell;
+        creators["restore follow behavior"] = &ActionContext::restore_follow_behavior;
     }
 
 private:
@@ -444,6 +452,14 @@ private:
     static Action* new_rpg_wander_npc(PlayerbotAI* ai) { return new NewRpgWanderNpcAction(ai); }
     static Action* new_rpg_do_quest(PlayerbotAI* ai) { return new NewRpgDoQuestAction(ai); }
     static Action* new_rpg_travel_flight(PlayerbotAI* ai) { return new NewRpgTravelFlightAction(ai); }
+    
+    // Universal ritual interactions
+    static Action* interact_with_soul_portal(PlayerbotAI* botAI) { return new InteractWithSoulPortalAction(botAI); }
+    static Action* interact_with_refreshment_portal(PlayerbotAI* botAI) { return new InteractWithRefreshmentPortalAction(botAI); }
+    static Action* interact_with_refreshment_table(PlayerbotAI* botAI) { return new InteractWithRefreshmentTableAction(botAI); }
+    static Action* interact_with_soulwell(PlayerbotAI* botAI) { return new InteractWithSoulwellAction(botAI); }
+    static Action* restore_follow_behavior(PlayerbotAI* botAI) { return new RestoreFollowBehaviorAction(botAI); }
+    static Action* check_conjured_items(PlayerbotAI* botAI) { return new CheckConjuredItemsAction(botAI); }
 };
 
 #endif
