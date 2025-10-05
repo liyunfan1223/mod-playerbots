@@ -39,12 +39,19 @@ private:
     Item* pole = nullptr;
 };
 
-class MoveToFishAction : public MovementAction, public Qualified
+class MoveNearWaterAction : public MovementAction, public Qualified
 {
 public:
-    MoveToFishAction(PlayerbotAI* botAI) : MovementAction(botAI, "move to fish") {}
+    MoveNearWaterAction(PlayerbotAI* botAI, WorldPosition fishingPos= WorldPosition() ): MovementAction(botAI, "move to fish"),
+        fishingPosition(fishingPos) 
+        {}
     bool Execute(Event event) override;
     bool isUseful() override;
+    bool isPossible() override;
+
+private:
+    WorldPosition fishingPosition;
+    WorldPosition landSpot = WorldPosition();
 };
 
 class UseBobber : public Action

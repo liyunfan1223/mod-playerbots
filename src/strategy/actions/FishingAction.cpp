@@ -124,6 +124,8 @@ WorldPosition findFishingHole(PlayerbotAI* botAI)
 {
     Player* player = botAI->GetBot();
     GuidVector gos = PAI_VALUE(GuidVector, "nearest game objects no los"); 
+    GameObject* nearestFishingHole = nullptr;
+    float minDist = std::numeric_limits<float>::max();
     for (const auto& guid : gos)
     {
         GameObject* go = botAI->GetGameObject(guid);
@@ -131,44 +133,65 @@ WorldPosition findFishingHole(PlayerbotAI* botAI)
             continue;
         if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
         {
-            return WorldPosition(go->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ());
+            float dist = player->GetDistance2d(go);
+            if (dist < minDist)
+            {
+                minDist = dist;
+                nearestFishingHole = go;
+            }
         }
+    }
+    if (nearestFishingHole)
+    {
+        return WorldPosition(nearestFishingHole->GetMapId(), nearestFishingHole->GetPositionX(), nearestFishingHole->GetPositionY(), nearestFishingHole->GetPositionZ());
     }
     return WorldPosition();
 }
 
-bool MoveToFishAction::Execute(Event event)
+bool MoveNearWaterAction::Execute(Event event)
 {
-    WorldPosition fishHole =findFishingHole(botAI);
-    if (fishHole.GetPositionX() != 0.0f && fishHole.GetPositionY() != 0.0f)
-    {
-        WorldPosition LandSpot = findWaterLinear(bot, 15.0f,20.0f, 1.0f, true, fishHole);
-        if(LandSpot.GetPositionX() != 0.0f && LandSpot.GetPositionY() != 0.0f)
-        {
-            return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
-        }
-        // No else, if cannot find a fishing spot to get to fishing hole it defaults to a radial search.
-    }
-    WorldPosition FishSpot = findWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, sPlayerbotAIConfig->fishingDistance, 2.5f, false);
-    if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
-    {
-        WorldPosition LandSpot = findWaterLinear(bot, 10.0f,20.0f, 2.5f, true, FishSpot);
-        if(LandSpot.GetPositionX() != 0.0f && LandSpot.GetPositionY() != 0.0f)
-            return MoveTo(LandSpot.GetMapId(), LandSpot.GetPositionX(), LandSpot.GetPositionY(), LandSpot.GetPositionZ());
+    if(landSpot.GetPositionX() != 0.0f && landSpot.GetPositionY() != 0.0f)
+    {   
+        return MoveTo(landSpot.GetMapId(), landSpot.GetPositionX(), landSpot.GetPositionY(), landSpot.GetPositionZ());
     }
     return false;
 }
 
-bool MoveToFishAction::isUseful()
+bool MoveNearWaterAction::isUseful()
 {
-    if (!AI_VALUE(bool, "can fish"))  // verify spell and skill.
+    if (fishingPosition.GetPositionX() == 0.0f && fishingPosition.GetPositionY() == 0.0f)
         return false;
     
-    if (AI_VALUE(bool, "is near water")) // verify near water
-        return false;
-        
-    return true;
+    Position pos = fishingPosition;
+    float distance = bot->GetExactDist2d(&pos);
+    if (distance > 20.0f || distance < 10.0f)
+    {
+        return true;
+    }
+    
+    // Distance is correct, no movement is needed.
+    return false;
 }
+
+bool MoveNearWaterAction::isPossible()
+{
+    if (fishingPosition.GetPositionX() == 0.0f && fishingPosition.GetPositionY() == 0.0f)
+        return false;
+
+    landSpot = findWaterLinear(bot, 10.0f,20.0f, 2.5f, true, fishingPosition);
+    if (landSpot.GetPositionX() != 0.0f && landSpot.GetPositionY() != 0.0f)
+    {
+        Player* master = botAI->GetMaster();
+        if (master)
+        {    
+            float distance = master ->GetExactDist2d(&landSpot);
+            return (distance < 20.0f);
+        }
+        return true;
+    }
+    return false;
+}
+
 
 bool EquipFishingPoleAction::Execute(Event event)
 {
@@ -240,30 +263,36 @@ bool FishingAction::Execute(Event event)
     {
         Position pos = fishingHole; 
         float distance = bot->GetExactDist2d(&pos);
-
+       
         if (distance > 20.0f || distance < 10.0f)
         {
-            return MoveToFishAction(botAI).Execute(event);
+            MoveNearWaterAction moveToFishingHole(botAI, fishingHole);
+            if (moveToFishingHole.isUseful())
+            {
+                if(moveToFishingHole.isPossible()) //Seperate if statement since this call is more expensive.
+                    return moveToFishingHole.Execute(event);
+            }
         } 
-        if (bot->HasInArc(1.0, &pos, 1.0))
-        {
-            facingWater = true;
-        }
         else
         {
-            float angle = bot->GetAngle(fishingHole.GetPositionX(), fishingHole.GetPositionY());
-            bot->SetOrientation(angle);
-            bot->SendMovementFlagUpdate();
-            return false;
+            if (bot->HasInArc(1.0, &pos, 1.0))
+                facingWater = true;
+            else
+            {
+                float angle = bot->GetAngle(fishingHole.GetPositionX(), fishingHole.GetPositionY());
+                bot->SetOrientation(angle);
+                bot->SendMovementFlagUpdate();
+                return false;
+            }
         }
     }
-    else
+    if (!facingWater)
     {
         WorldPosition FishSpot = findWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 20.0f, 5.0f, false);
         if (FishSpot.GetPositionX() != 0.0f && FishSpot.GetPositionY() != 0.0f)
         {
             Position pos = FishSpot; 
-            if (bot->HasInArc(1.0, &pos, 1.0))
+            if (bot->HasInArc(1.0, &pos, 5.0))
             {
                 facingWater = true;
             }
@@ -275,10 +304,14 @@ bool FishingAction::Execute(Event event)
                 return false;
             }
         }
+        else
+            return false;
     }
+
     EquipFishingPoleAction equipAction(botAI);
     if (equipAction.isUseful())
         return equipAction.Execute(event);
+
     botAI->CastSpell(FISHING_SPELL, bot);
     botAI->ChangeStrategy("+use bobber", BOT_STATE_NON_COMBAT);
    
