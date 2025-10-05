@@ -514,12 +514,12 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
         if (!groupValid)
         {
-            bot->RemoveFromGroup();
+            botAI->RemoveFromGroup();
         }
     }
 
     group = bot->GetGroup();
-    if (group)
+    if (!group)
     {
         botAI->ResetStrategies();
     }

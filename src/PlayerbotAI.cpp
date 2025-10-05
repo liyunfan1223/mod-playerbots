@@ -378,10 +378,7 @@ void PlayerbotAI::UpdateAIGroupMembership()
             PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
             if (leaderAI && !leaderAI->IsRealPlayer())
             {
-                WorldPacket* packet = new WorldPacket(CMSG_GROUP_DISBAND);
-                bot->GetSession()->QueuePacket(packet);
-                // bot->RemoveFromGroup();
-                ResetStrategies();
+                RemoveFromGroup();
             }
         }
     }
@@ -405,10 +402,7 @@ void PlayerbotAI::UpdateAIGroupMembership()
         }
         if (!hasRealPlayer)
         {
-            WorldPacket* packet = new WorldPacket(CMSG_GROUP_DISBAND);
-            bot->GetSession()->QueuePacket(packet);
-            // bot->RemoveFromGroup();
-            ResetStrategies();
+            RemoveFromGroup();
         }
     }
 }
@@ -789,6 +783,16 @@ void PlayerbotAI::Reset(bool full)
             engines[i]->Init();
         }
     }
+}
+
+void PlayerbotAI::RemoveFromGroup()
+{
+    if (!bot || !bot->GetGroup() || bot->IsRealPlayer())
+        return;
+
+    WorldPacket* packet = new WorldPacket(CMSG_GROUP_DISBAND);
+    bot->GetSession()->QueuePacket(packet);
+    ResetStrategies();
 }
 
 bool PlayerbotAI::IsAllowedCommand(std::string const text)
