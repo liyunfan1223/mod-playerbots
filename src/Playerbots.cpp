@@ -87,7 +87,8 @@ public:
         PLAYERHOOK_ON_BEFORE_CRITERIA_PROGRESS,
         PLAYERHOOK_ON_BEFORE_ACHI_COMPLETE,
         PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT,
-        PLAYERHOOK_ON_GIVE_EXP
+        PLAYERHOOK_ON_GIVE_EXP,
+        PLAYERHOOK_ON_BEFORE_TELEPORT
     }) {}
 
     void OnPlayerLogin(Player* player) override
@@ -119,6 +120,26 @@ public:
                     + roundedTime + "' minutes.");
             }
         }
+    }
+
+    bool OnPlayerBeforeTeleport(Player* player, uint32 mapid, float /*x*/, float /*y*/, float /*z*/, float /*orientation*/, uint32 /*options*/, Unit* /*target*/) override
+    {
+        // Only apply to bots to prevent affecting real players
+        if (!player || !player->GetSession()->IsBot())
+            return true;
+
+        // If changing maps, proactively clean visibility references to prevent
+        // stale pointers in other players' visibility maps during the teleport.
+        // This fixes a race condition where:
+        // 1. Bot A teleports and its visible objects start getting cleaned up
+        // 2. Bot B is simultaneously updating visibility and tries to access objects in Bot A's old visibility map
+        // 3. Those objects may already be freed, causing a segmentation fault
+        if (player->GetMapId() != mapid && player->IsInWorld())
+        {
+            player->GetObjectVisibilityContainer().CleanVisibilityReferences();
+        }
+
+        return true;  // Allow teleport to continue
     }
 
     void OnPlayerAfterUpdate(Player* player, uint32 diff) override
