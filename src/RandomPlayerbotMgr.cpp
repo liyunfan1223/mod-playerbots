@@ -2378,7 +2378,7 @@ void RandomPlayerbotMgr::IncreaseLevel(Player* bot)
 
 void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 {
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (botAI)
         return;
 
@@ -2473,7 +2473,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 
 void RandomPlayerbotMgr::RandomizeMin(Player* bot)
 {
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (botAI)
         return;
 

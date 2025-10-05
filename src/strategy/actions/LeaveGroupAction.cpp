@@ -70,7 +70,7 @@ bool UninviteAction::Execute(Event event)
     return false;
 }
 
-static bool LeaveGroupAction::Leave(Player* player)
+bool LeaveGroupAction::Leave(Player* player)
 {
     if (player &&
         !botAI &&

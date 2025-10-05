@@ -787,7 +787,7 @@ void PlayerbotAI::Reset(bool full)
 
 void PlayerbotAI::RemoveFromGroup()
 {
-    if (!bot || !bot->GetGroup() || bot->IsRealPlayer())
+    if (!bot || !bot->GetGroup() || IsRealPlayer())
         return;
 
     WorldPacket* packet = new WorldPacket(CMSG_GROUP_DISBAND);
