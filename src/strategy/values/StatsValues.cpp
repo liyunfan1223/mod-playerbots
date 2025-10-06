@@ -119,7 +119,7 @@ bool HasManaValue::Calculate()
     if (!target)
         return false;
 
-    constexpr uint32 PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID = 20711u;
+    constexpr uint32 PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID = 27827u;
     if (target->HasAura(PRIEST_SPIRIT_OF_REDEMPTION_SPELL_ID))
         return false;
 
