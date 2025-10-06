@@ -268,7 +268,7 @@ bool FishingAction::Execute(Event event)
         Position pos = fishingHole; 
         float distance = bot->GetExactDist2d(&pos);
        
-        if (distance > 20.0f || distance < 10.0f)
+        if (distance > 18.0f || distance < 12.0f)
         {
             MoveNearWaterAction moveToFishingHole(botAI, fishingHole);
             if (moveToFishingHole.isUseful())
