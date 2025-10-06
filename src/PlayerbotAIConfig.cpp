@@ -4,9 +4,7 @@
  */
 
 #include "PlayerbotAIConfig.h"
-
 #include <iostream>
-
 #include "Config.h"
 #include "NewRpgInfo.h"
 #include "PlayerbotDungeonSuggestionMgr.h"
@@ -85,15 +83,12 @@ bool PlayerbotAIConfig::Initialize()
     lootDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.LootDelay", 1000);
     // Buff system
     minBotsForGreaterBuff = sConfigMgr->GetOption<int32>("AiPlayerbot.MinBotsForGreaterBuff", 3);
-    rpWarningCooldown = sConfigMgr->GetOption<int32>("AiPlayerbot.RPWarningCooldown", 30);
-    disabledWithoutRealPlayerLoginDelay =
-        sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLoginDelay", 30);
-    disabledWithoutRealPlayerLogoutDelay =
-        sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay", 300);
+    rpWarningCooldown     = sConfigMgr->GetOption<int32>("AiPlayerbot.RPWarningCooldown", 30);
+    disabledWithoutRealPlayerLoginDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLoginDelay", 30);
+    disabledWithoutRealPlayerLogoutDelay = sConfigMgr->GetOption<int32>("AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay", 300);
     randomBotMinLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMinLoginLevel", 1);
     randomBotMaxLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMaxLoginLevel", 80);
-    randomBotLogoutOutsideLoginRange =
-        sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotLogoutOutsideLoginRange", false);
+    randomBotLogoutOutsideLoginRange = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotLogoutOutsideLoginRange", false);
 
     farDistance = sConfigMgr->GetOption<float>("AiPlayerbot.FarDistance", 20.0f);
     sightDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SightDistance", 75.0f);
@@ -124,9 +119,8 @@ bool PlayerbotAIConfig::Initialize()
     saveManaThreshold = sConfigMgr->GetOption<int32>("AiPlayerbot.SaveManaThreshold", 60);
     autoAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoAvoidAoe", true);
     maxAoeAvoidRadius = sConfigMgr->GetOption<float>("AiPlayerbot.MaxAoeAvoidRadius", 15.0f);
-    LoadSet<std::set<uint32>>(
-        sConfigMgr->GetOption<std::string>("AiPlayerbot.AoeAvoidSpellWhitelist", "50759,57491,13810"),
-        aoeAvoidSpellWhitelist);
+    LoadSet<std::set<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AoeAvoidSpellWhitelist", "50759,57491,13810"),
+                              aoeAvoidSpellWhitelist);
     tellWhenAvoidAoe = sConfigMgr->GetOption<bool>("AiPlayerbot.TellWhenAvoidAoe", false);
 
     randomGearLoweringChance = sConfigMgr->GetOption<float>("AiPlayerbot.RandomGearLoweringChance", 0.0f);
@@ -178,10 +172,9 @@ bool PlayerbotAIConfig::Initialize()
                                            "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080,3938,3754"),
         pvpProhibitedAreaIds);
     fastReactInBG = sConfigMgr->GetOption<bool>("AiPlayerbot.FastReactInBG", true);
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>(
-                                      "AiPlayerbot.RandomBotQuestIds",
-                                      "7848,3802,5505,6502,7761,10277,10285,11492,13188,13189,24499,24511,24710,24712"),
-                                  randomBotQuestIds);
+    LoadList<std::vector<uint32>>(
+        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761,10277,10285,11492,13188,13189,24499,24511,24710,24712"),
+        randomBotQuestIds);
 
     LoadSet<std::set<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.DisallowedGameObjects",
@@ -210,7 +203,8 @@ bool PlayerbotAIConfig::Initialize()
     maxRandomBotReviveTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotReviveTime", 5 * MINUTE);
     minRandomBotTeleportInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MinRandomBotTeleportInterval", 1 * HOUR);
     maxRandomBotTeleportInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxRandomBotTeleportInterval", 5 * HOUR);
-    permanantlyInWorldTime = sConfigMgr->GetOption<int32>("AiPlayerbot.PermanantlyInWorldTime", 1 * YEAR);
+    permanantlyInWorldTime =
+        sConfigMgr->GetOption<int32>("AiPlayerbot.PermanantlyInWorldTime", 1 * YEAR);
     randomBotTeleportDistance = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotTeleportDistance", 100);
     randomBotsPerInterval = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotsPerInterval", 60);
     minRandomBotsPriceChangeInterval =
@@ -222,10 +216,10 @@ bool PlayerbotAIConfig::Initialize()
     restrictHealerDPS = sConfigMgr->GetOption<bool>("AiPlayerbot.HealerDPSMapRestriction", false);
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("AiPlayerbot.RestrictedHealerDPSMaps",
-                                           "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,"
-                                           "1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,"
-                                           "575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,"
-                                           "531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"),
+                                             "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,"
+                                             "1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,"
+                                             "575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,"
+                                             "531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"),
         restrictedHealerDPSMaps);
 
     //////////////////////////// ICC
@@ -331,14 +325,10 @@ bool PlayerbotAIConfig::Initialize()
     randomBotAutoJoinArenaBracket = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotAutoJoinArenaBracket", 7);
 
     randomBotAutoJoinICBrackets = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinICBrackets", "0,1");
-    randomBotAutoJoinEYBrackets =
-        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinEYBrackets", "0,1,2");
-    randomBotAutoJoinAVBrackets =
-        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinAVBrackets", "0,1,2,3");
-    randomBotAutoJoinABBrackets =
-        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinABBrackets", "0,1,2,3,4,5,6");
-    randomBotAutoJoinWSBrackets =
-        sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinWSBrackets", "0,1,2,3,4,5,6,7");
+    randomBotAutoJoinEYBrackets = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinEYBrackets", "0,1,2");
+    randomBotAutoJoinAVBrackets = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinAVBrackets", "0,1,2,3");
+    randomBotAutoJoinABBrackets = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinABBrackets", "0,1,2,3,4,5,6");
+    randomBotAutoJoinWSBrackets = sConfigMgr->GetOption<std::string>("AiPlayerbot.RandomBotAutoJoinWSBrackets", "0,1,2,3,4,5,6,7");
 
     randomBotAutoJoinBGICCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotAutoJoinBGICCount", 0);
     randomBotAutoJoinBGEYCount = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotAutoJoinBGEYCount", 0);
@@ -366,20 +356,22 @@ bool PlayerbotAIConfig::Initialize()
     openGoSpell = sConfigMgr->GetOption<int32>("AiPlayerbot.OpenGoSpell", 6477);
 
     // Zones for NewRpgStrategy teleportation brackets
-    std::vector<uint32> zoneIds = {// Classic WoW - Low-level zones
-                                   1, 12, 14, 85, 141, 215, 3430, 3524,
-                                   // Classic WoW - Mid-level zones
-                                   17, 38, 40, 130, 148, 3433, 3525,
-                                   // Classic WoW - High-level zones
-                                   10, 11, 44, 267, 331, 400, 406,
-                                   // Classic WoW - Higher-level zones
-                                   3, 8, 15, 16, 33, 45, 47, 51, 357, 405, 440,
-                                   // Classic WoW - Top-level zones
-                                   4, 28, 46, 139, 361, 490, 618, 1377,
-                                   // The Burning Crusade - Zones
-                                   3483, 3518, 3519, 3520, 3521, 3522, 3523, 4080,
-                                   // Wrath of the Lich King - Zones
-                                   65, 66, 67, 210, 394, 495, 2817, 3537, 3711, 4197};
+    std::vector<uint32> zoneIds = {
+        // Classic WoW - Low-level zones
+        1, 12, 14, 85, 141, 215, 3430, 3524,
+        // Classic WoW - Mid-level zones
+        17, 38, 40, 130, 148, 3433, 3525,
+        // Classic WoW - High-level zones
+        10, 11, 44, 267, 331, 400, 406,
+        // Classic WoW - Higher-level zones
+        3, 8, 15, 16, 33, 45, 47, 51, 357, 405, 440,
+        // Classic WoW - Top-level zones
+        4, 28, 46, 139, 361, 490, 618, 1377,
+        // The Burning Crusade - Zones
+        3483, 3518, 3519, 3520, 3521, 3522, 3523, 4080,
+        // Wrath of the Lich King - Zones
+        65, 66, 67, 210, 394, 495, 2817, 3537, 3711, 4197
+    };
 
     for (uint32 zoneId : zoneIds)
     {
@@ -487,8 +479,8 @@ bool PlayerbotAIConfig::Initialize()
     }
 
     botCheats.clear();
-    LoadListString<std::vector<std::string>>(
-        sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "food,taxi,raid"), botCheats);
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.BotCheats", "food,taxi,raid"),
+                                             botCheats);
 
     botCheatMask = 0;
 
@@ -509,8 +501,8 @@ bool PlayerbotAIConfig::Initialize()
 
     LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.AllowedLogFiles", ""),
                                              allowedLogFiles);
-    LoadListString<std::vector<std::string>>(
-        sConfigMgr->GetOption<std::string>("AiPlayerbot.TradeActionExcludedPrefixes", ""), tradeActionExcludedPrefixes);
+    LoadListString<std::vector<std::string>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.TradeActionExcludedPrefixes", ""),
+                                             tradeActionExcludedPrefixes);
 
     worldBuffs.clear();
     loadWorldBuff();
@@ -527,8 +519,7 @@ bool PlayerbotAIConfig::Initialize()
     minGuildTaskChangeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinGuildTaskChangeTime", 3 * 24 * 3600);
     maxGuildTaskChangeTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxGuildTaskChangeTime", 4 * 24 * 3600);
     minGuildTaskAdvertisementTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinGuildTaskAdvertisementTime", 300);
-    maxGuildTaskAdvertisementTime =
-        sConfigMgr->GetOption<int32>("AiPlayerbot.MaxGuildTaskAdvertisementTime", 12 * 3600);
+    maxGuildTaskAdvertisementTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxGuildTaskAdvertisementTime", 12 * 3600);
     minGuildTaskRewardTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MinGuildTaskRewardTime", 300);
     maxGuildTaskRewardTime = sConfigMgr->GetOption<int32>("AiPlayerbot.MaxGuildTaskRewardTime", 3600);
     guildTaskAdvertCleanupTime = sConfigMgr->GetOption<int32>("AiPlayerbot.GuildTaskAdvertCleanupTime", 300);
@@ -600,14 +591,10 @@ bool PlayerbotAIConfig::Initialize()
     BotActiveAloneForceWhenIsFriend = sConfigMgr->GetOption<bool>("AiPlayerbot.BotActiveAloneForceWhenIsFriend", 1);
     BotActiveAloneForceWhenInGuild = sConfigMgr->GetOption<bool>("AiPlayerbot.BotActiveAloneForceWhenInGuild", 1);
     botActiveAloneSmartScale = sConfigMgr->GetOption<bool>("AiPlayerbot.botActiveAloneSmartScale", 1);
-    botActiveAloneSmartScaleDiffLimitfloor =
-        sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor", 50);
-    botActiveAloneSmartScaleDiffLimitCeiling =
-        sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling", 200);
-    botActiveAloneSmartScaleWhenMinLevel =
-        sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel", 1);
-    botActiveAloneSmartScaleWhenMaxLevel =
-        sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel", 80);
+    botActiveAloneSmartScaleDiffLimitfloor = sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor", 50);
+    botActiveAloneSmartScaleDiffLimitCeiling = sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling", 200);
+    botActiveAloneSmartScaleWhenMinLevel = sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel", 1);
+    botActiveAloneSmartScaleWhenMaxLevel = sConfigMgr->GetOption<uint32>("AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel", 80);
 
     randombotsWalkingRPG = sConfigMgr->GetOption<bool>("AiPlayerbot.RandombotsWalkingRPG", false);
     randombotsWalkingRPGInDoors = sConfigMgr->GetOption<bool>("AiPlayerbot.RandombotsWalkingRPG.InDoors", false);
@@ -633,7 +620,7 @@ bool PlayerbotAIConfig::Initialize()
     useDEButton = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.UseDEButton", true);
     tokenILevelMargin = sConfigMgr->GetOption<float>("AiPlayerbot.Roll.TokenILevelMargin", 0.10f);
     needOnProfessionRecipes = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.NeedOnProfessionRecipes", true);
-    recipesIgnoreSkillRank = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.Recipes.IgnoreSkillRank", false);
+    recipesIgnoreSkillRank   = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.Recipes.IgnoreSkillRank", false);
     smartNeedBySpec = sConfigMgr->GetOption<bool>("AiPlayerbot.Roll.SmartNeedBySpec", true);
     twoRoundsGearInit = sConfigMgr->GetOption<bool>("AiPlayerbot.TwoRoundsGearInit", false);
     syncQuestWithPlayer = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncQuestWithPlayer", true);
@@ -651,14 +638,12 @@ bool PlayerbotAIConfig::Initialize()
     autoDoQuests = sConfigMgr->GetOption<bool>("AiPlayerbot.AutoDoQuests", true);
     enableNewRpgStrategy = sConfigMgr->GetOption<bool>("AiPlayerbot.EnableNewRpgStrategy", true);
 
-    RpgStatusProbWeight[RPG_WANDER_RANDOM] =
-        sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.WanderRandom", 15);
+    RpgStatusProbWeight[RPG_WANDER_RANDOM] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.WanderRandom", 15);
     RpgStatusProbWeight[RPG_WANDER_NPC] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.WanderNpc", 20);
     RpgStatusProbWeight[RPG_GO_GRIND] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.GoGrind", 15);
     RpgStatusProbWeight[RPG_GO_CAMP] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.GoCamp", 10);
     RpgStatusProbWeight[RPG_DO_QUEST] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.DoQuest", 60);
-    RpgStatusProbWeight[RPG_TRAVEL_FLIGHT] =
-        sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.TravelFlight", 15);
+    RpgStatusProbWeight[RPG_TRAVEL_FLIGHT] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.TravelFlight", 15);
     RpgStatusProbWeight[RPG_REST] = sConfigMgr->GetOption<int32>("AiPlayerbot.RpgStatusProbWeight.Rest", 5);
 
     syncLevelWithPlayers = sConfigMgr->GetOption<bool>("AiPlayerbot.SyncLevelWithPlayers", false);
@@ -702,8 +687,7 @@ bool PlayerbotAIConfig::Initialize()
     }
 
     excludedHunterPetFamilies.clear();
-    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.ExcludedHunterPetFamilies", ""),
-                                  excludedHunterPetFamilies);
+    LoadList<std::vector<uint32>>(sConfigMgr->GetOption<std::string>("AiPlayerbot.ExcludedHunterPetFamilies", ""), excludedHunterPetFamilies);
 
     LOG_INFO("server.loading", "---------------------------------------");
     LOG_INFO("server.loading", "        AI Playerbots initialized       ");
@@ -739,8 +723,8 @@ bool PlayerbotAIConfig::IsInPvpProhibitedArea(uint32 id)
 
 bool PlayerbotAIConfig::IsRestrictedHealerDPSMap(uint32 mapId) const
 {
-    return restrictHealerDPS && std::find(restrictedHealerDPSMaps.begin(), restrictedHealerDPSMaps.end(), mapId) !=
-                                    restrictedHealerDPSMaps.end();
+    return restrictHealerDPS &&
+            std::find(restrictedHealerDPSMaps.begin(), restrictedHealerDPSMaps.end(), mapId) != restrictedHealerDPSMaps.end();
 }
 
 std::string const PlayerbotAIConfig::GetTimestampStr()
@@ -826,6 +810,7 @@ void PlayerbotAIConfig::loadWorldBuff()
 
     while (std::getline(entryStream, entry, ';'))
     {
+
         entry.erase(0, entry.find_first_not_of(" \t\r\n"));
         entry.erase(entry.find_last_not_of(" \t\r\n") + 1);
 
@@ -846,12 +831,9 @@ void PlayerbotAIConfig::loadWorldBuff()
         std::string token;
         while (std::getline(metaStream, token, ','))
         {
-            try
-            {
+            try {
                 ids.push_back(static_cast<uint32>(std::stoi(token)));
-            }
-            catch (...)
-            {
+            } catch (...) {
                 LOG_ERROR("playerbots", "Invalid meta token in [{}]", entry);
                 break;
             }
@@ -866,14 +848,11 @@ void PlayerbotAIConfig::loadWorldBuff()
         std::istringstream spellStream(spellPart);
         while (std::getline(spellStream, token, ','))
         {
-            try
-            {
+            try {
                 uint32 spellId = static_cast<uint32>(std::stoi(token));
-                worldBuff wb = {spellId, ids[0], ids[1], ids[2], ids[3], ids[4]};
+                worldBuff wb = { spellId, ids[0], ids[1], ids[2], ids[3], ids[4] };
                 worldBuffs.push_back(wb);
-            }
-            catch (...)
-            {
+            } catch (...) {
                 LOG_ERROR("playerbots", "Invalid spell ID in [{}]", entry);
             }
         }
@@ -930,7 +909,8 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempTalentsOrder(uint32
         {
             break;
         }
-        std::sort(spells[tab].begin(), spells[tab].end(), [&](TalentEntry const* lhs, TalentEntry const* rhs)
+        std::sort(spells[tab].begin(), spells[tab].end(),
+                  [&](TalentEntry const* lhs, TalentEntry const* rhs)
                   { return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col; });
         for (int i = 0; i < tab_links[tab].size(); i++)
         {
@@ -978,7 +958,8 @@ std::vector<std::vector<uint32>> PlayerbotAIConfig::ParseTempPetTalentsOrder(uin
 
         spells.push_back(talentInfo);
     }
-    std::sort(spells.begin(), spells.end(), [&](TalentEntry const* lhs, TalentEntry const* rhs)
+    std::sort(spells.begin(), spells.end(),
+              [&](TalentEntry const* lhs, TalentEntry const* rhs)
               { return lhs->Row != rhs->Row ? lhs->Row < rhs->Row : lhs->Col < rhs->Col; });
     for (int i = 0; i < tab_link.size(); i++)
     {
