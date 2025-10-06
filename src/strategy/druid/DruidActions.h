@@ -144,6 +144,8 @@ class CastStarfallAction : public CastSpellAction
 {
 public:
     CastStarfallAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "starfall") {}
+
+    bool isUseful() override;
 };
 
 class CastHurricaneAction : public CastSpellAction
