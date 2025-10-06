@@ -38,18 +38,22 @@ bool CastStarfallAction::isUseful()
     if (!CastSpellAction::isUseful())
         return false;
 
-    // Only in AOE situations
-    uint8 aoeCount = *context->GetValue<uint8>("aoe count");
-    if (aoeCount < 2)
-        return false;
-
-    // Avoid breaking CC: if any current CC target is near our aoe position, skip
+    // Avoid breaking CC
     WorldLocation aoePos = *context->GetValue<WorldLocation>("aoe position");
     Unit* ccTarget = context->GetValue<Unit*>("current cc target")->Get();
     if (ccTarget && ccTarget->IsAlive())
     {
         float dist2d = sServerFacade->GetDistance2d(ccTarget, aoePos.GetPositionX(), aoePos.GetPositionY());
         if (sServerFacade->IsDistanceLessOrEqualThan(dist2d, sPlayerbotAIConfig->aoeRadius))
+            return false;
+    }
+
+    // Avoid single-target usage on initial pull
+    uint8 aoeCount = *context->GetValue<uint8>("aoe count");
+    if (aoeCount < 2)
+    {
+        Unit* target = context->GetValue<Unit*>("current target")->Get();
+        if (!target || (!botAI->HasAura("moonfire", target) && !botAI->HasAura("insect swarm", target)))
             return false;
     }
 
