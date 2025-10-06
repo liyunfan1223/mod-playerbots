@@ -86,7 +86,7 @@ bool LeaveGroupAction::Leave(Player* player)
     bool shouldStay = randomBot && bot->GetGroup() && player == bot;
     if (!shouldStay)
     {
-        botAI->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
     }
 
     if (randomBot)

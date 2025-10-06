@@ -1559,7 +1559,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* bot)
     Group* group = bot->GetGroup();
     if (group && !group->isLFGGroup() && IsRandomBot(group->GetLeader()))
     {
-        botAI->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
         LOG_INFO("playerbots", "Bot {} remove from group since leader is random bot.", bot->GetName().c_str());
     }
 
@@ -2463,7 +2463,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     botAI->Reset(true);
 
     if (bot->GetGroup())
-        botAI->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
 
     if (pmo)
         pmo->finish();
@@ -2504,7 +2504,7 @@ void RandomPlayerbotMgr::RandomizeMin(Player* bot)
     botAI->Reset(true);
 
     if (bot->GetGroup())
-        botAI->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
 
     if (pmo)
         pmo->finish();
@@ -2586,7 +2586,7 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
     bot->SetMoney(money + 500 * sqrt(urand(1, bot->GetLevel() * 5)));
 
     if (bot->GetGroup())
-        botAI->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
 
     if (pmo)
         pmo->finish();

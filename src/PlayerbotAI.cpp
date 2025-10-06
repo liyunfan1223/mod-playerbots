@@ -378,7 +378,7 @@ void PlayerbotAI::UpdateAIGroupMembership()
             PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
             if (leaderAI && !leaderAI->IsRealPlayer())
             {
-                RemoveFromGroup();
+                LeaveOrDisbandGroup();
             }
         }
     }
@@ -402,7 +402,7 @@ void PlayerbotAI::UpdateAIGroupMembership()
         }
         if (!hasRealPlayer)
         {
-            RemoveFromGroup();
+            LeaveOrDisbandGroup();
         }
     }
 }
@@ -785,7 +785,7 @@ void PlayerbotAI::Reset(bool full)
     }
 }
 
-void PlayerbotAI::RemoveFromGroup()
+void PlayerbotAI::LeaveOrDisbandGroup()
 {
     if (!bot || !bot->GetGroup() || IsRealPlayer())
         return;
