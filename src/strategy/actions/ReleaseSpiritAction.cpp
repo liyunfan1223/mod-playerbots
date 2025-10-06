@@ -192,12 +192,11 @@ bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
 {
     // The below delays release to spirit with 6 seconds.
     // This prevents currently casted (ranged) spells to be re-directed to the died bot's ghost.
-    const int32_t botId = bot->GetGUID().GetRawValue();
 
-    // If the bot already is a spirit, erase release time and return true
+    // If the bot already is a spirit, reset release time and return true
     if (bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
     {
-        m_botReleaseTimes.erase(botId);
+        botAI->bgReleaseAttemptTime = 0;
         return true;
     }
 
@@ -205,14 +204,13 @@ bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
     const time_t now = time(nullptr);
     constexpr time_t RELEASE_DELAY = 6;
 
-    auto& lastReleaseTime = m_botReleaseTimes[botId];
-    if (lastReleaseTime == 0)
-        lastReleaseTime = now;
+    if (botAI->bgReleaseAttemptTime == 0)
+        botAI->bgReleaseAttemptTime = now;
 
-    if (now - lastReleaseTime < RELEASE_DELAY)
+    if (now - botAI->bgReleaseAttemptTime < RELEASE_DELAY)
         return false;
 
-    m_botReleaseTimes.erase(botId);
+    botAI->bgReleaseAttemptTime = 0;
     return true;
 }
 

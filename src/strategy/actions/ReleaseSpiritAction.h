@@ -38,7 +38,6 @@ private:
     bool ShouldAutoRelease() const;
     bool ShouldDelayBattlegroundRelease() const;
 
-    inline static std::unordered_map<uint32_t, time_t> m_botReleaseTimes;
     time_t m_bgGossipTime = 0;
 };
 
