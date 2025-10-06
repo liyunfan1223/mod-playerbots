@@ -15,6 +15,8 @@
 
 #include <string>
 #include <vector>
+#include <array>
+#include <algorithm>
 #include "Event.h"
 #include "Item.h"
 #include "ObjectGuid.h"
@@ -711,14 +713,17 @@ bool LootSoulwellAction::isUseful()
     if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
         return false;
     
-    // Check if bot already has a healthstone
-    if (bot->GetItemCount(WarlockConstants::MINOR_HEALTHSTONE, false) > 0 ||
-        bot->GetItemCount(WarlockConstants::LESSER_HEALTHSTONE, false) > 0 ||
-        bot->GetItemCount(WarlockConstants::MAJOR_HEALTHSTONE, false) > 0 ||
-        bot->GetItemCount(WarlockConstants::MINOR_HEALTHSTONE_ALT, false) > 0 ||
-        bot->GetItemCount(WarlockConstants::LESSER_HEALTHSTONE_ALT, false) > 0 ||
-        bot->GetItemCount(WarlockConstants::FEL_HEALTHSTONE, false) > 0 ||
-        bot->GetItemCount(WarlockConstants::DEMONIC_HEALTHSTONE, false) > 0)
+    // Check if bot already has any healthstone (data-driven for maintainability)
+    constexpr std::array<uint32, 7> kHealthstoneIds = {
+        WarlockConstants::MINOR_HEALTHSTONE,
+        WarlockConstants::LESSER_HEALTHSTONE,
+        WarlockConstants::MAJOR_HEALTHSTONE,
+        WarlockConstants::MINOR_HEALTHSTONE_ALT,
+        WarlockConstants::LESSER_HEALTHSTONE_ALT,
+        WarlockConstants::FEL_HEALTHSTONE,
+        WarlockConstants::DEMONIC_HEALTHSTONE
+    };
+    if (std::any_of(kHealthstoneIds.begin(), kHealthstoneIds.end(), [&](uint32 id){ return bot->GetItemCount(id, false) > 0; }))
     {
         return false; // Already has a healthstone
     }
