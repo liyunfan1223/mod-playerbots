@@ -12,6 +12,7 @@
 #include "PlayerbotAI.h"
 #include "ItemPackets.h"
 #include "Position.h"
+#include "PlayerbotTextMgr.h"
 
 
 const uint32 FISHING_SPELL = 7620;
@@ -250,8 +251,11 @@ bool EquipFishingPoleAction::isUseful()
         bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
         return true;
     }
-    
-    botAI->TellError("I don't have a fishing pole");
+
+    std::string text = sPlayerbotTextMgr->GetBotTextOrDefault(
+    "no_fishing_pole_error", "I dont Have a Fishing Pole");
+    Player* master = botAI->GetMaster();
+    botAI->Whisper(text, LANG_UNIVERSAL, master)
     return false;
 }
 
