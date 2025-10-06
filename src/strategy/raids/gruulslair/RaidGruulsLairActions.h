@@ -11,6 +11,7 @@ public:
     HighKingMaulgarMaulgarTankAction(PlayerbotAI* botAI, std::string const name = "high king maulgar maulgar tank") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HighKingMaulgarOlmTankAction : public AttackAction
@@ -19,6 +20,7 @@ public:
     HighKingMaulgarOlmTankAction(PlayerbotAI* botAI, std::string const name = "high king maulgar olm tank") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HighKingMaulgarBlindeyeTankAction : public AttackAction
@@ -27,6 +29,7 @@ public:
     HighKingMaulgarBlindeyeTankAction(PlayerbotAI* botAI, std::string const name = "high king maulgar blindeye tank") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HighKingMaulgarKroshMageTankAction : public AttackAction
@@ -35,6 +38,7 @@ public:
     HighKingMaulgarKroshMageTankAction(PlayerbotAI* botAI, std::string const name = "high king maulgar krosh mage tank") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HighKingMaulgarKigglerMoonkinTankAction : public AttackAction
@@ -43,6 +47,7 @@ public:
     HighKingMaulgarKigglerMoonkinTankAction(PlayerbotAI* botAI, std::string const name = "high king maulgar kiggler moonkin tank") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HighKingMaulgarMeleeDPSAction : public AttackAction
@@ -51,6 +56,7 @@ public:
     HighKingMaulgarMeleeDPSAction(PlayerbotAI* botAI, std::string const name = "high king maulgar melee dps") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HighKingMaulgarRangedDPSAction : public AttackAction
@@ -59,6 +65,7 @@ public:
     HighKingMaulgarRangedDPSAction(PlayerbotAI* botAI, std::string const name = "high king maulgar ranged dps") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HighKingMaulgarHealerAvoidanceAction : public MovementAction
@@ -67,6 +74,7 @@ public:
     HighKingMaulgarHealerAvoidanceAction(PlayerbotAI* botAI, std::string const name = "high king maulgar healer avoidance") : MovementAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class HighKingMaulgarWhirlwindRunAwayAction : public MovementAction
@@ -93,6 +101,7 @@ public:
     HighKingMaulgarHunterMisdirectionAction(PlayerbotAI* botAI, std::string const name = "high king maulgar hunter misdirection") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class GruulTheDragonkillerPositionBossAction : public MovementAction

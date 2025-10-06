@@ -1,28 +1,30 @@
-#ifndef RAID_GRUULSLAIR_HELPERS_H
-#define RAID_GRUULSLAIR_HELPERS_H
+#ifndef RAID_GRUULSLAIRHELPERS_H
+#define RAID_GRUULSLAIRHELPERS_H
 
 #include "PlayerbotAI.h"
-#include "Playerbots.h"
 #include "RtiTargetValue.h"
 
-enum GruulsLairSpells
+enum class GruulsLairSpells
 {
 	// High King Maulgar
-	SPELL_WHIRLWIND 		 = 33238,
+	WHIRLWIND  	   = 33238,
 
 	// Krosh Firehand
-	SPELL_AURA_SPELL_SHIELD  = 33054,
+	SPELL_SHIELD   = 33054,
 
 	// Hunter
-	SPELL_AURA_MISDIRECTION  = 34477,
+	MISDIRECTION   = 34477,
 
 	// Warlock
-	SPELL_BANISH     		 = 18647, // Rank 2
+	BANISH     	   = 18647, // Rank 2
 
 	// Gruul the Dragonkiller
-	SPELL_GROUND_SLAM_1 	 = 33525,
-	SPELL_GROUND_SLAM_2 	 = 39187,
+	GROUND_SLAM_1  = 33525,
+	GROUND_SLAM_2  = 39187,
 };
+
+namespace GruulsLairHelpers
+{
 
 inline constexpr int8 squareIcon = RtiTargetValue::squareIndex;
 inline constexpr int8 starIcon = RtiTargetValue::starIndex;
@@ -31,9 +33,6 @@ inline constexpr int8 diamondIcon = RtiTargetValue::diamondIndex;
 inline constexpr int8 triangleIcon = RtiTargetValue::triangleIndex;
 
 bool IsAnyOgreBossAlive(PlayerbotAI* botAI);
-bool IsMaulgarTank(PlayerbotAI* botAI, Player* bot);
-bool IsOlmTank(PlayerbotAI* botAI, Player* bot);
-bool IsBlindeyeTank(PlayerbotAI* botAI, Player* bot);
 bool IsKroshMageTank(PlayerbotAI* botAI, Player* bot);
 bool IsKigglerMoonkinTank(PlayerbotAI* botAI, Player* bot);
 bool IsPositionSafe(PlayerbotAI* botAI, Player* bot, Position pos);
@@ -52,6 +51,8 @@ namespace GruulsLairTankSpots
 	extern const TankSpot Krosh;
 	extern const TankSpot MaulgarRoomCenter;
     extern const TankSpot Gruul;
+}
+
 }
 
 #endif

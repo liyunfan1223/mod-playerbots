@@ -2,6 +2,8 @@
 #include "RaidGruulsLairHelpers.h"
 #include "Playerbots.h"
 
+using namespace GruulsLairHelpers;
+
 bool HighKingMaulgarTrigger::IsActive()
 {
     float originalSightDistance = sPlayerbotAIConfig->sightDistance;

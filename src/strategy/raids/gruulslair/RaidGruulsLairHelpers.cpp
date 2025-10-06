@@ -1,11 +1,11 @@
 #include "RaidGruulsLairHelpers.h"
 #include "AiFactory.h"
-#include "AiObjectContext.h"
-#include "Group.h"
 #include "GroupReference.h"
-#include "PlayerbotAI.h"
+#include "Playerbots.h"
 #include "Unit.h"
 
+namespace GruulsLairHelpers
+{
 namespace GruulsLairTankSpots 
 {
 	const TankSpot Maulgar           = { 90.686f, 167.047f, -13.234f };
@@ -102,88 +102,6 @@ bool IsKigglerMoonkinTank(PlayerbotAI* botAI, Player* bot)
     return highestHpMoonkin == bot;
 }
 
-bool IsMaulgarTank(PlayerbotAI* botAI, Player* bot)
-{
-    Group* group = bot->GetGroup();
-    if (!group || !botAI->IsTank(bot))
-    {
-        return false;
-    }
-
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-    {
-        Player* member = ref->GetSource();
-        if (!member) 
-        {
-            continue;
-        }
-        if (botAI->IsTank(member))
-        {
-            return member == bot;
-        }
-    }
-
-    return false;
-}
-
-bool IsOlmTank(PlayerbotAI* botAI, Player* bot)
-{
-    Group* group = bot->GetGroup();
-    if (!group || !botAI->IsTank(bot))
-    {
-        return false;
-    }
-
-    int tankIndex = 0;
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-    {
-        Player* member = ref->GetSource();
-        if (!member || !member->IsAlive() || !GET_PLAYERBOT_AI(member))
-        {
-            continue;
-        }
-        if (botAI->IsTank(member))
-        {
-            if (tankIndex == 1)
-            {
-                return member == bot;
-            }
-            ++tankIndex;
-        }
-    }
-
-    return false;
-}
-
-bool IsBlindeyeTank(PlayerbotAI* botAI, Player* bot)
-{
-    Group* group = bot->GetGroup();
-    if (!group || !botAI->IsTank(bot))
-    {
-        return false;
-    }
-
-    int tankIndex = 0;
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
-    {
-        Player* member = ref->GetSource();
-        if (!member || !member->IsAlive() || !GET_PLAYERBOT_AI(member))
-        {
-            continue;
-        }
-        if (botAI->IsTank(member))
-        {
-            if (tankIndex == 2)
-            {
-                return member == bot;
-            }
-            ++tankIndex;
-        }
-    }
-
-    return false;
-}
-
 bool IsPositionSafe(PlayerbotAI* botAI, Player* bot, Position pos)
 {
     const float KROSH_SAFE_DISTANCE = 20.0f;
@@ -268,4 +186,6 @@ bool FindSafePosition(PlayerbotAI* botAI, Player* bot, Position& outPos)
     }
 
     return foundSafeSpot;
+}
+
 }
