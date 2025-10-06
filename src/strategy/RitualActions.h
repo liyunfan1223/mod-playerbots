@@ -1,3 +1,22 @@
+#ifndef PLAYERBOTS_RITUALACTIONS_HELPERS_H
+#define PLAYERBOTS_RITUALACTIONS_HELPERS_H
+
+#include "Player.h"
+class PlayerbotAI;
+
+// Shared helpers for ritual-related actions
+float GetRitualSearchRange(Player* bot);
+GameObject* FindNearestByRanks(Player* bot, uint32 rank1Id, uint32 rank2Id);
+void FinalizeRitualInteraction(Player* bot, PlayerbotAI* botAI, uint32 delayMs);
+bool CanUseRituals(Player* bot);
+inline bool IsInRitualMap(Player* bot) { return bot->GetMap()->IsDungeon() || bot->GetMap()->IsRaid() || bot->GetMap()->IsBattleground(); }
+
+// Utility: check if bot has at least 'limit' of any item in the list
+bool HasAnyItemAtLeast(Player* bot, const std::vector<uint32>& itemIds, uint32 limit);
+// Utility: check if bot has less than 'limit' of all items in the list
+bool HasAllItemsBelow(Player* bot, const std::vector<uint32>& itemIds, uint32 limit);
+
+#endif
 /*
  * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
  * and/or modify it under version 2 of the License, or (at your option), any later version.
@@ -51,6 +70,7 @@ class PlayerbotAI;
 #define RITUAL_MINOR_HEALTHSTONE_ALT 19004
 #define RITUAL_LESSER_HEALTHSTONE_ALT 19005
 #define RITUAL_FEL_HEALTHSTONE 36892
+#define RITUAL_DEMONIC_HEALTHSTONE 22103
 
 #define RITUAL_CONJURED_MANA_BISCUIT 43523
 #define RITUAL_CONJURED_MANA_STRUDEL 43518

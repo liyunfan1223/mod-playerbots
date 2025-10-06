@@ -28,7 +28,7 @@ extern std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
 #include "RitualActions.h"
 
 // Global constants for spells and items
-namespace MageRitualConstants
+namespace MageConstants
 {
     // Ritual of Refreshment spells
     const uint32 RITUAL_REFRESHMENT_RANK_1 = 43987;
@@ -60,38 +60,48 @@ namespace MageRitualConstants
     const uint32 CONJURED_MANA_JUICE = 43520;
     const uint32 CONJURED_MANA_TEA = 43521;
     const uint32 CONJURED_MANA_COFFEE = 43522;
+    // Focus Magic spell (aura)
+    const uint32 FOCUS_MAGIC_AURA = 54646;
+
+    // Mana gem items
+    const uint32 MANA_SAPPHIRE = 33312;
+    const uint32 MANA_EMERALD  = 22044;
+    const uint32 MANA_RUBY     = 8008;
+    const uint32 MANA_CITRINE  = 8007;
+    const uint32 MANA_JADE     = 5513;
+    const uint32 MANA_AGATE    = 5514;
 }
 
 Value<Unit*>* CastPolymorphAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", getName()); }
 
 bool UseManaSapphireAction::isUseful()
 {
-    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(33312, false) > 0;  // Mana Sapphire
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(MageConstants::MANA_SAPPHIRE, false) > 0;
 }
 
 bool UseManaEmeraldAction::isUseful()
 {
-    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(22044, false) > 0;  // Mana Emerald
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(MageConstants::MANA_EMERALD, false) > 0;
 }
 
 bool UseManaRubyAction::isUseful()
 {
-    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(8008, false) > 0;  // Mana Ruby
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(MageConstants::MANA_RUBY, false) > 0;
 }
 
 bool UseManaCitrineAction::isUseful()
 {
-    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(8007, false) > 0;  // Mana Citrine
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(MageConstants::MANA_CITRINE, false) > 0;
 }
 
 bool UseManaJadeAction::isUseful()
 {
-    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(5513, false) > 0;  // Mana Jade
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(MageConstants::MANA_JADE, false) > 0;
 }
 
 bool UseManaAgateAction::isUseful()
 {
-    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(5514, false) > 0;  // Mana Agate
+    return AI_VALUE2(bool, "combat", "self target") && bot->GetItemCount(MageConstants::MANA_AGATE, false) > 0;
 }
 
 bool CastFrostNovaAction::isUseful()
@@ -155,7 +165,7 @@ Unit* CastFocusMagicOnPartyAction::GetTarget()
         if (member->GetMap() != bot->GetMap() || bot->GetDistance(member) > sPlayerbotAIConfig->spellDistance)
             continue;
 
-        if (member->HasAura(54646))
+        if (member->HasAura(MageConstants::FOCUS_MAGIC_AURA))
             continue;
 
         if (member->getClass() == CLASS_MAGE)
@@ -197,10 +207,10 @@ bool CastBlinkBackAction::Execute(Event event)
 uint32 CastRitualOfRefreshmentAction::GetBotRitualSpellId(Player* bot)
 {    
     // Prefer higher rank if available
-    if (bot->HasSpell(MageRitualConstants::RITUAL_REFRESHMENT_RANK_2)) {
-        return MageRitualConstants::RITUAL_REFRESHMENT_RANK_2;
-    } else if (bot->HasSpell(MageRitualConstants::RITUAL_REFRESHMENT_RANK_1)) {
-        return MageRitualConstants::RITUAL_REFRESHMENT_RANK_1;
+    if (bot->HasSpell(MageConstants::RITUAL_REFRESHMENT_RANK_2)) {
+        return MageConstants::RITUAL_REFRESHMENT_RANK_2;
+    } else if (bot->HasSpell(MageConstants::RITUAL_REFRESHMENT_RANK_1)) {
+        return MageConstants::RITUAL_REFRESHMENT_RANK_1;
     }
     
     return 0; // No ritual spell found
@@ -210,45 +220,22 @@ bool CastRitualOfRefreshmentAction::isUseful()
 {
     // Detect which rank the bot has
     uint32 botSpellId = GetBotRitualSpellId(bot);
-    std::string spellRank = (botSpellId == MageRitualConstants::RITUAL_REFRESHMENT_RANK_2) ? "Rank 2" : (botSpellId == MageRitualConstants::RITUAL_REFRESHMENT_RANK_1) ? "Rank 1" : "None";
     
-    // Check base class first
-    if (!CastSpellAction::isUseful())
+    // Fast-fail preconditions
+    if (!CastSpellAction::isUseful() || !CanUseRituals(bot) || botSpellId == 0)
     {
         return false;
     }
     
-    // Check if rituals can be used in current map
-    if (!CanUseRituals(bot))
-    {
-        return false;
-    }
-    
-    // Check if bot has the spell
-    if (botSpellId == 0)
-    {
-        return false;
-    }
-    
-    // Check if spell is on cooldown
-    if (bot->GetSpellCooldownDelay(botSpellId) > 0)
-    {
-        return false;
-    }
-    
-    // Check custom cooldown (2 minutes)
+    // Cooldown checks (spell or custom 2 minutes)
     uint32 currentTime = time(nullptr);
     auto it = lastRefreshmentRitualUsage.find(bot->GetGUID());
-    if (it != lastRefreshmentRitualUsage.end())
+    bool underCustomCooldown = (it != lastRefreshmentRitualUsage.end()) && ((currentTime - it->second) < 120);
+    if (bot->GetSpellCooldownDelay(botSpellId) > 0 || underCustomCooldown)
     {
-        uint32 timeSinceLastUse = currentTime - it->second;
-        if (timeSinceLastUse < 120) // 2 minutes = 120 seconds
-        {
-            return false;
-        }
+        return false;
     }
     
-    // NEW FUNCTIONALITY: Coordination between multiple mages in party
     // Only allows one mage to perform the ritual if there are other mages in the group
     if (Group* group = bot->GetGroup())
     {
@@ -282,23 +269,18 @@ bool CastRitualOfRefreshmentAction::isUseful()
         }
     }
     
-    if (!HasRitualComponent(bot, MageRitualConstants::RITUAL_REFRESHMENT_RANK_1))
+    if (!HasRitualComponent(bot, MageConstants::RITUAL_REFRESHMENT_RANK_1))
     {
         // Give Arcane Powder to bot - 2 units required
-        bot->AddItem(MageRitualConstants::ARCANE_POWDER_ITEM, 2);
+        bot->AddItem(MageConstants::ARCANE_POWDER_ITEM, 2);
     }
     
     // Check if already has refreshment table nearby
-    GameObject* existingTable = bot->FindNearestGameObject(MageRitualConstants::REFRESHMENT_TABLE_RANK_1, 30.0f);
+    GameObject* existingTable = bot->FindNearestGameObject(MageConstants::REFRESHMENT_TABLE_RANK_1, 30.0f);
     if (!existingTable)
-        existingTable = bot->FindNearestGameObject(MageRitualConstants::REFRESHMENT_TABLE_RANK_2, 30.0f);
+        existingTable = bot->FindNearestGameObject(MageConstants::REFRESHMENT_TABLE_RANK_2, 30.0f);
     
-    if (existingTable)
-    {
-        return false;
-    }
-    
-    return true;
+    return !existingTable;
 }
 
 bool CastRitualOfRefreshmentAction::Execute(Event event)
@@ -327,7 +309,7 @@ bool CastRitualOfRefreshmentAction::Execute(Event event)
     
     // Detect which rank the bot has
     uint32 botSpellId = GetBotRitualSpellId(bot);
-    std::string spellRank = (botSpellId == 58659) ? "Rank 2" : (botSpellId == 43987) ? "Rank 1" : "None";
+    // Rank string not used; only need the spell id for cooldown and cast
     if (botSpellId == 0)
     {
         return false;

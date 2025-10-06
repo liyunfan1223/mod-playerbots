@@ -27,9 +27,26 @@ static std::unordered_map<uint64, uint32> lastFollowRestoration;
 std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
 
 // Helper function to get appropriate search range based on map type
-static float GetRitualSearchRange(Player* bot)
+float GetRitualSearchRange(Player* bot)
 {
     return bot->GetMap()->IsBattleground() ? RITUAL_BATTLEGROUND_SEARCH_RANGE : RITUAL_DUNGEON_SEARCH_RANGE;
+}
+
+// Helper to find nearest gameobject by trying two rank IDs within appropriate range
+GameObject* FindNearestByRanks(Player* bot, uint32 rank1Id, uint32 rank2Id)
+{
+    GameObject* go = bot->FindNearestGameObject(rank1Id, GetRitualSearchRange(bot));
+    if (!go)
+        go = bot->FindNearestGameObject(rank2Id, GetRitualSearchRange(bot));
+    return go;
+}
+
+// Helper to finalize interaction: stop movement and set a short delay
+void FinalizeRitualInteraction(Player* bot, PlayerbotAI* botAI, uint32 delayMs)
+{
+    bot->GetMotionMaster()->Clear();
+    bot->GetMotionMaster()->MoveIdle();
+    botAI->SetNextCheckDelay(delayMs);
 }
 
 // Helper function to check if rituals can be used in current map
@@ -49,6 +66,26 @@ bool CanUseRituals(Player* bot)
         }
     }
     
+    return true;
+}
+
+bool HasAnyItemAtLeast(Player* bot, const std::vector<uint32>& itemIds, uint32 limit)
+{
+    for (uint32 id : itemIds)
+    {
+        if (bot->GetItemCount(id) >= limit)
+            return true;
+    }
+    return false;
+}
+
+bool HasAllItemsBelow(Player* bot, const std::vector<uint32>& itemIds, uint32 limit)
+{
+    for (uint32 id : itemIds)
+    {
+        if (bot->GetItemCount(id) >= limit)
+            return false;
+    }
     return true;
 }
 
@@ -78,22 +115,20 @@ bool InteractWithSoulPortalAction::isUseful()
         return false;
     
     // Check if bot already has Healthstone (limit to 1)
-    if (bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE) >= RITUAL_HEALTHSTONE_LIMIT ||
-        bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE) >= RITUAL_HEALTHSTONE_LIMIT ||
-        bot->GetItemCount(RITUAL_MAJOR_HEALTHSTONE) >= RITUAL_HEALTHSTONE_LIMIT ||
-        bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE_ALT) >= RITUAL_HEALTHSTONE_LIMIT ||
-        bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE_ALT) >= RITUAL_HEALTHSTONE_LIMIT)
     {
-        return false;
+        const std::vector<uint32> healthstoneIdsAtLeast = {
+            RITUAL_MINOR_HEALTHSTONE, RITUAL_LESSER_HEALTHSTONE, RITUAL_MAJOR_HEALTHSTONE,
+            RITUAL_MINOR_HEALTHSTONE_ALT, RITUAL_LESSER_HEALTHSTONE_ALT, RITUAL_FEL_HEALTHSTONE,
+            RITUAL_DEMONIC_HEALTHSTONE
+        };
+        if (HasAnyItemAtLeast(bot, healthstoneIdsAtLeast, RITUAL_HEALTHSTONE_LIMIT))
+        {
+            return false;
+        }
     }
     
-    // Search for soul portal nearby (within 30 yards)
-    // Try correct Soul Portal IDs from user
-    GameObject* soulPortal = bot->FindNearestGameObject(RITUAL_SOUL_PORTAL_RANK_1, GetRitualSearchRange(bot)); // Soul Portal Rank 1
-    if (!soulPortal)
-    {
-        soulPortal = bot->FindNearestGameObject(RITUAL_SOUL_PORTAL_RANK_2, GetRitualSearchRange(bot)); // Soul Portal Rank 2
-    }
+    // Search for soul portal nearby (within range)
+    GameObject* soulPortal = FindNearestByRanks(bot, RITUAL_SOUL_PORTAL_RANK_1, RITUAL_SOUL_PORTAL_RANK_2);
     
     if (!soulPortal)
     {
@@ -105,13 +140,8 @@ bool InteractWithSoulPortalAction::isUseful()
 
 bool InteractWithSoulPortalAction::Execute(Event event)
 {
-    // Search for soul portal nearby (within 30 yards)
-    // Try correct Soul Portal IDs from user
-    GameObject* soulPortal = bot->FindNearestGameObject(RITUAL_SOUL_PORTAL_RANK_1, GetRitualSearchRange(bot)); // Soul Portal Rank 1
-    if (!soulPortal)
-    {
-        soulPortal = bot->FindNearestGameObject(RITUAL_SOUL_PORTAL_RANK_2, GetRitualSearchRange(bot)); // Soul Portal Rank 2
-    }
+    // Search for soul portal nearby (within range)
+    GameObject* soulPortal = FindNearestByRanks(bot, RITUAL_SOUL_PORTAL_RANK_1, RITUAL_SOUL_PORTAL_RANK_2);
     
     if (!soulPortal)
     {
@@ -130,12 +160,8 @@ bool InteractWithSoulPortalAction::Execute(Event event)
     // Interact with the soul portal to create soul well
     soulPortal->Use(bot);
     
-    // Clear movement state to allow normal AI behavior
-    bot->GetMotionMaster()->Clear();
-    bot->GetMotionMaster()->MoveIdle();
-
-    // Add a small delay to allow re-evaluation of triggers and for mage to cast ritual
-    botAI->SetNextCheckDelay(RITUAL_DELAY_MS); // 3 seconds delay
+    // Clear movement and add small delay for re-evaluation
+    FinalizeRitualInteraction(bot, botAI, RITUAL_DELAY_MS);
     
     return true;
 }
@@ -148,9 +174,7 @@ bool InteractWithRefreshmentPortalAction::isUseful()
         return false;
     
     // Find refreshment portal nearby (both ranks)
-    GameObject* refreshmentPortal = bot->FindNearestGameObject(RITUAL_REFRESHMENT_PORTAL_RANK_1, GetRitualSearchRange(bot)); // Refreshment Portal Rank 1
-    if (!refreshmentPortal)
-        refreshmentPortal = bot->FindNearestGameObject(RITUAL_REFRESHMENT_PORTAL_RANK_2, GetRitualSearchRange(bot)); // Refreshment Portal Rank 2
+    GameObject* refreshmentPortal = FindNearestByRanks(bot, RITUAL_REFRESHMENT_PORTAL_RANK_1, RITUAL_REFRESHMENT_PORTAL_RANK_2);
     
     if (!refreshmentPortal)
     {
@@ -163,11 +187,7 @@ bool InteractWithRefreshmentPortalAction::isUseful()
 bool InteractWithRefreshmentPortalAction::Execute(Event event)
 {
     // Find refreshment portal nearby (both ranks)
-    GameObject* refreshmentPortal = bot->FindNearestGameObject(RITUAL_REFRESHMENT_PORTAL_RANK_1, GetRitualSearchRange(bot)); // Refreshment Portal Rank 1
-    if (!refreshmentPortal)
-    {
-        refreshmentPortal = bot->FindNearestGameObject(RITUAL_REFRESHMENT_PORTAL_RANK_2, GetRitualSearchRange(bot)); // Refreshment Portal Rank 2
-    }
+    GameObject* refreshmentPortal = FindNearestByRanks(bot, RITUAL_REFRESHMENT_PORTAL_RANK_1, RITUAL_REFRESHMENT_PORTAL_RANK_2);
     
     if (!refreshmentPortal)
     {
@@ -203,21 +223,14 @@ bool InteractWithRefreshmentTableAction::isUseful()
         return false;
     
     // Check if bot already has food/drink (limit to 1 stack each)
-    // Check for various types of conjured food and drink
-    if (bot->GetItemCount(RITUAL_CONJURED_MANA_BISCUIT) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_STRUDEL) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_COOKIE) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_CAKE) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_PIE) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BREAD) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_MUFFIN) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_DONUT) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BAGEL) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_PRETZEL) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_WATER) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_JUICE) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_TEA) >= RITUAL_FOOD_DRINK_LIMIT ||
-        bot->GetItemCount(RITUAL_CONJURED_MANA_COFFEE) >= RITUAL_FOOD_DRINK_LIMIT)
+    const std::vector<uint32> refreshmentIds = {
+        RITUAL_CONJURED_MANA_BISCUIT, RITUAL_CONJURED_MANA_STRUDEL, RITUAL_CONJURED_MANA_COOKIE,
+        RITUAL_CONJURED_MANA_CAKE, RITUAL_CONJURED_MANA_PIE, RITUAL_CONJURED_MANA_BREAD,
+        RITUAL_CONJURED_MANA_MUFFIN, RITUAL_CONJURED_MANA_DONUT, RITUAL_CONJURED_MANA_BAGEL,
+        RITUAL_CONJURED_MANA_PRETZEL, RITUAL_CONJURED_MANA_WATER, RITUAL_CONJURED_MANA_JUICE,
+        RITUAL_CONJURED_MANA_TEA, RITUAL_CONJURED_MANA_COFFEE
+    };
+    if (HasAnyItemAtLeast(bot, refreshmentIds, RITUAL_FOOD_DRINK_LIMIT))
     {
         return false; // Already has enough food/drink
     }
@@ -268,13 +281,8 @@ bool InteractWithRefreshmentTableAction::Execute(Event event)
     uint64 botGuid = bot->GetGUID().GetRawValue();
     hasCompletedRitualInteraction[botGuid] = true;
     
-    // Clear movement state to allow normal AI behavior
-    bot->GetMotionMaster()->Clear();
-    bot->GetMotionMaster()->MoveIdle();
-    
-    // Don't restore follow behavior immediately - let the ritual complete naturally
-    // Add a delay to prevent spam
-    botAI->SetNextCheckDelay(RITUAL_DELAY_MS); // 3 seconds delay (reduced from 5)
+    // Don't restore follow behavior immediately; add a delay to prevent spam
+    FinalizeRitualInteraction(bot, botAI, RITUAL_DELAY_MS);
     
     return true;
 }
@@ -283,12 +291,11 @@ bool InteractWithRefreshmentTableAction::Execute(Event event)
 // SoulPortalAvailableTrigger - Detect if Soul Portal is available (no delay)
 bool SoulPortalAvailableTrigger::IsActive()
 {
-    if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
+    if (!IsInRitualMap(bot))
     {
         return false;
     }
     
-    // CRITICAL FIX: Don't activate for Mages when they should be casting their own ritual
     // This prevents the Mage from interrupting its own ritual to interact with the Soul Portal
     if (bot->getClass() == CLASS_MAGE)
     {
@@ -341,11 +348,12 @@ bool InteractWithSoulwellAction::isUseful()
     }
     
     // Check if bot needs healthstone
-    bool needsHealthstone = (bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE) == 0 &&
-                            bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE) == 0 &&
-                            bot->GetItemCount(RITUAL_MAJOR_HEALTHSTONE) == 0 &&
-                            bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE_ALT) == 0 &&
-                            bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE_ALT) == 0);
+    const std::vector<uint32> healthstoneIdsBelow = {
+        RITUAL_MINOR_HEALTHSTONE, RITUAL_LESSER_HEALTHSTONE, RITUAL_MAJOR_HEALTHSTONE,
+        RITUAL_MINOR_HEALTHSTONE_ALT, RITUAL_LESSER_HEALTHSTONE_ALT, RITUAL_FEL_HEALTHSTONE,
+        RITUAL_DEMONIC_HEALTHSTONE
+    };
+    bool needsHealthstone = HasAllItemsBelow(bot, healthstoneIdsBelow, 1);
     
     if (!needsHealthstone)
     {
@@ -406,12 +414,8 @@ bool InteractWithSoulwellAction::Execute(Event event)
     hasCompletedRitualInteraction[botGuid] = true;
     
  
-    // Clear movement state to allow normal AI behavior
-    bot->GetMotionMaster()->Clear();
-    bot->GetMotionMaster()->MoveIdle();
-    
     // Add a delay to prevent spam
-    botAI->SetNextCheckDelay(RITUAL_DELAY_MS); // 3 seconds delay (reduced from 5)
+    FinalizeRitualInteraction(bot, botAI, RITUAL_DELAY_MS);
     
     return true;
 }
@@ -431,13 +435,11 @@ bool SoulwellAvailableTrigger::IsActive()
     }
     
     // Check if bot needs healthstone
-    bool needsHealthstone =
-        bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE) == 0 &&   // Minor Healthstone
-        bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE) == 0 &&   // Lesser Healthstone
-        bot->GetItemCount(RITUAL_MAJOR_HEALTHSTONE) == 0 &&   // Major Healthstone
-        bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE_ALT) == 0 &&  // Minor Healthstone
-        bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE_ALT) == 0 &&  // Lesser Healthstone
-        bot->GetItemCount(RITUAL_FEL_HEALTHSTONE) == 0;   // Fel Healthstone
+    const std::vector<uint32> healthstoneIdsZeroOrMore = {
+        RITUAL_MINOR_HEALTHSTONE, RITUAL_LESSER_HEALTHSTONE, RITUAL_MAJOR_HEALTHSTONE,
+        RITUAL_MINOR_HEALTHSTONE_ALT, RITUAL_LESSER_HEALTHSTONE_ALT, RITUAL_FEL_HEALTHSTONE, RITUAL_DEMONIC_HEALTHSTONE
+    };
+    bool needsHealthstone = HasAllItemsBelow(bot, healthstoneIdsZeroOrMore, 1);
 
     if (!needsHealthstone)
     {
@@ -660,29 +662,22 @@ bool NeedsConjuredItemsTrigger::IsActive()
         return false;
     
     // Check if bot needs healthstone
-    bool needsHealthstone = 
-        bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE) == 0 && // Minor Healthstone
-        bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE) == 0 && // Lesser Healthstone
-        bot->GetItemCount(RITUAL_MAJOR_HEALTHSTONE) == 0 && // Major Healthstone
-        bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE_ALT) == 0 && // Minor Healthstone
-        bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE_ALT) == 0;  // Lesser Healthstone
+    const std::vector<uint32> healthstoneIdsCheck1 = {
+        RITUAL_MINOR_HEALTHSTONE, RITUAL_LESSER_HEALTHSTONE, RITUAL_MAJOR_HEALTHSTONE,
+        RITUAL_MINOR_HEALTHSTONE_ALT, RITUAL_LESSER_HEALTHSTONE_ALT, RITUAL_FEL_HEALTHSTONE,
+        RITUAL_DEMONIC_HEALTHSTONE
+    };
+    bool needsHealthstone = HasAllItemsBelow(bot, healthstoneIdsCheck1, 1);
     
     // Check if bot needs food/drink
-    bool needsFoodDrink = 
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BISCUIT) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Biscuit
-        bot->GetItemCount(RITUAL_CONJURED_MANA_STRUDEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Strudel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_COOKIE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Cookie
-        bot->GetItemCount(RITUAL_CONJURED_MANA_CAKE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Cake
-        bot->GetItemCount(RITUAL_CONJURED_MANA_PIE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Pie
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BREAD) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Bread
-        bot->GetItemCount(RITUAL_CONJURED_MANA_MUFFIN) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Muffin
-        bot->GetItemCount(RITUAL_CONJURED_MANA_DONUT) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Donut
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BAGEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Bagel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_PRETZEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Pretzel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_WATER) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Water
-        bot->GetItemCount(RITUAL_CONJURED_MANA_JUICE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Juice
-        bot->GetItemCount(RITUAL_CONJURED_MANA_TEA) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Tea
-        bot->GetItemCount(RITUAL_CONJURED_MANA_COFFEE) < RITUAL_FOOD_DRINK_LIMIT;  // Conjured Mana Coffee
+    const std::vector<uint32> refreshmentIds = {
+        RITUAL_CONJURED_MANA_BISCUIT, RITUAL_CONJURED_MANA_STRUDEL, RITUAL_CONJURED_MANA_COOKIE,
+        RITUAL_CONJURED_MANA_CAKE, RITUAL_CONJURED_MANA_PIE, RITUAL_CONJURED_MANA_BREAD,
+        RITUAL_CONJURED_MANA_MUFFIN, RITUAL_CONJURED_MANA_DONUT, RITUAL_CONJURED_MANA_BAGEL,
+        RITUAL_CONJURED_MANA_PRETZEL, RITUAL_CONJURED_MANA_WATER, RITUAL_CONJURED_MANA_JUICE,
+        RITUAL_CONJURED_MANA_TEA, RITUAL_CONJURED_MANA_COFFEE
+    };
+    bool needsFoodDrink = HasAllItemsBelow(bot, refreshmentIds, RITUAL_FOOD_DRINK_LIMIT);
     
     // Check if there are conjured objects nearby that we can interact with
     bool hasSoulwell = 
@@ -715,21 +710,14 @@ bool CheckConjuredItemsAction::isUseful()
         bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE_ALT) == 0;  // Lesser Healthstone
     
     // Check if bot needs food/drink
-    bool needsFoodDrink =
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BISCUIT) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Biscuit
-        bot->GetItemCount(RITUAL_CONJURED_MANA_STRUDEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Strudel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_COOKIE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Cookie
-        bot->GetItemCount(RITUAL_CONJURED_MANA_CAKE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Cake
-        bot->GetItemCount(RITUAL_CONJURED_MANA_PIE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Pie
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BREAD) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Bread
-        bot->GetItemCount(RITUAL_CONJURED_MANA_MUFFIN) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Muffin
-        bot->GetItemCount(RITUAL_CONJURED_MANA_DONUT) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Donut
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BAGEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Bagel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_PRETZEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Pretzel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_WATER) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Water
-        bot->GetItemCount(RITUAL_CONJURED_MANA_JUICE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Juice
-        bot->GetItemCount(RITUAL_CONJURED_MANA_TEA) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Tea
-        bot->GetItemCount(RITUAL_CONJURED_MANA_COFFEE) < RITUAL_FOOD_DRINK_LIMIT;  // Conjured Mana Coffee
+    const std::vector<uint32> refreshmentIds = {
+        RITUAL_CONJURED_MANA_BISCUIT, RITUAL_CONJURED_MANA_STRUDEL, RITUAL_CONJURED_MANA_COOKIE,
+        RITUAL_CONJURED_MANA_CAKE, RITUAL_CONJURED_MANA_PIE, RITUAL_CONJURED_MANA_BREAD,
+        RITUAL_CONJURED_MANA_MUFFIN, RITUAL_CONJURED_MANA_DONUT, RITUAL_CONJURED_MANA_BAGEL,
+        RITUAL_CONJURED_MANA_PRETZEL, RITUAL_CONJURED_MANA_WATER, RITUAL_CONJURED_MANA_JUICE,
+        RITUAL_CONJURED_MANA_TEA, RITUAL_CONJURED_MANA_COFFEE
+    };
+    bool needsFoodDrink = HasAllItemsBelow(bot, refreshmentIds, RITUAL_FOOD_DRINK_LIMIT);
     
     // Check if there are conjured objects nearby that we can interact with
     bool hasSoulwell =
@@ -749,13 +737,11 @@ bool CheckConjuredItemsAction::isUseful()
 bool CheckConjuredItemsAction::Execute(Event event)
 {
     // Check if bot needs healthstone and there's a soulwell nearby
-    bool needsHealthstone =
-        bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE) == 0 && // Minor Healthstone
-        bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE) == 0 && // Lesser Healthstone
-        bot->GetItemCount(RITUAL_MAJOR_HEALTHSTONE) == 0 && // Major Healthstone
-        bot->GetItemCount(RITUAL_MINOR_HEALTHSTONE_ALT) == 0 && // Minor Healthstone
-        bot->GetItemCount(RITUAL_LESSER_HEALTHSTONE_ALT) == 0 && // Lesser Healthstone
-        bot->GetItemCount(RITUAL_FEL_HEALTHSTONE) == 0;  // Fel Healthstone
+    const std::vector<uint32> healthstoneIdsCheck2 = {
+        RITUAL_MINOR_HEALTHSTONE, RITUAL_LESSER_HEALTHSTONE, RITUAL_MAJOR_HEALTHSTONE,
+        RITUAL_MINOR_HEALTHSTONE_ALT, RITUAL_LESSER_HEALTHSTONE_ALT, RITUAL_FEL_HEALTHSTONE, RITUAL_DEMONIC_HEALTHSTONE
+    };
+    bool needsHealthstone = HasAllItemsBelow(bot, healthstoneIdsCheck2, 1);
     
     if (needsHealthstone)
     {
@@ -786,21 +772,14 @@ bool CheckConjuredItemsAction::Execute(Event event)
     }
     
     // Check if bot needs food/drink and there's a refreshment table nearby
-    bool needsFoodDrink = 
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BISCUIT) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Biscuit
-        bot->GetItemCount(RITUAL_CONJURED_MANA_STRUDEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Strudel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_COOKIE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Cookie
-        bot->GetItemCount(RITUAL_CONJURED_MANA_CAKE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Cake
-        bot->GetItemCount(RITUAL_CONJURED_MANA_PIE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Pie
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BREAD) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Bread
-        bot->GetItemCount(RITUAL_CONJURED_MANA_MUFFIN) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Muffin
-        bot->GetItemCount(RITUAL_CONJURED_MANA_DONUT) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Donut
-        bot->GetItemCount(RITUAL_CONJURED_MANA_BAGEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Bagel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_PRETZEL) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Pretzel
-        bot->GetItemCount(RITUAL_CONJURED_MANA_WATER) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Water
-        bot->GetItemCount(RITUAL_CONJURED_MANA_JUICE) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Juice
-        bot->GetItemCount(RITUAL_CONJURED_MANA_TEA) < RITUAL_FOOD_DRINK_LIMIT && // Conjured Mana Tea
-        bot->GetItemCount(RITUAL_CONJURED_MANA_COFFEE) < RITUAL_FOOD_DRINK_LIMIT;  // Conjured Mana Coffee
+    const std::vector<uint32> refreshmentIds = {
+        RITUAL_CONJURED_MANA_BISCUIT, RITUAL_CONJURED_MANA_STRUDEL, RITUAL_CONJURED_MANA_COOKIE,
+        RITUAL_CONJURED_MANA_CAKE, RITUAL_CONJURED_MANA_PIE, RITUAL_CONJURED_MANA_BREAD,
+        RITUAL_CONJURED_MANA_MUFFIN, RITUAL_CONJURED_MANA_DONUT, RITUAL_CONJURED_MANA_BAGEL,
+        RITUAL_CONJURED_MANA_PRETZEL, RITUAL_CONJURED_MANA_WATER, RITUAL_CONJURED_MANA_JUICE,
+        RITUAL_CONJURED_MANA_TEA, RITUAL_CONJURED_MANA_COFFEE
+    };
+    bool needsFoodDrink = HasAllItemsBelow(bot, refreshmentIds, RITUAL_FOOD_DRINK_LIMIT);
     
     if (needsFoodDrink)
     {
@@ -886,10 +865,10 @@ bool NeedsFollowRestorationTrigger::IsActive()
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE || bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
         return false;
     
-    // Check if bot has a master to follow
-    Unit* master = botAI->GetGroupMaster();
-    if (!master || master == bot)
+    // Check if bot has a real player master
+    if (!botAI->HasRealPlayerMaster())
         return false;
+    Unit* master = botAI->GetGroupMaster();
     
     // Check if bot is not currently following
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
@@ -934,10 +913,10 @@ bool RestoreFollowBehaviorAction::isUseful()
     if (!botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))
         return false;
     
-    // Check if bot has a master to follow
-    Unit* master = botAI->GetGroupMaster();
-    if (!master || master == bot)
+    // Check if bot has a real player master
+    if (!botAI->HasRealPlayerMaster())
         return false;
+    Unit* master = botAI->GetGroupMaster();
     
     // Check if bot is not currently following
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
@@ -956,10 +935,12 @@ bool RestoreFollowBehaviorAction::Execute(Event event)
     // Clear completed interaction flag to avoid reactivations
     hasCompletedRitualInteraction[botGuid] = false;
     
-    // Try to find master to follow
-    Unit* master = botAI->GetGroupMaster();
-    if (master && master != bot)
+    // Try to find master to follow (real player master only)
+    if (botAI->HasRealPlayerMaster())
     {        
+        Unit* master = botAI->GetGroupMaster();
+        if (!master || master == bot)
+            return false;
         // Use direct follow approach
         bot->GetMotionMaster()->MoveFollow(master, sPlayerbotAIConfig->followDistance, 0.0f);    
         return true;

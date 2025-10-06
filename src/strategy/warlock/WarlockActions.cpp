@@ -28,7 +28,7 @@
 #include <mutex>
 
 // Global constants for spells and items
-namespace WarlockRitualConstants
+namespace WarlockConstants
 {
     // Ritual of Souls spells
     const uint32 RITUAL_OF_SOULS_RANK_1 = 29893;
@@ -54,6 +54,7 @@ namespace WarlockRitualConstants
     const uint32 MINOR_HEALTHSTONE_ALT = 19004;
     const uint32 LESSER_HEALTHSTONE_ALT = 19005;
     const uint32 FEL_HEALTHSTONE = 36892;
+    const uint32 DEMONIC_HEALTHSTONE = 22103;
     
     // Soulstone items
     const uint32 MINOR_SOULSTONE = 5232;
@@ -79,7 +80,13 @@ namespace WarlockRitualConstants
     const uint32 CREATE_FIRESTONE_RANK_3 = 17952;
     const uint32 CREATE_FIRESTONE_RANK_4 = 17953;
     const uint32 CREATE_FIRESTONE_RANK_5 = 27250;
+    const uint32 CREATE_FIRESTONE_RANK_6 = 60219;
     const uint32 CREATE_FIRESTONE_RANK_7 = 60220;
+
+    // Seed of Corruption spells
+    const uint32 SEED_OF_CORRUPTION_RANK_1 = 27243;
+    const uint32 SEED_OF_CORRUPTION_RANK_2 = 47835;
+    const uint32 SEED_OF_CORRUPTION_RANK_3 = 47836;
 }
 
 // Function declared in RitualActions.cpp
@@ -93,8 +100,6 @@ extern std::unordered_map<uint64, bool> hasCompletedRitualInteraction;
 // Reservation map for soulstone targets (GUID -> reservation expiry in ms)
 static std::unordered_map<ObjectGuid, uint32> soulstoneReservations;
 static std::mutex soulstoneReservationsMutex;
-
-const int ITEM_SOUL_SHARD = 6265;
 
 // Checks if the bot has less than 26 soul shards, and if so, allows casting Drain Soul
 bool CastDrainSoulAction::isUseful() 
@@ -159,7 +164,10 @@ bool CastRainOfFireAction::isUseful()
     if (!target)
         return false;
     
-    if (bot->HasSpell(27243) || bot->HasSpell(47835) || bot->HasSpell(47836)) // Seed of Corruption spell IDs
+    // Seed of Corruption spell IDs (constants declared above)
+    if (bot->HasSpell(WarlockConstants::SEED_OF_CORRUPTION_RANK_1) ||
+        bot->HasSpell(WarlockConstants::SEED_OF_CORRUPTION_RANK_2) ||
+        bot->HasSpell(WarlockConstants::SEED_OF_CORRUPTION_RANK_3))
         return false;
     
     return true;
@@ -207,9 +215,9 @@ bool CreateSoulShardAction::Execute(Event event)
 
     ItemPosCountVec dest;
     uint32 count = 1;
-    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SOUL_SHARD, count) == EQUIP_ERR_OK)
+    if (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, WarlockConstants::SOUL_SHARD_ITEM, count) == EQUIP_ERR_OK)
     {
-        bot->StoreNewItem(dest, ITEM_SOUL_SHARD, true, Item::GenerateItemRandomPropertyId(ITEM_SOUL_SHARD));
+        bot->StoreNewItem(dest, WarlockConstants::SOUL_SHARD_ITEM, true, Item::GenerateItemRandomPropertyId(WarlockConstants::SOUL_SHARD_ITEM));
         SQLTransaction<CharacterDatabaseConnection> trans = CharacterDatabase.BeginTransaction();
         bot->SaveInventoryAndGoldToDB(trans);
         CharacterDatabase.CommitTransaction(trans);
@@ -224,13 +232,13 @@ bool CreateSoulShardAction::isUseful()
     if (!bot)
         return false;
 
-    uint32 currentShards = bot->GetItemCount(ITEM_SOUL_SHARD, false);  // false = only bags
+    uint32 currentShards = bot->GetItemCount(WarlockConstants::SOUL_SHARD_ITEM, false);  // false = only bags
     const uint32 SHARD_CAP = 6;                                    // adjust as needed
 
     // Only allow if under cap AND there is space for a new shard
     ItemPosCountVec dest;
     uint32 count = 1;
-    bool hasSpace = (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_SOUL_SHARD, count) == EQUIP_ERR_OK);
+    bool hasSpace = (bot->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, WarlockConstants::SOUL_SHARD_ITEM, count) == EQUIP_ERR_OK);
 
     return (currentShards < SHARD_CAP) && hasSpace;
 }
@@ -242,13 +250,13 @@ bool CastCreateSoulstoneAction::isUseful()
 
     // List of all Soulstone item IDs
     static const std::vector<uint32> soulstoneIds = {
-        5232,   // Minor Soulstone
-        16892,  // Lesser Soulstone
-        16893,  // Soulstone
-        16895,  // Greater Soulstone
-        16896,  // Major Soulstone
-        22116,  // Master Soulstone
-        36895   // Demonic Soulstone
+        WarlockConstants::MINOR_SOULSTONE,
+        WarlockConstants::LESSER_SOULSTONE,
+        WarlockConstants::SOULSTONE,
+        WarlockConstants::GREATER_SOULSTONE,
+        WarlockConstants::MAJOR_SOULSTONE,
+        WarlockConstants::MASTER_SOULSTONE,
+        WarlockConstants::DEMONIC_SOULSTONE
     };
 
     // Check if the bot already has any soulstone
@@ -279,7 +287,7 @@ bool DestroySoulShardAction::Execute(Event event)
             {
                 if (Item* pItem = pBag->GetItemByPos(j))
                 {
-                    if (pItem->GetTemplate()->ItemId == ITEM_SOUL_SHARD)
+                    if (pItem->GetTemplate()->ItemId == WarlockConstants::SOUL_SHARD_ITEM)
                     {
                         bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                         return true;  // Only destroy one!
@@ -294,7 +302,7 @@ bool DestroySoulShardAction::Execute(Event event)
     {
         if (Item* pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
-            if (pItem->GetTemplate()->ItemId == ITEM_SOUL_SHARD)
+            if (pItem->GetTemplate()->ItemId == WarlockConstants::SOUL_SHARD_ITEM)
             {
                 bot->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
                 return true;
@@ -307,7 +315,15 @@ bool DestroySoulShardAction::Execute(Event event)
 // Checks if the target has a soulstone aura
 static bool HasSoulstoneAura(Unit* unit)
 {
-    static const std::vector<uint32> soulstoneAuraIds = {20707, 20762, 20763, 20764, 20765, 27239, 47883};
+    static const std::vector<uint32> soulstoneAuraIds = {
+        WarlockConstants::SOULSTONE_SPELL_MINOR,
+        WarlockConstants::SOULSTONE_SPELL_LESSER,
+        WarlockConstants::SOULSTONE_SPELL_NORMAL,
+        WarlockConstants::SOULSTONE_SPELL_GREATER,
+        WarlockConstants::SOULSTONE_SPELL_MAJOR,
+        WarlockConstants::SOULSTONE_SPELL_MASTER,
+        WarlockConstants::SOULSTONE_SPELL_DEMONIC
+    };
     for (uint32 spellId : soulstoneAuraIds)
     {
         if (unit->HasAura(spellId))
@@ -496,12 +512,13 @@ bool UseSoulstoneHealerAction::Execute(Event event)
 }
 
 const std::vector<uint32> CastCreateFirestoneAction::firestoneSpellIds = {
-    60220,  // Create Firestone (Rank 7)
-    27250,  // Rank 5
-    17953,  // Rank 4
-    17952,  // Rank 3
-    17951,  // Rank 2
-    6366    // Rank 1
+    WarlockConstants::CREATE_FIRESTONE_RANK_7,
+    WarlockConstants::CREATE_FIRESTONE_RANK_6,
+    WarlockConstants::CREATE_FIRESTONE_RANK_5,
+    WarlockConstants::CREATE_FIRESTONE_RANK_4,
+    WarlockConstants::CREATE_FIRESTONE_RANK_3,
+    WarlockConstants::CREATE_FIRESTONE_RANK_2,
+    WarlockConstants::CREATE_FIRESTONE_RANK_1
 };
 
 CastCreateFirestoneAction::CastCreateFirestoneAction(PlayerbotAI* botAI)
@@ -533,30 +550,18 @@ bool CastCreateFirestoneAction::isUseful()
 
 bool CastRitualOfSoulsAction::isUseful()
 {
-    if (!CanUseRituals(bot))
-    {
-        return false;
-    }
-    
-    if (!bot->HasSpell(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_1) && !bot->HasSpell(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_2))
-    {
-        return false;
-    }
-    
-    if (bot->GetSpellCooldownDelay(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_1) > 0 && bot->GetSpellCooldownDelay(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_2) > 0)
-    {
-        return false;
-    }
-    
+    // Fast-fail preconditions in a single check for readability
+    const bool hasAnyRank = bot->HasSpell(WarlockConstants::RITUAL_OF_SOULS_RANK_1) ||
+                            bot->HasSpell(WarlockConstants::RITUAL_OF_SOULS_RANK_2);
+    const bool bothRanksOnCd = bot->GetSpellCooldownDelay(WarlockConstants::RITUAL_OF_SOULS_RANK_1) > 0 &&
+                               bot->GetSpellCooldownDelay(WarlockConstants::RITUAL_OF_SOULS_RANK_2) > 0;
     uint32 currentTime = time(nullptr);
     auto it = lastRitualUsage.find(bot->GetGUID());
-    if (it != lastRitualUsage.end())
+    const bool underCustomCooldown = (it != lastRitualUsage.end()) && ((currentTime - it->second) < 900); // 15 min
+
+    if (!CanUseRituals(bot) || !hasAnyRank || bothRanksOnCd || underCustomCooldown)
     {
-        uint32 timeSinceLastUse = currentTime - it->second;
-        if (timeSinceLastUse < 900) // 15 minutes = 900 seconds
-        {
-            return false;
-        }
+        return false;
     }
     
     // NEW FUNCTIONALITY: Coordination between multiple warlocks in party
@@ -574,9 +579,13 @@ bool CastRitualOfSoulsAction::isUseful()
                 if (member->getClass() == CLASS_WARLOCK && member->IsAlive())
                 {
                     // In Battlegrounds, only consider same faction
-                    bool isSameFaction = (member->GetTeamId() == bot->GetTeamId());
-                    bool shouldConsider = bot->GetMap()->IsBattleground() ? isSameFaction : true;
-                    
+                    bool shouldConsider = true;
+                    if (bot->GetMap()->IsBattleground())
+                    {
+                        bool isSameFaction = (member->GetTeamId() == bot->GetTeamId());
+                        shouldConsider = isSameFaction;
+                    }
+
                     if (shouldConsider && member->GetGUID().GetCounter() < lowestGuid)
                     {
                         lowestGuid = member->GetGUID().GetCounter();
@@ -593,22 +602,17 @@ bool CastRitualOfSoulsAction::isUseful()
         }
     }
     
-    if (!HasRitualComponent(bot, WarlockRitualConstants::RITUAL_OF_SOULS_RANK_1))
+    if (!HasRitualComponent(bot, WarlockConstants::RITUAL_OF_SOULS_RANK_1))
     {
         // Give Soul Shard to bot
-        bot->AddItem(WarlockRitualConstants::SOUL_SHARD_ITEM, 1);
+        bot->AddItem(WarlockConstants::SOUL_SHARD_ITEM, 1);
     }
     
-    GameObject* existingSoulPortal = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_PORTAL_RANK_1, 30.0f);
+    GameObject* existingSoulPortal = bot->FindNearestGameObject(WarlockConstants::SOUL_PORTAL_RANK_1, 30.0f);
     if (!existingSoulPortal)
-        existingSoulPortal = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_PORTAL_RANK_2, 30.0f);
+        existingSoulPortal = bot->FindNearestGameObject(WarlockConstants::SOUL_PORTAL_RANK_2, 30.0f);
     
-    if (existingSoulPortal)
-    {
-        return false;
-    }
-    
-    return true;
+    return !existingSoulPortal;
 }
 
 bool CastRitualOfSoulsAction::Execute(Event event)
@@ -622,9 +626,9 @@ bool CastRitualOfSoulsAction::Execute(Event event)
     }
     
     // Check if there are portals very close before casting to avoid overlap
-    GameObject* nearbyPortal = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_PORTAL_RANK_1, 10.0f);
+    GameObject* nearbyPortal = bot->FindNearestGameObject(WarlockConstants::SOUL_PORTAL_RANK_1, 10.0f);
     if (!nearbyPortal)
-        nearbyPortal = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_PORTAL_RANK_2, 10.0f);
+        nearbyPortal = bot->FindNearestGameObject(WarlockConstants::SOUL_PORTAL_RANK_2, 10.0f);
 
     // In Battlegrounds, also check if there are Mages of the SAME FACTION nearby
     bool hasMageNearby = false;
@@ -655,12 +659,21 @@ bool CastRitualOfSoulsAction::Execute(Event event)
         bot->SetFacingTo(newOrientation);
     }
     
-    if (!bot->HasSpell(29893) && !bot->HasSpell(58887))
+    // Determine rank via switch-style mapping for readability
+    uint32 ritualRankSpellId = 0;
+    if (bot->HasSpell(WarlockConstants::RITUAL_OF_SOULS_RANK_2))
     {
-        return false;
+        ritualRankSpellId = WarlockConstants::RITUAL_OF_SOULS_RANK_2;
     }
+    else if (bot->HasSpell(WarlockConstants::RITUAL_OF_SOULS_RANK_1))
+    {
+        ritualRankSpellId = WarlockConstants::RITUAL_OF_SOULS_RANK_1;
+    }
+
+    if (ritualRankSpellId == 0)
+        return false;
     
-    if (bot->GetSpellCooldownDelay(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_1) > 0 && bot->GetSpellCooldownDelay(WarlockRitualConstants::RITUAL_OF_SOULS_RANK_2) > 0)
+    if (bot->GetSpellCooldownDelay(WarlockConstants::RITUAL_OF_SOULS_RANK_1) > 0 && bot->GetSpellCooldownDelay(WarlockConstants::RITUAL_OF_SOULS_RANK_2) > 0)
     {
         return false;
     }
@@ -699,24 +712,25 @@ bool LootSoulwellAction::isUseful()
         return false;
     
     // Check if bot already has a healthstone
-    if (bot->GetItemCount(WarlockRitualConstants::MINOR_HEALTHSTONE, false) > 0 ||
-        bot->GetItemCount(WarlockRitualConstants::LESSER_HEALTHSTONE, false) > 0 ||
-        bot->GetItemCount(WarlockRitualConstants::MAJOR_HEALTHSTONE, false) > 0 ||
-        bot->GetItemCount(WarlockRitualConstants::MINOR_HEALTHSTONE_ALT, false) > 0 ||
-        bot->GetItemCount(WarlockRitualConstants::LESSER_HEALTHSTONE_ALT, false) > 0 ||
-        bot->GetItemCount(WarlockRitualConstants::FEL_HEALTHSTONE, false) > 0)
+    if (bot->GetItemCount(WarlockConstants::MINOR_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockConstants::LESSER_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockConstants::MAJOR_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockConstants::MINOR_HEALTHSTONE_ALT, false) > 0 ||
+        bot->GetItemCount(WarlockConstants::LESSER_HEALTHSTONE_ALT, false) > 0 ||
+        bot->GetItemCount(WarlockConstants::FEL_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockConstants::DEMONIC_HEALTHSTONE, false) > 0)
     {
         return false; // Already has a healthstone
     }
     
     // Check if there's a soulwell nearby
-    GameObject* soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_1, 30.0f);
+    GameObject* soulwell = bot->FindNearestGameObject(WarlockConstants::SOUL_WELL_RANK_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2, 30.0f);
+        soulwell = bot->FindNearestGameObject(WarlockConstants::SOUL_WELL_RANK_2, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2_VARIANT_1, 30.0f);
+        soulwell = bot->FindNearestGameObject(WarlockConstants::SOUL_WELL_RANK_2_VARIANT_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2_VARIANT_2, 30.0f);
+        soulwell = bot->FindNearestGameObject(WarlockConstants::SOUL_WELL_RANK_2_VARIANT_2, 30.0f);
     
     if (!soulwell)
         return false;
@@ -727,13 +741,13 @@ bool LootSoulwellAction::isUseful()
 bool LootSoulwellAction::Execute(Event event)
 {
     // Find the soulwell
-    GameObject* soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_1, 30.0f);
+    GameObject* soulwell = bot->FindNearestGameObject(WarlockConstants::SOUL_WELL_RANK_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2, 30.0f);
+        soulwell = bot->FindNearestGameObject(WarlockConstants::SOUL_WELL_RANK_2, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2_VARIANT_1, 30.0f);
+        soulwell = bot->FindNearestGameObject(WarlockConstants::SOUL_WELL_RANK_2_VARIANT_1, 30.0f);
     if (!soulwell)
-        soulwell = bot->FindNearestGameObject(WarlockRitualConstants::SOUL_WELL_RANK_2_VARIANT_2, 30.0f);
+        soulwell = bot->FindNearestGameObject(WarlockConstants::SOUL_WELL_RANK_2_VARIANT_2, 30.0f);
     
     if (!soulwell)
         return false;
@@ -750,12 +764,8 @@ bool LootSoulwellAction::Execute(Event event)
     // Interact with the soulwell to get healthstone
     soulwell->Use(bot);
     
-    // Clear movement state after interaction to allow normal movement
-    bot->GetMotionMaster()->Clear();
-    bot->GetMotionMaster()->MoveIdle();
-    
-    // Add a delay to prevent spam
-    botAI->SetNextCheckDelay(5000); // 5 seconds delay
+    // Clear movement state and add a delay to prevent spam
+    FinalizeRitualInteraction(bot, botAI, 5000);
     
     return true;
 }
