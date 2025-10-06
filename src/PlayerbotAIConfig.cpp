@@ -89,7 +89,6 @@ bool PlayerbotAIConfig::Initialize()
     randomBotMinLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMinLoginLevel", 1);
     randomBotMaxLoginLevel = sConfigMgr->GetOption<int32>("AiPlayerbot.RandomBotMaxLoginLevel", 80);
     randomBotLogoutOutsideLoginRange = sConfigMgr->GetOption<bool>("AiPlayerbot.RandomBotLogoutOutsideLoginRange", false);
-
     farDistance = sConfigMgr->GetOption<float>("AiPlayerbot.FarDistance", 20.0f);
     sightDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SightDistance", 75.0f);
     spellDistance = sConfigMgr->GetOption<float>("AiPlayerbot.SpellDistance", 25.0f);
