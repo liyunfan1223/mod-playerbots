@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #include "FollowActions.h"
@@ -97,8 +97,8 @@ bool FollowAction::isUseful()
 
         distance = bot->GetDistance(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
-    if (botAI->HasStrategy("masterfishing", BOT_STATE_NON_COMBAT))
-        return sServerFacade->IsDistanceGreaterThan(distance, 20.0); 
+    if (botAI->HasStrategy("master fishing", BOT_STATE_NON_COMBAT))
+        return sServerFacade->IsDistanceGreaterThan(distance, 5.0); 
 
     return sServerFacade->IsDistanceGreaterThan(distance, formation->GetMaxDistance());
 }
