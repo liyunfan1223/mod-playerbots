@@ -911,7 +911,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
     LOG_INFO("playerbots", "{}/{} random bot guilds exist in guild table",guildNumber, sPlayerbotAIConfig->randomBotGuildCount);
     if (guildNumber >= sPlayerbotAIConfig->randomBotGuildCount)
     {
-        LOG_INFO("playerbots", "No new random guilds required");
+        LOG_DEBUG("playerbots", "No new random guilds required");
         return;
     }
 
@@ -935,7 +935,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
             }
         }
     }
-    LOG_INFO("playerbots", "{} available leaders for new guilds found", availableLeaders.size());
+    LOG_DEBUG("playerbots", "{} available leaders for new guilds found", availableLeaders.size());
 
     // Create up to randomBotGuildCount by counting only EFFECTIVE creations
     uint32 createdThisRun = 0;
