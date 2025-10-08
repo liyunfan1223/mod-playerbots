@@ -3498,7 +3498,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     //     return false;
 
 
-    // check bot/target world-state just before preparing the actual spel
+    // check bot/target world-state just before preparing the actual spell
     Unit* unitTarget = targets.GetUnitTarget();
     if (!bot->IsInWorld() || bot->IsDuringRemoveFromWorld() ||
         (unitTarget && (!unitTarget->IsInWorld() || unitTarget->IsDuringRemoveFromWorld())))
