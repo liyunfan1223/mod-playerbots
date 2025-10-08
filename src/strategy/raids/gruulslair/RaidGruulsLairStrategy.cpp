@@ -19,7 +19,7 @@ void RaidGruulsLairStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     triggers.push_back(new TriggerNode("gruul the dragonkiller", NextAction::array(0,
         new NextAction("gruul the dragonkiller shatter spread", ACTION_EMERGENCY + 6),
-        new NextAction("gruul the dragonkiller position boss", ACTION_RAID + 1),
+        new NextAction("gruul the dragonkiller main tank", ACTION_RAID + 1),
         new NextAction("gruul the dragonkiller spread ranged", ACTION_RAID + 1),
         nullptr)));
 }

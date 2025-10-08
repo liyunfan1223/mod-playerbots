@@ -104,10 +104,10 @@ public:
     bool isUseful() override;
 };
 
-class GruulTheDragonkillerPositionBossAction : public MovementAction
+class GruulTheDragonkillerMainTankAction : public AttackAction
 {
 public:
-    GruulTheDragonkillerPositionBossAction(PlayerbotAI* botAI, std::string const name = "gruul the dragonkiller position boss") : MovementAction(botAI, name) {};
+    GruulTheDragonkillerMainTankAction(PlayerbotAI* botAI, std::string const name = "gruul the dragonkiller main tank") : AttackAction(botAI, name) {};
 
     bool Execute(Event event) override;
     bool isUseful() override;

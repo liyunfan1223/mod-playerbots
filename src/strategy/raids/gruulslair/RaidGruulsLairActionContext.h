@@ -23,7 +23,7 @@ public:
         creators["high king maulgar hunter misdirection"] = &RaidGruulsLairActionContext::high_king_maulgar_hunter_misdirection;
 
         // Gruul the Dragonkiller
-        creators["gruul the dragonkiller position boss"] = &RaidGruulsLairActionContext::gruul_the_dragonkiller_position_boss;
+        creators["gruul the dragonkiller main tank"] = &RaidGruulsLairActionContext::gruul_the_dragonkiller_main_tank;
         creators["gruul the dragonkiller spread ranged"] = &RaidGruulsLairActionContext::gruul_the_dragonkiller_spread_ranged;
         creators["gruul the dragonkiller shatter spread"] = &RaidGruulsLairActionContext::gruul_the_dragonkiller_shatter_spread;
     }
@@ -43,7 +43,7 @@ private:
     static Action* high_king_maulgar_hunter_misdirection(PlayerbotAI* botAI) { return new HighKingMaulgarHunterMisdirectionAction(botAI); }
 
     // Gruul the Dragonkiller
-    static Action* gruul_the_dragonkiller_position_boss(PlayerbotAI* botAI) { return new GruulTheDragonkillerPositionBossAction(botAI); }
+    static Action* gruul_the_dragonkiller_main_tank(PlayerbotAI* botAI) { return new GruulTheDragonkillerMainTankAction(botAI); }
     static Action* gruul_the_dragonkiller_spread_ranged(PlayerbotAI* botAI) { return new GruulTheDragonkillerSpreadRangedAction(botAI); }
     static Action* gruul_the_dragonkiller_shatter_spread(PlayerbotAI* botAI) { return new GruulTheDragonkillerShatterSpreadAction(botAI); }
 };
