@@ -609,7 +609,7 @@ bool HighKingMaulgarHealerAvoidanceAction::Execute(Event event)
         float angle = atan2(bot->GetPositionY() - fightCenter.y, bot->GetPositionX() - fightCenter.x);
         float destX = fightCenter.x + 40.0f * cos(angle);
         float destY = fightCenter.y + 40.0f * sin(angle);
-        const float destZ = fightCenter.z;
+        float destZ = fightCenter.z;
 
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(), 
             bot->GetPositionZ(), destX, destY, destZ))
@@ -950,9 +950,9 @@ bool GruulTheDragonkillerSpreadRangedAction::Execute(Event event)
     {
         if (!bot->IsWithinDist2d(targetPosition.GetPositionX(), targetPosition.GetPositionY(), 2.0f))
         {
-            const float destX = targetPosition.GetPositionX();
-            const float destY = targetPosition.GetPositionY();
-            const float destZ = targetPosition.GetPositionZ();
+            float destX = targetPosition.GetPositionX();
+            float destY = targetPosition.GetPositionY();
+            float destZ = targetPosition.GetPositionZ();
             if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(),
                 bot->GetPositionY(), bot->GetPositionZ(), destX, destY, destZ))
             {
@@ -983,7 +983,7 @@ bool GruulTheDragonkillerSpreadRangedAction::Execute(Event event)
                        static_cast<float>(RAND_MAX) * (maxRadius - minRadius);
         float destX = tankSpot.x + radius * cos(angle);
         float destY = tankSpot.y + radius * sin(angle);
-        const float destZ = bot->GetPositionZ();
+        float destZ = bot->GetPositionZ();
 
         if (!bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(),
             bot->GetPositionY(), bot->GetPositionZ(), destX, destY, destZ))
