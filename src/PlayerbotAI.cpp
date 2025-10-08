@@ -3402,7 +3402,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         return false;
     }
 
-    // early bot/target world-state check before spell creationg a spell, after pet
+    // early return; bot/target world-state check
     if (!bot->IsInWorld() || bot->IsDuringRemoveFromWorld() ||
         (target && (!target->IsInWorld() || target->IsDuringRemoveFromWorld())))
     {
