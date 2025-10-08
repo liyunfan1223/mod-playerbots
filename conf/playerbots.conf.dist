@@ -284,9 +284,6 @@ AiPlayerbot.TwoRoundsGearInit = 0
 #
 #
 
-# Bots will say information about items when collecting them
-AiPlayerbot.SayWhenCollectingItems = 1
-
 # Bots keep looting when loot system is set to free for all
 # Default: 0 (disabled)
 AiPlayerbot.FreeMethodLoot = 0
@@ -360,15 +357,15 @@ AiPlayerbot.LootDelay = 1000
 #
 #
 
+# Distances are in yards
 AiPlayerbot.FarDistance = 20.0
-AiPlayerbot.SightDistance = 75.0
+AiPlayerbot.SightDistance = 100.0
 AiPlayerbot.SpellDistance = 28.5
 AiPlayerbot.ShootDistance = 5.0
-AiPlayerbot.ReactDistance = 150.0
-AiPlayerbot.GrindDistance = 75.0
 AiPlayerbot.HealDistance = 38.5
 AiPlayerbot.LootDistance = 15.0
 AiPlayerbot.FleeDistance = 5.0
+AiPlayerbot.AggroDistance = 22
 AiPlayerbot.TooCloseDistance = 5.0
 AiPlayerbot.MeleeDistance = 0.75
 AiPlayerbot.FollowDistance = 1.5
@@ -376,7 +373,8 @@ AiPlayerbot.WhisperDistance = 6000.0
 AiPlayerbot.ContactDistance = 0.45
 AiPlayerbot.AoeRadius = 10
 AiPlayerbot.RpgDistance = 200
-AiPlayerbot.AggroDistance = 22
+AiPlayerbot.GrindDistance = 75.0
+AiPlayerbot.ReactDistance = 150.0
 
 #
 #
@@ -484,7 +482,8 @@ AiPlayerbot.RPWarningCooldown = 30
 #
 #
 
-# Enable/Disable maintenance command (learn all available spells and skills, supplement consumables, repair, enchant equipment if bot's level is above AiPlayerbot.MinEnchantingBotLevel)
+# Enable/Disable maintenance command
+# Learn all available spells and skills, refresh consumables, repair, enchant equipment and socket gems if bot's level is above AiPlayerbot.MinEnchantingBotLevel
 # Default: 1 (enabled)
 AiPlayerbot.MaintenanceCommand = 1
 
@@ -548,7 +547,7 @@ AiPlayerbot.AutoGearScoreLimit = 0
 # "mana" (bots have infinite mana)
 # "power" (bots have infinite energy, rage, and runic power)
 # "taxi" (bots may use all flight paths, though they will not actually learn them)
-# "raid" (bots use cheats implemented into raid strategies)
+# "raid" (bots use cheats implemented into raid strategies (currently only for Ulduar))
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,raid,taxi")
 # Default: food, taxi, and raid are enabled
 AiPlayerbot.BotCheats = "food,taxi,raid"
@@ -606,9 +605,11 @@ AiPlayerbot.RandomBotMaxLevel = 80
 AiPlayerbot.SyncLevelWithPlayers = 0
 
 # Mark many quests ≤ bot level as complete (slows down bot creation)
+# Default: 0 (disabled)
 AiPlayerbot.PreQuests = 0
 
 # Enable LFG for randombots
+# Default: 1 (enabled)
 AiPlayerbot.RandomBotJoinLfg = 1
 
 # Enable/Disable periodic online - offline of randombots to mimic the real-world scenario where not all players are online simultaneously
@@ -629,7 +630,8 @@ AiPlayerbot.RandomBotHordeRatio = 50
 AiPlayerbot.DisableDeathKnightLogin = 0
 
 # Enable simulated expansion limitation for talents and glyphs
-# If enabled, limits talent trees to 5 rows plus the middle talent of the 6th row for bots until level 61 and 7 rows plus the middle talent of the 8th row for bots until level 71
+# If enabled, limits talent trees to 5 rows plus the middle talent of the 6th row for bots until level 61 
+# and 7 rows plus the middle talent of the 8th row for bots from level 61 until level 71
 # Default: 0 (disabled)
 AiPlayerbot.LimitTalentsExpansion = 0
 
@@ -713,8 +715,8 @@ AiPlayerbot.IncrementalGearInit = 1
 # Default: 60
 AiPlayerbot.MinEnchantingBotLevel = 60
 
-# Enable expansion limitation for bot enchants
-# If enabled, bots will not use TBC enchants until level 61 or WotLK enchants until level 71
+# Enable expansion limitation for bot enchants and gems
+# If enabled, bots will not use TBC enchants until level 61 or WotLK enchants and gems until level 71
 # Default: 1 (enabled)
 AiPlayerbot.LimitEnchantExpansion = 1
 
@@ -810,7 +812,7 @@ AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 #
 
 # Quest that will be completed and rewarded for all randombots
-AiPlayerbot.RandomBotQuestIds = "7848,3802,5505,6502,7761,10277,10285,11492,13188,13189,24499,24511,24710,24712"
+AiPlayerbot.RandomBotQuestIds = "3802,5505,6502,7761,7848,10277,10285,11492,13188,13189,24499,24511,24710,24712"
 
 # Randombots will group with nearby randombots to do shared quests
 AiPlayerbot.RandomBotGroupNearby = 0
@@ -871,9 +873,9 @@ AiPlayerbot.RandomBotNonCombatStrategies = ""
 AiPlayerbot.CombatStrategies = ""
 AiPlayerbot.NonCombatStrategies = ""
 
-# Remove "healer dps" strategy on specified maps.
-# Default: 0 (disabled)
-AiPlayerbot.HealerDPSMapRestriction = 0
+# Remove "healer dps" strategy on the maps specified below.
+# Default: 1 (enabled)
+AiPlayerbot.HealerDPSMapRestriction = 1
 
 # List of Map IDs where "healer dps" strategy will be removed if AiPlayerbot.HealerDPSMapRestriction is enabled
 # Default: (Dungeon and Raid maps) "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"
