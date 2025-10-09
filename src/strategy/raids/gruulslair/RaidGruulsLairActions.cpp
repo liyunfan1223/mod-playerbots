@@ -43,7 +43,7 @@ bool HighKingMaulgarMaulgarTankAction::Execute(Event event)
             float moveY = spot.y + (dY / distanceToMaulgar) * maxDistance;
             {
                 return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
-                              MovementPriority::MOVEMENT_COMBAT);
+                              MovementPriority::MOVEMENT_COMBAT, true, false);
             }
         }
 
@@ -106,7 +106,7 @@ bool HighKingMaulgarOlmTankAction::Execute(Event event)
             float moveY = spot.y + (dY / distanceToOlm) * maxDistance;
             {
                 return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
-                              MovementPriority::MOVEMENT_COMBAT);
+                              MovementPriority::MOVEMENT_COMBAT, true, false);
             }
         }
     }
@@ -164,7 +164,7 @@ bool HighKingMaulgarBlindeyeTankAction::Execute(Event event)
             float moveY = spot.y + (dY / distanceToBlindeye) * maxDistance;
             {
                 return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
-                              MovementPriority::MOVEMENT_COMBAT);
+                              MovementPriority::MOVEMENT_COMBAT, true, false);
             }
         }
 
@@ -235,7 +235,7 @@ bool HighKingMaulgarKroshMageTankAction::Execute(Event event)
             if (!bot->IsWithinDist2d(spot.x, spot.y, spotLeeway))
             {
                 return MoveTo(bot->GetMapId(), spot.x, spot.y, spot.z, false, false, false, false, 
-                            MovementPriority::MOVEMENT_COMBAT);
+                            MovementPriority::MOVEMENT_COMBAT, true, false);
             }
 
             float orientation = atan2(krosh->GetPositionY() - bot->GetPositionY(), 
@@ -863,7 +863,7 @@ bool GruulTheDragonkillerMainTankAction::Execute(Event event)
             const float moveZ = tankSpot.z;
             {
                 return MoveTo(bot->GetMapId(), moveX, moveY, moveZ, false, false, false, false, 
-                              MovementPriority::MOVEMENT_COMBAT);
+                              MovementPriority::MOVEMENT_COMBAT, true, false);
             }
         }
 
