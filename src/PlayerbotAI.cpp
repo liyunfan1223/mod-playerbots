@@ -357,7 +357,7 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     // Update the bot's group status (moved to helper function)
     UpdateAIGroupMembership();
 
-    // Fix logout addclass bots
+    // Logout Playerbots that are added from .playerbot addclass after getting kicked from party
     if (!bot->IsInWorld())
         return;
 
