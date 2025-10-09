@@ -519,7 +519,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     }
 
     group = bot->GetGroup();
-    if (!group)
+    if (group)
     {
         botAI->ResetStrategies();
     }

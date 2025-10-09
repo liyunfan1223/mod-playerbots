@@ -1521,7 +1521,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* bot)
 {
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (botAI)
+    if (!botAI)
         return false;
 
     if (bot->InBattleground())
@@ -2379,7 +2379,7 @@ void RandomPlayerbotMgr::IncreaseLevel(Player* bot)
 void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (botAI)
+    if (!botAI)
         return;
 
     uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
@@ -2474,7 +2474,7 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 void RandomPlayerbotMgr::RandomizeMin(Player* bot)
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (botAI)
+    if (!botAI)
         return;
 
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "RandomizeMin");
