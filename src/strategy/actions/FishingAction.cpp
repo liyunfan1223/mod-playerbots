@@ -23,7 +23,6 @@ const uint32 FISHING_POLE = 6256;
 const uint32 FISHING_BOBBER = 35591;
 const float MIN_DISTANCE_TO_WATER = 10.0f;
 const float MAX_DISTANCE_TO_WATER = 20.0f;
-const float OPTIMAL_FISHING_DISTANCE = 15.0f;
 const float MIN_WATER_SEARCH_DISTANCE = 10.0f;
 const float MAX_WATER_SEARCH_DISTANCE = 40.0f;
 const float HEIGHT_ABOVE_WATER_TOLERANCE = 0.2f;
@@ -46,7 +45,7 @@ static bool isFishingPole(const Item* item)
         proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE;
 }
 
-float hasFishableWaterOrLand(float x, float y, float z,  Map* map, uint32 phaseMask, bool checkForLand=false) 
+float hasFishableWaterOrLand(float x, float y, float z,  Map* map, uint32 phaseMask, bool checkForLand=false)
 {
     if (!map)
         return INVALID_HEIGHT;
@@ -57,7 +56,7 @@ float hasFishableWaterOrLand(float x, float y, float z,  Map* map, uint32 phaseM
     if (liq.Entry == 0)
     {
         if (checkForLand)
-            return ground; 
+            return ground;
         return INVALID_HEIGHT;
     }
     if (checkForLand)
@@ -67,9 +66,9 @@ float hasFishableWaterOrLand(float x, float y, float z,  Map* map, uint32 phaseM
         return INVALID_HEIGHT;
     }
     if (liq.Level + HEIGHT_ABOVE_WATER_TOLERANCE > ground)
+    {
         return liq.Level;
-
-
+    }
     return INVALID_HEIGHT;
 }
 
@@ -83,7 +82,7 @@ bool hasLosToWater(Player* bot, float wx, float wy, float waterZ)
         VMAP::ModelIgnoreFlags::Nothing);
 }
 
-WorldPosition findLandFromPosition(Player* bot, float startDistance, float endDistance, float increment, float orientation, WorldPosition targetPos, bool checkLOS = true) 
+WorldPosition findLandFromPosition(Player* bot, float startDistance, float endDistance, float increment, float orientation, WorldPosition targetPos, bool checkLOS = true)
 {
     Map* map = bot->GetMap();
     uint32 phaseMask = bot->GetPhaseMask();
@@ -155,16 +154,16 @@ WorldPosition findLandRadialFromPosition (Player* bot, WorldPosition targetPos, 
         if (!boundaryPoints.empty())
             break;
         
-        dist += increment;            
+        dist += increment;
     }
-    
+
     if (boundaryPoints.empty())
         return WorldPosition();
 
     if (boundaryPoints.size() == 1)
-        return boundaryPoints[0];   
-    
-    float minDistance = 100000; 
+        return boundaryPoints[0];
+
+    float minDistance = 100000;
     WorldLocation closestPoint = WorldPosition();
     for (const auto& pos : boundaryPoints)
     {
@@ -186,7 +185,7 @@ WorldPosition findWaterRadial(Player* bot, float x, float y, float z, Map* map, 
     float dist = minDistance;
     while (dist <= maxDistance)
     {
-        for (int i = 0; i < numDirections; ++i) 
+        for (int i = 0; i < numDirections; ++i)
         {
             float angle = (2.0f * M_PI * i) / numDirections;
             float checkX = x + cos(angle) * dist;
@@ -202,26 +201,26 @@ WorldPosition findWaterRadial(Player* bot, float x, float y, float z, Map* map, 
             }
             boundaryPoints.emplace_back(WorldPosition(bot->GetMapId(), checkX, checkY, waterZ));
         }
-        
+
         if (!boundaryPoints.empty())
             break;
-        
+
         dist += increment;
     }
-    
+
     if (boundaryPoints.empty())
         return WorldPosition();
 
     if (boundaryPoints.size() == 1)
-        return boundaryPoints[0];   
+        return boundaryPoints[0];
 
     return boundaryPoints[boundaryPoints.size() / 2];
 }
 
-WorldPosition findFishingHole(PlayerbotAI* botAI) 
+WorldPosition findFishingHole(PlayerbotAI* botAI)
 {
     Player* player = botAI->GetBot();
-    GuidVector gos = PAI_VALUE(GuidVector, "nearest game objects no los"); 
+    GuidVector gos = PAI_VALUE(GuidVector, "nearest game objects no los");
     GameObject* nearestFishingHole = nullptr;
     float minDist = std::numeric_limits<float>::max();
     for (const auto& guid : gos)
@@ -272,7 +271,7 @@ bool MoveNearWaterAction::isPossible()
         // Water spot is in range, and we have LOS to it. Do not move
         if (distance  >= MIN_DISTANCE_TO_WATER &&
             distance <=  MAX_DISTANCE_TO_WATER && hasLOS)
-        {   
+        {
             return false;
         }
         // Water spot is out of range, lets look for a spot to move to for the fishing hole.
@@ -290,7 +289,7 @@ bool MoveNearWaterAction::isPossible()
             }
         }
     }
-    // Lets find some water we can fish at. 
+    // Lets find some water where we can fish.
     WorldPosition water = findWaterRadial(
         bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
         bot->GetMap(), bot->GetPhaseMask(),
@@ -314,7 +313,7 @@ bool MoveNearWaterAction::isPossible()
             angle, water, false);
 
         if (IsValid(landSpot))
-        {   
+        {
             if (master && botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))
             {
                 return (master->GetExactDist2d(bot) < MAX_MASTER_DISTANCE);
@@ -335,7 +334,6 @@ bool EquipFishingPoleAction::Execute(Event event)
     WorldPackets::Item::AutoEquipItemSlot nicePacket(std::move(eqPacket));
     nicePacket.Read();
     bot->GetSession()->HandleAutoEquipItemSlotOpcode(nicePacket);
-
     return true;
 }
 
@@ -357,7 +355,7 @@ bool EquipFishingPoleAction::isUseful()
             }
         }
     }
-        
+
     for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
     {
         if (Bag* pBag = bot->GetBagByPos(bag))
@@ -375,8 +373,7 @@ bool EquipFishingPoleAction::isUseful()
             }
         }
     }
-    
-    
+
     if (sRandomPlayerbotMgr->IsRandomBot(bot))
     {
         bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
@@ -417,7 +414,7 @@ bool FishingAction::Execute(Event event)
         }
     }
     Position pos = target;
- 
+
     if (!bot->HasInArc(1.0, &pos, 5.0))
     {
         float angle = bot->GetAngle(pos.GetPositionX(), pos.GetPositionY());
@@ -431,7 +428,7 @@ bool FishingAction::Execute(Event event)
 
     botAI->CastSpell(FISHING_SPELL, bot);
     botAI->ChangeStrategy("+use bobber", BOT_STATE_NON_COMBAT);
-   
+
     return true;
 }
 
@@ -467,7 +464,6 @@ bool UseBobber::Execute(Event event)
                 botAI->ChangeStrategy("-use bobber", BOT_STATE_NON_COMBAT);
                 return true;
             }
-
         }
     }
     return false;
