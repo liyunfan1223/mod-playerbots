@@ -41,10 +41,8 @@ bool HighKingMaulgarMaulgarTankAction::Execute(Event event)
             float dY = spot.y - maulgar->GetPositionY();
             float moveX = spot.x + (dX / distanceToMaulgar) * maxDistance;
             float moveY = spot.y + (dY / distanceToMaulgar) * maxDistance;
-            {
-                return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
-                              MovementPriority::MOVEMENT_COMBAT, true, false);
-            }
+            return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
+                          MovementPriority::MOVEMENT_COMBAT, true, false);
         }
 
         float orientation = atan2(maulgar->GetPositionY() - bot->GetPositionY(), 
@@ -104,10 +102,8 @@ bool HighKingMaulgarOlmTankAction::Execute(Event event)
             float dY = spot.y - olm->GetPositionY();
             float moveX = spot.x + (dX / distanceToOlm) * maxDistance;
             float moveY = spot.y + (dY / distanceToOlm) * maxDistance;
-            {
-                return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
-                              MovementPriority::MOVEMENT_COMBAT, true, false);
-            }
+            return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
+                          MovementPriority::MOVEMENT_COMBAT, true, false);
         }
     }
     else if (!bot->IsWithinMeleeRange(olm))
@@ -122,9 +118,8 @@ bool HighKingMaulgarOlmTankAction::Execute(Event event)
 bool HighKingMaulgarOlmTankAction::isUseful()
 {
     Unit* olm = AI_VALUE2(Unit*, "find target", "olm the summoner");
-    Group* group = bot->GetGroup();
 
-    return botAI->IsAssistTankOfIndex(bot, 0) && olm && olm->IsAlive() && group;
+    return botAI->IsAssistTankOfIndex(bot, 0) && olm && olm->IsAlive();
 }
 
 bool HighKingMaulgarBlindeyeTankAction::Execute(Event event)
@@ -162,10 +157,8 @@ bool HighKingMaulgarBlindeyeTankAction::Execute(Event event)
             float dY = spot.y - blindeye->GetPositionY();
             float moveX = spot.x + (dX / distanceToBlindeye) * maxDistance;
             float moveY = spot.y + (dY / distanceToBlindeye) * maxDistance;
-            {
-                return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
-                              MovementPriority::MOVEMENT_COMBAT, true, false);
-            }
+            return MoveTo(bot->GetMapId(), moveX, moveY, spot.z, false, false, false, false, 
+                          MovementPriority::MOVEMENT_COMBAT, true, false);
         }
 
         float orientation = atan2(blindeye->GetPositionY() - bot->GetPositionY(), 
@@ -184,9 +177,8 @@ bool HighKingMaulgarBlindeyeTankAction::Execute(Event event)
 bool HighKingMaulgarBlindeyeTankAction::isUseful()
 {
     Unit* blindeye = AI_VALUE2(Unit*, "find target", "blindeye the seer");
-    Group* group = bot->GetGroup();
 
-    return botAI->IsAssistTankOfIndex(bot, 1) && blindeye && blindeye->IsAlive() && group;
+    return botAI->IsAssistTankOfIndex(bot, 1) && blindeye && blindeye->IsAlive();
 }
 
 bool HighKingMaulgarKroshMageTankAction::Execute(Event event)
@@ -728,8 +720,8 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
         {
             continue;
         }
-        if (botAI->IsAssistTankOfIndex(bot, 0)) olmTank = member;
-        if (botAI->IsAssistTankOfIndex(bot, 1)) blindeyeTank = member;
+        else if (botAI->IsAssistTankOfIndex(bot, 0)) olmTank = member;
+        else if (botAI->IsAssistTankOfIndex(bot, 1)) blindeyeTank = member;
     }
 
     switch (hunterIndex)
@@ -815,8 +807,8 @@ bool HighKingMaulgarHunterMisdirectionAction::isUseful()
         {
             continue;
         }
-        if (botAI->IsAssistTankOfIndex(bot, 0)) olmTank = member;
-        if (botAI->IsAssistTankOfIndex(bot, 1)) blindeyeTank = member;
+        else if (botAI->IsAssistTankOfIndex(bot, 0)) olmTank = member;
+        else if (botAI->IsAssistTankOfIndex(bot, 1)) blindeyeTank = member;
     }
 
     switch (hunterIndex)
