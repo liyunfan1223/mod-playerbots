@@ -7,6 +7,9 @@
 
 #include "Event.h"
 #include "Playerbots.h"
+#include "ServerFacade.h"
+#include "AoeValues.h"
+#include "TargetValue.h"
 
 NextAction** CastAbolishPoisonAction::getAlternatives()
 {
@@ -30,6 +33,32 @@ bool CastEntanglingRootsCcAction::Execute(Event event) { return botAI->CastSpell
 Value<Unit*>* CastHibernateCcAction::GetTargetValue() { return context->GetValue<Unit*>("cc target", "hibernate"); }
 
 bool CastHibernateCcAction::Execute(Event event) { return botAI->CastSpell("hibernate", GetTarget()); }
+bool CastStarfallAction::isUseful()
+{
+    if (!CastSpellAction::isUseful())
+        return false;
+
+    // Avoid breaking CC
+    WorldLocation aoePos = *context->GetValue<WorldLocation>("aoe position");
+    Unit* ccTarget = context->GetValue<Unit*>("current cc target")->Get();
+    if (ccTarget && ccTarget->IsAlive())
+    {
+        float dist2d = sServerFacade->GetDistance2d(ccTarget, aoePos.GetPositionX(), aoePos.GetPositionY());
+        if (sServerFacade->IsDistanceLessOrEqualThan(dist2d, sPlayerbotAIConfig->aoeRadius))
+            return false;
+    }
+
+    // Avoid single-target usage on initial pull
+    uint8 aoeCount = *context->GetValue<uint8>("aoe count");
+    if (aoeCount < 2)
+    {
+        Unit* target = context->GetValue<Unit*>("current target")->Get();
+        if (!target || (!botAI->HasAura("moonfire", target) && !botAI->HasAura("insect swarm", target)))
+            return false;
+    }
+
+    return true;
+}
 
 NextAction** CastReviveAction::getPrerequisites()
 {
