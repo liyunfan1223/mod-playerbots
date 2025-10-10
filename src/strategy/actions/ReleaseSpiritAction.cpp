@@ -147,6 +147,7 @@ bool AutoReleaseSpiritAction::HandleBattlegroundSpiritHealer()
         // and in IOC it's not within clicking range when they res in own base
 
         // Teleport to nearest friendly Spirit Healer when not currently in range of one.
+        bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
         bot->TeleportTo(bot->GetMapId(), spiritHealer->GetPositionX(), spiritHealer->GetPositionY(), spiritHealer->GetPositionZ(), 0.f);
         RESET_AI_VALUE(bool, "combat::self target");
         RESET_AI_VALUE(WorldPosition, "current position");
@@ -191,12 +192,11 @@ bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
 {
     // The below delays release to spirit with 6 seconds.
     // This prevents currently casted (ranged) spells to be re-directed to the died bot's ghost.
-    const int32_t botId = bot->GetGUID().GetRawValue();
 
-    // If the bot already is a spirit, erase release time and return true
+    // If the bot already is a spirit, reset release time and return true
     if (bot->HasPlayerFlag(PLAYER_FLAGS_GHOST))
     {
-        m_botReleaseTimes.erase(botId);
+        botAI->bgReleaseAttemptTime = 0;
         return true;
     }
 
@@ -204,14 +204,13 @@ bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const
     const time_t now = time(nullptr);
     constexpr time_t RELEASE_DELAY = 6;
 
-    auto& lastReleaseTime = m_botReleaseTimes[botId];
-    if (lastReleaseTime == 0)
-        lastReleaseTime = now;
+    if (botAI->bgReleaseAttemptTime == 0)
+        botAI->bgReleaseAttemptTime = now;
 
-    if (now - lastReleaseTime < RELEASE_DELAY)
+    if (now - botAI->bgReleaseAttemptTime < RELEASE_DELAY)
         return false;
 
-    m_botReleaseTimes.erase(botId);
+    botAI->bgReleaseAttemptTime = 0;
     return true;
 }
 
@@ -244,6 +243,7 @@ int64 RepopAction::CalculateDeadTime() const
 
 void RepopAction::PerformGraveyardTeleport(const GraveyardStruct* graveyard) const
 {
+    bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
     bot->TeleportTo(graveyard->Map, graveyard->x, graveyard->y, graveyard->z, 0.f);
     RESET_AI_VALUE(bool, "combat::self target");
     RESET_AI_VALUE(WorldPosition, "current position");

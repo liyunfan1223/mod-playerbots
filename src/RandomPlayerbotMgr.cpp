@@ -1771,6 +1771,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI)
             botAI->Reset(true);
+        bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
         bot->TeleportTo(loc.GetMapId(), x, y, z, 0);
         bot->SendMovementFlagUpdate();
 
@@ -3090,6 +3091,7 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
             } while (true);
         }
 
+        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
         player->TeleportTo(botPos);
 
         // player->Relocate(botPos.getX(), botPos.getY(), botPos.getZ(), botPos.getO());
