@@ -1187,6 +1187,9 @@ AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,388
 # Improve reaction speeds in battlegrounds and arenas (may cause lag)
 AiPlayerbot.FastReactInBG = 1
 
+# Chance of a RandomBot challenging to a duel (0.0 = never, 1.0 = always)
+AiPlayerbot.RandomBotDuelChance = 0.25
+
 #
 #
 #
