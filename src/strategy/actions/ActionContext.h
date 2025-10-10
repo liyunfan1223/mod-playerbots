@@ -192,7 +192,7 @@ public:
         creators["buy tabard"] = &ActionContext::buy_tabard;
         creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
         creators["clean quest log"] = &ActionContext::clean_quest_log;
-        creators["move to near water"] = &ActionContext::move_near_water;
+        creators["move near water"] = &ActionContext::move_near_water;
         creators["go fishing"] = &ActionContext::go_fishing;
         creators["use fishing bobber"] = &ActionContext::use_fishing_bobber;
         creators["end fishing"] = &ActionContext::end_fishing;

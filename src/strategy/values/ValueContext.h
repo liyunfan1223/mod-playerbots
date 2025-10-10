@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it
- * and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
+ * and/or modify it under version 3 of the License, or (at your option), any later version.
  */
 
 #ifndef _PLAYERBOT_VALUECONTEXT_H
@@ -315,9 +315,7 @@ public:
         creators["recently flee info"] = &ValueContext::recently_flee_info;
 
         creators["can fish"] = &ValueContext::can_fish;
-        creators["is near water"] = &ValueContext::is_near_water;
         creators["can use fishing bobber"] = &ValueContext::can_use_fishing_bobber;
-        creators["done fishing"] = &ValueContext::done_fishing;
     }
 
 private:
@@ -562,9 +560,7 @@ private:
     static UntypedValue* last_flee_timestamp(PlayerbotAI* ai) { return new LastFleeTimestampValue(ai); }
     static UntypedValue* recently_flee_info(PlayerbotAI* ai) { return new RecentlyFleeInfo(ai); }
     static UntypedValue* can_fish(PlayerbotAI* ai) { return new CanFishValue(ai); }
-    static UntypedValue* is_near_water(PlayerbotAI* ai) { return new IsNearWaterValue(ai); }
     static UntypedValue* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanUseFishingBobberValue(ai); }
-    static UntypedValue* done_fishing(PlayerbotAI* ai) { return new DoneFishingValue(ai); }
     // -------------------------------------------------------
     // Flag for cutom glyphs : true when /w bot glyph equip
     // -------------------------------------------------------

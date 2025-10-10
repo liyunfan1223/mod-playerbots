@@ -15,8 +15,7 @@ extern const uint32 FISHING_SPELL;
 extern const uint32 FISHING_POLE;
 extern const uint32 FISHING_BOBBER;
 
-WorldPosition findWaterLinear(Player* bot, float startDistance, float endDsistance, float increment, bool findLand = false, WorldPosition targetPos = nullptr);
-WorldPosition findWaterRadial(Player* bot, float x, float y, float z, Map* map, uint32 phaseMask, float minDistance, float maxDistance, float increment, bool findLand = false);
+WorldPosition findWaterRadial(Player* bot, float x, float y, float z, Map* map, uint32 phaseMask, float minDistance, float maxDistance, float increment, bool checkLOS=false);
 WorldPosition findFishingNode(PlayerbotAI* botAI);
 
 class PlayerbotAI;
@@ -42,9 +41,7 @@ private:
 class MoveNearWaterAction : public MovementAction, public Qualified
 {
 public:
-    MoveNearWaterAction(PlayerbotAI* botAI, WorldPosition fishingPos= WorldPosition() ): MovementAction(botAI, "move to fish"),
-        fishingPosition(fishingPos) 
-        {}
+    MoveNearWaterAction(PlayerbotAI* botAI): MovementAction(botAI, "move near water") {}
     bool Execute(Event event) override;
     bool isUseful() override;
     bool isPossible() override;
@@ -67,6 +64,7 @@ class EndFishing : public Action
 public:
     EndFishing(PlayerbotAI* botAI) : Action(botAI, "end fishing") {}
     bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class RemoveBobberStrategyAction : public Action

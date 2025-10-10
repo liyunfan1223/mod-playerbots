@@ -19,20 +19,11 @@ bool CanFishValue::Calculate()
 
     if (bot->isSwimming())
         return false;
+
     if (bot->IsInCombat())
         return false;
-        
-    return true;
-}
 
-bool IsNearWaterValue::Calculate()
-{
-    WorldPosition nearwater = findWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 20.0f, 2.5f, false);
-    if (nearwater.GetPositionX() != 0.0f && nearwater.GetPositionY() != 0.0f)
-        {
-            return true;
-        }
-    return false;
+    return true;
 }
 
 bool CanUseFishingBobberValue::Calculate()
@@ -61,10 +52,4 @@ bool CanUseFishingBobberValue::Calculate()
         }
     }
     return false;
-}
-
-bool DoneFishingValue::Calculate()
-{
-    WorldPosition nearwater = findWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMap(), bot->GetPhaseMask(), 10.0f, 40.0f, 10.0f, false);
-    return (nearwater.GetPositionX() == 0.0f && nearwater.GetPositionY() == 0.0f);
 }

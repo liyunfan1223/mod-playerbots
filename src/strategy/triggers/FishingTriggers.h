@@ -23,10 +23,4 @@ public:
     bool IsActive() override;
 };
 
-class DoneFishingTrigger : public Trigger
-{
-public:
-    DoneFishingTrigger(PlayerbotAI* ai) : Trigger(ai, "done fishing") {};
-    bool IsActive() override;
-};
 #endif
