@@ -72,8 +72,10 @@ bool UninviteAction::Execute(Event event)
 
 bool LeaveGroupAction::Leave(Player* player)
 {
-    if (player && !GET_PLAYERBOT_AI(player) &&
+    if (player &&
+        !botAI &&
         !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, player))
+
         return false;
 
     bool aiMaster = GET_PLAYERBOT_AI(botAI->GetMaster()) != nullptr;
@@ -84,7 +86,7 @@ bool LeaveGroupAction::Leave(Player* player)
     bool shouldStay = randomBot && bot->GetGroup() && player == bot;
     if (!shouldStay)
     {
-        bot->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
     }
 
     if (randomBot)
