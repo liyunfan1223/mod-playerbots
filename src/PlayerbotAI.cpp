@@ -357,6 +357,36 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     // Update the bot's group status (moved to helper function)
     UpdateAIGroupMembership();
 
+    // Logout Playerbots that are added from .playerbot addclass after getting kicked from party
+    if (!bot->IsInWorld())
+        return;
+
+    if (sRandomPlayerbotMgr->IsAddclassBot(bot))
+    {
+        Group* group = bot->GetGroup();
+        Player* mst  = GetMaster();
+
+        const bool inQueueOrBG   = bot->InBattleground() || bot->inRandomLfgDungeon() || (group && group->isLFGGroup());
+        const bool masterInGroup = group && mst && group->IsMember(mst->GetGUID());
+
+        if (!inQueueOrBG && (!group || (mst && !masterInGroup)))
+        {
+            if (mst)
+            {
+                if (PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(mst))
+                {
+                    mgr->EnqueueLogout(bot->GetGUID());
+                    return;
+                }
+            }
+            if (WorldSession* sess = bot->GetSession())
+            {
+                sess->KickPlayer();
+                return;
+            }
+        }
+    }
+
     // Update internal AI
     UpdateAIInternal(elapsed, minimal);
     YieldThread(GetReactDelay());

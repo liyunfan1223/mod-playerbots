@@ -6,6 +6,8 @@
 #ifndef _PLAYERBOT_PLAYERBOTMGR_H
 #define _PLAYERBOT_PLAYERBOTMGR_H
 
+#include <vector>
+
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "Player.h"
@@ -87,6 +89,8 @@ public:
     void HandleLinkAccountCommand(Player* player, const std::string& accountName, const std::string& key);
     void HandleViewLinkedAccountsCommand(Player* player);
     void HandleUnlinkAccountCommand(Player* player, const std::string& accountName);
+    void EnqueueLogout(ObjectGuid guid); // Requests a safe, deferred logout (consumed in Update)
+
 
 protected:
     void OnBotLoginInternal(Player* const bot) override;
@@ -96,6 +100,7 @@ private:
     Player* const master;
     PlayerBotErrorMap errors;
     time_t lastErrorTell;
+    std::vector<ObjectGuid> m_pendingLogout; // File of GUIDs to disconnect after the AI ​​tick
 };
 
 class PlayerbotsMgr

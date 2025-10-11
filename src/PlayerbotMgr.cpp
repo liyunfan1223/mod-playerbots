@@ -1474,6 +1474,20 @@ void PlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
 {
     SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
     CheckTellErrors(elapsed);
+
+    // Consume deferred logout requests at a safe point
+    // We first empty the queue via swap to avoid reentrancy
+    // if LogoutPlayerBot removes bots from our structures.
+    if (!m_pendingLogout.empty())
+    {
+        std::vector<ObjectGuid> toLogout;
+        toLogout.swap(m_pendingLogout);
+
+        for (ObjectGuid const& guid : toLogout)
+        {
+            LogoutPlayerBot(guid);
+        }
+    }
 }
 
 void PlayerbotMgr::HandleCommand(uint32 type, std::string const text)
@@ -1644,6 +1658,16 @@ void PlayerbotMgr::TellError(std::string const botName, std::string const text)
 
     errors[text] = names;
 }
+
+// EnqueueLogout : adds a bot to the delayed logout file
+void PlayerbotMgr::EnqueueLogout(ObjectGuid guid)
+{
+    if (std::find(m_pendingLogout.begin(), m_pendingLogout.end(), guid) == m_pendingLogout.end())
+    {
+        m_pendingLogout.push_back(guid);
+    }
+}
+
 
 void PlayerbotMgr::CheckTellErrors(uint32 elapsed)
 {
