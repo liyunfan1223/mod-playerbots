@@ -227,6 +227,12 @@ void PlayerbotHolder::HandleBotPackets(WorldSession* session)
     {
         OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
         ClientOpcodeHandler const* opHandle = opcodeTable[opcode];
+        if (!opHandle)
+        {
+            LOG_ERROR("playerbots", "Unhandled opcode {} queued for bot session {}. Packet dropped.", static_cast<uint32>(opcode), session->GetAccountId());
+            delete packet;
+            continue;
+        }
         opHandle->Call(session, *packet);
         delete packet;
     }
