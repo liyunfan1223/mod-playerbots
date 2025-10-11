@@ -3406,8 +3406,14 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         return false;
     }
 
-    Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
+    // early return; bot/target world-state check
+    if (!bot->IsInWorld() || bot->IsDuringRemoveFromWorld() ||
+        (target && (!target->IsInWorld() || target->IsDuringRemoveFromWorld())))
+    {
+        return false;
+    }
 
+    Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
     SpellCastTargets targets;
     if (spellInfo->Effects[0].Effect != SPELL_EFFECT_OPEN_LOCK &&
         (spellInfo->Targets & TARGET_FLAG_ITEM || spellInfo->Targets & TARGET_FLAG_GAMEOBJECT_ITEM))
@@ -3495,6 +3501,15 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     // if (spellSuccess != SPELL_CAST_OK)
     //     return false;
 
+
+    // check bot/target world-state just before preparing the actual spell
+    Unit* unitTarget = targets.GetUnitTarget();
+    if (!bot->IsInWorld() || bot->IsDuringRemoveFromWorld() ||
+        (unitTarget && (!unitTarget->IsInWorld() || unitTarget->IsDuringRemoveFromWorld())))
+    {
+        delete spell;
+        return false;
+    }
     SpellCastResult result = spell->prepare(&targets);
 
     if (result != SPELL_CAST_OK)
