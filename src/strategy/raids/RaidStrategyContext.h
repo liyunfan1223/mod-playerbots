@@ -6,6 +6,7 @@
 #include "RaidMcStrategy.h"
 #include "RaidBwlStrategy.h"
 #include "RaidKarazhanStrategy.h"
+#include "RaidMagtheridonStrategy.h"
 #include "RaidNaxxStrategy.h"
 #include "RaidOsStrategy.h"
 #include "RaidEoEStrategy.h"
@@ -23,6 +24,7 @@ public:
         creators["mc"] = &RaidStrategyContext::mc;
         creators["bwl"] = &RaidStrategyContext::bwl;
         creators["karazhan"] = &RaidStrategyContext::karazhan;
+        creators["magtheridon"] = &RaidStrategyContext::magtheridon;
         creators["naxx"] = &RaidStrategyContext::naxx;
         creators["wotlk-os"] = &RaidStrategyContext::wotlk_os;
         creators["wotlk-eoe"] = &RaidStrategyContext::wotlk_eoe;
@@ -37,6 +39,7 @@ private:
     static Strategy* mc(PlayerbotAI* botAI) { return new RaidMcStrategy(botAI); }
     static Strategy* bwl(PlayerbotAI* botAI) { return new RaidBwlStrategy(botAI); }
     static Strategy* karazhan(PlayerbotAI* botAI) { return new RaidKarazhanStrategy(botAI); }
+    static Strategy* magtheridon(PlayerbotAI* botAI) { return new RaidMagtheridonStrategy(botAI); }
     static Strategy* naxx(PlayerbotAI* botAI) { return new RaidNaxxStrategy(botAI); }
     static Strategy* wotlk_os(PlayerbotAI* botAI) { return new RaidOsStrategy(botAI); }
     static Strategy* wotlk_eoe(PlayerbotAI* botAI) { return new RaidEoEStrategy(botAI); }
