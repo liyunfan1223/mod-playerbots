@@ -1517,33 +1517,38 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     return false;
 }
 
-bool RandomPlayerbotMgr::ProcessBot(Player* player)
+bool RandomPlayerbotMgr::ProcessBot(Player* bot)
 {
-    uint32 bot = player->GetGUID().GetCounter();
 
-    if (player->InBattleground())
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
         return false;
 
-    if (player->InBattlegroundQueue())
+    if (bot->InBattleground())
         return false;
+
+    if (bot->InBattlegroundQueue())
+        return false;
+
+     uint32 botId = bot->GetGUID().GetCounter();
 
     // if death revive
-    if (player->isDead())
+    if (bot->isDead())
     {
-        if (!GetEventValue(bot, "dead"))
+        if (!GetEventValue(botId, "dead"))
         {
             uint32 randomTime =
                 urand(sPlayerbotAIConfig->minRandomBotReviveTime, sPlayerbotAIConfig->maxRandomBotReviveTime);
-            LOG_DEBUG("playerbots", "Mark bot {} as dead, will be revived in {}s.", player->GetName().c_str(),
+            LOG_DEBUG("playerbots", "Mark bot {} as dead, will be revived in {}s.", bot->GetName().c_str(),
                       randomTime);
-            SetEventValue(bot, "dead", 1, sPlayerbotAIConfig->maxRandomBotInWorldTime);
-            SetEventValue(bot, "revive", 1, randomTime);
+            SetEventValue(botId, "dead", 1, sPlayerbotAIConfig->maxRandomBotInWorldTime);
+            SetEventValue(botId, "revive", 1, randomTime);
             return false;
         }
 
-        if (!GetEventValue(bot, "revive"))
+        if (!GetEventValue(botId, "revive"))
         {
-            Revive(player);
+            Revive(bot);
             return true;
         }
 
@@ -1551,34 +1556,31 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
     }
 
     // leave group if leader is rndbot
-    Group* group = player->GetGroup();
+    Group* group = bot->GetGroup();
     if (group && !group->isLFGGroup() && IsRandomBot(group->GetLeader()))
     {
-        player->RemoveFromGroup();
-        LOG_INFO("playerbots", "Bot {} remove from group since leader is random bot.", player->GetName().c_str());
+        botAI->LeaveOrDisbandGroup();
+        LOG_INFO("playerbots", "Bot {} remove from group since leader is random bot.", bot->GetName().c_str());
     }
 
     // only randomize and teleport idle bots
     bool idleBot = false;
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
-    if (botAI)
+    if (TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get())
     {
-        if (TravelTarget* target = botAI->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get())
-        {
-            if (target->getTravelState() == TravelState::TRAVEL_STATE_IDLE)
-            {
-                idleBot = true;
-            }
-        }
-        else
+        if (target->getTravelState() == TravelState::TRAVEL_STATE_IDLE)
         {
             idleBot = true;
         }
     }
+    else
+    {
+        idleBot = true;
+    }
+    
     if (idleBot)
     {
         // randomize
-        uint32 randomize = GetEventValue(bot, "randomize");
+        uint32 randomize = GetEventValue(botId, "randomize");
         if (!randomize)
         {
             // bool randomiser = true;
@@ -1602,12 +1604,12 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
             // }
             // if (randomiser)
             // {
-            Randomize(player);
-            LOG_DEBUG("playerbots", "Bot #{} {}:{} <{}>: randomized", bot,
-                      player->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", player->GetLevel(), player->GetName());
+            Randomize(bot);
+            LOG_DEBUG("playerbots", "Bot #{} {}:{} <{}>: randomized", botId,
+                      bot->GetTeamId() == TEAM_ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
             uint32 randomTime =
                 urand(sPlayerbotAIConfig->minRandomBotRandomizeTime, sPlayerbotAIConfig->maxRandomBotRandomizeTime);
-            ScheduleRandomize(bot, randomTime);
+            ScheduleRandomize(botId, randomTime);
             return true;
         }
 
@@ -1619,15 +1621,15 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         //     return true;
         // }
 
-        uint32 teleport = GetEventValue(bot, "teleport");
+        uint32 teleport = GetEventValue(botId, "teleport");
         if (!teleport)
         {
-            LOG_DEBUG("playerbots", "Bot #{} <{}>: teleport for level and refresh", bot, player->GetName());
-            Refresh(player);
-            RandomTeleportForLevel(player);
+            LOG_DEBUG("playerbots", "Bot #{} <{}>: teleport for level and refresh", botId, bot->GetName());
+            Refresh(bot);
+            RandomTeleportForLevel(bot);
             uint32 time = urand(sPlayerbotAIConfig->minRandomBotTeleportInterval,
                                 sPlayerbotAIConfig->maxRandomBotTeleportInterval);
-            ScheduleTeleport(bot, time);
+            ScheduleTeleport(botId, time);
             return true;
         }
     }
@@ -1771,6 +1773,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, std::vector<WorldLocation>&
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (botAI)
             botAI->Reset(true);
+        bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
         bot->TeleportTo(loc.GetMapId(), x, y, z, 0);
         bot->SendMovementFlagUpdate();
 
@@ -2376,6 +2379,10 @@ void RandomPlayerbotMgr::IncreaseLevel(Player* bot)
 
 void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 {
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+        return;
+
     uint32 maxLevel = sPlayerbotAIConfig->randomBotMaxLevel;
     if (maxLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
@@ -2433,7 +2440,6 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     }
 
     SetValue(bot, "level", level);
-
     PlayerbotFactory factory(bot, level);
     factory.Randomize(false);
 
@@ -2455,11 +2461,10 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     PlayerbotsDatabase.Execute(stmt);
 
     // teleport to a random inn for bot level
-    if (GET_PLAYERBOT_AI(bot))
-        GET_PLAYERBOT_AI(bot)->Reset(true);
+    botAI->Reset(true);
 
     if (bot->GetGroup())
-        bot->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
 
     if (pmo)
         pmo->finish();
@@ -2469,12 +2474,13 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
 
 void RandomPlayerbotMgr::RandomizeMin(Player* bot)
 {
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+        return;
+
     PerformanceMonitorOperation* pmo = sPerformanceMonitor->start(PERF_MON_RNDBOT, "RandomizeMin");
-
     uint32 level = sPlayerbotAIConfig->randomBotMinLevel;
-
     SetValue(bot, "level", level);
-
     PlayerbotFactory factory(bot, level);
     factory.Randomize(false);
 
@@ -2496,11 +2502,10 @@ void RandomPlayerbotMgr::RandomizeMin(Player* bot)
     PlayerbotsDatabase.Execute(stmt);
 
     // teleport to a random inn for bot level
-    if (GET_PLAYERBOT_AI(bot))
-        GET_PLAYERBOT_AI(bot)->Reset(true);
+    botAI->Reset(true);
 
     if (bot->GetGroup())
-        bot->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
 
     if (pmo)
         pmo->finish();
@@ -2582,7 +2587,7 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
     bot->SetMoney(money + 500 * sqrt(urand(1, bot->GetLevel() * 5)));
 
     if (bot->GetGroup())
-        bot->RemoveFromGroup();
+        botAI->LeaveOrDisbandGroup();
 
     if (pmo)
         pmo->finish();
@@ -3090,6 +3095,7 @@ void RandomPlayerbotMgr::OnPlayerLogin(Player* player)
             } while (true);
         }
 
+        player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
         player->TeleportTo(botPos);
 
         // player->Relocate(botPos.getX(), botPos.getY(), botPos.getZ(), botPos.getO());

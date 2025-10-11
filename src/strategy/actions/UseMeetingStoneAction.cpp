@@ -225,6 +225,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player)
 
                 player->GetMotionMaster()->Clear();
                 AI_VALUE(LastMovement&, "last movement").clear();
+                player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED | AURA_INTERRUPT_FLAG_CHANGE_MAP);
                 player->TeleportTo(mapId, x, y, z, 0);
 
                 if (botAI->HasStrategy("stay", botAI->GetState()))
