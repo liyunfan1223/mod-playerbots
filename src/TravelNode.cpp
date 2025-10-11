@@ -178,6 +178,9 @@ uint32 TravelNodePath::getPrice()
 
     TaxiPathEntry const* taxiPath = sTaxiPathStore.LookupEntry(pathObject);
 
+    if (!taxiPath)
+        return 0;
+	
     return taxiPath->price;
 }
 
