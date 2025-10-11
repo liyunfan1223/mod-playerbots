@@ -875,23 +875,67 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
         LOG_INFO("playerbots", "Random bot guilds deleted");
     }
 
+    std::unordered_set<uint32> botAccounts;
+    botAccounts.reserve(sPlayerbotAIConfig->randomBotAccounts.size());
+    for (uint32 acc : sPlayerbotAIConfig->randomBotAccounts)
+        botAccounts.insert(acc);
+
+    // Recount bot guilds directly from the database (does not depend on connected bots)
     uint32 guildNumber = 0;
-    GuidVector availableLeaders;
-    for (std::vector<uint32>::iterator i = randomBots.begin(); i != randomBots.end(); ++i)
+    sPlayerbotAIConfig->randomBotGuilds.clear();
+    sPlayerbotAIConfig->randomBotGuilds.shrink_to_fit(); // avoids accumulating old capacity
+
+    if (!botAccounts.empty())
     {
-        ObjectGuid leader = ObjectGuid::Create<HighGuid::Player>(*i);
-        if (Guild* guild = sGuildMgr->GetGuildByLeader(leader))
+        if (QueryResult res = CharacterDatabase.Query(
+                // We only retrieve what is necessary (guildid, leader account)
+                "SELECT g.guildid, c.account "
+                "FROM guild g JOIN characters c ON g.leaderguid = c.guid"))
         {
-            ++guildNumber;
-            sPlayerbotAIConfig->randomBotGuilds.push_back(guild->GetId());
+            do
+            {
+                Field* f = res->Fetch();
+                const uint32 guildId   = f[0].Get<uint32>();
+                const uint32 accountId = f[1].Get<uint32>();
+
+                // Boss considered 'bot' if his account is in botAccounts
+                if (botAccounts.find(accountId) != botAccounts.end())
+                {
+                    ++guildNumber;
+                    sPlayerbotAIConfig->randomBotGuilds.push_back(guildId);
+                }
+            } while (res->NextRow());
+        }
+    }
+
+    LOG_INFO("playerbots", "{}/{} random bot guilds exist in guild table",guildNumber, sPlayerbotAIConfig->randomBotGuildCount);
+    if (guildNumber >= sPlayerbotAIConfig->randomBotGuildCount)
+    {
+        LOG_DEBUG("playerbots", "No new random guilds required");
+        return;
+    }
+
+    // We list the available leaders (online bots, not in guilds)
+    GuidVector availableLeaders;
+    availableLeaders.reserve(randomBots.size()); // limit reallocs
+    for (const uint32 botLowGuid : randomBots)
+    {
+        ObjectGuid leader = ObjectGuid::Create<HighGuid::Player>(botLowGuid);
+        if (sGuildMgr->GetGuildByLeader(leader))
+        {
+            // already GuildLeader -> ignored
+            continue;
         }
         else
         {
-            Player* player = ObjectAccessor::FindPlayer(leader);
-            if (player && !player->GetGuildId())
-                availableLeaders.push_back(leader);
+            if (Player* player = ObjectAccessor::FindPlayer(leader))
+            {
+                if (!player->GetGuildId())
+                    availableLeaders.push_back(leader);
+            }
         }
     }
+    LOG_DEBUG("playerbots", "{} available leaders for new guilds found", availableLeaders.size());
 
     // Create up to randomBotGuildCount by counting only EFFECTIVE creations
     uint32 createdThisRun = 0;
@@ -899,10 +943,10 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
     {
         std::string const guildName = CreateRandomGuildName();
         if (guildName.empty())
-            continue;
+            break; // no more names available in playerbots_guild_names
 
         if (sGuildMgr->GetGuildByName(guildName))
-            continue;
+            continue; // name already taken, skip
 
         if (availableLeaders.empty())
         {
@@ -981,8 +1025,7 @@ void RandomPlayerbotFactory::CreateRandomGuilds()
     }
 
     // Shows the true total and how many were created during this run
-    LOG_INFO("playerbots", "{} random bot guilds available (created this run: {})",
-             uint32(sPlayerbotAIConfig->randomBotGuilds.size()), createdThisRun);
+    LOG_INFO("playerbots", "{} random bot guilds created this run)", createdThisRun);
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomGuildName()
