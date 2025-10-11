@@ -748,7 +748,7 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
                 }
                 botAI->CastSpell("steady shot", olm);
             }
-            break;
+            return true;
 
         case 1:
             botAI->CastSpell("misdirection", blindeyeTank);
@@ -756,7 +756,7 @@ bool HighKingMaulgarHunterMisdirectionAction::Execute(Event event)
             {
                 botAI->CastSpell("steady shot", blindeye);
             }
-            break;
+            return true;
             
         default:
             break;
