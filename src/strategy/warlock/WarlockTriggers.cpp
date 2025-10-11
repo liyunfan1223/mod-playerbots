@@ -8,6 +8,55 @@
 #include "Playerbots.h"
 #include "PlayerbotAI.h"
 #include "Player.h"
+#include "Battleground.h"
+#include "GameObject.h"
+#include "Log.h"
+#include "Cell.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "RitualActions.h"
+#include <unordered_map>
+#include <ctime>
+
+// Global constants for spells and items
+namespace WarlockTriggerConstants
+{
+    // Soul Shard item
+    const uint32 SOUL_SHARD_ITEM = 6265;
+    
+    // Ritual of Souls spells
+    const uint32 RITUAL_OF_SOULS_RANK_1 = 29893;
+    const uint32 RITUAL_OF_SOULS_RANK_2 = 58887;
+    
+    // Soul Portal game objects
+    const uint32 SOUL_PORTAL_RANK_1 = 181622;
+    const uint32 SOUL_PORTAL_RANK_2 = 193168;
+    
+    // Soul Well game objects
+    const uint32 SOUL_WELL_RANK_1 = 181621;
+    const uint32 SOUL_WELL_RANK_2 = 193169;
+    const uint32 SOUL_WELL_RANK_2_VARIANT_1 = 193170;
+    const uint32 SOUL_WELL_RANK_2_VARIANT_2 = 193171;
+    
+    // Healthstone items
+    const uint32 MINOR_HEALTHSTONE = 5512;
+    const uint32 LESSER_HEALTHSTONE = 5511;
+    const uint32 MAJOR_HEALTHSTONE = 9421;
+    const uint32 MINOR_HEALTHSTONE_ALT = 19004;
+    const uint32 LESSER_HEALTHSTONE_ALT = 19005;
+    const uint32 FEL_HEALTHSTONE = 36892;
+    
+    // Soulstone items
+    const uint32 MINOR_SOULSTONE = 5232;
+    const uint32 LESSER_SOULSTONE = 16892;
+    const uint32 SOULSTONE = 16893;
+    const uint32 GREATER_SOULSTONE = 16895;
+    const uint32 MAJOR_SOULSTONE = 16896;
+    const uint32 MASTER_SOULSTONE = 22116;
+    const uint32 DEMONIC_SOULSTONE = 36895;
+}
+
+// Function declared in RitualActions.cpp
 
 static const uint32 SOUL_SHARD_ITEM_ID = 6265;
 
@@ -262,4 +311,105 @@ bool RainOfFireChannelCheckTrigger::IsActive()
 
     // Not channeling Rain of Fire
     return false;
+}
+
+// Ritual Triggers Implementation
+
+bool NoSoulwellTrigger::IsActive()
+{
+    Player* bot = botAI->GetBot();
+    
+    static uint32 lastLogTime = 0;
+    uint32 currentTime = time(nullptr);
+    if (currentTime - lastLogTime > 10)
+    {
+        lastLogTime = currentTime;
+    }
+    
+    if (!CanUseRituals(bot))
+    {
+        return false;
+    }
+    
+    if (!bot->HasSpell(29893)) // Ritual of Souls
+    {
+        return false;
+    }
+    
+    if (!HasRitualComponent(bot, 29893))
+    {
+        // Give Soul Shard to bot (item ID 6265)
+        bot->AddItem(6265, 1);
+        return true; // Continue with ritual creation
+    }
+    
+    // For now, we'll assume no soulwell exists if we're in a dungeon/raid
+    
+    // Check for existing soul portals (both ranks)
+    GameObject* existingSoulPortal = bot->FindNearestGameObject(181622, 30.0f); // Soul Portal Rank 1
+    if (!existingSoulPortal)
+        existingSoulPortal = bot->FindNearestGameObject(193168, 30.0f); // Soul Portal Rank 2
+    
+    if (existingSoulPortal)
+    {
+        return false; // Soul portal already exists nearby
+    }
+    
+    // Check if we recently created a ritual (within last 30 seconds)
+    extern std::unordered_map<ObjectGuid, uint32> lastRitualCreation;
+    auto it = lastRitualCreation.find(bot->GetGUID());
+    if (it != lastRitualCreation.end())
+    {
+        uint32 timeSinceCreation = currentTime - it->second;
+        if (timeSinceCreation < 30) // 30 seconds grace period
+        {
+            return false; // Recently created ritual, wait a bit
+        }
+    }
+    
+    // Only create ritual if we're in a group (more realistic)
+    Group* group = bot->GetGroup();
+    if (!group || group->GetMembersCount() < 2)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+// SoulPortalAvailableTrigger implementation moved to RitualActions.cpp
+
+bool LootSoulwellTrigger::IsActive()
+{
+    Player* bot = botAI->GetBot();
+    
+    // Warlock should NOT loot soulwell - they create it
+    if (bot->getClass() == CLASS_WARLOCK)
+    {
+        return false;
+    }
+    
+    // Only active in dungeons/raids
+    if (!bot->GetMap()->IsDungeon() && !bot->GetMap()->IsRaid() && !bot->GetMap()->IsBattleground())
+        return false;
+    
+    if (bot->GetItemCount(WarlockTriggerConstants::MINOR_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::LESSER_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::MAJOR_HEALTHSTONE, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::MINOR_HEALTHSTONE_ALT, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::LESSER_HEALTHSTONE_ALT, false) > 0 ||
+        bot->GetItemCount(WarlockTriggerConstants::FEL_HEALTHSTONE, false) > 0)
+    {
+        return false; // Already has a healthstone
+    }
+    
+    GameObject* soulwell = bot->FindNearestGameObject(WarlockTriggerConstants::SOUL_WELL_RANK_1, 30.0f);
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(WarlockTriggerConstants::SOUL_WELL_RANK_2, 30.0f);
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(WarlockTriggerConstants::SOUL_WELL_RANK_2_VARIANT_1, 30.0f);
+    if (!soulwell)
+        soulwell = bot->FindNearestGameObject(WarlockTriggerConstants::SOUL_WELL_RANK_2_VARIANT_2, 30.0f);
+    
+    return soulwell;
 }

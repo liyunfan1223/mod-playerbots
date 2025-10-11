@@ -45,6 +45,7 @@ void GenericWarlockStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("too many soul shards", NextAction::array(0, new NextAction("destroy soul shard", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("devour magic purge", NextAction::array(0, new NextAction("devour magic purge", 50.0f), nullptr)));
     triggers.push_back(new TriggerNode("devour magic cleanse", NextAction::array(0, new NextAction("devour magic cleanse", 50.0f), nullptr)));
+    triggers.push_back(new TriggerNode("no soulwell", NextAction::array(0, new NextAction("ritual of souls", 5.0f), nullptr)));
 }
 
 // ===== AoE Strategy, 3+ enemies =====

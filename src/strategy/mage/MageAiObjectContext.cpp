@@ -13,6 +13,7 @@
 #include "MageTriggers.h"
 #include "NamedObjectContext.h"
 #include "Playerbots.h"
+#include "RitualActions.h"
 #include "PullStrategy.h"
 
 class MageStrategyFactoryInternal : public NamedObjectContext<Strategy>
@@ -124,6 +125,13 @@ public:
         creators["no firestarter strategy"] = &MageTriggerFactoryInternal::no_firestarter_strategy;
         creators["enemy is close and no firestarter strategy"] = &MageTriggerFactoryInternal::enemy_is_close_and_no_firestarter_strategy;
         creators["enemy too close for spell and no firestarter strategy"] = &MageTriggerFactoryInternal::enemy_too_close_for_spell_and_no_firestarter_strategy;
+        creators["in dungeon or raid"] = &MageTriggerFactoryInternal::in_dungeon_or_raid;
+        creators["no refreshment table"] = &MageTriggerFactoryInternal::no_refreshment_table;
+        creators["ritual of refreshment"] = &MageTriggerFactoryInternal::ritual_of_refreshment;
+        creators["refreshment table available"] = &MageTriggerFactoryInternal::refreshment_table_available;
+        creators["soul portal available"] = &MageTriggerFactoryInternal::soul_portal_available;
+        creators["needs conjured items"] = &MageTriggerFactoryInternal::needs_conjured_items;
+        creators["mage ritual with delay"] = &MageTriggerFactoryInternal::mage_ritual_with_delay;
     }
 
 private:
@@ -173,6 +181,13 @@ private:
     static Trigger* no_firestarter_strategy(PlayerbotAI* botAI) { return new NoFirestarterStrategyTrigger(botAI); }
     static Trigger* enemy_is_close_and_no_firestarter_strategy(PlayerbotAI* botAI) { return new EnemyIsCloseAndNoFirestarterStrategyTrigger(botAI); }
     static Trigger* enemy_too_close_for_spell_and_no_firestarter_strategy(PlayerbotAI* botAI) { return new EnemyTooCloseForSpellAndNoFirestarterStrategyTrigger(botAI); }
+    static Trigger* in_dungeon_or_raid(PlayerbotAI* botAI) { return new InDungeonOrRaidTrigger(botAI); }
+    static Trigger* no_refreshment_table(PlayerbotAI* botAI) { return new NoRefreshmentTableTrigger(botAI); }
+    static Trigger* ritual_of_refreshment(PlayerbotAI* botAI) { return new RitualOfRefreshmentTrigger(botAI); }
+    static Trigger* refreshment_table_available(PlayerbotAI* botAI) { return new RefreshmentTableAvailableTrigger(botAI); }
+    static Trigger* soul_portal_available(PlayerbotAI* botAI) { return new SoulPortalAvailableTrigger(botAI); }
+    static Trigger* needs_conjured_items(PlayerbotAI* botAI) { return new NeedsConjuredItemsTrigger(botAI); }
+    static Trigger* mage_ritual_with_delay(PlayerbotAI* botAI) { return new MageRitualWithDelayTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
@@ -238,6 +253,10 @@ public:
         creators["use mana jade"] = &MageAiObjectContextInternal::use_mana_jade;
         creators["use mana agate"] = &MageAiObjectContextInternal::use_mana_agate;
         creators["mana shield"] = &MageAiObjectContextInternal::mana_shield;
+        creators["ritual of refreshment"] = &MageAiObjectContextInternal::ritual_of_refreshment;
+        creators["interact with refreshment table"] = &MageAiObjectContextInternal::interact_with_refreshment_table;
+        creators["move away from spawn"] = &MageAiObjectContextInternal::move_away_from_spawn;
+        creators["check conjured items"] = &MageAiObjectContextInternal::check_conjured_items;
     }
 
 private:
@@ -299,6 +318,10 @@ private:
     static Action* use_mana_jade(PlayerbotAI* botAI) { return new UseManaJadeAction(botAI); }
     static Action* use_mana_agate(PlayerbotAI* botAI) { return new UseManaAgateAction(botAI); }
     static Action* mana_shield(PlayerbotAI* botAI) { return new CastManaShieldAction(botAI); }
+    static Action* ritual_of_refreshment(PlayerbotAI* botAI) { return new CastRitualOfRefreshmentAction(botAI); }
+    static Action* interact_with_refreshment_table(PlayerbotAI* botAI) { return new InteractWithRefreshmentTableAction(botAI); }
+    static Action* move_away_from_spawn(PlayerbotAI* botAI) { return new MoveAwayFromSpawnAction(botAI); }
+    static Action* check_conjured_items(PlayerbotAI* botAI) { return new CheckConjuredItemsAction(botAI); }
 };
 
 SharedNamedObjectContextList<Strategy> MageAiObjectContext::sharedStrategyContexts;

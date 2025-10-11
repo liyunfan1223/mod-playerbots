@@ -20,6 +20,7 @@
 #include "RtiTriggers.h"
 #include "StuckTriggers.h"
 #include "TravelTriggers.h"
+#include "RitualActions.h"
 
 class PlayerbotAI;
 
@@ -228,6 +229,16 @@ public:
         creators["travel flight status"] = &TriggerContext::travel_flight_status;
         creators["can self resurrect"] = &TriggerContext::can_self_resurrect;
         creators["new pet"] = &TriggerContext::new_pet;
+        creators["in dungeon"] = &TriggerContext::in_dungeon;
+        
+        // Universal ritual triggers
+        creators["soul portal available"] = &TriggerContext::soul_portal_available;
+        creators["refreshment portal available"] = &TriggerContext::refreshment_portal_available;
+        creators["refreshment table available"] = &TriggerContext::refreshment_table_available;
+        creators["soulwell available"] = &TriggerContext::soulwell_available;
+        creators["needs follow restoration"] = &TriggerContext::needs_follow_restoration;
+        creators["needs conjured items"] = &TriggerContext::needs_conjured_items;
+        creators["mage ritual with delay"] = &TriggerContext::mage_ritual_with_delay;
     }
 
 private:
@@ -427,6 +438,16 @@ private:
     static Trigger* travel_flight_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_TRAVEL_FLIGHT); }
     static Trigger* can_self_resurrect(PlayerbotAI* ai) { return new SelfResurrectTrigger(ai); }
     static Trigger* new_pet(PlayerbotAI* ai) { return new NewPetTrigger(ai); }
+    static Trigger* in_dungeon(PlayerbotAI* ai) { return new InDungeonTrigger(ai); }
+    
+    // Universal ritual triggers
+    static Trigger* soul_portal_available(PlayerbotAI* botAI) { return new SoulPortalAvailableTrigger(botAI); }
+    static Trigger* refreshment_portal_available(PlayerbotAI* botAI) { return new RefreshmentPortalAvailableTrigger(botAI); }
+    static Trigger* refreshment_table_available(PlayerbotAI* botAI) { return new RefreshmentTableAvailableTrigger(botAI); }
+    static Trigger* soulwell_available(PlayerbotAI* botAI) { return new SoulwellAvailableTrigger(botAI); }
+    static Trigger* needs_follow_restoration(PlayerbotAI* botAI) { return new NeedsFollowRestorationTrigger(botAI); }
+    static Trigger* needs_conjured_items(PlayerbotAI* botAI) { return new NeedsConjuredItemsTrigger(botAI); }
+    static Trigger* mage_ritual_with_delay(PlayerbotAI* botAI) { return new MageRitualWithDelayTrigger(botAI); }
 };
 
 #endif
