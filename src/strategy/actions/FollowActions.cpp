@@ -97,6 +97,8 @@ bool FollowAction::isUseful()
 
         distance = bot->GetDistance(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
+    if (botAI->HasStrategy("master fishing", BOT_STATE_NON_COMBAT))
+        return sServerFacade->IsDistanceGreaterThan(distance, 5.0); 
 
     return sServerFacade->IsDistanceGreaterThan(distance, formation->GetMaxDistance());
 }

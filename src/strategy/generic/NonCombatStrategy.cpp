@@ -35,5 +35,15 @@ void MountStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void WorldBuffStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("need world buff", NextAction::array(0, new NextAction("world buff", 1.0f), NULL)));
+    triggers.push_back(new TriggerNode("need world buff", NextAction::array(0, new NextAction("world buff", 1.0f), nullptr)));
+}
+
+void MasterFishingStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode("very often", NextAction::array(0, new NextAction("move near water" , 10.0f), nullptr)));
+
+    triggers.push_back(new TriggerNode("very often", NextAction::array(0, new NextAction("go fishing" , 10.0f), nullptr)));
+
+    triggers.push_back(new TriggerNode("random", NextAction::array(0, new NextAction("end fishing", 90.0f),
+                                        new NextAction("equip upgrades", 6.0f), nullptr)));
 }
