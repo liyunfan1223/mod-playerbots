@@ -79,7 +79,7 @@ public:
     void InitFood();
     void InitMounts();
     void InitBags(bool destroyOld = true);
-    void ApplyEnchantAndGemsNew(bool destoryOld = true);
+    void ApplyEnchantAndGemsNew(bool destroyOld = true);
     void InitInstanceQuests();
     void UnbindInstance();
     void InitKeyring();
