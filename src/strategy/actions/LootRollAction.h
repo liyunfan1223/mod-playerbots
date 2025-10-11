@@ -7,6 +7,7 @@
 #define _PLAYERBOT_LOOTROLLACTION_H
 
 #include "QueryItemUsageAction.h"
+#include "ItemTemplate.h"
 
 class PlayerbotAI;
 
@@ -22,11 +23,28 @@ public:
     bool Execute(Event event) override;
 
 protected:
-    RollVote CalculateRollVote(ItemTemplate const* proto);
+    /**
+     * Default roll rule (outside Master Loot & outside tokens):
+     * - NEED if direct upgrade (ItemUsage = EQUIP/REPLACE)
+     * - GREED if useful but not an upgrade (BAD_EQUIP, USE, SKILL, DISENCHANT, AH, VENDOR, KEEP, AMMO)
+     * - PASS otherwise
+     *
+     * Safeguards:
+     *   - SmartNeedBySpec: downgrade NEED->GREED if the item does not match the bot's main spec
+     *   - BoP: if at least one relevant slot is empty, allow NEED (if spec is valid)
+     *   - BoE/BoU: NEED blocked unless explicitly allowed by config (AllowBoENeedIfUpgrade / AllowBoUNeedIfUpgrade)
+     *   - Cross-armor: BAD_EQUIP can become NEED only if newScore >= bestScore * CrossArmorExtraMargin
+     *
+     * Specific cases:
+     *   - Tokens: NEED only if the targeted slot is a likely upgrade (ilvl heuristic),
+     *             otherwise GREED (tokens with unknown slot remain GREED by default)
+     *   - Disenchant (NBG): if ItemUsage = DISENCHANT and config enabled, vote DISENCHANT
+     *                       (the core enforces if the DE button is actually available)
+     */
+     
+    // randomProperty: 0 (none) ; >0 = itemRandomPropId ; <0 = -itemRandomSuffix
+    RollVote CalculateRollVote(ItemTemplate const* proto, int32 randomProperty = 0);
 };
-
-bool CanBotUseToken(ItemTemplate const* proto, Player* bot);
-bool RollUniqueCheck(ItemTemplate const* proto, Player* bot);
 
 class MasterLootRollAction : public LootRollAction
 {

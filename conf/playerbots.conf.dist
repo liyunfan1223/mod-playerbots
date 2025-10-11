@@ -291,9 +291,56 @@ AiPlayerbot.SayWhenCollectingItems = 1
 # Default: 0 (disabled)
 AiPlayerbot.FreeMethodLoot = 0
 
-# Bots' loot roll level (0 = pass, 1 = greed, 2 = need)
-# Default: 1 (greed)
-AiPlayerbot.LootRollLevel = 1
+# Bots' loot roll level:
+#   0 = always pass
+#   1 = always greed (legacy default, bots never roll "need")
+#   2 = allow need (recommended with new loot AI)
+#
+# With the new loot AI, bots can correctly decide when an item is really useful.
+# Setting this to 2 lets them use "need" appropriately. Value 1 only does greed,
+# which was the old safe default but bypasses the new decision-making.
+AiPlayerbot.LootRollLevel = 2
+
+# NEED only if the item matches the bot's MAIN spec (stats & armor/weapon type).
+# Off-spec upgrades are automatically downgraded to GREED.
+# Default: 1 (enabled)
+AiPlayerbot.Roll.SmartNeedBySpec = 1
+
+# Bind-on-Equip etiquette: GREED by default to keep it tradeable.
+# Set to 1 to allow NEED on BoE if it's a clear upgrade.
+# Default: 1 (enabled)
+AiPlayerbot.Roll.AllowBoENeedIfUpgrade = 1
+
+# Bind-on-Use etiquette: GREED by default to keep it tradeable.
+# Set to 1 to allow NEED on BoU if it's a clear upgrade.
+# Default: 1 (enabled)
+AiPlayerbot.Roll.AllowBoUNeedIfUpgrade = 1
+
+# If Need-Before-Greed is active and the item is only useful for disenchanting,
+# bots will press the "Disenchant" button instead of GREED.
+# Default: 1 (enabled)
+AiPlayerbot.Roll.UseDEButton = 1
+
+# NEED on learnable profession recipes/patterns/books if the bot has the profession.
+# Default: 1 (enabled)
+AiPlayerbot.Roll.NeedOnProfessionRecipes = 1
+
+# Ignore required skill rank when deciding NEED on profession recipes (not recommended for strict etiquette).
+# Default: 0 (disabled)
+AiPlayerbot.Roll.Recipes.IgnoreSkillRank = 0
+
+# Cross-armor rule (cloth/leather/mail on a plate user, etc.):
+# Allow NEED only if newScore >= CrossArmorExtraMargin * bestEquippedScore.
+# Default: 1.20 (conservative). Use 9.99 to effectively forbid cross-armor NEED.
+AiPlayerbot.Roll.CrossArmorExtraMargin = 1.20
+
+# Minimum item level delta to treat a SET TOKEN as a real upgrade (0 means >=).
+# Prevents NEED on same-tier duplicates.
+# Example: Paladin Prot with chest ilvl 232:
+#  - “Trophy of the Crusade” (ilvl 245) => NEED allowed.
+#  - Token ilvl 232 with TokenILevelMargin=0.1 => GREED (no same-tier NEED).
+# Default: 0.1
+AiPlayerbot.Roll.TokenILevelMargin = 0.1
 
 #
 #

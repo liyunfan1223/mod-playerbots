@@ -62,7 +62,7 @@ enum NewRpgStatus : int
 class PlayerbotAIConfig
 {
 public:
-    PlayerbotAIConfig(){};
+    PlayerbotAIConfig() {};
     static PlayerbotAIConfig* instance()
     {
         static PlayerbotAIConfig instance;
@@ -343,6 +343,15 @@ public:
     std::string autoPickReward;
     bool autoEquipUpgradeLoot;
     float equipUpgradeThreshold;
+    bool allowBoENeedIfUpgrade;  // Loot roll fine-tuning
+    bool allowBoUNeedIfUpgrade;  // Allow NEED on BoU if upgrade
+    float crossArmorExtraMargin;
+    bool useDEButton;              // Allow "Disenchant" on NBG if available
+    float tokenILevelMargin;       // ilvl threshold to consider the token an upgrade
+    bool smartNeedBySpec;          // Intelligent NEED (based on stats/spec)
+    bool needOnProfessionRecipes;  // If true, bots will roll NEED on profession recipes/patterns/books they can use &
+                                   // learn.
+    bool recipesIgnoreSkillRank;   // If true, ignore skill rank requirement when rolling on profession recipes
     bool twoRoundsGearInit;
     bool syncQuestWithPlayer;
     bool syncQuestForPlayer;
@@ -391,25 +400,11 @@ public:
     int32 addClassCommand;
     int32 addClassAccountPoolSize;
     int32 maintenanceCommand;
-    bool altMaintenanceAttunementQs,
-            altMaintenanceBags,
-            altMaintenanceAmmo,
-            altMaintenanceFood,
-            altMaintenanceReagents,
-            altMaintenanceConsumables,
-            altMaintenancePotions,
-            altMaintenanceTalentTree,
-            altMaintenancePet,
-            altMaintenancePetTalents,
-            altMaintenanceClassSpells,
-            altMaintenanceAvailableSpells,
-            altMaintenanceSkills,
-            altMaintenanceReputation,
-            altMaintenanceSpecialSpells,
-            altMaintenanceMounts,
-            altMaintenanceGlyphs,
-            altMaintenanceKeyring,
-            altMaintenanceGemsEnchants;
+    bool altMaintenanceAttunementQs, altMaintenanceBags, altMaintenanceAmmo, altMaintenanceFood, altMaintenanceReagents,
+        altMaintenanceConsumables, altMaintenancePotions, altMaintenanceTalentTree, altMaintenancePet,
+        altMaintenancePetTalents, altMaintenanceClassSpells, altMaintenanceAvailableSpells, altMaintenanceSkills,
+        altMaintenanceReputation, altMaintenanceSpecialSpells, altMaintenanceMounts, altMaintenanceGlyphs,
+        altMaintenanceKeyring, altMaintenanceGemsEnchants;
     int32 autoGearCommand, autoGearCommandAltBots, autoGearQualityLimit, autoGearScoreLimit;
 
     uint32 useGroundMountAtMinLevel;
