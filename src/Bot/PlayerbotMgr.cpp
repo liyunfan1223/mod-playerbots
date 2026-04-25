@@ -346,10 +346,10 @@ void PlayerbotHolder::LogoutAllBots()
         if (!botAI || IsSelfBot(bot))
             continue;
 
-        // If bot is mid-countdown, cancel the timer so LogoutPlayerBot proceeds immediately.
+        // Force ShouldLogOut() to return true so LogoutPlayerBot completes instant logout immediately.
         WorldSession* session = bot->GetSession();
         if (session && session->IsLoggingOut())
-            session->SetLogoutStartTime(0);
+            session->SetLogoutStartTime(1);
 
         LogoutPlayerBot(bot->GetGUID());
     }
@@ -480,9 +480,8 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
     {
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (!botAI)
-        {
             return;
-        }
+
         botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
             "goodbye", "Goodbye!", {}));
         bot->StopMoving();
@@ -490,14 +489,10 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
 
         Group* group = bot->GetGroup();
         if (group && !bot->InBattleground() && !bot->InBattlegroundQueue() && IsRealPlayer(botAI->GetMaster()))
-        {
             PlayerbotRepository::instance().Save(botAI);
-        }
 
         LOG_DEBUG("playerbots", "Bot {} logged out", bot->GetName().c_str());
-
         bot->SaveToDB(false, false);
-
         RemoveFromPlayerbotsMap(guid);  // deletes bot player ptr inside this WorldSession PlayerBotMap
 
         delete botAI;
