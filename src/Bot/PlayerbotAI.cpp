@@ -256,9 +256,21 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         nextAICheckDelay = 0;
 
     // Early return if bot is in invalid state
-    if (!bot || !bot->GetSession() || !bot->IsInWorld() || bot->IsBeingTeleported() ||
-        bot->GetSession()->IsLoggingOut() || bot->IsDuringRemoveFromWorld())
+    if (!bot || !bot->GetSession() || !bot->IsInWorld() || bot->IsBeingTeleported() || bot->IsDuringRemoveFromWorld())
         return;
+
+    // During timed logout countdown, cancel if bot enters combat (this cancellation is handled client-side for real players).
+    if (bot->GetSession()->IsLoggingOut())
+    {
+        bool canLogoutInCombat = bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
+        if (bot->IsInCombat() && !canLogoutInCombat)
+        {
+            WorldPackets::Character::LogoutCancel cancelData = WorldPacket(CMSG_LOGOUT_CANCEL);
+            bot->GetSession()->HandleLogoutCancelOpcode(cancelData);
+        }
+        else
+            return;
+    }
 
     // Bots send no movement opcodes, so m_lastFallZ stays frozen and Player::IsFalling() (a Z test
     // against it) blocks LFG teleports. Unit::IsFalling() is the flag test, so real falls keep theirs.
@@ -797,30 +809,9 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const& text, Player& fr
         Reset(true);
     }
 
-    // TODO: missing implementation to port
-    /*else if (filtered == "logout")
-    {
-        if (!(bot->IsStunnedByLogout() || bot->GetSession()->IsLoggingOut()))
-        {
-            if (type == CHAT_MSG_WHISPER)
-                TellPlayer(&fromPlayer, BOT_TEXT("logout_start"));
-
-            if (master && master->GetPlayerbotMgr())
-                SetShouldLogOut(true);
-        }
-    }
-    else if (filtered == "logout cancel")
-    {
-        if (bot->IsStunnedByLogout() || bot->GetSession()->IsLoggingOut())
-        {
-            if (type == CHAT_MSG_WHISPER)
-                TellPlayer(&fromPlayer, BOT_TEXT("logout_cancel"));
-
-            WorldPacket p;
-            bot->GetSession()->HandleLogoutCancelOpcode(p);
-            SetShouldLogOut(false);
-        }
-    }
+    // Commented-out logout commands blocks removed from here and implemented in HandleCommand.
+    // Remaining is a commented-out action delay command block.
+    /*
     else if ((filtered.size() > 5) && (filtered.substr(0, 5) == "wait ") && (filtered.find("wait for attack") ==
     std::string::npos))
     {
@@ -1174,7 +1165,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
             TellMaster(message);
         }
     }
-    else if (filtered == "logout cancel")
+    else if (filtered == "cancel logout" || filtered == "logout cancel")
     {
         if (!bot->GetSession()->IsLoggingOut())
             return;
@@ -1190,9 +1181,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
         bot->GetSession()->HandleLogoutCancelOpcode(data);
     }
     else
-    {
         chatCommands.push_back(ChatCommandHolder(filtered, fromPlayer->GetGUID(), requiredLevel, type));
-    }
 }
 
 void PlayerbotAI::HandleBotOutgoingPacket(WorldPacket const& packet)
