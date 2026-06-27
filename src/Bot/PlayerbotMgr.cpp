@@ -417,7 +417,7 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
         bot->SaveToDB(false, false);
 
         WorldSession* botWorldSessionPtr = bot->GetSession();
-        [[maybe_unused]] WorldSession* masterWorldSessionPtr = nullptr;     // Remove [[maybe_unused]] tag if timed logout implemented.
+        WorldSession* masterWorldSessionPtr = nullptr;
 
         // If already in timed logout countdown, complete it once the 20-second timer expires.
         if (botWorldSessionPtr->IsLoggingOut())
