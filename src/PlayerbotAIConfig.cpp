@@ -132,7 +132,7 @@ bool PlayerbotAIConfig::Initialize()
     HighMana = sConfigMgr->GetOption<int32>("Playerbots.HighMana", 65);
     AutoSaveMana = sConfigMgr->GetOption<bool>("Playerbots.AutoSaveMana", true);
     SaveManaThreshold = sConfigMgr->GetOption<int32>("Playerbots.SaveManaThreshold", 60);
-    switch (sConfigMgr->GetOption<uint32>("Playerbots.AutoGreaterBlessings", 1))
+    switch (sConfigMgr->GetOption<uint32>("Playerbots.AutoGreaterBlessings", 2))
     {
         case 0:
             AutoGreaterBlessings = AutoPartyBuffMode::DISABLED;
@@ -145,6 +145,8 @@ bool PlayerbotAIConfig::Initialize()
             AutoGreaterBlessings = AutoPartyBuffMode::RAID_ONLY;
             break;
     }
+    BlessingRefreshThresholdSeconds =
+        sConfigMgr->GetOption<uint32>("Playerbots.BlessingRefreshThresholdSeconds", 60);
     switch (sConfigMgr->GetOption<uint32>("Playerbots.AutoPartyBuffs", 2))
     {
         case 0:

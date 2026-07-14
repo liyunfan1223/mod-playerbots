@@ -18,19 +18,32 @@
 
 namespace ai::buff
 {
-    namespace
+    bool IsWithinPostLoginBuffGrace(Player* player)
     {
-        // Prevents bots from immediately casting already-present buffs upon logging in
+        if (!player)
+            return false;
+
         constexpr uint32 POST_LOGIN_BUFF_GRACE_MS = 5 * IN_MILLISECONDS;
+        return getMSTimeDiff(
+            player->GetInGameTime(), GameTime::GetGameTimeMS().count()) < POST_LOGIN_BUFF_GRACE_MS;
+    }
 
-        bool IsWithinPostLoginBuffGrace(Player* player)
+    bool IsGroupEligibleForBuffMode(Group const* group, AutoPartyBuffMode mode)
+    {
+        if (!group)
+            return false;
+
+        switch (mode)
         {
-            if (!player)
+            case AutoPartyBuffMode::RAID_ONLY:
+                return group->isRaidGroup();
+            case AutoPartyBuffMode::GROUP_OR_RAID:
+                return true;
+            case AutoPartyBuffMode::DISABLED:
                 return false;
-
-            return getMSTimeDiff(
-                player->GetInGameTime(), GameTime::GetGameTimeMS().count()) < POST_LOGIN_BUFF_GRACE_MS;
         }
+
+        return false;
     }
 
     bool BuffBelowRefreshTarget(PlayerbotAI* botAI, Aura* aura, uint32 baseBeforeDuration)
@@ -73,20 +86,7 @@ namespace ai::buff
 
     static bool IsEligibleGroupForPartyBuffs(Group const* group)
     {
-        if (!group)
-            return false;
-
-        switch (sPlayerbotAIConfig.AutoPartyBuffs)
-        {
-            case AutoPartyBuffMode::RAID_ONLY:
-                return group->isRaidGroup();
-            case AutoPartyBuffMode::GROUP_OR_RAID:
-                return true;
-            case AutoPartyBuffMode::DISABLED:
-                return false;
-        }
-
-        return false;
+        return IsGroupEligibleForBuffMode(group, sPlayerbotAIConfig.AutoPartyBuffs);
     }
 
     bool IsGroupVariantEnabled(Player* bot, std::string const& name)

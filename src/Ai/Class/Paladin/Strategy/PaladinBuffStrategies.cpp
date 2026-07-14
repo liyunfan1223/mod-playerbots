@@ -7,27 +7,19 @@
 #include "PaladinBuffStrategies.h"
 #include "Playerbots.h"
 
-void PaladinBuffManaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PaladinBuffManaStrategy::InitTriggers(std::vector<TriggerNode*>& /*triggers*/)
 {
-    triggers.push_back(new TriggerNode("blessing of wisdom on party",
-        { NextAction("blessing of wisdom on party", 11.0f) }));
-
-    triggers.push_back(new TriggerNode("blessing of kings on party",
-        { NextAction("blessing of kings on party", 10.5f) }));
+    // Intentionally empty: enabling "bwisdom" signals a forced Wisdom assignment
 }
 
-void PaladinBuffHealthStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PaladinBuffHealthStrategy::InitTriggers(std::vector<TriggerNode*>& /*triggers*/)
 {
-    triggers.push_back(
-        new TriggerNode("blessing of sanctuary on party",
-                        { NextAction("blessing of sanctuary on party", 11.0f) }));
+    // Intentionally empty: enabling "bsanc" signals a forced Sanctuary assignment
 }
 
-void PaladinBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PaladinBuffDpsStrategy::InitTriggers(std::vector<TriggerNode*>& /*triggers*/)
 {
-    triggers.push_back(
-        new TriggerNode("blessing of might on party",
-                        { NextAction("blessing of might on party", 11.0f) }));
+    // Intentionally empty: enabling "bmight" signals a forced Might assignment
 }
 
 void PaladinShadowResistanceStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -80,15 +72,7 @@ void PaladinBuffThreatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers
         "righteous fury", { NextAction("righteous fury", ACTION_HIGH + 8) }));
 }
 
-void PaladinBuffStatsStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void PaladinBuffStatsStrategy::InitTriggers(std::vector<TriggerNode*>& /*triggers*/)
 {
-    // First Sanctuary (prio > Kings)
-    triggers.push_back(
-        new TriggerNode("blessing of sanctuary on party",
-                        { NextAction("blessing of sanctuary on party", 12.0f) }));
-
-    // After Kings
-    triggers.push_back(
-        new TriggerNode("blessing of kings on party",
-                        { NextAction("blessing of kings on party", 11.0f) }));
+    // Intentionally empty: enabling "bkings" signals a forced Kings assignment
 }

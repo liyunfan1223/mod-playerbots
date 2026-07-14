@@ -6,8 +6,8 @@
 
 #include "PaladinTriggers.h"
 #include "GenericBuffUtils.h"
-#include "PaladinActions.h"
-#include "PaladinGreaterBlessingAction.h"
+#include "PaladinBlessingAction.h"
+#include "PaladinBlessingPlan.h"
 #include "PaladinHelper.h"
 #include "Playerbots.h"
 
@@ -24,14 +24,6 @@ bool CrusaderAuraTrigger::IsActive()
 {
     Unit* target = GetTarget();
     return AI_VALUE2(bool, "mounted", "self target") && !botAI->HasAura("crusader aura", target);
-}
-
-bool BlessingTrigger::IsActive()
-{
-    Unit* target = GetTarget();
-    return SpellTrigger::IsActive() &&
-           !botAI->HasAnyAuraOf(target, "blessing of might", "blessing of wisdom",
-                                "blessing of kings", "blessing of sanctuary", nullptr);
 }
 
 bool DivineShieldLowHealthTrigger::IsActive()
@@ -79,28 +71,9 @@ bool NotSensingUndeadTrigger::IsActive()
     return !botAI->HasAura("sense undead", bot);
 }
 
-bool GreaterBlessingNeededTrigger::IsActive()
+bool BlessingNeededTrigger::IsActive()
 {
-    if (!ai::gbless::IsEligibleGroupForAutoBlessings(bot->GetGroup()))
-        return false;
-
-    if (ai::buff::ShouldDeferGreaterBlessingAssignmentForRecentLogin(bot))
-        return false;
-
-    Group* group = bot->GetGroup();
-    uint32 const groupKey = group ? group->GetLeaderGUID().GetCounter() : 0;
-
-    Value<ai::gbless::CachedPendingBlessingAssignment>* pendingValue =
-        context->GetValue<ai::gbless::CachedPendingBlessingAssignment>("greater blessing pending assignment");
-    if (!pendingValue)
-        return false;
-
-    ai::gbless::CachedPendingBlessingAssignment pendingAssignment = pendingValue->Get();
-    if (pendingAssignment.groupKey != groupKey)
-    {
-        pendingValue->Reset();
-        pendingAssignment = pendingValue->Get();
-    }
-
-    return pendingAssignment.valid && pendingAssignment.groupKey == groupKey;
+    ai::blessing::PendingBlessing const pb = ai::blessing::PaladinBlessingPlanner(botAI).Plan();
+    context->GetValue<ai::blessing::PendingBlessing>("blessing to cast")->Set(pb);
+    return pb.spellId != 0;
 }

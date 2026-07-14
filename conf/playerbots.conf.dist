@@ -491,14 +491,17 @@ Playerbots.AutoSaveMana = 1
 # Default: 60 (60%)
 Playerbots.SaveManaThreshold = 60
 
-# Enable Paladin bots to use greater blessings, with the blessing used being based on the
-# number of Paladins in the raid/group and the spec of the recipient. Priorities for each
-# spec are hardcoded in GreaterBlessingActions.h.
-# 0 = disabled
+# Allow Paladin bots to use greater (class-wide) blessings when group size warrants it,
+# instead of single-target blessings. Recipients and ranks are chosen by the blessing planner.
+# 0 = disabled (single-target only)
 # 1 = enabled in raid groups only
 # 2 = enabled in all groups
-# Default: 1 (raid only)
-Playerbots.AutoGreaterBlessings = 1
+# Default: 2
+Playerbots.AutoGreaterBlessings = 2
+
+# Seconds of remaining duration below which a paladin refreshes a blessing it owns.
+# Default: 60
+Playerbots.BlessingRefreshThresholdSeconds = 60
 
 # Enable bots to use group reagent buffs: Gift of the Wild, Arcane Brilliance,
 # Prayer of Fortitude, Prayer of Spirit, and Prayer of Shadow Protection.
