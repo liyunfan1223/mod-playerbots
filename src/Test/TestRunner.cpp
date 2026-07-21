@@ -446,6 +446,9 @@ public:
 
 // One registration function per Scenarios/*Registrations.cpp file.
 void RegisterGenericScenarios(IntegrationTestMgr& mgr);
+void RegisterMoltenCoreScenarios(IntegrationTestMgr& mgr);
+void RegisterNaxxramasScenarios(IntegrationTestMgr& mgr);
+void RegisterDpsDummyScenarios(IntegrationTestMgr& mgr);
 void AddPlayerbotsTestCombatRecorder();
 
 void AddPlayerbotsIntegrationTestScripts()
@@ -454,6 +457,9 @@ void AddPlayerbotsIntegrationTestScripts()
     new IntegrationTestCommandScript();
     AddPlayerbotsTestCombatRecorder();
     RegisterGenericScenarios(IntegrationTestMgr::instance());
+    RegisterMoltenCoreScenarios(IntegrationTestMgr::instance());
+    RegisterNaxxramasScenarios(IntegrationTestMgr::instance());
+    RegisterDpsDummyScenarios(IntegrationTestMgr::instance());
 }
 
 #endif  // PLAYERBOTS_INTEGRATION_TESTS
