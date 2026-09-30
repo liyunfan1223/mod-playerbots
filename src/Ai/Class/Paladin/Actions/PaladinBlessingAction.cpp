@@ -225,12 +225,19 @@ BaseBlessingCategory PaladinBlessingPlanner::PlanClass(
     for (BaseBlessingCategory c : { BASE_MIGHT, BASE_WISDOM, BASE_KINGS, BASE_SANCTUARY })
         botCanCast[c] = SomeBotCanCast(bots, c);
 
+    // Greaters land class-wide, so a pet sharing its class with a player adds no demand (it would
+    // flip the player's blessing) and takes its wants as exception singles; mage-class pets are casters.
+    bool const petsFollow = std::any_of(group.members.begin(), group.members.end(),
+        [](Unit* u) { return u->IsPlayer(); });
+
     for (std::size_t k = 0; k < M; ++k)
     {
-        RoleProfile const role = group.members[k]->IsPlayer()
-            ? ai::blessing::ResolveRoleProfile(group.members[k]->ToPlayer())
-            : ROLE_PHYSICAL_DPS;
+        Unit* const member = group.members[k];
+        RoleProfile const role = member->IsPlayer()
+            ? ai::blessing::ResolveRoleProfile(member->ToPlayer())
+            : (member->getClass() == CLASS_MAGE ? ROLE_CASTER : ROLE_PHYSICAL_DPS);
         roles[k] = role;
+        bool const addsDemand = member->IsPlayer() || !petsFollow;
         std::size_t taken = 0;
         for (BaseBlessingCategory c : BASE_BLESSING_PRIORITIES[role].priorities)
         {
@@ -245,7 +252,8 @@ BaseBlessingCategory PaladinBlessingPlanner::PlanClass(
             if (!botCanCast[c])
                 continue;
             wantedSet[k][c] = true;
-            demand[c] += RoleWeight(role, c);
+            if (addsDemand)
+                demand[c] += RoleWeight(role, c);
             if (++taken == N)
                 break;
         }
