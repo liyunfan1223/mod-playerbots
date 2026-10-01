@@ -18,7 +18,6 @@ class Event;
 class Player;
 class PlayerbotAI;
 class Unit;
-class UntypedValue;
 
 namespace ai::blessing
 {
@@ -71,8 +70,6 @@ namespace ai::blessing
         std::unordered_map<ObjectGuid, ai::blessing::BaseBlessingCategory> _intended;
         std::unordered_map<ObjectGuid, bool> _humanCaster;
     };
-
-    UntypedValue* blessing_to_cast_value(PlayerbotAI* botAI);
 }
 
 class CastBlessingAction : public CastBuffSpellAction
@@ -84,6 +81,9 @@ public:
     bool isUseful() override;
     bool isPossible() override;
     bool Execute(Event event) override;
+
+private:
+    ai::blessing::PendingBlessing pending;
 };
 
 #endif

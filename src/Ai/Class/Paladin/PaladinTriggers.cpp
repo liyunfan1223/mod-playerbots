@@ -6,8 +6,6 @@
 
 #include "PaladinTriggers.h"
 #include "GenericBuffUtils.h"
-#include "PaladinBlessingAction.h"
-#include "PaladinBlessingPlan.h"
 #include "PaladinHelper.h"
 #include "Playerbots.h"
 
@@ -69,11 +67,4 @@ bool HandOfFreedomOnPartyTrigger::IsActive()
 bool NotSensingUndeadTrigger::IsActive()
 {
     return !botAI->HasAura("sense undead", bot);
-}
-
-bool BlessingNeededTrigger::IsActive()
-{
-    ai::blessing::PendingBlessing const pb = ai::blessing::PaladinBlessingPlanner(botAI).Plan();
-    context->GetValue<ai::blessing::PendingBlessing>("blessing to cast")->Set(pb);
-    return pb.spellId != 0;
 }

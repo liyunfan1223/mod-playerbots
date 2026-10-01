@@ -14,7 +14,6 @@
 #include "SharedDefines.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "Value.h"
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -411,28 +410,24 @@ PendingBlessing PaladinBlessingPlanner::SelectSingle(
     return {};
 }
 
-UntypedValue* blessing_to_cast_value(PlayerbotAI* botAI)
-{
-    return new ManualSetValue<PendingBlessing>(botAI, PendingBlessing{}, "blessing to cast");
-}
-
 }
 
 Unit* CastBlessingAction::GetTarget()
 {
-    return botAI->GetUnit(AI_VALUE(PendingBlessing, "blessing to cast").target);
+    return botAI->GetUnit(pending.target);
 }
 
 bool CastBlessingAction::isUseful()
 {
-    return AI_VALUE(PendingBlessing, "blessing to cast").spellId && GetTarget();
+    pending = PaladinBlessingPlanner(botAI).Plan();
+    return pending.spellId && GetTarget();
 }
 
 bool CastBlessingAction::isPossible() { return true; }
 
 bool CastBlessingAction::Execute(Event /*event*/)
 {
-    PendingBlessing const pb = AI_VALUE(PendingBlessing, "blessing to cast");
+    PendingBlessing const pb = pending;
     if (!pb.spellId)
         return false;
 

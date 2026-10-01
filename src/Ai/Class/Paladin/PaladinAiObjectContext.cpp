@@ -388,21 +388,6 @@ private:
     static Action* cast_blessing(PlayerbotAI* botAI) { return new CastBlessingAction(botAI); }
 };
 
-class PaladinValueContextInternal : public NamedObjectContext<UntypedValue>
-{
-public:
-    PaladinValueContextInternal()
-    {
-        creators["blessing to cast"] = &PaladinValueContextInternal::blessing_to_cast;
-    }
-
-private:
-    static UntypedValue* blessing_to_cast(PlayerbotAI* botAI)
-    {
-        return ai::blessing::blessing_to_cast_value(botAI);
-    }
-};
-
 SharedNamedObjectContextList<Strategy> PaladinAiObjectContext::sharedStrategyContexts;
 SharedNamedObjectContextList<Action> PaladinAiObjectContext::sharedActionContexts;
 SharedNamedObjectContextList<Trigger> PaladinAiObjectContext::sharedTriggerContexts;
@@ -445,5 +430,4 @@ void PaladinAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContext
 void PaladinAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
 {
     AiObjectContext::BuildSharedValueContexts(valueContexts);
-    valueContexts.Add(new PaladinValueContextInternal());
 }
