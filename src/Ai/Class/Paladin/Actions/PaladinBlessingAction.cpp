@@ -103,7 +103,7 @@ void PaladinBlessingPlanner::ProcessMember(
     Player* m, BlessingConstraints& c,
     std::unordered_map<uint8, ClassGroup>& classGroups, bool& renewedHopePresent, bool& recentLogin)
 {
-    if (!m || !m->IsInWorld() || m->GetMapId() != bot->GetMapId())
+    if (!m || !m->IsInWorld() || m->GetMap() != bot->GetMap())
         return;
 
     if (ai::buff::IsWithinPostLoginBuffGrace(m))
@@ -147,7 +147,7 @@ void PaladinBlessingPlanner::ProcessMember(
     addDemand(m);
 
     if (Pet* pet = m->GetPet();
-        pet && pet->IsAlive() && pet->IsInWorld() && pet->GetMapId() == bot->GetMapId())
+        pet && pet->IsAlive() && pet->IsInWorld() && pet->GetMap() == bot->GetMap())
         addDemand(pet);
 }
 
