@@ -131,10 +131,13 @@ namespace ai::blessing
             if (honoredHuman[c])
                 claimed[c] = true;
 
-        // 1. Forced strategy casts: a forced bot greaters its forced category.
+        // 1. Forced strategy casts: a forced bot greaters its forced category.  Two bots forced to
+        //    one category would overwrite each other's greater; the first in group order keeps it.
         for (auto const& f : forced)
         {
             if (suppressSanctuary && f.second == BASE_SANCTUARY)
+                continue;
+            if (std::find(g.begin(), g.end(), f.second) != g.end())
                 continue;
             for (size_t i = 0; i < bots.size(); ++i)
                 if (bots[i].guid == f.first && g[i] == BASE_NONE && PaladinCanCast(bots[i], f.second))
