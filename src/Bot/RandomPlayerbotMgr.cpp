@@ -1847,9 +1847,9 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     }
     std::vector<WorldLocation> locs = sTravelMgr.GetTeleportLocations(bot);
 
-    if (sPlayerbotAIConfig.RandomBotConcentrateInPlayerZone && !locs.empty())
+    if (sPlayerbotAIConfig.RandomBotConcentrateInPlayerZone)
     {
-        std::vector<WorldLocation> playerZoneLocs = GetPlayerZoneTeleportLocations(locs, bot);
+        std::vector<WorldLocation> playerZoneLocs = GetPlayerZoneHubLocations(locs, bot);
         if (!playerZoneLocs.empty())
             locs = std::move(playerZoneLocs);
     }
@@ -1868,12 +1868,51 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
 std::vector<WorldLocation> RandomPlayerbotMgr::GetPlayerZoneTeleportLocations(std::vector<WorldLocation> const& locs,
                                                                               Player* bot)
 {
-    std::set<std::pair<uint32, uint32>> playerMapZones;
+    return FilterPlayerZoneTeleportLocations(locs, bot, GetPlayerZones());
+}
+
+// Same filter for the bot's level hubs, falling back to the hubs of nearby levels.
+std::vector<WorldLocation> RandomPlayerbotMgr::GetPlayerZoneHubLocations(std::vector<WorldLocation> const& hubs,
+                                                                         Player* bot)
+{
+    std::set<std::pair<uint32, uint32>> const playerMapZones = GetPlayerZones();
+    std::vector<WorldLocation> filtered = FilterPlayerZoneTeleportLocations(hubs, bot, playerMapZones);
+
+    // Hubs are indexed only for their zone's level range; the legacy cache already includes the margin.
+    if (!filtered.empty() || playerMapZones.empty() || !sPlayerbotAIConfig.EnableNewRpgStrategy)
+        return filtered;
+
+    uint32 botLevel = bot->GetLevel();
+    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    uint32 higher = sPlayerbotAIConfig.RandomBotTeleHigherLevel;
+    uint32 lower = sPlayerbotAIConfig.RandomBotTeleLowerLevel;
+    uint32 maxOffset = std::min(std::max(higher, lower), maxLevel);
+    for (uint32 offset = 1; offset <= maxOffset; ++offset)
     {
-        std::lock_guard<std::mutex> lock(_playerZonesLock);
-        playerMapZones = _playerZones;
+        if (offset <= higher && botLevel > offset)
+            filtered = FilterPlayerZoneTeleportLocations(sTravelMgr.GetTeleportLocations(bot, botLevel - offset), bot,
+                                                         playerMapZones);
+
+        if (filtered.empty() && offset <= lower && botLevel + offset <= maxLevel)
+            filtered = FilterPlayerZoneTeleportLocations(sTravelMgr.GetTeleportLocations(bot, botLevel + offset), bot,
+                                                         playerMapZones);
+
+        if (!filtered.empty())
+            break;
     }
 
+    return filtered;
+}
+
+std::set<std::pair<uint32, uint32>> RandomPlayerbotMgr::GetPlayerZones()
+{
+    std::lock_guard<std::mutex> lock(_playerZonesLock);
+    return _playerZones;
+}
+
+std::vector<WorldLocation> RandomPlayerbotMgr::FilterPlayerZoneTeleportLocations(
+    std::vector<WorldLocation> const& locs, Player* bot, std::set<std::pair<uint32, uint32>> const& playerMapZones)
+{
     std::vector<WorldLocation> filtered;
     if (playerMapZones.empty())
         return filtered;
