@@ -300,6 +300,24 @@ bool PaladinBlessingPlanner::CanBlessNow(Unit* m, uint32 spellId) const
     return botAI->CanCastSpell(spellId, m);
 }
 
+namespace
+{
+    // The core refuses our aura under a stronger "highest wins" buff from elsewhere (Battle Shout vs
+    // Might), but CheckCast only tests that for single-target spells, not the area greaters.
+    bool OutrankedByOtherBuff(Unit* caster, Unit* member, SpellInfo const* spell)
+    {
+        uint8 auraMask = 0;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (spell->Effects[i].IsAura())
+                auraMask |= 1 << i;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if ((auraMask & (1 << i)) && !member->IsHighestExclusiveAuraEffect(spell,
+                    spell->Effects[i].ApplyAuraName, spell->Effects[i].CalcValue(caster), auraMask))
+                return true;
+        return false;
+    }
+}
+
 PendingBlessing PaladinBlessingPlanner::SelectGreater(
     std::unordered_map<uint8, ClassGroup> const& groups,
     std::unordered_map<uint8, BaseBlessingCategory> const& classMajority,
@@ -314,6 +332,9 @@ PendingBlessing PaladinBlessingPlanner::SelectGreater(
         if (ai::blessing::IsEligibleGroupForAutoBlessings(bot->GetGroup()))
             greaterId = HighestKnownBlessingRank(bot, cat, true);
         if (!greaterId || !ai::buff::HasRequiredReagents(bot, *greaterId))
+            continue;
+        SpellInfo const* greaterInfo = sSpellMgr->GetSpellInfo(*greaterId);
+        if (!greaterInfo)
             continue;
 
         int32 const myStrength = GetBlessingCastStrength(bot, ToGreaterVariant(cat), *greaterId);
@@ -339,6 +360,8 @@ PendingBlessing PaladinBlessingPlanner::SelectGreater(
                 if (HasHumanBlessing(m, cat, _coverage))
                     continue;
                 if (HasStrongerBlessing(m, cat, myStrength, _coverage))
+                    continue;
+                if (OutrankedByOtherBuff(bot, m, greaterInfo))
                     continue;
                 classNeedsGreater = true;
                 if (CanBlessNow(m, *greaterId))
