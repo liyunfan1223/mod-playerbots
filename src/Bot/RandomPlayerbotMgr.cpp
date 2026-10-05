@@ -1882,6 +1882,7 @@ std::vector<WorldLocation> RandomPlayerbotMgr::GetPlayerZoneTeleportLocations(st
     for (auto const& mapZone : playerMapZones)
         playerMaps.insert(mapZone.first);
 
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     for (WorldLocation const& loc : locs)
     {
         if (playerMaps.find(loc.GetMapId()) == playerMaps.end())
@@ -1903,6 +1904,14 @@ std::vector<WorldLocation> RandomPlayerbotMgr::GetPlayerZoneTeleportLocations(st
                 continue;
         }
 
+        // Same reason: RandomTeleport also rejects maps outside RandomBotMaps and far starter-level spots.
+        if (std::find(sPlayerbotAIConfig.RandomBotMaps.begin(), sPlayerbotAIConfig.RandomBotMaps.end(),
+                      loc.GetMapId()) == sPlayerbotAIConfig.RandomBotMaps.end())
+            continue;
+
+        if (botAI && !botAI->StarterLevelDistanceCheck(bot, loc, true))
+            continue;
+
         filtered.push_back(loc);
     }
 
@@ -1919,6 +1928,10 @@ void RandomPlayerbotMgr::UpdatePlayerZones()
     for (Player* player : players)
     {
         if (!player || !player->IsInWorld() || player->IsGameMaster())
+            continue;
+
+        // Alt and addclass bots do not attract random bots, only human-controlled characters do.
+        if (!IsRealPlayer(player) && !IsSelfBot(player))
             continue;
 
         Map* map = player->GetMap();
