@@ -32,7 +32,7 @@ public:
         // neglect if victim is main tank, or no victim (for untauntable target)
         if (Unit* victim = threatMgr->GetCurrentVictim())
         {
-            if (victim->ToPlayer() && botAI->IsMainTank(victim->ToPlayer()))
+            if (victim->ToPlayer() && PlayerbotAI::IsMainTank(victim->ToPlayer()))
                 return;
         }
         if (minThreat >= threat)
@@ -73,7 +73,7 @@ public:
         Player* bot = botAI->GetBot();
         // if group has multiple tanks, explicit main tank just focus on the current target
         Unit* currentTarget = botAI->GetAiObjectContext()->GetValue<Unit*>("current target")->Get();
-        if (currentTarget && botAI->IsExplicitMainTank(bot) && botAI->GetGroupTankNum(bot) > 1)
+        if (currentTarget && PlayerbotAI::IsExplicitMainTank(bot) && PlayerbotAI::GetGroupTankNum(bot) > 1)
         {
             if (old_unit == currentTarget)
                 return false;

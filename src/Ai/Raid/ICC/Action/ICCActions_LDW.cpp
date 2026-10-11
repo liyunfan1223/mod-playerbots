@@ -43,7 +43,7 @@ bool IccRangedPositionLadyDeathwhisperAction::Execute(Event /*event*/)
     if (currentDistance < minDistance || currentDistance > maxDistance)
         return false;
 
-    if (!botAI->IsRanged(bot) && !botAI->IsHeal(bot))
+    if (!PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsHeal(bot))
         return false;
 
     return MaintainRangedSpacing();
@@ -54,7 +54,7 @@ bool IccRangedPositionLadyDeathwhisperAction::MaintainRangedSpacing()
     float const safeSpacingRadius = 3.0f;
     float const moveIncrement = 2.0f;
     float const maxMoveDistance = 5.0f;
-    bool const isRanged = botAI->IsRanged(bot) || botAI->IsHeal(bot);
+    bool const isRanged = PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot);
 
     if (!isRanged)
         return false;
@@ -129,10 +129,10 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event /*event*/)
     if (sPlayerbotAIConfig.EnableICCBuffs && boss->IsInCombat() && diff &&
         (diff == RAID_DIFFICULTY_10MAN_HEROIC || diff == RAID_DIFFICULTY_25MAN_HEROIC))
     {
-        if (!bot->HasAura(SPELL_NO_THREAT) && botAI->HasAggro(boss) && !botAI->IsTank(bot))
+        if (!bot->HasAura(SPELL_NO_THREAT) && botAI->HasAggro(boss) && !PlayerbotAI::IsTank(bot))
             bot->AddAura(SPELL_NO_THREAT, bot);
 
-        if (botAI->IsMainTank(bot) && !bot->HasAura(SPELL_SPITEFULL_FURY) && boss->GetVictim() != bot)
+        if (PlayerbotAI::IsMainTank(bot) && !bot->HasAura(SPELL_SPITEFULL_FURY) && boss->GetVictim() != bot)
             bot->AddAura(SPELL_SPITEFULL_FURY, bot);
     }
 
@@ -162,7 +162,7 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event /*event*/)
 
     constexpr uint32 shadeEntryId = NPC_SHADE;
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         if (bot->HasAura(SPELL_TOUCH_OF_INSIGNIFICANCE))
             bot->RemoveAura(SPELL_TOUCH_OF_INSIGNIFICANCE);
@@ -174,7 +174,7 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event /*event*/)
         bool const isAttackingAdd = currentTarget && IsAdd(currentTarget);
         if (isAttackingAdd && currentTarget->IsAlive())
         {
-            if (botAI->IsAssistTank(bot) || !IsAssistTankAlive())
+            if (PlayerbotAI::IsAssistTank(bot) || !IsAssistTankAlive())
             {
                 constexpr float MARK_RANGE = 25.0f;
                 Unit* nearAdd = FindAddNearBoss(boss, MARK_RANGE);
@@ -206,7 +206,7 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event /*event*/)
         Unit* targetAdd = FindAndCollectAdd(boss);
         if (targetAdd)
         {
-            if (botAI->IsAssistTank(bot) || !IsAssistTankAlive())
+            if (PlayerbotAI::IsAssistTank(bot) || !IsAssistTankAlive())
             {
                 constexpr float MARK_RANGE = 25.0f;
                 Unit* nearAdd = FindAddNearBoss(boss, MARK_RANGE);
@@ -230,7 +230,7 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event /*event*/)
                     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
                     {
                         Player* member = ref->GetSource();
-                        if (member && member->IsAlive() && botAI->IsTank(member) && boss->GetVictim() == member)
+                        if (member && member->IsAlive() && PlayerbotAI::IsTank(member) && boss->GetVictim() == member)
                         {
                             anyTankHasAggro = true;
                             break;
@@ -261,7 +261,7 @@ bool IccAddsLadyDeathwhisperAction::Execute(Event /*event*/)
 
     ApplyNearbyAddCC();
 
-    if (!boss->HealthAbovePct(95) && (botAI->IsRanged(bot) || botAI->IsHeal(bot)))
+    if (!boss->HealthAbovePct(95) && (PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot)))
     {
         bool threatened = false;
         GuidVector const npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
@@ -311,7 +311,7 @@ Unit* IccAddsLadyDeathwhisperAction::FindAndCollectAdd(Unit* boss)
             continue;
 
         Unit* victim = unit->GetVictim();
-        if (victim && victim->IsPlayer() && botAI->IsTank(victim->ToPlayer()))
+        if (victim && victim->IsPlayer() && PlayerbotAI::IsTank(victim->ToPlayer()))
             continue;
 
         float distance = bot->GetExactDist(unit);
@@ -524,8 +524,8 @@ bool IccAddsLadyDeathwhisperAction::EngageBoss()
     if (!boss || !boss->IsAlive())
         return false;
 
-    bool const isMelee = botAI->IsMelee(bot);
-    bool const isRanged = botAI->IsRanged(bot) || botAI->IsHeal(bot);
+    bool const isMelee = PlayerbotAI::IsMelee(bot);
+    bool const isRanged = PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot);
 
     if (isMelee)
     {
@@ -608,7 +608,7 @@ bool IccAddsLadyDeathwhisperAction::IsAssistTankAlive()
         if (!member || !member->IsAlive() || member == bot)
             continue;
 
-        if (botAI->IsTank(member) && !botAI->IsMainTank(member))
+        if (PlayerbotAI::IsTank(member) && !PlayerbotAI::IsMainTank(member))
             return true;
     }
 
@@ -773,14 +773,14 @@ bool IccRottingFrostGiantTankPositionAction::Execute(Event /*event*/)
        = botAI->GetAura("recently infected", bot) != nullptr;
 
         // Tank behavior - unchanged
-        if (botAI->IsTank(bot) && botAI->HasAggro(boss) && !isInfected)
+        if (PlayerbotAI::IsTank(bot) && botAI->HasAggro(boss) && !isInfected)
             if (bot->GetExactDist2d(ICC_ROTTING_FROST_GIANT_TANK_POSITION) > 5.0f)
                 return MoveTo(bot->GetMapId(), ICC_ROTTING_FROST_GIANT_TANK_POSITION.GetPositionX(),
                               ICC_ROTTING_FROST_GIANT_TANK_POSITION.GetPositionY(),
                               ICC_ROTTING_FROST_GIANT_TANK_POSITION.GetPositionZ(), false, false, false, true,
                               MovementPriority::MOVEMENT_NORMAL);
 
-        if (botAI->IsTank(bot))
+        if (PlayerbotAI::IsTank(bot))
             return false;
 
         // Handle infected bot behavior - move near a non-infected, non-cured bot
@@ -852,7 +852,7 @@ bool IccRottingFrostGiantTankPositionAction::Execute(Event /*event*/)
                     float score = bot->GetExactDist2d(member);
 
                     // Prefer ranged targets
-                    if (botAI->IsRanged(bot))
+                    if (PlayerbotAI::IsRanged(bot))
                     {
                         score *= 0.7f;  // Bonus for ranged targets
                     }
@@ -903,7 +903,7 @@ bool IccRottingFrostGiantTankPositionAction::Execute(Event /*event*/)
         }
 
         // For ranged bots, only spread from non-infected bots
-        if (botAI->IsRanged(bot))
+        if (PlayerbotAI::IsRanged(bot))
         {
             const float safeSpacingRadius = 11.0f;
             const float moveIncrement = 2.0f;

@@ -182,9 +182,9 @@ protected:
 private:
     RandomPlayerbotMgr() : PlayerbotHolder()
     {
-        this->playersLevel = sPlayerbotAIConfig.randombotStartingLevel;
+        this->playersLevel = sPlayerbotAIConfig.RandomBotStartingLevel;
 
-        if (sPlayerbotAIConfig.enabled || sPlayerbotAIConfig.randomBotAutologin)
+        if (sPlayerbotAIConfig.Enabled || sPlayerbotAIConfig.RandomBotAutologin)
         {
             PlayerbotCommandServer::instance().Start();
         }

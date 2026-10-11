@@ -36,7 +36,7 @@ public:
         : RotateAroundTheCenterPointAction(botAI, "rotate grobbulus", 3281.23f, -3310.38f, 35.0f, 8, true, M_PI) {}
     virtual bool isUseful() override
     {
-        return RotateAroundTheCenterPointAction::isUseful() && botAI->IsMainTank(bot) &&
+        return RotateAroundTheCenterPointAction::isUseful() && PlayerbotAI::IsMainTank(bot) &&
                AI_VALUE2(bool, "has aggro", "boss target");
     }
     uint32 GetCurrWaypoint() override;

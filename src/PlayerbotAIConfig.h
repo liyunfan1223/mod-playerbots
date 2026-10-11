@@ -79,15 +79,15 @@ enum NewRpgStatus : int
 // One level range/bucket used by the random bot level brackets sub-feature (see RandomBotLevelMgr).
 struct LevelBracketConfig
 {
-    uint8 lower = 1;
-    uint8 upper = 80;
-    uint8 pct = 0;
+    uint8 Lower = 1;
+    uint8 Upper = 80;
+    uint8 Pct = 0;
 };
 
 class PlayerbotAIConfig
 {
 public:
-    static PlayerbotAIConfig& instance()
+    static PlayerbotAIConfig& Instance()
     {
         static PlayerbotAIConfig instance;
 
@@ -102,419 +102,418 @@ public:
     bool IsInPvpProhibitedZone(uint32 id);
     bool IsInPvpProhibitedArea(uint32 id);
 
-    bool enabled;
-    bool disabledWithoutRealPlayer;
+    bool Enabled;
+    bool DisabledWithoutRealPlayer;
     bool EnableICCBuffs;
-    bool allowAccountBots, allowGuildBots, allowTrustedAccountBots;
-    bool randomBotGuildNearby, randomBotInvitePlayer, inviteChat;
-    uint32 globalCoolDown, reactDelay, maxWaitForMove, disableMoveSplinePath, maxMovementSearchTime, expireActionTime,
-        dispelAuraDuration, passiveDelay, repeatDelay, errorDelay, rpgDelay, sitDelay, returnDelay, lootDelay;
-    bool dynamicReactDelay;
-    float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance, fleeDistance,
-        tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance, aoeRadius, rpgDistance,
-        targetPosRecalcDistance, farDistance, healDistance, aggroDistance;
-    uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
-    uint32 lowMana, mediumMana, highMana;
-    bool autoSaveMana;
-    uint32 saveManaThreshold;
-    AutoPartyBuffMode autoGreaterBlessings;
-    AutoPartyBuffMode autoPartyBuffs;
-    bool tellWhenMissingBuffReagents;
-    uint32 missingBuffReagentMessageCooldown;
-    bool forceRebuffOnReadyCheck;
-    uint32 forceRebuffMarginSecs;
-    bool autoAvoidAoe;
-    float maxAoeAvoidRadius;
-    std::set<uint32> aoeAvoidSpellWhitelist;
-    bool tellWhenAvoidAoe;
-    std::set<uint32> disallowedGameObjects;
-    std::set<uint32> attunementQuests;
-    std::set<uint32> unobtainableItems;
+    bool AllowAccountBots, AllowGuildBots, AllowTrustedAccountBots;
+    bool RandomBotGuildNearby, RandomBotInvitePlayer, InviteChat;
+    uint32 GlobalCoolDown, ReactDelay, MaxWaitForMove, DisableMoveSplinePath, MaxMovementSearchTime, ExpireActionTime,
+        DispelAuraDuration, PassiveDelay, RepeatDelay, ErrorDelay, RpgDelay, SitDelay, ReturnDelay, LootDelay;
+    bool DynamicReactDelay;
+    float SightDistance, SpellDistance, ReactDistance, GrindDistance, LootDistance, ShootDistance, FleeDistance,
+        TooCloseDistance, MeleeDistance, FollowDistance, WhisperDistance, ContactDistance, AoeRadius, RpgDistance,
+        TargetPosRecalcDistance, FarDistance, HealDistance, AggroDistance;
+    uint32 CriticalHealth, LowHealth, MediumHealth, AlmostFullHealth;
+    uint32 LowMana, MediumMana, HighMana;
+    bool AutoSaveMana;
+    uint32 SaveManaThreshold;
+    AutoPartyBuffMode AutoGreaterBlessings;
+    AutoPartyBuffMode AutoPartyBuffs;
+    bool TellWhenMissingBuffReagents;
+    uint32 MissingBuffReagentMessageCooldown;
+    bool ForceRebuffOnReadyCheck;
+    uint32 ForceRebuffMarginSecs;
+    bool AutoAvoidAoe;
+    float MaxAoeAvoidRadius;
+    std::set<uint32> AoeAvoidSpellWhitelist;
+    bool TellWhenAvoidAoe;
+    std::set<uint32> DisallowedGameObjects;
+    std::set<uint32> AttunementQuests;
+    std::set<uint32> UnobtainableItems;
 
-    uint32 openGoSpell;
-    bool randomBotAutologin;
-    bool botAutologin;
-    std::string randomBotMapsAsString;
-    float probTeleToBankers;
-    bool enableWeightTeleToCityBankers;
-    int weightTeleToStormwind;
-    int weightTeleToIronforge;
-    int weightTeleToDarnassus;
-    int weightTeleToExodar;
-    int weightTeleToOrgrimmar;
-    int weightTeleToUndercity;
-    int weightTeleToThunderBluff;
-    int weightTeleToSilvermoonCity;
-    int weightTeleToShattrathCity;
-    int weightTeleToDalaran;
-    std::vector<uint32> randomBotMaps;
-    std::vector<uint32> randomBotQuestItems;
-    std::vector<uint32> randomBotAccounts;
-    std::vector<uint32> randomBotSpellIds;
-    std::vector<uint32> randomBotQuestIds;
-    uint32 randomBotTeleportDistance;
-    float randomGearLoweringChance;
-    int32 randomGearQualityLimit;
-    int32 randomGearScoreLimit;
-    bool preferClassArmorType;
-    bool preferredSpecWeapons;
-    float randomBotMinLevelChance, randomBotMaxLevelChance;
-    float randomBotRpgChance;
-    uint32 minRandomBots, maxRandomBots;
-    uint32 randomBotUpdateInterval, randomBotCountChangeMinInterval, randomBotCountChangeMaxInterval;
-    uint32 minRandomBotInWorldTime, maxRandomBotInWorldTime;
-    uint32 minRandomBotRandomizeTime, maxRandomBotRandomizeTime;
-    uint32 minRandomBotChangeStrategyTime, maxRandomBotChangeStrategyTime;
-    uint32 minRandomBotReviveTime, maxRandomBotReviveTime;
-    uint32 minRandomBotTeleportInterval, maxRandomBotTeleportInterval;
-    uint32 permanentlyInWorldTime;
-    uint32 minRandomBotPvpTime, maxRandomBotPvpTime;
-    uint32 randomBotsPerInterval;
-    uint32 randomBotPrintStatsInterval;
-    uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
-    uint32 disabledWithoutRealPlayerLoginDelay, disabledWithoutRealPlayerLogoutDelay;
-    bool randomBotJoinLfg;
+    uint32 OpenGoSpell;
+    bool RandomBotAutologin;
+    bool BotAutologin;
+    std::string RandomBotMapsAsString;
+    float ProbTeleToBankers;
+    bool EnableWeightTeleToCityBankers;
+    int WeightTeleToStormwind;
+    int WeightTeleToIronforge;
+    int WeightTeleToDarnassus;
+    int WeightTeleToExodar;
+    int WeightTeleToOrgrimmar;
+    int WeightTeleToUndercity;
+    int WeightTeleToThunderBluff;
+    int WeightTeleToSilvermoonCity;
+    int WeightTeleToShattrathCity;
+    int WeightTeleToDalaran;
+    std::vector<uint32> RandomBotMaps;
+    std::vector<uint32> RandomBotQuestItems;
+    std::vector<uint32> RandomBotAccounts;
+    std::vector<uint32> RandomBotSpellIds;
+    std::vector<uint32> RandomBotQuestIds;
+    uint32 RandomBotTeleportDistance;
+    float RandomGearLoweringChance;
+    int32 RandomGearQualityLimit;
+    int32 RandomGearScoreLimit;
+    bool PreferClassArmorType;
+    bool PreferredSpecWeapons;
+    float RandomBotMinLevelChance, RandomBotMaxLevelChance;
+    float RandomBotRpgChance;
+    uint32 MinRandomBots, MaxRandomBots;
+    uint32 RandomBotUpdateInterval, RandomBotCountChangeMinInterval, RandomBotCountChangeMaxInterval;
+    uint32 MinRandomBotInWorldTime, MaxRandomBotInWorldTime;
+    uint32 MinRandomBotRandomizeTime, MaxRandomBotRandomizeTime;
+    uint32 MinRandomBotChangeStrategyTime, MaxRandomBotChangeStrategyTime;
+    uint32 MinRandomBotReviveTime, MaxRandomBotReviveTime;
+    uint32 MinRandomBotTeleportInterval, MaxRandomBotTeleportInterval;
+    uint32 PermanentlyInWorldTime;
+    uint32 MinRandomBotPvpTime, MaxRandomBotPvpTime;
+    uint32 RandomBotsPerInterval;
+    uint32 RandomBotPrintStatsInterval;
+    uint32 MinRandomBotsPriceChangeInterval, MaxRandomBotsPriceChangeInterval;
+    uint32 DisabledWithoutRealPlayerLoginDelay, DisabledWithoutRealPlayerLogoutDelay;
+    bool RandomBotJoinLfg;
 
     // Professions
-    bool enableFishingWithMaster;
-    uint32 classMatchingProfessionChance;
-    float fishingDistanceFromMaster, fishingDistance, endFishingWithMaster;
+    bool EnableFishingWithMaster;
+    uint32 ClassMatchingProfessionChance;
+    float FishingDistanceFromMaster, FishingDistance, EndFishingWithMaster;
 
     // chat
-    bool randomBotTalk;
-    bool randomBotEmote;
-    bool randomBotSuggestDungeons;
-    bool enableBroadcasts;
-    bool enableGreet;
-    bool randomBotSayWithoutMaster;
+    bool RandomBotTalk;
+    bool RandomBotEmote;
+    bool RandomBotSuggestDungeons;
+    bool EnableBroadcasts;
+    bool EnableGreet;
+    bool RandomBotSayWithoutMaster;
     bool AnnounceConsumableUse;
 
-    uint32 broadcastChanceMaxValue;
+    uint32 BroadcastChanceMaxValue;
 
-    uint32 broadcastToGuildGlobalChance;
-    uint32 broadcastToWorldGlobalChance;
-    uint32 broadcastToGeneralGlobalChance;
-    uint32 broadcastToTradeGlobalChance;
-    uint32 broadcastToLFGGlobalChance;
-    uint32 broadcastToLocalDefenseGlobalChance;
-    uint32 broadcastToWorldDefenseGlobalChance;
-    uint32 broadcastToGuildRecruitmentGlobalChance;
+    uint32 BroadcastToGuildGlobalChance;
+    uint32 BroadcastToWorldGlobalChance;
+    uint32 BroadcastToGeneralGlobalChance;
+    uint32 BroadcastToTradeGlobalChance;
+    uint32 BroadcastToLFGGlobalChance;
+    uint32 BroadcastToLocalDefenseGlobalChance;
+    uint32 BroadcastToWorldDefenseGlobalChance;
+    uint32 BroadcastToGuildRecruitmentGlobalChance;
 
-    uint32 broadcastChanceLootingItemPoor;
-    uint32 broadcastChanceLootingItemNormal;
-    uint32 broadcastChanceLootingItemUncommon;
-    uint32 broadcastChanceLootingItemRare;
-    uint32 broadcastChanceLootingItemEpic;
-    uint32 broadcastChanceLootingItemLegendary;
-    uint32 broadcastChanceLootingItemArtifact;
+    uint32 BroadcastChanceLootingItemPoor;
+    uint32 BroadcastChanceLootingItemNormal;
+    uint32 BroadcastChanceLootingItemUncommon;
+    uint32 BroadcastChanceLootingItemRare;
+    uint32 BroadcastChanceLootingItemEpic;
+    uint32 BroadcastChanceLootingItemLegendary;
+    uint32 BroadcastChanceLootingItemArtifact;
 
-    uint32 broadcastChanceQuestAccepted;
-    uint32 broadcastChanceQuestUpdateObjectiveCompleted;
-    uint32 broadcastChanceQuestUpdateObjectiveProgress;
-    uint32 broadcastChanceQuestUpdateFailedTimer;
-    uint32 broadcastChanceQuestUpdateComplete;
-    uint32 broadcastChanceQuestTurnedIn;
+    uint32 BroadcastChanceQuestAccepted;
+    uint32 BroadcastChanceQuestUpdateObjectiveCompleted;
+    uint32 BroadcastChanceQuestUpdateObjectiveProgress;
+    uint32 BroadcastChanceQuestUpdateFailedTimer;
+    uint32 BroadcastChanceQuestUpdateComplete;
+    uint32 BroadcastChanceQuestTurnedIn;
 
-    uint32 broadcastChanceKillNormal;
-    uint32 broadcastChanceKillElite;
-    uint32 broadcastChanceKillRareelite;
-    uint32 broadcastChanceKillWorldboss;
-    uint32 broadcastChanceKillRare;
-    uint32 broadcastChanceKillUnknown;
-    uint32 broadcastChanceKillPet;
-    uint32 broadcastChanceKillPlayer;
+    uint32 BroadcastChanceKillNormal;
+    uint32 BroadcastChanceKillElite;
+    uint32 BroadcastChanceKillRareelite;
+    uint32 BroadcastChanceKillWorldboss;
+    uint32 BroadcastChanceKillRare;
+    uint32 BroadcastChanceKillUnknown;
+    uint32 BroadcastChanceKillPet;
+    uint32 BroadcastChanceKillPlayer;
 
-    uint32 broadcastChanceLevelupGeneric;
-    uint32 broadcastChanceLevelupTenX;
-    uint32 broadcastChanceLevelupMaxLevel;
+    uint32 BroadcastChanceLevelupGeneric;
+    uint32 BroadcastChanceLevelupTenX;
+    uint32 BroadcastChanceLevelupMaxLevel;
 
-    uint32 broadcastChanceSuggestInstance;
-    uint32 broadcastChanceSuggestQuest;
-    uint32 broadcastChanceSuggestGrindMaterials;
-    uint32 broadcastChanceSuggestGrindReputation;
-    uint32 broadcastChanceSuggestSell;
-    uint32 broadcastChanceSuggestSomething;
+    uint32 BroadcastChanceSuggestInstance;
+    uint32 BroadcastChanceSuggestQuest;
+    uint32 BroadcastChanceSuggestGrindMaterials;
+    uint32 BroadcastChanceSuggestGrindReputation;
+    uint32 BroadcastChanceSuggestSell;
+    uint32 BroadcastChanceSuggestSomething;
 
-    uint32 broadcastChanceSuggestSomethingToxic;
+    uint32 BroadcastChanceSuggestSomethingToxic;
 
-    uint32 broadcastChanceSuggestToxicLinks;
-    std::string toxicLinksPrefix;
-    uint32 toxicLinksRepliesChance;
+    uint32 BroadcastChanceSuggestToxicLinks;
+    std::string ToxicLinksPrefix;
+    uint32 ToxicLinksRepliesChance;
 
-    uint32 broadcastChanceSuggestThunderfury;
-    uint32 thunderfuryRepliesChance;
+    uint32 BroadcastChanceSuggestThunderfury;
+    uint32 ThunderfuryRepliesChance;
 
-    uint32 broadcastChanceGuildManagement;
+    uint32 BroadcastChanceGuildManagement;
 
-    uint32 guildRepliesRate;
+    uint32 GuildRepliesRate;
 
-    bool randomBotJoinBG;
-    bool randomBotAutoJoinBG;
+    bool RandomBotJoinBG;
+    bool RandomBotAutoJoinBG;
 
-    std::string randomBotAutoJoinICBrackets;
-    std::string randomBotAutoJoinEYBrackets;
-    std::string randomBotAutoJoinAVBrackets;
-    std::string randomBotAutoJoinABBrackets;
-    std::string randomBotAutoJoinWSBrackets;
+    std::string RandomBotAutoJoinICBrackets;
+    std::string RandomBotAutoJoinEYBrackets;
+    std::string RandomBotAutoJoinAVBrackets;
+    std::string RandomBotAutoJoinABBrackets;
+    std::string RandomBotAutoJoinWSBrackets;
 
-    uint32 randomBotAutoJoinBGICCount;
-    uint32 randomBotAutoJoinBGEYCount;
-    uint32 randomBotAutoJoinBGAVCount;
-    uint32 randomBotAutoJoinBGABCount;
-    uint32 randomBotAutoJoinBGWSCount;
+    uint32 RandomBotAutoJoinBGICCount;
+    uint32 RandomBotAutoJoinBGEYCount;
+    uint32 RandomBotAutoJoinBGAVCount;
+    uint32 RandomBotAutoJoinBGABCount;
+    uint32 RandomBotAutoJoinBGWSCount;
 
-    uint32 randomBotAutoJoinArenaBracket;
+    uint32 RandomBotAutoJoinArenaBracket;
 
-    uint32 randomBotAutoJoinBGRatedArena2v2Count;
-    uint32 randomBotAutoJoinBGRatedArena3v3Count;
-    uint32 randomBotAutoJoinBGRatedArena5v5Count;
+    uint32 RandomBotAutoJoinBGRatedArena2v2Count;
+    uint32 RandomBotAutoJoinBGRatedArena3v3Count;
+    uint32 RandomBotAutoJoinBGRatedArena5v5Count;
 
-    uint32 randomBotTeleLowerLevel, randomBotTeleHigherLevel;
-    std::map<uint32, std::pair<uint32, uint32>> zoneBrackets;
-    bool logInGroupOnly, logValuesPerTick;
-    bool summonAtInnkeepersEnabled;
-    std::string combatStrategies, nonCombatStrategies;
-    std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
-    std::string reactStrategies, randomBotReactStrategies;
-    bool applyInstanceStrategies;
-    uint32 randomBotMinLevel, randomBotMaxLevel;
-    float randomChangeMultiplier;
+    uint32 RandomBotTeleLowerLevel, RandomBotTeleHigherLevel;
+    std::map<uint32, std::pair<uint32, uint32>> ZoneBrackets;
+    bool LogInGroupOnly, LogValuesPerTick;
+    bool SummonAtInnkeepersEnabled;
+    std::string CombatStrategies, NonCombatStrategies;
+    std::string RandomBotCombatStrategies, RandomBotNonCombatStrategies;
+    std::string ReactStrategies, RandomBotReactStrategies;
+    bool ApplyInstanceStrategies;
+    uint32 RandomBotMinLevel, RandomBotMaxLevel;
+    float RandomChangeMultiplier;
 
     // std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
     // ClassSpecs classSpecs[MAX_CLASSES];
 
-    std::string premadeSpecName[MAX_CLASSES][MAX_SPECNO];
-    std::string premadeSpecGlyph[MAX_CLASSES][MAX_SPECNO];
-    std::vector<uint32> parsedSpecGlyph[MAX_CLASSES][MAX_SPECNO];
-    std::string premadeSpecLink[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
-    std::string premadeHunterPetLink[3][21];
-    std::vector<std::vector<uint32>> parsedSpecLinkOrder[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
-    std::vector<std::vector<uint32>> parsedHunterPetLinkOrder[3][21];
-    uint32 randomClassSpecProb[MAX_CLASSES][MAX_SPECNO];
-    uint32 randomClassSpecIndex[MAX_CLASSES][MAX_SPECNO];
+    std::string PremadeSpecName[MAX_CLASSES][MAX_SPECNO];
+    std::string PremadeSpecGlyph[MAX_CLASSES][MAX_SPECNO];
+    std::vector<uint32> ParsedSpecGlyph[MAX_CLASSES][MAX_SPECNO];
+    std::string PremadeSpecLink[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
+    std::string PremadeHunterPetLink[3][21];
+    std::vector<std::vector<uint32>> ParsedSpecLinkOrder[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
+    std::vector<std::vector<uint32>> ParsedHunterPetLinkOrder[3][21];
+    uint32 RandomClassSpecProb[MAX_CLASSES][MAX_SPECNO];
+    uint32 RandomClassSpecIndex[MAX_CLASSES][MAX_SPECNO];
 
-    std::string commandPrefix, commandSeparator;
-    std::string randomBotAccountPrefix;
-    uint32 randomBotAccountCount;
-    bool randomBotRandomPassword;
-    bool deleteRandomBotAccounts;
-    uint32 randomBotGuildCount, randomBotGuildSizeMax;
-    bool deleteRandomBotGuilds;
-    std::vector<uint32> pvpProhibitedZoneIds;
-    std::vector<uint32> pvpProhibitedAreaIds;
-    bool fastReactInBG;
+    std::string CommandPrefix, CommandSeparator;
+    std::string RandomBotAccountPrefix;
+    uint32 RandomBotAccountCount;
+    bool RandomBotRandomPassword;
+    bool DeleteRandomBotAccounts;
+    uint32 RandomBotGuildCount, RandomBotGuildSizeMax;
+    bool DeleteRandomBotGuilds;
+    std::vector<uint32> PvpProhibitedZoneIds;
+    std::vector<uint32> PvpProhibitedAreaIds;
+    bool FastReactInBG;
 
-    bool randombotsWalkingRPG;
-    bool randombotsWalkingRPGInDoors;
-    uint32 minEnchantingBotLevel;
-    uint32 limitEnchantExpansion;
-    uint32 limitGearExpansion;
-    uint32 randombotStartingLevel;
-    bool enablePeriodicOnlineOffline;
-    float periodicOnlineOfflineRatio;
-    bool gearscorecheck;
-    bool randomBotPreQuests;
-    bool botSendMailEnabled;
+    bool RandomBotsWalkingRPG;
+    bool RandomBotsWalkingRPGInDoors;
+    uint32 MinEnchantingBotLevel;
+    uint32 LimitEnchantExpansion;
+    uint32 LimitGearExpansion;
+    uint32 RandomBotStartingLevel;
+    bool EnablePeriodicOnlineOffline;
+    float PeriodicOnlineOfflineRatio;
+    bool GearScoreCheck;
+    bool RandomBotPreQuests;
+    bool BotSendMailEnabled;
 
-    bool guildTaskEnabled;
-    uint32 minGuildTaskChangeTime, maxGuildTaskChangeTime;
-    uint32 minGuildTaskAdvertisementTime, maxGuildTaskAdvertisementTime;
-    uint32 minGuildTaskRewardTime, maxGuildTaskRewardTime;
-    uint32 guildTaskAdvertCleanupTime;
-    uint32 guildTaskKillTaskDistance;
+    bool GuildTaskEnabled;
+    uint32 MinGuildTaskChangeTime, MaxGuildTaskChangeTime;
+    uint32 MinGuildTaskAdvertisementTime, MaxGuildTaskAdvertisementTime;
+    uint32 MinGuildTaskRewardTime, MaxGuildTaskRewardTime;
+    uint32 GuildTaskAdvertCleanupTime;
+    uint32 GuildTaskKillTaskDistance;
 
-    uint32 iterationsPerTick;
+    uint32 IterationsPerTick;
 
-    std::mutex m_logMtx;
-    bool enableAutoTradeOnItemMention;
-    std::vector<std::string> tradeActionExcludedPrefixes;
-    std::vector<std::string> allowedLogFiles;
-    std::unordered_map<std::string, std::pair<FILE*, bool>> logFiles;
+    std::mutex LogMutex;
+    bool EnableAutoTradeOnItemMention;
+    std::vector<std::string> TradeActionExcludedPrefixes;
+    std::vector<std::string> AllowedLogFiles;
+    std::unordered_map<std::string, std::pair<FILE*, bool>> LogFiles;
 
-    std::vector<std::string> botCheats;
-    uint32 botCheatMask = 0;
+    std::vector<std::string> BotCheats;
+    uint32 BotCheatMask = 0;
 
-    struct worldBuff
+    struct WorldBuff
     {
-        uint32 spellId;
-        uint32 factionId;
-        uint32 classId;
-        uint32 specId;
-        uint32 minLevel;
-        uint32 maxLevel;
+        uint32 SpellId;
+        uint32 FactionId;
+        uint32 ClassId;
+        uint32 SpecId;
+        uint32 MinLevel;
+        uint32 MaxLevel;
     };
 
-    std::vector<worldBuff> worldBuffs;
+    std::vector<WorldBuff> WorldBuffs;
 
-    uint32 commandServerPort;
-    bool perfMonEnabled;
-    bool summonWhenGroup;
-    ShowHideCosmetic randomBotShowHelmet;
-    ShowHideCosmetic randomBotShowCloak;
-    bool randomBotFixedLevel;
-    bool disableRandomLevels;
-    float randomBotXPRate;
-    uint32 randomBotAllianceRatio;
-    uint32 randomBotHordeRatio;
-    bool disableDeathKnightLogin;
-    bool limitTalentsExpansion;
-    uint32 botActiveAlone;
+    uint32 CommandServerPort;
+    bool PerfMonEnabled;
+    bool SummonWhenGroup;
+    ShowHideCosmetic RandomBotShowHelmet;
+    ShowHideCosmetic RandomBotShowCloak;
+    bool RandomBotFixedLevel;
+    bool DisableRandomLevels;
+    float RandomBotXPRate;
+    uint32 RandomBotAllianceRatio;
+    uint32 RandomBotHordeRatio;
+    bool DisableDeathKnightLogin;
+    bool LimitTalentsExpansion;
+    uint32 BotActiveAlone;
     uint32 BotActiveAloneDurationSeconds;
     uint32 BotActiveAloneForceWhenInRadius;
     bool BotActiveAloneForceWhenInZone;
     bool BotActiveAloneForceWhenInMap;
     bool BotActiveAloneForceWhenIsFriend;
     bool BotActiveAloneForceWhenInGuild;
-    bool botActiveAloneSmartScale;
-    uint32 botActiveAloneSmartScaleDiffLimitfloor;
-    uint32 botActiveAloneSmartScaleDiffLimitCeiling;
-    uint32 botActiveAloneSmartScaleWhenMinLevel;
-    uint32 botActiveAloneSmartScaleWhenMaxLevel;
+    bool BotActiveAloneSmartScale;
+    uint32 BotActiveAloneSmartScaleDiffLimitFloor;
+    uint32 BotActiveAloneSmartScaleDiffLimitCeiling;
+    uint32 BotActiveAloneSmartScaleWhenMinLevel;
+    uint32 BotActiveAloneSmartScaleWhenMaxLevel;
 
-    bool freeMethodLoot;
-    int32 lootNeedRollLevel;
-    bool lootGreedRollLevel;
-    bool lootRollRecipe;
-    bool lootRollDisenchant;
-    std::string autoPickReward;
-    bool autoEquipUpgradeLoot;
-    float equipUpgradeThreshold;
-    bool twoRoundsGearInit;
-    bool syncQuestWithPlayer;
-    bool syncQuestForPlayer;
-    bool dropObsoleteQuests;
-    bool allowLearnTrainerSpells;
-    bool autoPickTalents;
-    bool autoUpgradeEquip;
-    int32 hunterWolfPet;
-    int32 defaultPetStance;
-    int32 petChatCommandDebug;
-    bool autoLearnTrainerSpells;
-    bool autoDoQuests;
-    bool enableNewRpgStrategy;
+    bool FreeMethodLoot;
+    int32 LootNeedRollLevel;
+    bool LootGreedRollLevel;
+    bool LootRollRecipe;
+    bool LootRollDisenchant;
+    std::string AutoPickReward;
+    bool AutoEquipUpgradeLoot;
+    float EquipUpgradeThreshold;
+    bool TwoRoundsGearInit;
+    bool SyncQuestWithPlayer;
+    bool SyncQuestForPlayer;
+    bool DropObsoleteQuests;
+    bool AllowLearnTrainerSpells;
+    bool AutoPickTalents;
+    bool AutoUpgradeEquip;
+    int32 HunterWolfPet;
+    int32 DefaultPetStance;
+    int32 PetChatCommandDebug;
+    bool AutoLearnTrainerSpells;
+    bool AutoDoQuests;
+    bool EnableNewRpgStrategy;
     std::unordered_map<NewRpgStatus, uint32> RpgStatusProbWeight;
-    bool syncLevelWithPlayers;
-    bool randomBotConcentrateInPlayerZone;
-    bool autoLearnQuestSpells;
-    bool autoTeleportForLevel;
-    bool randomBotGroupNearby;
-    int32 enableRandomBotTrading;
-    uint32 tweakValue;  // Debugging config
+    bool SyncLevelWithPlayers;
+    bool RandomBotConcentrateInPlayerZone;
+    bool AutoLearnQuestSpells;
+    bool AutoTeleportForLevel;
+    bool RandomBotGroupNearby;
+    int32 EnableRandomBotTrading;
+    uint32 TweakValue;  // Debugging config
 
-    uint32 randomBotArenaTeamMaxRating;
-    uint32 randomBotArenaTeamMinRating;
-    uint32 randomBotArenaTeam2v2Count;
-    uint32 randomBotArenaTeam3v3Count;
-    uint32 randomBotArenaTeam5v5Count;
-    bool deleteRandomBotArenaTeams;
+    uint32 RandomBotArenaTeamMaxRating;
+    uint32 RandomBotArenaTeamMinRating;
+    uint32 RandomBotArenaTeam2v2Count;
+    uint32 RandomBotArenaTeam3v3Count;
+    uint32 RandomBotArenaTeam5v5Count;
+    bool DeleteRandomBotArenaTeams;
 
-    uint32 selfBotLevel;
-    bool downgradeMaxLevelBot;
-    bool equipAndSpecPersistence;
-    int32 equipAndSpecPersistenceLevel;
-    int32 groupInvitationPermission;
-    bool keepAltsInGroup = false;
-    bool KeepAltsInGroup() const { return keepAltsInGroup; }
-    bool allowSummonInCombat;
-    bool allowSummonWhenMasterIsDead;
-    bool allowSummonWhenBotIsDead;
-    int reviveBotWhenSummoned;
-    bool botRepairWhenSummon;
-    bool autoInitOnly;
-    bool resetInstanceIdForAltBots;
-    float autoInitEquipLevelLimitRatio;
-    int32 maxAddedBots;
-    int32 addClassCommand;
-    int32 addClassAccountPoolSize;
-    bool addClassRandomCharacter;
-    int32 maintenanceCommand;
-    bool altMaintenanceAttunementQs,
-            altMaintenanceBags,
-            altMaintenanceAmmo,
-            altMaintenanceFood,
-            altMaintenanceReagents,
-            altMaintenanceConsumables,
-            altMaintenancePotions,
-            altMaintenanceTalentTree,
-            altMaintenancePet,
-            altMaintenancePetTalents,
-            altMaintenanceClassSpells,
-            altMaintenanceAvailableSpells,
-            altMaintenanceSkills,
-            altMaintenanceReputation,
-            altMaintenanceSpecialSpells,
-            altMaintenanceMounts,
-            altMaintenanceGlyphs,
-            altMaintenanceKeyring,
-            altMaintenanceGemsEnchants;
-    int32 autoGearCommand, autoGearCommandAltBots, autoGearQualityLimit, autoGearScoreLimit;
-    int32 autoGearBisCommand;
+    uint32 SelfBotLevel;
+    bool DowngradeMaxLevelBot;
+    bool EquipAndSpecPersistence;
+    int32 EquipAndSpecPersistenceLevel;
+    int32 GroupInvitationPermission;
+    bool KeepAltsInGroup = false;
+    bool AllowSummonInCombat;
+    bool AllowSummonWhenMasterIsDead;
+    bool AllowSummonWhenBotIsDead;
+    int ReviveBotWhenSummoned;
+    bool BotRepairWhenSummon;
+    bool AutoInitOnly;
+    bool ResetInstanceIdForAltBots;
+    float AutoInitEquipLevelLimitRatio;
+    int32 MaxAddedBots;
+    int32 AddClassCommand;
+    int32 AddClassAccountPoolSize;
+    bool AddClassRandomCharacter;
+    int32 MaintenanceCommand;
+    bool AltMaintenanceAttunementQs,
+            AltMaintenanceBags,
+            AltMaintenanceAmmo,
+            AltMaintenanceFood,
+            AltMaintenanceReagents,
+            AltMaintenanceConsumables,
+            AltMaintenancePotions,
+            AltMaintenanceTalentTree,
+            AltMaintenancePet,
+            AltMaintenancePetTalents,
+            AltMaintenanceClassSpells,
+            AltMaintenanceAvailableSpells,
+            AltMaintenanceSkills,
+            AltMaintenanceReputation,
+            AltMaintenanceSpecialSpells,
+            AltMaintenanceMounts,
+            AltMaintenanceGlyphs,
+            AltMaintenanceKeyring,
+            AltMaintenanceGemsEnchants;
+    int32 AutoGearCommand, AutoGearCommandAltBots, AutoGearQualityLimit, AutoGearScoreLimit;
+    int32 AutoGearBisCommand;
 
-    uint32 useGroundMountAtMinLevel;
-    uint32 useFastGroundMountAtMinLevel;
-    uint32 useFlyMountAtMinLevel;
-    uint32 useFastFlyMountAtMinLevel;
+    uint32 UseGroundMountAtMinLevel;
+    uint32 UseFastGroundMountAtMinLevel;
+    uint32 UseFlyMountAtMinLevel;
+    uint32 UseFastFlyMountAtMinLevel;
 
     // stagger flightpath takeoff
-    uint32 botTaxiDelayMin;
-    uint32 botTaxiDelayMax;
-    uint32 botTaxiGapMs;
-    uint32 botTaxiGapJitterMs;
+    uint32 BotTaxiDelayMin;
+    uint32 BotTaxiDelayMax;
+    uint32 BotTaxiGapMs;
+    uint32 BotTaxiGapJitterMs;
 
     std::string const GetTimestampStr();
-    bool hasLog(std::string const fileName)
+    bool HasLog(std::string const fileName)
     {
-        return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) != allowedLogFiles.end();
+        return std::find(AllowedLogFiles.begin(), AllowedLogFiles.end(), fileName) != AllowedLogFiles.end();
     };
-    bool openLog(std::string const fileName, char const* mode = "a");
-    bool isLogOpen(std::string const fileName)
+    bool OpenLog(std::string const fileName, char const* mode = "a");
+    bool IsLogOpen(std::string const fileName)
     {
-        auto it = logFiles.find(fileName);
-        return it != logFiles.end() && it->second.second;
+        auto it = LogFiles.find(fileName);
+        return it != LogFiles.end() && it->second.second;
     }
-    void log(std::string const fileName, char const* str, ...);
+    void Log(std::string const fileName, char const* str, ...);
 
-    void loadWorldBuff();
+    void LoadWorldBuff();
 
     static std::vector<std::vector<uint32>> ParseTempTalentsOrder(uint32 cls, std::string temp_talents_order);
     static std::vector<std::vector<uint32>> ParseTempPetTalentsOrder(uint32 spec, std::string temp_talents_order);
 
-    bool restrictHealerDPS = false;
-    std::vector<uint32> restrictedHealerDPSMaps;
+    bool RestrictHealerDPS = false;
+    std::vector<uint32> RestrictedHealerDPSMaps;
     bool IsRestrictedHealerDPSMap(uint32 mapId) const;
 
-    std::vector<uint32> excludedHunterPetFamilies;
+    std::vector<uint32> ExcludedHunterPetFamilies;
 
     // Random bot level brackets (periodic redistribution across per-faction level ranges). See
     // RandomBotLevelMgr; percentages here are the as-configured values, not the runtime working copy.
-    bool levelBracketsEnabled;
-    uint32 levelBracketsCheckFrequency;
-    uint32 levelBracketsFlaggedCheckFrequency;
-    uint32 levelBracketsFlaggedProcessLimit;
-    bool levelBracketsIgnoreGuildWithRealPlayers;
-    bool levelBracketsIgnoreArenaTeamBots;
-    bool levelBracketsIgnoreFriendListed;
-    std::vector<std::string> levelBracketsExcludeNames;
-    uint8 levelBracketsNumRanges;
-    std::vector<LevelBracketConfig> levelBracketsAlliance;
-    std::vector<LevelBracketConfig> levelBracketsHorde;
-    bool levelBracketsDynamicDistribution;
-    float levelBracketsRealPlayerWeight;
-    bool levelBracketsSyncFactions;
+    bool LevelBracketsEnabled;
+    uint32 LevelBracketsCheckFrequency;
+    uint32 LevelBracketsFlaggedCheckFrequency;
+    uint32 LevelBracketsFlaggedProcessLimit;
+    bool LevelBracketsIgnoreGuildWithRealPlayers;
+    bool LevelBracketsIgnoreArenaTeamBots;
+    bool LevelBracketsIgnoreFriendListed;
+    std::vector<std::string> LevelBracketsExcludeNames;
+    uint8 LevelBracketsNumRanges;
+    std::vector<LevelBracketConfig> LevelBracketsAlliance;
+    std::vector<LevelBracketConfig> LevelBracketsHorde;
+    bool LevelBracketsDynamicDistribution;
+    float LevelBracketsRealPlayerWeight;
+    bool LevelBracketsSyncFactions;
 
     // Random bot level reset (reset random bots reaching max level). See RandomBotLevelMgr.
-    bool resetBotLevelEnabled;
-    uint8 resetBotLevelMaxLevel;
-    uint8 resetBotLevelResetTo;
-    uint8 resetBotLevelSkipFrom;
-    uint8 resetBotLevelSkipTo;
-    uint8 resetBotLevelChance;
-    bool resetBotLevelScaledChance;
-    bool resetBotLevelRestrictTimePlayed;
-    uint32 resetBotLevelMinTimePlayed;
-    uint32 resetBotLevelPlayedTimeCheckFrequency;
-    bool resetBotLevelIgnoreGuildWithRealPlayers;
-    std::vector<std::string> resetBotLevelExcludeNames;
+    bool ResetBotLevelEnabled;
+    uint8 ResetBotLevelMaxLevel;
+    uint8 ResetBotLevelResetTo;
+    uint8 ResetBotLevelSkipFrom;
+    uint8 ResetBotLevelSkipTo;
+    uint8 ResetBotLevelChance;
+    bool ResetBotLevelScaledChance;
+    bool ResetBotLevelRestrictTimePlayed;
+    uint32 ResetBotLevelMinTimePlayed;
+    uint32 ResetBotLevelPlayedTimeCheckFrequency;
+    bool ResetBotLevelIgnoreGuildWithRealPlayers;
+    std::vector<std::string> ResetBotLevelExcludeNames;
 
 private:
     PlayerbotAIConfig() = default;
@@ -527,6 +526,6 @@ private:
     PlayerbotAIConfig& operator=(PlayerbotAIConfig&&) = delete;
 };
 
-#define sPlayerbotAIConfig PlayerbotAIConfig::instance()
+#define sPlayerbotAIConfig PlayerbotAIConfig::Instance()
 
 #endif

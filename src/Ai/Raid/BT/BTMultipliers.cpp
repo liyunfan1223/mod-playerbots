@@ -124,7 +124,7 @@ float TeronGorefiendControlMovementMultiplier::GetValue(Action* action)
         return 0.0f;
     }
 
-    if (botAI->IsRanged(bot) && dynamic_cast<ReachTargetAction*>(action))
+    if (PlayerbotAI::IsRanged(bot) && dynamic_cast<ReachTargetAction*>(action))
         return 0.0f;
 
     return 1.0f;
@@ -170,7 +170,7 @@ float TeronGorefiendDisableAttackingConstructsMultiplier::GetValue(Action* actio
         return 0.0f;
     }
 
-    if (!botAI->IsRangedDps(bot))
+    if (!PlayerbotAI::IsRangedDps(bot))
         return 1.0f;
 
     auto castSpellAction = dynamic_cast<CastSpellAction*>(action);
@@ -321,22 +321,22 @@ float IllidariCouncilControlMovementMultiplier::GetValue(Action* action)
         return 0.0f;
     }
 
-    if (botAI->IsAssistHealOfIndex(bot, 0, true) &&
+    if (PlayerbotAI::IsAssistHealOfIndex(bot, 0, true) &&
         (dynamic_cast<MovementAction*>(action) &&
          !dynamic_cast<IllidariCouncilPositionMageTankHealerAction*>(action)))
     {
         return 0.0f;
     }
 
-    if (!botAI->IsAssistTankOfIndex(bot, 0, false) &&
+    if (!PlayerbotAI::IsAssistTankOfIndex(bot, 0, false) &&
         dynamic_cast<TankFaceAction*>(action))
     {
         return 0.0f;
     }
 
-    if ((botAI->IsMainTank(bot) ||
-         botAI->IsAssistTankOfIndex(bot, 0, false) ||
-         botAI->IsAssistTankOfIndex(bot, 1, false) ||
+    if ((PlayerbotAI::IsMainTank(bot) ||
+         PlayerbotAI::IsAssistTankOfIndex(bot, 0, false) ||
+         PlayerbotAI::IsAssistTankOfIndex(bot, 1, false) ||
          GetZerevorMageTank(bot) == bot) &&
         dynamic_cast<AvoidAoeAction*>(action))
     {
@@ -395,9 +395,9 @@ float IllidariCouncilDisableArcaneShotOnZerevorMultiplier::GetValue(Action* acti
 
 float IllidariCouncilWaitForDpsMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsMainTank(bot) ||
-        botAI->IsAssistTankOfIndex(bot, 0, false) ||
-        botAI->IsAssistTankOfIndex(bot, 1, false) ||
+    if (PlayerbotAI::IsMainTank(bot) ||
+        PlayerbotAI::IsAssistTankOfIndex(bot, 0, false) ||
+        PlayerbotAI::IsAssistTankOfIndex(bot, 1, false) ||
         GetZerevorMageTank(bot) == bot)
     {
         return 1.0f;
@@ -456,7 +456,7 @@ float IllidanStormrageDelayDpsCooldownsMultiplier::GetValue(Action* action)
 
 float IllidanStormrageControlTankActionsMultiplier::GetValue(Action* action)
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return 1.0f;
 
     Unit* illidan = AI_VALUE2(Unit*, "find target", "illidan stormrage");
@@ -469,7 +469,7 @@ float IllidanStormrageControlTankActionsMultiplier::GetValue(Action* action)
     if (GetIllidanPhase(illidan) != 2)
         return 1.0f;
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         if (dynamic_cast<MovementAction*>(action) &&
             !dynamic_cast<IllidanStormragePositionAboveGrateAction*>(action))
@@ -483,8 +483,8 @@ float IllidanStormrageControlTankActionsMultiplier::GetValue(Action* action)
             return 0.0f;
         }
     }
-    else if (botAI->IsAssistTankOfIndex(bot, 0, false) ||
-             botAI->IsAssistTankOfIndex(bot, 1, false))
+    else if (PlayerbotAI::IsAssistTankOfIndex(bot, 0, false) ||
+             PlayerbotAI::IsAssistTankOfIndex(bot, 1, false))
     {
         if (dynamic_cast<MovementAction*>(action) &&
             !dynamic_cast<IllidanStormrageAssistTanksHandleFlamesOfAzzinothAction*>(action))
@@ -516,7 +516,7 @@ float IllidanStormrageDisableDefaultTargetingMultiplier::GetValue(Action* action
     if (phase == 4 && dynamic_cast<DpsAssistAction*>(action))
         return 0.0f;
 
-    if (botAI->IsRangedDps(bot))
+    if (PlayerbotAI::IsRangedDps(bot))
     {
         if (phase != 2)
             context->GetValue<bool>("neglect threat")->Set(true);
@@ -543,7 +543,7 @@ float IllidanStormrageDisableDefaultTargetingMultiplier::GetValue(Action* action
 
 float IllidanStormrageControlNonTankMovementMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return 1.0f;
 
     Unit* illidan = AI_VALUE2(Unit*, "find target", "illidan stormrage");
@@ -576,7 +576,7 @@ float IllidanStormrageControlNonTankMovementMultiplier::GetValue(Action* action)
         return 0.0f;
     }
 
-    if (phase == 4 && botAI->IsHeal(bot) &&
+    if (phase == 4 && PlayerbotAI::IsHeal(bot) &&
         dynamic_cast<ReachTargetAction*>(action))
     {
         return 0.0f;
@@ -620,7 +620,7 @@ float IllidanStormrageWaitForDpsMultiplier::GetValue(Action* action)
     int phase = GetIllidanPhase(illidan);
 
     if ((phase == 1 || phase == 3 || phase == 5) &&
-        !botAI->IsMainTank(bot))
+        !PlayerbotAI::IsMainTank(bot))
     {
         constexpr uint8 humanoidPhaseDpsWaitSeconds = 3;
         auto it = illidanBossDpsWaitTimer.find(instanceId);
@@ -651,8 +651,8 @@ float IllidanStormrageWaitForDpsMultiplier::GetValue(Action* action)
     }
 
     if (AI_VALUE2(Unit*, "find target", "flame of azzinoth") &&
-        !botAI->IsAssistTankOfIndex(bot, 0, true) &&
-        !botAI->IsAssistTankOfIndex(bot, 1, true))
+        !PlayerbotAI::IsAssistTankOfIndex(bot, 0, true) &&
+        !PlayerbotAI::IsAssistTankOfIndex(bot, 1, true))
     {
         constexpr uint8 flamePhaseDpsWaitSeconds = 6;
         auto it = illidanFlameDpsWaitTimer.find(instanceId);

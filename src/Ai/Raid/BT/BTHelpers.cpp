@@ -67,7 +67,7 @@ std::vector<std::vector<Player*>> GetGurtoggRangedRotationGroups(Player* bot)
         if (member && member->IsAlive())
         {
             PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
-            if (memberAI && memberAI->IsRanged(member))
+            if (memberAI && PlayerbotAI::IsRanged(member))
                 rangedMembers.push_back(member);
         }
     }

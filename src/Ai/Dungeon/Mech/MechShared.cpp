@@ -102,7 +102,7 @@ namespace MechanarFlames
     bool HealerHoldsFire(Player* bot)
     {
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-        if (!botAI->IsHeal(bot))
+        if (!PlayerbotAI::IsHeal(bot))
             return false;
         if (bot->GetHealthPct() <= HEALER_FIRE_BAIL_PCT)
             return false;

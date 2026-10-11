@@ -24,7 +24,7 @@ bool AddLootAction::Execute(Event event)
 
     GameObject* go = botAI->GetGameObject(guid);
     if (!go || go->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER ||
-        sPlayerbotAIConfig.disallowedGameObjects.contains(go->GetEntry()))
+        sPlayerbotAIConfig.DisallowedGameObjects.contains(go->GetEntry()))
         return false;
 
     LootObject loot(bot, guid);
@@ -55,7 +55,7 @@ bool AddAllLootAction::isUseful() { return true; }
 
 bool AddAllLootAction::AddLoot(ObjectGuid guid)
 {
-    if (guid.IsGameObject() && sPlayerbotAIConfig.disallowedGameObjects.contains(guid.GetEntry()))
+    if (guid.IsGameObject() && sPlayerbotAIConfig.DisallowedGameObjects.contains(guid.GetEntry()))
         return false;
 
     return AI_VALUE(LootObjectStack*, "available loot")->Add(guid);

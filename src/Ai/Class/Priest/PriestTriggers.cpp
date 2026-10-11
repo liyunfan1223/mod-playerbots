@@ -46,14 +46,14 @@ bool ShadowformTrigger::IsActive() { return !botAI->HasAura("shadowform", bot); 
 bool ShadowfiendTrigger::IsActive() { return BoostTrigger::IsActive() && !bot->HasSpellCooldown(34433); }
 
 BindingHealTrigger::BindingHealTrigger(PlayerbotAI* botAI)
-    : PartyMemberLowHealthTrigger(botAI, "binding heal", sPlayerbotAIConfig.lowHealth, 0)
+    : PartyMemberLowHealthTrigger(botAI, "binding heal", sPlayerbotAIConfig.LowHealth, 0)
 {
 }
 
 bool BindingHealTrigger::IsActive()
 {
     return PartyMemberLowHealthTrigger::IsActive() &&
-           AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.mediumHealth;
+           AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.MediumHealth;
 }
 
 const std::set<uint32> MindSearChannelCheckTrigger::MIND_SEAR_SPELL_IDS = {

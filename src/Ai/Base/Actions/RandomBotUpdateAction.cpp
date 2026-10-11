@@ -20,7 +20,7 @@ bool RandomBotUpdateAction::Execute(Event /*event*/)
             return true;
     }
 
-    if (botAI->HasPlayerNearby(sPlayerbotAIConfig.grindDistance))
+    if (botAI->HasPlayerNearby(sPlayerbotAIConfig.GrindDistance))
         return true;
 
     return sRandomPlayerbotMgr.ProcessBot(bot);

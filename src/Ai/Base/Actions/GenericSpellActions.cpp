@@ -199,7 +199,7 @@ bool CastSpellAction::isUseful()
         return false;
 
     // float combatReach = bot->GetCombatReach() + target->GetCombatReach();
-    // if (!botAI->IsRanged(bot))
+    // if (!PlayerbotAI::IsRanged(bot))
     //     combatReach += 4.0f / 3.0f;
 
     return AI_VALUE2(bool, "spell cast useful", spell);
@@ -210,7 +210,7 @@ bool CastSpellAction::isPossible()
 {
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true))
     {
-        if (!sPlayerbotAIConfig.logInGroupOnly || (bot->GetGroup() && botAI->HasGameClientMaster()))
+        if (!sPlayerbotAIConfig.LogInGroupOnly || (bot->GetGroup() && botAI->HasGameClientMaster()))
             LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", bot->GetName());
 
         return false;
@@ -221,7 +221,7 @@ bool CastSpellAction::isPossible()
 
     if (spell == "mount" && bot->IsInCombat())
     {
-        if (!sPlayerbotAIConfig.logInGroupOnly || (bot->GetGroup() && botAI->HasGameClientMaster()))
+        if (!sPlayerbotAIConfig.LogInGroupOnly || (bot->GetGroup() && botAI->HasGameClientMaster()))
             LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", bot->GetName());
 
         bot->Dismount();
@@ -601,8 +601,8 @@ bool UseTrinketAction::UseTrinket(Item* item)
                     return false;
 
                 uint8 const manaPct = AI_VALUE2(uint8, "mana", "self target");
-                if ((restoresMana && manaPct >= sPlayerbotAIConfig.mediumMana) ||
-                    manaPct >= sPlayerbotAIConfig.highMana)
+                if ((restoresMana && manaPct >= sPlayerbotAIConfig.MediumMana) ||
+                    manaPct >= sPlayerbotAIConfig.HighMana)
                 {
                     return false;
                 }
@@ -611,7 +611,7 @@ bool UseTrinketAction::UseTrinket(Item* item)
             if (defensiveTankEffect)
             {
                 uint8 const healthPct = AI_VALUE2(uint8, "health", "self target");
-                if (healthPct > sPlayerbotAIConfig.lowHealth)
+                if (healthPct > sPlayerbotAIConfig.LowHealth)
                     return false;
             }
 

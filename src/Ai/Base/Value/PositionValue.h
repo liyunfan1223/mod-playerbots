@@ -68,7 +68,7 @@ public:
 
     bool EqualToLast(WorldPosition value) override
     {
-        return value.fDist(lastValue) < sPlayerbotAIConfig.tooCloseDistance;
+        return value.fDist(lastValue) < sPlayerbotAIConfig.TooCloseDistance;
     }
 
     WorldPosition Calculate() override;

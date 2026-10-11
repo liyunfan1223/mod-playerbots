@@ -32,7 +32,7 @@ bool UnderbogColossusSpawnedToxicPoolAfterDeathTrigger::IsActive()
 
 bool GreyheartTidecallerWaterElementalTotemSpawnedTrigger::IsActive()
 {
-    return botAI->IsDps(bot) &&
+    return PlayerbotAI::IsDps(bot) &&
            AI_VALUE2(Unit*, "find target", "greyheart tidecaller");
 }
 
@@ -40,26 +40,26 @@ bool GreyheartTidecallerWaterElementalTotemSpawnedTrigger::IsActive()
 
 bool HydrossTheUnstableBotIsFrostTankTrigger::IsActive()
 {
-    return botAI->IsMainTank(bot) &&
+    return PlayerbotAI::IsMainTank(bot) &&
            AI_VALUE2(Unit*, "find target", "hydross the unstable");
 }
 
 bool HydrossTheUnstableBotIsNatureTankTrigger::IsActive()
 {
-    return botAI->IsAssistTankOfIndex(bot, 0, true) &&
+    return PlayerbotAI::IsAssistTankOfIndex(bot, 0, true) &&
            AI_VALUE2(Unit*, "find target", "hydross the unstable");
 }
 
 bool HydrossTheUnstableElementalsSpawnedTrigger::IsActive()
 {
-    if (botAI->IsHeal(bot))
+    if (PlayerbotAI::IsHeal(bot))
         return false;
 
     Unit* hydross = AI_VALUE2(Unit*, "find target", "hydross the unstable");
     if (!hydross || hydross->GetHealthPct() < 10.0f)
         return false;
 
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0, true))
+    if (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0, true))
         return false;
 
     return AI_VALUE2(Unit*, "find target", "pure spawn of hydross") ||
@@ -68,7 +68,7 @@ bool HydrossTheUnstableElementalsSpawnedTrigger::IsActive()
 
 bool HydrossTheUnstableDangerFromWaterTombsTrigger::IsActive()
 {
-    return botAI->IsRanged(bot) &&
+    return PlayerbotAI::IsRanged(bot) &&
            AI_VALUE2(Unit*, "find target", "hydross the unstable");
 }
 
@@ -81,9 +81,9 @@ bool HydrossTheUnstableTankNeedsAggroUponPhaseChangeTrigger::IsActive()
 bool HydrossTheUnstableAggroResetsUponPhaseChangeTrigger::IsActive()
 {
     if (bot->getClass() == CLASS_HUNTER ||
-        botAI->IsHeal(bot) ||
-        botAI->IsMainTank(bot) ||
-        botAI->IsAssistTankOfIndex(bot, 0, true))
+        PlayerbotAI::IsHeal(bot) ||
+        PlayerbotAI::IsMainTank(bot) ||
+        PlayerbotAI::IsAssistTankOfIndex(bot, 0, true))
         return false;
 
     return AI_VALUE2(Unit*, "find target", "hydross the unstable");
@@ -111,7 +111,7 @@ bool TheLurkerBelowSpoutIsActiveTrigger::IsActive()
 
 bool TheLurkerBelowBossIsActiveForMainTankTrigger::IsActive()
 {
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
         return false;
 
     Unit* lurker = AI_VALUE2(Unit*, "find target", "the lurker below");
@@ -127,7 +127,7 @@ bool TheLurkerBelowBossIsActiveForMainTankTrigger::IsActive()
 
 bool TheLurkerBelowBossCastsGeyserTrigger::IsActive()
 {
-    if (!botAI->IsRanged(bot))
+    if (!PlayerbotAI::IsRanged(bot))
         return false;
 
     Unit* lurker = AI_VALUE2(Unit*, "find target", "the lurker below");
@@ -144,7 +144,7 @@ bool TheLurkerBelowBossCastsGeyserTrigger::IsActive()
 // Trigger will be active only if there are at least 3 tanks in the raid
 bool TheLurkerBelowBossIsSubmergedTrigger::IsActive()
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* lurker = AI_VALUE2(Unit*, "find target", "the lurker below");
@@ -191,7 +191,7 @@ bool LeotherasTheBlindBossTransformedIntoDemonFormTrigger::IsActive()
 
 bool LeotherasTheBlindOnlyWarlockShouldTankDemonFormTrigger::IsActive()
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     if (bot->HasAura(SPELL_INSIDIOUS_WHISPER))
@@ -208,7 +208,7 @@ bool LeotherasTheBlindOnlyWarlockShouldTankDemonFormTrigger::IsActive()
 
 bool LeotherasTheBlindBossEngagedByRangedTrigger::IsActive()
 {
-    if (!botAI->IsRanged(bot))
+    if (!PlayerbotAI::IsRanged(bot))
         return false;
 
     if (bot->HasAura(SPELL_INSIDIOUS_WHISPER))
@@ -225,7 +225,7 @@ bool LeotherasTheBlindBossEngagedByRangedTrigger::IsActive()
 
 bool LeotherasTheBlindBossChannelingWhirlwindTrigger::IsActive()
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* leotheras = AI_VALUE2(Unit*, "find target", "leotheras the blind");
@@ -241,7 +241,7 @@ bool LeotherasTheBlindBossChannelingWhirlwindTrigger::IsActive()
 
 bool LeotherasTheBlindBotHasTooManyChaosBlastStacksTrigger::IsActive()
 {
-    if (botAI->IsRanged(bot))
+    if (PlayerbotAI::IsRanged(bot))
         return false;
 
     if (!AI_VALUE2(Unit*, "find target", "leotheras the blind"))
@@ -254,7 +254,7 @@ bool LeotherasTheBlindBotHasTooManyChaosBlastStacksTrigger::IsActive()
     if (!chaosBlast || chaosBlast->GetStackAmount() < 5)
         return false;
 
-    if (!GetLeotherasDemonFormTank(bot) && botAI->IsMainTank(bot))
+    if (!GetLeotherasDemonFormTank(bot) && PlayerbotAI::IsMainTank(bot))
         return false;
 
     return GetPhase2LeotherasDemon(bot);
@@ -268,7 +268,7 @@ bool LeotherasTheBlindInnerDemonHasAwakenedTrigger::IsActive()
 
 bool LeotherasTheBlindEnteredFinalPhaseTrigger::IsActive()
 {
-    if (botAI->IsHeal(bot))
+    if (PlayerbotAI::IsHeal(bot))
         return false;
 
     if (!AI_VALUE2(Unit*, "find target", "leotheras the blind"))
@@ -304,31 +304,31 @@ bool LeotherasTheBlindBossWipesAggroUponPhaseChangeTrigger::IsActive()
 
 bool FathomLordKarathressBossEngagedByMainTankTrigger::IsActive()
 {
-    return botAI->IsMainTank(bot) &&
+    return PlayerbotAI::IsMainTank(bot) &&
            AI_VALUE2(Unit*, "find target", "fathom-lord karathress");
 }
 
 bool FathomLordKarathressCaribdisEngagedByFirstAssistTankTrigger::IsActive()
 {
-    return botAI->IsAssistTankOfIndex(bot, 0, false) &&
+    return PlayerbotAI::IsAssistTankOfIndex(bot, 0, false) &&
            AI_VALUE2(Unit*, "find target", "fathom-guard caribdis");
 }
 
 bool FathomLordKarathressSharkkisEngagedBySecondAssistTankTrigger::IsActive()
 {
-    return botAI->IsAssistTankOfIndex(bot, 1, false) &&
+    return PlayerbotAI::IsAssistTankOfIndex(bot, 1, false) &&
            AI_VALUE2(Unit*, "find target", "fathom-guard sharkkis");
 }
 
 bool FathomLordKarathressTidalvessEngagedByThirdAssistTankTrigger::IsActive()
 {
-    return botAI->IsAssistTankOfIndex(bot, 2, false) &&
+    return PlayerbotAI::IsAssistTankOfIndex(bot, 2, false) &&
            AI_VALUE2(Unit*, "find target", "fathom-guard tidalvess");
 }
 
 bool FathomLordKarathressCaribdisTankNeedsDedicatedHealerTrigger::IsActive()
 {
-    return botAI->IsAssistHealOfIndex(bot, 0, true) &&
+    return PlayerbotAI::IsAssistHealOfIndex(bot, 0, true) &&
            AI_VALUE2(Unit*, "find target", "fathom-guard caribdis");
 }
 
@@ -343,19 +343,19 @@ bool FathomLordKarathressPullingBossesTrigger::IsActive()
 
 bool FathomLordKarathressDeterminingKillOrderTrigger::IsActive()
 {
-    if (botAI->IsHeal(bot))
+    if (PlayerbotAI::IsHeal(bot))
         return false;
 
     if (!AI_VALUE2(Unit*, "find target", "fathom-lord karathress"))
         return false;
 
-    if (botAI->IsDps(bot))
+    if (PlayerbotAI::IsDps(bot))
         return true;
-    else if (botAI->IsAssistTankOfIndex(bot, 0, false))
+    else if (PlayerbotAI::IsAssistTankOfIndex(bot, 0, false))
         return !AI_VALUE2(Unit*, "find target", "fathom-guard caribdis");
-    else if (botAI->IsAssistTankOfIndex(bot, 1, false))
+    else if (PlayerbotAI::IsAssistTankOfIndex(bot, 1, false))
         return !AI_VALUE2(Unit*, "find target", "fathom-guard sharkkis");
-    else if (botAI->IsAssistTankOfIndex(bot, 2, false))
+    else if (PlayerbotAI::IsAssistTankOfIndex(bot, 2, false))
         return !AI_VALUE2(Unit*, "find target", "fathom-guard tidalvess");
     else
         return false;
@@ -380,13 +380,13 @@ bool MorogrimTidewalkerPullingBossTrigger::IsActive()
 
 bool MorogrimTidewalkerBossEngagedByMainTankTrigger::IsActive()
 {
-    return botAI->IsMainTank(bot) &&
+    return PlayerbotAI::IsMainTank(bot) &&
            AI_VALUE2(Unit*, "find target", "morogrim tidewalker");
 }
 
 bool MorogrimTidewalkerWaterGlobulesAreIncomingTrigger::IsActive()
 {
-    if (!botAI->IsRanged(bot))
+    if (!PlayerbotAI::IsRanged(bot))
         return false;
 
     Unit* tidewalker = AI_VALUE2(Unit*, "find target", "morogrim tidewalker");
@@ -397,7 +397,7 @@ bool MorogrimTidewalkerWaterGlobulesAreIncomingTrigger::IsActive()
 
 bool LadyVashjBossEngagedByMainTankTrigger::IsActive()
 {
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
         return false;
 
     return AI_VALUE2(Unit*, "find target", "lady vashj") &&
@@ -406,7 +406,7 @@ bool LadyVashjBossEngagedByMainTankTrigger::IsActive()
 
 bool LadyVashjBossEngagedByRangedInPhase1Trigger::IsActive()
 {
-    return botAI->IsRanged(bot) && IsLadyVashjInPhase1(botAI);
+    return PlayerbotAI::IsRanged(bot) && IsLadyVashjInPhase1(botAI);
 }
 
 bool LadyVashjCastsShockBlastOnHighestAggroTrigger::IsActive()
@@ -418,7 +418,7 @@ bool LadyVashjCastsShockBlastOnHighestAggroTrigger::IsActive()
         IsLadyVashjInPhase2(botAI))
         return false;
 
-    return IsMainTankInSameSubgroup(botAI, bot);
+    return IsMainTankInSameSubgroup(bot);
 }
 
 bool LadyVashjBotHasStaticChargeTrigger::IsActive()
@@ -456,7 +456,7 @@ bool LadyVashjPullingBossInPhase1AndPhase3Trigger::IsActive()
 
 bool LadyVashjAddsSpawnInPhase2AndPhase3Trigger::IsActive()
 {
-    if (botAI->IsHeal(bot))
+    if (PlayerbotAI::IsHeal(bot))
         return false;
 
     return AI_VALUE2(Unit*, "find target", "lady vashj") &&
@@ -576,7 +576,7 @@ bool LadyVashjBotIsEntangledInToxicSporesOrStaticChargeTrigger::IsActive()
         if (!member || !member->HasAura(SPELL_ENTANGLE))
             continue;
 
-        if (botAI->IsMelee(member))
+        if (PlayerbotAI::IsMelee(member))
             return true;
     }
 

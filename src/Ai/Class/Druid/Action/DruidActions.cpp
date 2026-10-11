@@ -161,7 +161,7 @@ bool CastStarfallAction::isUseful()
     if (ccTarget && ccTarget->IsAlive())
     {
         float dist2d = ServerFacade::instance().GetDistance2d(ccTarget, aoePos.GetPositionX(), aoePos.GetPositionY());
-        if (ServerFacade::instance().IsDistanceLessOrEqualThan(dist2d, sPlayerbotAIConfig.aoeRadius))
+        if (ServerFacade::instance().IsDistanceLessOrEqualThan(dist2d, sPlayerbotAIConfig.AoeRadius))
             return false;
     }
 
@@ -206,7 +206,7 @@ std::vector<NextAction> CastRebirthAction::getPrerequisites()
 bool CastRebirthAction::isUseful()
 {
     return CastSpellAction::isUseful() &&
-           AI_VALUE2(float, "distance", GetTargetName()) <= sPlayerbotAIConfig.spellDistance;
+           AI_VALUE2(float, "distance", GetTargetName()) <= sPlayerbotAIConfig.SpellDistance;
 }
 
 bool CastInnervateOnHealerAction::isPossible()
@@ -240,7 +240,7 @@ Unit* CastRejuvenationOnNotFullAction::GetTarget()
         {
             continue;
         }
-        if (player->GetDistance2d(bot) > sPlayerbotAIConfig.spellDistance)
+        if (player->GetDistance2d(bot) > sPlayerbotAIConfig.SpellDistance)
         {
             continue;
         }
@@ -270,7 +270,7 @@ ObjectGuid BlanketHotTargetValue::Calculate()
     {
         return member && member->IsAlive() &&
                !member->IsGameMaster() &&
-               bot->GetDistance2d(member) <= sPlayerbotAIConfig.spellDistance &&
+               bot->GetDistance2d(member) <= sPlayerbotAIConfig.SpellDistance &&
                !botAI->HasAura(qualifier, member, false, true) &&
                bot->IsWithinLOSInMap(member);
     };

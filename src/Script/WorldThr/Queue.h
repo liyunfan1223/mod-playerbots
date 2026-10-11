@@ -57,7 +57,7 @@ public:
     /**
      * @brief Removes and deletes expired actions from the queue
      *
-     * Uses sPlayerbotAIConfig.expireActionTime to determine if actions have expired.
+     * Uses sPlayerbotAIConfig.ExpireActionTime to determine if actions have expired.
      * Both the ActionNode and ActionBasket are deleted for expired actions.
      */
     void RemoveExpired();

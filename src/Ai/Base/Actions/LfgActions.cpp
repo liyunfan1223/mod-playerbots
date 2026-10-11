@@ -22,9 +22,9 @@ uint32 LfgJoinAction::GetRoles()
 {
     if (!RandomPlayerbotMgr::instance().IsRandomBot(bot))
     {
-        if (botAI->IsTank(bot))
+        if (PlayerbotAI::IsTank(bot))
             return PLAYER_ROLE_TANK;
-        if (botAI->IsHeal(bot))
+        if (PlayerbotAI::IsHeal(bot))
             return PLAYER_ROLE_HEALER;
         else
             return PLAYER_ROLE_DAMAGE;
@@ -280,7 +280,7 @@ bool LfgLeaveAction::Execute(Event /*event*/)
     // RandomBotJoinLfg off still lets whoever is mid-queue fall through and leave.
     // Config bool is tested first so the O(currentBots) IsRandomBot() scan is skipped
     // whenever the feature is disabled.
-    if (sPlayerbotAIConfig.randomBotJoinLfg && RandomPlayerbotMgr::instance().IsRandomBot(bot))
+    if (sPlayerbotAIConfig.RandomBotJoinLfg && RandomPlayerbotMgr::instance().IsRandomBot(bot))
         return false;
 
     WorldPacket* packet = new WorldPacket(CMSG_LFG_LEAVE);
@@ -314,7 +314,7 @@ bool LfgTeleportAction::Execute(Event event)
 
 bool LfgJoinAction::isUseful()
 {
-    if (!sPlayerbotAIConfig.randomBotJoinLfg)
+    if (!sPlayerbotAIConfig.RandomBotJoinLfg)
     {
         // botAI->ChangeStrategy("-lfg", BOT_STATE_NON_COMBAT);
         return false;

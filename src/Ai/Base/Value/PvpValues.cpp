@@ -46,7 +46,7 @@ Unit* FlagCarrierValue::Calculate()
 
             if (carrier)
             {
-                if (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig.sightDistance))
+                if (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig.SightDistance))
                 {
                     return carrier;
                 }
@@ -77,7 +77,7 @@ Unit* FlagCarrierValue::Calculate()
 
             if (carrier)
             {
-                if (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig.sightDistance))
+                if (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig.SightDistance))
                 {
                     return carrier;
                 }

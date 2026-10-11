@@ -21,7 +21,7 @@ static bool IsBlessingTargetCandidate(Player* bot, Player* player)
     if (player->IsGameMaster())
         return false;
 
-    return bot->GetDistance(player) < sPlayerbotAIConfig.spellDistance * 2 &&
+    return bot->GetDistance(player) < sPlayerbotAIConfig.SpellDistance * 2 &&
            bot->IsWithinLOS(player->GetPositionX(), player->GetPositionY(),
                             player->GetPositionZ());
 }
@@ -60,9 +60,9 @@ static Unit* FindBlessingTarget(
 
         if (player == master)
             masters.push_back(player);
-        else if (botAI->IsHeal(player))
+        else if (PlayerbotAI::IsHeal(player))
             healers.push_back(player);
-        else if (botAI->IsTank(player))
+        else if (PlayerbotAI::IsTank(player))
             tanks.push_back(player);
         else
             others.push_back(player);

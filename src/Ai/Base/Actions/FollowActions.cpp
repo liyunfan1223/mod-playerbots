@@ -193,7 +193,7 @@ bool FollowAction::Execute(Event /*event*/)
                         return false;
 
                     float delay = IN_MILLISECONDS * MoveDelay(bot->GetExactDist(destX, destY, destZ));
-                    delay = std::clamp(delay, 0.0f, static_cast<float>(sPlayerbotAIConfig.maxWaitForMove));
+                    delay = std::clamp(delay, 0.0f, static_cast<float>(sPlayerbotAIConfig.MaxWaitForMove));
 
                     AI_VALUE(LastMovement&, "last movement")
                         .Set(mapId, destX, destY, destZ, bot->GetOrientation(), delay, priority);
@@ -229,7 +229,7 @@ bool FollowAction::Execute(Event /*event*/)
     //     botAI->PetFollow();
     // }
     // if (moved)
-    // botAI->SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
+    // botAI->SetNextCheckDelay(sPlayerbotAIConfig.ReactDelay);
 
     return moved;
 }
@@ -285,7 +285,7 @@ bool FollowAction::isUseful()
         distance = bot->GetDistance(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
     if (botAI->HasStrategy("master fishing", BOT_STATE_NON_COMBAT))
-        return ServerFacade::instance().IsDistanceGreaterThan(distance, sPlayerbotAIConfig.fishingDistanceFromMaster);
+        return ServerFacade::instance().IsDistanceGreaterThan(distance, sPlayerbotAIConfig.FishingDistanceFromMaster);
 
     return ServerFacade::instance().IsDistanceGreaterThan(distance, formation->GetMaxDistance());
 }

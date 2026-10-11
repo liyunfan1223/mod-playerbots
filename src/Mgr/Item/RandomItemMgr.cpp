@@ -968,7 +968,7 @@ uint32 RandomItemMgr::GetAmmo(uint32 level, uint32 subClass) const
         return 0;
 
     std::vector<uint32> const& ammo = subItr->second;
-    if (!sPlayerbotAIConfig.limitGearExpansion)
+    if (!sPlayerbotAIConfig.LimitGearExpansion)
         return ammo.front();
 
     static constexpr uint32 EXPANSION_ITEM_ID_TBC   = 23728; // approx. first item in TBC content (patch 2.0)
@@ -1434,7 +1434,7 @@ bool RandomItemMgr::IsValidItem(ItemTemplate const* proto)
         return false;
 
     // skip items flagged as unobtainable
-    if (sPlayerbotAIConfig.unobtainableItems.contains(proto->ItemId))
+    if (sPlayerbotAIConfig.UnobtainableItems.contains(proto->ItemId))
         return false;
 
     return true;
@@ -3039,7 +3039,7 @@ std::vector<EquipmentSlots> const* RandomItemMgr::GetViableSlots(InventoryType i
 
 uint32 RandomItemMgr::NormalizeLevel(uint32 level) const
 {
-    uint32 const levelCap = std::min(sPlayerbotAIConfig.randomBotMaxLevel,
+    uint32 const levelCap = std::min(sPlayerbotAIConfig.RandomBotMaxLevel,
                                      static_cast<uint32>(DEFAULT_MAX_LEVEL));
     return std::min(level, levelCap);
 }

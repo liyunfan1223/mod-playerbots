@@ -49,7 +49,7 @@ float TharonjaMultiplier::GetValue(Action* action)
     }
 
     // Tanks should only taunt, no slaying strike
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         if (dynamic_cast<CastSlayingStrikeAction*>(action))
         {

@@ -68,7 +68,7 @@ bool BroadcastHelper::BroadcastTest(PlayerbotAI* botAI, Player* /* bot */)
 */
 bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std::string message, std::list<std::pair<ToChannel, uint32>> toChannels)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
     if (message.empty())
     {
@@ -79,14 +79,14 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
     {
         uint32 roll = urand(1, 100);
         uint32 chance = pair.second;
-        uint32 broadcastRoll = urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue);
+        uint32 broadcastRoll = urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue);
 
         switch (pair.first)
         {
             case TO_GUILD:
             {
                 if (roll <= chance
-                    && broadcastRoll <= sPlayerbotAIConfig.broadcastToGuildGlobalChance
+                    && broadcastRoll <= sPlayerbotAIConfig.BroadcastToGuildGlobalChance
                     && botAI->SayToGuild(message))
                 {
                     return true;
@@ -96,7 +96,7 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
             case TO_WORLD:
             {
                 if (roll <= chance
-                    && broadcastRoll <= sPlayerbotAIConfig.broadcastToWorldGlobalChance
+                    && broadcastRoll <= sPlayerbotAIConfig.BroadcastToWorldGlobalChance
                     && botAI->SayToWorld(message))
                 {
                     return true;
@@ -106,7 +106,7 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
             case TO_GENERAL:
             {
                 if (roll <= chance
-                    && broadcastRoll <= sPlayerbotAIConfig.broadcastToGeneralGlobalChance
+                    && broadcastRoll <= sPlayerbotAIConfig.BroadcastToGeneralGlobalChance
                     && botAI->SayToChannel(message, ChatChannelId::GENERAL))
                 {
                     return true;
@@ -116,7 +116,7 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
             case TO_TRADE:
             {
                 if (roll <= chance
-                    && broadcastRoll <= sPlayerbotAIConfig.broadcastToTradeGlobalChance
+                    && broadcastRoll <= sPlayerbotAIConfig.BroadcastToTradeGlobalChance
                     && botAI->SayToChannel(message, ChatChannelId::TRADE))
                 {
                     return true;
@@ -126,7 +126,7 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
             case TO_LOOKING_FOR_GROUP:
             {
                 if (roll <= chance
-                    && broadcastRoll <= sPlayerbotAIConfig.broadcastToLFGGlobalChance
+                    && broadcastRoll <= sPlayerbotAIConfig.BroadcastToLFGGlobalChance
                     && botAI->SayToChannel(message, ChatChannelId::LOOKING_FOR_GROUP))
                 {
                     return true;
@@ -136,7 +136,7 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
             case TO_LOCAL_DEFENSE:
             {
                 if (roll <= chance
-                    && broadcastRoll <= sPlayerbotAIConfig.broadcastToLocalDefenseGlobalChance
+                    && broadcastRoll <= sPlayerbotAIConfig.BroadcastToLocalDefenseGlobalChance
                     && botAI->SayToChannel(message, ChatChannelId::LOCAL_DEFENSE))
                 {
                     return true;
@@ -146,7 +146,7 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
             case TO_WORLD_DEFENSE:
             {
                 if (roll <= chance
-                    && broadcastRoll <= sPlayerbotAIConfig.broadcastToWorldDefenseGlobalChance
+                    && broadcastRoll <= sPlayerbotAIConfig.BroadcastToWorldDefenseGlobalChance
                     && botAI->SayToChannel(message, ChatChannelId::WORLD_DEFENSE))
                 {
                     return true;
@@ -156,7 +156,7 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
             case TO_GUILD_RECRUITMENT:
             {
                 if (roll <= chance
-                    && broadcastRoll <= sPlayerbotAIConfig.broadcastToGuildRecruitmentGlobalChance
+                    && broadcastRoll <= sPlayerbotAIConfig.BroadcastToGuildRecruitmentGlobalChance
                     && botAI->SayToChannel(message, ChatChannelId::GUILD_RECRUITMENT))
                 {
                     return true;
@@ -173,14 +173,14 @@ bool BroadcastHelper::BroadcastToChannelWithGlobalChance(PlayerbotAI* botAI, std
 
 bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, ItemTemplate const* proto)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
     std::map<std::string, std::string> placeholders;
     placeholders["%item_link"] = botAI->GetChatHelper()->FormatItem(proto);
     AreaTableEntry const* current_area = botAI->GetCurrentArea();
     AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-    placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-    placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
     placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
     placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
     placeholders["%my_level"] = std::to_string(bot->GetLevel());
@@ -188,7 +188,7 @@ bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, Item
     switch (proto->Quality)
     {
         case ITEM_QUALITY_POOR:
-            if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLootingItemPoor)
+            if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLootingItemPoor)
             {
                 return BroadcastToChannelWithGlobalChance(
                     botAI,
@@ -198,7 +198,7 @@ bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, Item
             }
             break;
         case ITEM_QUALITY_NORMAL:
-            if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLootingItemNormal)
+            if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLootingItemNormal)
             {
                 return BroadcastToChannelWithGlobalChance(
                     botAI,
@@ -208,7 +208,7 @@ bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, Item
             }
             break;
         case ITEM_QUALITY_UNCOMMON:
-            if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLootingItemUncommon)
+            if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLootingItemUncommon)
             {
                 return BroadcastToChannelWithGlobalChance(
                     botAI,
@@ -218,7 +218,7 @@ bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, Item
             }
             break;
         case ITEM_QUALITY_RARE:
-            if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLootingItemRare)
+            if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLootingItemRare)
             {
                 return BroadcastToChannelWithGlobalChance(
                     botAI,
@@ -228,7 +228,7 @@ bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, Item
             }
             break;
         case ITEM_QUALITY_EPIC:
-            if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLootingItemEpic)
+            if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLootingItemEpic)
             {
                 return BroadcastToChannelWithGlobalChance(
                     botAI,
@@ -238,7 +238,7 @@ bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, Item
             }
             break;
         case ITEM_QUALITY_LEGENDARY:
-            if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLootingItemLegendary)
+            if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLootingItemLegendary)
             {
                 return BroadcastToChannelWithGlobalChance(
                     botAI,
@@ -248,7 +248,7 @@ bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, Item
             }
             break;
         case ITEM_QUALITY_ARTIFACT:
-            if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLootingItemArtifact)
+            if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLootingItemArtifact)
             {
                 return BroadcastToChannelWithGlobalChance(
                     botAI,
@@ -266,16 +266,16 @@ bool BroadcastHelper::BroadcastLootingItem(PlayerbotAI* botAI, Player* bot, Item
 
 bool BroadcastHelper::BroadcastQuestAccepted(PlayerbotAI* botAI, Player* bot, Quest const* quest)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceQuestAccepted)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceQuestAccepted)
     {
         std::map<std::string, std::string> placeholders;
         placeholders["%quest_link"] = botAI->GetChatHelper()->FormatQuest(quest);
         AreaTableEntry const* current_area = botAI->GetCurrentArea();
         AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-        placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-        placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
         placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
@@ -292,13 +292,13 @@ bool BroadcastHelper::BroadcastQuestAccepted(PlayerbotAI* botAI, Player* bot, Qu
 
 bool BroadcastHelper::BroadcastQuestUpdateAddKill(PlayerbotAI* botAI, Player* bot, Quest const* quest, uint32 availableCount, uint32 requiredCount, std::string obectiveName)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
     std::map<std::string, std::string> placeholders;
     AreaTableEntry const* current_area = botAI->GetCurrentArea();
     AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-    placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-    placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
     placeholders["%quest_link"] = botAI->GetChatHelper()->FormatQuest(quest);
     placeholders["%quest_obj_name"] = obectiveName;
     placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
@@ -310,7 +310,7 @@ bool BroadcastHelper::BroadcastQuestUpdateAddKill(PlayerbotAI* botAI, Player* bo
     placeholders["%quest_obj_full_formatted"] = botAI->GetChatHelper()->FormatQuestObjective(obectiveName, availableCount, requiredCount);
 
     if (availableCount < requiredCount
-        && urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceQuestUpdateObjectiveProgress)
+        && urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceQuestUpdateObjectiveProgress)
     {
         return BroadcastToChannelWithGlobalChance(
             botAI,
@@ -319,7 +319,7 @@ bool BroadcastHelper::BroadcastQuestUpdateAddKill(PlayerbotAI* botAI, Player* bo
         );
     }
     else if (availableCount == requiredCount
-        && urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceQuestUpdateObjectiveCompleted)
+        && urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceQuestUpdateObjectiveCompleted)
     {
         return BroadcastToChannelWithGlobalChance(
             botAI,
@@ -333,13 +333,13 @@ bool BroadcastHelper::BroadcastQuestUpdateAddKill(PlayerbotAI* botAI, Player* bo
 
 bool BroadcastHelper::BroadcastQuestUpdateAddItem(PlayerbotAI* botAI, Player* bot, Quest const* quest, uint32 availableCount, uint32 requiredCount, ItemTemplate const* proto)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
     std::map<std::string, std::string> placeholders;
     AreaTableEntry const* current_area = botAI->GetCurrentArea();
     AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-    placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-    placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
     placeholders["%quest_link"] = botAI->GetChatHelper()->FormatQuest(quest);
     std::string itemLinkFormatted = botAI->GetChatHelper()->FormatItem(proto);
     placeholders["%item_link"] = itemLinkFormatted;
@@ -352,7 +352,7 @@ bool BroadcastHelper::BroadcastQuestUpdateAddItem(PlayerbotAI* botAI, Player* bo
     placeholders["%quest_obj_full_formatted"] = botAI->GetChatHelper()->FormatQuestObjective(itemLinkFormatted, availableCount, requiredCount);
 
     if (availableCount < requiredCount
-        && urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceQuestUpdateObjectiveProgress)
+        && urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceQuestUpdateObjectiveProgress)
     {
         return BroadcastToChannelWithGlobalChance(
             botAI,
@@ -361,7 +361,7 @@ bool BroadcastHelper::BroadcastQuestUpdateAddItem(PlayerbotAI* botAI, Player* bo
         );
     }
     else if (availableCount == requiredCount
-        && urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceQuestUpdateObjectiveCompleted)
+        && urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceQuestUpdateObjectiveCompleted)
     {
         return BroadcastToChannelWithGlobalChance(
             botAI,
@@ -375,16 +375,16 @@ bool BroadcastHelper::BroadcastQuestUpdateAddItem(PlayerbotAI* botAI, Player* bo
 
 bool BroadcastHelper::BroadcastQuestUpdateFailedTimer(PlayerbotAI* botAI, Player* bot, Quest const* quest)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceQuestUpdateFailedTimer)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceQuestUpdateFailedTimer)
     {
         std::map<std::string, std::string> placeholders;
         placeholders["%quest_link"] = botAI->GetChatHelper()->FormatQuest(quest);
         AreaTableEntry const* current_area = botAI->GetCurrentArea();
         AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-        placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-        placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
         placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
@@ -401,16 +401,16 @@ bool BroadcastHelper::BroadcastQuestUpdateFailedTimer(PlayerbotAI* botAI, Player
 
 bool BroadcastHelper::BroadcastQuestUpdateComplete(PlayerbotAI* botAI, Player* bot, Quest const* quest)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceQuestUpdateComplete)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceQuestUpdateComplete)
     {
         std::map<std::string, std::string> placeholders;
         placeholders["%quest_link"] = botAI->GetChatHelper()->FormatQuest(quest);
         AreaTableEntry const* current_area = botAI->GetCurrentArea();
         AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-        placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-        placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
         placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
@@ -427,16 +427,16 @@ bool BroadcastHelper::BroadcastQuestUpdateComplete(PlayerbotAI* botAI, Player* b
 
 bool BroadcastHelper::BroadcastQuestTurnedIn(PlayerbotAI* botAI, Player* bot, Quest const* quest)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceQuestTurnedIn)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceQuestTurnedIn)
     {
         std::map<std::string, std::string> placeholders;
         placeholders["%quest_link"] = botAI->GetChatHelper()->FormatQuest(quest);
         AreaTableEntry const* current_area = botAI->GetCurrentArea();
         AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-        placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-        placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
         placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
@@ -453,14 +453,14 @@ bool BroadcastHelper::BroadcastQuestTurnedIn(PlayerbotAI* botAI, Player* bot, Qu
 
 bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *creature)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
     std::map<std::string, std::string> placeholders;
     placeholders["%victim_name"] = creature->GetName();
     AreaTableEntry const* current_area = botAI->GetCurrentArea();
     AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-    placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-    placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
     placeholders["%victim_level"] = creature->GetLevel();
     placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
     placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
@@ -473,7 +473,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
 
     if (creature->IsPet())
     {
-        if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillPet)
+        if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceKillPet)
         {
             return BroadcastToChannelWithGlobalChance(
                 botAI,
@@ -484,7 +484,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
     }
     else if (creature->IsPlayer())
     {
-        if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillPlayer)
+        if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceKillPlayer)
         {
             placeholders["%victim_class"] = botAI->GetChatHelper()->FormatClass(creature->getClass());
 
@@ -500,7 +500,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
         switch (creature->GetCreatureTemplate()->rank)
         {
             case CREATURE_ELITE_NORMAL:
-                if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillNormal)
+                if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceKillNormal)
                 {
                     return BroadcastToChannelWithGlobalChance(
                         botAI,
@@ -510,7 +510,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
                 }
                 break;
             case CREATURE_ELITE_ELITE:
-                if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillElite)
+                if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceKillElite)
                 {
                     return BroadcastToChannelWithGlobalChance(
                         botAI,
@@ -520,7 +520,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
                 }
                 break;
             case CREATURE_ELITE_RAREELITE:
-                if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillRareelite)
+                if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceKillRareelite)
                 {
                     return BroadcastToChannelWithGlobalChance(
                         botAI,
@@ -530,7 +530,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
                 }
                 break;
             case CREATURE_ELITE_WORLDBOSS:
-                if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillWorldboss)
+                if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceKillWorldboss)
                 {
                     return BroadcastToChannelWithGlobalChance(
                         botAI,
@@ -540,7 +540,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
                 }
                 break;
             case CREATURE_ELITE_RARE:
-                if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillRare)
+                if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceKillRare)
                 {
                     return BroadcastToChannelWithGlobalChance(
                         botAI,
@@ -550,7 +550,7 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
                 }
                 break;
             case CREATURE_UNKNOWN:
-                if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceKillUnknown)
+                if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceKillUnknown)
                 {
                     return BroadcastToChannelWithGlobalChance(
                         botAI,
@@ -569,21 +569,21 @@ bool BroadcastHelper::BroadcastKill(PlayerbotAI* botAI, Player* bot, Creature *c
 
 bool BroadcastHelper::BroadcastLevelup(PlayerbotAI* botAI, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
     uint32 level = bot->GetLevel();
 
     std::map<std::string, std::string> placeholders;
     AreaTableEntry const* current_area = botAI->GetCurrentArea();
     AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-    placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-    placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
     placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
     placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
     placeholders["%my_level"] = std::to_string(level);
 
-    if (level == sPlayerbotAIConfig.randomBotMaxLevel
-        && urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLevelupMaxLevel)
+    if (level == sPlayerbotAIConfig.RandomBotMaxLevel
+        && urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLevelupMaxLevel)
     {
         return BroadcastToChannelWithGlobalChance(
             botAI,
@@ -593,7 +593,7 @@ bool BroadcastHelper::BroadcastLevelup(PlayerbotAI* botAI, Player* bot)
     }
     // It's divisible by 10
     else if (level % 10 == 0
-        && urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLevelupTenX)
+        && urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLevelupTenX)
     {
         return BroadcastToChannelWithGlobalChance(
             botAI,
@@ -601,7 +601,7 @@ bool BroadcastHelper::BroadcastLevelup(PlayerbotAI* botAI, Player* bot)
             { {TO_GUILD, 50}, {TO_WORLD, 90}, {TO_GENERAL, 100} }
         );
     }
-    else if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceLevelupGeneric)
+    else if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceLevelupGeneric)
     {
         return BroadcastToChannelWithGlobalChance(
             botAI,
@@ -615,9 +615,9 @@ bool BroadcastHelper::BroadcastLevelup(PlayerbotAI* botAI, Player* bot)
 
 bool BroadcastHelper::BroadcastGuildMemberPromotion(PlayerbotAI* botAI, Player* /* bot */, Player* player)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceGuildManagement)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceGuildManagement)
     {
         std::map<std::string, std::string> placeholders;
         placeholders["%other_name"] = player->GetName();
@@ -633,7 +633,7 @@ bool BroadcastHelper::BroadcastGuildMemberPromotion(PlayerbotAI* botAI, Player* 
 
 bool BroadcastHelper::BroadcastGuildMemberDemotion(PlayerbotAI* botAI, Player* /* bot */, Player* player)
 {
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceGuildManagement)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceGuildManagement)
     {
         std::map<std::string, std::string> placeholders;
         placeholders["%other_name"] = player->GetName();
@@ -649,14 +649,14 @@ bool BroadcastHelper::BroadcastGuildMemberDemotion(PlayerbotAI* botAI, Player* /
 
 bool BroadcastHelper::BroadcastGuildGroupOrRaidInvite(PlayerbotAI* botAI, Player* /* bot */, Player* player, Group* group)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
     std::map<std::string, std::string> placeholders;
     placeholders["%name"] = player->GetName();
     AreaTableEntry const* current_area = botAI->GetCurrentArea();
     AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-    placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-    placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+    placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
 
     //TODO move texts to sql!
     if (group && group->isRaidGroup())
@@ -688,9 +688,9 @@ bool BroadcastHelper::BroadcastGuildGroupOrRaidInvite(PlayerbotAI* botAI, Player
 
 bool BroadcastHelper::BroadcastSuggestInstance(PlayerbotAI* botAI, std::vector<std::string>& allowedInstances, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestInstance)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestInstance)
     {
         std::map<std::string, std::string> placeholders;
         placeholders["%my_role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
@@ -716,9 +716,9 @@ bool BroadcastHelper::BroadcastSuggestInstance(PlayerbotAI* botAI, std::vector<s
 
 bool BroadcastHelper::BroadcastSuggestQuest(PlayerbotAI* botAI, std::vector<uint32>& quests, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestQuest)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestQuest)
     {
 
         int index = rand() % quests.size();
@@ -745,9 +745,9 @@ bool BroadcastHelper::BroadcastSuggestQuest(PlayerbotAI* botAI, std::vector<uint
 
 bool BroadcastHelper::BroadcastSuggestGrindMaterials(PlayerbotAI* botAI, std::string item, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestGrindMaterials)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestGrindMaterials)
     {
 
         std::map<std::string, std::string> placeholders;
@@ -770,9 +770,9 @@ bool BroadcastHelper::BroadcastSuggestGrindMaterials(PlayerbotAI* botAI, std::st
 
 bool BroadcastHelper::BroadcastSuggestGrindReputation(PlayerbotAI* botAI, std::vector<std::string> levels, std::vector<std::string> allowedFactions, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestGrindReputation)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestGrindReputation)
     {
 
         std::map<std::string, std::string> placeholders;
@@ -802,9 +802,9 @@ bool BroadcastHelper::BroadcastSuggestGrindReputation(PlayerbotAI* botAI, std::v
 
 bool BroadcastHelper::BroadcastSuggestSell(PlayerbotAI* botAI, ItemTemplate const* proto, uint32 count, uint32 price, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestSell)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestSell)
     {
 
         std::map<std::string, std::string> placeholders;
@@ -829,17 +829,17 @@ bool BroadcastHelper::BroadcastSuggestSell(PlayerbotAI* botAI, ItemTemplate cons
 
 bool BroadcastHelper::BroadcastSuggestSomething(PlayerbotAI* botAI, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestSomething)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestSomething)
     {
         std::map<std::string, std::string> placeholders;
         placeholders["%my_role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
 
         AreaTableEntry const* current_area = botAI->GetCurrentArea();
         AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-        placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-        placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
         placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
@@ -856,9 +856,9 @@ bool BroadcastHelper::BroadcastSuggestSomething(PlayerbotAI* botAI, Player* bot)
 
 bool BroadcastHelper::BroadcastSuggestSomethingToxic(PlayerbotAI* botAI, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestSomethingToxic)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestSomethingToxic)
     {
         //items
         std::vector<Item*> botItems = botAI->GetInventoryAndEquippedItems();
@@ -870,8 +870,8 @@ bool BroadcastHelper::BroadcastSuggestSomethingToxic(PlayerbotAI* botAI, Player*
         placeholders["%my_role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
         AreaTableEntry const* current_area = botAI->GetCurrentArea();
         AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-        placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-        placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
         placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
@@ -888,9 +888,9 @@ bool BroadcastHelper::BroadcastSuggestSomethingToxic(PlayerbotAI* botAI, Player*
 
 bool BroadcastHelper::BroadcastSuggestToxicLinks(PlayerbotAI* botAI, Player* bot)
 {
-    if (!sPlayerbotAIConfig.enableBroadcasts)
+    if (!sPlayerbotAIConfig.EnableBroadcasts)
         return false;
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestToxicLinks)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestToxicLinks)
     {
         //quests
         std::vector<uint32> incompleteQuests;
@@ -914,7 +914,7 @@ bool BroadcastHelper::BroadcastSuggestToxicLinks(PlayerbotAI* botAI, Player* bot
         std::map<std::string, std::string> placeholders;
 
         placeholders["%random_inventory_item_link"] = botItems.size() > 0 ? botAI->GetChatHelper()->FormatItem(botItems[rand() % botItems.size()]->GetTemplate()) : PlayerbotTextMgr::instance().GetBotText("string_empty_link");
-        placeholders["%prefix"] = sPlayerbotAIConfig.toxicLinksPrefix;
+        placeholders["%prefix"] = sPlayerbotAIConfig.ToxicLinksPrefix;
 
         if (incompleteQuests.size() > 0)
         {
@@ -929,8 +929,8 @@ bool BroadcastHelper::BroadcastSuggestToxicLinks(PlayerbotAI* botAI, Player* bot
         placeholders["%my_role"] = ChatHelper::FormatClass(bot, AiFactory::GetPlayerSpecTab(bot));
         AreaTableEntry const* current_area = botAI->GetCurrentArea();
         AreaTableEntry const* current_zone = botAI->GetCurrentZone();
-        placeholders["%area_name"] = current_area ? botAI->GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
-        placeholders["%zone_name"] = current_zone ? botAI->GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%area_name"] = current_area ? PlayerbotAI::GetLocalizedAreaName(current_area) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
+        placeholders["%zone_name"] = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : PlayerbotTextMgr::instance().GetBotText("string_unknown_area");
         placeholders["%my_class"] = botAI->GetChatHelper()->FormatClass(bot->getClass());
         placeholders["%my_race"] = botAI->GetChatHelper()->FormatRace(bot->getRace());
         placeholders["%my_level"] = std::to_string(bot->GetLevel());
@@ -947,7 +947,7 @@ bool BroadcastHelper::BroadcastSuggestToxicLinks(PlayerbotAI* botAI, Player* bot
 
 bool BroadcastHelper::BroadcastSuggestThunderfury(PlayerbotAI* botAI, Player* bot)
 {
-    if (urand(1, sPlayerbotAIConfig.broadcastChanceMaxValue) <= sPlayerbotAIConfig.broadcastChanceSuggestThunderfury)
+    if (urand(1, sPlayerbotAIConfig.BroadcastChanceMaxValue) <= sPlayerbotAIConfig.BroadcastChanceSuggestThunderfury)
     {
         std::map<std::string, std::string> placeholders;
         ItemTemplate const* thunderfuryProto = sObjectMgr->GetItemTemplate(19019);

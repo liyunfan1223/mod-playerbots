@@ -102,7 +102,7 @@ bool HyjalRemoveDangerousDotAction::Execute(Event /*event*/)
 
 // Rage Winterchill
 
-// This is essentially a modified "avoid aoe" due to the default AiPlayerbot.MaxAoeAvoidRadius in
+// This is essentially a modified "avoid aoe" due to the default Playerbots.MaxAoeAvoidRadius in
 // the config being 15y (>25y would be needed for avoid aoe to work for D&D).
 bool RageWinterchillRangedGetOutOfDeathAndDecayAction::Execute(Event /*event*/)
 {

@@ -68,7 +68,7 @@ bool ReactionEngine::FindReaction(bool minimal, bool canControlSelf)
         ActionBasket* reactionItem = nullptr;
 
         int iterations = 0;
-        int iterationsPerTick = queue.Size() * sPlayerbotAIConfig.iterationsPerTick;
+        int iterationsPerTick = queue.Size() * sPlayerbotAIConfig.IterationsPerTick;
         do
         {
             reactionItem = queue.Peek();
@@ -211,8 +211,8 @@ bool ReactionEngine::Update(uint32 elapsed, bool minimal, bool canControlSelf, b
             }
         }
 
-        if (!HasIncomingReaction() && !IsReacting() && aiReactionUpdateDelay < sPlayerbotAIConfig.reactDelay)
-            aiReactionUpdateDelay = minimal ? sPlayerbotAIConfig.reactDelay * 10 : sPlayerbotAIConfig.reactDelay;
+        if (!HasIncomingReaction() && !IsReacting() && aiReactionUpdateDelay < sPlayerbotAIConfig.ReactDelay)
+            aiReactionUpdateDelay = minimal ? sPlayerbotAIConfig.ReactDelay * 10 : sPlayerbotAIConfig.ReactDelay;
     }
 
     return HasIncomingReaction() || IsReacting();

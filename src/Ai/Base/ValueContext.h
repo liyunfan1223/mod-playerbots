@@ -411,7 +411,7 @@ private:
     static UntypedValue* nearest_game_objects(PlayerbotAI* botAI) { return new NearestGameObjects(botAI); }
     static UntypedValue* nearest_game_objects_no_los(PlayerbotAI* botAI)
     {
-        return new NearestGameObjects(botAI, sPlayerbotAIConfig.sightDistance, true);
+        return new NearestGameObjects(botAI, sPlayerbotAIConfig.SightDistance, true);
     }
     static UntypedValue* closest_game_objects(PlayerbotAI* botAI)
     {
@@ -437,7 +437,7 @@ private:
     static UntypedValue* possible_triggers(PlayerbotAI* botAI) { return new PossibleTriggersValue(botAI); }
     static UntypedValue* possible_targets_no_los(PlayerbotAI* botAI)
     {
-        return new PossibleTargetsValue(botAI, "possible targets", sPlayerbotAIConfig.sightDistance, true);
+        return new PossibleTargetsValue(botAI, "possible targets", sPlayerbotAIConfig.SightDistance, true);
     }
     static UntypedValue* possible_adds(PlayerbotAI* botAI) { return new PossibleAddsValue(botAI); }
     static UntypedValue* prioritized_targets(PlayerbotAI* botAI) { return new PrioritizedTargetsValue(botAI); }

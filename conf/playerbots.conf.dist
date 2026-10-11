@@ -80,43 +80,43 @@
 ####################################################################################################
 
 # Enable or disable Playerbots module
-AiPlayerbot.Enabled = 1
+Playerbots.Enabled = 1
 
 # Enable randombot system
-AiPlayerbot.RandomBotAutologin = 1
+Playerbots.RandomBotAutologin = 1
 
 # Randombot count
-AiPlayerbot.MinRandomBots = 500
-AiPlayerbot.MaxRandomBots = 500
+Playerbots.MinRandomBots = 500
+Playerbots.MaxRandomBots = 500
 
 # Randombot accounts
 # Set to 0 to automatically calculate needed accounts based on MaxRandomBots, EnablePeriodicOnlineOffline
 # and its ratio, and AddClassAccountPoolSize. Set manually if you want to create more accounts than needed.
 # If the manual value is less than the required, the system will override it with the required value.
 # Default: 0 (automatic)
-AiPlayerbot.RandomBotAccountCount = 0
+Playerbots.RandomBotAccountCount = 0
 
 # Addclass accounts
 # Number of accounts created for bots reserved for the addclass command. As with randombots, each account has
 # 10 bots (or 9 if WotLK is disabled), one bot for each class.
-AiPlayerbot.AddClassAccountPoolSize = 50
+Playerbots.AddClassAccountPoolSize = 50
 
 # Prefix for created bot accounts (of any type).
 # Do not change this prefix while there are existing bot accounts.
-AiPlayerbot.RandomBotAccountPrefix = "rndbot"
+Playerbots.RandomBotAccountPrefix = "rndbot"
 
 # Delete all randombot accounts
 # To apply this, set the number to 1 and run the Worldserver. Once deletion is complete, if you would
 # like to recreate randombots, set the number back to 0 and rerun the Worldserver.
-AiPlayerbot.DeleteRandomBotAccounts = 0
+Playerbots.DeleteRandomBotAccounts = 0
 
 # Disable randombots when no real players are logged in
 # Default: 0 (randombots will login when server starts)
 # If enabled, randombots will only log in 30 seconds (default) after a real player logs in, and will
 # log out 300 seconds (default) after all real players log out
-AiPlayerbot.DisabledWithoutRealPlayer = 0
-AiPlayerbot.DisabledWithoutRealPlayerLoginDelay = 30
-AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay = 300
+Playerbots.DisabledWithoutRealPlayer = 0
+Playerbots.DisabledWithoutRealPlayerLoginDelay = 30
+Playerbots.DisabledWithoutRealPlayerLogoutDelay = 300
 
 ####################################################################################################
 
@@ -133,88 +133,88 @@ AiPlayerbot.DisabledWithoutRealPlayerLogoutDelay = 300
 #
 
 # The maximum number of bots that a player can control simultaneously
-AiPlayerbot.MaxAddedBots = 40
+Playerbots.MaxAddedBots = 40
 
 # Enable/Disable creating bots by addclass command (0 = GM only, 1 = enabled)
 # Default: 1 (enabled)
-AiPlayerbot.AddClassCommand = 1
+Playerbots.AddClassCommand = 1
 
 # Pick a random eligible character each time the addclass command adds a bot of a given class.
 # When disabled, addclass keeps adding the same character for a class as long as it is available,
 # so a bot geared with init or tweak comes back on the next call.
 # Default: 0 (always the same character)
-AiPlayerbot.AddClassRandomCharacter = 0
+Playerbots.AddClassRandomCharacter = 0
 
 # Bot group invitation permission level (0 = GM only, 1 = accept based on level, 2 = always accept)
 # Default: 1 (accept based on level)
-AiPlayerbot.GroupInvitationPermission = 1
+Playerbots.GroupInvitationPermission = 1
 
 # Keep altbots in the party even when the master leaves
 # 0 = disabled (default behavior)
 # 1 = enabled (prevents bots from automatically leaving the group)
-AiPlayerbot.KeepAltsInGroup = 0
+Playerbots.KeepAltsInGroup = 0
 
 # Auto-login all player alts as altbots on player login
-AiPlayerbot.BotAutologin = 0
+Playerbots.BotAutologin = 0
 
 # Allow/deny inviting altbots from the player's account
-AiPlayerbot.AllowAccountBots = 1
+Playerbots.AllowAccountBots = 1
 
 # Allow/deny inviting altbots in the player's guild
-AiPlayerbot.AllowGuildBots = 1
+Playerbots.AllowGuildBots = 1
 
 # Allow linking accounts for shared altbot control
-AiPlayerbot.AllowTrustedAccountBots = 1
+Playerbots.AllowTrustedAccountBots = 1
 
 # Randombots will create guilds with nearby randombots
 # Note: currently, randombots will not invite more bots after a guild is created,
 # meaning randombot guilds will have only the 10 initial randombots needed to sign the charter
 # Default: 0 (disabled)
-AiPlayerbot.RandomBotGuildNearby = 0
+Playerbots.RandomBotGuildNearby = 0
 
 # Number of guilds created by randombots
-AiPlayerbot.RandomBotGuildCount = 20
+Playerbots.RandomBotGuildCount = 20
 
 # Maximum number of members in randombot guilds (minimum is hardcoded to 10)
-AiPlayerbot.RandomBotGuildSizeMax = 15
+Playerbots.RandomBotGuildSizeMax = 15
 
 # Delete all randombot (and any addclass bot) guilds on startup. While enabled,
 # no new randombot guilds are created or joined. Set back to 0 and restart the
 # server to resume normal random bot guild assignment.
-AiPlayerbot.DeleteRandomBotGuilds = 0
+Playerbots.DeleteRandomBotGuilds = 0
 
 # Randombots will invite players to groups/raids/guilds
-AiPlayerbot.RandomBotInvitePlayer = 0
+Playerbots.RandomBotInvitePlayer = 0
 
 # Bots will chat in say/guild when they invite other bots to groups/raids/guilds
-AiPlayerbot.InviteChat = 0
+Playerbots.InviteChat = 0
 
 # Bots will be automatically summoned to the player when they accept a group invitation
-AiPlayerbot.SummonWhenGroup = 1
+Playerbots.SummonWhenGroup = 1
 
 # Player can be activated as a bot (selfbot)
 # Selfbot permission level (0 = disabled, 1 = GM only (default), 2 = all players, 3 = activate on login)
-AiPlayerbot.SelfBotLevel = 1
+Playerbots.SelfBotLevel = 1
 
 # Non-GM player can only use init=auto to initialize bots based on their own level and gearscore
 # Default: 0 (non-GM player can use any intialization commands)
-AiPlayerbot.AutoInitOnly = 0
+Playerbots.AutoInitOnly = 0
 
 # Allow .bot refresh=raid to unbind instances on player-created alt
 # bots (non-addclass bots). When 0, refresh=raid is denied on alts
 # with "non-addclass bot" error. UnbindInstance is DB-light, no lag
 # risk from enabling this.
 # Default: 0
-AiPlayerbot.ResetInstanceIdForAltBots = 0
+Playerbots.ResetInstanceIdForAltBots = 0
 
 # The upper limit ratio of bot equipment level for init=auto
 # Default: 1.0 (same with the player)
-AiPlayerbot.AutoInitEquipLevelLimitRatio = 1.0
+Playerbots.AutoInitEquipLevelLimitRatio = 1.0
 
 # AllowLearnTrainerSpells
 # Description: Allow the bot to learn trainers' spells as long as it has the money.
 # Default: 1 - (enabled)
-AiPlayerbot.AllowLearnTrainerSpells = 1
+Playerbots.AllowLearnTrainerSpells = 1
 
 #
 #
@@ -226,23 +226,23 @@ AiPlayerbot.AllowLearnTrainerSpells = 1
 
 # Enable/Disable summoning bots when the master is in combat
 # Default: 1 (enabled)
-AiPlayerbot.AllowSummonInCombat = 1
+Playerbots.AllowSummonInCombat = 1
 
 # Enable/Disable summoning bots when the master is dead
 # Default: 1 (enabled)
-AiPlayerbot.AllowSummonWhenMasterIsDead = 1
+Playerbots.AllowSummonWhenMasterIsDead = 1
 
 # Enable/Disable summoning bots when they are dead (0 = only when the bots are ghosts, 1 = always)
 # Default: 1 (always)
-AiPlayerbot.AllowSummonWhenBotIsDead = 1
+Playerbots.AllowSummonWhenBotIsDead = 1
 
 # Enable/Disable reviving bots when summoning them (0 = disabled, 1 = disabled in combat, 2 = enabled)
 # Default: 1 (disabled in combat)
-AiPlayerbot.ReviveBotWhenSummoned = 1
+Playerbots.ReviveBotWhenSummoned = 1
 
 # Enable/Disable bots repairing gear when summoned
 # Default: 1 (enabled)
-AiPlayerbot.BotRepairWhenSummon = 1
+Playerbots.BotRepairWhenSummon = 1
 
 #
 #
@@ -255,22 +255,22 @@ AiPlayerbot.BotRepairWhenSummon = 1
 # Defines at what level a bot will naturally use its 60% ground mount
 # Note: was level 20 during WotLK, 30 during TBC, 40 during Vanilla
 # Default: 20
-AiPlayerbot.UseGroundMountAtMinLevel = 20
+Playerbots.UseGroundMountAtMinLevel = 20
 
 # Defines at what level a bot will naturally use its 100% fast ground mount
 # Note: was level 40 during WotLK, 60 during Vanilla
 # Default: 40
-AiPlayerbot.UseFastGroundMountAtMinLevel = 40
+Playerbots.UseFastGroundMountAtMinLevel = 40
 
 # Defines at what level a bot will naturally use its 150% flying mount
 # Note: was level 60 during WotLK, 70 during TBC
 # Default: 60
-AiPlayerbot.UseFlyMountAtMinLevel = 60
+Playerbots.UseFlyMountAtMinLevel = 60
 
 # Defines at what level a bot will naturally use its 280% fast flying mount
 # Note: was level 70 during WotLK and TBC
 # Default: 70
-AiPlayerbot.UseFastFlyMountAtMinLevel = 70
+Playerbots.UseFastFlyMountAtMinLevel = 70
 
 #
 #
@@ -285,19 +285,19 @@ AiPlayerbot.UseFastFlyMountAtMinLevel = 70
 # 1 - Helmet or cloak will be visually visible on all randombots
 # 2 - Helmet or cloak visibility is random when a randombot is randomized
 # Default: 1 (helm/cloak visible on all randombots)
-AiPlayerbot.RandomBotShowHelmet = 1
-AiPlayerbot.RandomBotShowCloak = 1
+Playerbots.RandomBotShowHelmet = 1
+Playerbots.RandomBotShowCloak = 1
 
 # Toggles whether altbots will automatically equip items in their inventory that are sufficient upgrades
 # Default: 1 (enabled)
-AiPlayerbot.AutoEquipUpgradeLoot = 1
+Playerbots.AutoEquipUpgradeLoot = 1
 
 # Threshold for auto equipping upgrades
 # Default: 1.1 (Equip when the equipment score of the new item is 1.1 times higher than the currently equipped item)
-AiPlayerbot.EquipUpgradeThreshold = 1.1
+Playerbots.EquipUpgradeThreshold = 1.1
 
 # Two rounds of equipment initialization to create more suitable gear
-AiPlayerbot.TwoRoundsGearInit = 0
+Playerbots.TwoRoundsGearInit = 0
 
 #
 #
@@ -309,26 +309,26 @@ AiPlayerbot.TwoRoundsGearInit = 0
 
 # Bots keep looting when loot system is set to free for all
 # Default: 0 (disabled)
-AiPlayerbot.FreeMethodLoot = 0
+Playerbots.FreeMethodLoot = 0
 
 # Bots' Roll level bots will use for items they Need (0 = pass, 1 = greed, 2 = need)
 # Default: 1 (greed)
-AiPlayerbot.LootNeedRollLevel = 1
+Playerbots.LootNeedRollLevel = 1
 
 # Enable bots to roll GREED on items (global toggle)
 # If disabled, bots will PASS instead of GREED on all items
 # Default: 0 (disabled - bots only NEED or PASS)
-AiPlayerbot.LootGreedRollLevel = 0
+Playerbots.LootGreedRollLevel = 0
 
 # Enable bots to roll on recipes. Will NEED on learnable profession recipes they don't already know
 # Bots will roll GREED on BoE recipes they can't learn if LootRollGreed is enabled.
 # Default: 0 (disabled)
-AiPlayerbot.LootRollRecipe = 0
+Playerbots.LootRollRecipe = 0
 
 # Bots with enchanting will roll DISENCHANT instead of GREED on disenchantable items
 # If disabled, bots will GREED on disenchantable items instead
 # Default: 0 (disabled)
-AiPlayerbot.LootRollDisenchant = 0
+Playerbots.LootRollDisenchant = 0
 
 # A list of GameObject GUIDs that bots will not interact with.
 # List of default GUIDs:
@@ -338,7 +338,7 @@ AiPlayerbot.LootRollDisenchant = 0
 # Large Solid Chest = 74448, Box of Assorted Parts = 19020, Food Crate = 3719, Water Barrel = 3658, Barrel of Milk = 3705, Barrel of sweet Nectar = 3706, Tattered Chest = 105579, Large bettered Chest = 75293, Solid Chest = 2857, Battered Foodlocker = 179490, Witch Doctor's Chest = 141596, Relic Coffer = 160836, Dark Coffer = 160845, Fengus's Chest = 179516, Supply Crate = 176224/181085, Malor's Strongbox = 176112
 # Other:
 # Shallow Grave (Zul'Farrak) = 128308/128403, Grim Guzzler Boar (Blackrock Depths) = 165739, Dark Iron Ale Mug (Blackrock Depths) = 165738, Father Flame (Blackrock Spire) = 175245, Unforged Runic Breastplate (Blackrock Spire) = 175970, Blacksmithing Plans (Stratholme) = 176325/176327
-AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,165739,165738,175245,175970,176325,176327,123329,2560
+Playerbots.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705,3706,105579,75293,2857,179490,141596,160836,160845,179516,176224,181085,176112,128308,128403,165739,165738,175245,175970,176325,176327,123329,2560
 
 #
 #
@@ -349,50 +349,50 @@ AiPlayerbot.DisallowedGameObjects = 176213,17155,2656,74448,19020,3719,3658,3705
 #
 
 # Max AI iterations per tick
-AiPlayerbot.IterationsPerTick = 10
+Playerbots.IterationsPerTick = 10
 
 # Delay between two short-time spells cast
-AiPlayerbot.GlobalCooldown = 500
+Playerbots.GlobalCooldown = 500
 
 # Max wait time when moving
-AiPlayerbot.MaxWaitForMove = 5000
+Playerbots.MaxWaitForMove = 5000
 
 # Enable/disable use of MoveSplinePath for bot movement
 # Disabling will result in more erratic movement but is required for stuns, snares, and roots to work on bots
 # Default: 0 - MoveSplinePath enabled
 #          1 - MoveSplinePath disabled in BG/Arena only
 #          2 - MoveSplinePath disabled everywhere
-AiPlayerbot.DisableMoveSplinePath = 0
+Playerbots.DisableMoveSplinePath = 0
 
 # Max search time for movement (higher for better movement on slopes)
 # Default: 3
-AiPlayerbot.MaxMovementSearchTime = 3
+Playerbots.MaxMovementSearchTime = 3
 
 # Action expiration time
-AiPlayerbot.ExpireActionTime = 5000
+Playerbots.ExpireActionTime = 5000
 
 # Max dispel auras duration
-AiPlayerbot.DispelAuraDuration = 700
+Playerbots.DispelAuraDuration = 700
 
 # Delay between two bot actions
-AiPlayerbot.ReactDelay = 100
+Playerbots.ReactDelay = 100
 
 # Dynamically adjust react delay for bots in different status to reduce server lags
-AiPlayerbot.DynamicReactDelay = 1
+Playerbots.DynamicReactDelay = 1
 
 # Inactivity delay
-AiPlayerbot.PassiveDelay = 10000
+Playerbots.PassiveDelay = 10000
 
 # Minimum delay between repeating actions (chat messages, emotes etc)
-AiPlayerbot.RepeatDelay = 2000
+Playerbots.RepeatDelay = 2000
 
 # Delay timers
-AiPlayerbot.ErrorDelay = 100
-AiPlayerbot.RpgDelay = 10000
-AiPlayerbot.SitDelay = 20000
+Playerbots.ErrorDelay = 100
+Playerbots.RpgDelay = 10000
+Playerbots.SitDelay = 20000
 # ReturnDelay has a minimum value of 2000 - lower values will cause a crash!
-AiPlayerbot.ReturnDelay = 2000
-AiPlayerbot.LootDelay = 1000
+Playerbots.ReturnDelay = 2000
+Playerbots.LootDelay = 1000
 
 #
 #
@@ -403,23 +403,23 @@ AiPlayerbot.LootDelay = 1000
 #
 
 # Distances are in yards
-AiPlayerbot.FarDistance = 20.0
-AiPlayerbot.SightDistance = 100.0
-AiPlayerbot.SpellDistance = 28.5
-AiPlayerbot.ShootDistance = 5.0
-AiPlayerbot.HealDistance = 38.5
-AiPlayerbot.LootDistance = 15.0
-AiPlayerbot.FleeDistance = 5.0
-AiPlayerbot.AggroDistance = 22
-AiPlayerbot.TooCloseDistance = 5.0
-AiPlayerbot.MeleeDistance = 0.75
-AiPlayerbot.FollowDistance = 1.5
-AiPlayerbot.WhisperDistance = 6000.0
-AiPlayerbot.ContactDistance = 0.45
-AiPlayerbot.AoeRadius = 10
-AiPlayerbot.RpgDistance = 200
-AiPlayerbot.GrindDistance = 75.0
-AiPlayerbot.ReactDistance = 150.0
+Playerbots.FarDistance = 20.0
+Playerbots.SightDistance = 100.0
+Playerbots.SpellDistance = 28.5
+Playerbots.ShootDistance = 5.0
+Playerbots.HealDistance = 38.5
+Playerbots.LootDistance = 15.0
+Playerbots.FleeDistance = 5.0
+Playerbots.AggroDistance = 22
+Playerbots.TooCloseDistance = 5.0
+Playerbots.MeleeDistance = 0.75
+Playerbots.FollowDistance = 1.5
+Playerbots.WhisperDistance = 6000.0
+Playerbots.ContactDistance = 0.45
+Playerbots.AoeRadius = 10
+Playerbots.RpgDistance = 200
+Playerbots.GrindDistance = 75.0
+Playerbots.ReactDistance = 150.0
 
 #
 #
@@ -430,13 +430,13 @@ AiPlayerbot.ReactDistance = 150.0
 #
 
 # Health/Mana levels
-AiPlayerbot.CriticalHealth = 25
-AiPlayerbot.LowHealth = 45
-AiPlayerbot.MediumHealth = 65
-AiPlayerbot.AlmostFullHealth = 85
-AiPlayerbot.LowMana = 15
-AiPlayerbot.MediumMana = 40
-AiPlayerbot.HighMana = 65
+Playerbots.CriticalHealth = 25
+Playerbots.LowHealth = 45
+Playerbots.MediumHealth = 65
+Playerbots.AlmostFullHealth = 85
+Playerbots.LowMana = 15
+Playerbots.MediumMana = 40
+Playerbots.HighMana = 65
 
 #
 #
@@ -448,19 +448,19 @@ AiPlayerbot.HighMana = 65
 
 # Bots pick their quest rewards
 # yes = picks the most useful item, no = list all rewards, ask = pick useful item and lists if multiple
-AiPlayerbot.AutoPickReward = yes
+Playerbots.AutoPickReward = yes
 
 # Sync quests with player (bots will complete quests the moment you hand them in and will not loot quest items.)
 # Default: 1 (enabled)
-AiPlayerbot.SyncQuestWithPlayer = 1
+Playerbots.SyncQuestWithPlayer = 1
 
 # Bots will auto-complete quests for the player when handing in bots' quests
 # Default: 0 (disabled)
-AiPlayerbot.SyncQuestForPlayer = 0
+Playerbots.SyncQuestForPlayer = 0
 
 # Bots will drop obsolete quests
 # Default: 1 (enabled)
-AiPlayerbot.DropObsoleteQuests = 1
+Playerbots.DropObsoleteQuests = 1
 
 #
 #
@@ -471,25 +471,25 @@ AiPlayerbot.DropObsoleteQuests = 1
 #
 
 # Auto add dungeon/raid strategies when entering the instance if implemented
-AiPlayerbot.ApplyInstanceStrategies = 1
+Playerbots.ApplyInstanceStrategies = 1
 
 # Enable auto avoid aoe strategy
 # Default: 1 (enabled)
-AiPlayerbot.AutoAvoidAoe = 1
+Playerbots.AutoAvoidAoe = 1
 
 # Only avoid aoe spells with a radius smaller than this value
-AiPlayerbot.MaxAoeAvoidRadius = 15.0
+Playerbots.MaxAoeAvoidRadius = 15.0
 
 # A whitelist of aoe spell IDs that should not be avoided
-AiPlayerbot.AoeAvoidSpellWhitelist = 50759,57491,13810,29946
+Playerbots.AoeAvoidSpellWhitelist = 50759,57491,13810,29946
 
 # Enable healer bot save mana strategy
 # Default: 1 (enabled)
-AiPlayerbot.AutoSaveMana = 1
+Playerbots.AutoSaveMana = 1
 
 # Healer bot save mana threshold
 # Default: 60 (60%)
-AiPlayerbot.SaveManaThreshold = 60
+Playerbots.SaveManaThreshold = 60
 
 # Enable Paladin bots to use greater blessings, with the blessing used being based on the
 # number of Paladins in the raid/group and the spec of the recipient. Priorities for each
@@ -498,7 +498,7 @@ AiPlayerbot.SaveManaThreshold = 60
 # 1 = enabled in raid groups only
 # 2 = enabled in all groups
 # Default: 1 (raid only)
-AiPlayerbot.AutoGreaterBlessings = 1
+Playerbots.AutoGreaterBlessings = 1
 
 # Enable bots to use group reagent buffs: Gift of the Wild, Arcane Brilliance,
 # Prayer of Fortitude, Prayer of Spirit, and Prayer of Shadow Protection.
@@ -506,16 +506,16 @@ AiPlayerbot.AutoGreaterBlessings = 1
 # 1 = enabled in raid groups only
 # 2 = enabled in all groups
 # Default: 2 (all groups)
-AiPlayerbot.AutoPartyBuffs = 2
+Playerbots.AutoPartyBuffs = 2
 
 # Bots tell the group when they attempt to use a reagent-based greater blessing or group buff
 # but have to fall back to the single-target version because they are out of reagents.
 # Default: 1 (enabled)
-AiPlayerbot.TellWhenMissingBuffReagents = 1
+Playerbots.TellWhenMissingBuffReagents = 1
 
 # Cooldown for the missing buff reagent message, in seconds.
 # Default: 300 (5 minutes)
-AiPlayerbot.MissingBuffReagentMessageCooldown = 300
+Playerbots.MissingBuffReagentMessageCooldown = 300
 
 # When a ready check is issued out of combat, bots refresh missing/short buffs before reporting ready.
 # A bot that still has buff work it can perform stays not-ready until the ready check ends; this
@@ -524,14 +524,14 @@ AiPlayerbot.MissingBuffReagentMessageCooldown = 300
 # strategies or use "nc +force rebuff" to opt them in. The "rebuff" chat command starts the same
 # buff pass without a ready check and works regardless of this setting.
 # Default: 0 (disabled)
-AiPlayerbot.ForceRebuffOnReadyCheck = 0
+Playerbots.ForceRebuffOnReadyCheck = 0
 
 # During a force-rebuff pass (ready check or the "rebuff" command), a buff is topped off (recast)
 # once it drops more than this many seconds below its full duration, so buffs are refreshed toward
 # maximum remaining time to last the fight. The effective margin never drops below the time the
 # pass has already run, so small values are safe.
 # Default: 60
-AiPlayerbot.ForceRebuffMarginSecs = 60
+Playerbots.ForceRebuffMarginSecs = 60
 
 #
 #
@@ -543,37 +543,37 @@ AiPlayerbot.ForceRebuffMarginSecs = 60
 
 # Enable/Disable maintenance command
 # Learn all available spells and skills, assign talent points, refresh consumables, repair, enchant equipment, socket gems, etc.
-# Applies if bot's level is above AiPlayerbot.MinEnchantingBotLevel
+# Applies if bot's level is above Playerbots.MinEnchantingBotLevel
 # Default: 1 (enabled)
-AiPlayerbot.MaintenanceCommand = 1
+Playerbots.MaintenanceCommand = 1
 
 # Enable/Disable specific maintenance command functionality for altbots
 # Disable to prevent players from giving free bags, spells, skill levels, etc. to their altbots
 # Default: 1 (enabled)
-AiPlayerbot.AltMaintenanceAmmo = 1
-AiPlayerbot.AltMaintenanceFood = 1
-AiPlayerbot.AltMaintenanceReagents = 1
-AiPlayerbot.AltMaintenanceConsumables = 1
-AiPlayerbot.AltMaintenancePotions = 1
+Playerbots.AltMaintenanceAmmo = 1
+Playerbots.AltMaintenanceFood = 1
+Playerbots.AltMaintenanceReagents = 1
+Playerbots.AltMaintenanceConsumables = 1
+Playerbots.AltMaintenancePotions = 1
 
-AiPlayerbot.AltMaintenanceBags = 1
-AiPlayerbot.AltMaintenanceMounts = 1
-AiPlayerbot.AltMaintenanceSkills = 1
+Playerbots.AltMaintenanceBags = 1
+Playerbots.AltMaintenanceMounts = 1
+Playerbots.AltMaintenanceSkills = 1
 
-# "Special Spells" consist of any spells listed in AiPlayerbot.RandomBotSpellIds and Death Gate for Death Knights
-AiPlayerbot.AltMaintenanceClassSpells = 1
-AiPlayerbot.AltMaintenanceAvailableSpells = 1
-AiPlayerbot.AltMaintenanceSpecialSpells = 1
-AiPlayerbot.AltMaintenanceTalentTree = 1
-AiPlayerbot.AltMaintenanceGlyphs = 1
-AiPlayerbot.AltMaintenanceGemsEnchants = 1
+# "Special Spells" consist of any spells listed in Playerbots.RandomBotSpellIds and Death Gate for Death Knights
+Playerbots.AltMaintenanceClassSpells = 1
+Playerbots.AltMaintenanceAvailableSpells = 1
+Playerbots.AltMaintenanceSpecialSpells = 1
+Playerbots.AltMaintenanceTalentTree = 1
+Playerbots.AltMaintenanceGlyphs = 1
+Playerbots.AltMaintenanceGemsEnchants = 1
 
-AiPlayerbot.AltMaintenancePet = 1
-AiPlayerbot.AltMaintenancePetTalents = 1
+Playerbots.AltMaintenancePet = 1
+Playerbots.AltMaintenancePetTalents = 1
 
-AiPlayerbot.AltMaintenanceReputation = 1
-AiPlayerbot.AltMaintenanceAttunementQuests = 1
-AiPlayerbot.AltMaintenanceKeyring = 1
+Playerbots.AltMaintenanceReputation = 1
+Playerbots.AltMaintenanceAttunementQuests = 1
+Playerbots.AltMaintenanceKeyring = 1
 
 # Enable/Disable autogear command, which automatically upgrades bots' gear
 # The quality is limited by AutoGearQualityLimit and AutoGearScoreLimit
@@ -589,11 +589,11 @@ AiPlayerbot.AltMaintenanceKeyring = 1
 #                         autogear reset 200, autogear reset match)
 #   autogear bis        - separate BiS command, see AutoGearBisCommand below
 # Default: 1 (enabled)
-AiPlayerbot.AutoGearCommand = 1
+Playerbots.AutoGearCommand = 1
 
 # Enable/Disable autogear command on altbots
 # Default: 1 (enabled)
-AiPlayerbot.AutoGearCommandAltBots = 1
+Playerbots.AutoGearCommandAltBots = 1
 
 # If 1 (enabled) chat command: autogear bis, gives bots BiS gear from the playerbots_bis_gear table
 # whose item-level floor matches AutoGearScoreLimit (e.g. 290 = ICC, 245 = ToC,
@@ -604,11 +604,11 @@ AiPlayerbot.AutoGearCommandAltBots = 1
 # Requires AutoGearQualityLimit = 4 and AutoGearCommand = 1.
 # If AutoGearCommandAltBots = 1 it will be anbled for alt bots.
 # Default: 0 (disabled)
-AiPlayerbot.AutoGearBisCommand = 0
+Playerbots.AutoGearBisCommand = 0
 
 # Equipment quality limitation for autogear command (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
 # Default: 3 (rare)
-AiPlayerbot.AutoGearQualityLimit = 3
+Playerbots.AutoGearQualityLimit = 3
 
 # Equipment item level (not gearscore) limitation for autogear command (0 = no limit)
 # Classic
@@ -621,7 +621,7 @@ AiPlayerbot.AutoGearQualityLimit = 3
 # Max iLVL Tier 7(10/25) = 200/213 | Tier 8(10/25) = 225/232 | Tier 9(10/25) = 232/245 | Tier 10(10/25/HC) = 251/264/290
 # Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290
 # Default: 0 (no limit)
-AiPlayerbot.AutoGearScoreLimit = 0
+Playerbots.AutoGearScoreLimit = 0
 
 # Enable/Disable cheats for bots
 # "food" (bots eat or drink without using food or drinks from their inventory)
@@ -633,7 +633,7 @@ AiPlayerbot.AutoGearScoreLimit = 0
 # "raid" (bots use certain cheats implemented into raid strategies)
 # To use multiple cheats, separate them by commas below (e.g., to enable all, use "gold,health,mana,power,raid,taxi")
 # Default: food, taxi, and raid are enabled
-AiPlayerbot.BotCheats = "food,taxi,raid"
+Playerbots.BotCheats = "food,taxi,raid"
 
 # List of attunement quests (comma-separated list of quest IDs) that are automatically completed for all bots.
 # While mod-playerbots does not restore removed attunement requirements, other mods, such as mod-individual-progression, may do so.
@@ -666,7 +666,7 @@ AiPlayerbot.BotCheats = "food,taxi,raid"
 # - 10445, The Vials of Eternity
 # Black Temple
 # - 10985, A Distraction for Akama
-AiPlayerbot.AttunementQuests = 10279,10277,10282,10283,10284,10285,10296,10297,10298,11481,11482,11488,11490,11492,10901,10888,10445,10985
+Playerbots.AttunementQuests = 10279,10277,10282,10283,10284,10285,10296,10297,10298,11481,11482,11488,11490,11492,10901,10888,10445,10985
 
 #
 #
@@ -677,16 +677,16 @@ AiPlayerbot.AttunementQuests = 10279,10277,10282,10283,10284,10285,10296,10297,1
 #
 
 # Min random delay before the 1st follower bot clicks the flight-master (ms)
-AiPlayerbot.BotTaxiDelayMinMs = 350
+Playerbots.BotTaxiDelayMinMs = 350
 
 # Upper bound for the overall taxi delay window (ms) – larger spreads big raids
-AiPlayerbot.BotTaxiDelayMaxMs = 5000
+Playerbots.BotTaxiDelayMaxMs = 5000
 
 # Fixed gap added per group-slot so bots never take off together (ms)
-AiPlayerbot.BotTaxiGapMs = 200
+Playerbots.BotTaxiGapMs = 200
 
 # Extra small randomness added to each gap so launches don’t look robotic (ms)
-AiPlayerbot.BotTaxiGapJitterMs = 100
+Playerbots.BotTaxiGapJitterMs = 100
 
 #
 #
@@ -700,21 +700,21 @@ AiPlayerbot.BotTaxiGapJitterMs = 100
 # weighted profession combination. The remaining randombots use the weighted
 # random sane-pair profession pool.
 # Default: 30
-AiPlayerbot.ClassMatchingProfessionChance = 30
+Playerbots.ClassMatchingProfessionChance = 30
 
 # Automatically adds the 'master fishing' strategy to bots that have the fishing skill when the bots master fishes.
 # Default: 1 (Enabled)
-AiPlayerbot.EnableFishingWithMaster = 1
+Playerbots.EnableFishingWithMaster = 1
 
 # Distance from itself (in yards) that a bot with a master will search for water to fish
-AiPlayerbot.FishingDistanceFromMaster = 10.0
+Playerbots.FishingDistanceFromMaster = 10.0
 
 # Distance from itself (in yards) that a bot without a master will search for water to fish
 # Currently not relevant since masterless bots will not fish
-AiPlayerbot.FishingDistance = 40.0
+Playerbots.FishingDistance = 40.0
 
 # Distance from water (in yards) beyond which a bot will remove the 'master fishing' strategy
-AiPlayerbot.EndFishingWithMaster = 30.0
+Playerbots.EndFishingWithMaster = 30.0
 
 #
 #
@@ -731,64 +731,64 @@ AiPlayerbot.EndFishingWithMaster = 30.0
 #
 
 # Enable/Disable randomly generated password for randombot accounts
-AiPlayerbot.RandomBotRandomPassword = 0
+Playerbots.RandomBotRandomPassword = 0
 
 # Minimum and maximum levels for randombots
-AiPlayerbot.RandomBotMinLevel = 1
-AiPlayerbot.RandomBotMaxLevel = 80
+Playerbots.RandomBotMinLevel = 1
+Playerbots.RandomBotMaxLevel = 80
 
 # Sync max randombot level with max level of online players
 # Default: 0 (disabled)
-AiPlayerbot.SyncLevelWithPlayers = 0
+Playerbots.SyncLevelWithPlayers = 0
 
 # Concentrate randombots teleporting into level-appropriate open-world zones that hold a real
 # (non-GM) player. Falls back to normal teleporting behaviour when no player's zone matches.
-# Best paired with AiPlayerbot.SyncLevelWithPlayers.
+# Best paired with Playerbots.SyncLevelWithPlayers.
 # Default: 0 (disabled)
-AiPlayerbot.RandomBotConcentrateInPlayerZone = 0
+Playerbots.RandomBotConcentrateInPlayerZone = 0
 
 # Mark many quests ≤ bot level as complete (slows down bot creation)
 # Default: 0 (disabled)
-AiPlayerbot.PreQuests = 0
+Playerbots.PreQuests = 0
 
 # Enable LFG for randombots
 # Default: 1 (enabled)
-AiPlayerbot.RandomBotJoinLfg = 1
+Playerbots.RandomBotJoinLfg = 1
 
 # Enable/Disable periodic online - offline of randombots to mimic the real-world scenario where not all players are online simultaneously
 # When enabled, randombots are randomly selected to go online or offline periodically from a larger set
 # Default: 0 (disabled, the set of online bots remains fixed)
-AiPlayerbot.EnablePeriodicOnlineOffline = 0
+Playerbots.EnablePeriodicOnlineOffline = 0
 
 # Defines the ratio between the total number of randombots (including offline ones) and the number of randombots currently online (MaxRandomBots)
 # This setting must greater than 1.0 and only applies when EnablePeriodicOnlineOffline
 # Default: 2.0 (total number of bots is twice the number of MaxRandomBots)
-AiPlayerbot.PeriodicOnlineOfflineRatio = 2.0
+Playerbots.PeriodicOnlineOfflineRatio = 2.0
 
 # Percentage ratio of Alliance and Horde randombots
-AiPlayerbot.RandomBotAllianceRatio = 50
-AiPlayerbot.RandomBotHordeRatio = 50
+Playerbots.RandomBotAllianceRatio = 50
+Playerbots.RandomBotHordeRatio = 50
 
 # Disable logging in of death knight bots
-AiPlayerbot.DisableDeathKnightLogin = 0
+Playerbots.DisableDeathKnightLogin = 0
 
 # Enable simulated expansion limitation for talents and glyphs
 # If enabled, limits talent trees to 6 rows plus the middle talent of the 7th row for bots until level 61
 # and 8 rows plus the middle talent of the 9th row for bots from level 61 until level 71
 # Default: 0 (disabled)
-AiPlayerbot.LimitTalentsExpansion = 0
+Playerbots.LimitTalentsExpansion = 0
 
 # Configure randombot trading (0: Disabled, 1: Enabled, 2: Only Buy, 3: Only Sell)
 # Default: 1 (enabled)
-AiPlayerbot.EnableRandomBotTrading = 1
+Playerbots.EnableRandomBotTrading = 1
 
 # Configure message prefixes which will be excluded in analysis in trade action to open trade window
-AiPlayerbot.TradeActionExcludedPrefixes = "RPLL_H_,DBMv4,{звезда} Questie,{rt1} Questie"
+Playerbots.TradeActionExcludedPrefixes = "RPLL_H_,DBMv4,{звезда} Questie,{rt1} Questie"
 
 # Allow bots to send mail. When disabled, bots will not mail items or money in
 # response to chat commands ("send mail").
 # Default: 1 (enabled)
-AiPlayerbot.BotSendMailEnabled = 1
+Playerbots.BotSendMailEnabled = 1
 
 #
 #
@@ -800,30 +800,30 @@ AiPlayerbot.BotSendMailEnabled = 1
 
 # Disable randombots being generated with a random level
 # If disabled, every randombot starts on a specified level (but can still level up by killing mobs and questing)
-AiPlayerbot.DisableRandomLevels = 0
+Playerbots.DisableRandomLevels = 0
 
-# Set randombots' starting level here if "AiPlayerbot.DisableRandomLevels" is enabled
-AiPlayerbot.RandombotStartingLevel = 1
+# Set randombots' starting level here if "Playerbots.DisableRandomLevels" is enabled
+Playerbots.RandombotStartingLevel = 1
 
 # Chance randombot has min level on first randomize
 # Default: 0.1 (10%)
-AiPlayerbot.RandomBotMinLevelChance = 0.1
+Playerbots.RandomBotMinLevelChance = 0.1
 
 # Chance randombot has max level on first randomize
 # Default 0.1 (10%)
-AiPlayerbot.RandomBotMaxLevelChance = 0.1
+Playerbots.RandomBotMaxLevelChance = 0.1
 
 # Fix the level of randombots (they won't level up)
 # Default: 0 (disabled)
-AiPlayerbot.RandomBotFixedLevel = 0
+Playerbots.RandomBotFixedLevel = 0
 
 # Set RandomBotMaxLevel bots to RandomBotMinLevel
 # Default: 0 (disabled)
-AiPlayerbot.DowngradeMaxLevelBot = 0
+Playerbots.DowngradeMaxLevelBot = 0
 
 # Set XP rate for randombots (Default: 1.0)
-# Server XP Rate * AiPlayerbot.RandomBotXPRate
-AiPlayerbot.RandomBotXPRate = 1.0
+# Server XP Rate * Playerbots.RandomBotXPRate
+Playerbots.RandomBotXPRate = 1.0
 
 #
 #
@@ -837,7 +837,7 @@ AiPlayerbot.RandomBotXPRate = 1.0
 #
 #   - Level Brackets: periodically redistributes random bots across configurable per-faction level
 #     brackets, optionally weighting the distribution toward brackets that contain real (non-bot)
-#     players. This complements AiPlayerbot.DowngradeMaxLevelBot-style behavior: instead of a
+#     players. This complements Playerbots.DowngradeMaxLevelBot-style behavior: instead of a
 #     one-shot downgrade, it continuously rebalances the whole random bot population across brackets
 #     over time.
 #
@@ -846,11 +846,11 @@ AiPlayerbot.RandomBotXPRate = 1.0
 #     scaled by level), an optional minimum played-time restriction, and an optional "skip" that
 #     sends a bot straight to a different level as soon as it reaches a configured trigger level.
 #
-# NOTE: Level Reset overlaps with AiPlayerbot.DowngradeMaxLevelBot, which downgrades a bot that is
+# NOTE: Level Reset overlaps with Playerbots.DowngradeMaxLevelBot, which downgrades a bot that is
 #       already at RandomBotMaxLevel to RandomBotMinLevel the next time it is periodically
 #       re-randomized. Level Reset instead acts immediately (or on a played-time timer) as soon as a
 #       bot reaches the configured level, with its own chance/played-time controls. Do not normally
-#       enable both AiPlayerbot.DowngradeMaxLevelBot and AiPlayerbot.ResetBotLevel.Enabled at the
+#       enable both Playerbots.DowngradeMaxLevelBot and Playerbots.ResetBotLevel.Enabled at the
 #       same time.
 #
 
@@ -860,43 +860,43 @@ AiPlayerbot.RandomBotXPRate = 1.0
 
 # Enables the level brackets feature.
 # Default: 0 (disabled)
-AiPlayerbot.LevelBrackets.Enabled = 0
+Playerbots.LevelBrackets.Enabled = 0
 
 # The frequency (in seconds) at which the bot level distribution check is performed.
 # Default: 300
-AiPlayerbot.LevelBrackets.CheckFrequency = 300
+Playerbots.LevelBrackets.CheckFrequency = 300
 
 # The frequency (in seconds) at which pending level resets are processed for safe bots and flagged
 # bots that failed safety checks initially.
 # Default: 15
-AiPlayerbot.LevelBrackets.CheckFlaggedFrequency = 15
+Playerbots.LevelBrackets.CheckFlaggedFrequency = 15
 
 # Maximum number of flagged bots to process per pending level change step.
 # 0 = unlimited (process all flagged bots each step)
 # Default: 5
-AiPlayerbot.LevelBrackets.FlaggedProcessLimit = 5
+Playerbots.LevelBrackets.FlaggedProcessLimit = 5
 
 # When enabled, bots in a guild led by a real (non-bot) player are excluded from bot bracket
 # calculations and will not be level changed or flagged. Backed by the shared PlayerbotGuildMgr
 # guild cache (validated at startup and refreshed hourly), which also covers offline players; a
 # guild counts as real when its leader is not a random-bot account.
 # Default: 1 (enabled)
-AiPlayerbot.LevelBrackets.IgnoreGuildBotsWithRealPlayers = 1
+Playerbots.LevelBrackets.IgnoreGuildBotsWithRealPlayers = 1
 
 # When enabled, bots that are members of arena teams are excluded from bot bracket calculations
 # and will not be level changed or flagged. This prevents bots in arena teams from being changed,
 # which would break team compositions.
 # Default: 1 (enabled)
-AiPlayerbot.LevelBrackets.IgnoreArenaTeamBots = 1
+Playerbots.LevelBrackets.IgnoreArenaTeamBots = 1
 
 # Ignore bots that are on real players' friends lists from any brackets.
 # Default: 1 (enabled)
-AiPlayerbot.LevelBrackets.IgnoreFriendListed = 1
+Playerbots.LevelBrackets.IgnoreFriendListed = 1
 
 # Comma-separated list of bot names to exclude from all bracket checks. Names must match the
 # character name exactly (character names are stored capitalized, e.g. "Thrall").
 # Default: ""
-AiPlayerbot.LevelBrackets.ExcludeNames =
+Playerbots.LevelBrackets.ExcludeNames =
 
 # The number of level brackets used for bot distribution. Both Alliance and Horde should have the
 # same number of brackets defined below.
@@ -906,12 +906,12 @@ AiPlayerbot.LevelBrackets.ExcludeNames =
 #            the additional bracket lines below (e.g. Range10, Range11, etc.) to both your
 #            playerbots.conf and this playerbots.conf.dist. Ensure that the sum of the Pct values
 #            for each faction remains 100.
-AiPlayerbot.LevelBrackets.NumRanges = 9
+Playerbots.LevelBrackets.NumRanges = 9
 
 # Enables dynamic recalculation of bot distribution percentages based on the number of non-bot
 # players present in each level bracket. This overrides any custom brackets in the conf.
 # Default: 0 (disabled)
-AiPlayerbot.LevelBrackets.Dynamic.UseDynamicDistribution = 0
+Playerbots.LevelBrackets.Dynamic.UseDynamicDistribution = 0
 
 # Controls how much extra weight is given to brackets (level ranges) that contain real (non-bot)
 # players, when dynamic distribution is enabled. The higher this value, the more bots move to the
@@ -935,7 +935,7 @@ AiPlayerbot.LevelBrackets.Dynamic.UseDynamicDistribution = 0
 #   bracket_weight = 1.0 + (RealPlayerWeight x (1 / TotalRealPlayers) x log(1 + RealPlayersInBracket))
 #   All bracket weights are normalized to total 100%.
 # Default: 1.0
-AiPlayerbot.LevelBrackets.Dynamic.RealPlayerWeight = 1.0
+Playerbots.LevelBrackets.Dynamic.RealPlayerWeight = 1.0
 
 # If enabled, both Alliance and Horde must have identical bracket definitions (same number, same
 # level bounds). All real players (regardless of faction) influence the dynamic distribution for
@@ -943,20 +943,20 @@ AiPlayerbot.LevelBrackets.Dynamic.RealPlayerWeight = 1.0
 # Default: 0 (disabled)
 # NOTE: If the brackets do not match when enabled, SyncFactions is forcibly disabled for that
 #       session and an error is logged; the server will not fail to start over this.
-AiPlayerbot.LevelBrackets.Dynamic.SyncFactions = 0
+Playerbots.LevelBrackets.Dynamic.SyncFactions = 0
 
 ##############################################
 # Alliance Level Brackets Configuration
 ##############################################
 # The following settings define the level brackets for Alliance bots. For each bracket, specify:
 #
-#    AiPlayerbot.LevelBrackets.Alliance.RangeX.Lower
+#    Playerbots.LevelBrackets.Alliance.RangeX.Lower
 #        Description: The lower bound (inclusive) of bracket X.
 #
-#    AiPlayerbot.LevelBrackets.Alliance.RangeX.Upper
+#    Playerbots.LevelBrackets.Alliance.RangeX.Upper
 #        Description: The upper bound (inclusive) of bracket X.
 #
-#    AiPlayerbot.LevelBrackets.Alliance.RangeX.Pct
+#    Playerbots.LevelBrackets.Alliance.RangeX.Pct
 #        Description: The desired percentage of Alliance bots that should fall into bracket X.
 #
 # EXAMPLE:
@@ -968,59 +968,59 @@ AiPlayerbot.LevelBrackets.Dynamic.SyncFactions = 0
 #         Range8 accordingly.
 #
 #   To add an extra bracket beyond the default 9:
-#       1. Increase AiPlayerbot.LevelBrackets.NumRanges to the desired number.
+#       1. Increase Playerbots.LevelBrackets.NumRanges to the desired number.
 #       2. Add configuration lines for the new RangeX.Lower, RangeX.Upper, and RangeX.Pct.
 #
 # NOTE: The sum of all Pct values for the Alliance brackets must equal 100.
 #
-AiPlayerbot.LevelBrackets.Alliance.Range1.Lower = 1
-AiPlayerbot.LevelBrackets.Alliance.Range1.Upper = 9
-AiPlayerbot.LevelBrackets.Alliance.Range1.Pct   = 12
+Playerbots.LevelBrackets.Alliance.Range1.Lower = 1
+Playerbots.LevelBrackets.Alliance.Range1.Upper = 9
+Playerbots.LevelBrackets.Alliance.Range1.Pct   = 12
 
-AiPlayerbot.LevelBrackets.Alliance.Range2.Lower = 10
-AiPlayerbot.LevelBrackets.Alliance.Range2.Upper = 19
-AiPlayerbot.LevelBrackets.Alliance.Range2.Pct   = 11
+Playerbots.LevelBrackets.Alliance.Range2.Lower = 10
+Playerbots.LevelBrackets.Alliance.Range2.Upper = 19
+Playerbots.LevelBrackets.Alliance.Range2.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Alliance.Range3.Lower = 20
-AiPlayerbot.LevelBrackets.Alliance.Range3.Upper = 29
-AiPlayerbot.LevelBrackets.Alliance.Range3.Pct   = 11
+Playerbots.LevelBrackets.Alliance.Range3.Lower = 20
+Playerbots.LevelBrackets.Alliance.Range3.Upper = 29
+Playerbots.LevelBrackets.Alliance.Range3.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Alliance.Range4.Lower = 30
-AiPlayerbot.LevelBrackets.Alliance.Range4.Upper = 39
-AiPlayerbot.LevelBrackets.Alliance.Range4.Pct   = 11
+Playerbots.LevelBrackets.Alliance.Range4.Lower = 30
+Playerbots.LevelBrackets.Alliance.Range4.Upper = 39
+Playerbots.LevelBrackets.Alliance.Range4.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Alliance.Range5.Lower = 40
-AiPlayerbot.LevelBrackets.Alliance.Range5.Upper = 49
-AiPlayerbot.LevelBrackets.Alliance.Range5.Pct   = 11
+Playerbots.LevelBrackets.Alliance.Range5.Lower = 40
+Playerbots.LevelBrackets.Alliance.Range5.Upper = 49
+Playerbots.LevelBrackets.Alliance.Range5.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Alliance.Range6.Lower = 50
-AiPlayerbot.LevelBrackets.Alliance.Range6.Upper = 59
-AiPlayerbot.LevelBrackets.Alliance.Range6.Pct   = 11
+Playerbots.LevelBrackets.Alliance.Range6.Lower = 50
+Playerbots.LevelBrackets.Alliance.Range6.Upper = 59
+Playerbots.LevelBrackets.Alliance.Range6.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Alliance.Range7.Lower = 60
-AiPlayerbot.LevelBrackets.Alliance.Range7.Upper = 69
-AiPlayerbot.LevelBrackets.Alliance.Range7.Pct   = 11
+Playerbots.LevelBrackets.Alliance.Range7.Lower = 60
+Playerbots.LevelBrackets.Alliance.Range7.Upper = 69
+Playerbots.LevelBrackets.Alliance.Range7.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Alliance.Range8.Lower = 70
-AiPlayerbot.LevelBrackets.Alliance.Range8.Upper = 79
-AiPlayerbot.LevelBrackets.Alliance.Range8.Pct   = 11
+Playerbots.LevelBrackets.Alliance.Range8.Lower = 70
+Playerbots.LevelBrackets.Alliance.Range8.Upper = 79
+Playerbots.LevelBrackets.Alliance.Range8.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Alliance.Range9.Lower = 80
-AiPlayerbot.LevelBrackets.Alliance.Range9.Upper = 80
-AiPlayerbot.LevelBrackets.Alliance.Range9.Pct   = 11
+Playerbots.LevelBrackets.Alliance.Range9.Lower = 80
+Playerbots.LevelBrackets.Alliance.Range9.Upper = 80
+Playerbots.LevelBrackets.Alliance.Range9.Pct   = 11
 
 ##############################################
 # Horde Level Brackets Configuration
 ##############################################
 # The following settings define the level brackets for Horde bots. For each bracket, specify:
 #
-#    AiPlayerbot.LevelBrackets.Horde.RangeX.Lower
+#    Playerbots.LevelBrackets.Horde.RangeX.Lower
 #        Description: The lower bound (inclusive) of bracket X.
 #
-#    AiPlayerbot.LevelBrackets.Horde.RangeX.Upper
+#    Playerbots.LevelBrackets.Horde.RangeX.Upper
 #        Description: The upper bound (inclusive) of bracket X.
 #
-#    AiPlayerbot.LevelBrackets.Horde.RangeX.Pct
+#    Playerbots.LevelBrackets.Horde.RangeX.Pct
 #        Description: The desired percentage of Horde bots that should fall into bracket X.
 #
 # EXAMPLE:
@@ -1033,41 +1033,41 @@ AiPlayerbot.LevelBrackets.Alliance.Range9.Pct   = 11
 #
 # NOTE: The sum of all Pct values for the Horde brackets must equal 100.
 #
-AiPlayerbot.LevelBrackets.Horde.Range1.Lower = 1
-AiPlayerbot.LevelBrackets.Horde.Range1.Upper = 9
-AiPlayerbot.LevelBrackets.Horde.Range1.Pct   = 12
+Playerbots.LevelBrackets.Horde.Range1.Lower = 1
+Playerbots.LevelBrackets.Horde.Range1.Upper = 9
+Playerbots.LevelBrackets.Horde.Range1.Pct   = 12
 
-AiPlayerbot.LevelBrackets.Horde.Range2.Lower = 10
-AiPlayerbot.LevelBrackets.Horde.Range2.Upper = 19
-AiPlayerbot.LevelBrackets.Horde.Range2.Pct   = 11
+Playerbots.LevelBrackets.Horde.Range2.Lower = 10
+Playerbots.LevelBrackets.Horde.Range2.Upper = 19
+Playerbots.LevelBrackets.Horde.Range2.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Horde.Range3.Lower = 20
-AiPlayerbot.LevelBrackets.Horde.Range3.Upper = 29
-AiPlayerbot.LevelBrackets.Horde.Range3.Pct   = 11
+Playerbots.LevelBrackets.Horde.Range3.Lower = 20
+Playerbots.LevelBrackets.Horde.Range3.Upper = 29
+Playerbots.LevelBrackets.Horde.Range3.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Horde.Range4.Lower = 30
-AiPlayerbot.LevelBrackets.Horde.Range4.Upper = 39
-AiPlayerbot.LevelBrackets.Horde.Range4.Pct   = 11
+Playerbots.LevelBrackets.Horde.Range4.Lower = 30
+Playerbots.LevelBrackets.Horde.Range4.Upper = 39
+Playerbots.LevelBrackets.Horde.Range4.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Horde.Range5.Lower = 40
-AiPlayerbot.LevelBrackets.Horde.Range5.Upper = 49
-AiPlayerbot.LevelBrackets.Horde.Range5.Pct   = 11
+Playerbots.LevelBrackets.Horde.Range5.Lower = 40
+Playerbots.LevelBrackets.Horde.Range5.Upper = 49
+Playerbots.LevelBrackets.Horde.Range5.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Horde.Range6.Lower = 50
-AiPlayerbot.LevelBrackets.Horde.Range6.Upper = 59
-AiPlayerbot.LevelBrackets.Horde.Range6.Pct   = 11
+Playerbots.LevelBrackets.Horde.Range6.Lower = 50
+Playerbots.LevelBrackets.Horde.Range6.Upper = 59
+Playerbots.LevelBrackets.Horde.Range6.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Horde.Range7.Lower = 60
-AiPlayerbot.LevelBrackets.Horde.Range7.Upper = 69
-AiPlayerbot.LevelBrackets.Horde.Range7.Pct   = 11
+Playerbots.LevelBrackets.Horde.Range7.Lower = 60
+Playerbots.LevelBrackets.Horde.Range7.Upper = 69
+Playerbots.LevelBrackets.Horde.Range7.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Horde.Range8.Lower = 70
-AiPlayerbot.LevelBrackets.Horde.Range8.Upper = 79
-AiPlayerbot.LevelBrackets.Horde.Range8.Pct   = 11
+Playerbots.LevelBrackets.Horde.Range8.Lower = 70
+Playerbots.LevelBrackets.Horde.Range8.Upper = 79
+Playerbots.LevelBrackets.Horde.Range8.Pct   = 11
 
-AiPlayerbot.LevelBrackets.Horde.Range9.Lower = 80
-AiPlayerbot.LevelBrackets.Horde.Range9.Upper = 80
-AiPlayerbot.LevelBrackets.Horde.Range9.Pct   = 11
+Playerbots.LevelBrackets.Horde.Range9.Lower = 80
+Playerbots.LevelBrackets.Horde.Range9.Upper = 80
+Playerbots.LevelBrackets.Horde.Range9.Pct   = 11
 
 ##############################################
 # Level Reset
@@ -1075,71 +1075,71 @@ AiPlayerbot.LevelBrackets.Horde.Range9.Pct   = 11
 
 # Enables the level reset feature.
 # Default: 0 (disabled)
-AiPlayerbot.ResetBotLevel.Enabled = 0
+Playerbots.ResetBotLevel.Enabled = 0
 
 # The maximum level a bot can reach before being reset.
 # Default:     80
 # Valid range: 2-80 (or 0 to disable the max-level reset check; SkipFromLevel/SkipToLevel still apply)
-AiPlayerbot.ResetBotLevel.MaxLevel = 80
+Playerbots.ResetBotLevel.MaxLevel = 80
 
 # The level bots will be reset to. For Death Knights, if this is below the heroic starting level,
 # they will be reset to the heroic starting level instead.
 # Default:     1
 # Valid range: 1-79 and < MaxLevel
-AiPlayerbot.ResetBotLevel.ResetToLevel = 1
+Playerbots.ResetBotLevel.ResetToLevel = 1
 
 # When a bot reaches exactly this level, it is sent directly to the level specified by SkipToLevel.
 # This setting is not affected by ScaledChance or RestrictTimePlayed.
 # Default:     0 (disabled)
 # Valid range: 1-80 and < MaxLevel (or 0 to disable)
-AiPlayerbot.ResetBotLevel.SkipFromLevel = 0
+Playerbots.ResetBotLevel.SkipFromLevel = 0
 
 # The level bots will be sent to when they reach SkipFromLevel. For Death Knights, if this is below
 # the heroic starting level, they will be reset to the heroic starting level instead.
 # Default:     1
 # Valid range: 1-80 and <= MaxLevel
-AiPlayerbot.ResetBotLevel.SkipToLevel = 1
+Playerbots.ResetBotLevel.SkipToLevel = 1
 
 # The percent chance a bot has to have its level reset when reaching the max level (or the
 # configured played time at max level).
 # Default:     100
 # Valid range: 0-100
-AiPlayerbot.ResetBotLevel.ResetChance = 100
+Playerbots.ResetBotLevel.ResetChance = 100
 
 # If enabled, the reset chance is (re-)rolled every level-up and scales based on the distance
 # between the bot's level and MaxLevel. Bots have a small chance of resetting at lower levels,
 # increasing as they approach MaxLevel, where the chance reaches ResetChance.
 # Default: 0 (disabled)
-AiPlayerbot.ResetBotLevel.ScaledChance = 0
+Playerbots.ResetBotLevel.ScaledChance = 0
 
 # If enabled, bots at MaxLevel will only have their level reset once they have played at least
 # MinTimePlayed seconds at that level.
 # Default: 0 (disabled)
-AiPlayerbot.ResetBotLevel.RestrictTimePlayed = 0
+Playerbots.ResetBotLevel.RestrictTimePlayed = 0
 
 # If RestrictTimePlayed is enabled, the minimum time (in seconds) a bot must have played at its
 # current level before a reset can occur at MaxLevel.
 # Default: 86400 (3600 = 1 hour, 86400 = 1 day, 604800 = 1 week)
-AiPlayerbot.ResetBotLevel.MinTimePlayed = 86400
+Playerbots.ResetBotLevel.MinTimePlayed = 86400
 
 # If RestrictTimePlayed is enabled, the frequency (in seconds) at which the played-time check is
 # performed for bots at or above MaxLevel.
 # Default: 864
 # Recommended: 1% of MinTimePlayed, or 300 seconds, whichever is higher.
-AiPlayerbot.ResetBotLevel.PlayedTimeCheckFrequency = 864
+Playerbots.ResetBotLevel.PlayedTimeCheckFrequency = 864
 
 # When enabled, bots in a guild led by a real (non-bot) player are excluded from level reset
 # processing. Backed by the same shared PlayerbotGuildMgr guild cache used by
-# AiPlayerbot.LevelBrackets.IgnoreGuildBotsWithRealPlayers (validated at startup and refreshed
+# Playerbots.LevelBrackets.IgnoreGuildBotsWithRealPlayers (validated at startup and refreshed
 # hourly), which also covers offline players; a guild counts as real when its leader is not a
 # random-bot account.
 # Default: 0 (disabled)
-AiPlayerbot.ResetBotLevel.IgnoreGuildBotsWithRealPlayers = 0
+Playerbots.ResetBotLevel.IgnoreGuildBotsWithRealPlayers = 0
 
 # Comma-separated list of bot names to exclude from level reset processing. Names must match the
 # character name exactly (character names are stored capitalized, e.g. "Thrall").
 # Default: "" (empty)
-AiPlayerbot.ResetBotLevel.ExcludeNames =
+Playerbots.ResetBotLevel.ExcludeNames =
 
 #
 #
@@ -1151,22 +1151,22 @@ AiPlayerbot.ResetBotLevel.ExcludeNames =
 
 # Randombots automatically receive upgraded equipment on levelup
 # Default: 1 (enabled)
-AiPlayerbot.AutoUpgradeEquip = 1
+Playerbots.AutoUpgradeEquip = 1
 
 # Enable/disable which (if any) randombots preserve their current equipment and spec during login
 # and periodic randomization (i.e., persistence).
 # Default: 1 (enabled)
-AiPlayerbot.EquipAndSpecPersistence = 1
+Playerbots.EquipAndSpecPersistence = 1
 
 # If EquipAndSpecPersistence is enabled, equipment and talent persistence will affect randombots of this
 # level or higher.
 # Default: 1 (enable persistence for randombots of at least level 1 (i.e., all levels))
-AiPlayerbot.EquipAndSpecPersistenceLevel = 1
+Playerbots.EquipAndSpecPersistenceLevel = 1
 
 # Equipment quality limitation for randombots (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary)
 # This also sets the maximum quality that can be generated by autogear for randombots and altbots
 # Default: 3 (rare)
-AiPlayerbot.RandomGearQualityLimit = 3
+Playerbots.RandomGearQualityLimit = 3
 
 # Equipment item level (not gearscore) limitation for randombots (0 = no limit)
 # Classic
@@ -1179,7 +1179,7 @@ AiPlayerbot.RandomGearQualityLimit = 3
 # Max iLVL Tier 7(10/25) = 200/213 | Tier 8(10/25) = 225/232 | Tier 9(10/25) = 232/245 | Tier 10(10/25/HC) = 251/264/290
 # Max iLVL Phase 1(Naxx) = 224 | Phase 2(Ulduar) = 245 | Phase 3(ToC) = 258 | Phase 4(ICC) = 290
 # Default: 0 (no limit)
-AiPlayerbot.RandomGearScoreLimit = 0
+Playerbots.RandomGearScoreLimit = 0
 
 # Prefer armor of the class's ideal type: apply 3x score multiplier to class-appropriate armor.
 # When enabled, Warriors strongly prefer plate, Shamans prefer mail, etc.
@@ -1193,59 +1193,59 @@ AiPlayerbot.RandomGearScoreLimit = 0
 #   Cloth:   Priests, Mages, Warlocks
 #
 # Default: 0 (disabled)
-AiPlayerbot.PreferClassArmorType = 0
+Playerbots.PreferClassArmorType = 0
 
 # When enabled, bots prefer spec-appropriate weapons based on speed and weapon type during autogear.
 # Examples: Arms Warriors favor slow 2H axes/polearms (Axe Specialization), Combat Rogues
 # favor a slow MH with a fast OH, and Enhancement Shamans favor synchronized slow 1H weapons.
 # Default: 0 (disabled)
-AiPlayerbot.PreferredSpecWeapons = 0
+Playerbots.PreferredSpecWeapons = 0
 
 # Set minimum level of bots that will enchant and socket gems into their equipment with maintenance
 # If greater than RandomBotMaxlevel, bots will not automatically enchant equipment or socket gems
 # Default: 60
-AiPlayerbot.MinEnchantingBotLevel = 60
+Playerbots.MinEnchantingBotLevel = 60
 
 # Enable expansion limitation for bot enchants and gems
 # If enabled, bots will not use TBC enchants until level 61 or WotLK enchants and gems until level 71
 # Default: 1 (enabled)
-AiPlayerbot.LimitEnchantExpansion = 1
+Playerbots.LimitEnchantExpansion = 1
 
 # Enable expansion limitation for gear
 # If enabled, bots will not equip TBC gear until level 61 or WotLK gear until level 71
 # Default: 1 (enabled)
-AiPlayerbot.LimitGearExpansion = 1
+Playerbots.LimitGearExpansion = 1
 
 # Chance randombot will have less-than-optimized generated gear
 # Set between 0 (0%) and 1 (100%)
-AiPlayerbot.RandomGearLoweringChance = 0
+Playerbots.RandomGearLoweringChance = 0
 
 # Unobtainable or unusable items (comma-separated list of item IDs)
 # Defaults: Chilton Wand (12468), Frenzyheart Insignia of Fury test/on-use row (44869),
 #           Oracle Talisman of Ablution test/on-use row (44870), Totem of the Earthen Ring (46978)
-AiPlayerbot.UnobtainableItems = 12468,44869,44870,46978
+Playerbots.UnobtainableItems = 12468,44869,44870,46978
 
 # Randombots check player's gearscore level and deny the group invitation if it's too low
 # Default: 0 (disabled)
-AiPlayerbot.GearScoreCheck = 0
+Playerbots.GearScoreCheck = 0
 
 # Only set wolf pets for hunters for optimal raid performance (0 = disabled, 1 = enabled only for max-level bots, 2 = enabled)
 # Default: 0 (disabled)
-AiPlayerbot.HunterWolfPet = 0
+Playerbots.HunterWolfPet = 0
 
 # Default pet stance when a bot summons a pet
 # 0 = Passive, 1 = Defensive, 2 = Aggressive
 # Default: 1 (Defensive)
-AiPlayerbot.DefaultPetStance = 1
+Playerbots.DefaultPetStance = 1
 
 # Enable/disable debug messages about pet commands
 # 0 = Disabled, 1 = Enabled
 # Default = 0 (disabled)
-AiPlayerbot.PetChatCommandDebug = 0
+Playerbots.PetChatCommandDebug = 0
 
 # Prohibit hunter bots from creating pets with any family ID listed below in ExcludedHunterPetFamilies
 # See the creature_family database table for all pet families by ID (note: ID for spiders is 3)
-AiPlayerbot.ExcludedHunterPetFamilies = ""
+Playerbots.ExcludedHunterPetFamilies = ""
 
 #
 #
@@ -1273,8 +1273,8 @@ AiPlayerbot.ExcludedHunterPetFamilies = ""
 #   rotation happens, it stays active until those conditions end — it won't be cut off
 #   mid-fight just because its turn expired.
 #
-AiPlayerbot.BotActiveAlone = 10
-AiPlayerbot.BotActiveAloneDurationSeconds = 30
+Playerbots.BotActiveAlone = 10
+Playerbots.BotActiveAloneDurationSeconds = 30
 
 # Force-active rules (1 = on, 0 = off)
 # These override the percentage above. If any of these conditions is true, the bot stays active.
@@ -1289,11 +1289,11 @@ AiPlayerbot.BotActiveAloneDurationSeconds = 30
 #   in combat, inside a dungeon/raid/BG, in a BG or LFG queue,
 #   grouped with a real player, or controlled by a real player.
 #
-AiPlayerbot.BotActiveAloneForceWhenInRadius = 150
-AiPlayerbot.BotActiveAloneForceWhenInZone = 1
-AiPlayerbot.BotActiveAloneForceWhenInMap = 0
-AiPlayerbot.BotActiveAloneForceWhenIsFriend = 0
-AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
+Playerbots.BotActiveAloneForceWhenInRadius = 150
+Playerbots.BotActiveAloneForceWhenInZone = 1
+Playerbots.BotActiveAloneForceWhenInMap = 0
+Playerbots.BotActiveAloneForceWhenIsFriend = 0
+Playerbots.BotActiveAloneForceWhenInGuild = 1
 
 # SmartScale — automatically reduces active bots when the server is struggling.
 # Monitors the server's update time (how long each server tick takes in milliseconds).
@@ -1311,11 +1311,11 @@ AiPlayerbot.BotActiveAloneForceWhenInGuild = 1
 #   Bots outside the range always use the full BotActiveAlone value.
 #   Force rules always win over SmartScale.
 #
-AiPlayerbot.botActiveAloneSmartScale = 1
-AiPlayerbot.botActiveAloneSmartScaleDiffLimitfloor = 50
-AiPlayerbot.botActiveAloneSmartScaleDiffLimitCeiling = 200
-AiPlayerbot.botActiveAloneSmartScaleWhenMinLevel = 1
-AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
+Playerbots.botActiveAloneSmartScale = 1
+Playerbots.botActiveAloneSmartScaleDiffLimitfloor = 50
+Playerbots.botActiveAloneSmartScaleDiffLimitCeiling = 200
+Playerbots.botActiveAloneSmartScaleWhenMinLevel = 1
+Playerbots.botActiveAloneSmartScaleWhenMaxLevel = 80
 
 #
 #
@@ -1326,18 +1326,18 @@ AiPlayerbot.botActiveAloneSmartScaleWhenMaxLevel = 80
 #
 
 # Quests that will be completed and rewarded for all randombots
-AiPlayerbot.RandomBotQuestIds = "3802,5505,6502,7761,7848,10277,10285,11492,13188,13189,24499,24511,24710,24712"
+Playerbots.RandomBotQuestIds = "3802,5505,6502,7761,7848,10277,10285,11492,13188,13189,24499,24511,24710,24712"
 
 # Randombots will group with nearby randombots to do shared quests
 # Note: Currently not functioning properly
-AiPlayerbot.RandomBotGroupNearby = 0
+Playerbots.RandomBotGroupNearby = 0
 
 # Randombots will pick quests on their own and try to complete them
 # Default: 1 (enabled)
-AiPlayerbot.AutoDoQuests = 1
+Playerbots.AutoDoQuests = 1
 
 # Quest items to keep in bots' inventories (do not automatically destroy)
-AiPlayerbot.RandomBotQuestItems = "5175,5176,5177,5178,6948,11000,12382,13704,16309"
+Playerbots.RandomBotQuestItems = "5175,5176,5177,5178,6948,11000,12382,13704,16309"
 
 #
 #
@@ -1349,22 +1349,22 @@ AiPlayerbot.RandomBotQuestItems = "5175,5176,5177,5178,6948,11000,12382,13704,16
 
 # Randombots automatically learn class quest reward spells on levelup
 # Default: 1 (enabled)
-AiPlayerbot.AutoLearnQuestSpells = 1
+Playerbots.AutoLearnQuestSpells = 1
 
 # Randombots automatically learn trainable spells on levelup
 # Default: 1 (enabled)
-AiPlayerbot.AutoLearnTrainerSpells = 1
+Playerbots.AutoLearnTrainerSpells = 1
 
 # Randombots automatically spend talent points on levelup
 # Default: 1 (enabled)
-AiPlayerbot.AutoPickTalents = 1
+Playerbots.AutoPickTalents = 1
 
 # Spells every randombot will learn automatically and every altbot will learn with maintenance
 # Default: 54197 (Cold Weather Flying)
-AiPlayerbot.RandomBotSpellIds = "54197"
+Playerbots.RandomBotSpellIds = "54197"
 
 # ID of spell to open lootable chests
-AiPlayerbot.OpenGoSpell = 6477
+Playerbots.OpenGoSpell = 6477
 
 #
 #
@@ -1378,14 +1378,14 @@ AiPlayerbot.OpenGoSpell = 6477
 # Strategies added here are applied to all randombots, in addition (or subtraction) to spec/role-based default strategies.
 # These rules are processed after the defaults.
 # Example: "+threat,-potions"
-AiPlayerbot.RandomBotCombatStrategies = ""
-AiPlayerbot.RandomBotNonCombatStrategies = ""
+Playerbots.RandomBotCombatStrategies = ""
+Playerbots.RandomBotNonCombatStrategies = ""
 
 # Additional altbot strategies
 # Strategies added here are applied to all altbots, in addition (or subtraction) to spec/role-based default strategies.
 # These rules are processed after the defaults.
-AiPlayerbot.CombatStrategies = ""
-AiPlayerbot.NonCombatStrategies = ""
+Playerbots.CombatStrategies = ""
+Playerbots.NonCombatStrategies = ""
 
 # Reaction engine strategy overrides.
 # Strategy modifiers applied to the reaction engine after the defaults.
@@ -1393,16 +1393,16 @@ AiPlayerbot.NonCombatStrategies = ""
 # ReactStrategies applies to bots with a real player master or that are real players themselves.
 # RandomBotReactStrategies applies to all other bots (random bots without a real player master).
 # Example: "-chat" stops chat commands being handled as reactions; "+custom_react" adds a custom reaction strategy.
-AiPlayerbot.ReactStrategies = ""
-AiPlayerbot.RandomBotReactStrategies = ""
+Playerbots.ReactStrategies = ""
+Playerbots.RandomBotReactStrategies = ""
 
 # Remove "healer dps" strategy on the maps specified below.
 # Default: 1 (enabled)
-AiPlayerbot.HealerDPSMapRestriction = 1
+Playerbots.HealerDPSMapRestriction = 1
 
-# List of Map IDs where "healer dps" strategy will be removed if AiPlayerbot.HealerDPSMapRestriction is enabled
+# List of Map IDs where "healer dps" strategy will be removed if Playerbots.HealerDPSMapRestriction is enabled
 # Default: (Dungeon and Raid maps) "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"
-AiPlayerbot.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"
+Playerbots.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,230,329,349,389,429,1001,1004,1007,269,540,542,543,545,546,547,552,553,554,555,556,557,558,560,585,574,575,576,578,595,599,600,601,602,604,608,619,632,650,658,668,409,469,509,531,532,534,544,548,550,564,565,580,249,533,603,615,616,624,631,649,724"
 
 #
 #
@@ -1413,9 +1413,9 @@ AiPlayerbot.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,2
 #
 
 # Randombots will behave more like real players (experimental)
-# This option will override AiPlayerbot.AutoDoQuests, RandomBotTeleLowerLevel, and RandomBotTeleHigherLevel
+# This option will override Playerbots.AutoDoQuests, RandomBotTeleLowerLevel, and RandomBotTeleHigherLevel
 # Default: 1 (enabled)
-AiPlayerbot.EnableNewRpgStrategy = 1
+Playerbots.EnableNewRpgStrategy = 1
 
 # Control probability weights for RPG status of bots. Takes effect only when the status meets its premise.​
 # Sum of weights need not be 100. Set to 0 to disable the status.
@@ -1428,17 +1428,17 @@ AiPlayerbot.EnableNewRpgStrategy = 1
 # TravelFlight  (Default: 15  Go to the nearest flightmaster and fly to a level-appropriate area)
 # Rest          (Default: 5   Take a break for a while and do nothing)
 # OutdoorPvp    (Default: 10  Participate in outdoor PvP capture points if already in an outdoor PvP zone)
-AiPlayerbot.RpgStatusProbWeight.WanderRandom = 15
-AiPlayerbot.RpgStatusProbWeight.WanderNpc = 20
-AiPlayerbot.RpgStatusProbWeight.GoGrind = 15
-AiPlayerbot.RpgStatusProbWeight.GoCamp = 10
-AiPlayerbot.RpgStatusProbWeight.DoQuest = 60
-AiPlayerbot.RpgStatusProbWeight.TravelFlight = 15
-AiPlayerbot.RpgStatusProbWeight.Rest = 5
-AiPlayerbot.RpgStatusProbWeight.OutdoorPvp = 10
+Playerbots.RpgStatusProbWeight.WanderRandom = 15
+Playerbots.RpgStatusProbWeight.WanderNpc = 20
+Playerbots.RpgStatusProbWeight.GoGrind = 15
+Playerbots.RpgStatusProbWeight.GoCamp = 10
+Playerbots.RpgStatusProbWeight.DoQuest = 60
+Playerbots.RpgStatusProbWeight.TravelFlight = 15
+Playerbots.RpgStatusProbWeight.Rest = 5
+Playerbots.RpgStatusProbWeight.OutdoorPvp = 10
 
 # Bots' minimum and maximum level when teleporting in and out of a zone, according to the new RPG strategy
-# Format: AiPlayerbot.ZoneBracket.zoneID = minLevel,maxLevel
+# Format: Playerbots.ZoneBracket.zoneID = minLevel,maxLevel
 #
 # Classic WoW - Low-level zones:
 # Dun Morogh             (Zone ID:    1    Default Min,Max:  5,12)
@@ -1449,14 +1449,14 @@ AiPlayerbot.RpgStatusProbWeight.OutdoorPvp = 10
 # Mulgore                (Zone ID:  215    Default Min,Max:  5,12)
 # Eversong Woods         (Zone ID: 3430    Default Min,Max:  5,12)
 # Azuremyst Isle         (Zone ID: 3524    Default Min,Max:  5,12)
-AiPlayerbot.ZoneBracket.1 = 5,12
-AiPlayerbot.ZoneBracket.12 = 5,12
-AiPlayerbot.ZoneBracket.14 = 5,12
-AiPlayerbot.ZoneBracket.85 = 5,12
-AiPlayerbot.ZoneBracket.141 = 5,12
-AiPlayerbot.ZoneBracket.215 = 5,12
-AiPlayerbot.ZoneBracket.3430 = 5,12
-AiPlayerbot.ZoneBracket.3524 = 5,12
+Playerbots.ZoneBracket.1 = 5,12
+Playerbots.ZoneBracket.12 = 5,12
+Playerbots.ZoneBracket.14 = 5,12
+Playerbots.ZoneBracket.85 = 5,12
+Playerbots.ZoneBracket.141 = 5,12
+Playerbots.ZoneBracket.215 = 5,12
+Playerbots.ZoneBracket.3430 = 5,12
+Playerbots.ZoneBracket.3524 = 5,12
 
 # Classic WoW - Mid-level zones:
 # Barrens                (Zone ID:   17    Default Min,Max: 10,25)
@@ -1466,13 +1466,13 @@ AiPlayerbot.ZoneBracket.3524 = 5,12
 # Darkshore              (Zone ID:  148    Default Min,Max: 10,21)
 # Ghostlands             (Zone ID: 3433    Default Min,Max: 10,22)
 # Bloodmyst Isle         (Zone ID: 3525    Default Min,Max: 10,21)
-AiPlayerbot.ZoneBracket.17 = 10,25
-AiPlayerbot.ZoneBracket.38 = 10,20
-AiPlayerbot.ZoneBracket.40 = 10,21
-AiPlayerbot.ZoneBracket.130 = 10,23
-AiPlayerbot.ZoneBracket.148 = 10,21
-AiPlayerbot.ZoneBracket.3433 = 10,22
-AiPlayerbot.ZoneBracket.3525 = 10,21
+Playerbots.ZoneBracket.17 = 10,25
+Playerbots.ZoneBracket.38 = 10,20
+Playerbots.ZoneBracket.40 = 10,21
+Playerbots.ZoneBracket.130 = 10,23
+Playerbots.ZoneBracket.148 = 10,21
+Playerbots.ZoneBracket.3433 = 10,22
+Playerbots.ZoneBracket.3525 = 10,21
 
 # Classic WoW - High-level zones:
 # Duskwood               (Zone ID:   10    Default Min,Max: 19,33)
@@ -1482,13 +1482,13 @@ AiPlayerbot.ZoneBracket.3525 = 10,21
 # Ashenvale              (Zone ID:  331    Default Min,Max: 18,33)
 # Thousand Needles       (Zone ID:  400    Default Min,Max: 24,36)
 # Stonetalon Mountains   (Zone ID:  406    Default Min,Max: 16,29)
-AiPlayerbot.ZoneBracket.10 = 19,33
-AiPlayerbot.ZoneBracket.11 = 21,30
-AiPlayerbot.ZoneBracket.44 = 16,28
-AiPlayerbot.ZoneBracket.267 = 20,34
-AiPlayerbot.ZoneBracket.331 = 18,33
-AiPlayerbot.ZoneBracket.400 = 24,36
-AiPlayerbot.ZoneBracket.406 = 16,29
+Playerbots.ZoneBracket.10 = 19,33
+Playerbots.ZoneBracket.11 = 21,30
+Playerbots.ZoneBracket.44 = 16,28
+Playerbots.ZoneBracket.267 = 20,34
+Playerbots.ZoneBracket.331 = 18,33
+Playerbots.ZoneBracket.400 = 24,36
+Playerbots.ZoneBracket.406 = 16,29
 
 # Classic WoW - Higher-level zones:
 # Badlands               (Zone ID:    3    Default Min,Max: 36,46)
@@ -1502,17 +1502,17 @@ AiPlayerbot.ZoneBracket.406 = 16,29
 # Feralas                (Zone ID:  357    Default Min,Max: 40,52)
 # Desolace               (Zone ID:  405    Default Min,Max: 30,41)
 # Tanaris                (Zone ID:  440    Default Min,Max: 41,52)
-AiPlayerbot.ZoneBracket.3 = 36,46
-AiPlayerbot.ZoneBracket.8 = 36,46
-AiPlayerbot.ZoneBracket.15 = 35,46
-AiPlayerbot.ZoneBracket.16 = 45,52
-AiPlayerbot.ZoneBracket.33 = 32,47
-AiPlayerbot.ZoneBracket.45 = 30,42
-AiPlayerbot.ZoneBracket.47 = 42,51
-AiPlayerbot.ZoneBracket.51 = 45,51
-AiPlayerbot.ZoneBracket.357 = 40,52
-AiPlayerbot.ZoneBracket.405 = 30,41
-AiPlayerbot.ZoneBracket.440 = 41,52
+Playerbots.ZoneBracket.3 = 36,46
+Playerbots.ZoneBracket.8 = 36,46
+Playerbots.ZoneBracket.15 = 35,46
+Playerbots.ZoneBracket.16 = 45,52
+Playerbots.ZoneBracket.33 = 32,47
+Playerbots.ZoneBracket.45 = 30,42
+Playerbots.ZoneBracket.47 = 42,51
+Playerbots.ZoneBracket.51 = 45,51
+Playerbots.ZoneBracket.357 = 40,52
+Playerbots.ZoneBracket.405 = 30,41
+Playerbots.ZoneBracket.440 = 41,52
 
 # Classic WoW - Top-level zones:
 # Blasted Lands          (Zone ID:    4    Default Min,Max: 52,57)
@@ -1523,14 +1523,14 @@ AiPlayerbot.ZoneBracket.440 = 41,52
 # Un'Goro Crater         (Zone ID:  490    Default Min,Max: 49,56)
 # Winterspring           (Zone ID:  618    Default Min,Max: 54,61)
 # Silithus               (Zone ID: 1377    Default Min,Max: 54,63)
-AiPlayerbot.ZoneBracket.4 = 52,57
-AiPlayerbot.ZoneBracket.28 = 50,60
-AiPlayerbot.ZoneBracket.46 = 51,60
-AiPlayerbot.ZoneBracket.139 = 54,62
-AiPlayerbot.ZoneBracket.361 = 47,57
-AiPlayerbot.ZoneBracket.490 = 49,56
-AiPlayerbot.ZoneBracket.618 = 54,61
-AiPlayerbot.ZoneBracket.1377 = 54,63
+Playerbots.ZoneBracket.4 = 52,57
+Playerbots.ZoneBracket.28 = 50,60
+Playerbots.ZoneBracket.46 = 51,60
+Playerbots.ZoneBracket.139 = 54,62
+Playerbots.ZoneBracket.361 = 47,57
+Playerbots.ZoneBracket.490 = 49,56
+Playerbots.ZoneBracket.618 = 54,61
+Playerbots.ZoneBracket.1377 = 54,63
 
 # The Burning Crusade - Zones:
 # Hellfire Peninsula     (Zone ID: 3483    Default Min,Max: 58,66)
@@ -1541,14 +1541,14 @@ AiPlayerbot.ZoneBracket.1377 = 54,63
 # Blade's Edge Mountains (Zone ID: 3522    Default Min,Max: 64,73)
 # Netherstorm            (Zone ID: 3523    Default Min,Max: 67,73)
 # Isle of Quel'Danas     (Zone ID: 4080    Default Min,Max: 68,73)
-AiPlayerbot.ZoneBracket.3483 = 58,66
-AiPlayerbot.ZoneBracket.3518 = 64,70
-AiPlayerbot.ZoneBracket.3519 = 62,73
-AiPlayerbot.ZoneBracket.3520 = 66,73
-AiPlayerbot.ZoneBracket.3521 = 60,67
-AiPlayerbot.ZoneBracket.3522 = 64,73
-AiPlayerbot.ZoneBracket.3523 = 67,73
-AiPlayerbot.ZoneBracket.4080 = 68,73
+Playerbots.ZoneBracket.3483 = 58,66
+Playerbots.ZoneBracket.3518 = 64,70
+Playerbots.ZoneBracket.3519 = 62,73
+Playerbots.ZoneBracket.3520 = 66,73
+Playerbots.ZoneBracket.3521 = 60,67
+Playerbots.ZoneBracket.3522 = 64,73
+Playerbots.ZoneBracket.3523 = 67,73
+Playerbots.ZoneBracket.4080 = 68,73
 
 # Wrath of the Lich King - Zones:
 # Dragonblight           (Zone ID:   65    Default Min,Max: 71,77)
@@ -1561,16 +1561,16 @@ AiPlayerbot.ZoneBracket.4080 = 68,73
 # Borean Tundra          (Zone ID: 3537    Default Min,Max: 68,75)
 # Sholazar Basin         (Zone ID: 3711    Default Min,Max: 75,80)
 # Wintergrasp            (Zone ID: 4197    Default Min,Max: 79,80)
-AiPlayerbot.ZoneBracket.65 = 71,77
-AiPlayerbot.ZoneBracket.66 = 74,80
-AiPlayerbot.ZoneBracket.67 = 77,80
-AiPlayerbot.ZoneBracket.210 = 77,80
-AiPlayerbot.ZoneBracket.394 = 72,78
-AiPlayerbot.ZoneBracket.495 = 68,74
-AiPlayerbot.ZoneBracket.2817 = 77,80
-AiPlayerbot.ZoneBracket.3537 = 68,75
-AiPlayerbot.ZoneBracket.3711 = 75,80
-AiPlayerbot.ZoneBracket.4197 = 79,80
+Playerbots.ZoneBracket.65 = 71,77
+Playerbots.ZoneBracket.66 = 74,80
+Playerbots.ZoneBracket.67 = 77,80
+Playerbots.ZoneBracket.210 = 77,80
+Playerbots.ZoneBracket.394 = 72,78
+Playerbots.ZoneBracket.495 = 68,74
+Playerbots.ZoneBracket.2817 = 77,80
+Playerbots.ZoneBracket.3537 = 68,75
+Playerbots.ZoneBracket.3711 = 75,80
+Playerbots.ZoneBracket.4197 = 79,80
 
 #
 #
@@ -1582,42 +1582,42 @@ AiPlayerbot.ZoneBracket.4197 = 79,80
 
 # Map IDs where bots can be teleported to
 # Defaults: 0 = Eastern Kingdoms, 1 = Kalimdor, 530 = Outland, 571 = Northrend
-AiPlayerbot.RandomBotMaps = 0,1,530,571
+Playerbots.RandomBotMaps = 0,1,530,571
 
 # Probability bots teleport to banker (city)
 # Default: 0.25
-AiPlayerbot.ProbTeleToBankers = 0.25
+Playerbots.ProbTeleToBankers = 0.25
 
 # Control probability weights for bots teleporting to Capital city bankers
 # Sum of weights need not be 100. Set to 0 to disable teleporting to the city.
-AiPlayerbot.EnableWeightTeleToCityBankers = 1
-AiPlayerbot.TeleToStormwindWeight = 2
-AiPlayerbot.TeleToIronforgeWeight = 1
-AiPlayerbot.TeleToDarnassusWeight = 1
-AiPlayerbot.TeleToExodarWeight = 1
-AiPlayerbot.TeleToOrgrimmarWeight = 2
-AiPlayerbot.TeleToUndercityWeight = 1
-AiPlayerbot.TeleToThunderBluffWeight = 1
-AiPlayerbot.TeleToSilvermoonCityWeight = 1
-AiPlayerbot.TeleToShattrathCityWeight = 1
-AiPlayerbot.TeleToDalaranWeight = 1
+Playerbots.EnableWeightTeleToCityBankers = 1
+Playerbots.TeleToStormwindWeight = 2
+Playerbots.TeleToIronforgeWeight = 1
+Playerbots.TeleToDarnassusWeight = 1
+Playerbots.TeleToExodarWeight = 1
+Playerbots.TeleToOrgrimmarWeight = 2
+Playerbots.TeleToUndercityWeight = 1
+Playerbots.TeleToThunderBluffWeight = 1
+Playerbots.TeleToSilvermoonCityWeight = 1
+Playerbots.TeleToShattrathCityWeight = 1
+Playerbots.TeleToDalaranWeight = 1
 
 # How far randombots are teleported after death in yards
-AiPlayerbot.RandomBotTeleportDistance = 100
+Playerbots.RandomBotTeleportDistance = 100
 
 # How many levels below the lowest-level creature in a zone, can a bot be
-# This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
+# This will have no effect if Playerbots.EnableNewRpgStrategy is enabled
 # Default: 1 (randombot will leave if they are more than 1 level lower)
-AiPlayerbot.RandomBotTeleLowerLevel = 1
+Playerbots.RandomBotTeleLowerLevel = 1
 
 # How many levels above the highest-level creature in a zone, can a bot be
-# This will have no effect if AiPlayerbot.EnableNewRpgStrategy is enabled
+# This will have no effect if Playerbots.EnableNewRpgStrategy is enabled
 # Default: 3 (randombot will leave if they are more than 3 levels higher)
-AiPlayerbot.RandomBotTeleHigherLevel = 3
+Playerbots.RandomBotTeleHigherLevel = 3
 
 # Bots automatically teleport to another place for leveling on levelup
 # Default: 1 (enabled)
-AiPlayerbot.AutoTeleportForLevel = 1
+Playerbots.AutoTeleportForLevel = 1
 
 #
 #
@@ -1628,10 +1628,10 @@ AiPlayerbot.AutoTeleportForLevel = 1
 #
 
 # Enable battlegrounds/arenas for randombots
-AiPlayerbot.RandomBotJoinBG = 1
+Playerbots.RandomBotJoinBG = 1
 
 # Enable auto-joining of battlegrounds - have bots start battlegrounds and arenas on their own
-AiPlayerbot.RandomBotAutoJoinBG = 0
+Playerbots.RandomBotAutoJoinBG = 0
 
 # Required Configuration for RandomBotAutoJoinBG
 #
@@ -1659,32 +1659,32 @@ AiPlayerbot.RandomBotAutoJoinBG = 0
 # - Ensure there are enough eligible bots to meet the specified counts.
 
 # Battleground bracket range possibilities:
-# AiPlayerbot.RandomBotAutoJoinWSBrackets = 0,1,2,3,4,5,6,7
-# AiPlayerbot.RandomBotAutoJoinABBrackets = 0,1,2,3,4,5,6
-# AiPlayerbot.RandomBotAutoJoinAVBrackets = 0,1,2,3
-# AiPlayerbot.RandomBotAutoJoinEYBrackets = 0,1,2
-# AiPlayerbot.RandomBotAutoJoinICBrackets = 0,1
-AiPlayerbot.RandomBotAutoJoinWSBrackets = 7
-AiPlayerbot.RandomBotAutoJoinABBrackets = 6
-AiPlayerbot.RandomBotAutoJoinAVBrackets = 3
-AiPlayerbot.RandomBotAutoJoinEYBrackets = 2
-AiPlayerbot.RandomBotAutoJoinICBrackets = 1
+# Playerbots.RandomBotAutoJoinWSBrackets = 0,1,2,3,4,5,6,7
+# Playerbots.RandomBotAutoJoinABBrackets = 0,1,2,3,4,5,6
+# Playerbots.RandomBotAutoJoinAVBrackets = 0,1,2,3
+# Playerbots.RandomBotAutoJoinEYBrackets = 0,1,2
+# Playerbots.RandomBotAutoJoinICBrackets = 0,1
+Playerbots.RandomBotAutoJoinWSBrackets = 7
+Playerbots.RandomBotAutoJoinABBrackets = 6
+Playerbots.RandomBotAutoJoinAVBrackets = 3
+Playerbots.RandomBotAutoJoinEYBrackets = 2
+Playerbots.RandomBotAutoJoinICBrackets = 1
 
 # Battlegrounds battles count (per bracket):
-AiPlayerbot.RandomBotAutoJoinBGWSCount = 1
-AiPlayerbot.RandomBotAutoJoinBGABCount = 1
-AiPlayerbot.RandomBotAutoJoinBGAVCount = 0
-AiPlayerbot.RandomBotAutoJoinBGEYCount = 1
-AiPlayerbot.RandomBotAutoJoinBGICCount = 0
+Playerbots.RandomBotAutoJoinBGWSCount = 1
+Playerbots.RandomBotAutoJoinBGABCount = 1
+Playerbots.RandomBotAutoJoinBGAVCount = 0
+Playerbots.RandomBotAutoJoinBGEYCount = 1
+Playerbots.RandomBotAutoJoinBGICCount = 0
 
 # Arena bracket (single bracket only):
 # Custom code changes are required for lower-level arena brackets to function properly.
-AiPlayerbot.RandomBotAutoJoinArenaBracket = 14
+Playerbots.RandomBotAutoJoinArenaBracket = 14
 
 # Arena battles count:
-AiPlayerbot.RandomBotAutoJoinBGRatedArena2v2Count = 0
-AiPlayerbot.RandomBotAutoJoinBGRatedArena3v3Count = 0
-AiPlayerbot.RandomBotAutoJoinBGRatedArena5v5Count = 0
+Playerbots.RandomBotAutoJoinBGRatedArena2v2Count = 0
+Playerbots.RandomBotAutoJoinBGRatedArena3v3Count = 0
+Playerbots.RandomBotAutoJoinBGRatedArena5v5Count = 0
 
 # Randombot arena team count
 # Teams are created when bots are initialized on server restart.
@@ -1692,28 +1692,28 @@ AiPlayerbot.RandomBotAutoJoinBGRatedArena5v5Count = 0
 # Warning: Reinitializing bots completely resets them (command in game: .playerbots rndbot init)
 # Bots only join one arena team to avoid queueing issues. Take that into account when increasing count.
 # Default: 2v2: 10 (20 Bots), 3v3: 10 (30 bots), 5v5: 5 (25 bots)
-AiPlayerbot.RandomBotArenaTeam2v2Count = 10
-AiPlayerbot.RandomBotArenaTeam3v3Count = 10
-AiPlayerbot.RandomBotArenaTeam5v5Count = 5
+Playerbots.RandomBotArenaTeam2v2Count = 10
+Playerbots.RandomBotArenaTeam3v3Count = 10
+Playerbots.RandomBotArenaTeam5v5Count = 5
 
 # Arena rating is randomized on team creation.
 # Default: Max: 2000, Min: 1000
-AiPlayerbot.RandomBotArenaTeamMaxRating = 2000
-AiPlayerbot.RandomBotArenaTeamMinRating = 1000
+Playerbots.RandomBotArenaTeamMaxRating = 2000
+Playerbots.RandomBotArenaTeamMinRating = 1000
 
 # Delete all randombot (and any addclass bot) arena teams on startup. While enabled,
 # no new randombot arena teams are created or joined. Set back to 0 and restart the
 # server to resume normal randombot arena team assignment.
-AiPlayerbot.DeleteRandomBotArenaTeams = 0
+Playerbots.DeleteRandomBotArenaTeams = 0
 
 # PvP Restricted Zones (bots will not initiate PvP or defend themselves if attacked)
-AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,3951"
+Playerbots.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,3951"
 
 # PvP Restricted Areas (bots will not initiate PvP or defend themselves if attacked)
-AiPlayerbot.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080,3938,3754,3786,3973,4085,4086,4087,4088"
+Playerbots.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080,3938,3754,3786,3973,4085,4086,4087,4088,251"
 
 # Improve reaction speeds in battlegrounds and arenas (may cause lag)
-AiPlayerbot.FastReactInBG = 1
+Playerbots.FastReactInBG = 1
 
 #
 #
@@ -1725,47 +1725,47 @@ AiPlayerbot.FastReactInBG = 1
 
 # How often (in seconds) the randombot manager runs its main update loop
 # Default: 20
-AiPlayerbot.RandomBotUpdateInterval = 20
+Playerbots.RandomBotUpdateInterval = 20
 
 # Minimum and maximum seconds before the manager re-evaluates and adjusts total randombot count
 # Defaults: 1800 (min), 7200 (max)
-AiPlayerbot.RandomBotCountChangeMinInterval = 1800
-AiPlayerbot.RandomBotCountChangeMaxInterval = 7200
+Playerbots.RandomBotCountChangeMinInterval = 1800
+Playerbots.RandomBotCountChangeMaxInterval = 7200
 
 # Minimum and maximum seconds a randombot will stay online before logging out
 # Defaults: 600 (min), 28800 (max)
-AiPlayerbot.MinRandomBotInWorldTime = 600
-AiPlayerbot.MaxRandomBotInWorldTime = 28800
+Playerbots.MinRandomBotInWorldTime = 600
+Playerbots.MaxRandomBotInWorldTime = 28800
 
 # Some aspects of randombots are periodically randomized while they are logged in and idle,
 # including their inventories and, if EquipAndSpecPersistence is disabled, their equipment and specs.
 # This config sets the minimum and maximum seconds between such randomization events.
 # Defaults: 7200 (min - 2 hours), 1209600 (max - 14 days)
-AiPlayerbot.MinRandomBotRandomizeTime = 7200
-AiPlayerbot.MaxRandomBotRandomizeTime = 1209600
+Playerbots.MinRandomBotRandomizeTime = 7200
+Playerbots.MaxRandomBotRandomizeTime = 1209600
 
 # Number of bots processed (login, logout, update) per manager update cycle
 # Default: 60
-AiPlayerbot.RandomBotsPerInterval = 60
+Playerbots.RandomBotsPerInterval = 60
 
 # Interval (in seconds) between periodic random bot statistics dumps in the log
 # (online count, level/race/class distribution, roles, status). Set to 0 to disable.
 # Default: 300
-AiPlayerbot.RandomBotPrintStatsInterval = 300
+Playerbots.RandomBotPrintStatsInterval = 300
 
 # Minimum and maximum seconds after death before a bot revives
 # Defaults: 60 (min), 300 (max)
-AiPlayerbot.MinRandomBotReviveTime = 60
-AiPlayerbot.MaxRandomBotReviveTime = 300
+Playerbots.MinRandomBotReviveTime = 60
+Playerbots.MaxRandomBotReviveTime = 300
 
 # Minimum and maximum seconds between bot teleports to new areas or zones
 # Defaults: 3600 (min), 18000 (max)
-AiPlayerbot.MinRandomBotTeleportInterval = 3600
-AiPlayerbot.MaxRandomBotTeleportInterval = 18000
+Playerbots.MinRandomBotTeleportInterval = 3600
+Playerbots.MaxRandomBotTeleportInterval = 18000
 
 # Number of seconds bots flagged as permanent stay in the world (31,104,000 ≈ 1 year)
 # Default: 31104000
-AiPlayerbot.PermanentlyInWorldTime = 31104000
+Playerbots.PermanentlyInWorldTime = 31104000
 
 #
 #
@@ -1781,9 +1781,9 @@ AiPlayerbot.PermanentlyInWorldTime = 31104000
 # INFORMATION
 #
 
-# AiPlayerbot.PremadeSpecName.<class>.<specno> = <name>         #Name of the talent specialisation
-# AiPlayerbot.PremadeSpecLink.<class>.<specno>.<level> = <link> #Wowhead style link the bot should work towards at given level.
-# AiPlayerbot.PremadeSpecGlyph.<class>.<specno> = <major 1>,<minor 1>,<major 2>,<minor 2>,<minor 3>,<major 3>   #ItemId of the glyphs
+# Playerbots.PremadeSpecName.<class>.<specno> = <name>         #Name of the talent specialisation
+# Playerbots.PremadeSpecLink.<class>.<specno>.<level> = <link> #Wowhead style link the bot should work towards at given level.
+# Playerbots.PremadeSpecGlyph.<class>.<specno> = <major 1>,<minor 1>,<major 2>,<minor 2>,<minor 3>,<major 3>   #ItemId of the glyphs
 # e.g., formulate the link on https://www.wowhead.com/wotlk/talent-calc/warrior/3022032123335100202012013031251-32505010002
 # 0 <= specno < 20, 1 <= level <= 80
 
@@ -1795,30 +1795,30 @@ AiPlayerbot.PermanentlyInWorldTime = 31104000
 # WARRIOR
 #
 
-AiPlayerbot.PremadeSpecName.1.0 = arms pve
-AiPlayerbot.PremadeSpecGlyph.1.0 = 43418,43395,43423,43399,43397,43421
-AiPlayerbot.PremadeSpecLink.1.0.60 = 3022032023335100002012211231241
-AiPlayerbot.PremadeSpecLink.1.0.80 = 3022032023335100102012213231251-305-2033
-AiPlayerbot.PremadeSpecName.1.1 = fury pve
-AiPlayerbot.PremadeSpecGlyph.1.1 = 43418,43395,43414,43396,49084,43432
-AiPlayerbot.PremadeSpecLink.1.1.60 = -305053000500310053120501351
-AiPlayerbot.PremadeSpecLink.1.1.80 = 32002300233-305053000500310153120511351
-AiPlayerbot.PremadeSpecName.1.2 = prot pve
-AiPlayerbot.PremadeSpecGlyph.1.2 = 43429,43397,43425,43399,49084,45797
-AiPlayerbot.PremadeSpecLink.1.2.60 = --053351225000210521030113321
-AiPlayerbot.PremadeSpecLink.1.2.80 = 3500030023-301-053351225000210521030113321
-AiPlayerbot.PremadeSpecName.1.3 = arms pvp
-AiPlayerbot.PremadeSpecGlyph.1.3 = 43417,43397,43423,43396,49084,43421
-AiPlayerbot.PremadeSpecLink.1.3.60 = 0320232023331100032212012221251
-AiPlayerbot.PremadeSpecLink.1.3.80 = 0320332023335100232212013231251-3250001
-AiPlayerbot.PremadeSpecName.1.4 = fury pvp
-AiPlayerbot.PremadeSpecGlyph.1.4 = 43432,43397,43417,43395,43396,43418
-AiPlayerbot.PremadeSpecLink.1.4.60 = -325000131500212250120511351
-AiPlayerbot.PremadeSpecLink.1.4.80 = 03220300233-325000131500212250122511351
-AiPlayerbot.PremadeSpecName.1.5 = prot pvp
-AiPlayerbot.PremadeSpecGlyph.1.5 = 43425,43397,43415,43396,49084,45792
-AiPlayerbot.PremadeSpecLink.1.5.60 = --250031220223012520332113321
-AiPlayerbot.PremadeSpecLink.1.5.80 = 0502300123-3-250031220223012521332113321
+Playerbots.PremadeSpecName.1.0 = arms pve
+Playerbots.PremadeSpecGlyph.1.0 = 43418,43395,43423,43399,43397,43421
+Playerbots.PremadeSpecLink.1.0.60 = 3022032023335100002012211231241
+Playerbots.PremadeSpecLink.1.0.80 = 3022032023335100102012213231251-305-2033
+Playerbots.PremadeSpecName.1.1 = fury pve
+Playerbots.PremadeSpecGlyph.1.1 = 43418,43395,43414,43396,49084,43432
+Playerbots.PremadeSpecLink.1.1.60 = -305053000500310053120501351
+Playerbots.PremadeSpecLink.1.1.80 = 32002300233-305053000500310153120511351
+Playerbots.PremadeSpecName.1.2 = prot pve
+Playerbots.PremadeSpecGlyph.1.2 = 43429,43397,43425,43399,49084,45797
+Playerbots.PremadeSpecLink.1.2.60 = --053351225000210521030113321
+Playerbots.PremadeSpecLink.1.2.80 = 3500030023-301-053351225000210521030113321
+Playerbots.PremadeSpecName.1.3 = arms pvp
+Playerbots.PremadeSpecGlyph.1.3 = 43417,43397,43423,43396,49084,43421
+Playerbots.PremadeSpecLink.1.3.60 = 0320232023331100032212012221251
+Playerbots.PremadeSpecLink.1.3.80 = 0320332023335100232212013231251-3250001
+Playerbots.PremadeSpecName.1.4 = fury pvp
+Playerbots.PremadeSpecGlyph.1.4 = 43432,43397,43417,43395,43396,43418
+Playerbots.PremadeSpecLink.1.4.60 = -325000131500212250120511351
+Playerbots.PremadeSpecLink.1.4.80 = 03220300233-325000131500212250122511351
+Playerbots.PremadeSpecName.1.5 = prot pvp
+Playerbots.PremadeSpecGlyph.1.5 = 43425,43397,43415,43396,49084,45792
+Playerbots.PremadeSpecLink.1.5.60 = --250031220223012520332113321
+Playerbots.PremadeSpecLink.1.5.80 = 0502300123-3-250031220223012521332113321
 
 #
 #
@@ -1828,31 +1828,31 @@ AiPlayerbot.PremadeSpecLink.1.5.80 = 0502300123-3-250031220223012521332113321
 # PALADIN
 #
 
-AiPlayerbot.PremadeSpecName.2.0 = holy pve
-AiPlayerbot.PremadeSpecGlyph.2.0 = 41106,43367,45741,43368,43365,41109
-AiPlayerbot.PremadeSpecLink.2.0.60 = 50350151020013053100515221
-AiPlayerbot.PremadeSpecLink.2.0.80 = 50350152100013053100515221-50320104203
-AiPlayerbot.PremadeSpecName.2.1 = prot pve
-AiPlayerbot.PremadeSpecGlyph.2.1 = 41100,43367,43869,43368,43369,45745
-AiPlayerbot.PremadeSpecLink.2.1.60 = -05005135203102311333112321
-AiPlayerbot.PremadeSpecLink.2.1.80 = -05005135203102311333312321-502302012003
-AiPlayerbot.PremadeSpecName.2.2 = ret pve
-AiPlayerbot.PremadeSpecGlyph.2.2 = 41092,43367,41099,43368,43340,43869
-AiPlayerbot.PremadeSpecLink.2.2.60 = --05230051203331302133231131
-AiPlayerbot.PremadeSpecLink.2.2.65 = -05-05230051203331302133231131
-AiPlayerbot.PremadeSpecLink.2.2.80 = 050501-05-05232051203331302133231331
-AiPlayerbot.PremadeSpecName.2.3 = holy pvp
-AiPlayerbot.PremadeSpecGlyph.2.3 = 41110,43367,45746,43369,43365,45747
-AiPlayerbot.PremadeSpecLink.2.3.60 = 50332150300013050133215221
-AiPlayerbot.PremadeSpecLink.2.3.80 = 50332150300013050133315221-5032013122
-AiPlayerbot.PremadeSpecName.2.4 = prot pvp
-AiPlayerbot.PremadeSpecGlyph.2.4 = 41092,43367,41101,43369,43365,45745
-AiPlayerbot.PremadeSpecLink.2.4.60 = -15320130223122311323311321
-AiPlayerbot.PremadeSpecLink.2.4.80 = -15320130223122321333312321-052300502
-AiPlayerbot.PremadeSpecName.2.5 = ret pvp
-AiPlayerbot.PremadeSpecGlyph.2.5 = 41095,43367,41102,43369,43365,45747
-AiPlayerbot.PremadeSpecLink.2.5.60 = --05230250203331222133201321
-AiPlayerbot.PremadeSpecLink.2.5.80 = -1532013022-05230250203331322133201321
+Playerbots.PremadeSpecName.2.0 = holy pve
+Playerbots.PremadeSpecGlyph.2.0 = 41106,43367,45741,43368,43365,41109
+Playerbots.PremadeSpecLink.2.0.60 = 50350151020013053100515221
+Playerbots.PremadeSpecLink.2.0.80 = 50350152100013053100515221-50320104203
+Playerbots.PremadeSpecName.2.1 = prot pve
+Playerbots.PremadeSpecGlyph.2.1 = 41100,43367,43869,43368,43369,45745
+Playerbots.PremadeSpecLink.2.1.60 = -05005135203102311333112321
+Playerbots.PremadeSpecLink.2.1.80 = -05005135203102311333312321-502302012003
+Playerbots.PremadeSpecName.2.2 = ret pve
+Playerbots.PremadeSpecGlyph.2.2 = 41092,43367,41099,43368,43340,43869
+Playerbots.PremadeSpecLink.2.2.60 = --05230051203331302133231131
+Playerbots.PremadeSpecLink.2.2.65 = -05-05230051203331302133231131
+Playerbots.PremadeSpecLink.2.2.80 = 050501-05-05232051203331302133231331
+Playerbots.PremadeSpecName.2.3 = holy pvp
+Playerbots.PremadeSpecGlyph.2.3 = 41110,43367,45746,43369,43365,45747
+Playerbots.PremadeSpecLink.2.3.60 = 50332150300013050133215221
+Playerbots.PremadeSpecLink.2.3.80 = 50332150300013050133315221-5032013122
+Playerbots.PremadeSpecName.2.4 = prot pvp
+Playerbots.PremadeSpecGlyph.2.4 = 41092,43367,41101,43369,43365,45745
+Playerbots.PremadeSpecLink.2.4.60 = -15320130223122311323311321
+Playerbots.PremadeSpecLink.2.4.80 = -15320130223122321333312321-052300502
+Playerbots.PremadeSpecName.2.5 = ret pvp
+Playerbots.PremadeSpecGlyph.2.5 = 41095,43367,41102,43369,43365,45747
+Playerbots.PremadeSpecLink.2.5.60 = --05230250203331222133201321
+Playerbots.PremadeSpecLink.2.5.80 = -1532013022-05230250203331322133201321
 
 #
 #
@@ -1862,44 +1862,44 @@ AiPlayerbot.PremadeSpecLink.2.5.80 = -1532013022-05230250203331322133201321
 # HUNTER
 #
 
-AiPlayerbot.PremadeSpecName.3.0 = bm pve
-AiPlayerbot.PremadeSpecGlyph.3.0 = 42912,43350,42902,43351,43338,42914
-AiPlayerbot.PremadeSpecLink.3.0.40 = 512002015051122301
-AiPlayerbot.PremadeSpecLink.3.0.60 = 51200201505112233110531151
-AiPlayerbot.PremadeSpecLink.3.0.80 = 51200201505112233111531351-0323031-5
-AiPlayerbot.PremadeSpecName.3.1 = mm pve
-AiPlayerbot.PremadeSpecGlyph.3.1 = 42912,43350,45625,43351,43338,42914
-AiPlayerbot.PremadeSpecLink.3.1.60 = -035305101030013233115031151
-AiPlayerbot.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
-AiPlayerbot.PremadeSpecName.3.2 = surv pve
-AiPlayerbot.PremadeSpecGlyph.3.2 = 45733,43350,45731,43351,43338,45732
-AiPlayerbot.PremadeSpecLink.3.2.60 = --5000032500033330502135201311
-AiPlayerbot.PremadeSpecLink.3.2.80 = -005305101-5000032500033330532135301321
-AiPlayerbot.PremadeSpecName.3.3 = bm pvp
-AiPlayerbot.PremadeSpecGlyph.3.3 = 42897,42900,42902,43356,43338,42900
-AiPlayerbot.PremadeSpecLink.3.3.60 = 05203201505012233100531151
-AiPlayerbot.PremadeSpecLink.3.3.80 = 05203201505012233100531351-005305101-03
-AiPlayerbot.PremadeSpecName.3.4 = mm pvp
-AiPlayerbot.PremadeSpecGlyph.3.4 = 42912,43351,42897,43338,43356,42904
-AiPlayerbot.PremadeSpecLink.3.4.60 = -034305101030213231135031051
-AiPlayerbot.PremadeSpecLink.3.4.80 = -035305101030213233135031051-53013020102
-AiPlayerbot.PremadeSpecName.3.5 = surv pvp
-AiPlayerbot.PremadeSpecGlyph.3.5 = 42912,43350,42904,43356,43338,45731
-AiPlayerbot.PremadeSpecLink.3.5.60 = --2300302410233030533135001031
-AiPlayerbot.PremadeSpecLink.3.5.80 = -005305201-2300302510233330533135001031
+Playerbots.PremadeSpecName.3.0 = bm pve
+Playerbots.PremadeSpecGlyph.3.0 = 42912,43350,42902,43351,43338,42914
+Playerbots.PremadeSpecLink.3.0.40 = 512002015051122301
+Playerbots.PremadeSpecLink.3.0.60 = 51200201505112233110531151
+Playerbots.PremadeSpecLink.3.0.80 = 51200201505112233111531351-0323031-5
+Playerbots.PremadeSpecName.3.1 = mm pve
+Playerbots.PremadeSpecGlyph.3.1 = 42912,43350,45625,43351,43338,42914
+Playerbots.PremadeSpecLink.3.1.60 = -035305101030013233115031151
+Playerbots.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
+Playerbots.PremadeSpecName.3.2 = surv pve
+Playerbots.PremadeSpecGlyph.3.2 = 45733,43350,45731,43351,43338,45732
+Playerbots.PremadeSpecLink.3.2.60 = --5000032500033330502135201311
+Playerbots.PremadeSpecLink.3.2.80 = -005305101-5000032500033330532135301321
+Playerbots.PremadeSpecName.3.3 = bm pvp
+Playerbots.PremadeSpecGlyph.3.3 = 42897,42900,42902,43356,43338,42900
+Playerbots.PremadeSpecLink.3.3.60 = 05203201505012233100531151
+Playerbots.PremadeSpecLink.3.3.80 = 05203201505012233100531351-005305101-03
+Playerbots.PremadeSpecName.3.4 = mm pvp
+Playerbots.PremadeSpecGlyph.3.4 = 42912,43351,42897,43338,43356,42904
+Playerbots.PremadeSpecLink.3.4.60 = -034305101030213231135031051
+Playerbots.PremadeSpecLink.3.4.80 = -035305101030213233135031051-53013020102
+Playerbots.PremadeSpecName.3.5 = surv pvp
+Playerbots.PremadeSpecGlyph.3.5 = 42912,43350,42904,43356,43338,45731
+Playerbots.PremadeSpecLink.3.5.60 = --2300302410233030533135001031
+Playerbots.PremadeSpecLink.3.5.80 = -005305201-2300302510233330533135001031
 
 
 # HUNTER PET
 #
 # Ferocity
-AiPlayerbot.PremadeHunterPetLink.0.16 = 2100003130003010101
-AiPlayerbot.PremadeHunterPetLink.0.20 = 2100003130103010122
+Playerbots.PremadeHunterPetLink.0.16 = 2100003130003010101
+Playerbots.PremadeHunterPetLink.0.20 = 2100003130103010122
 # Tenacity
-AiPlayerbot.PremadeHunterPetLink.1.16 = 21103000300120101001
-AiPlayerbot.PremadeHunterPetLink.1.20 = 21303010300120101002
+Playerbots.PremadeHunterPetLink.1.16 = 21103000300120101001
+Playerbots.PremadeHunterPetLink.1.20 = 21303010300120101002
 # Cunning
-AiPlayerbot.PremadeHunterPetLink.2.16 = 2100020330000211001
-AiPlayerbot.PremadeHunterPetLink.2.20 = 21000203300002110221
+Playerbots.PremadeHunterPetLink.2.16 = 2100020330000211001
+Playerbots.PremadeHunterPetLink.2.20 = 21000203300002110221
 
 #
 #
@@ -1909,30 +1909,30 @@ AiPlayerbot.PremadeHunterPetLink.2.20 = 21000203300002110221
 # ROGUE
 #
 
-AiPlayerbot.PremadeSpecName.4.0 = as pve
-AiPlayerbot.PremadeSpecGlyph.4.0 = 45768,43379,45761,43380,43378,45766
-AiPlayerbot.PremadeSpecLink.4.0.60 = 005303104352100520103331051
-AiPlayerbot.PremadeSpecLink.4.0.80 = 005303005352100520103331051-005005003-502
-AiPlayerbot.PremadeSpecName.4.1 = combat pve
-AiPlayerbot.PremadeSpecGlyph.4.1 = 42962,43379,45762,43380,43378,42969
-AiPlayerbot.PremadeSpecLink.4.1.60 = -0252051000035015223100501251
-AiPlayerbot.PremadeSpecLink.4.1.80 = 00532000523-0252051000035015223100501251
-AiPlayerbot.PremadeSpecName.4.2 = subtlety pve
-AiPlayerbot.PremadeSpecGlyph.4.2 = 42967,43379,45764,43380,43378,45767
-AiPlayerbot.PremadeSpecLink.4.2.60 = --5022012030321121350115031151
-AiPlayerbot.PremadeSpecLink.4.2.80 = 30532010114--5022012030321121350115031151
-AiPlayerbot.PremadeSpecName.4.3 = as pvp
-AiPlayerbot.PremadeSpecGlyph.4.3 = 42974,43380,45768,43379,43376,42971
-AiPlayerbot.PremadeSpecLink.4.3.60 = 005303103342102522103031--50002
-AiPlayerbot.PremadeSpecLink.4.3.80 = 005303103342102522103031-004-532023203000012
-AiPlayerbot.PremadeSpecName.4.4 = combat pvp
-AiPlayerbot.PremadeSpecGlyph.4.4 = 42972,43380,45762,43376,43378,42971
-AiPlayerbot.PremadeSpecLink.4.4.60 = -3250002050225010223102321251
-AiPlayerbot.PremadeSpecLink.4.4.80 = 305120105-3250002050235010223102521251
-AiPlayerbot.PremadeSpecName.4.5 = subtlety pvp
-AiPlayerbot.PremadeSpecGlyph.4.5 = 42968,43376,45764,43380,43379,42971
-AiPlayerbot.PremadeSpecLink.4.5.60 = --5120212030320121330133221251
-AiPlayerbot.PremadeSpecLink.4.5.80 = 3023031-3-5120212030320121350135231251
+Playerbots.PremadeSpecName.4.0 = as pve
+Playerbots.PremadeSpecGlyph.4.0 = 45768,43379,45761,43380,43378,45766
+Playerbots.PremadeSpecLink.4.0.60 = 005303104352100520103331051
+Playerbots.PremadeSpecLink.4.0.80 = 005303005352100520103331051-005005003-502
+Playerbots.PremadeSpecName.4.1 = combat pve
+Playerbots.PremadeSpecGlyph.4.1 = 42962,43379,45762,43380,43378,42969
+Playerbots.PremadeSpecLink.4.1.60 = -0252051000035015223100501251
+Playerbots.PremadeSpecLink.4.1.80 = 00532000523-0252051000035015223100501251
+Playerbots.PremadeSpecName.4.2 = subtlety pve
+Playerbots.PremadeSpecGlyph.4.2 = 42967,43379,45764,43380,43378,45767
+Playerbots.PremadeSpecLink.4.2.60 = --5022012030321121350115031151
+Playerbots.PremadeSpecLink.4.2.80 = 30532010114--5022012030321121350115031151
+Playerbots.PremadeSpecName.4.3 = as pvp
+Playerbots.PremadeSpecGlyph.4.3 = 42974,43380,45768,43379,43376,42971
+Playerbots.PremadeSpecLink.4.3.60 = 005303103342102522103031--50002
+Playerbots.PremadeSpecLink.4.3.80 = 005303103342102522103031-004-532023203000012
+Playerbots.PremadeSpecName.4.4 = combat pvp
+Playerbots.PremadeSpecGlyph.4.4 = 42972,43380,45762,43376,43378,42971
+Playerbots.PremadeSpecLink.4.4.60 = -3250002050225010223102321251
+Playerbots.PremadeSpecLink.4.4.80 = 305120105-3250002050235010223102521251
+Playerbots.PremadeSpecName.4.5 = subtlety pvp
+Playerbots.PremadeSpecGlyph.4.5 = 42968,43376,45764,43380,43379,42971
+Playerbots.PremadeSpecLink.4.5.60 = --5120212030320121330133221251
+Playerbots.PremadeSpecLink.4.5.80 = 3023031-3-5120212030320121350135231251
 
 #
 #
@@ -1942,30 +1942,30 @@ AiPlayerbot.PremadeSpecLink.4.5.80 = 3023031-3-5120212030320121350135231251
 # PRIEST
 #
 
-AiPlayerbot.PremadeSpecName.5.0 = disc pve
-AiPlayerbot.PremadeSpecGlyph.5.0 = 42408,43371,42400,43374,43342,45756
-AiPlayerbot.PremadeSpecLink.5.0.60 = 0503203130300512301323131051
-AiPlayerbot.PremadeSpecLink.5.0.80 = 0503203130300512331323231251-03520103
-AiPlayerbot.PremadeSpecName.5.1 = holy pve
-AiPlayerbot.PremadeSpecGlyph.5.1 = 42408,43371,42400,43374,43342,42396
-AiPlayerbot.PremadeSpecLink.5.1.60 = -035050031301152530000331331
-AiPlayerbot.PremadeSpecLink.5.1.80 = 05032031-235050032302152530000331351
-AiPlayerbot.PremadeSpecName.5.2 = shadow pve
-AiPlayerbot.PremadeSpecGlyph.5.2 = 45753,43371,42407,43374,43370,42415
-AiPlayerbot.PremadeSpecLink.5.2.60 = --325003041203010323150301351
-AiPlayerbot.PremadeSpecLink.5.2.80 = 0503203--325023051223010323152301351
-AiPlayerbot.PremadeSpecName.5.3 = disc pvp
-AiPlayerbot.PremadeSpecGlyph.5.3 = 42408,43371,45760,43370,43374,45756
-AiPlayerbot.PremadeSpecLink.5.3.60 = 5003203130320512201323031051
-AiPlayerbot.PremadeSpecLink.5.3.80 = 5003203130322512331013231151-23050113
-AiPlayerbot.PremadeSpecName.5.4 = holy pvp
-AiPlayerbot.PremadeSpecGlyph.5.4 = 42411,43371,42408,43370,43374,45755
-AiPlayerbot.PremadeSpecLink.5.4.60 = -235501031000152430320031151
-AiPlayerbot.PremadeSpecLink.5.4.80 = 500320313-235501031000152530320031351
-AiPlayerbot.PremadeSpecName.5.5 = shadow pvp
-AiPlayerbot.PremadeSpecGlyph.5.5 = 42407,43371,45753,43370,43374,42408
-AiPlayerbot.PremadeSpecLink.5.5.60 = --005323241223112003102311351
-AiPlayerbot.PremadeSpecLink.5.5.80 = 50332031003--005323241223112003102311351
+Playerbots.PremadeSpecName.5.0 = disc pve
+Playerbots.PremadeSpecGlyph.5.0 = 42408,43371,42400,43374,43342,45756
+Playerbots.PremadeSpecLink.5.0.60 = 0503203130300512301323131051
+Playerbots.PremadeSpecLink.5.0.80 = 0503203130300512331323231251-03520103
+Playerbots.PremadeSpecName.5.1 = holy pve
+Playerbots.PremadeSpecGlyph.5.1 = 42408,43371,42400,43374,43342,42396
+Playerbots.PremadeSpecLink.5.1.60 = -035050031301152530000331331
+Playerbots.PremadeSpecLink.5.1.80 = 05032031-235050032302152530000331351
+Playerbots.PremadeSpecName.5.2 = shadow pve
+Playerbots.PremadeSpecGlyph.5.2 = 45753,43371,42407,43374,43370,42415
+Playerbots.PremadeSpecLink.5.2.60 = --325003041203010323150301351
+Playerbots.PremadeSpecLink.5.2.80 = 0503203--325023051223010323152301351
+Playerbots.PremadeSpecName.5.3 = disc pvp
+Playerbots.PremadeSpecGlyph.5.3 = 42408,43371,45760,43370,43374,45756
+Playerbots.PremadeSpecLink.5.3.60 = 5003203130320512201323031051
+Playerbots.PremadeSpecLink.5.3.80 = 5003203130322512331013231151-23050113
+Playerbots.PremadeSpecName.5.4 = holy pvp
+Playerbots.PremadeSpecGlyph.5.4 = 42411,43371,42408,43370,43374,45755
+Playerbots.PremadeSpecLink.5.4.60 = -235501031000152430320031151
+Playerbots.PremadeSpecLink.5.4.80 = 500320313-235501031000152530320031351
+Playerbots.PremadeSpecName.5.5 = shadow pvp
+Playerbots.PremadeSpecGlyph.5.5 = 42407,43371,45753,43370,43374,42408
+Playerbots.PremadeSpecLink.5.5.60 = --005323241223112003102311351
+Playerbots.PremadeSpecLink.5.5.80 = 50332031003--005323241223112003102311351
 
 #
 #
@@ -1975,34 +1975,34 @@ AiPlayerbot.PremadeSpecLink.5.5.80 = 50332031003--005323241223112003102311351
 # DEATH KNIGHT
 #
 
-AiPlayerbot.PremadeSpecName.6.0 = blood pve
-AiPlayerbot.PremadeSpecGlyph.6.0 = 45805,43673,43538,43544,43672,43542
-AiPlayerbot.PremadeSpecLink.6.0.60 = 035502150300331320102013111-005
-AiPlayerbot.PremadeSpecLink.6.0.80 = 0055021533303310201020131-305020510002-00522
-AiPlayerbot.PremadeSpecName.6.1 = frost pve
-AiPlayerbot.PremadeSpecGlyph.6.1 = 45805,43673,43547,43544,43672,43543
-AiPlayerbot.PremadeSpecLink.6.1.60 = -32003350332203012300023101351
-AiPlayerbot.PremadeSpecLink.6.1.80 = -32002350352203012300033101351-230200305003
-AiPlayerbot.PremadeSpecName.6.2 = unholy pve
-AiPlayerbot.PremadeSpecGlyph.6.2 = 43542,43673,43546,43535,43672,43549
-AiPlayerbot.PremadeSpecLink.6.2.60 = --2301303050032151000150013131151
-AiPlayerbot.PremadeSpecLink.6.2.80 = 23050202--2302303350032152000150003133151
-AiPlayerbot.PremadeSpecName.6.3 = double aura blood pve
-AiPlayerbot.PremadeSpecGlyph.6.3 = 45805,43673,43538,43544,43672,43554
-AiPlayerbot.PremadeSpecLink.6.3.60 = 005512153330030320102013-305
-AiPlayerbot.PremadeSpecLink.6.3.80 = 005512153330030320102013-3050505002023001-002
-AiPlayerbot.PremadeSpecName.6.4 = blood pvp
-AiPlayerbot.PremadeSpecGlyph.6.4 = 43534,43535,45799,43673,43672,45805
-AiPlayerbot.PremadeSpecLink.6.4.60 = 2305021503003313201222101351
-AiPlayerbot.PremadeSpecLink.6.4.80 = 2305021503003313201222101351--032232300023
-AiPlayerbot.PremadeSpecName.6.5 = frost pvp
-AiPlayerbot.PremadeSpecGlyph.6.5 = 43543,43539,45800,43673,43672,45806
-AiPlayerbot.PremadeSpecLink.6.5.60 = -32015351022203012001233101251
-AiPlayerbot.PremadeSpecLink.6.5.80 = 0055-32015351052203012001233131351-03
-AiPlayerbot.PremadeSpecName.6.6 = unholy pvp
-AiPlayerbot.PremadeSpecGlyph.6.6 = 45804,43539,43549,43673,43672,45805
-AiPlayerbot.PremadeSpecLink.6.6.60 = --2301323301002152230101203103151
-AiPlayerbot.PremadeSpecLink.6.6.80 = -320050410002-2301323301002152230101203133151
+Playerbots.PremadeSpecName.6.0 = blood pve
+Playerbots.PremadeSpecGlyph.6.0 = 45805,43673,43538,43544,43672,43542
+Playerbots.PremadeSpecLink.6.0.60 = 035502150300331320102013111-005
+Playerbots.PremadeSpecLink.6.0.80 = 0055021533303310201020131-305020510002-00522
+Playerbots.PremadeSpecName.6.1 = frost pve
+Playerbots.PremadeSpecGlyph.6.1 = 45805,43673,43547,43544,43672,43543
+Playerbots.PremadeSpecLink.6.1.60 = -32003350332203012300023101351
+Playerbots.PremadeSpecLink.6.1.80 = -32002350352203012300033101351-230200305003
+Playerbots.PremadeSpecName.6.2 = unholy pve
+Playerbots.PremadeSpecGlyph.6.2 = 43542,43673,43546,43535,43672,43549
+Playerbots.PremadeSpecLink.6.2.60 = --2301303050032151000150013131151
+Playerbots.PremadeSpecLink.6.2.80 = 23050202--2302303350032152000150003133151
+Playerbots.PremadeSpecName.6.3 = double aura blood pve
+Playerbots.PremadeSpecGlyph.6.3 = 45805,43673,43538,43544,43672,43554
+Playerbots.PremadeSpecLink.6.3.60 = 005512153330030320102013-305
+Playerbots.PremadeSpecLink.6.3.80 = 005512153330030320102013-3050505002023001-002
+Playerbots.PremadeSpecName.6.4 = blood pvp
+Playerbots.PremadeSpecGlyph.6.4 = 43534,43535,45799,43673,43672,45805
+Playerbots.PremadeSpecLink.6.4.60 = 2305021503003313201222101351
+Playerbots.PremadeSpecLink.6.4.80 = 2305021503003313201222101351--032232300023
+Playerbots.PremadeSpecName.6.5 = frost pvp
+Playerbots.PremadeSpecGlyph.6.5 = 43543,43539,45800,43673,43672,45806
+Playerbots.PremadeSpecLink.6.5.60 = -32015351022203012001233101251
+Playerbots.PremadeSpecLink.6.5.80 = 0055-32015351052203012001233131351-03
+Playerbots.PremadeSpecName.6.6 = unholy pvp
+Playerbots.PremadeSpecGlyph.6.6 = 45804,43539,43549,43673,43672,45805
+Playerbots.PremadeSpecLink.6.6.60 = --2301323301002152230101203103151
+Playerbots.PremadeSpecLink.6.6.80 = -320050410002-2301323301002152230101203133151
 
 #
 #
@@ -2012,30 +2012,30 @@ AiPlayerbot.PremadeSpecLink.6.6.80 = -320050410002-23013233010021522301012031331
 # SHAMAN
 #
 
-AiPlayerbot.PremadeSpecName.7.0 = ele pve
-AiPlayerbot.PremadeSpecGlyph.7.0 = 41536,43385,41532,43386,44923,45776
-AiPlayerbot.PremadeSpecLink.7.0.60 = 4530001520213351102301351
-AiPlayerbot.PremadeSpecLink.7.0.80 = 4530001523213351302301351-00525003
-AiPlayerbot.PremadeSpecName.7.1 = enh pve
-AiPlayerbot.PremadeSpecGlyph.7.1 = 41542,43385,41539,43386,43725,45771
-AiPlayerbot.PremadeSpecLink.7.1.60 = -30305003105021333031121131051
-AiPlayerbot.PremadeSpecLink.7.1.80 = 053030152-30305003105021333031131131051
-AiPlayerbot.PremadeSpecName.7.2 = resto pve
-AiPlayerbot.PremadeSpecGlyph.7.2 = 41527,43385,41517,43386,43725,45775
-AiPlayerbot.PremadeSpecLink.7.2.60 = --50005301235310501102321251
-AiPlayerbot.PremadeSpecLink.7.2.80 = -00502033-50005331335310501122331251
-AiPlayerbot.PremadeSpecName.7.3 = ele pvp
-AiPlayerbot.PremadeSpecGlyph.7.3 = 45778,43388,45770,43725,43386,41524
-AiPlayerbot.PremadeSpecLink.7.3.60 = 0533001503213051322301341
-AiPlayerbot.PremadeSpecLink.7.3.80 = 0533051503213051322331351-023212001
-AiPlayerbot.PremadeSpecName.7.4 = enh pvp
-AiPlayerbot.PremadeSpecGlyph.7.4 = 45778,43388,41526,43725,43344,45771
-AiPlayerbot.PremadeSpecLink.7.4.60 = -02305203105001333201131131151
-AiPlayerbot.PremadeSpecLink.7.4.80 = 0503351-02305203105001333211131231251
-AiPlayerbot.PremadeSpecName.7.5 = resto pvp
-AiPlayerbot.PremadeSpecGlyph.7.5 = 45778,43388,45775,43725,43344,41535
-AiPlayerbot.PremadeSpecLink.7.5.60 = --05032331331013501120321251
-AiPlayerbot.PremadeSpecLink.7.5.80 = -023222301004-05032331331013501120331251
+Playerbots.PremadeSpecName.7.0 = ele pve
+Playerbots.PremadeSpecGlyph.7.0 = 41536,43385,41532,43386,44923,45776
+Playerbots.PremadeSpecLink.7.0.60 = 4530001520213351102301351
+Playerbots.PremadeSpecLink.7.0.80 = 4530001523213351302301351-00525003
+Playerbots.PremadeSpecName.7.1 = enh pve
+Playerbots.PremadeSpecGlyph.7.1 = 41542,43385,41539,43386,43725,45771
+Playerbots.PremadeSpecLink.7.1.60 = -30305003105021333031121131051
+Playerbots.PremadeSpecLink.7.1.80 = 053030152-30305003105021333031131131051
+Playerbots.PremadeSpecName.7.2 = resto pve
+Playerbots.PremadeSpecGlyph.7.2 = 41527,43385,41517,43386,43725,45775
+Playerbots.PremadeSpecLink.7.2.60 = --50005301235310501102321251
+Playerbots.PremadeSpecLink.7.2.80 = -00502033-50005331335310501122331251
+Playerbots.PremadeSpecName.7.3 = ele pvp
+Playerbots.PremadeSpecGlyph.7.3 = 45778,43388,45770,43725,43386,41524
+Playerbots.PremadeSpecLink.7.3.60 = 0533001503213051322301341
+Playerbots.PremadeSpecLink.7.3.80 = 0533051503213051322331351-023212001
+Playerbots.PremadeSpecName.7.4 = enh pvp
+Playerbots.PremadeSpecGlyph.7.4 = 45778,43388,41526,43725,43344,45771
+Playerbots.PremadeSpecLink.7.4.60 = -02305203105001333201131131151
+Playerbots.PremadeSpecLink.7.4.80 = 0503351-02305203105001333211131231251
+Playerbots.PremadeSpecName.7.5 = resto pvp
+Playerbots.PremadeSpecGlyph.7.5 = 45778,43388,45775,43725,43344,41535
+Playerbots.PremadeSpecLink.7.5.60 = --05032331331013501120321251
+Playerbots.PremadeSpecLink.7.5.80 = -023222301004-05032331331013501120331251
 
 #
 #
@@ -2045,34 +2045,34 @@ AiPlayerbot.PremadeSpecLink.7.5.80 = -023222301004-05032331331013501120331251
 # MAGE
 #
 
-AiPlayerbot.PremadeSpecName.8.0 = arcane pve
-AiPlayerbot.PremadeSpecGlyph.8.0 = 42735,43339,44955,43364,43361,42751
-AiPlayerbot.PremadeSpecLink.8.0.60 = 230005231100330150323102500321
-AiPlayerbot.PremadeSpecLink.8.0.80 = 230005231100330150323102505321-03-203303001
-AiPlayerbot.PremadeSpecName.8.1 = fire pve
-AiPlayerbot.PremadeSpecGlyph.8.1 = 42739,43339,45737,43364,44920,42751
-AiPlayerbot.PremadeSpecLink.8.1.60 = -0055030011302231053120321341
-AiPlayerbot.PremadeSpecLink.8.1.80 = 23000503110003-0055032012303330053120300351
-AiPlayerbot.PremadeSpecName.8.2 = frost pve
-AiPlayerbot.PremadeSpecGlyph.8.2 = 42742,43339,50045,43364,43361,42751
-AiPlayerbot.PremadeSpecLink.8.2.60 = --0533030313203100030152231151
-AiPlayerbot.PremadeSpecLink.8.2.80 = 23002303110003--0533030313203100030152231351
-AiPlayerbot.PremadeSpecName.8.3 = frostfire pve
-AiPlayerbot.PremadeSpecGlyph.8.3 = 44684,44920,42751,43339,43364,45737
-AiPlayerbot.PremadeSpecLink.8.3.60 = -2305032012303331053120300051
-AiPlayerbot.PremadeSpecLink.8.3.80 = -2305032012303331053120321351-023302031
-AiPlayerbot.PremadeSpecName.8.4 = arcane pvp
-AiPlayerbot.PremadeSpecGlyph.8.4 = 42735,43364,42738,43360,43357,42752
-AiPlayerbot.PremadeSpecLink.8.4.60 = 205323200122032103303102015221
-AiPlayerbot.PremadeSpecLink.8.4.80 = 205323200122032103303102015321-23002-303020301
-AiPlayerbot.PremadeSpecName.8.5 = fire pvp
-AiPlayerbot.PremadeSpecGlyph.8.5 = 42738,43364,42752,43360,43357,45737
-AiPlayerbot.PremadeSpecLink.8.5.60 = -2305202312020031223122301351
-AiPlayerbot.PremadeSpecLink.8.5.80 = 230321030122-2305212312020031223122301351
-AiPlayerbot.PremadeSpecName.8.6 = frost pvp
-AiPlayerbot.PremadeSpecGlyph.8.6 = 42738,43364,45740,43357,43360,42752
-AiPlayerbot.PremadeSpecLink.8.6.60 = --3533203210203100232102231151
-AiPlayerbot.PremadeSpecLink.8.6.80 = 23032103010203--3533203210203100232102231151
+Playerbots.PremadeSpecName.8.0 = arcane pve
+Playerbots.PremadeSpecGlyph.8.0 = 42735,43339,44955,43364,43361,42751
+Playerbots.PremadeSpecLink.8.0.60 = 230005231100330150323102500321
+Playerbots.PremadeSpecLink.8.0.80 = 230005231100330150323102505321-03-203303001
+Playerbots.PremadeSpecName.8.1 = fire pve
+Playerbots.PremadeSpecGlyph.8.1 = 42739,43339,45737,43364,44920,42751
+Playerbots.PremadeSpecLink.8.1.60 = -0055030011302231053120321341
+Playerbots.PremadeSpecLink.8.1.80 = 23000503110003-0055032012303330053120300351
+Playerbots.PremadeSpecName.8.2 = frost pve
+Playerbots.PremadeSpecGlyph.8.2 = 42742,43339,50045,43364,43361,42751
+Playerbots.PremadeSpecLink.8.2.60 = --0533030313203100030152231151
+Playerbots.PremadeSpecLink.8.2.80 = 23002303110003--0533030313203100030152231351
+Playerbots.PremadeSpecName.8.3 = frostfire pve
+Playerbots.PremadeSpecGlyph.8.3 = 44684,44920,42751,43339,43364,45737
+Playerbots.PremadeSpecLink.8.3.60 = -2305032012303331053120300051
+Playerbots.PremadeSpecLink.8.3.80 = -2305032012303331053120321351-023302031
+Playerbots.PremadeSpecName.8.4 = arcane pvp
+Playerbots.PremadeSpecGlyph.8.4 = 42735,43364,42738,43360,43357,42752
+Playerbots.PremadeSpecLink.8.4.60 = 205323200122032103303102015221
+Playerbots.PremadeSpecLink.8.4.80 = 205323200122032103303102015321-23002-303020301
+Playerbots.PremadeSpecName.8.5 = fire pvp
+Playerbots.PremadeSpecGlyph.8.5 = 42738,43364,42752,43360,43357,45737
+Playerbots.PremadeSpecLink.8.5.60 = -2305202312020031223122301351
+Playerbots.PremadeSpecLink.8.5.80 = 230321030122-2305212312020031223122301351
+Playerbots.PremadeSpecName.8.6 = frost pvp
+Playerbots.PremadeSpecGlyph.8.6 = 42738,43364,45740,43357,43360,42752
+Playerbots.PremadeSpecLink.8.6.60 = --3533203210203100232102231151
+Playerbots.PremadeSpecLink.8.6.80 = 23032103010203--3533203210203100232102231151
 
 #
 #
@@ -2082,32 +2082,32 @@ AiPlayerbot.PremadeSpecLink.8.6.80 = 23032103010203--353320321020310023210223115
 # WARLOCK
 #
 
-AiPlayerbot.PremadeSpecName.9.0 = affli pve
-AiPlayerbot.PremadeSpecGlyph.9.0 = 45785,43390,50077,43394,43393,45779
-AiPlayerbot.PremadeSpecLink.9.0.60 = 2350022001113510053500131151
-AiPlayerbot.PremadeSpecLink.9.0.70 = 2350022001113510053500131151--55
-AiPlayerbot.PremadeSpecLink.9.0.80 = 2350022001123510253500331151--55000005
-AiPlayerbot.PremadeSpecName.9.1 = demo pve
-AiPlayerbot.PremadeSpecGlyph.9.1 = 45785,43390,50077,43394,43393,42459
-AiPlayerbot.PremadeSpecLink.9.1.60 = -003203301135112530135201051
-AiPlayerbot.PremadeSpecLink.9.1.70 = -003203301135112530135201051-55
-AiPlayerbot.PremadeSpecLink.9.1.80 = -003203301135112530135221351-55000005
-AiPlayerbot.PremadeSpecName.9.2 = destro pve
-AiPlayerbot.PremadeSpecGlyph.9.2 = 45785,43390,42454,43394,43393,42453
-AiPlayerbot.PremadeSpecLink.9.2.60 = --05203215200231051305031151
-AiPlayerbot.PremadeSpecLink.9.2.80 = 23-0302-05203215220331051335231351
-AiPlayerbot.PremadeSpecName.9.3 = affli pvp
-AiPlayerbot.PremadeSpecGlyph.9.3 = 50077,43392,42455,43390,43389,45783
-AiPlayerbot.PremadeSpecLink.9.3.60 = 0350002231223011053502301151
-AiPlayerbot.PremadeSpecLink.9.3.80 = 2350002231223111053502301151-2032003011302
-AiPlayerbot.PremadeSpecName.9.4 = demo pvp
-AiPlayerbot.PremadeSpecGlyph.9.4 = 42459,43392,45780,43390,43389,45783
-AiPlayerbot.PremadeSpecLink.9.4.60 = -003203301135202530135001251
-AiPlayerbot.PremadeSpecLink.9.4.80 = -003203301135202530135011351-052300152
-AiPlayerbot.PremadeSpecName.9.5 = destro pvp
-AiPlayerbot.PremadeSpecGlyph.9.5 = 42471,43392,42454,43390,43389,45783
-AiPlayerbot.PremadeSpecLink.9.5.60 = --05230015220331351005031051
-AiPlayerbot.PremadeSpecLink.9.5.80 = -2032003311302-05230015220331351005031051
+Playerbots.PremadeSpecName.9.0 = affli pve
+Playerbots.PremadeSpecGlyph.9.0 = 45785,43390,50077,43394,43393,45779
+Playerbots.PremadeSpecLink.9.0.60 = 2350022001113510053500131151
+Playerbots.PremadeSpecLink.9.0.70 = 2350022001113510053500131151--55
+Playerbots.PremadeSpecLink.9.0.80 = 2350022001123510253500331151--55000005
+Playerbots.PremadeSpecName.9.1 = demo pve
+Playerbots.PremadeSpecGlyph.9.1 = 45785,43390,50077,43394,43393,42459
+Playerbots.PremadeSpecLink.9.1.60 = -003203301135112530135201051
+Playerbots.PremadeSpecLink.9.1.70 = -003203301135112530135201051-55
+Playerbots.PremadeSpecLink.9.1.80 = -003203301135112530135221351-55000005
+Playerbots.PremadeSpecName.9.2 = destro pve
+Playerbots.PremadeSpecGlyph.9.2 = 45785,43390,42454,43394,43393,42453
+Playerbots.PremadeSpecLink.9.2.60 = --05203215200231051305031151
+Playerbots.PremadeSpecLink.9.2.80 = 23-0302-05203215220331051335231351
+Playerbots.PremadeSpecName.9.3 = affli pvp
+Playerbots.PremadeSpecGlyph.9.3 = 50077,43392,42455,43390,43389,45783
+Playerbots.PremadeSpecLink.9.3.60 = 0350002231223011053502301151
+Playerbots.PremadeSpecLink.9.3.80 = 2350002231223111053502301151-2032003011302
+Playerbots.PremadeSpecName.9.4 = demo pvp
+Playerbots.PremadeSpecGlyph.9.4 = 42459,43392,45780,43390,43389,45783
+Playerbots.PremadeSpecLink.9.4.60 = -003203301135202530135001251
+Playerbots.PremadeSpecLink.9.4.80 = -003203301135202530135011351-052300152
+Playerbots.PremadeSpecName.9.5 = destro pvp
+Playerbots.PremadeSpecGlyph.9.5 = 42471,43392,42454,43390,43389,45783
+Playerbots.PremadeSpecLink.9.5.60 = --05230015220331351005031051
+Playerbots.PremadeSpecLink.9.5.80 = -2032003311302-05230015220331351005031051
 
 #
 #
@@ -2117,34 +2117,34 @@ AiPlayerbot.PremadeSpecLink.9.5.80 = -2032003311302-05230015220331351005031051
 # DRUID
 #
 
-AiPlayerbot.PremadeSpecName.11.0 = balance pve
-AiPlayerbot.PremadeSpecGlyph.11.0 = 40916,43331,40921,43335,44922,40919
-AiPlayerbot.PremadeSpecLink.11.0.60 = 5032003125031003213304301231
-AiPlayerbot.PremadeSpecLink.11.0.80 = 5032003125331303213305301231--205003012
-AiPlayerbot.PremadeSpecName.11.1 = bear pve
-AiPlayerbot.PremadeSpecGlyph.11.1 = 40897,43331,46372,43335,43332,40899
-AiPlayerbot.PremadeSpecLink.11.1.60 = -503232132322010303120300013501
-AiPlayerbot.PremadeSpecLink.11.1.80 = -503232132322010353120303013511-20350001
-AiPlayerbot.PremadeSpecName.11.2 = resto pve
-AiPlayerbot.PremadeSpecGlyph.11.2 = 40906,43331,45602,43335,43674,45603
-AiPlayerbot.PremadeSpecLink.11.2.60 = --230033312031502331050313031
-AiPlayerbot.PremadeSpecLink.11.2.80 = 05320031--230033312031502431053313051
-AiPlayerbot.PremadeSpecName.11.3 = cat pve
-AiPlayerbot.PremadeSpecGlyph.11.3 = 40902,43331,40901,43674,43335,45604
-AiPlayerbot.PremadeSpecLink.11.3.60 = -552202032322010053100030310501
-AiPlayerbot.PremadeSpecLink.11.3.80 = -553202032322010053120030310511-203503012
-AiPlayerbot.PremadeSpecName.11.4 = balance pvp
-AiPlayerbot.PremadeSpecGlyph.11.4 = 40921,43331,45622,43674,43335,45623
-AiPlayerbot.PremadeSpecLink.11.4.60 = 5012203115331002213032311231
-AiPlayerbot.PremadeSpecLink.11.4.80 = 5022203125331003213035311231--230033012
-AiPlayerbot.PremadeSpecName.11.5 = cat pvp
-AiPlayerbot.PremadeSpecGlyph.11.5 = 40902,43331,45601,43674,43335,40901
-AiPlayerbot.PremadeSpecLink.11.5.60 = -513202032322010053103030310501
-AiPlayerbot.PremadeSpecLink.11.5.80 = -523202032322010053103030310511-205503012
-AiPlayerbot.PremadeSpecName.11.6 = resto pvp
-AiPlayerbot.PremadeSpecGlyph.11.6 = 40913,43331,40906,43335,43674,45623
-AiPlayerbot.PremadeSpecLink.11.6.60 = --230033312031500511350013051
-AiPlayerbot.PremadeSpecLink.11.6.80 = 05320021--230033312031500531353013251
+Playerbots.PremadeSpecName.11.0 = balance pve
+Playerbots.PremadeSpecGlyph.11.0 = 40916,43331,40921,43335,44922,40919
+Playerbots.PremadeSpecLink.11.0.60 = 5032003125031003213304301231
+Playerbots.PremadeSpecLink.11.0.80 = 5032003125331303213305301231--205003012
+Playerbots.PremadeSpecName.11.1 = bear pve
+Playerbots.PremadeSpecGlyph.11.1 = 40897,43331,46372,43335,43332,40899
+Playerbots.PremadeSpecLink.11.1.60 = -503232132322010303120300013501
+Playerbots.PremadeSpecLink.11.1.80 = -503232132322010353120303013511-20350001
+Playerbots.PremadeSpecName.11.2 = resto pve
+Playerbots.PremadeSpecGlyph.11.2 = 40906,43331,45602,43335,43674,45603
+Playerbots.PremadeSpecLink.11.2.60 = --230033312031502331050313031
+Playerbots.PremadeSpecLink.11.2.80 = 05320031--230033312031502431053313051
+Playerbots.PremadeSpecName.11.3 = cat pve
+Playerbots.PremadeSpecGlyph.11.3 = 40902,43331,40901,43674,43335,45604
+Playerbots.PremadeSpecLink.11.3.60 = -552202032322010053100030310501
+Playerbots.PremadeSpecLink.11.3.80 = -553202032322010053120030310511-203503012
+Playerbots.PremadeSpecName.11.4 = balance pvp
+Playerbots.PremadeSpecGlyph.11.4 = 40921,43331,45622,43674,43335,45623
+Playerbots.PremadeSpecLink.11.4.60 = 5012203115331002213032311231
+Playerbots.PremadeSpecLink.11.4.80 = 5022203125331003213035311231--230033012
+Playerbots.PremadeSpecName.11.5 = cat pvp
+Playerbots.PremadeSpecGlyph.11.5 = 40902,43331,45601,43674,43335,40901
+Playerbots.PremadeSpecLink.11.5.60 = -513202032322010053103030310501
+Playerbots.PremadeSpecLink.11.5.80 = -523202032322010053103030310511-205503012
+Playerbots.PremadeSpecName.11.6 = resto pvp
+Playerbots.PremadeSpecGlyph.11.6 = 40913,43331,40906,43335,43674,45623
+Playerbots.PremadeSpecLink.11.6.60 = --230033312031500511350013051
+Playerbots.PremadeSpecLink.11.6.80 = 05320021--230033312031500531353013251
 
 #
 #
@@ -2167,7 +2167,7 @@ AiPlayerbot.PremadeSpecLink.11.6.80 = 05320021--230033312031500531353013251
 # The default entries create a cross-faction level 60-69 Vanilla buffs, level 70-79 TBC buffs, and level 80 buffs for each implemented pve spec from the "Premade Specs" section
 # The default entries may be deleted or modified, and new custom entries may be added
 
-AiPlayerbot.WorldBuffMatrix = # WARRIOR ARMS 1:0,1,0,80,80:53760,57358; # WARRIOR FURY 2:0,1,1,80,80:53760,57358; # WARRIOR PROTECTION 3:0,1,2,80,80:53758,57356; # PALADIN HOLY 4:0,2,0,80,80:53749,57332,60347; # PALADIN PROTECTION 5:0,2,1,80,80:53758,57356; # PALADIN RETRIBUTION 6:0,2,2,80,80:53760,57371; # HUNTER BEAST 7:0,3,0,80,80:53760,57325; # HUNTER MARKSMANSHIP 8:0,3,1,80,80:53760,57358; # HUNTER SURVIVAL 9:0,3,2,80,80:53760,57367; # ROGUE ASSASSINATION 10:0,4,0,80,80:53760,57325; # ROGUE COMBAT 11:0,4,1,80,80:53760,57358; # ROGUE SUBTLETY 12:0,4,2,80,80:53760,57367; # PRIEST DISCIPLINE 13:0,5,0,80,80:53755,57327; # PRIEST HOLY 14:0,5,1,80,80:53755,57327; # PRIEST SHADOW 15:0,5,2,80,80:53755,57327; # DEATH KNIGHT BLOOD 16:0,6,0,80,80:53758,57356; # DEATH KNIGHT FROST 17:0,6,1,80,80:53760,57358; # DEATH KNIGHT UNHOLY 18:0,6,2,80,80:53760,57358; # DEATH KNIGHT BLOOD DPS 19:0,6,3,80,80:53760,57371; # SHAMAN ELEMENTAL 20:0,7,0,80,80:53755,57327; # SHAMAN ENHANCEMENT 21:0,7,1,80,80:53760,57325; # SHAMAN RESTORATION 22:0,7,2,80,80:53755,57327; # MAGE ARCANE 23:0,8,0,80,80:53755,57327; # MAGE FIRE 24:0,8,1,80,80:53755,57327; # MAGE FROST 25:0,8,2,80,80:53755,57327; # WARLOCK AFFLICTION 26:0,9,0,80,80:53755,57327; # WARLOCK DEMONOLOGY 27:0,9,1,80,80:53755,57327; # WARLOCK DESTRUCTION 28:0,9,2,80,80:53755,57327; # DRUID BALANCE 29:0,11,0,80,80:53755,57327; # DRUID FERAL BEAR 30:0,11,1,80,80:53749,53763,57367; # DRUID RESTORATION 31:0,11,2,80,80:54212,57334; # DRUID FERAL CAT 32:0,11,3,80,80:53760,57358; # WARRIOR ARMS TBC 33:0,1,0,70,79:28520,33256; # WARRIOR FURY TBC 34:0,1,1,70,79:28520,33256; # WARRIOR PROTECTION TBC 35:0,1,2,70,79:28518,33257; # PALADIN HOLY TBC 36:0,2,0,70,79:28491,39627,33263; # PALADIN PROTECTION TBC 37:0,2,1,70,79:28518,33257; # PALADIN RETRIBUTION TBC 38:0,2,2,70,79:28520,33256; # HUNTER BEAST TBC 39:0,3,0,70,79:28520,33261; # HUNTER MARKSMANSHIP TBC 40:0,3,1,70,79:28520,33261; # HUNTER SURVIVAL TBC 41:0,3,2,70,79:28520,33261; # ROGUE ASSASSINATION TBC 42:0,4,0,70,79:28520,33261; # ROGUE COMBAT TBC 43:0,4,1,70,79:28520,33261; # ROGUE SUBTLETY TBC 44:0,4,2,70,79:28520,33261; # PRIEST DISCIPLINE TBC 45:0,5,0,70,79:28491,39627,33263; # PRIEST HOLY TBC 46:0,5,1,70,79:28491,39627,33263; # PRIEST SHADOW TBC 47:0,5,2,70,79:28540,33263; # SHAMAN ELEMENTAL TBC 48:0,7,0,70,79:28521,33263; # SHAMAN ENHANCEMENT TBC 49:0,7,1,70,79:28520,33261; # SHAMAN RESTORATION TBC 50:0,7,2,70,79:28491,39627,33263; # MAGE ARCANE TBC 51:0,8,0,70,79:28521,33263; # MAGE FIRE TBC 52:0,8,1,70,79:28540,33263; # MAGE FROST TBC 53:0,8,2,70,79:28540,33263; # WARLOCK AFFLICTION TBC 54:0,9,0,70,79:28540,33263; # WARLOCK DEMONOLOGY TBC 55:0,9,1,70,79:28540,33263; # WARLOCK DESTRUCTION TBC 56:0,9,2,70,79:28540,33263; # DRUID BALANCE TBC 57:0,11,0,70,79:28521,33263; # DRUID FERAL BEAR TBC 58:0,11,1,70,79:28518,33257; # DRUID RESTORATION TBC 59:0,11,2,70,79:28491,39627,33263; # DRUID FERAL CAT TBC 60:0,11,3,70,79:28520,33261; # WARRIOR ARMS VANILLA 61:0,1,0,60,69:17538,24799; # WARRIOR FURY VANILLA 62:0,1,1,60,69:17538,24799; # WARRIOR PROTECTION VANILLA 63:0,1,2,60,69:17626,25661; # PALADIN HOLY VANILLA 64:0,2,0,60,69:17627,18194; # PALADIN PROTECTION VANILLA 65:0,2,1,60,69:17626,25661; # PALADIN RETRIBUTION VANILLA 66:0,2,2,60,69:17628,24799; # HUNTER BEAST VANILLA 67:0,3,0,60,69:17538,18192; # HUNTER MARKSMANSHIP VANILLA 68:0,3,1,60,69:17538,18192; # HUNTER SURVIVAL VANILLA 69:0,3,2,60,69:17538,18192; # ROGUE ASSASSINATION VANILLA 70:0,4,0,60,69:17538,18192; # ROGUE COMBAT VANILLA 71:0,4,1,60,69:17538,18192; # ROGUE SUBTLETY VANILLA 72:0,4,2,60,69:17538,18192; # PRIEST DISCIPLINE VANILLA 73:0,5,0,60,69:17628,18194; # PRIEST HOLY VANILLA 74:0,5,1,60,69:17627,18194; # PRIEST SHADOW VANILLA 75:0,5,2,60,69:17628,18194; # SHAMAN ELEMENTAL VANILLA 76:0,7,0,60,69:17628,18194; # SHAMAN ENHANCEMENT VANILLA 77:0,7,1,60,69:17538,24799; # SHAMAN RESTORATION VANILLA 78:0,7,2,60,69:17627,18194; # MAGE ARCANE VANILLA 79:0,8,0,60,69:17628,18194; # MAGE FIRE VANILLA 80:0,8,1,60,69:17628,18194; # MAGE FROST VANILLA 81:0,8,2,60,69:17628,18194; # WARLOCK AFFLICTION VANILLA 82:0,9,0,60,69:17628,25661; # WARLOCK DEMONOLOGY VANILLA 83:0,9,1,60,69:17628,25661; # WARLOCK DESTRUCTION VANILLA 84:0,9,2,60,69:17628,25661; # DRUID BALANCE VANILLA 85:0,11,0,60,69:17628,18194; # DRUID FERAL BEAR VANILLA 86:0,11,1,60,69:17626,25661; # DRUID RESTORATION VANILLA 87:0,11,2,60,69:17627,18194; # DRUID FERAL CAT VANILLA 88:0,11,3,60,69:17538,24799
+Playerbots.WorldBuffMatrix = # WARRIOR ARMS 1:0,1,0,80,80:53760,57358; # WARRIOR FURY 2:0,1,1,80,80:53760,57358; # WARRIOR PROTECTION 3:0,1,2,80,80:53758,57356; # PALADIN HOLY 4:0,2,0,80,80:53749,57332,60347; # PALADIN PROTECTION 5:0,2,1,80,80:53758,57356; # PALADIN RETRIBUTION 6:0,2,2,80,80:53760,57371; # HUNTER BEAST 7:0,3,0,80,80:53760,57325; # HUNTER MARKSMANSHIP 8:0,3,1,80,80:53760,57358; # HUNTER SURVIVAL 9:0,3,2,80,80:53760,57367; # ROGUE ASSASSINATION 10:0,4,0,80,80:53760,57325; # ROGUE COMBAT 11:0,4,1,80,80:53760,57358; # ROGUE SUBTLETY 12:0,4,2,80,80:53760,57367; # PRIEST DISCIPLINE 13:0,5,0,80,80:53755,57327; # PRIEST HOLY 14:0,5,1,80,80:53755,57327; # PRIEST SHADOW 15:0,5,2,80,80:53755,57327; # DEATH KNIGHT BLOOD 16:0,6,0,80,80:53758,57356; # DEATH KNIGHT FROST 17:0,6,1,80,80:53760,57358; # DEATH KNIGHT UNHOLY 18:0,6,2,80,80:53760,57358; # DEATH KNIGHT BLOOD DPS 19:0,6,3,80,80:53760,57371; # SHAMAN ELEMENTAL 20:0,7,0,80,80:53755,57327; # SHAMAN ENHANCEMENT 21:0,7,1,80,80:53760,57325; # SHAMAN RESTORATION 22:0,7,2,80,80:53755,57327; # MAGE ARCANE 23:0,8,0,80,80:53755,57327; # MAGE FIRE 24:0,8,1,80,80:53755,57327; # MAGE FROST 25:0,8,2,80,80:53755,57327; # WARLOCK AFFLICTION 26:0,9,0,80,80:53755,57327; # WARLOCK DEMONOLOGY 27:0,9,1,80,80:53755,57327; # WARLOCK DESTRUCTION 28:0,9,2,80,80:53755,57327; # DRUID BALANCE 29:0,11,0,80,80:53755,57327; # DRUID FERAL BEAR 30:0,11,1,80,80:53749,53763,57367; # DRUID RESTORATION 31:0,11,2,80,80:54212,57334; # DRUID FERAL CAT 32:0,11,3,80,80:53760,57358; # WARRIOR ARMS TBC 33:0,1,0,70,79:28520,33256; # WARRIOR FURY TBC 34:0,1,1,70,79:28520,33256; # WARRIOR PROTECTION TBC 35:0,1,2,70,79:28518,33257; # PALADIN HOLY TBC 36:0,2,0,70,79:28491,39627,33263; # PALADIN PROTECTION TBC 37:0,2,1,70,79:28518,33257; # PALADIN RETRIBUTION TBC 38:0,2,2,70,79:28520,33256; # HUNTER BEAST TBC 39:0,3,0,70,79:28520,33261; # HUNTER MARKSMANSHIP TBC 40:0,3,1,70,79:28520,33261; # HUNTER SURVIVAL TBC 41:0,3,2,70,79:28520,33261; # ROGUE ASSASSINATION TBC 42:0,4,0,70,79:28520,33261; # ROGUE COMBAT TBC 43:0,4,1,70,79:28520,33261; # ROGUE SUBTLETY TBC 44:0,4,2,70,79:28520,33261; # PRIEST DISCIPLINE TBC 45:0,5,0,70,79:28491,39627,33263; # PRIEST HOLY TBC 46:0,5,1,70,79:28491,39627,33263; # PRIEST SHADOW TBC 47:0,5,2,70,79:28540,33263; # SHAMAN ELEMENTAL TBC 48:0,7,0,70,79:28521,33263; # SHAMAN ENHANCEMENT TBC 49:0,7,1,70,79:28520,33261; # SHAMAN RESTORATION TBC 50:0,7,2,70,79:28491,39627,33263; # MAGE ARCANE TBC 51:0,8,0,70,79:28521,33263; # MAGE FIRE TBC 52:0,8,1,70,79:28540,33263; # MAGE FROST TBC 53:0,8,2,70,79:28540,33263; # WARLOCK AFFLICTION TBC 54:0,9,0,70,79:28540,33263; # WARLOCK DEMONOLOGY TBC 55:0,9,1,70,79:28540,33263; # WARLOCK DESTRUCTION TBC 56:0,9,2,70,79:28540,33263; # DRUID BALANCE TBC 57:0,11,0,70,79:28521,33263; # DRUID FERAL BEAR TBC 58:0,11,1,70,79:28518,33257; # DRUID RESTORATION TBC 59:0,11,2,70,79:28491,39627,33263; # DRUID FERAL CAT TBC 60:0,11,3,70,79:28520,33261; # WARRIOR ARMS VANILLA 61:0,1,0,60,69:17538,24799; # WARRIOR FURY VANILLA 62:0,1,1,60,69:17538,24799; # WARRIOR PROTECTION VANILLA 63:0,1,2,60,69:17626,25661; # PALADIN HOLY VANILLA 64:0,2,0,60,69:17627,18194; # PALADIN PROTECTION VANILLA 65:0,2,1,60,69:17626,25661; # PALADIN RETRIBUTION VANILLA 66:0,2,2,60,69:17628,24799; # HUNTER BEAST VANILLA 67:0,3,0,60,69:17538,18192; # HUNTER MARKSMANSHIP VANILLA 68:0,3,1,60,69:17538,18192; # HUNTER SURVIVAL VANILLA 69:0,3,2,60,69:17538,18192; # ROGUE ASSASSINATION VANILLA 70:0,4,0,60,69:17538,18192; # ROGUE COMBAT VANILLA 71:0,4,1,60,69:17538,18192; # ROGUE SUBTLETY VANILLA 72:0,4,2,60,69:17538,18192; # PRIEST DISCIPLINE VANILLA 73:0,5,0,60,69:17628,18194; # PRIEST HOLY VANILLA 74:0,5,1,60,69:17627,18194; # PRIEST SHADOW VANILLA 75:0,5,2,60,69:17628,18194; # SHAMAN ELEMENTAL VANILLA 76:0,7,0,60,69:17628,18194; # SHAMAN ENHANCEMENT VANILLA 77:0,7,1,60,69:17538,24799; # SHAMAN RESTORATION VANILLA 78:0,7,2,60,69:17627,18194; # MAGE ARCANE VANILLA 79:0,8,0,60,69:17628,18194; # MAGE FIRE VANILLA 80:0,8,1,60,69:17628,18194; # MAGE FROST VANILLA 81:0,8,2,60,69:17628,18194; # WARLOCK AFFLICTION VANILLA 82:0,9,0,60,69:17628,25661; # WARLOCK DEMONOLOGY VANILLA 83:0,9,1,60,69:17628,25661; # WARLOCK DESTRUCTION VANILLA 84:0,9,2,60,69:17628,25661; # DRUID BALANCE VANILLA 85:0,11,0,60,69:17628,18194; # DRUID FERAL BEAR VANILLA 86:0,11,1,60,69:17626,25661; # DRUID RESTORATION VANILLA 87:0,11,2,60,69:17627,18194; # DRUID FERAL CAT VANILLA 88:0,11,3,60,69:17538,24799
 
 #
 #
@@ -2183,8 +2183,8 @@ AiPlayerbot.WorldBuffMatrix = # WARRIOR ARMS 1:0,1,0,80,80:53760,57358; # WARRIO
 #
 #
 
-# AiPlayerbot.RandomClassSpecProb.<class>.<specno>  # The probability to choose the spec
-# AiPlayerbot.RandomClassSpecIndex.<class>.<specno> # The spec index in PremadeSpec
+# Playerbots.RandomClassSpecProb.<class>.<specno>  # The probability to choose the spec
+# Playerbots.RandomClassSpecIndex.<class>.<specno> # The spec index in PremadeSpec
 
 #
 #
@@ -2195,23 +2195,23 @@ AiPlayerbot.WorldBuffMatrix = # WARRIOR ARMS 1:0,1,0,80,80:53760,57358; # WARRIO
 #
 
 # arms pve
-AiPlayerbot.RandomClassSpecProb.1.0 = 20
-AiPlayerbot.RandomClassSpecIndex.1.0 = 0
+Playerbots.RandomClassSpecProb.1.0 = 20
+Playerbots.RandomClassSpecIndex.1.0 = 0
 # fury pve
-AiPlayerbot.RandomClassSpecProb.1.1 = 40
-AiPlayerbot.RandomClassSpecIndex.1.1 = 1
+Playerbots.RandomClassSpecProb.1.1 = 40
+Playerbots.RandomClassSpecIndex.1.1 = 1
 # prot pve
-AiPlayerbot.RandomClassSpecProb.1.2 = 40
-AiPlayerbot.RandomClassSpecIndex.1.2 = 2
+Playerbots.RandomClassSpecProb.1.2 = 40
+Playerbots.RandomClassSpecIndex.1.2 = 2
 # arms pvp
-AiPlayerbot.RandomClassSpecProb.1.3 = 0
-AiPlayerbot.RandomClassSpecIndex.1.3 = 3
+Playerbots.RandomClassSpecProb.1.3 = 0
+Playerbots.RandomClassSpecIndex.1.3 = 3
 # fury pvp
-AiPlayerbot.RandomClassSpecProb.1.4 = 0
-AiPlayerbot.RandomClassSpecIndex.1.4 = 4
+Playerbots.RandomClassSpecProb.1.4 = 0
+Playerbots.RandomClassSpecIndex.1.4 = 4
 # prot pvp
-AiPlayerbot.RandomClassSpecProb.1.5 = 0
-AiPlayerbot.RandomClassSpecIndex.1.5 = 5
+Playerbots.RandomClassSpecProb.1.5 = 0
+Playerbots.RandomClassSpecIndex.1.5 = 5
 
 #
 #
@@ -2222,23 +2222,23 @@ AiPlayerbot.RandomClassSpecIndex.1.5 = 5
 #
 
 # holy pve
-AiPlayerbot.RandomClassSpecProb.2.0 = 30
-AiPlayerbot.RandomClassSpecIndex.2.0 = 0
+Playerbots.RandomClassSpecProb.2.0 = 30
+Playerbots.RandomClassSpecIndex.2.0 = 0
 # prot pve
-AiPlayerbot.RandomClassSpecProb.2.1 = 40
-AiPlayerbot.RandomClassSpecIndex.2.1 = 1
+Playerbots.RandomClassSpecProb.2.1 = 40
+Playerbots.RandomClassSpecIndex.2.1 = 1
 # ret pve
-AiPlayerbot.RandomClassSpecProb.2.2 = 30
-AiPlayerbot.RandomClassSpecIndex.2.2 = 2
+Playerbots.RandomClassSpecProb.2.2 = 30
+Playerbots.RandomClassSpecIndex.2.2 = 2
 # holy pvp
-AiPlayerbot.RandomClassSpecProb.2.3 = 0
-AiPlayerbot.RandomClassSpecIndex.2.3 = 3
+Playerbots.RandomClassSpecProb.2.3 = 0
+Playerbots.RandomClassSpecIndex.2.3 = 3
 # prot pvp
-AiPlayerbot.RandomClassSpecProb.2.4 = 0
-AiPlayerbot.RandomClassSpecIndex.2.4 = 4
+Playerbots.RandomClassSpecProb.2.4 = 0
+Playerbots.RandomClassSpecIndex.2.4 = 4
 # ret pvp
-AiPlayerbot.RandomClassSpecProb.2.5 = 0
-AiPlayerbot.RandomClassSpecIndex.2.5 = 5
+Playerbots.RandomClassSpecProb.2.5 = 0
+Playerbots.RandomClassSpecIndex.2.5 = 5
 
 #
 #
@@ -2249,23 +2249,23 @@ AiPlayerbot.RandomClassSpecIndex.2.5 = 5
 #
 
 # bm pve
-AiPlayerbot.RandomClassSpecProb.3.0 = 33
-AiPlayerbot.RandomClassSpecIndex.3.0 = 0
+Playerbots.RandomClassSpecProb.3.0 = 33
+Playerbots.RandomClassSpecIndex.3.0 = 0
 # mm pve
-AiPlayerbot.RandomClassSpecProb.3.1 = 33
-AiPlayerbot.RandomClassSpecIndex.3.1 = 1
+Playerbots.RandomClassSpecProb.3.1 = 33
+Playerbots.RandomClassSpecIndex.3.1 = 1
 # surv pve
-AiPlayerbot.RandomClassSpecProb.3.2 = 33
-AiPlayerbot.RandomClassSpecIndex.3.2 = 2
+Playerbots.RandomClassSpecProb.3.2 = 33
+Playerbots.RandomClassSpecIndex.3.2 = 2
 # bm pvp
-AiPlayerbot.RandomClassSpecProb.3.3 = 0
-AiPlayerbot.RandomClassSpecIndex.3.3 = 3
+Playerbots.RandomClassSpecProb.3.3 = 0
+Playerbots.RandomClassSpecIndex.3.3 = 3
 # mm pvp
-AiPlayerbot.RandomClassSpecProb.3.4 = 0
-AiPlayerbot.RandomClassSpecIndex.3.4 = 4
+Playerbots.RandomClassSpecProb.3.4 = 0
+Playerbots.RandomClassSpecIndex.3.4 = 4
 # surv pvp
-AiPlayerbot.RandomClassSpecProb.3.5 = 0
-AiPlayerbot.RandomClassSpecIndex.3.5 = 5
+Playerbots.RandomClassSpecProb.3.5 = 0
+Playerbots.RandomClassSpecIndex.3.5 = 5
 
 #
 #
@@ -2276,23 +2276,23 @@ AiPlayerbot.RandomClassSpecIndex.3.5 = 5
 #
 
 # as pve
-AiPlayerbot.RandomClassSpecProb.4.0 = 45
-AiPlayerbot.RandomClassSpecIndex.4.0 = 0
+Playerbots.RandomClassSpecProb.4.0 = 40
+Playerbots.RandomClassSpecIndex.4.0 = 0
 # combat pve
-AiPlayerbot.RandomClassSpecProb.4.1 = 45
-AiPlayerbot.RandomClassSpecIndex.4.1 = 1
-# subtlety pve
-AiPlayerbot.RandomClassSpecProb.4.2 = 10
-AiPlayerbot.RandomClassSpecIndex.4.2 = 2
+Playerbots.RandomClassSpecProb.4.1 = 60
+Playerbots.RandomClassSpecIndex.4.1 = 1
+# subtlety pve (note: subtlety strategies are not yet implemented)
+Playerbots.RandomClassSpecProb.4.2 = 0
+Playerbots.RandomClassSpecIndex.4.2 = 2
 # as pvp
-AiPlayerbot.RandomClassSpecProb.4.3 = 0
-AiPlayerbot.RandomClassSpecIndex.4.3 = 3
+Playerbots.RandomClassSpecProb.4.3 = 0
+Playerbots.RandomClassSpecIndex.4.3 = 3
 # combat pvp
-AiPlayerbot.RandomClassSpecProb.4.4 = 0
-AiPlayerbot.RandomClassSpecIndex.4.4 = 4
-# subtlety pvp
-AiPlayerbot.RandomClassSpecProb.4.5 = 0
-AiPlayerbot.RandomClassSpecIndex.4.5 = 5
+Playerbots.RandomClassSpecProb.4.4 = 0
+Playerbots.RandomClassSpecIndex.4.4 = 4
+# subtlety pvp (note: subtlety strategies are not yet implemented)
+Playerbots.RandomClassSpecProb.4.5 = 0
+Playerbots.RandomClassSpecIndex.4.5 = 5
 
 #
 #
@@ -2303,23 +2303,23 @@ AiPlayerbot.RandomClassSpecIndex.4.5 = 5
 #
 
 # disc pve
-AiPlayerbot.RandomClassSpecProb.5.0 = 40
-AiPlayerbot.RandomClassSpecIndex.5.0 = 0
+Playerbots.RandomClassSpecProb.5.0 = 40
+Playerbots.RandomClassSpecIndex.5.0 = 0
 # holy pve
-AiPlayerbot.RandomClassSpecProb.5.1 = 35
-AiPlayerbot.RandomClassSpecIndex.5.1 = 1
+Playerbots.RandomClassSpecProb.5.1 = 35
+Playerbots.RandomClassSpecIndex.5.1 = 1
 # shadow pve
-AiPlayerbot.RandomClassSpecProb.5.2 = 25
-AiPlayerbot.RandomClassSpecIndex.5.2 = 2
+Playerbots.RandomClassSpecProb.5.2 = 25
+Playerbots.RandomClassSpecIndex.5.2 = 2
 # disc pvp
-AiPlayerbot.RandomClassSpecProb.5.3 = 0
-AiPlayerbot.RandomClassSpecIndex.5.3 = 3
+Playerbots.RandomClassSpecProb.5.3 = 0
+Playerbots.RandomClassSpecIndex.5.3 = 3
 # holy pvp
-AiPlayerbot.RandomClassSpecProb.5.4 = 0
-AiPlayerbot.RandomClassSpecIndex.5.4 = 4
+Playerbots.RandomClassSpecProb.5.4 = 0
+Playerbots.RandomClassSpecIndex.5.4 = 4
 # shadow pvp
-AiPlayerbot.RandomClassSpecProb.5.5 = 0
-AiPlayerbot.RandomClassSpecIndex.5.5 = 5
+Playerbots.RandomClassSpecProb.5.5 = 0
+Playerbots.RandomClassSpecIndex.5.5 = 5
 
 #
 #
@@ -2330,26 +2330,26 @@ AiPlayerbot.RandomClassSpecIndex.5.5 = 5
 #
 
 # blood pve
-AiPlayerbot.RandomClassSpecProb.6.0 = 30
-AiPlayerbot.RandomClassSpecIndex.6.0 = 0
+Playerbots.RandomClassSpecProb.6.0 = 30
+Playerbots.RandomClassSpecIndex.6.0 = 0
 # frost pve
-AiPlayerbot.RandomClassSpecProb.6.1 = 40
-AiPlayerbot.RandomClassSpecIndex.6.1 = 1
+Playerbots.RandomClassSpecProb.6.1 = 40
+Playerbots.RandomClassSpecIndex.6.1 = 1
 # unholy pve
-AiPlayerbot.RandomClassSpecProb.6.2 = 30
-AiPlayerbot.RandomClassSpecIndex.6.2 = 2
+Playerbots.RandomClassSpecProb.6.2 = 30
+Playerbots.RandomClassSpecIndex.6.2 = 2
 # double aura blood pve
-AiPlayerbot.RandomClassSpecProb.6.3 = 0
-AiPlayerbot.RandomClassSpecIndex.6.3 = 3
+Playerbots.RandomClassSpecProb.6.3 = 0
+Playerbots.RandomClassSpecIndex.6.3 = 3
 # blood pvp
-AiPlayerbot.RandomClassSpecProb.6.4 = 0
-AiPlayerbot.RandomClassSpecIndex.6.4 = 4
+Playerbots.RandomClassSpecProb.6.4 = 0
+Playerbots.RandomClassSpecIndex.6.4 = 4
 # frost pvp
-AiPlayerbot.RandomClassSpecProb.6.5 = 0
-AiPlayerbot.RandomClassSpecIndex.6.5 = 5
+Playerbots.RandomClassSpecProb.6.5 = 0
+Playerbots.RandomClassSpecIndex.6.5 = 5
 # unholy pvp
-AiPlayerbot.RandomClassSpecProb.6.6 = 0
-AiPlayerbot.RandomClassSpecIndex.6.6 = 6
+Playerbots.RandomClassSpecProb.6.6 = 0
+Playerbots.RandomClassSpecIndex.6.6 = 6
 
 #
 #
@@ -2360,23 +2360,23 @@ AiPlayerbot.RandomClassSpecIndex.6.6 = 6
 #
 
 # ele pve
-AiPlayerbot.RandomClassSpecProb.7.0 = 33
-AiPlayerbot.RandomClassSpecIndex.7.0 = 0
+Playerbots.RandomClassSpecProb.7.0 = 33
+Playerbots.RandomClassSpecIndex.7.0 = 0
 # enh pve
-AiPlayerbot.RandomClassSpecProb.7.1 = 33
-AiPlayerbot.RandomClassSpecIndex.7.1 = 1
+Playerbots.RandomClassSpecProb.7.1 = 33
+Playerbots.RandomClassSpecIndex.7.1 = 1
 # resto pve
-AiPlayerbot.RandomClassSpecProb.7.2 = 33
-AiPlayerbot.RandomClassSpecIndex.7.2 = 2
+Playerbots.RandomClassSpecProb.7.2 = 33
+Playerbots.RandomClassSpecIndex.7.2 = 2
 # ele pvp
-AiPlayerbot.RandomClassSpecProb.7.3 = 0
-AiPlayerbot.RandomClassSpecIndex.7.3 = 3
+Playerbots.RandomClassSpecProb.7.3 = 0
+Playerbots.RandomClassSpecIndex.7.3 = 3
 # enh pvp
-AiPlayerbot.RandomClassSpecProb.7.4 = 0
-AiPlayerbot.RandomClassSpecIndex.7.4 = 4
+Playerbots.RandomClassSpecProb.7.4 = 0
+Playerbots.RandomClassSpecIndex.7.4 = 4
 # resto pvp
-AiPlayerbot.RandomClassSpecProb.7.5 = 0
-AiPlayerbot.RandomClassSpecIndex.7.5 = 5
+Playerbots.RandomClassSpecProb.7.5 = 0
+Playerbots.RandomClassSpecIndex.7.5 = 5
 
 #
 #
@@ -2387,26 +2387,26 @@ AiPlayerbot.RandomClassSpecIndex.7.5 = 5
 #
 
 # arcane pve
-AiPlayerbot.RandomClassSpecProb.8.0 = 30
-AiPlayerbot.RandomClassSpecIndex.8.0 = 0
+Playerbots.RandomClassSpecProb.8.0 = 30
+Playerbots.RandomClassSpecIndex.8.0 = 0
 # fire pve
-AiPlayerbot.RandomClassSpecProb.8.1 = 30
-AiPlayerbot.RandomClassSpecIndex.8.1 = 1
+Playerbots.RandomClassSpecProb.8.1 = 30
+Playerbots.RandomClassSpecIndex.8.1 = 1
 # frost pve
-AiPlayerbot.RandomClassSpecProb.8.2 = 40
-AiPlayerbot.RandomClassSpecIndex.8.2 = 2
+Playerbots.RandomClassSpecProb.8.2 = 40
+Playerbots.RandomClassSpecIndex.8.2 = 2
 # frostfire pve
-AiPlayerbot.RandomClassSpecProb.8.3 = 0
-AiPlayerbot.RandomClassSpecIndex.8.3 = 3
+Playerbots.RandomClassSpecProb.8.3 = 0
+Playerbots.RandomClassSpecIndex.8.3 = 3
 # arcane pvp
-AiPlayerbot.RandomClassSpecProb.8.4 = 0
-AiPlayerbot.RandomClassSpecIndex.8.4 = 4
+Playerbots.RandomClassSpecProb.8.4 = 0
+Playerbots.RandomClassSpecIndex.8.4 = 4
 # fire pvp
-AiPlayerbot.RandomClassSpecProb.8.5 = 0
-AiPlayerbot.RandomClassSpecIndex.8.5 = 5
+Playerbots.RandomClassSpecProb.8.5 = 0
+Playerbots.RandomClassSpecIndex.8.5 = 5
 # frost pvp
-AiPlayerbot.RandomClassSpecProb.8.6 = 0
-AiPlayerbot.RandomClassSpecIndex.8.6 = 6
+Playerbots.RandomClassSpecProb.8.6 = 0
+Playerbots.RandomClassSpecIndex.8.6 = 6
 
 #
 #
@@ -2417,23 +2417,23 @@ AiPlayerbot.RandomClassSpecIndex.8.6 = 6
 #
 
 # affli pve
-AiPlayerbot.RandomClassSpecProb.9.0 = 33
-AiPlayerbot.RandomClassSpecIndex.9.0 = 0
+Playerbots.RandomClassSpecProb.9.0 = 33
+Playerbots.RandomClassSpecIndex.9.0 = 0
 # demo pve
-AiPlayerbot.RandomClassSpecProb.9.1 = 34
-AiPlayerbot.RandomClassSpecIndex.9.1 = 1
+Playerbots.RandomClassSpecProb.9.1 = 34
+Playerbots.RandomClassSpecIndex.9.1 = 1
 # destro pve
-AiPlayerbot.RandomClassSpecProb.9.2 = 33
-AiPlayerbot.RandomClassSpecIndex.9.2 = 2
+Playerbots.RandomClassSpecProb.9.2 = 33
+Playerbots.RandomClassSpecIndex.9.2 = 2
 # affli pvp
-AiPlayerbot.RandomClassSpecProb.9.3 = 0
-AiPlayerbot.RandomClassSpecIndex.9.3 = 3
+Playerbots.RandomClassSpecProb.9.3 = 0
+Playerbots.RandomClassSpecIndex.9.3 = 3
 # demo pvp
-AiPlayerbot.RandomClassSpecProb.9.4 = 0
-AiPlayerbot.RandomClassSpecIndex.9.4 = 4
+Playerbots.RandomClassSpecProb.9.4 = 0
+Playerbots.RandomClassSpecIndex.9.4 = 4
 # destro pvp
-AiPlayerbot.RandomClassSpecProb.9.5 = 0
-AiPlayerbot.RandomClassSpecIndex.9.5 = 5
+Playerbots.RandomClassSpecProb.9.5 = 0
+Playerbots.RandomClassSpecIndex.9.5 = 5
 
 #
 #
@@ -2444,26 +2444,26 @@ AiPlayerbot.RandomClassSpecIndex.9.5 = 5
 #
 
 # balance pve
-AiPlayerbot.RandomClassSpecProb.11.0 = 20
-AiPlayerbot.RandomClassSpecIndex.11.0 = 0
+Playerbots.RandomClassSpecProb.11.0 = 20
+Playerbots.RandomClassSpecIndex.11.0 = 0
 # bear pve
-AiPlayerbot.RandomClassSpecProb.11.1 = 25
-AiPlayerbot.RandomClassSpecIndex.11.1 = 1
+Playerbots.RandomClassSpecProb.11.1 = 25
+Playerbots.RandomClassSpecIndex.11.1 = 1
 # resto pve
-AiPlayerbot.RandomClassSpecProb.11.2 = 35
-AiPlayerbot.RandomClassSpecIndex.11.2 = 2
+Playerbots.RandomClassSpecProb.11.2 = 35
+Playerbots.RandomClassSpecIndex.11.2 = 2
 # cat pve
-AiPlayerbot.RandomClassSpecProb.11.3 = 20
-AiPlayerbot.RandomClassSpecIndex.11.3 = 3
+Playerbots.RandomClassSpecProb.11.3 = 20
+Playerbots.RandomClassSpecIndex.11.3 = 3
 # balance pvp
-AiPlayerbot.RandomClassSpecProb.11.4 = 0
-AiPlayerbot.RandomClassSpecIndex.11.4 = 4
+Playerbots.RandomClassSpecProb.11.4 = 0
+Playerbots.RandomClassSpecIndex.11.4 = 4
 # cat pvp
-AiPlayerbot.RandomClassSpecProb.11.5 = 0
-AiPlayerbot.RandomClassSpecIndex.11.5 = 5
+Playerbots.RandomClassSpecProb.11.5 = 0
+Playerbots.RandomClassSpecIndex.11.5 = 5
 # resto pvp
-AiPlayerbot.RandomClassSpecProb.11.6 = 0
-AiPlayerbot.RandomClassSpecIndex.11.6 = 6
+Playerbots.RandomClassSpecProb.11.6 = 0
+Playerbots.RandomClassSpecIndex.11.6 = 6
 
 #
 #
@@ -2484,7 +2484,7 @@ AiPlayerbot.RandomClassSpecIndex.11.6 = 6
 # non-tank bots, increased threat for tank bots.
 # Buffs will be applied on LDW, PP, Sindragosa and Lich King.
 # Default: 1 (enabled)
-AiPlayerbot.EnableICCBuffs = 1
+Playerbots.EnableICCBuffs = 1
 
 #
 #
@@ -2526,7 +2526,7 @@ PlayerbotsDatabase.WorkerThreads     = 1
 
 PlayerbotsDatabase.SynchThreads     = 1
 
-#    Playerbot.Updates.EnableDatabases
+#    Playerbots.Updates.EnableDatabases
 #        Description: Determined if updates system work with playerbots database.
 #
 #        Default:     1  - (Enabled)
@@ -2535,7 +2535,7 @@ PlayerbotsDatabase.SynchThreads     = 1
 Playerbots.Updates.EnableDatabases = 1
 
 # Command server port, 0 - disabled
-AiPlayerbot.CommandServerPort = 8888
+Playerbots.CommandServerPort = 8888
 
 #
 #
@@ -2545,17 +2545,17 @@ AiPlayerbot.CommandServerPort = 8888
 # DEBUG SWITCHES
 #
 
-AiPlayerbot.SpellDump = 0
-AiPlayerbot.LogInGroupOnly = 1
-AiPlayerbot.LogValuesPerTick = 0
-AiPlayerbot.RandomChangeMultiplier = 1
+Playerbots.SpellDump = 0
+Playerbots.LogInGroupOnly = 1
+Playerbots.LogValuesPerTick = 0
+Playerbots.RandomChangeMultiplier = 1
 
 # Tell which spell is avoiding (experimental)
 # Default: 0 (disabled)
-AiPlayerbot.TellWhenAvoidAoe = 0
+Playerbots.TellWhenAvoidAoe = 0
 
 # Enable/Disable performance monitor
-AiPlayerbot.PerfMonEnabled = 0
+Playerbots.PerfMonEnabled = 0
 
 #
 #
@@ -2566,10 +2566,10 @@ AiPlayerbot.PerfMonEnabled = 0
 #
 
 # Prefix for bot chat commands (e.g., follow, stay)
-AiPlayerbot.CommandPrefix = ""
+Playerbots.CommandPrefix = ""
 
 # Separator for bot chat commands
-AiPlayerbot.CommandSeparator = "\\\\"
+Playerbots.CommandSeparator = "\\\\"
 
 # Enable automatic item count/trade trigger when a chat message contains
 # item-related keywords. When enabled (1), mentioning items in chat
@@ -2577,30 +2577,28 @@ AiPlayerbot.CommandSeparator = "\\\\"
 # open a trade window with the bot. Explicit "c" and "t" commands still
 # work regardless of this setting.
 # Default: 1 (enabled)
-AiPlayerbot.EnableAutoTradeOnItemMention = 1
+Playerbots.EnableAutoTradeOnItemMention = 1
 
 # Enable bots talking (say / yell / general chatting / lfg)
-AiPlayerbot.RandomBotTalk = 1
+Playerbots.RandomBotTalk = 1
 # Enable bots emoting
-AiPlayerbot.RandomBotEmote = 0
+Playerbots.RandomBotEmote = 0
 # Enable randombots suggesting dungeons in chat
-AiPlayerbot.RandomBotSuggestDungeons = 1
+Playerbots.RandomBotSuggestDungeons = 1
 # Bots greet players when invited
-AiPlayerbot.EnableGreet = 0
+Playerbots.EnableGreet = 0
 # Chance to reply to toxic links with toxic links (0-100)
-AiPlayerbot.ToxicLinksRepliesChance = 30
+Playerbots.ToxicLinksRepliesChance = 30
 # Chance to reply to Thunderfury with Thunderfury (0-100)
-AiPlayerbot.ThunderfuryRepliesChance = 40
-# Enable bots chatting in guild about certain events
-AIPlayerbot.GuildFeedback = 1
+Playerbots.ThunderfuryRepliesChance = 40
 # Chance bots will chat in guild about certain events (int) (0-100)
-AiPlayerbot.GuildRepliesRate = 100
+Playerbots.GuildRepliesRate = 100
 # Bots without a master will say their lines
-AiPlayerbot.RandomBotSayWithoutMaster = 0
+Playerbots.RandomBotSayWithoutMaster = 0
 # Bots whisper their master when they eat/drink/feast ("Eating [item] (85%)"). Set to 0 to
 # suppress those consumable-use messages (bots still sit and eat, just silently).
 # Default: 1 (enabled)
-AiPlayerbot.AnnounceConsumableUse = 1
+Playerbots.AnnounceConsumableUse = 1
 
 #
 #
@@ -2612,73 +2610,73 @@ AiPlayerbot.AnnounceConsumableUse = 1
 
 # Enable/disable broadcasts globally
 # Default: 1 (enabled)
-AiPlayerbot.EnableBroadcasts = 1
+Playerbots.EnableBroadcasts = 1
 
 # All broadcast chances should be in range 0-30000
 # Value of 0 will disable this particular broadcast
 # Setting value to 30000 does not guarantee the broadcast, as there are some internal randoms as well
 # Setting channel broadcast chance to 0 will re-route most broadcasts to other available channels
 # Setting all channel broadcasts to 0 will disable most broadcasts
-AiPlayerbot.BroadcastToGuildGlobalChance = 30000
-AiPlayerbot.BroadcastToWorldGlobalChance = 30000
-AiPlayerbot.BroadcastToGeneralGlobalChance = 30000
-AiPlayerbot.BroadcastToTradeGlobalChance = 30000
-AiPlayerbot.BroadcastToLFGGlobalChance = 30000
-AiPlayerbot.BroadcastToLocalDefenseGlobalChance = 30000
-AiPlayerbot.BroadcastToWorldDefenseGlobalChance = 30000
-AiPlayerbot.BroadcastToGuildRecruitmentGlobalChance = 30000
+Playerbots.BroadcastToGuildGlobalChance = 30000
+Playerbots.BroadcastToWorldGlobalChance = 30000
+Playerbots.BroadcastToGeneralGlobalChance = 30000
+Playerbots.BroadcastToTradeGlobalChance = 30000
+Playerbots.BroadcastToLFGGlobalChance = 30000
+Playerbots.BroadcastToLocalDefenseGlobalChance = 30000
+Playerbots.BroadcastToWorldDefenseGlobalChance = 30000
+Playerbots.BroadcastToGuildRecruitmentGlobalChance = 30000
 
 # Individual settings
 # Setting one of these to 0 will disable the particular broadcast
-AiPlayerbot.BroadcastChanceLootingItemPoor = 30
-AiPlayerbot.BroadcastChanceLootingItemNormal = 150
-AiPlayerbot.BroadcastChanceLootingItemUncommon = 10000
-AiPlayerbot.BroadcastChanceLootingItemRare = 20000
-AiPlayerbot.BroadcastChanceLootingItemEpic = 30000
-AiPlayerbot.BroadcastChanceLootingItemLegendary = 30000
-AiPlayerbot.BroadcastChanceLootingItemArtifact = 30000
+Playerbots.BroadcastChanceLootingItemPoor = 30
+Playerbots.BroadcastChanceLootingItemNormal = 150
+Playerbots.BroadcastChanceLootingItemUncommon = 10000
+Playerbots.BroadcastChanceLootingItemRare = 20000
+Playerbots.BroadcastChanceLootingItemEpic = 30000
+Playerbots.BroadcastChanceLootingItemLegendary = 30000
+Playerbots.BroadcastChanceLootingItemArtifact = 30000
 
-AiPlayerbot.BroadcastChanceQuestAccepted = 6000
-AiPlayerbot.BroadcastChanceQuestUpdateObjectiveCompleted = 300
-AiPlayerbot.BroadcastChanceQuestUpdateObjectiveProgress = 300
-AiPlayerbot.BroadcastChanceQuestUpdateFailedTimer = 300
-AiPlayerbot.BroadcastChanceQuestUpdateComplete = 1000
-AiPlayerbot.BroadcastChanceQuestTurnedIn = 10000
+Playerbots.BroadcastChanceQuestAccepted = 6000
+Playerbots.BroadcastChanceQuestUpdateObjectiveCompleted = 300
+Playerbots.BroadcastChanceQuestUpdateObjectiveProgress = 300
+Playerbots.BroadcastChanceQuestUpdateFailedTimer = 300
+Playerbots.BroadcastChanceQuestUpdateComplete = 1000
+Playerbots.BroadcastChanceQuestTurnedIn = 10000
 
-AiPlayerbot.BroadcastChanceKillNormal = 30
-AiPlayerbot.BroadcastChanceKillElite = 300
-AiPlayerbot.BroadcastChanceKillRareelite = 3000
-AiPlayerbot.BroadcastChanceKillWorldboss = 20000
-AiPlayerbot.BroadcastChanceKillRare = 10000
-AiPlayerbot.BroadcastChanceKillUnknown = 100
-AiPlayerbot.BroadcastChanceKillPet = 10
-AiPlayerbot.BroadcastChanceKillPlayer = 30
+Playerbots.BroadcastChanceKillNormal = 30
+Playerbots.BroadcastChanceKillElite = 300
+Playerbots.BroadcastChanceKillRareelite = 3000
+Playerbots.BroadcastChanceKillWorldboss = 20000
+Playerbots.BroadcastChanceKillRare = 10000
+Playerbots.BroadcastChanceKillUnknown = 100
+Playerbots.BroadcastChanceKillPet = 10
+Playerbots.BroadcastChanceKillPlayer = 30
 
-AiPlayerbot.BroadcastChanceLevelupGeneric = 20000
-AiPlayerbot.BroadcastChanceLevelupTenX = 30000
-AiPlayerbot.BroadcastChanceLevelupMaxLevel = 30000
+Playerbots.BroadcastChanceLevelupGeneric = 20000
+Playerbots.BroadcastChanceLevelupTenX = 30000
+Playerbots.BroadcastChanceLevelupMaxLevel = 30000
 
-AiPlayerbot.BroadcastChanceSuggestInstance = 5000
-AiPlayerbot.BroadcastChanceSuggestQuest = 10000
-AiPlayerbot.BroadcastChanceSuggestGrindMaterials = 5000
-AiPlayerbot.BroadcastChanceSuggestGrindReputation = 5000
-AiPlayerbot.BroadcastChanceSuggestSell = 300
-AiPlayerbot.BroadcastChanceSuggestSomething = 30000
+Playerbots.BroadcastChanceSuggestInstance = 5000
+Playerbots.BroadcastChanceSuggestQuest = 10000
+Playerbots.BroadcastChanceSuggestGrindMaterials = 5000
+Playerbots.BroadcastChanceSuggestGrindReputation = 5000
+Playerbots.BroadcastChanceSuggestSell = 300
+Playerbots.BroadcastChanceSuggestSomething = 30000
 
 # Bots will say very rude things
-AiPlayerbot.BroadcastChanceSuggestSomethingToxic = 0
+Playerbots.BroadcastChanceSuggestSomethingToxic = 0
 
 # Specifically for "<word> [item link]"
-AiPlayerbot.BroadcastChanceSuggestToxicLinks = 0
+Playerbots.BroadcastChanceSuggestToxicLinks = 0
 
 # Prefix is used as a word in "<word> [item link]"
-AiPlayerbot.ToxicLinksPrefix = gnomes
+Playerbots.ToxicLinksPrefix = gnomes
 
 # Chance to suggest Thunderfury
-AiPlayerbot.BroadcastChanceSuggestThunderfury = 1
+Playerbots.BroadcastChanceSuggestThunderfury = 1
 
 # Does not depend on global chance
-AiPlayerbot.BroadcastChanceGuildManagement = 30000
+Playerbots.BroadcastChanceGuildManagement = 30000
 
 #
 #
@@ -2689,8 +2687,8 @@ AiPlayerbot.BroadcastChanceGuildManagement = 30000
 #
 
 # Custom config to allow logfiles to be created.
-# Example: AiPlayerbot.AllowedLogFiles = travelNodes.csv,travelPaths.csv,TravelNodeStore.h,bot_movement.csv,bot_location.csv
-AiPlayerbot.AllowedLogFiles = ""
+# Example: Playerbots.AllowedLogFiles = travelNodes.csv,travelPaths.csv,TravelNodeStore.h,bot_movement.csv,bot_location.csv
+Playerbots.AllowedLogFiles = ""
 
 #
 #
@@ -2701,42 +2699,42 @@ AiPlayerbot.AllowedLogFiles = ""
 ##############################################
 
 # Guild Task system
-AiPlayerbot.EnableGuildTasks = 0
+Playerbots.EnableGuildTasks = 0
 
 # Chance bot chooses RPG (Teleport to random camp for their level) instead of grinding
-AiPlayerbot.RandomBotRpgChance = 0.20
+Playerbots.RandomBotRpgChance = 0.20
 
 # Set randombots movement speed to walking anywhere
-AiPlayerbot.RandombotsWalkingRPG = 0
+Playerbots.RandombotsWalkingRPG = 0
 
 # Set randombots movement speed to walking only inside buildings
-AiPlayerbot.RandombotsWalkingRPG.InDoors = 0
+Playerbots.RandombotsWalkingRPG.InDoors = 0
 
-AiPlayerbot.MinRandomBotsPriceChangeInterval = 7200
-AiPlayerbot.MaxRandomBotsPriceChangeInterval = 172800
-AiPlayerbot.MinRandomBotChangeStrategyTime = 180
-AiPlayerbot.MaxRandomBotChangeStrategyTime = 720
+Playerbots.MinRandomBotsPriceChangeInterval = 7200
+Playerbots.MaxRandomBotsPriceChangeInterval = 172800
+Playerbots.MinRandomBotChangeStrategyTime = 180
+Playerbots.MaxRandomBotChangeStrategyTime = 720
 
 # How often tasks are changed
-AiPlayerbot.MinGuildTaskChangeTime = 172800
-AiPlayerbot.MaxGuildTaskChangeTime = 432000
+Playerbots.MinGuildTaskChangeTime = 172800
+Playerbots.MaxGuildTaskChangeTime = 432000
 
 # Mail spam interval
-AiPlayerbot.MinGuildTaskAdvertisementTime = 300
-AiPlayerbot.MaxGuildTaskAdvertisementTime = 28800
+Playerbots.MinGuildTaskAdvertisementTime = 300
+Playerbots.MaxGuildTaskAdvertisementTime = 28800
 
 # Delay before reward is sent
-AiPlayerbot.MinGuildTaskRewardTime = 300
-AiPlayerbot.MaxGuildTaskRewardTime = 3600
+Playerbots.MinGuildTaskRewardTime = 300
+Playerbots.MaxGuildTaskRewardTime = 3600
 
 # Cleanup of guild tasks interval
-AiPlayerbot.GuildTaskAdvertCleanupTime = 300
+Playerbots.GuildTaskAdvertCleanupTime = 300
 
 # Specify max distance between victim and bot when creating guild kill task
-AiPlayerbot.GuildTaskKillTaskDistance = 200
+Playerbots.GuildTaskKillTaskDistance = 200
 
 # Distance margin for facade calculations
-AiPlayerbot.TargetPosRecalcDistance = 0.1
+Playerbots.TargetPosRecalcDistance = 0.1
 
 # Allow bots to be summoned near innkeepers
-AiPlayerbot.SummonAtInnkeepersEnabled = 1
+Playerbots.SummonAtInnkeepersEnabled = 1

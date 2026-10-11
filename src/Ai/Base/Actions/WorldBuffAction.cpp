@@ -26,7 +26,7 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
 {
     std::vector<uint32> retVec;
 
-    if (sPlayerbotAIConfig.worldBuffs.empty())
+    if (sPlayerbotAIConfig.WorldBuffs.empty())
         return retVec;
 
     FactionTemplateEntry const* humanFaction = sFactionTemplateStore.LookupEntry(1);
@@ -71,29 +71,29 @@ std::vector<uint32> WorldBuffAction::NeedWorldBuffs(Unit* unit)
         // If tank, effectiveSpec remains unchanged
     }
 
-    for (auto const& wb : sPlayerbotAIConfig.worldBuffs)
+    for (auto const& wb : sPlayerbotAIConfig.WorldBuffs)
     {
         // Faction check
-        if (wb.factionId != 0 && wb.factionId != factionId)
+        if (wb.FactionId != 0 && wb.FactionId != factionId)
             continue;
 
         // Class check
-        if (wb.classId != 0 && wb.classId != botClass)
+        if (wb.ClassId != 0 && wb.ClassId != botClass)
             continue;
 
         // Level check
-        if (wb.minLevel != 0 && wb.minLevel > botLevel)
+        if (wb.MinLevel != 0 && wb.MinLevel > botLevel)
             continue;
-        if (wb.maxLevel != 0 && wb.maxLevel < botLevel)
+        if (wb.MaxLevel != 0 && wb.MaxLevel < botLevel)
             continue;
 
         // Already has aura?
-        if (bot->HasAura(wb.spellId))
+        if (bot->HasAura(wb.SpellId))
             continue;
 
         // Final check: does the world-buff spec ID match our effective spec?
-        if (wb.specId == effectiveSpec)
-            retVec.push_back(wb.spellId);
+        if (wb.SpecId == effectiveSpec)
+            retVec.push_back(wb.SpellId);
     }
 
     return retVec;

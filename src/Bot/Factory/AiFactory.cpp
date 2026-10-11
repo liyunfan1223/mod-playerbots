@@ -288,7 +288,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
     if (!player->InBattleground())
         engine->addStrategiesNoInit("racials", "chat", "default", "cast time", "potions", "duel", "boost", nullptr);
 
-    if (sPlayerbotAIConfig.autoAvoidAoe && facade->HasGameClientMaster())
+    if (sPlayerbotAIConfig.AutoAvoidAoe && facade->HasGameClientMaster())
         engine->addStrategy("avoid aoe", false);
 
     engine->addStrategy("formation", false);
@@ -410,7 +410,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
     if (PlayerbotAI::IsHeal(player, true))
     {
-        if (sPlayerbotAIConfig.autoSaveMana)
+        if (sPlayerbotAIConfig.AutoSaveMana)
             engine->addStrategy("save mana", false);
         if (!sPlayerbotAIConfig.IsRestrictedHealerDPSMap(player->GetMapId()))
             engine->addStrategy("healer dps", false);
@@ -457,9 +457,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         }
     }
     if (sRandomPlayerbotMgr.IsRandomBot(player))
-        engine->ChangeStrategy(sPlayerbotAIConfig.randomBotCombatStrategies);
+        engine->ChangeStrategy(sPlayerbotAIConfig.RandomBotCombatStrategies);
     else
-        engine->ChangeStrategy(sPlayerbotAIConfig.combatStrategies);
+        engine->ChangeStrategy(sPlayerbotAIConfig.CombatStrategies);
 
     // Battleground switch
     if (player->InBattleground() && player->GetBattleground())
@@ -588,7 +588,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                                             "gather", "duel", "pvp", "buff", "mount", "emote", nullptr);
     }
 
-    if (sPlayerbotAIConfig.autoSaveMana && PlayerbotAI::IsHeal(player, true))
+    if (sPlayerbotAIConfig.AutoSaveMana && PlayerbotAI::IsHeal(player, true))
         nonCombatEngine->addStrategy("save mana", false);
 
     if ((sRandomPlayerbotMgr.IsRandomBot(player)) && !player->InBattleground())
@@ -599,7 +599,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
         if (!urand(0, 3))
             nonCombatEngine->addStrategy("start duel", false);
 
-        if (sPlayerbotAIConfig.randomBotJoinLfg)
+        if (sPlayerbotAIConfig.RandomBotJoinLfg)
             nonCombatEngine->addStrategy("lfg", false);
 
         if (!player->GetGroup() || player->GetGroup()->GetLeaderGUID() == player->GetGUID())
@@ -614,9 +614,9 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             // nonCombatEngine->addStrategy("guild");
             nonCombatEngine->addStrategy("grind", false);
 
-            if (sPlayerbotAIConfig.enableNewRpgStrategy)
+            if (sPlayerbotAIConfig.EnableNewRpgStrategy)
                 nonCombatEngine->addStrategy("new rpg", false);
-            else if (sPlayerbotAIConfig.autoDoQuests)
+            else if (sPlayerbotAIConfig.AutoDoQuests)
             {
                 // nonCombatEngine->addStrategy("travel");
                 nonCombatEngine->addStrategy("rpg", false);
@@ -624,13 +624,13 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             else
                 nonCombatEngine->addStrategy("move random", false);
 
-            if (sPlayerbotAIConfig.randomBotJoinBG)
+            if (sPlayerbotAIConfig.RandomBotJoinBG)
                 nonCombatEngine->addStrategy("bg", false);
 
             // if (!master || GET_PLAYERBOT_AI(master))
             //     nonCombatEngine->addStrategy("maintenance");
 
-            nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
+            nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.RandomBotNonCombatStrategies);
         }
         else
         {
@@ -646,7 +646,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                         // nonCombatEngine->addStrategy("group");
                         // nonCombatEngine->addStrategy("guild");
 
-                        // if (sPlayerbotAIConfig.autoDoQuests)
+                        // if (sPlayerbotAIConfig.AutoDoQuests)
                         // {
                         //     // nonCombatEngine->addStrategy("travel");
                         //     nonCombatEngine->addStrategy("rpg");
@@ -659,19 +659,19 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                         // if (masterBotAI)
                         //     nonCombatEngine->addStrategy("maintenance");
 
-                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
+                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.RandomBotNonCombatStrategies);
                     }
                     else
                     {
                         // nonCombatEngine->addStrategy("pvp", false);
-                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
+                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.NonCombatStrategies);
                     }
                 }
             }
         }
     }
     else
-        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
+        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.NonCombatStrategies);
 
     // Battleground switch
     if (player->InBattleground() && player->GetBattleground())
@@ -746,9 +746,9 @@ void AiFactory::AddDefaultReactionStrategies(Player* player, PlayerbotAI* const 
     reactionEngine->addStrategies("react", "chat", nullptr);
 
     if (sRandomPlayerbotMgr.IsRandomBot(player))
-        reactionEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotReactStrategies);
+        reactionEngine->ChangeStrategy(sPlayerbotAIConfig.RandomBotReactStrategies);
     else
-        reactionEngine->ChangeStrategy(sPlayerbotAIConfig.reactStrategies);
+        reactionEngine->ChangeStrategy(sPlayerbotAIConfig.ReactStrategies);
 }
 
 ReactionEngine* AiFactory::createReactionEngine(Player* player, PlayerbotAI* const facade, AiObjectContext* aiObjectContext)

@@ -167,13 +167,13 @@ static bool CastAoeTaunt(PlayerbotAI* botAI, Player* bot)
 bool IccLichKingShadowTrapAction::Execute(Event /*event*/)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "the lich king");
-    if (!boss || !botAI->IsTank(bot))
+    if (!boss || !PlayerbotAI::IsTank(bot))
         return false;
 
     Difficulty const diff = bot->GetRaidDifficulty();
 
     if (sPlayerbotAIConfig.EnableICCBuffs && boss->IsInCombat() && IsHeroicLk(diff))
-        IccApplyHeroicBuffToMember(botAI, bot, true, false);
+        IccApplyHeroicBuffToMember(bot, true, false);
 
     static constexpr float CIRCLE_RADIUS = 20.0f;
     static constexpr float SAFE_DISTANCE = 12.0f;
@@ -272,7 +272,7 @@ bool IccLichKingNecroticPlagueAction::Execute(Event /*event*/)
         float const dist = bot->GetDistance(unit);
 
         Unit* victim = unit->GetVictim();
-        if (victim && botAI->IsAssistTank(victim->ToPlayer()))
+        if (victim && PlayerbotAI::IsAssistTank(victim->ToPlayer()))
         {
             if (dist < minDist)
             {
@@ -370,7 +370,7 @@ bool IccLichKingWinterAction::Execute(Event /*event*/)
     Difficulty const diff = bot->GetRaidDifficulty();
 
     if (sPlayerbotAIConfig.EnableICCBuffs && boss->IsInCombat() && IsHeroicLk(diff))
-        IccApplyHeroicBuffToMember(botAI, bot, true, true);
+        IccApplyHeroicBuffToMember(bot, true, true);
 
     // Speed boost to help escape the inward push
     if (bot->GetDistance2d(boss) < 35.0f && !bot->HasAura(SPELL_NITRO_BOOSTS))
@@ -378,7 +378,7 @@ bool IccLichKingWinterAction::Execute(Event /*event*/)
 
     // Heroic: if more than 2 Raging Spirits are alive, kill the one with the
     // highest HP. Only the main tank does this to avoid simultaneous actions.
-    if (botAI->IsMainTank(bot) && IsHeroicLk(diff))
+    if (PlayerbotAI::IsMainTank(bot) && IsHeroicLk(diff))
     {
         GuidVector const& heroicNpcs = AI_VALUE(GuidVector, "nearest hostile npcs");
         std::vector<Unit*> spirits;
@@ -474,7 +474,7 @@ bool IccLichKingWinterAction::Execute(Event /*event*/)
     bool const stageActive = winterIt != s_winterStage.end() &&
                              getMSTimeDiff(winterIt->second.startMs, now) < STAGE_DURATION_MS;
 
-    if (!botAI->IsTank(bot) && (bossCastingWinter || stageActive))
+    if (!PlayerbotAI::IsTank(bot) && (bossCastingWinter || stageActive))
     {
         if (winterIt == s_winterStage.end())
         {
@@ -555,7 +555,7 @@ bool IccLichKingWinterAction::Execute(Event /*event*/)
     // Defile evacuation has absolute priority over everything else
     if (!IsPositionSafeFromDefile(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), 3.0f))
     {
-        Position const& safePos = botAI->IsTank(bot)
+        Position const& safePos = PlayerbotAI::IsTank(bot)
             ? *GetMainTankPosition()
             : *GetMainTankRangedPosition();
 
@@ -565,7 +565,7 @@ bool IccLichKingWinterAction::Execute(Event /*event*/)
 
     // If any ice sphere is targeting this bot, move to the midpoint between the
     // melee and ranged frost positions
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
     {
         GuidVector const& sphereNpcs = AI_VALUE(GuidVector, "nearest hostile npcs");
         for (ObjectGuid const& guid : sphereNpcs)
@@ -594,9 +594,9 @@ bool IccLichKingWinterAction::Execute(Event /*event*/)
     ClearInvalidTarget();
     HandlePetManagement();
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         HandleTankPositioning();
-    else if (!botAI->IsRanged(bot))
+    else if (!PlayerbotAI::IsRanged(bot))
     {
         // Non-tank melee:
         //   - MT at the frost anchor with an add (shambling/spirit) within
@@ -681,7 +681,7 @@ bool IccLichKingWinterAction::ClearInvalidTarget()
         doClear = true;
 
     // Tanks must not chase ice spheres
-    if (botAI->IsTank(bot) && IsIceSphere(currentTarget->GetEntry()))
+    if (PlayerbotAI::IsTank(bot) && IsIceSphere(currentTarget->GetEntry()))
         doClear = true;
 
     if (doClear)
@@ -958,7 +958,7 @@ bool IccLichKingWinterAction::HandleTankPositioning()
     Position const& frostPos = *GetMainTankPosition();
     static constexpr float FROST_AT_POS_TOLERANCE = 3.0f;
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         float const dist = bot->GetDistance2d(frostPos.GetPositionX(), frostPos.GetPositionY());
         auto& s_mtInbound = IcecrownHelpers::IccState(bot->GetInstanceId()).mtAddInbound;
@@ -989,7 +989,7 @@ bool IccLichKingWinterAction::HandleTankPositioning()
         return HandleMainTankAddManagement(boss, &frostPos);
     }
 
-    if (botAI->IsAssistTank(bot))
+    if (PlayerbotAI::IsAssistTank(bot))
         return HandleAssistTankAddManagement(boss, &frostPos);
 
     return false;
@@ -1277,7 +1277,7 @@ bool IccLichKingWinterAction::HandleRangedPositioning()
 
     s_rangedInbound[rangedKey] = false;
 
-    if (!botAI->IsRangedDps(bot))
+    if (!PlayerbotAI::IsRangedDps(bot))
         return false;
 
     static constexpr float SPHERE_RANGE = 30.0f;
@@ -1377,7 +1377,7 @@ bool IccLichKingWinterAction::HandleMainTankAddManagement(Unit*, Position const*
         for (GroupReference* itr = group->GetFirstMember(); itr; itr = itr->next())
         {
             Player* member = itr->GetSource();
-            if (member && member->IsAlive() && member != bot && botAI->IsAssistTank(member))
+            if (member && member->IsAlive() && member != bot && PlayerbotAI::IsAssistTank(member))
             {
                 hasAliveAssistTank = true;
                 break;
@@ -1403,7 +1403,7 @@ bool IccLichKingWinterAction::HandleMainTankAddManagement(Unit*, Position const*
     auto rescueRank = [&](Unit* u) -> int
     {
         Unit* v = u->GetVictim();
-        return v && v->IsPlayer() && !botAI->IsTank(v->ToPlayer()) ? 1 : 0;
+        return v && v->IsPlayer() && !PlayerbotAI::IsTank(v->ToPlayer()) ? 1 : 0;
     };
 
     auto better = [&](Unit* cand, Unit* cur) -> bool
@@ -1436,12 +1436,12 @@ bool IccLichKingWinterAction::HandleMainTankAddManagement(Unit*, Position const*
         Unit* victim = add->GetVictim();
 
         // Taunt pass: all adds in range that are NOT already on MT
-        bool const onMT = victim && victim->IsPlayer() && botAI->IsMainTank(victim->ToPlayer());
+        bool const onMT = victim && victim->IsPlayer() && PlayerbotAI::IsMainTank(victim->ToPlayer());
         if (!onMT && addDist <= TAUNT_RADIUS)
             IccCastClassTaunt(bot, botAI, add);
 
         // Priority taunt: adds on the assist tank within 10 yd
-        bool const onAT = victim && victim->IsPlayer() && botAI->IsAssistTank(victim->ToPlayer());
+        bool const onAT = victim && victim->IsPlayer() && PlayerbotAI::IsAssistTank(victim->ToPlayer());
         if (onAT && addDist <= 10.0f)
             IccCastClassTaunt(bot, botAI, add);
 
@@ -1638,7 +1638,7 @@ bool IccLichKingWinterAction::HandleAssistTankAddManagement(Unit*, Position cons
     for (Unit* add : addsLoose)
     {
         Unit* victim = add->GetVictim();
-        if (victim && victim->IsPlayer() && !botAI->IsTank(victim->ToPlayer()))
+        if (victim && victim->IsPlayer() && !PlayerbotAI::IsTank(victim->ToPlayer()))
         {
             float const dist = bot->GetDistance(add);
             if (dist < closestDist)
@@ -1722,7 +1722,7 @@ bool IccLichKingWinterAction::HandlePetManagement()
     if (!ci)
         return false;
 
-    if (botAI->IsHeal(bot))
+    if (PlayerbotAI::IsHeal(bot))
     {
         if (ci->GetCommandState() != COMMAND_FOLLOW)
         {
@@ -1821,7 +1821,7 @@ bool IccLichKingAddsAction::Execute(Event /*event*/)
                 if (!member || !member->IsAlive() || !member->IsInWorld())
                     continue;
 
-                IccApplyHeroicBuffToMember(botAI, member, true, true);
+                IccApplyHeroicBuffToMember(member, true, true);
 
                 if (boss && boss->HealthBelowPct(60) && boss->HealthAbovePct(40) &&
                     !member->HasAura(SPELL_EMPOWERED_BLOOD))
@@ -1906,7 +1906,7 @@ bool IccLichKingAddsAction::Execute(Event /*event*/)
                     group->SetTargetIcon(CROSS_ICON, bot->GetGUID(), ObjectGuid::Empty);
 
                 // Per-bot RTI: melee non-tanks always target skull (boss or raging)
-                if (botAI->IsMelee(bot) && !botAI->IsTank(bot))
+                if (PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsTank(bot))
                     context->GetValue<std::string>("rti")->Set("skull");
             }
 
@@ -2054,9 +2054,9 @@ bool IccLichKingAddsAction::HandleTeleportationFixes(Difficulty diff, Unit* tere
                 Player* member = itr->GetSource();
                 if (!member || !member->IsAlive())
                     continue;
-                if (!mainTank && botAI->IsMainTank(member))
+                if (!mainTank && PlayerbotAI::IsMainTank(member))
                     mainTank = member;
-                else if (!assistTank && botAI->IsAssistTank(member))
+                else if (!assistTank && PlayerbotAI::IsAssistTank(member))
                     assistTank = member;
             }
         }
@@ -2096,7 +2096,7 @@ bool IccLichKingAddsAction::HandleTeleportationFixes(Difficulty diff, Unit* tere
             for (GroupReference* itr = group->GetFirstMember(); itr; itr = itr->next())
             {
                 Player* member = itr->GetSource();
-                if (member && member->IsAlive() && botAI->IsMainTank(member))
+                if (member && member->IsAlive() && PlayerbotAI::IsMainTank(member))
                 {
                     mainTank = member;
                     break;
@@ -2114,7 +2114,7 @@ bool IccLichKingAddsAction::HandleTeleportationFixes(Difficulty diff, Unit* tere
 
 bool IccLichKingSpiritBombAction::IsBombThreatActive(PlayerbotAI* botAI, Player* bot)
 {
-    if (!botAI || !bot || !botAI->IsMainTank(bot))
+    if (!botAI || !bot || !PlayerbotAI::IsMainTank(bot))
         return false;
 
     Difficulty const diff = bot->GetMap() ? bot->GetMap()->GetDifficulty() : RAID_DIFFICULTY_10MAN_NORMAL;
@@ -2140,7 +2140,7 @@ bool IccLichKingSpiritBombAction::Execute(Event)
     Difficulty const diff = bot->GetMap() ? bot->GetMap()->GetDifficulty() : RAID_DIFFICULTY_10MAN_NORMAL;
     Unit* terenas = bot->FindNearestCreature(NPC_TERENAS_MENETHIL_HC, 55.0f);
 
-    if (!botAI->IsMainTank(bot) || !terenas || !IsHeroicLk(diff))
+    if (!PlayerbotAI::IsMainTank(bot) || !terenas || !IsHeroicLk(diff))
         return false;
 
     // Snap back to spirit-room Z if glitched through the floor
@@ -2337,7 +2337,7 @@ bool IccLichKingSpiritBombAction::Execute(Event)
 
 bool IccLichKingAddsAction::HandleHeroicNonTankPositioning(Difficulty diff, Unit* terenas)
 {
-    if (!terenas || botAI->IsMainTank(bot) || !IsHeroicLk(diff))
+    if (!terenas || PlayerbotAI::IsMainTank(bot) || !IsHeroicLk(diff))
         return false;
 
     Unit* mainTank = AI_VALUE(Unit*, "main tank");
@@ -2357,7 +2357,7 @@ bool IccLichKingAddsAction::HandleHeroicNonTankPositioning(Difficulty diff, Unit
 
 bool IccLichKingAddsAction::HandleSpiritMarkingAndTargeting(Difficulty diff, Unit* terenas)
 {
-    if (!terenas || botAI->IsMainTank(bot) || !IsHeroicLk(diff))
+    if (!terenas || PlayerbotAI::IsMainTank(bot) || !IsHeroicLk(diff))
         return false;
 
     Group* group = bot->GetGroup();
@@ -2421,7 +2421,7 @@ bool IccLichKingAddsAction::HandleSpiritMarkingAndTargeting(Difficulty diff, Uni
     }
 
     // Ranged DPS focus the star target
-    if (botAI->IsRangedDps(bot))
+    if (PlayerbotAI::IsRangedDps(bot))
     {
         context->GetValue<std::string>("rti")->Set("star");
 
@@ -2470,7 +2470,7 @@ bool IccLichKingAddsAction::HandleQuakeMechanics(Unit* boss)
 
 bool IccLichKingAddsAction::HandleRagingSpiritFlanking(Unit* boss, bool hasPlague, Difficulty diff)
 {
-    if (!boss || botAI->IsTank(bot) || hasPlague)
+    if (!boss || PlayerbotAI::IsTank(bot) || hasPlague)
         return false;
     if (IccBossHasRemorselessWinter(boss))
         return false;
@@ -2549,7 +2549,7 @@ bool IccLichKingAddsAction::HandleRagingSpiritFlanking(Unit* boss, bool hasPlagu
     if (spirits.empty())
         return false;
 
-    bool const isRanged = botAI->IsRanged(bot);
+    bool const isRanged = PlayerbotAI::IsRanged(bot);
     static constexpr float RANGED_SAFE_DIST = 15.0f;
 
     auto IsSafeFromAllSpirits = [&](float x, float y) -> bool
@@ -2710,7 +2710,7 @@ bool IccLichKingAddsAction::HandleShamblingHorrors(Unit* /*boss*/, bool /*hasPla
 
 bool IccLichKingAddsAction::HandleAssistTankAddManagement(Unit* boss, Difficulty diff)
 {
-    if (!botAI->IsAssistTank(bot) || !boss)
+    if (!PlayerbotAI::IsAssistTank(bot) || !boss)
         return false;
 
     // Below 71%: stun all shamblings until winter starts so they don't
@@ -3115,7 +3115,7 @@ bool IccLichKingAddsAction::HandleAssistTankAddManagement(Unit* boss, Difficulty
 
 bool IccLichKingAddsAction::HandleMeleePositioning(Unit* boss, bool hasPlague, Difficulty diff)
 {
-    if (!boss || !botAI->IsMelee(bot) || botAI->IsAssistTank(bot) ||
+    if (!boss || !PlayerbotAI::IsMelee(bot) || PlayerbotAI::IsAssistTank(bot) ||
         boss->HealthBelowPct(71) || hasPlague || IsHeroicLk(diff))
         return false;
 
@@ -3123,7 +3123,7 @@ bool IccLichKingAddsAction::HandleMeleePositioning(Unit* boss, bool hasPlague, D
     if (distToPos <= 6.0f)
         return false;
 
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
     {
         MoveTo(bot->GetMapId(),
                ICC_LICH_KING_MELEE_POSITION.GetPositionX(),
@@ -3168,7 +3168,7 @@ bool IccLichKingAddsAction::HandleMeleePositioning(Unit* boss, bool hasPlague, D
 
 bool IccLichKingAddsAction::HandleMainTankTargeting(Unit* boss, Difficulty diff)
 {
-    if (!botAI->IsMainTank(bot) || !boss)
+    if (!PlayerbotAI::IsMainTank(bot) || !boss)
         return false;
 
     if (boss->GetVictim() == bot)
@@ -3199,7 +3199,7 @@ bool IccLichKingAddsAction::HandleMainTankTargeting(Unit* boss, Difficulty diff)
                 {
                     Player* member = itr->GetSource();
                     if (member && member->IsAlive() && member != bot &&
-                        botAI->IsAssistTank(member))
+                        PlayerbotAI::IsAssistTank(member))
                     {
                         assistTankAlive = true;
                         break;
@@ -3229,7 +3229,7 @@ bool IccLichKingAddsAction::HandleMainTankTargeting(Unit* boss, Difficulty diff)
 
 bool IccLichKingAddsAction::HandleNonTankHeroicPositioning(Unit* boss, Difficulty diff, bool hasPlague)
 {
-    if (botAI->IsTank(bot) || !boss || !IsHeroicLk(diff))
+    if (PlayerbotAI::IsTank(bot) || !boss || !IsHeroicLk(diff))
         return false;
 
     if (boss->HealthBelowPct(71) || hasPlague)
@@ -3281,7 +3281,7 @@ bool IccLichKingAddsAction::HandleNonTankHeroicPositioning(Unit* boss, Difficult
 
 bool IccLichKingAddsAction::HandleRangedPositioning(Unit* boss, bool hasPlague, Difficulty diff)
 {
-    if (!boss || !botAI->IsRanged(bot) || boss->HealthBelowPct(71) ||
+    if (!boss || !PlayerbotAI::IsRanged(bot) || boss->HealthBelowPct(71) ||
         hasPlague || IsHeroicLk(diff))
         return false;
 
@@ -3434,7 +3434,7 @@ bool IccLichKingAddsAction::HandleCenterStacking(Unit* boss, Difficulty diff)
     }
 
     // Main tank only moves to the stack point if he's still the boss's victim.
-    if (botAI->IsMainTank(bot) && boss->GetVictim() != bot)
+    if (PlayerbotAI::IsMainTank(bot) && boss->GetVictim() != bot)
         return false;
 
     float const distToDest = bot->GetDistance2d(dest.GetPositionX(), dest.GetPositionY());
@@ -3559,7 +3559,7 @@ bool IccLichKingAddsAction::HandleDefileMechanics(Unit* boss, Difficulty diff)
 
     // Main tank yells once per cast.
     uint32& lastYellMs = IcecrownHelpers::IccState(bot->GetInstanceId()).lkLastYellMs;
-    if (botAI->IsMainTank(bot) && info.castTime != lastYellMs)
+    if (PlayerbotAI::IsMainTank(bot) && info.castTime != lastYellMs)
     {
         botAI->Yell("Defile on " + target->GetName() + " - move to the edge!");
         lastYellMs = info.castTime;
@@ -3704,7 +3704,7 @@ bool IccLichKingAddsAction::HandleValkyrMechanics(Difficulty diff)
         return false;
     }
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
         return false;
 
     // Defile target: let HandleDefileMechanics() handle movement
@@ -3806,7 +3806,7 @@ bool IccLichKingAddsAction::HandleValkyrAssignment(std::vector<Unit*> const& gra
     for (GroupReference* itr = group->GetFirstMember(); itr; itr = itr->next())
     {
         Player* member = itr->GetSource();
-        if (member && !botAI->IsMainTank(member))
+        if (member && !PlayerbotAI::IsMainTank(member))
             assistMembers.push_back(member);
     }
 
@@ -4052,7 +4052,7 @@ bool IccLichKingAddsAction::HandleVileSpiritMechanics()
     // Assist tank: stacks with the raid at the chosen vile slot, but allowed
     // a 40y leash to intercept the spirit nearest the slot. Keeps nitro boost
     // for chase speed.
-    if (botAI->IsAssistTank(bot))
+    if (PlayerbotAI::IsAssistTank(bot))
     {
         if (!bot->HasAura(SPELL_NITRO_BOOSTS))
             bot->AddAura(SPELL_NITRO_BOOSTS, bot);
@@ -4151,7 +4151,7 @@ bool IccLichKingAddsAction::HandleVileSpiritMechanics()
          Boss->FindCurrentSpellBySpellId(SPELL_HARVEST_SOULS_LK_H2) ||
          Boss->FindCurrentSpellBySpellId(SPELL_HARVEST_SOULS_LK_H3));
 
-    if (!botAI->IsTank(bot) && !bossCastingHarvest)
+    if (!PlayerbotAI::IsTank(bot) && !bossCastingHarvest)
     {
         // Flee to MT if a spirit is targeting this bot OR is within FLEE_RANGE.
         // Either condition is enough — proximity catches spirits that haven't
@@ -4220,7 +4220,7 @@ bool IccLichKingAddsAction::HandleVileSpiritMechanics()
     }
 
     // Healers may stay up to 20y from the slot so they can heal the assist tank
-    float const arriveTol = botAI->IsHeal(bot) ? 20.0f : ARRIVE_TOLERANCE;
+    float const arriveTol = PlayerbotAI::IsHeal(bot) ? 20.0f : ARRIVE_TOLERANCE;
 
     float const tx = slotPos.GetPositionX();
     float const ty = slotPos.GetPositionY();
@@ -4238,7 +4238,7 @@ bool IccLichKingAddsAction::HandleVileSpiritMechanics()
 
 bool IccLichKingAddsAction::HandleIceSphereMechanics()
 {
-    if (!botAI->IsRangedDps(bot))
+    if (!PlayerbotAI::IsRangedDps(bot))
         return false;
 
     Group* group = bot->GetGroup();

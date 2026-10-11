@@ -79,7 +79,7 @@ class EnemyOutOfMeleeTrigger : public OutOfRangeTrigger
 {
 public:
     EnemyOutOfMeleeTrigger(PlayerbotAI* botAI)
-        : OutOfRangeTrigger(botAI, "enemy out of melee range", sPlayerbotAIConfig.meleeDistance)
+        : OutOfRangeTrigger(botAI, "enemy out of melee range", sPlayerbotAIConfig.MeleeDistance)
     {
     }
 

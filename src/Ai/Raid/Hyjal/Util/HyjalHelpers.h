@@ -77,7 +77,7 @@ struct BlockedArc
 // General
 
 inline constexpr uint32 HYJAL_MAP_ID = 534;
-// The interval matches the default AiPlayerbot.ReactDelay.
+// The interval matches the default Playerbots.ReactDelay.
 inline constexpr uint32 HAZARD_CACHE_INTERVAL = 100;
 // The additional distance beyond a hazard's edge in which movement is still suppressed by a
 // multiplier relating to such hazard. Used for Winterchill D&D and Azgalor RoF.
@@ -172,7 +172,7 @@ inline constexpr uint32 MARK_FULL_DRAIN = 3000;
 inline constexpr uint32 MARK_DANGER_MANA = 3200;
 inline constexpr uint32 MARK_REJOIN_MANA = 4000;
 // The standard Warlock strategy casts Life Tap at 85% mana but with very low priority. It is
-// increased to emergency+ priority at AiPlayerbot.LowMana (default 20%). Against Kaz'rogal,
+// increased to emergency+ priority at Playerbots.LowMana (default 20%). Against Kaz'rogal,
 // Life Tap is instead forced to emergency+ priority at the below level, and the requirement for
 // a minimum health threshold (which applies to the class strategies) is removed.
 inline constexpr uint32 MARK_LIFE_TAP_MANA = 5000;

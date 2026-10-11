@@ -15,7 +15,7 @@ class PlayerbotAI;
 class NearestCorpsesValue : public NearestUnitsValue
 {
 public:
-    NearestCorpsesValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig.sightDistance)
+    NearestCorpsesValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig.SightDistance)
         : NearestUnitsValue(botAI, "nearest corpses", range, true)
     {
     }

@@ -17,7 +17,7 @@ class Unit;
 class NearestEnemyPlayersValue : public PossibleTargetsValue
 {
 public:
-    NearestEnemyPlayersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig.grindDistance)
+    NearestEnemyPlayersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig.GrindDistance)
         : PossibleTargetsValue(botAI, "nearest enemy players", range)
     {
     }

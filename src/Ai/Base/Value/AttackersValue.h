@@ -21,7 +21,7 @@ public:
     AttackersValue(PlayerbotAI* botAI) : ObjectGuidListCalculatedValue(botAI, "attackers", 1 * IN_MILLISECONDS) {}
 
     GuidVector Calculate();
-    static bool IsPossibleTarget(Unit* attacker, Player* bot, float range = sPlayerbotAIConfig.sightDistance);
+    static bool IsPossibleTarget(Unit* attacker, Player* bot, float range = sPlayerbotAIConfig.SightDistance);
     static bool IsValidTarget(Unit* attacker, Player* bot);
 
 private:

@@ -173,7 +173,7 @@ public:
     virtual bool IsActive()
     {
         Unit* target = AI_VALUE(Unit*, "current target");
-        return ThaddiusPhasePetTrigger::IsActive() && botAI->IsTank(bot) && target && target->GetVictim() != bot;
+        return ThaddiusPhasePetTrigger::IsActive() && PlayerbotAI::IsTank(bot) && target && target->GetVictim() != bot;
     }
 };
 

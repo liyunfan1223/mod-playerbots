@@ -60,10 +60,10 @@ bool UseItemAction::UseGameObject(ObjectGuid guid)
     if (!go || !go->isSpawned())
         return fail("gameobject_unavailable_error", "Game object is no longer available");
 
-    if (sPlayerbotAIConfig.disallowedGameObjects.contains(go->GetEntry()))
+    if (sPlayerbotAIConfig.DisallowedGameObjects.contains(go->GetEntry()))
         return fail("gameobject_disallowed_error", "Game object is disallowed by configuration");
 
-    if (sPlayerbotAIConfig.lootDistance && bot->GetDistance(go) > sPlayerbotAIConfig.lootDistance)
+    if (sPlayerbotAIConfig.LootDistance && bot->GetDistance(go) > sPlayerbotAIConfig.LootDistance)
         return fail("gameobject_outside_loot_distance_error", "Game object is outside the configured loot distance");
 
     if (go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE) ||
@@ -315,7 +315,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     if (bot->isMoving())
     {
         bot->StopMoving();
-        botAI->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
         return false;
     }
 
@@ -357,7 +357,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
                 targetText = chat->FormatItem(itemForSpell->GetTemplate());
             }
             uint32 castTime = spellInfo->CalcCastTime();
-            botAI->SetNextCheckDelay(castTime + sPlayerbotAIConfig.reactDelay);
+            botAI->SetNextCheckDelay(castTime + sPlayerbotAIConfig.ReactDelay);
         }
 
         break;
@@ -435,7 +435,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     if (!spellId)
         return false;
 
-    // botAI->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+    // botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
     std::string useText =
         targetSelected
             ? PlayerbotTextMgr::instance().GetBotTextOrDefault("use_item_on_target", "Using %item on %target",
@@ -626,7 +626,7 @@ bool UseRandomQuestItem::Execute(Event /*event*/)
 
     bool used = UseItem(item, goTarget, nullptr, unitTarget);
     if (used)
-        botAI->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
 
     return used;
 }

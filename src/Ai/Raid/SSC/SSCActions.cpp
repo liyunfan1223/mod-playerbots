@@ -488,7 +488,7 @@ bool TheLurkerBelowRunAroundBehindBossAction::Execute(Event /*event*/)
     float relativeAngle = Position::NormalizeOrientation(botAngle - lurker->GetOrientation());
     constexpr float safeArc = M_PI / 2.0f;
 
-    if (!botAI->IsMainTank(bot) &&
+    if (!PlayerbotAI::IsMainTank(bot) &&
         std::fabs(Position::NormalizeOrientation(relativeAngle - M_PI)) > safeArc / 2.0f)
     {
         float tangentAngle = botAngle + (relativeAngle > M_PI ? -0.1f : 0.1f);
@@ -549,7 +549,7 @@ bool TheLurkerBelowSpreadRangedInArcAction::Execute(Event /*event*/)
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->GetSource();
-            if (!member || !member->IsAlive() || !botAI->IsRanged(member))
+            if (!member || !member->IsAlive() || !PlayerbotAI::IsRanged(member))
                 continue;
 
             rangedMembers.push_back(member);
@@ -842,10 +842,10 @@ bool LeotherasTheBlindDestroyInnerDemonAction::Execute(Event /*event*/)
 
     if (innerDemon)
     {
-        if (botAI->IsTank(bot) && bot->getClass() == CLASS_DRUID)
+        if (PlayerbotAI::IsTank(bot) && bot->getClass() == CLASS_DRUID)
             return HandleFeralTankStrategy(innerDemon);
 
-        if (botAI->IsHeal(bot))
+        if (PlayerbotAI::IsHeal(bot))
             return HandleHealerStrategy(innerDemon);
 
         // Roles without a strategy need to affirmatively attack their Inner Demons
@@ -1336,7 +1336,7 @@ bool FathomLordKarathressAssignDpsPriorityAction::Execute(Event /*event*/)
 {
     // Target priority 1: Spitfire Totems for melee dps
     Unit* totem = GetFirstAliveUnitByEntry(botAI, NPC_SPITFIRE_TOTEM);
-    if (totem && botAI->IsMelee(bot) && botAI->IsDps(bot))
+    if (totem && PlayerbotAI::IsMelee(bot) && PlayerbotAI::IsDps(bot))
     {
         if (MarkTargetWithSkull(bot, totem))
             return true;
@@ -1374,7 +1374,7 @@ bool FathomLordKarathressAssignDpsPriorityAction::Execute(Event /*event*/)
 
     // Target priority 3: Caribdis for ranged dps
     Unit* caribdis = AI_VALUE2(Unit*, "find target", "fathom-guard caribdis");
-    if (botAI->IsRangedDps(bot) && caribdis)
+    if (PlayerbotAI::IsRangedDps(bot) && caribdis)
     {
         if (MarkTargetWithDiamond(bot, caribdis))
             return true;
@@ -1411,7 +1411,7 @@ bool FathomLordKarathressAssignDpsPriorityAction::Execute(Event /*event*/)
 
     // Target priority 5: Sharkkis pets for all dps
     Unit* fathomSporebat = AI_VALUE2(Unit*, "find target", "fathom sporebat");
-    if (fathomSporebat && botAI->IsMelee(bot))
+    if (fathomSporebat && PlayerbotAI::IsMelee(bot))
     {
         if (MarkTargetWithCross(bot, fathomSporebat))
             return true;
@@ -1425,7 +1425,7 @@ bool FathomLordKarathressAssignDpsPriorityAction::Execute(Event /*event*/)
     }
 
     Unit* fathomLurker = AI_VALUE2(Unit*, "find target", "fathom lurker");
-    if (fathomLurker && botAI->IsMelee(bot))
+    if (fathomLurker && PlayerbotAI::IsMelee(bot))
     {
         if (MarkTargetWithSquare(bot, fathomLurker))
             return true;
@@ -1694,7 +1694,7 @@ bool LadyVashjPhase1SpreadRangedInArcAction::Execute(Event /*event*/)
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (member && GET_PLAYERBOT_AI(member) && botAI->IsRanged(member))
+        if (member && GET_PLAYERBOT_AI(member) && PlayerbotAI::IsRanged(member))
             spreadMembers.push_back(member);
     }
 
@@ -1792,7 +1792,7 @@ bool LadyVashjStaticChargeMoveAwayFromGroupAction::Execute(Event /*event*/)
     }
 
     // If any other bot has Static Charge, it should move away from other group members
-    if (!botAI->IsMainTank(bot) && bot->HasAura(SPELL_STATIC_CHARGE))
+    if (!PlayerbotAI::IsMainTank(bot) && bot->HasAura(SPELL_STATIC_CHARGE))
     {
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
@@ -1840,7 +1840,7 @@ bool LadyVashjAssignPhase2AndPhase3DpsPriorityAction::Execute(Event /*event*/)
 
     // Search and attack radius are intended to keep bots from going down the stairs
     const float maxSearchRange =
-        botAI->IsRanged(bot) ? 60.0f : 55.0f;
+        PlayerbotAI::IsRanged(bot) ? 60.0f : 55.0f;
     const float maxPursueRange = maxSearchRange - 5.0f;
 
     for (auto guid : attackers)
@@ -1887,7 +1887,7 @@ bool LadyVashjAssignPhase2AndPhase3DpsPriorityAction::Execute(Event /*event*/)
     std::vector<Unit*> targets;
     if (IsLadyVashjInPhase2(botAI))
     {
-        if (botAI->IsRanged(bot))
+        if (PlayerbotAI::IsRanged(bot))
         {
             // Hunters and Mages prioritize Enchanted Elementals,
             // while other ranged DPS prioritize Striders
@@ -1896,11 +1896,11 @@ bool LadyVashjAssignPhase2AndPhase3DpsPriorityAction::Execute(Event /*event*/)
             else
                 targets = { strider, elite, enchanted };
         }
-        else if (botAI->IsMelee(bot) && botAI->IsDps(bot))
+        else if (PlayerbotAI::IsMelee(bot) && PlayerbotAI::IsDps(bot))
             targets = { enchanted, elite };
-        else if (botAI->IsTank(bot))
+        else if (PlayerbotAI::IsTank(bot))
         {
-            if (botAI->HasCheat(BotCheatMask::raid) && botAI->IsAssistTankOfIndex(bot, 0, true))
+            if (botAI->HasCheat(BotCheatMask::raid) && PlayerbotAI::IsAssistTankOfIndex(bot, 0, true))
                 targets = { strider, elite, enchanted };
             else
                 targets = { elite, strider, enchanted };
@@ -1911,9 +1911,9 @@ bool LadyVashjAssignPhase2AndPhase3DpsPriorityAction::Execute(Event /*event*/)
 
     if (IsLadyVashjInPhase3(botAI))
     {
-        if (botAI->IsTank(bot))
+        if (PlayerbotAI::IsTank(bot))
         {
-            if (botAI->IsMainTank(bot))
+            if (PlayerbotAI::IsMainTank(bot))
             {
                 if (MarkTargetWithDiamond(bot, vashj))
                     return true;
@@ -1922,14 +1922,14 @@ bool LadyVashjAssignPhase2AndPhase3DpsPriorityAction::Execute(Event /*event*/)
                 targets = { vashj };
             }
             else if (botAI->HasCheat(BotCheatMask::raid) &&
-                     botAI->IsAssistTankOfIndex(bot, 0, true))
+                     PlayerbotAI::IsAssistTankOfIndex(bot, 0, true))
             {
                 targets = { strider, elite, enchanted, vashj };
             }
             else
                 targets = { elite, strider, enchanted, vashj };
         }
-        else if (botAI->IsRanged(bot))
+        else if (PlayerbotAI::IsRanged(bot))
         {
             // Hunters are assigned to kill Sporebats in Phase 3
             if (bot->getClass() == CLASS_HUNTER)
@@ -1937,7 +1937,7 @@ bool LadyVashjAssignPhase2AndPhase3DpsPriorityAction::Execute(Event /*event*/)
             else
                 targets = { enchanted, strider, elite, vashj };
         }
-        else if (botAI->IsMelee(bot) && botAI->IsDps(bot))
+        else if (PlayerbotAI::IsMelee(bot) && PlayerbotAI::IsDps(bot))
             targets = { enchanted, elite, vashj };
         else
             targets = { enchanted, elite, strider, vashj };
@@ -2015,12 +2015,12 @@ bool LadyVashjTankAttackAndMoveAwayStriderAction::Execute(Event /*event*/)
     // Raid cheat automatically applies Fear Ward to tanks to make Strider tankable
     // This simulates the real-life strategy where the Strider can be meleed by
     // players wearing an Ogre Suit (due to the extended combat reach)
-    if (botAI->HasCheat(BotCheatMask::raid) && botAI->IsTank(bot))
+    if (botAI->HasCheat(BotCheatMask::raid) && PlayerbotAI::IsTank(bot))
     {
         if (!bot->HasAura(SPELL_FEAR_WARD))
             bot->AddAura(SPELL_FEAR_WARD, bot);
 
-        if (botAI->IsAssistTankOfIndex(bot, 0, true) &&
+        if (PlayerbotAI::IsAssistTankOfIndex(bot, 0, true) &&
             AI_VALUE(Unit*, "current target") != strider)
             return Attack(strider);
 
@@ -2037,7 +2037,7 @@ bool LadyVashjTankAttackAndMoveAwayStriderAction::Execute(Event /*event*/)
     {
         float currentDistance = bot->GetExactDist2d(strider);
         constexpr float safeDistance = 20.0f;
-        if (!botAI->IsTank(bot) && currentDistance < safeDistance)
+        if (!PlayerbotAI::IsTank(bot) && currentDistance < safeDistance)
             return MoveAway(strider, safeDistance - currentDistance);
 
         // Try to root/slow the Strider if it is not tankable (poor man's kiting strategy)
@@ -2124,7 +2124,7 @@ bool LadyVashjLootTaintedCoreAction::Execute(Event /*event*/)
 
     context->GetValue<LootObject>("loot target")->Set(loot);
 
-    const float maxLootRange = sPlayerbotAIConfig.lootDistance;
+    const float maxLootRange = sPlayerbotAIConfig.LootDistance;
     constexpr float distFromObject = 2.0f;
 
     if (bot->GetDistance(elemental) > maxLootRange)
@@ -2862,7 +2862,7 @@ bool LadyVashjUseFreeActionAbilitiesAction::Execute(Event /*event*/)
     {
         Player* member = ref->GetSource();
         if (!member || !member->IsAlive() || !member->HasAura(SPELL_ENTANGLE) ||
-            !botAI->IsMelee(member))
+            !PlayerbotAI::IsMelee(member))
             continue;
 
         bool nearToxicSpore = false;
@@ -2877,7 +2877,7 @@ bool LadyVashjUseFreeActionAbilitiesAction::Execute(Event /*event*/)
 
         if (nearToxicSpore)
         {
-            if (botAI->IsMainTank(member))
+            if (PlayerbotAI::IsMainTank(member))
                 mainTankToxic = member;
 
             if (!anyToxic)
@@ -2886,7 +2886,7 @@ bool LadyVashjUseFreeActionAbilitiesAction::Execute(Event /*event*/)
 
         if (member->HasAura(SPELL_STATIC_CHARGE))
         {
-            if (botAI->IsMainTank(member))
+            if (PlayerbotAI::IsMainTank(member))
                 mainTankStatic = member;
 
             if (!anyStatic)

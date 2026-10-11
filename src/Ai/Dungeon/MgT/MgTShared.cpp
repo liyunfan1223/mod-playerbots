@@ -1811,7 +1811,7 @@ bool OnLapseStation(Player* bot, Unit* kael, LapseSpot const& spot)
     if (!IsLapseMeleeSlot(bot) || !kael)
         return bot->GetExactDist2d(spot.x, spot.y) <= LAPSE_TOLERANCE;
 
-    return bot->IsWithinCombatRange(kael, sPlayerbotAIConfig.meleeDistance + CONTACT_DISTANCE);
+    return bot->IsWithinCombatRange(kael, sPlayerbotAIConfig.MeleeDistance + CONTACT_DISTANCE);
 }
 
 bool LapseThreatened(Player* bot, LapseWorld const& world)

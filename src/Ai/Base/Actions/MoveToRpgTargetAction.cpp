@@ -57,7 +57,7 @@ bool MoveToRpgTargetAction::Execute(Event /*event*/)
     }
 
     if ((unit && unit->isMoving() && !urand(0, 20)) || !ChooseRpgTargetAction::isFollowValid(bot, wo) ||
-        guidP.distance(bot) > sPlayerbotAIConfig.reactDistance * 2 || !urand(0, 50))
+        guidP.distance(bot) > sPlayerbotAIConfig.ReactDistance * 2 || !urand(0, 50))
     {
         AI_VALUE(GuidSet&, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target"));
         RESET_AI_VALUE(GuidPosition, "rpg target");
@@ -69,7 +69,7 @@ bool MoveToRpgTargetAction::Execute(Event /*event*/)
     float z = wo->GetPositionZ();
     float mapId = wo->GetMapId();
 
-    if (sPlayerbotAIConfig.randombotsWalkingRPG)
+    if (sPlayerbotAIConfig.RandomBotsWalkingRPG)
         if (!bot->IsOutdoors())
             bot->m_movementInfo.AddMovementFlag(MOVEMENTFLAG_WALKING);
 

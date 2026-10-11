@@ -72,7 +72,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             return PLAYERBOT_SECURITY_TALK;
         }
 
-        if (sPlayerbotAIConfig.groupInvitationPermission <= 0)
+        if (sPlayerbotAIConfig.GroupInvitationPermission <= 0)
         {
             if (reason)
                 *reason = PLAYERBOT_DENY_NONE;
@@ -80,7 +80,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             return PLAYERBOT_SECURITY_TALK;
         }
 
-        if (sPlayerbotAIConfig.groupInvitationPermission <= 1)
+        if (sPlayerbotAIConfig.GroupInvitationPermission <= 1)
         {
             int32 levelDiff = int32(bot->GetLevel()) - int32(from->GetLevel());
             if (levelDiff > 5)
@@ -98,7 +98,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         int32 botGS = static_cast<int32>(botAI->GetEquipGearScore(bot));
         int32 fromGS = static_cast<int32>(botAI->GetEquipGearScore(from));
 
-        if (sPlayerbotAIConfig.gearscorecheck && botGS && bot->GetLevel() > 15 && botGS > fromGS)
+        if (sPlayerbotAIConfig.GearScoreCheck && botGS && bot->GetLevel() > 15 && botGS > fromGS)
         {
             uint32 diffPct = uint32(100 * (botGS - fromGS) / botGS);
             uint32 reqPct = uint32(12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) / from->GetLevel());
@@ -276,7 +276,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
     ObjectGuid guid = from->GetGUID();
     time_t lastSaid = whispers[guid][text];
 
-    if (!lastSaid || (time(nullptr) - lastSaid) >= sPlayerbotAIConfig.repeatDelay / 1000)
+    if (!lastSaid || (time(nullptr) - lastSaid) >= sPlayerbotAIConfig.RepeatDelay / 1000)
     {
         whispers[guid][text] = time(nullptr);
 

@@ -25,13 +25,13 @@
 bool LowManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana;
+           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.LowMana;
 }
 
 bool MediumManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.mediumMana;
+           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.MediumMana;
 }
 
 bool LowEnergyTrigger::IsActive()
@@ -72,7 +72,7 @@ bool PetAttackTrigger::IsActive()
 bool HighManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.highMana;
+           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.HighMana;
 }
 
 bool AlmostFullManaTrigger::IsActive()
@@ -84,7 +84,7 @@ bool AlmostFullManaTrigger::IsActive()
 bool EnoughManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.highMana;
+           AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.HighMana;
 }
 
 bool RageAvailable::IsActive() { return AI_VALUE2(uint8, "rage", "self target") >= amount; }
@@ -280,11 +280,11 @@ RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 p
 
 bool RandomTrigger::IsActive()
 {
-    if (getMSTime() - lastCheck < sPlayerbotAIConfig.repeatDelay)
+    if (getMSTime() - lastCheck < sPlayerbotAIConfig.RepeatDelay)
         return false;
 
     lastCheck = getMSTime();
-    int32 k = (int32)(probability / sPlayerbotAIConfig.randomChangeMultiplier);
+    int32 k = (int32)(probability / sPlayerbotAIConfig.RandomChangeMultiplier);
     if (k < 1)
         k = 1;
 
@@ -345,10 +345,10 @@ bool GenericBoostTrigger::IsActive()
 
 bool HealerShouldAttackTrigger::IsActive()
 {
-    if (botAI->GetNearGroupMemberCount(sPlayerbotAIConfig.sightDistance) <= 1)
+    if (botAI->GetNearGroupMemberCount(sPlayerbotAIConfig.SightDistance) <= 1)
         return true;
 
-    if (AI_VALUE2(uint8, "health", "party member to heal") < sPlayerbotAIConfig.almostFullHealth)
+    if (AI_VALUE2(uint8, "health", "party member to heal") < sPlayerbotAIConfig.AlmostFullHealth)
         return false;
 
     if (bot->GetAura(33891)) // Tree of Life
@@ -363,9 +363,9 @@ bool HealerShouldAttackTrigger::IsActive()
     if (balance <= 50)
         manaThreshold = 85;
     else if (balance <= 100)
-        manaThreshold = sPlayerbotAIConfig.highMana;
+        manaThreshold = sPlayerbotAIConfig.HighMana;
     else
-        manaThreshold = sPlayerbotAIConfig.mediumMana;
+        manaThreshold = sPlayerbotAIConfig.MediumMana;
 
     if (AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < manaThreshold)
         return false;
@@ -637,7 +637,7 @@ bool ReturnToStayPositionTrigger::IsActive()
     if (stayPosition.isSet())
     {
         const float distance = bot->GetDistance(stayPosition.x, stayPosition.y, stayPosition.z);
-        return distance > sPlayerbotAIConfig.followDistance;
+        return distance > sPlayerbotAIConfig.FollowDistance;
     }
 
     return false;

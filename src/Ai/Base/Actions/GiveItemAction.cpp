@@ -63,7 +63,7 @@ Unit* GiveItemAction::GetTarget() { return AI_VALUE2(Unit*, "party member withou
 
 bool GiveItemAction::isUseful()
 {
-    return GetTarget() && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.lowMana;
+    return GetTarget() && AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.LowMana;
 }
 
 Unit* GiveFoodAction::GetTarget() { return AI_VALUE(Unit*, "party member without food"); }

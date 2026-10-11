@@ -46,7 +46,7 @@ bool DrinkAction::Execute(Event event)
         if (bot->isMoving())
         {
             bot->StopMoving();
-            // botAI->SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
+            // botAI->SetNextCheckDelay(sPlayerbotAIConfig->GlobalCoolDown);
             // return false;
         }
         bot->SetStandState(UNIT_STAND_STATE_SIT);
@@ -105,7 +105,7 @@ bool EatAction::Execute(Event event)
         if (bot->isMoving())
         {
             bot->StopMoving();
-            // botAI->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+            // botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
             // return false;
         }
 
@@ -134,7 +134,7 @@ bool EatAction::Execute(Event event)
 bool EatAction::isUseful()
 {
     return UseItemAction::isUseful() &&
-           AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.lowHealth;
+           AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.LowHealth;
 }
 
 bool EatAction::isPossible()
