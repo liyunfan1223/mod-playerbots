@@ -411,6 +411,20 @@ Position GetHydrossHandoffPosition(bool frostTank)
         own.GetPositionZ());
 }
 
+bool CanHydrossMarkBeMaxed(Unit* hydross)
+{
+    if (!hydross)
+        return false;
+
+    SscInstanceState const& state = SscState(hydross->GetInstanceId());
+    std::optional<uint32> const& phaseStartTime = IsHydrossInFrostPhase(hydross) ?
+        state.hydrossFrostPhaseStartTime : state.hydrossNaturePhaseStartTime;
+
+    // Don't count residual Marks from a bad transition for purposes of the dps hold window.
+    constexpr uint32 staleMarkWindowMs = 45 * IN_MILLISECONDS;
+    return phaseStartTime && getMSTimeDiff(*phaseStartTime, getMSTime()) >= staleMarkWindowMs;
+}
+
 bool HasMarkOfHydrossAt100Percent(Player* player)
 {
     if (!player)
@@ -1544,7 +1558,7 @@ bool IsVashjCorePassingChainLive(Player* bot, VashjCorePassingChain const& chain
         return false;
 
     // The core lands in the catcher's bags at once; this covers the tick or so before its own
-    // checks see it
+    // checks see it.
     constexpr uint32 throwGraceMs = 3 * IN_MILLISECONDS;
     if (chain.throwTime && getMSTimeDiff(chain.throwTime, getMSTime()) < throwGraceMs)
         return true;
@@ -1553,7 +1567,6 @@ bool IsVashjCorePassingChainLive(Player* bot, VashjCorePassingChain const& chain
     if (tainted && IsTaintedCoreStillToLoot(tainted))
         return true;
 
-    // Only the last holder, or the catcher it last threw to, can have it
     ObjectGuid const holder =
         chain.reached >= 0 ? chain.catchers[chain.reached].bot : chain.originBot;
     for (ObjectGuid const guid : { holder, chain.throwTarget })
@@ -1583,7 +1596,7 @@ int8 GetLadyVashjPhase(Unit* vashj)
     if (vashj->HasAura(Id(SscSpells::SPELL_MAGIC_BARRIER)))
         return 2;
 
-    // Phase 3, else transitioning from Phase 1 to Phase 2
+    // Phase 3, else transitioning from Phase 1 to Phase 2.
     return healthPct <= 50.0f ? 3 : 0;
 }
 
@@ -2104,7 +2117,6 @@ bool GetStepToCastRangeAroundSpores(
             continue;
         }
 
-        // From the stairs the line can't keep to the dais; it only must not cut through a rock.
         if (fromDais ?
                 !IsVashjLineOnDais(
                     from, candidate, VASHJ_DAIS_MARGIN, VASHJ_STANDING_ROCK_CLEARANCE) :

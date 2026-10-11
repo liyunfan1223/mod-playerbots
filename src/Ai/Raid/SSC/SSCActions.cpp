@@ -150,8 +150,8 @@ bool HydrossTheUnstablePositionAndSwapTanksAction::Execute(Event /*event*/)
         return StepTo(myPosition, hydross);
     }
 
-    bool const markMaxed =
-        _frostTank ? HasMarkOfHydrossAt100Percent(bot) : HasMarkOfCorruptionAt100Percent(bot);
+    bool const markMaxed = CanHydrossMarkBeMaxed(hydross) &&
+        (_frostTank ? HasMarkOfHydrossAt100Percent(bot) : HasMarkOfCorruptionAt100Percent(bot));
 
     if (!markMaxed)
     {
@@ -233,8 +233,11 @@ bool HydrossTheUnstableManagePhaseTimersAction::Execute(Event /*event*/)
         updated |= ResetIfSet(state.hydrossNaturePhaseStartTime);
         updated |= ResetIfSet(state.hydrossNatureMarkMaxedTime);
 
-        if (!state.hydrossFrostMarkMaxedTime && HasMarkOfHydrossAt100Percent(marked))
+        if (!state.hydrossFrostMarkMaxedTime && CanHydrossMarkBeMaxed(hydross) &&
+            HasMarkOfHydrossAt100Percent(marked))
+        {
             updated |= EmplaceIfUnset(state.hydrossFrostMarkMaxedTime, now);
+        }
     }
     else // Nature phase
     {
@@ -242,8 +245,11 @@ bool HydrossTheUnstableManagePhaseTimersAction::Execute(Event /*event*/)
         updated |= ResetIfSet(state.hydrossFrostPhaseStartTime);
         updated |= ResetIfSet(state.hydrossFrostMarkMaxedTime);
 
-        if (!state.hydrossNatureMarkMaxedTime && HasMarkOfCorruptionAt100Percent(marked))
+        if (!state.hydrossNatureMarkMaxedTime && CanHydrossMarkBeMaxed(hydross) &&
+            HasMarkOfCorruptionAt100Percent(marked))
+        {
             updated |= EmplaceIfUnset(state.hydrossNatureMarkMaxedTime, now);
+        }
     }
 
     return updated;

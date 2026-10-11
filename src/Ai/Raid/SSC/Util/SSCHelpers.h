@@ -214,6 +214,7 @@ bool IsHydrossInFrostPhase(Unit* hydross);
 bool IsHydrossInNaturePhase(Unit* hydross);
 HydrossDpsHoldWindow GetHydrossDpsHoldWindow(Unit* hydross);
 Position GetHydrossHandoffPosition(bool frostTank);
+bool CanHydrossMarkBeMaxed(Unit* hydross);
 bool HasMarkOfHydrossAt100Percent(Player* player);
 bool HasNoMarkOfHydross(Player* bot);
 bool HasMarkOfCorruptionAt100Percent(Player* player);
