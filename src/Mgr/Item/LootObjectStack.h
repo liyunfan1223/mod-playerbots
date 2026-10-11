@@ -9,6 +9,7 @@
 
 #include <array>
 #include <chrono>
+#include <vector>
 
 #include "ObjectGuid.h"
 
@@ -49,7 +50,7 @@ public:
     bool IsLootPossible(Player* bot);
     void Refresh(Player* bot, ObjectGuid guid);
     WorldObject* GetWorldObject(Player* bot);
-    static Player* GetQuestLootReceiver(Player* bot);
+    static std::vector<Player*> GetQuestLootReceivers(Player* bot);
     uint32 GetLockType() const { return _lockType; }
     ObjectGuid guid;
 

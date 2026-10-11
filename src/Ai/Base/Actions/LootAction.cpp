@@ -6,6 +6,8 @@
 
 #include "LootAction.h"
 
+#include <algorithm>
+
 #include "BroadcastHelper.h"
 #include "ChatHelper.h"
 #include "Event.h"
@@ -354,7 +356,7 @@ proto->Name1.c_str(), 1, bidPrice, buyoutPrice);
 }
 */
 
-// Loot a bot leaves to its quest loot receiver (see LootObject::GetQuestLootReceiver): only what the receiver can
+// Loot a bot leaves to a quest loot receiver (see LootObject::GetQuestLootReceivers): only what the receiver can
 // still take, since an item left for nobody keeps the corpse lootable and the bot coming back to it.
 static bool IsQuestLoot(ItemTemplate const* proto, Player* receiver)
 {
@@ -377,6 +379,12 @@ static bool IsQuestLoot(ItemTemplate const* proto, Player* receiver)
            !receiver->GetQuestRewardStatus(proto->StartQuest) &&
            !(proto->MaxCount && receiver->HasItemCount(proto->ItemId, proto->MaxCount, true)) &&
            (!prevQuestId || receiver->GetQuestRewardStatus(prevQuestId));
+}
+
+static bool IsQuestLoot(ItemTemplate const* proto, std::vector<Player*> const& receivers)
+{
+    return std::any_of(receivers.begin(), receivers.end(),
+                       [proto](Player* receiver) { return IsQuestLoot(proto, receiver); });
 }
 
 bool StoreLootAction::Execute(Event event)
@@ -423,7 +431,7 @@ bool StoreLootAction::Execute(Event event)
     if (!currentLoot)
         bot->SetLootGUID(guid);
 
-    Player* questLootReceiver = LootObject::GetQuestLootReceiver(bot);
+    std::vector<Player*> const questLootReceivers = LootObject::GetQuestLootReceivers(bot);
 
     if (gold > 0)
     {
@@ -458,7 +466,7 @@ bool StoreLootAction::Execute(Event event)
             continue;
 
         // Opening spells deliver gameobject loot as LOOT_SKINNING, which skips IsLootAllowed above.
-        if (loot_type == LOOT_SKINNING && questLootReceiver && IsQuestLoot(proto, questLootReceiver))
+        if (loot_type == LOOT_SKINNING && IsQuestLoot(proto, questLootReceivers))
             continue;
 
         if (!IsRealPlayer(botAI->GetMaster()) && AI_VALUE(uint8, "bag space") > 80)
@@ -540,10 +548,8 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
         return true;
 
     // Loot from an item in the bot's own bags can't go to anyone else.
-    Player* questLootReceiver = AI_VALUE(LootObject, "loot target").guid.IsItem()
-                                    ? nullptr
-                                    : LootObject::GetQuestLootReceiver(botAI->GetBot());
-    if (questLootReceiver && IsQuestLoot(proto, questLootReceiver))
+    if (!AI_VALUE(LootObject, "loot target").guid.IsItem() &&
+        IsQuestLoot(proto, LootObject::GetQuestLootReceivers(botAI->GetBot())))
         return false;
 
     uint32 max = proto->MaxCount;
