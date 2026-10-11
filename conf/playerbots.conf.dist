@@ -1766,13 +1766,20 @@ Playerbots.PermanentlyInWorldTime = 31104000
 #                                                       #
 #########################################################
 
+# Playerbots.BotAdaptiveTalents.
+# When enabled: Bots do a full respec at 60, 61, 70, 71 and 80. And have a chance to select a new spec.
+# Frost Mage, might spec Fire. Holy Priest might spec Shadow etc.
+
+# When disabled: Chooses a spec when bot is created and increments on it.
+# The bots do however reset talents when a new talent bracket is available, but still selects the same spec
+# A fire mage, will always be fire for example.
+# Default: 0
+
+Playerbots.BotAdaptiveTalents = 0
+
 ####################################################################################################
 # INFORMATION
 #
-
-# Playerbots.BotAdaptiveTalents.
-# When enabled: Bots respecs at 60, 61, 70, 71 and 80, and might choose a completely new spec.
-# When disabled: Chooses a spec and increments on it, from 10-80.
 
 # Playerbots.PremadeSpecName.<class>.<specno> = <name>         #Name of the talent specialisation
 # Playerbots.PremadeSpecLink.<class>.<specno>.<level> = <link> #Wowhead style link the bot should work towards at given level.
@@ -1783,11 +1790,17 @@ Playerbots.PermanentlyInWorldTime = 31104000
 # Playerbots.RandomClassSpecProb.<class>.<specno>.<level>  # The probability to choose the spec
 # Playerbots.RandomClassSpecIndex.<class>.<specno> # The spec index in PremadeSpec
 
+# Examples - With the default configuration:
+# When leveling 10-59, bots will choose .59 spec.
+# When leveling 60, bots will choose .60 spec.
+# When leveling 61-69, bots will choose .69 spec.
+# When leveling 70, bots will choose .70 spec.
+# When leveling 71, bots will choose .79 spec.
+# When leveling 80, bots will choose .80 spec.
 #
 #
 ####################################################################################################
 
-Playerbots.BotAdaptiveTalents = 1
 
 ####################################################################################################
 # WARRIOR
