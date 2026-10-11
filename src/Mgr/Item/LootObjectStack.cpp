@@ -269,12 +269,12 @@ bool LootObject::IsNeededForQuest(Player* bot, uint32 itemId)
     return false;
 }
 
-// With AiPlayerbot.SyncQuestWithPlayer a bot completes a quest the moment its master hands it in, so quest loot is
+// With Playerbots.SyncQuestWithPlayer a bot completes a quest the moment its master hands it in, so quest loot is
 // of no use to it and would only be taken from the player. Returns the player a grouped bot leaves quest loot to,
 // or nullptr when the bot loots for itself.
 Player* LootObject::GetQuestLootReceiver(Player* bot)
 {
-    if (!sPlayerbotAIConfig.syncQuestWithPlayer)
+    if (!sPlayerbotAIConfig.SyncQuestWithPlayer)
         return nullptr;
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
