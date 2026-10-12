@@ -755,6 +755,13 @@ Playerbots.PreQuests = 0
 # Default: 1 (enabled)
 Playerbots.RandomBotJoinLfg = 1
 
+# Allow randombots to join the Dungeon Finder for dungeons and raids of an expansion they have outleveled
+# If disabled, randombots above level 60 do not queue for classic entries and randombots above level 70
+# do not queue for TBC entries, even where the entry's level range allows it (Stratholme is 55-65)
+# Seasonal bosses are exempt
+# Default: 1 (enabled)
+Playerbots.RandomBotJoinLfgOutleveledExpansion = 1
+
 # Enable/Disable periodic online - offline of randombots to mimic the real-world scenario where not all players are online simultaneously
 # When enabled, randombots are randomly selected to go online or offline periodically from a larger set
 # Default: 0 (disabled, the set of online bots remains fixed)
