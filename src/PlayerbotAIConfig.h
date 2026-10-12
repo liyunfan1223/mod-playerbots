@@ -71,7 +71,9 @@ enum NewRpgStatus : int
     // Taking a break
     RPG_REST = 7,
     RPG_OUTDOOR_PVP = 8,
-    RPG_STATUS_END = 9
+    // Roam the current zone harvesting herb/ore nodes
+    RPG_DO_GATHER = 9,
+    RPG_STATUS_END = 10
 };
 
 #define MAX_SPECNO 20
