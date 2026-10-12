@@ -409,6 +409,18 @@ Playerbots.SpellDistance = 28.5
 Playerbots.ShootDistance = 5.0
 Playerbots.HealDistance = 38.5
 Playerbots.LootDistance = 15.0
+
+# Suppress new grind targets while a quest giver with something to accept or reward is within
+# Playerbots.QuestGiverSearchDistance; without it the nearby-giver interaction the new RPG actions
+# try first stays starved behind "attack anything" and bots keep grinding next to a turn-in.
+# Food, drink and looting keep their priority.
+# Default: 0 (opt-in)
+Playerbots.PrioritiseQuestGivers = 0
+
+# Search range (yards) for the new RPG quest giver interaction, and for the grind suppression above.
+# Effective range is capped at Playerbots.RpgTargetSearchDistance (or the map visibility range when
+# that is 0), since the candidates come from the new RPG caches.
+Playerbots.QuestGiverSearchDistance = 80.0
 Playerbots.FleeDistance = 5.0
 Playerbots.AggroDistance = 22
 Playerbots.TooCloseDistance = 5.0

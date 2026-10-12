@@ -28,6 +28,7 @@
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
 #include "Position.h"
+#include "PossibleRpgTargetsValue.h"
 #include "QuestDef.h"
 #include "QuestPackets.h"
 #include "Random.h"
@@ -37,6 +38,7 @@
 #include "Timer.h"
 #include "TravelMgr.h"
 #include "G3D/Vector2.h"
+#include <algorithm>
 
 bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
 {
@@ -328,7 +330,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
 
         QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
         if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
-            IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
+            IsQuestWorthDoing(bot, quest) && IsQuestCapableDoing(bot, quest))
         {
             AcceptQuest(quest, guid);
             if (botAI->GetMaster())
@@ -356,7 +358,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
     return true;
 }
 
-bool NewRpgBaseAction::CanInteractWithQuestGiver(Object* questGiver)
+bool NewRpgBaseAction::CanInteractWithQuestGiver(Player* bot, Object* questGiver)
 {
     // This is a variant of Player::CanInteractWithQuestGiver
     // that removes the distance check and keeps all other checks
@@ -561,7 +563,7 @@ uint32 NewRpgBaseAction::BestRewardIndex(Quest const* quest)
     }
 }
 
-bool NewRpgBaseAction::IsQuestWorthDoing(Quest const* quest)
+bool NewRpgBaseAction::IsQuestWorthDoing(Player* bot, Quest const* quest)
 {
     bool isLowLevelQuest =
         bot->GetLevel() > (bot->GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF));
@@ -578,7 +580,7 @@ bool NewRpgBaseAction::IsQuestWorthDoing(Quest const* quest)
     return true;
 }
 
-bool NewRpgBaseAction::IsQuestCapableDoing(Quest const* quest)
+bool NewRpgBaseAction::IsQuestCapableDoing(Player* bot, Quest const* quest)
 {
     bool highLevelQuest = bot->GetLevel() + 3 < bot->GetQuestLevel(quest);
     if (highLevelQuest)
@@ -619,7 +621,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             continue;
 
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        if (!IsQuestWorthDoing(quest) || !IsQuestCapableDoing(quest) ||
+        if (!IsQuestWorthDoing(bot, quest) || !IsQuestCapableDoing(bot, quest) ||
             bot->GetQuestStatus(questId) == QUEST_STATUS_FAILED)
         {
             LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), questId);
@@ -701,7 +703,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
 bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
 {
     OrganizeQuestLog();
-    if (ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract(true, 80.0f))
+    if (ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract(true, GetQuestGiverSearchDistance(bot)))
     {
         WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npcOrGo);
         if (!object)
@@ -720,8 +722,21 @@ bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
 
 ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly, float distanceLimit)
 {
-    GuidVector possibleTargets = AI_VALUE(GuidVector, "possible new rpg targets");
-    GuidVector possibleGameObjects = AI_VALUE(GuidVector, "possible new rpg game objects");
+    return FindQuestGiverToInteract(botAI, bot, questgiverOnly, distanceLimit);
+}
+
+float NewRpgBaseAction::GetQuestGiverSearchDistance(Player* bot)
+{
+    return std::min(sPlayerbotAIConfig.QuestGiverSearchDistance,
+                    PossibleNewRpgTargetsValue::GetSearchRange(bot));
+}
+
+ObjectGuid NewRpgBaseAction::FindQuestGiverToInteract(PlayerbotAI* botAI, Player* bot, bool questgiverOnly,
+                                                      float distanceLimit)
+{
+    GuidVector possibleTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("possible new rpg targets")->Get();
+    GuidVector possibleGameObjects =
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("possible new rpg game objects")->Get();
 
     if (possibleTargets.empty() && possibleGameObjects.empty())
         return ObjectGuid();
@@ -737,7 +752,7 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
         if (distanceLimit && bot->GetDistance(object) > distanceLimit)
             continue;
 
-        if (CanInteractWithQuestGiver(object) && HasQuestToAcceptOrReward(object))
+        if (CanInteractWithQuestGiver(bot, object) && HasQuestToAcceptOrReward(bot, object))
         {
             if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
                 nearestObject = object;
@@ -755,7 +770,7 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
         if (distanceLimit && bot->GetDistance(object) > distanceLimit)
             continue;
 
-        if (CanInteractWithQuestGiver(object) && HasQuestToAcceptOrReward(object))
+        if (CanInteractWithQuestGiver(bot, object) && HasQuestToAcceptOrReward(bot, object))
         {
             if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
                 nearestObject = object;
@@ -786,7 +801,7 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
     return ObjectGuid();
 }
 
-bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
+bool NewRpgBaseAction::HasQuestToAcceptOrReward(Player* bot, WorldObject* object)
 {
     ObjectGuid guid = object->GetGUID();
     bot->PrepareQuestMenu(guid);
@@ -815,7 +830,7 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
 
         QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
         if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
-            IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
+            IsQuestWorthDoing(bot, quest) && IsQuestCapableDoing(bot, quest))
         {
             return true;
         }

@@ -75,6 +75,7 @@
 #include "PossibleRpgTargetsValue.h"
 #include "PossibleTargetsValue.h"
 #include "PvpValues.h"
+#include "QuestGiverNearbyValue.h"
 #include "QuestValues.h"
 #include "RTSCValues.h"
 #include "RandomBotUpdateValue.h"
@@ -175,6 +176,7 @@ public:
         creators["loot target"] = &ValueContext::loot_target;
         creators["available loot"] = &ValueContext::available_loot;
         creators["has available loot"] = &ValueContext::has_available_loot;
+        creators["quest giver nearby"] = &ValueContext::quest_giver_nearby;
         creators["always loot list"] = &ValueContext::always_loot_list;
         creators["loot strategy"] = &ValueContext::loot_strategy;
         creators["last movement"] = &ValueContext::last_movement;
@@ -392,6 +394,7 @@ private:
     static UntypedValue* available_loot(PlayerbotAI* botAI) { return new AvailableLootValue(botAI); }
     static UntypedValue* loot_target(PlayerbotAI* botAI) { return new LootTargetValue(botAI); }
     static UntypedValue* has_available_loot(PlayerbotAI* botAI) { return new HasAvailableLootValue(botAI); }
+    static UntypedValue* quest_giver_nearby(PlayerbotAI* botAI) { return new QuestGiverNearbyValue(botAI); }
     static UntypedValue* always_loot_list(PlayerbotAI* botAI) { return new AlwaysLootListValue(botAI); }
     static UntypedValue* loot_strategy(PlayerbotAI* botAI) { return new LootStrategyValue(botAI); }
 
