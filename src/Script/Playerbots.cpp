@@ -16,6 +16,7 @@
 #include "PlayerbotsDatabase.h"
 #include <mysqld_error.h>
 #include "AllMapScript.h"
+#include "GatherNodeMgr.h"
 #include "GlobalScript.h"
 #include "GuildTaskMgr.h"
 #include "NewRpgDoQuest.h"
@@ -550,6 +551,8 @@ public:
         NewRpgDoQuestAction::BuildCaches();
         LOG_INFO("server.loading", ">> Loaded quest objective spawn index in {} ms",
                  GetMSTimeDiffToNow(questIndexMSTime));
+        LOG_INFO("server.loading", "Loading gather node index...");
+        GatherNodeMgr::instance().Load();
 
         LOG_INFO("server.loading", "Playerbots World Thread Processor initialized");
     }
@@ -621,8 +624,8 @@ public:
 
 void AddPlayerbotsSecureLoginScripts();
 void AddPlayerbotsSelfBotAfkScripts();
-
 void AddSC_MagtheridonBotScripts();
+void AddSC_SerpentshrineCavernBotScripts();
 void AddSC_TempestKeepBotScripts();
 void AddSC_HyjalBotScripts();
 void AddSC_IcecrownBotScripts();
@@ -646,6 +649,7 @@ void AddPlayerbotsScripts()
     AddPlayerbotsCommandscripts();
     PlayerBotsGuildValidationScript();
     AddSC_MagtheridonBotScripts();
+    AddSC_SerpentshrineCavernBotScripts();
     AddSC_TempestKeepBotScripts();
     AddSC_HyjalBotScripts();
     AddSC_IcecrownBotScripts();
