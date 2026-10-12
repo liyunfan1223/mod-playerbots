@@ -415,6 +415,7 @@ public:
     bool EquipAndSpecPersistence;
     int32 EquipAndSpecPersistenceLevel;
     int32 GroupInvitationPermission;
+    bool AllowBattlegroundCommands;
     bool KeepAltsInGroup = false;
     bool AllowSummonInCombat;
     bool AllowSummonWhenMasterIsDead;

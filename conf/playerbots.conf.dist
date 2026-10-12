@@ -1632,6 +1632,12 @@ Playerbots.AutoTeleportForLevel = 1
 # Enable battlegrounds/arenas for randombots
 Playerbots.RandomBotJoinBG = 1
 
+# Allow players to command random bots on their own team in the same battleground or arena.
+# Every such player gets the command access of a master without becoming the bot's master,
+# so the bot keeps playing the battleground.
+# Default: 0 (disabled)
+Playerbots.AllowBattlegroundCommands = 0
+
 # Enable auto-joining of battlegrounds - have bots start battlegrounds and arenas on their own
 Playerbots.RandomBotAutoJoinBG = 0
 

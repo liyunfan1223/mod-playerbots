@@ -633,6 +633,7 @@ bool PlayerbotAIConfig::Initialize()
     EquipAndSpecPersistence = sConfigMgr->GetOption<bool>("Playerbots.EquipAndSpecPersistence", true);
     EquipAndSpecPersistenceLevel = sConfigMgr->GetOption<int32>("Playerbots.EquipAndSpecPersistenceLevel", 1);
     GroupInvitationPermission = sConfigMgr->GetOption<int32>("Playerbots.GroupInvitationPermission", 1);
+    AllowBattlegroundCommands = sConfigMgr->GetOption<bool>("Playerbots.AllowBattlegroundCommands", false);
     KeepAltsInGroup = sConfigMgr->GetOption<bool>("Playerbots.KeepAltsInGroup", false);
     AllowSummonInCombat = sConfigMgr->GetOption<bool>("Playerbots.AllowSummonInCombat", true);
     AllowSummonWhenMasterIsDead = sConfigMgr->GetOption<bool>("Playerbots.AllowSummonWhenMasterIsDead", true);
