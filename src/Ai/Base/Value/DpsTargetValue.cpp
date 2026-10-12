@@ -9,18 +9,10 @@
 #include "Playerbots.h"
 #include "Strategy.h"
 
-class DpsFindTargetStrategy : public FindTargetStrategy
+class FindMaxThreatGapTargetStrategy : public FindTargetStrategy
 {
 public:
-    DpsFindTargetStrategy(PlayerbotAI* botAI) : FindTargetStrategy(botAI) {}
-
-    TargetValueExclusionType GetExclusionType() override { return TargetValueExclusionType::Dps; }
-};
-
-class FindMaxThreatGapTargetStrategy : public DpsFindTargetStrategy
-{
-public:
-    FindMaxThreatGapTargetStrategy(PlayerbotAI* botAI) : DpsFindTargetStrategy(botAI), minThreat(0) {}
+    FindMaxThreatGapTargetStrategy(PlayerbotAI* botAI) : FindTargetStrategy(botAI), minThreat(0) {}
 
     void CheckAttacker(Unit* attacker, ThreatManager* threatMgr) override
     {
@@ -50,11 +42,11 @@ protected:
 };
 
 // caster
-class CasterFindTargetSmartStrategy : public DpsFindTargetStrategy
+class CasterFindTargetSmartStrategy : public FindTargetStrategy
 {
 public:
     CasterFindTargetSmartStrategy(PlayerbotAI* botAI, float dps)
-        : DpsFindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
+        : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
     {
         result = nullptr;
     }
@@ -133,11 +125,11 @@ protected:
 };
 
 // General
-class GeneralFindTargetSmartStrategy : public DpsFindTargetStrategy
+class GeneralFindTargetSmartStrategy : public FindTargetStrategy
 {
 public:
     GeneralFindTargetSmartStrategy(PlayerbotAI* botAI, float dps)
-        : DpsFindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
+        : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
     {
     }
 
@@ -203,11 +195,11 @@ protected:
 };
 
 // combo
-class ComboFindTargetSmartStrategy : public DpsFindTargetStrategy
+class ComboFindTargetSmartStrategy : public FindTargetStrategy
 {
 public:
     ComboFindTargetSmartStrategy(PlayerbotAI* botAI, float dps)
-        : DpsFindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
+        : FindTargetStrategy(botAI), dps_(dps), targetExpectedLifeTime(1000000)
     {
     }
 
@@ -280,8 +272,9 @@ protected:
 
 Unit* DpsTargetValue::Calculate()
 {
+    GuidSet const exclusions = GatherStrategyTargetExclusions(botAI, TargetValueExclusionType::DpsTarget);
     Unit* rti = RtiTargetValue::Calculate();
-    if (rti)
+    if (rti && exclusions.find(rti->GetGUID()) == exclusions.end())
         return rti;
 
     float dps = AI_VALUE(float, "estimated group dps");
@@ -293,22 +286,22 @@ Unit* DpsTargetValue::Calculate()
             // Caster find target strategy avoids casting spells on enemies
             // with too low health to ensure the effectiveness of casting
             CasterFindTargetSmartStrategy strategy(botAI, dps);
-            return TargetValue::FindTarget(&strategy);
+            return TargetValue::FindTarget(&strategy, exclusions);
         }
         else if (PlayerbotAI::IsCombo(bot))
         {
             ComboFindTargetSmartStrategy strategy(botAI, dps);
-            return TargetValue::FindTarget(&strategy);
+            return TargetValue::FindTarget(&strategy, exclusions);
         }
     }
     GeneralFindTargetSmartStrategy strategy(botAI, dps);
-    return TargetValue::FindTarget(&strategy);
+    return TargetValue::FindTarget(&strategy, exclusions);
 }
 
-class FindMaxHpTargetStrategy : public DpsFindTargetStrategy
+class FindMaxHpTargetStrategy : public FindTargetStrategy
 {
 public:
-    FindMaxHpTargetStrategy(PlayerbotAI* botAI) : DpsFindTargetStrategy(botAI), maxHealth(0) {}
+    FindMaxHpTargetStrategy(PlayerbotAI* botAI) : FindTargetStrategy(botAI), maxHealth(0) {}
 
     void CheckAttacker(Unit* attacker, ThreatManager*) override
     {
@@ -329,10 +322,11 @@ protected:
 
 Unit* DpsAoeTargetValue::Calculate()
 {
+    GuidSet const exclusions = GatherStrategyTargetExclusions(botAI, TargetValueExclusionType::DpsTarget);
     Unit* rti = RtiTargetValue::Calculate();
-    if (rti)
+    if (rti && exclusions.find(rti->GetGUID()) == exclusions.end())
         return rti;
 
     FindMaxHpTargetStrategy strategy(botAI);
-    return TargetValue::FindTarget(&strategy);
+    return TargetValue::FindTarget(&strategy, exclusions);
 }

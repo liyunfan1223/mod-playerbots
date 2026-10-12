@@ -43,7 +43,7 @@ void AiObjectContext::BuildSharedActionContexts(
     actionContexts.Add(new RaidKarazhanActionContext());
     actionContexts.Add(new RaidGruulsLairActionContext());
     actionContexts.Add(new RaidMagtheridonActionContext());
-    actionContexts.Add(new RaidSSCActionContext());
+    actionContexts.Add(new RaidSscActionContext());
     actionContexts.Add(new RaidTempestKeepActionContext());
     actionContexts.Add(new RaidHyjalActionContext());
     actionContexts.Add(new RaidBlackTempleActionContext());
