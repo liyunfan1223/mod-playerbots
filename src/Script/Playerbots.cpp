@@ -139,7 +139,8 @@ public:
         PLAYERHOOK_CAN_PLAYER_USE_GUILD_CHAT,
         PLAYERHOOK_CAN_PLAYER_USE_CHANNEL_CHAT,
         PLAYERHOOK_ON_GIVE_EXP,
-        PLAYERHOOK_ON_BEFORE_TELEPORT
+        PLAYERHOOK_ON_BEFORE_TELEPORT,
+        PLAYERHOOK_ON_PLAYER_ENTER_COMBAT
     }) {}
 
     void OnPlayerLogin(Player* player) override
@@ -257,6 +258,13 @@ public:
         {
             playerbotMgr->UpdateAI(diff);
         }
+    }
+
+    void OnPlayerEnterCombat(Player* player, Unit* /*enemy*/) override
+    {
+        // World/RPG actions can park the AI for seconds; combat must not wait for that sleep to expire.
+        if (PlayerbotAI* const botAI = PlayerbotsMgr::instance().GetPlayerbotAI(player))
+            botAI->ResetActionDuration();
     }
 
     using PlayerScript::OnPlayerCanUseChat;  // keep the base overloads visible
