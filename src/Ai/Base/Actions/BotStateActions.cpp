@@ -8,6 +8,7 @@
 
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
+#include "ThreatManager.h"
 
 namespace
 {
@@ -21,6 +22,16 @@ namespace
         for (Unit* attacker : bot->getAttackers())
             if (attacker && attacker->IsAlive() && attacker->IsInWorld())
                 return attacker;
+
+        // Being attacked does not populate getAttackers() (only Unit::Attack() does): a passive
+        // victim keeps its attackers as threat references on their lists, mirrored here.
+        for (auto const& entry : bot->GetThreatMgr().GetThreatenedByMeList())
+        {
+            Unit* attacker = entry.second ? entry.second->GetOwner() : nullptr;
+            if (attacker && attacker->IsAlive() && attacker->IsInWorld() && bot->IsValidAttackTarget(attacker) &&
+                bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.SightDistance))
+                return attacker;
+        }
 
         return nullptr;
     }
