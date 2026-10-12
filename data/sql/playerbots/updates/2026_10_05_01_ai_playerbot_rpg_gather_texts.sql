@@ -19,7 +19,7 @@ INSERT INTO `ai_playerbot_texts`
      `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`,
      `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`)
 VALUES (
-    1929,
+    1928,
     'rpg_gather_no_profession_error',
     'I have neither Herbalism nor Mining, so I can''t gather.',
     0, 0,
