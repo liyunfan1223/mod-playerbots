@@ -1710,7 +1710,7 @@ Playerbots.DeleteRandomBotArenaTeams = 0
 Playerbots.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395,3703,4298,3951"
 
 # PvP Restricted Areas (bots will not initiate PvP or defend themselves if attacked)
-Playerbots.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080,3938,3754,3786,3973,4085,4086,4087,4088"
+Playerbots.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887,3958,3724,4080,3938,3754,3786,3973,4085,4086,4087,4088,251"
 
 # Improve reaction speeds in battlegrounds and arenas (may cause lag)
 Playerbots.FastReactInBG = 1
@@ -2276,13 +2276,13 @@ Playerbots.RandomClassSpecIndex.3.5 = 5
 #
 
 # as pve
-Playerbots.RandomClassSpecProb.4.0 = 45
+Playerbots.RandomClassSpecProb.4.0 = 40
 Playerbots.RandomClassSpecIndex.4.0 = 0
 # combat pve
-Playerbots.RandomClassSpecProb.4.1 = 45
+Playerbots.RandomClassSpecProb.4.1 = 60
 Playerbots.RandomClassSpecIndex.4.1 = 1
-# subtlety pve
-Playerbots.RandomClassSpecProb.4.2 = 10
+# subtlety pve (note: subtlety strategies are not yet implemented)
+Playerbots.RandomClassSpecProb.4.2 = 0
 Playerbots.RandomClassSpecIndex.4.2 = 2
 # as pvp
 Playerbots.RandomClassSpecProb.4.3 = 0
@@ -2290,7 +2290,7 @@ Playerbots.RandomClassSpecIndex.4.3 = 3
 # combat pvp
 Playerbots.RandomClassSpecProb.4.4 = 0
 Playerbots.RandomClassSpecIndex.4.4 = 4
-# subtlety pvp
+# subtlety pvp (note: subtlety strategies are not yet implemented)
 Playerbots.RandomClassSpecProb.4.5 = 0
 Playerbots.RandomClassSpecIndex.4.5 = 5
 
@@ -2591,8 +2591,6 @@ Playerbots.EnableGreet = 0
 Playerbots.ToxicLinksRepliesChance = 30
 # Chance to reply to Thunderfury with Thunderfury (0-100)
 Playerbots.ThunderfuryRepliesChance = 40
-# Enable bots chatting in guild about certain events
-AIPlayerbot.GuildFeedback = 1
 # Chance bots will chat in guild about certain events (int) (0-100)
 Playerbots.GuildRepliesRate = 100
 # Bots without a master will say their lines
