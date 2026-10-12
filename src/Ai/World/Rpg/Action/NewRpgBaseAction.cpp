@@ -704,6 +704,9 @@ bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
     if (ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract(true, 80.0f))
     {
         WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npcOrGo);
+        if (!object)
+            return false;
+
         if (bot->CanInteractWithQuestGiver(object))
         {
             InteractWithNpcOrGameObjectForQuest(npcOrGo);
