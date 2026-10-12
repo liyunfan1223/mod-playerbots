@@ -15,6 +15,9 @@
 #include "RandomPlayerbotMgr.h"
 #include "ServerFacade.h"
 
+// Top of the default start-zone brackets (Playerbots.ZoneBracket.*).
+constexpr uint32 START_ZONE_GRAVEYARD_MAX_LEVEL = 12;
+
 bool ReviveFromCorpseAction::Execute(Event event)
 {
     // BG ghosts are revived by spirit healer waves; teleporting to a world graveyard removes them from the BG.
@@ -252,8 +255,7 @@ GraveyardStruct const* SpiritHealerAction::GetGrave(bool startZone)
         }
     }
 
-    uint32 const maxLevel = sPlayerbotAIConfig.StartZoneGraveyardMaxLevel;
-    if (ownGrave && maxLevel && bot->GetLevel() > maxLevel)
+    if (ownGrave && bot->GetLevel() > START_ZONE_GRAVEYARD_MAX_LEVEL)
         return ownGrave;
 
     std::vector<uint32> races;

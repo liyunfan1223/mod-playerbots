@@ -264,7 +264,6 @@ bool PlayerbotAIConfig::Initialize()
     PermanentlyInWorldTime =
         sConfigMgr->GetOption<int32>("Playerbots.PermanentlyInWorldTime", 1 * YEAR);
     RandomBotTeleportDistance = sConfigMgr->GetOption<int32>("Playerbots.RandomBotTeleportDistance", 100);
-    StartZoneGraveyardMaxLevel = sConfigMgr->GetOption<int32>("Playerbots.StartZoneGraveyardMaxLevel", 0);
     RandomBotsPerInterval = sConfigMgr->GetOption<int32>("Playerbots.RandomBotsPerInterval", 60);
     RandomBotPrintStatsInterval = sConfigMgr->GetOption<int32>("Playerbots.RandomBotPrintStatsInterval", 300);
     MinRandomBotsPriceChangeInterval =

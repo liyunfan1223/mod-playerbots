@@ -153,7 +153,6 @@ public:
     std::vector<uint32> RandomBotSpellIds;
     std::vector<uint32> RandomBotQuestIds;
     uint32 RandomBotTeleportDistance;
-    uint32 StartZoneGraveyardMaxLevel;
     float RandomGearLoweringChance;
     int32 RandomGearQualityLimit;
     int32 RandomGearScoreLimit;

@@ -1605,12 +1605,6 @@ Playerbots.TeleToDalaranWeight = 1
 # How far randombots are teleported after death in yards
 Playerbots.RandomBotTeleportDistance = 100
 
-# A dead bot that has died more than 10 times, has been dead for a long time or is below 10%
-# durability goes to the nearest starting-zone graveyard, unless it follows a group leader or has
-# a travel target. Bots above this level use their own nearest graveyard instead.
-# Default: 0 (no level limit)
-Playerbots.StartZoneGraveyardMaxLevel = 0
-
 # How many levels below the lowest-level creature in a zone, can a bot be
 # This will have no effect if Playerbots.EnableNewRpgStrategy is enabled
 # Default: 1 (randombot will leave if they are more than 1 level lower)
