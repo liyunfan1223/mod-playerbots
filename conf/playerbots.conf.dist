@@ -409,6 +409,7 @@ Playerbots.SpellDistance = 28.5
 Playerbots.ShootDistance = 5.0
 Playerbots.HealDistance = 38.5
 Playerbots.LootDistance = 15.0
+
 Playerbots.FleeDistance = 5.0
 Playerbots.AggroDistance = 22
 Playerbots.TooCloseDistance = 5.0
@@ -1423,6 +1424,12 @@ Playerbots.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,23
 # This option will override Playerbots.AutoDoQuests, RandomBotTeleLowerLevel, and RandomBotTeleHigherLevel
 # Default: 1 (enabled)
 Playerbots.EnableNewRpgStrategy = 1
+
+# Zero "attack anything" while a quest giver with something to accept or reward is within 80 yd and
+# the current RPG status would visit it (grind, camp, wander, do quest); otherwise bots keep picking
+# grind targets next to a turn-in and never reach the interaction.
+# Default: 0 (opt-in)
+Playerbots.PrioritiseQuestGivers = 0
 
 # Control probability weights for RPG status of bots. Takes effect only when the status meets its premise.​
 # Sum of weights need not be 100. Set to 0 to disable the status.

@@ -408,7 +408,7 @@ bool NewRpgWanderNpcAction::Execute(Event /*event*/)
     if (!data.npcOrGo)
     {
         // No npc can be found, switch to IDLE
-        ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract();
+        ObjectGuid npcOrGo = FindNpcOrGameObjectToInteract(botAI, bot);
         if (npcOrGo.IsEmpty())
         {
             info.ChangeToIdle();
