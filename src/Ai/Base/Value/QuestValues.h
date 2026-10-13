@@ -96,50 +96,31 @@ public:
     questGiverMap Calculate() override;
 };
 
-// Quest objective spawn index.
-// Everything below is built by BuildQuestObjectiveSpawns and read-only afterwards.
-
-// Single-threaded, before any bot reads it.
+// Built once at startup and read-only afterwards, so map threads can share it.
 void BuildQuestObjectiveSpawns();
 
-// Entries satisfying one objective of a quest, keyed by objective bit (objective1..4, then
-// item objectives at QUEST_OBJECTIVES_COUNT + i). Negative = gameobject. Empty if the quest
-// has none.
+// objectiveFlag is 1 << idx; item objectives sit at idx QUEST_OBJECTIVES_COUNT + i.
 std::vector<int32> const& GetQuestObjectiveEntries(uint32 questId, uint32 objectiveFlag);
 
-// Spawn positions of one entry on one map.
 std::vector<GuidPosition> const& GetEntrySpawns(int32 entry, uint32 mapId);
 
-// Creatures and gameobjects the quest turns in at. Negative = gameobject.
 std::vector<int32> const& GetQuestEnderEntries(uint32 questId);
 
-// Creature entries this quest's provided item transforms into the creature that carries a
-// required drop (SmartAI SPELLHIT -> UPDATE_TEMPLATE). Empty for the vast majority of quests.
 std::unordered_set<uint32> const& GetQuestTransformSources(uint32 questId);
 
-// Where an objective mob with no spawn row has to be conjured with the quest's provided item:
-// beside a spell-focus gameobject, which the core enforces, or beside a creature, which only the
-// summoned trigger's own script enforces. Both zero for an ordinary objective.
 struct QuestSummonAnchor
 {
     uint32 focusId{0};
     uint32 creature{0};
-    // The anchor is also the kill target, so the item has to land before the fight starts.
     bool killAnchor{false};
-    // The item's spell summons the objective itself. When it does not, the objective is an
-    // ordinary spawned mob and its presence must not suppress a re-use.
+    // When false the objective is an ordinary spawned mob, so its presence must not block a re-use.
     bool summonsObjective{false};
 };
 
 QuestSummonAnchor GetQuestSummonAnchor(uint32 questId, uint32 objectiveIdx);
 
-// Spawned creatures to kill for this objective when the entry the quest names is not killable
-// itself: a credit marker some other mob credits on death, or one that does not exist until a
-// mob summons it. Empty for an ordinary objective.
 std::vector<uint32> const& GetQuestKillSources(uint32 questId, uint32 objectiveIdx);
 
-// Reagents a craft objective's required item is made from, when that item drops nowhere. Empty
-// for an ordinary looted objective. Indexed by item objective, not by objectiveIdx.
 struct QuestCraftReagent
 {
     uint32 item{0};
@@ -148,15 +129,10 @@ struct QuestCraftReagent
 
 std::vector<QuestCraftReagent> const& GetQuestCraftReagents(uint32 questId, uint32 itemObjectiveIdx);
 
-// The item whose on-use spell crafts this objective's required item. 0 if it is not a craft
-// objective. The reagents do not name it: it is only the carrier when it consumes itself.
 uint32 GetQuestCraftItem(uint32 questId, uint32 itemObjectiveIdx);
 
-// Reagents the quest's provided item consumes per use. Empty if it consumes nothing.
 std::vector<QuestCraftReagent> const& GetQuestItemReagents(uint32 questId);
 
-// True while the bot still wants `itemId` for `quest` on grounds RequiredItemId does not cover:
-// a quest-only ItemDrop, or a reagent the provided item spends.
 bool IsQuestExtraItemWanted(Player* bot, Quest const* quest, uint32 itemId);
 
 // All questgivers that have a quest for the bot.

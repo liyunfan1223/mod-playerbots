@@ -229,8 +229,7 @@ bool NewRpgStatusUpdateAction::Execute(Event /*event*/)
     NewRpgInfo& info = botAI->rpgInfo;
     NewRpgStatus status = info.GetStatus();
 
-    // Grinding pulls the bot onto random XP mobs instead of the objective, so RPG_DO_QUEST runs
-    // without it - except in the POI fallback.
+    // Grind drags the bot onto random XP mobs; only the POI fallback relies on it.
     auto const* doQuest = std::get_if<NewRpgInfo::DoQuest>(&info.data);
     if (doQuest && !doQuest->poiFallback)
     {

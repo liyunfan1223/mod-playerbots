@@ -5,7 +5,6 @@
  */
 
 #include "QuestValues.h"
-
 #include "DatabaseEnv.h"
 #include "GameObjectData.h"
 #include "LootValues.h"
@@ -130,40 +129,29 @@ questGuidpMap QuestGuidpMapValue::Calculate()
     return worker.GetResult();
 }
 
-// entry -> mapId -> positions.
+// Entry keys: negative = gameobject.
 static std::unordered_map<int32, std::unordered_map<uint32, std::vector<GuidPosition>>> g_entrySpawns;
 
-// questId -> objective flag -> the entries that satisfy it.
 static std::unordered_map<uint32, std::unordered_map<uint32, std::vector<int32>>> g_questObjectiveEntries;
 
-// questId -> the entries it turns in at.
 static std::unordered_map<uint32, std::vector<int32>> g_questEnderEntries;
 
-// Above this an item objective is a world drop: no useful nearest spawn to walk to.
+// Above this an item objective is a world drop, with no useful spawn to walk to.
 static constexpr size_t MAX_ITEM_OBJECTIVE_SPAWNS = 500;
 
-// questId -> pre-transform creature entries (see GetQuestTransformSources).
 static std::unordered_map<uint32, std::unordered_set<uint32>> g_questTransformSources;
 
-// questId -> per-objective summon anchor (see GetQuestSummonAnchor).
 static std::unordered_map<uint32, std::array<QuestSummonAnchor, QUEST_OBJECTIVES_COUNT>> g_questSummonAnchors;
 
-// questId -> per-objective creatures the bot must kill (see GetQuestKillSources).
 static std::unordered_map<uint32, std::array<std::vector<uint32>, QUEST_OBJECTIVES_COUNT>> g_questKillSources;
 
-// questId -> everything the provided item consumes per use (see GetQuestItemReagents).
 static std::unordered_map<uint32, std::vector<QuestCraftReagent>> g_questItemReagents;
 
-// How many casts' worth of reagent the bot keeps stocked.
 static constexpr uint32 REAGENT_STOCK_CASTS = 5;
 
-// questId -> per item-objective reagents its required item is crafted from (GetQuestCraftReagents).
 static std::unordered_map<uint32, std::array<std::vector<QuestCraftReagent>, QUEST_ITEM_OBJECTIVES_COUNT>>
     g_questCraftReagents;
 
-// questId -> per item-objective, the item whose on-use spell does the crafting. Resolved at
-// index time: the reagents alone do not name it, and a quest with no StartItem keeps it on a
-// looted ItemDrop.
 static std::unordered_map<uint32, std::array<uint32, QUEST_ITEM_OBJECTIVES_COUNT>> g_questCraftItems;
 
 static uint32 GetItemSpell(uint32 itemId)
@@ -181,8 +169,7 @@ static uint32 GetItemSpell(uint32 itemId)
 
 static uint32 GetSrcItemSpell(Quest const* quest) { return GetItemSpell(quest->GetSrcItemId()); }
 
-// spell -> [(pre-transform entry, post-transform entry)] from SmartAI
-// SMART_EVENT_SPELLHIT (8) -> SMART_ACTION_UPDATE_TEMPLATE (36).
+// SMART_EVENT_SPELLHIT (8) -> SMART_ACTION_UPDATE_TEMPLATE (36): spell -> (pre, post) entries.
 static std::unordered_map<uint32, std::vector<std::pair<uint32, uint32>>> LoadSpellTransforms()
 {
     std::unordered_map<uint32, std::vector<std::pair<uint32, uint32>>> transforms;
@@ -202,9 +189,8 @@ static std::unordered_map<uint32, std::vector<std::pair<uint32, uint32>>> LoadSp
     return transforms;
 }
 
-// Creature proximity hints from SmartAI, keyed by the summoned trigger. SMART_TARGET_CLOSEST_
-// CREATURE is how a trigger finds the NPC that reacts to it, and how an NPC finds the trigger,
-// so either direction names a creature the item has to be used next to.
+// target_type 19 = SMART_TARGET_CLOSEST_CREATURE, which links a summoned trigger and the NPC
+// reacting to it; either side is a creature the item has to be used next to.
 static std::unordered_map<uint32, std::vector<uint32>> LoadSmartAnchorHints(
     std::unordered_map<uint32, std::vector<uint32>>& deathAnchors)
 {
@@ -221,11 +207,10 @@ static std::unordered_map<uint32, std::vector<uint32>> LoadSmartAnchorHints(
         Field* fields = result->Fetch();
         uint32 const owner = fields[0].Get<uint32>();
         uint32 const target = fields[1].Get<uint32>();
-        hints[owner].push_back(target);  // the trigger looks for its reactor
-        hints[target].push_back(owner);  // the reactor looks for the trigger
+        hints[owner].push_back(target);
+        hints[target].push_back(owner);
 
-        // A reactor that reaches for the trigger from its own death event only credits once it
-        // dies, making it a kill target as much as an anchor.
+        // A reactor acting from its own death event only credits once killed.
         if (fields[2].Get<uint32>() == SMART_EVENT_DEATH)
             deathAnchors[target].push_back(owner);
     } while (result->NextRow());
@@ -261,11 +246,8 @@ static uint32 SpellSummonEntry(uint32 spellId)
     return 0;
 }
 
-// objective creature entry -> the creatures to kill for it to progress. A quest wires that up
-// three ways, all meaning "kill this one instead": the creature hands the credit over directly,
-// it casts a credit spell, or it casts a spell that summons the objective (which is only
-// creditable once it exists). Resolved through sSpellMgr, since many of those spells are
-// server-side and absent from Spell.dbc.
+// action 11 = SMART_ACTION_CAST, 33 = SMART_ACTION_CALL_KILLEDMONSTER. Spells go through
+// sSpellMgr, not Spell.dbc: many of them are server-side.
 static std::unordered_map<uint32, std::vector<uint32>> LoadObjectiveKillSources()
 {
     std::unordered_map<uint32, std::vector<uint32>> sources;
@@ -297,8 +279,6 @@ static std::unordered_map<uint32, std::vector<uint32>> LoadObjectiveKillSources(
     return sources;
 }
 
-// The reagent a spell consumes to create `itemId`, if that is what it does. When a required
-// item drops nowhere, the reagent is what the bot actually has to farm.
 static bool SpellCraftsItem(uint32 spellId, uint32 itemId, std::vector<QuestCraftReagent>& reagents)
 {
     SpellInfo const* info = sSpellMgr->GetSpellInfo(spellId);
@@ -315,14 +295,11 @@ static bool SpellCraftsItem(uint32 spellId, uint32 itemId, std::vector<QuestCraf
 
     for (uint8 r = 0; r < MAX_SPELL_REAGENTS; ++r)
         if (info->Reagent[r] > 0 && info->ReagentCount[r] > 0)
-            reagents.push_back({ uint32(info->Reagent[r]), info->ReagentCount[r] });
+            reagents.push_back({uint32(info->Reagent[r]), info->ReagentCount[r]});
 
     return !reagents.empty();
 }
 
-// What has to be gathered to make `itemId`, when a quest hands out no such item directly.
-// Returns the item carrying the crafting spell - the provided item, or one of the quest's own
-// ItemDrops when there is no StartItem - and fills `reagents`. 0 if nothing crafts `itemId`.
 static uint32 FindCraftReagents(Quest const* quest, uint32 itemId, std::vector<QuestCraftReagent>& reagents)
 {
     if (SpellCraftsItem(GetItemSpell(quest->GetSrcItemId()), itemId, reagents))
@@ -335,8 +312,7 @@ static uint32 FindCraftReagents(Quest const* quest, uint32 itemId, std::vector<Q
     return 0;
 }
 
-// The creature entry named by a CONDITION_NEAR_CREATURE on a spell, 0 if it has none. The
-// explicit form of the same "use it next to this" rule the SmartAI hints imply.
+// 17 = CONDITION_SOURCE_TYPE_SPELL, 29 = CONDITION_NEAR_CREATURE.
 static std::unordered_map<uint32, uint32> LoadSpellNearCreature()
 {
     std::unordered_map<uint32, uint32> nearCreature;
@@ -365,8 +341,7 @@ static void CollectWantedDrops(LootTemplateAccess const* loot, std::unordered_se
 
     for (auto const& item : loot->Entries)
     {
-        // Signed, and negative rows are ordinary references in the shipped tables - the core
-        // itself only ever tests the field for zero and takes its absolute value.
+        // Negative references are ordinary in the shipped tables; the core uses the absolute value.
         if (item->reference)
         {
             CollectWantedDrops(reinterpret_cast<LootTemplateAccess const*>(
@@ -380,13 +355,11 @@ static void CollectWantedDrops(LootTemplateAccess const* loot, std::unordered_se
     }
 }
 
-// Collect the spawn positions of every wanted entry, once each. entry: negative = gameobject.
 static void FileSpawnPositions(std::unordered_map<int32, std::vector<std::pair<uint32, uint32>>> const& entryMap)
 {
     for (auto const& [spawnId, creData] : sObjectMgr->GetAllCreatureData())
     {
-        // A point whose base and alternate are both wanted is filed under each of them - it
-        // can serve either, depending on what the respawn rolled.
+        // Filed under each wanted alternate entry: the respawn decides which one appears.
         for (uint32 entry : SpawnEntries(creData))
         {
             if (entry && entryMap.count(int32(entry)))
@@ -401,7 +374,6 @@ static void FileSpawnPositions(std::unordered_map<int32, std::vector<std::pair<u
     }
 }
 
-// Total spawns of an entry across every map.
 static size_t GetEntrySpawnCount(int32 entry)
 {
     auto it = g_entrySpawns.find(entry);
@@ -415,13 +387,10 @@ static size_t GetEntrySpawnCount(int32 entry)
     return total;
 }
 
-// Attach the wanted entries to their quest objectives, dropping world-drop item objectives.
 static void FileObjectiveEntries(std::unordered_map<int32, std::vector<std::pair<uint32, uint32>>> const& entryMap)
 {
     uint32 constexpr firstItemFlag = 1u << QUEST_OBJECTIVES_COUNT;
 
-    // One entry can reach the same objective by more than one route - two reagents of the same
-    // craft, an anchor that also drops, several transform pairs.
     std::unordered_map<int32, std::vector<std::pair<uint32, uint32>>> spawned;
     for (auto const& [entry, wants] : entryMap)
     {
@@ -434,8 +403,7 @@ static void FileObjectiveEntries(std::unordered_map<int32, std::vector<std::pair
         spawned.emplace(entry, std::move(objectives));
     }
 
-    // Sum per (quest, flag) first: the cap is about how scattered the objective is overall,
-    // not about any single dropper.
+    // The world-drop cap applies to the objective's total spawns, not to each dropper.
     std::unordered_map<uint32, std::unordered_map<uint32, size_t>> spawnTotals;
     for (auto const& [entry, wants] : spawned)
         for (auto const& [questId, flag] : wants)
@@ -459,12 +427,10 @@ void BuildQuestObjectiveSpawns()
     if (!g_entrySpawns.empty())
         return;
 
-    // entry (negative = gameobject) -> the quests/objectives wanting it
     std::unordered_map<int32, std::vector<std::pair<uint32, uint32>>> entryMap;
     std::unordered_set<uint32> questItems;
 
-    // Quest enders. Keyed with an empty want-list: FileSpawnPositions collects their spawn
-    // points, FileObjectiveEntries has nothing to file them under.
+    // Enders get an empty want-list: spawn positions only, no objective.
     for (auto const& [entry, questId] : *sObjectMgr->GetCreatureQuestInvolvedRelationMap())
     {
         g_questEnderEntries[questId].push_back(int32(entry));
@@ -487,12 +453,10 @@ void BuildQuestObjectiveSpawns()
 
         uint32 const srcSpellId = GetSrcItemSpell(quest);
 
-        // Whatever the provided item consumes per use.
         if (SpellInfo const* srcSpell = sSpellMgr->GetSpellInfo(srcSpellId))
             for (uint8 r = 0; r < MAX_SPELL_REAGENTS; ++r)
                 if (srcSpell->Reagent[r] > 0 && srcSpell->ReagentCount[r] > 0)
-                    g_questItemReagents[questId].push_back(
-                        { uint32(srcSpell->Reagent[r]), srcSpell->ReagentCount[r] });
+                    g_questItemReagents[questId].push_back({uint32(srcSpell->Reagent[r]), srcSpell->ReagentCount[r]});
 
         for (uint32 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
         {
@@ -501,8 +465,6 @@ void BuildQuestObjectiveSpawns()
 
             questItems.insert(quest->RequiredItemId[i]);
 
-            // Craft objectives: the required item is made, not looted, so the reagents are what
-            // the loot walk below has to resolve to droppers.
             std::vector<QuestCraftReagent> reagents;
             uint32 const crafter = FindCraftReagents(quest, quest->RequiredItemId[i], reagents);
             if (reagents.empty())
@@ -511,7 +473,6 @@ void BuildQuestObjectiveSpawns()
             for (QuestCraftReagent const& reagent : reagents)
                 questItems.insert(reagent.item);
 
-            // The carrier is looted like any reagent when the quest provides no StartItem.
             questItems.insert(crafter);
 
             g_questCraftReagents[questId][i] = std::move(reagents);
@@ -519,17 +480,15 @@ void BuildQuestObjectiveSpawns()
         }
     }
 
-    // Item objectives name no source entry, so walk the loot tables once to
-    // find who drops them.
     std::unordered_map<uint32, std::vector<int32>> dropSources;
     if (!questItems.empty())
     {
         if (CreatureTemplateContainer const* creatures = sObjectMgr->GetCreatureTemplates())
         {
             for (auto const& [entry, tmpl] : *creatures)
-                CollectWantedDrops(DropMapValue::GetLootTemplate(
-                                       ObjectGuid::Create<HighGuid::Unit>(entry, uint32(1)), LOOT_CORPSE),
-                                   questItems, int32(entry), dropSources);
+                CollectWantedDrops(
+                    DropMapValue::GetLootTemplate(ObjectGuid::Create<HighGuid::Unit>(entry, uint32(1)), LOOT_CORPSE),
+                    questItems, int32(entry), dropSources);
         }
 
         if (GameObjectTemplateContainer const* gos = sObjectMgr->GetGameObjectTemplates())
@@ -541,8 +500,6 @@ void BuildQuestObjectiveSpawns()
         }
     }
 
-    // Creatures that actually have a spawn row - a drop source with none is unreachable
-    // unless something puts it into the world (see the transform substitution below).
     std::unordered_set<uint32> spawnedEntries;
     for (auto const& [spawnId, creData] : sObjectMgr->GetAllCreatureData())
         for (uint32 entry : SpawnEntries(creData))
@@ -551,8 +508,6 @@ void BuildQuestObjectiveSpawns()
 
     auto const spellTransforms = LoadSpellTransforms();
 
-    // Anchors for objectives whose mob has no spawn row at all: the quest item conjures it
-    // beside a spell focus or a creature, or it is only a marker something else credits.
     std::unordered_map<uint32, std::vector<uint32>> focusObjects;
     if (GameObjectTemplateContainer const* gos = sObjectMgr->GetGameObjectTemplates())
         for (auto const& [goEntry, goInfo] : *gos)
@@ -564,8 +519,6 @@ void BuildQuestObjectiveSpawns()
     auto const objectiveKillSources = LoadObjectiveKillSources();
     auto const spellNearCreature = LoadSpellNearCreature();
 
-    // Item objectives live at index QUEST_OBJECTIVES_COUNT + i, matching objectiveIdx in
-    // NewRpgInfo::DoQuest; creature objectives keep their own index.
     for (auto const& [questId, quest] : sObjectMgr->GetQuestTemplates())
     {
         uint32 const srcSpellId = GetSrcItemSpell(quest);
@@ -577,19 +530,14 @@ void BuildQuestObjectiveSpawns()
             if (!quest->RequiredItemId[i] || !quest->RequiredItemCount[i])
                 continue;
 
-            // A craft objective's required item is looted from nothing; walk the bot to the
-            // reagents' droppers instead.
-            std::vector<uint32> wanted{ quest->RequiredItemId[i] };
+            std::vector<uint32> wanted{quest->RequiredItemId[i]};
             if (craftIt != g_questCraftReagents.end() && !craftIt->second[i].empty())
             {
                 wanted.clear();
                 for (QuestCraftReagent const& reagent : craftIt->second[i])
                     wanted.push_back(reagent.item);
 
-                // The item carrying the crafting spell is farmed like a reagent when the
-                // quest hands out no StartItem, so its droppers have to be walkable too.
-                if (uint32 const crafter = GetQuestCraftItem(questId, i);
-                    crafter && crafter != quest->GetSrcItemId())
+                if (uint32 const crafter = GetQuestCraftItem(questId, i); crafter && crafter != quest->GetSrcItemId())
                     wanted.push_back(crafter);
             }
 
@@ -602,10 +550,8 @@ void BuildQuestObjectiveSpawns()
 
                 for (int32 entry : src->second)
                 {
-                    // A drop source with no spawn row exists only as the result of a SmartAI
-                    // transform: the quest's own provided item is used on a creature that does
-                    // spawn and turns it into this one. Index the pre-transform creature so the
-                    // bot has somewhere to walk to.
+                    // An unspawned dropper only exists after a SmartAI transform by the quest's item, so index the
+                    // spawned pre-transform creature instead.
                     if (entry > 0 && !spawnedEntries.count(uint32(entry)))
                     {
                         auto tf = spellTransforms.find(srcSpellId);
@@ -637,8 +583,6 @@ void BuildQuestObjectiveSpawns()
             uint32 const flag = 1u << idx;
             bool const objectiveSpawned = spawnedEntries.count(uint32(entry)) != 0;
 
-            // Real creatures standing in for the objective: ordinary kill targets, so index
-            // them and let the scan engage them.
             std::vector<uint32> credits;
             if (!objectiveSpawned)
             {
@@ -653,8 +597,6 @@ void BuildQuestObjectiveSpawns()
                     for (uint32 source : it->second)
                         addCredit(source);
 
-                // A reactor that only acts on the trigger when it dies has to be killed, so it
-                // belongs in the scan's target set even though nothing names it a credit source.
                 if (auto it = deathAnchors.find(uint32(entry)); it != deathAnchors.end())
                     for (uint32 source : it->second)
                         addCredit(source);
@@ -671,13 +613,10 @@ void BuildQuestObjectiveSpawns()
 
             bool summoned = false;
             for (uint8 e = 0; e < MAX_SPELL_EFFECTS; ++e)
-                if (srcSpell->Effects[e].Effect == SPELL_EFFECT_SUMMON &&
-                    srcSpell->Effects[e].MiscValue == entry)
+                if (srcSpell->Effects[e].Effect == SPELL_EFFECT_SUMMON && srcSpell->Effects[e].MiscValue == entry)
                     summoned = true;
 
-            // Spell focus wins: it is the only anchor the core itself enforces, and it applies
-            // whether or not the item is what puts the objective in the world - a spawned
-            // objective can still need the item used at a focus to credit it.
+            // Spell focus wins: the core enforces it, even for an objective that is already spawned.
             if (srcSpell->RequiresSpellFocus)
             {
                 g_questSummonAnchors[questId][idx].focusId = srcSpell->RequiresSpellFocus;
@@ -691,8 +630,6 @@ void BuildQuestObjectiveSpawns()
             if (!summoned || objectiveSpawned)
                 continue;
 
-            // Otherwise a creature anchor, most explicit source first. A kill source doubles as
-            // one: whatever grants the credit is by definition what the summon has to be beside.
             uint32 anchor = 0;
             if (auto it = spellNearCreature.find(srcSpellId);
                 it != spellNearCreature.end() && spawnedEntries.count(it->second))
@@ -797,7 +734,6 @@ bool IsQuestExtraItemWanted(Player* bot, Quest const* quest, uint32 itemId)
         if (reagent.item != itemId)
             continue;
 
-        // Spent per use, so hold a buffer instead of a single cast's worth.
         return bot->GetItemCount(itemId, false) < reagent.count * REAGENT_STOCK_CASTS;
     }
 

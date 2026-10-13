@@ -17,7 +17,9 @@ class AnyGameObjectInObjectRangeCheck
 {
 public:
     AnyGameObjectInObjectRangeCheck(WorldObject const* obj, float range, bool scriptActivated = false)
-        : i_obj(obj), i_range(range), i_scriptActivated(scriptActivated) {}
+        : i_obj(obj), i_range(range), i_scriptActivated(scriptActivated)
+    {
+    }
     WorldObject const& GetFocusObject() const { return *i_obj; }
     bool operator()(GameObject* u)
     {

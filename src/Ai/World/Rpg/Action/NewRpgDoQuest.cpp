@@ -5,6 +5,11 @@
  */
 
 #include "NewRpgDoQuest.h"
+
+#include <algorithm>
+#include <cfloat>
+#include <unordered_map>
+
 #include "BroadcastHelper.h"
 #include "CellImpl.h"
 #include "ChatHelper.h"
@@ -36,9 +41,6 @@
 #include "TravelMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <algorithm>
-#include <cfloat>
-#include <unordered_map>
 
 bool StartRpgDoQuestAction::Execute(Event event)
 {
@@ -83,8 +85,7 @@ bool NewRpgAttackQuestTargetAction::Execute(Event /*event*/)
     bot->SetSelection(target->GetGUID());
     context->GetValue<Unit*>("current target")->Set(target);
 
-    // Halt at commit range even when a later rule defers the attack this
-    // tick - the in-flight spline ends at the mob's exact position.
+    // Halt even when the attack is deferred: the in-flight spline ends on the mob itself.
     LastMovement& lastMovement = AI_VALUE(LastMovement&, "last movement");
     bool moveControlled = bot->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) != NULL_MOTION_TYPE;
     if (bot->isMoving() && lastMovement.priority < MovementPriority::MOVEMENT_COMBAT && !moveControlled)
@@ -140,8 +141,7 @@ QuestStatusData const* NewRpgDoQuestAction::GetQuestStatus(uint32 questId) const
 
 bool NewRpgDoQuestAction::IsObjectiveCompleted(NewRpgInfo::DoQuest const& data) const
 {
-    // objectiveIdx is -1 while heading to turn-in. If the quest reverted to incomplete,
-    // report done so a fresh objective is picked instead of indexing arrays with -1.
+    // -1 while heading to turn-in; a quest that reverted to incomplete needs a fresh objective.
     if (data.objectiveIdx < 0)
         return true;
 
@@ -219,14 +219,11 @@ bool NewRpgDoQuestAction::SelectObjectiveSpawn(NewRpgInfo::DoQuest& data)
     int32 bestObjective = 0;
     float bestDist = FLT_MAX;
 
-    // Item objectives follow the creature/GO ones at QUEST_OBJECTIVES_COUNT + i, indexed
-    // against whoever drops them, so a quest needing a drop walks to its source mobs.
     for (int32 idx = 0; idx < QUEST_OBJECTIVES_COUNT + QUEST_ITEM_OBJECTIVES_COUNT; ++idx)
     {
         if (idx < QUEST_OBJECTIVES_COUNT)
         {
-            if (!quest->RequiredNpcOrGo[idx] ||
-                q_status->CreatureOrGOCount[idx] >= quest->RequiredNpcOrGoCount[idx])
+            if (!quest->RequiredNpcOrGo[idx] || q_status->CreatureOrGOCount[idx] >= quest->RequiredNpcOrGoCount[idx])
                 continue;
         }
         else
@@ -258,9 +255,8 @@ bool NewRpgDoQuestAction::SelectObjectiveSpawn(NewRpgInfo::DoQuest& data)
     if (!best)
     {
         if (data.triedSpawns.empty())
-            return false;  // nothing spawned for any incomplete objective on this map
+            return false;
 
-        // every spawn has had its window without progress - let them be retried
         data.triedSpawns.clear();
         return true;
     }
@@ -274,9 +270,6 @@ bool NewRpgDoQuestAction::SelectObjectiveSpawn(NewRpgInfo::DoQuest& data)
     return true;
 }
 
-// Objectives whose entries have no spawn row anywhere. Fall back to what the
-// quest's own POI says and let the grind strategy work the area,
-// which is all this action did before it targeted spawns.
 bool NewRpgDoQuestAction::SelectObjectivePoi(NewRpgInfo::DoQuest& data)
 {
     std::vector<POIInfo> poiInfo;
@@ -294,8 +287,7 @@ bool NewRpgDoQuestAction::SelectObjectivePoi(NewRpgInfo::DoQuest& data)
     return true;
 }
 
-// The turn-in's own spawn point, which the quest POI cannot give: its rows carry x/y only.
-// Same relation the core's `.go quest ender` walks.
+// Quest POI rows carry x/y only, so the turn-in goes by the ender's spawn point.
 bool NewRpgDoQuestAction::SelectQuestEnder(NewRpgInfo::DoQuest& data)
 {
     GuidPosition const* best = nullptr;
@@ -352,7 +344,6 @@ bool NewRpgDoQuestAction::IsValidCreatureTarget(NewRpgInfo::DoQuest const& data,
     if (IsWrittenOff(data, creature->GetGUID()))
         return false;
 
-    // tapped by someone else - no credit/loot for us
     if (creature->hasLootRecipient() && !creature->isTappedBy(bot))
         return false;
 
@@ -386,11 +377,9 @@ bool NewRpgDoQuestAction::HasNeededQuestItem(GameObject* go) const
     return false;
 }
 
-// Yield the tick while loot is pending, bounded: nothing guarantees the pipeline finishes,
-// and a corpse that despawned leaves "loot target" set with nothing able to clear it.
+// Bounded: a despawned corpse leaves "loot target" set with nothing to clear it.
 bool NewRpgDoQuestAction::HoldForLoot(NewRpgInfo::DoQuest& data)
 {
-    // The loot pipeline runs at higher relevance, so "loot target" is already committed.
     if (AI_VALUE(LootObject, "loot target").IsEmpty())
     {
         data.lootHoldSince = 0;
@@ -428,8 +417,6 @@ WorldObject* NewRpgDoQuestAction::ScanEntryObjectives(NewRpgInfo::DoQuest const&
         }
     };
 
-    // Every incomplete objective, not just the one being walked to - a mob of another is
-    // free progress. Collected first so all of them cost one sweep.
     std::vector<uint32> creatureEntries;
     std::vector<uint32> goEntries;
     for (int32 idx = 0; idx < QUEST_OBJECTIVES_COUNT; ++idx)
@@ -440,8 +427,7 @@ WorldObject* NewRpgDoQuestAction::ScanEntryObjectives(NewRpgInfo::DoQuest const&
 
         if (entry > 0)
         {
-            // The objective entry plus anything that has to die in its place: a marker the
-            // quest names is never spawned itself, so hunting its entry alone finds nothing.
+            // A credit marker is never spawned itself; only its kill sources are.
             creatureEntries.push_back(uint32(entry));
             std::vector<uint32> const& sources = GetQuestKillSources(data.questId, uint32(idx));
             creatureEntries.insert(creatureEntries.end(), sources.begin(), sources.end());
@@ -503,12 +489,9 @@ WorldObject* NewRpgDoQuestAction::ScanItemObjective(NewRpgInfo::DoQuest const& d
         if (!creature || !IsValidCreatureTarget(data, creature))
             continue;
 
-        // Either it drops what we need, or the quest item turns it into something
-        // that does (GetQuestTransformSources), or it carries a craft reagent.
         uint32 lootId = creature->GetCreatureTemplate()->lootid;
-        bool const dropsReagent =
-            craftSources && std::find(craftSources->begin(), craftSources->end(),
-                                      int32(creature->GetEntry())) != craftSources->end();
+        bool const dropsReagent = craftSources && std::find(craftSources->begin(), craftSources->end(),
+                                                            int32(creature->GetEntry())) != craftSources->end();
         bool dropsWanted = false;
         if (!dropsReagent && lootId)
         {
@@ -541,8 +524,6 @@ bool NewRpgDoQuestAction::ScanForObjectiveTarget(NewRpgInfo::DoQuest& data, floa
     if (!data.quest)
         return false;
 
-    // Item objectives name no source entry, so they scan by loot predicate, not by entry.
-    // Clamped to sightDistance: the bot cannot act on anything further out.
     float const scanRange = std::min({maxDist, objectiveScanRange, sPlayerbotAIConfig.SightDistance});
     WorldObject* target = data.objectiveIdx < QUEST_OBJECTIVES_COUNT ? ScanEntryObjectives(data, scanRange)
                                                                      : ScanItemObjective(data, scanRange);
@@ -550,12 +531,11 @@ bool NewRpgDoQuestAction::ScanForObjectiveTarget(NewRpgInfo::DoQuest& data, floa
         return false;
 
     data.targetGuid = target->GetGUID();
-    data.targetPos = WorldPosition(bot->GetMapId(), target->GetPositionX(), target->GetPositionY(),
-                                   target->GetPositionZ());
+    data.targetPos =
+        WorldPosition(bot->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
     data.targetSince = 0;
-    LOG_DEBUG("playerbots", "[New RPG] {} found quest target {} (dist {}) for quest {} objective {}",
-              bot->GetName(), data.targetGuid.ToString(), bot->GetDistance(target), data.questId,
-              data.objectiveIdx);
+    LOG_DEBUG("playerbots", "[New RPG] {} found quest target {} (dist {}) for quest {} objective {}", bot->GetName(),
+              data.targetGuid.ToString(), bot->GetDistance(target), data.questId, data.objectiveIdx);
     return true;
 }
 
@@ -577,7 +557,6 @@ bool NewRpgDoQuestAction::EngageTarget(NewRpgInfo::DoQuest& data)
         Creature* creature = unit ? unit->ToCreature() : nullptr;
         if (!creature || !creature->IsAlive())
         {
-            // Killed or despawned - rescan. Queue the corpse first.
             if (creature)
                 AI_VALUE(LootObjectStack*, "available loot")->Add(data.targetGuid);
             ClearTarget(data);
@@ -594,9 +573,8 @@ bool NewRpgDoQuestAction::EngageTarget(NewRpgInfo::DoQuest& data)
             data.targetSince = getMSTime();
         else if (GetMSTimeDiffToNow(data.targetSince) >= targetEngageTimeout)
         {
-            // unreachable, or the attack action keeps refusing it - don't chase forever
-            LOG_DEBUG("playerbots", "[New RPG] {} wrote off quest target {} for quest {}",
-                      bot->GetName(), data.targetGuid.ToString(), data.questId);
+            LOG_DEBUG("playerbots", "[New RPG] {} wrote off quest target {} for quest {}", bot->GetName(),
+                      data.targetGuid.ToString(), data.questId);
             WriteOffTarget(data);
             return true;
         }
@@ -609,7 +587,6 @@ bool NewRpgDoQuestAction::EngageTarget(NewRpgInfo::DoQuest& data)
         GameObject* go = botAI->GetGameObject(data.targetGuid);
         if (!go || !go->isSpawned())
         {
-            // opened/used (by us or others) or despawned - rescan
             ClearTarget(data);
             return true;
         }
@@ -618,8 +595,8 @@ bool NewRpgDoQuestAction::EngageTarget(NewRpgInfo::DoQuest& data)
             data.targetSince = getMSTime();
         else if (GetMSTimeDiffToNow(data.targetSince) >= targetEngageTimeout)
         {
-            LOG_DEBUG("playerbots", "[New RPG] {} wrote off quest target {} for quest {}",
-                      bot->GetName(), data.targetGuid.ToString(), data.questId);
+            LOG_DEBUG("playerbots", "[New RPG] {} wrote off quest target {} for quest {}", bot->GetName(),
+                      data.targetGuid.ToString(), data.questId);
             WriteOffTarget(data);
             return true;
         }
@@ -633,30 +610,24 @@ bool NewRpgDoQuestAction::EngageTarget(NewRpgInfo::DoQuest& data)
 
 bool NewRpgDoQuestAction::EngageCreature(NewRpgInfo::DoQuest& data, Creature* creature)
 {
-    // Cast objective: takes precedence over talk/attack.
     if (IsIncompleteObjectiveEntry(data, creature->GetEntry()))
         if (Item* castItem = GetCastQuestItem(data))
             return EngageCastTarget(data, creature, castItem);
 
-    // Transform objective: the item has to be used before the kill. Afterwards the
-    // transformed mob is an ordinary target and falls through below.
     if (data.quest && GetQuestTransformSources(data.questId).count(creature->GetEntry()))
         if (Item* item = bot->GetItemByEntry(data.quest->GetSrcItemId()))
             return EngageTransformTarget(data, creature, item);
 
-    // Friendly objective NPC -> talk-to credit, not a kill.
     if (!bot->IsValidAttackTarget(creature))
         return EngageTalkTarget(data, creature);
 
-    // Re-anchor only when the mob really moved
     if (creature->GetExactDist(data.targetPos) > 10.0f)
         data.targetPos = WorldPosition(bot->GetMapId(), creature->GetPositionX(), creature->GetPositionY(),
                                        creature->GetPositionZ());
 
     float const dist = bot->GetDistance(creature);
 
-    // En-route re-target. Each switch needs a 2x improvement in distance, so two
-    // near-equidistant mobs can't ping-pong. The displaced mob is not written off.
+    // Switching needs a 2x closer target, so equidistant mobs can't ping-pong.
     if (dist > engageRange && (!data.lastScan || GetMSTimeDiffToNow(data.lastScan) >= scanInterval))
     {
         data.lastScan = getMSTime();
@@ -664,21 +635,16 @@ bool NewRpgDoQuestAction::EngageCreature(NewRpgInfo::DoQuest& data, Creature* cr
         if (ScanForObjectiveTarget(data, dist * 0.5f) && data.targetGuid != held)
         {
             data.lastEngage = 0;
-            LOG_DEBUG("playerbots", "[New RPG] {} switched quest target {} -> {} for quest {}",
-                      bot->GetName(), held.ToString(), data.targetGuid.ToString(), data.questId);
+            LOG_DEBUG("playerbots", "[New RPG] {} switched quest target {} -> {} for quest {}", bot->GetName(),
+                      held.ToString(), data.targetGuid.ToString(), data.questId);
             return true;
         }
     }
 
-    // LOS is part of the commit condition: while it is blocked, keep closing in rather
-    // than retrying an attack that cannot land.
     if (dist > engageRange || !bot->IsWithinLOSInMap(creature))
     {
         if (MoveFarTo(data.targetPos))
             return true;
-        // Same fallback the talk/cast/transform approaches take: a target the sampler cannot
-        // path to must not pin the bot in place. Nudging it re-samples from somewhere else
-        // next tick, and targetEngageTimeout retires the target if that never helps.
         return MoveRandomNear(10.0f);
     }
 
@@ -691,8 +657,8 @@ bool NewRpgDoQuestAction::EngageGameObject(NewRpgInfo::DoQuest& data, GameObject
     {
         if (bot->isMoving())
             return false;
-        return MoveTo(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(),
-                      false, false, false, false);
+        return MoveTo(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(), false, false, false,
+                      false);
     }
 
     if (bot->IsMounted())
@@ -706,8 +672,7 @@ bool NewRpgDoQuestAction::EngageGameObject(NewRpgInfo::DoQuest& data, GameObject
         return true;
     }
 
-    // Lootable chest: hand it to the loot pipeline. Progress comes from the quest items in
-    // the loot - the core grants a gameobject credit only for goobers.
+    // The core grants gameobject credit only to goobers; a chest progresses through its loot.
     LootObject lootObj(bot, go->GetGUID());
     if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && !lootObj.IsEmpty())
     {
@@ -719,21 +684,19 @@ bool NewRpgDoQuestAction::EngageGameObject(NewRpgInfo::DoQuest& data, GameObject
         return AI_VALUE(LootObjectStack*, "available loot")->Add(go->GetGUID());
     }
 
-    // One attempt then write off: Use() credits goobers directly (KillCreditGO), while
-    // buttons and quest chests credit only through a linked trap or their loot.
+    // One try: buttons credit only through a linked trap.
     WorldPacket packet(CMSG_GAMEOBJ_USE, 8);
     packet << go->GetGUID();
     bot->GetSession()->HandleGameObjectUseOpcode(packet);
-    LOG_DEBUG("playerbots", "[New RPG] {} used quest gameobject {} for quest {}",
-              bot->GetName(), go->GetEntry(), data.questId);
+    LOG_DEBUG("playerbots", "[New RPG] {} used quest gameobject {} for quest {}", bot->GetName(), go->GetEntry(),
+              data.questId);
     WriteOffTarget(data);
     return true;
 }
 
 bool NewRpgDoQuestAction::EngageTalkTarget(NewRpgInfo::DoQuest& data, Creature* creature)
 {
-    // Claim the tick rather than yielding on isMoving like the GO path: yielding lets a
-    // competing strategy pull the bot off a talk target it cannot attack.
+    // No isMoving yield: a competing strategy would pull the bot off a target it cannot attack.
     if (bot->GetDistance(creature) > INTERACTION_DISTANCE - 1.0f)
     {
         if (MoveFarTo(data.targetPos))
@@ -751,8 +714,8 @@ bool NewRpgDoQuestAction::EngageTalkTarget(NewRpgInfo::DoQuest& data, Creature* 
     // commented out (NPCHandler.cpp), so opening a gossip menu would credit nothing.
     bot->SetFacingToObject(creature);
     bot->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-    LOG_DEBUG("playerbots", "[New RPG] {} talked to quest npc {} for quest {}",
-              bot->GetName(), creature->GetEntry(), data.questId);
+    LOG_DEBUG("playerbots", "[New RPG] {} talked to quest npc {} for quest {}", bot->GetName(), creature->GetEntry(),
+              data.questId);
     WriteOffTarget(data);
     return true;
 }
@@ -765,8 +728,6 @@ void NewRpgDoQuestAction::BuildCaches()
 
 bool NewRpgDoQuestAction::IsCastQuest(uint32 questId)
 {
-    // One query, cached for the process: the raw CAST bit is gone from the Quest object
-    // at runtime, so it has to come from the DB column.
     static std::unordered_set<uint32> const castQuests = []
     {
         std::unordered_set<uint32> s;
@@ -805,8 +766,7 @@ uint32 NewRpgDoQuestAction::GetItemUseSpell(Item* item)
 
 bool NewRpgDoQuestAction::EngageTransformTarget(NewRpgInfo::DoQuest& data, Creature* creature, Item* item)
 {
-    // From range, unlike EngageCastTarget: combat pauses this engine, so a bot that walked
-    // into melee would kill the mob untransformed.
+    // From range: combat pauses this engine, so a bot in melee would kill the mob untransformed.
     if (bot->GetDistance(creature) > transformCastRange || !bot->IsWithinLOSInMap(creature))
     {
         if (MoveFarTo(data.targetPos))
@@ -820,18 +780,15 @@ bool NewRpgDoQuestAction::EngageTransformTarget(NewRpgInfo::DoQuest& data, Creat
         return true;
     }
 
-    // Same cooldown hold as EngageCastTarget. Hold the target rather than write it off;
-    // targetEngageTimeout is the backstop if the cast never lands.
     uint32 const spellId = GetItemUseSpell(item);
     if (spellId && bot->HasSpellItemCooldown(spellId, item->GetEntry()))
         return true;
 
-    // Not written off: the creature keeps its guid, SmartAI turns it into the entry that
-    // carries the drop, and the next tick engages it as an ordinary kill/loot target.
+    // Not written off: SmartAI changes the entry in place, so the same guid becomes the kill target.
     bot->SetFacingToObject(creature);
     botAI->ImbueItem(item, creature);
-    LOG_DEBUG("playerbots", "[New RPG] {} used quest item {} to transform npc {} for quest {}",
-              bot->GetName(), item->GetEntry(), creature->GetEntry(), data.questId);
+    LOG_DEBUG("playerbots", "[New RPG] {} used quest item {} to transform npc {} for quest {}", bot->GetName(),
+              item->GetEntry(), creature->GetEntry(), data.questId);
     return true;
 }
 
@@ -854,12 +811,10 @@ bool NewRpgDoQuestAction::EngageCastTarget(NewRpgInfo::DoQuest& data, Creature* 
     if (spellId && bot->HasSpellItemCooldown(spellId, item->GetEntry()))
         return true;
 
-    // The item's SPELL_EFFECT_KILL_CREDIT (or scripted credit) is what advances the
-    // objective. A mis-cast is retried when the write-off list clears on progress.
     bot->SetFacingToObject(creature);
     botAI->ImbueItem(item, creature);
-    LOG_DEBUG("playerbots", "[New RPG] {} used quest item {} on npc {} for quest {}",
-              bot->GetName(), item->GetEntry(), creature->GetEntry(), data.questId);
+    LOG_DEBUG("playerbots", "[New RPG] {} used quest item {} on npc {} for quest {}", bot->GetName(), item->GetEntry(),
+              creature->GetEntry(), data.questId);
     WriteOffTarget(data);
     return true;
 }
@@ -894,8 +849,8 @@ bool NewRpgDoQuestAction::DoCraftObjective(NewRpgInfo::DoQuest& data)
 
     botAI->ImbueItem(item);
     data.lastItemUse = getMSTime();
-    LOG_DEBUG("playerbots", "[New RPG] {} used quest item {} to craft for quest {}", bot->GetName(),
-              item->GetEntry(), data.questId);
+    LOG_DEBUG("playerbots", "[New RPG] {} used quest item {} to craft for quest {}", bot->GetName(), item->GetEntry(),
+              data.questId);
     return true;
 }
 
@@ -908,8 +863,6 @@ WorldObject* NewRpgDoQuestAction::SelectSummonAnchor(NewRpgInfo::DoQuest const& 
     if (!anchor.killAnchor)
         return FindCreatureAnchor(anchor.creature, summonCreatureAnchorRange);
 
-    // Kill sources are alternates of one another, so take whichever the bot reached,
-    // skipping the one it already used the item on so the fight can follow.
     Creature* best = nullptr;
     float nearest = summonKillAnchorRange;
     for (uint32 entry : GetQuestKillSources(data.questId, uint32(data.objectiveIdx)))
@@ -952,11 +905,9 @@ bool NewRpgDoQuestAction::DoSummonObjective(NewRpgInfo::DoQuest& data, QuestSumm
     // Re-summoning replaces a trigger before its timer fires, but only suppress while it is
     // still near the fight - engaging a kill-anchor walks away from where it was planted.
     int32 const summoned = data.quest->RequiredNpcOrGo[data.objectiveIdx];
-    if (anchor.summonsObjective && summoned > 0 &&
-        FindCreatureAnchor(uint32(summoned), summonTriggerNearRange))
+    if (anchor.summonsObjective && summoned > 0 && FindCreatureAnchor(uint32(summoned), summonTriggerNearRange))
         return false;
 
-    // Hold for the whole cast
     if (data.lastItemUse && GetMSTimeDiffToNow(data.lastItemUse) < QuestItemUseGrace(spellId))
         return true;
 
@@ -980,8 +931,8 @@ bool NewRpgDoQuestAction::DoSummonObjective(NewRpgInfo::DoQuest& data, QuestSumm
     botAI->ImbueItem(item);
     data.lastItemUse = getMSTime();
     data.lastSummonAnchor = target->GetGUID();
-    LOG_DEBUG("playerbots", "[New RPG] {} used quest item {} at anchor {} to summon for quest {}",
-              bot->GetName(), item->GetEntry(), target->GetEntry(), data.questId);
+    LOG_DEBUG("playerbots", "[New RPG] {} used quest item {} at anchor {} to summon for quest {}", bot->GetName(),
+              item->GetEntry(), target->GetEntry(), data.questId);
     return true;
 }
 
@@ -990,8 +941,6 @@ GameObject* NewRpgDoQuestAction::FindFocusAnchor(uint32 focusId) const
     GameObject* found = nullptr;
     float nearest = FLT_MAX;
 
-    // Only objects already close enough to cast at, so this stays a small grid visit
-    // rather than an objectiveScanRange sweep on every summon quest tick.
     std::list<GameObject*> gos;
     AnyGameObjectInObjectRangeCheck goCheck(bot, summonAnchorScanRange);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> goSearcher(bot, gos, goCheck);
@@ -1070,15 +1019,14 @@ bool NewRpgDoQuestAction::DoExploreObjective(NewRpgInfo::DoQuest& data)
     if (!quest || !quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT))
         return false;
 
-    // Explored is a separate completion requirement from the objective counts. Once set,
-    // whatever remains is a scripted event we can't drive - leave it to the quest budget.
+    // Explored is separate from the objective counts; once set, what remains is a scripted event.
     QuestStatusData const* q_status = GetQuestStatus(data.questId);
     if (!q_status || q_status->Explored)
         return false;
 
     uint32 triggerId = GetQuestAreaTrigger(data.questId);
     if (!triggerId)
-        return false;  // event quest, not an area-trigger explore
+        return false;
 
     AreaTrigger const* at = sObjectMgr->GetAreaTrigger(triggerId);
     if (!at || at->map != bot->GetMapId())
@@ -1091,8 +1039,8 @@ bool NewRpgDoQuestAction::DoExploreObjective(NewRpgInfo::DoQuest& data)
         p << triggerId;
         p.rpos(0);
         bot->GetSession()->HandleAreaTriggerOpcode(p);
-        LOG_DEBUG("playerbots", "[New RPG] {} fired area trigger {} for quest {}",
-                  bot->GetName(), triggerId, data.questId);
+        LOG_DEBUG("playerbots", "[New RPG] {} fired area trigger {} for quest {}", bot->GetName(), triggerId,
+                  data.questId);
         return true;
     }
 
@@ -1103,7 +1051,6 @@ bool NewRpgDoQuestAction::DoExploreObjective(NewRpgInfo::DoQuest& data)
             return true;
         return MoveRandomNear(10.0f);
     }
-    // Near the center but not yet inside a small/box trigger - inch in.
     return MoveRandomNear(5.0f);
 }
 
@@ -1113,23 +1060,17 @@ bool NewRpgDoQuestAction::DoIncompleteQuest(NewRpgInfo::DoQuest& data)
 
     if (data.pos != WorldPosition() && IsObjectiveCompleted(data))
     {
-        // Sweep nearby corpses into the loot stack before departing.
         botAI->DoSpecificAction("add all loot", Event(), true);
         data.triedSpawns.clear();
         data.visited.clear();
         ResetObjectiveSpawn(data);
     }
 
-    // Bounded: a chest the pipeline reports as lootable but refuses to open would
-    // otherwise pin the bot here for the rest of the run.
     if (HoldForLoot(data))
         return false;
 
-    // Whole-quest budget: the spawn rotation below never gives up on its own, so this is
-    // what releases a bot from a quest it cannot finish.
     if (botAI->rpgInfo.HasStatusPersisted(questStayTime))
     {
-        /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
         botAI->lowPriorityQuest.insert(questId);
         botAI->rpgStatistic.questAbandoned++;
         LOG_DEBUG("playerbots", "[New RPG] {} marked as abandoned quest {} (quest budget)", bot->GetName(), questId);
@@ -1141,46 +1082,38 @@ bool NewRpgDoQuestAction::DoIncompleteQuest(NewRpgInfo::DoQuest& data)
     {
         if (!SelectObjectiveSpawn(data))
         {
-            // An unmet explore objective has no spawn, so try it before giving up.
             if (DoExploreObjective(data))
                 return true;
-            // No spawn point for any objective - walk the POI and grind it instead.
             if (SelectObjectivePoi(data))
             {
                 LOG_DEBUG("playerbots", "[New RPG] {} quest {} objective {}: no spawn indexed, POI fallback",
                           bot->GetName(), questId, data.objectiveIdx);
                 return true;
             }
-            LOG_DEBUG("playerbots", "[New RPG] {} gave up quest {}: no spawn and no POI on map {}",
-                      bot->GetName(), questId, bot->GetMapId());
+            LOG_DEBUG("playerbots", "[New RPG] {} gave up quest {}: no spawn and no POI on map {}", bot->GetName(),
+                      questId, bot->GetMapId());
             botAI->rpgInfo.ChangeToIdle();
             return true;
         }
-        LOG_DEBUG("playerbots", "[New RPG] {} quest {} heading to objective {} spawn at {} yd",
-                  bot->GetName(), questId, data.objectiveIdx, uint32(bot->GetDistance(data.pos)));
+        LOG_DEBUG("playerbots", "[New RPG] {} quest {} heading to objective {} spawn at {} yd", bot->GetName(), questId,
+                  data.objectiveIdx, uint32(bot->GetDistance(data.pos)));
         return true;
     }
 
-    // No-progress backstop, measured from when this spawn was picked, not from arrival:
-    // a bot that cannot path to it never arrives.
+    // Timed from when the spawn was picked, not arrival: an unpathable spawn is never reached.
     if (data.spawnSince && GetMSTimeDiffToNow(data.spawnSince) >= poiStayTime)
     {
         LOG_DEBUG("playerbots", "[New RPG] {} quest {} objective {}: {} after {} s at this spawn, {} tried",
-                  bot->GetName(), questId, data.objectiveIdx,
-                  HasObjectiveProgress(data) ? "progress" : "nothing", poiStayTime / 1000, data.triedSpawns.size());
+                  bot->GetName(), questId, data.objectiveIdx, HasObjectiveProgress(data) ? "progress" : "nothing",
+                  poiStayTime / 1000, data.triedSpawns.size());
 
         if (!HasObjectiveProgress(data))
         {
-            // dry (or unreachable) spawn: move on to the next nearest one. The quest
-            // budget above is what eventually gives up on the quest entirely.
             if (data.spawnGuid)
                 data.triedSpawns.insert(data.spawnGuid);
         }
         else
         {
-            // The area works, so let dry spawns be retried and drop the write-offs with
-            // them: `visited` stops a bot re-chasing what it just failed on, it is not a
-            // whole-quest blacklist.
             data.triedSpawns.clear();
             data.visited.clear();
         }
@@ -1188,20 +1121,16 @@ bool NewRpgDoQuestAction::DoIncompleteQuest(NewRpgInfo::DoQuest& data)
         return true;
     }
 
-    QuestSummonAnchor const anchor = data.objectiveIdx >= 0
-                                         ? GetQuestSummonAnchor(data.questId, uint32(data.objectiveIdx))
-                                         : QuestSummonAnchor{};
+    QuestSummonAnchor const anchor =
+        data.objectiveIdx >= 0 ? GetQuestSummonAnchor(data.questId, uint32(data.objectiveIdx)) : QuestSummonAnchor{};
 
-    // A kill-anchor must be used on before it is fought: the scan targets it because it
-    // grants the credit, and engaging first means fighting it un-primed.
+    // A kill-anchor gets the item before the fight, or it is fought un-primed.
     if (anchor.killAnchor && DoSummonObjective(data, anchor))
         return true;
 
     if (data.targetGuid)
         return EngageTarget(data);
 
-    // Throttled scan - runs during the approach too, so targets en route are engaged
-    // instead of walked past.
     if (!data.lastScan || GetMSTimeDiffToNow(data.lastScan) >= scanInterval)
     {
         data.lastScan = getMSTime();
@@ -1212,9 +1141,6 @@ bool NewRpgDoQuestAction::DoIncompleteQuest(NewRpgInfo::DoQuest& data)
     if (DoCraftObjective(data))
         return true;
 
-    // Nothing of the objective in range - if it is conjured at an anchor, use the item here.
-    // After the scan so anything already summoned is killed first, and before the walk below
-    // so the anchor drives the last stretch.
     if (DoSummonObjective(data, anchor))
         return true;
 
@@ -1222,13 +1148,10 @@ bool NewRpgDoQuestAction::DoIncompleteQuest(NewRpgInfo::DoQuest& data)
     {
         if (MoveFarTo(data.pos))
             return true;
-        // Long-range sampler found no candidate - nudge the bot so the next tick
-        // retries from a different position instead of sitting idle.
         return MoveRandomNear(10.0f);
     }
 
-    // Give the destination one scan window before writing it off. The throttled scan above
-    // has not necessarily run since arrival, and the cell may only just have loaded.
+    // One scan window after arrival: the cell may only just have loaded.
     if (!data.lastReachPOI)
     {
         data.lastReachPOI = getMSTime();
@@ -1238,13 +1161,9 @@ bool NewRpgDoQuestAction::DoIncompleteQuest(NewRpgInfo::DoQuest& data)
     if (GetMSTimeDiffToNow(data.lastReachPOI) < scanInterval)
         return true;
 
-    // A POI has no spawn point to retire and nothing better to move to - stay and let the
-    // grind strategy work the area until the no-progress window above rotates to another one.
     if (data.poiFallback)
         return MoveRandomNear(8.0f);
 
-    // Standing on the spawn point with nothing in range: it is dead or empty, so take the
-    // next nearest rather than waiting out poiStayTime here.
     LOG_DEBUG("playerbots", "[New RPG] {} quest {} objective {}: arrived, nothing in range - next spawn",
               bot->GetName(), questId, data.objectiveIdx);
     data.triedSpawns.insert(data.spawnGuid);
@@ -1259,27 +1178,20 @@ bool NewRpgDoQuestAction::DoCompletedQuest(NewRpgInfo::DoQuest& data)
 
     if (data.objectiveIdx != -1)
     {
-        // Same sweep as the objective-complete transition: the walk to the turn-in
-        // starts immediately and outruns the random "add all loot" trigger.
+        // The turn-in walk would outrun the random "add all loot" trigger.
         botAI->DoSpecificAction("add all loot", Event(), true);
         ClearTarget(data);
-        // Nothing left to grind for - the walk to the turn-in must not be interrupted by
-        // "attack anything", which outranks this action.
+        // "attack anything" outranks this action and would interrupt the turn-in walk.
         data.poiFallback = false;
-        // if quest is completed, back to poi with -1 idx to reward
         BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, quest);
         botAI->rpgStatistic.questCompleted++;
         data.lastReachPOI = 0;
         data.objectiveIdx = -1;
-        // Clear the objective's spawn point and its write-offs: from here they track the
-        // turn-in's spawn points instead.
         data.spawnGuid = 0;
         data.pos = WorldPosition();
         data.triedSpawns.clear();
     }
 
-    // Re-entered whenever a turn-in destination is retired below, so an entry with several
-    // spawn points works through them instead of waiting out the clock at the first.
     if (data.pos == WorldPosition())
     {
         if (SelectQuestEnder(data))
@@ -1292,8 +1204,8 @@ bool NewRpgDoQuestAction::DoCompletedQuest(NewRpgInfo::DoQuest& data)
             std::vector<POIInfo> poiInfo;
             if (!GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
             {
-                // can't find a poi pos to reward, stop doing quest for now
-                LOG_DEBUG("playerbots", "[New RPG] {} quest {} complete but no turn-in on map {}: "
+                LOG_DEBUG("playerbots",
+                          "[New RPG] {} quest {} complete but no turn-in on map {}: "
                           "{} ender entries indexed ({} spawns tried), no POI either",
                           bot->GetName(), questId, bot->GetMapId(), GetQuestEnderEntries(questId).size(),
                           data.triedSpawns.size());
@@ -1301,17 +1213,15 @@ bool NewRpgDoQuestAction::DoCompletedQuest(NewRpgInfo::DoQuest& data)
                 return false;
             }
             assert(poiInfo.size() > 0);
-            // now we get the place to get rewarded
             data.pos = WorldPosition(bot->GetMapId(), poiInfo[0].pos.x, poiInfo[0].pos.y, poiInfo[0].z);
-            LOG_DEBUG("playerbots", "[New RPG] {} quest {} complete, turn-in POI {} yd away ({} ender entries, "
+            LOG_DEBUG("playerbots",
+                      "[New RPG] {} quest {} complete, turn-in POI {} yd away ({} ender entries, "
                       "{} spawns tried)",
-                      bot->GetName(), questId, uint32(bot->GetDistance(data.pos)),
-                      GetQuestEnderEntries(questId).size(), data.triedSpawns.size());
+                      bot->GetName(), questId, uint32(bot->GetDistance(data.pos)), GetQuestEnderEntries(questId).size(),
+                      data.triedSpawns.size());
         }
     }
 
-    // Same gate as DoIncompleteQuest: don't start the walk to the turn-in while lootable
-    // corpses are pending nearby.
     if (HoldForLoot(data))
         return false;
 
@@ -1322,17 +1232,14 @@ bool NewRpgDoQuestAction::DoCompletedQuest(NewRpgInfo::DoQuest& data)
         return MoveRandomNear(10.0f);
     }
 
-    // Now we are near the qoi of reward
-    // the quest should be rewarded by SearchQuestGiverAndAcceptOrReward
+    // The hand-in itself happens in SearchQuestGiverAndAcceptOrReward.
     if (!data.lastReachPOI)
     {
         data.lastReachPOI = getMSTime();
-        LOG_DEBUG("playerbots", "[New RPG] {} reached turn-in for quest {}, waiting on the hand-in",
-                  bot->GetName(), questId);
+        LOG_DEBUG("playerbots", "[New RPG] {} reached turn-in for quest {}, waiting on the hand-in", bot->GetName(),
+                  questId);
         return true;
     }
-    // Standing at an ender spawn point with nobody handing the quest in: it is empty (dead,
-    // despawned, or only put in the world by a script). Retire it and try the next one
     if (data.spawnGuid && GetMSTimeDiffToNow(data.lastReachPOI) >= enderWaitTime)
     {
         LOG_DEBUG("playerbots", "[New RPG] {} nobody took quest {} at this ender spawn, trying the next",
@@ -1344,7 +1251,6 @@ bool NewRpgDoQuestAction::DoCompletedQuest(NewRpgInfo::DoQuest& data)
         return true;
     }
 
-    // stayed at this POI for more than 5 minutes
     if (GetMSTimeDiffToNow(data.lastReachPOI) >= poiStayTime)
     {
         // e.g. Can not reward quest to gameobjects

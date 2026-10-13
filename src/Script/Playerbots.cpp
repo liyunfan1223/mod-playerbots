@@ -535,7 +535,6 @@ public:
         LOG_INFO("server.loading", ">> Loaded playerbots config in {} ms", GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
 
-        // Everything below builds bot-only indexes; a disabled module should build none.
         if (!sPlayerbotAIConfig.Enabled)
         {
             LOG_INFO("server.loading", "Playerbots disabled by config - skipping bot indexes");

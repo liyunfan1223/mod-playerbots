@@ -150,7 +150,7 @@ bool CheckMountStateAction::Execute(Event /*event*/)
     if ((noRealMaster || inBattleground) && !bot->IsMounted() &&
         noAttackers && shouldMount && !bot->IsInCombat())
     {
-        // Do-quest travel dismounts at engage range from a target, or on arrival otherwise.
+        // Don't mount for a leg that ends in a dismount.
         if (auto const* doQuest = std::get_if<NewRpgInfo::DoQuest>(&botAI->rpgInfo.data))
         {
             float const arrival = doQuest->targetGuid ? NEW_RPG_ENGAGE_RANGE : 10.0f;
