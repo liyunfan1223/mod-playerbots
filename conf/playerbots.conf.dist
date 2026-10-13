@@ -409,6 +409,14 @@ Playerbots.SpellDistance = 28.5
 Playerbots.ShootDistance = 5.0
 Playerbots.HealDistance = 38.5
 Playerbots.LootDistance = 15.0
+
+# Let bots keep and work on quests from other zones: the quest log no longer drops quests whose
+# zone differs from the bot's current zone (bots travel, including by flight paths, instead of
+# re-accepting dropped quests). Class/sort quests are never dropped. When the quest log runs out of
+# free slots, the quest with the furthest objective is dropped first.
+# Disable to restore the old behaviour (cross-zone quests dropped on sight).
+# Default: 0 (opt-in)
+Playerbots.CrossZoneQuests = 0
 Playerbots.FleeDistance = 5.0
 Playerbots.AggroDistance = 22
 Playerbots.TooCloseDistance = 5.0
