@@ -39,6 +39,11 @@ void AutoMaintenanceOnLevelupAction::AutoPickTalents()
     if (!sPlayerbotAIConfig.AutoPickTalents || !sRandomPlayerbotMgr.IsRandomBot(bot))
         return;
 
+    uint32 currentLevel = bot->GetLevel();
+
+    if (currentLevel < 10)
+        return;
+
     if (bot->GetFreeTalentPoints() <= 0)
         return;
 

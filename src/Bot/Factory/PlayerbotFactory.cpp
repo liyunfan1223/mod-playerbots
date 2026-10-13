@@ -544,23 +544,16 @@ uint16 PlayerbotFactory::ChooseComplementaryProfession(
 
 uint32 PlayerbotFactory::GetClassSpecProbability(uint32 cls, uint32 specIndex, uint32 currentLevel)
 {
-    uint32 searchLevel = currentLevel;
+    if (currentLevel >= MAX_LEVEL)
+        currentLevel = MAX_LEVEL;
 
-    while (searchLevel <= 80 && sPlayerbotAIConfig.RandomClassSpecProb[cls][specIndex][searchLevel] == 0)
-    {
-        searchLevel++;
-    }
+    if (specIndex >= MAX_SPECNO)
+        return 0;
 
-    if (searchLevel > 80 || sPlayerbotAIConfig.RandomClassSpecProb[cls][specIndex][searchLevel] == 0)
-    {
-        searchLevel = currentLevel;
-        while (searchLevel > 1 && sPlayerbotAIConfig.RandomClassSpecProb[cls][specIndex][searchLevel] == 0)
-        {
-            searchLevel--;
-        }
-    }
+    if (sPlayerbotAIConfig.PremadeSpecName[cls][specIndex].empty())
+        return 0;
 
-    return sPlayerbotAIConfig.RandomClassSpecProb[cls][specIndex][searchLevel];
+    return sPlayerbotAIConfig.RandomClassSpecProb[cls][specIndex][currentLevel];
 }
 
 uint32 PlayerbotFactory::GetStoredOrRandomValue(Player* bot,
