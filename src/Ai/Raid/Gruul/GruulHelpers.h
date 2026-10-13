@@ -49,7 +49,13 @@ enum class GruulSpells : uint32
 
 enum class GruulNpcs : uint32
 {
-    NPC_WILD_FEL_STALKER = 18847,
+    // High King Maulgar <Lord of the Ogres>
+    NPC_HIGH_KING_MAULGAR  = 18831,
+    NPC_KROSH_FIREHAND     = 18832,
+    NPC_OLM_THE_SUMMONER   = 18834,
+    NPC_KIGGLER_THE_CRAZED = 18835,
+    NPC_BLINDEYE_THE_SEER  = 18836,
+    NPC_WILD_FEL_STALKER   = 18847,
 };
 
 inline constexpr uint32 GRUUL_MAP_ID = 565;
