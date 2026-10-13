@@ -14,6 +14,7 @@
 #include "GridTerrainData.h"
 #include "IVMapMgr.h"
 #include "GameGraveyard.h"
+#include "DBCStores.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
@@ -41,6 +42,7 @@
 #include "G3D/Vector2.h"
 #include <algorithm>
 #include <limits>
+#include <utility>
 
 bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
 {
@@ -1127,7 +1129,8 @@ WorldPosition NewRpgBaseAction::SelectRandomCampPos(Player* bot)
     return dest;
 }
 
-bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, WorldPosition& flightMasterPos, std::vector<uint32>& path)
+bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, WorldPosition& flightMasterPos,
+                                                  std::vector<uint32>& path, bool questAware)
 {
     TravelMgr::FlightMasterInfo const* info = sTravelMgr.GetNearestFlightMasterInfo(bot);
     if (!info)
@@ -1139,6 +1142,80 @@ bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, Wor
 
     flightMasterEntry = info->templateEntry;
     flightMasterPos = info->pos;
+
+    if (questAware && sPlayerbotAIConfig.QuestAwareTaxi)
+    {
+        // Land near the bot's quests: score each destination node by the closest active objective,
+        // turn-in or available quest giver, then weighted-random among the best three.
+        std::vector<WorldLocation> const giverLocs = sTravelMgr.GetValidQuestGiverLocations(bot);
+        std::vector<std::pair<float, size_t>> scored;
+        for (size_t i = 0; i < availablePaths.size(); ++i)
+        {
+            TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(availablePaths[i].back());
+            if (!node || node->map_id != bot->GetMapId())
+                continue;
+
+            float dist = std::numeric_limits<float>::max();
+            auto consider = [&](float x, float y)
+            {
+                float d = bot->GetDistance2d(x, y);
+                if (d < dist)
+                    dist = d;
+            };
+
+            for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+            {
+                uint32 questId = bot->GetQuestSlotQuestId(slot);
+                if (!questId)
+                    continue;
+
+                std::vector<POIInfo> poiInfo;
+                if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo,
+                                                  bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE))
+                {
+                    for (POIInfo const& poi : poiInfo)
+                        consider(poi.pos.x, poi.pos.y);
+                }
+            }
+            for (WorldLocation const& loc : giverLocs)
+                consider(loc.GetPositionX(), loc.GetPositionY());
+
+            if (dist < std::numeric_limits<float>::max())
+                scored.emplace_back(dist, i);
+        }
+
+        if (!scored.empty())
+        {
+            std::sort(scored.begin(), scored.end());
+            static constexpr uint32 TOP_WEIGHTS[3] = {3, 2, 1};
+            size_t top = std::min<size_t>(3, scored.size());
+            uint32 total = 0;
+            for (size_t i = 0; i < top; ++i)
+                total += TOP_WEIGHTS[i];
+
+            uint32 roll = urand(1, total);
+            uint32 acc = 0;
+            size_t pick = 0;
+            for (size_t i = 0; i < top; ++i)
+            {
+                acc += TOP_WEIGHTS[i];
+                if (roll <= acc)
+                {
+                    pick = i;
+                    break;
+                }
+            }
+
+            path = availablePaths[scored[pick].second];
+            LOG_DEBUG("playerbots",
+                      "[New RPG] Bot {} select quest-aware flight taxi node from:{} (node {}) to:{} "
+                      "({:.0f} yd to nearest quest point, {} candidates)",
+                      bot->GetName(), flightMasterEntry, path[0], path[path.size() - 1], scored[pick].first,
+                      availablePaths.size());
+            return true;
+        }
+    }
+
     path = availablePaths[urand(0, availablePaths.size() - 1)];
     LOG_DEBUG("playerbots", "[New RPG] Bot {} select random flight taxi node from:{} (node {}) to:{} ({} available)",
               bot->GetName(), flightMasterEntry, path[0], path[path.size() - 1], availablePaths.size());
@@ -1411,7 +1488,7 @@ bool NewRpgBaseAction::CheckRpgStatusAvailable(NewRpgStatus status)
             uint32 flightMasterEntry = 0;
             WorldPosition flightMasterPos;
             std::vector<uint32> path;
-            return SelectRandomFlightTaxiNode(flightMasterEntry, flightMasterPos, path);
+            return SelectRandomFlightTaxiNode(flightMasterEntry, flightMasterPos, path, /*questAware*/ false);
         }
         case RPG_OUTDOOR_PVP:
         {
