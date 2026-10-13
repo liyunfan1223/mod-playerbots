@@ -13,7 +13,7 @@
 #include "Position.h"
 #include <string>
 
-// General
+// Shared
 
 class HyjalResetEncounterStatesAction : public Action
 {
@@ -35,8 +35,7 @@ private:
     std::string const _bossName;
 };
 
-// For all five bosses. _bailBelowHealthPct is the tank's own health, below which it stops walking
-// the boss.
+// For all five bosses. _bailBelowHealthPct is the tank's hp, below which it stops moving the boss.
 class HyjalMainTankPositionBossAction : public AttackAction
 {
 public:
@@ -53,7 +52,6 @@ private:
     float const _bailBelowHealthPct;
 };
 
-// Remove Mark of Kaz'rogal and Doomfire in certain cases
 class HyjalRemoveDangerousDotAction : public Action
 {
 public:

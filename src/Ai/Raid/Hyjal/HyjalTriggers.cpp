@@ -12,14 +12,14 @@
 using namespace HyjalHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool HyjalNoEncounterInProgressTrigger::IsActive()
 {
     return !IsEncounterInProgress(bot, HYJAL_MAP_ID);
 }
 
-bool HyjalPullingBossTrigger::IsActiveInEncounter()
+bool HyjalHunterShouldMisdirectTrigger::IsActiveInEncounter()
 {
     if (bot->getClass() != CLASS_HUNTER)
         return false;
@@ -33,8 +33,6 @@ bool HyjalBossShouldBeTankedTrigger::IsActiveInEncounter()
     if (!PlayerbotAI::IsTank(bot))
         return false;
 
-    // IsMainTank() does not require an actual tank (by strategy or spec), but the raid strategy
-    // assumes the main tank will be a tank.
     if (_mainTankOnly && !PlayerbotAI::IsMainTank(bot))
         return false;
 
@@ -77,7 +75,7 @@ bool RageWinterchillRangedInDeathAndDecayTrigger::IsActiveInEncounter()
 
 // Anetheron
 
-bool AnetheronPullingBossOrInfernalTrigger::IsActiveInEncounter()
+bool AnetheronHunterShouldMisdirectTrigger::IsActiveInEncounter()
 {
     return bot->getClass() == CLASS_HUNTER && AI_VALUE2(Unit*, "find target", "anetheron");
 }
