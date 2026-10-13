@@ -619,7 +619,20 @@ bool NewRpgDoQuestAction::EngageCreature(NewRpgInfo::DoQuest& data, Creature* cr
             return EngageTransformTarget(data, creature, item);
 
     if (!bot->IsValidAttackTarget(creature))
-        return EngageTalkTarget(data, creature);
+    {
+        // Most item-on-target quests lack the CAST flag, so try the quest's source item first.
+        if (data.quest && data.quest->GetSrcItemId())
+            if (Item* item = bot->GetItemByEntry(data.quest->GetSrcItemId()))
+                if (GetItemUseSpell(item))
+                    return EngageCastTarget(data, creature, item);
+
+        // Speak-to credit only for gossip NPCs; triggers and immune mobs need something the bot can't do.
+        if (creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+            return EngageTalkTarget(data, creature);
+
+        WriteOffTarget(data);
+        return true;
+    }
 
     if (creature->GetExactDist(data.targetPos) > 10.0f)
         data.targetPos = WorldPosition(bot->GetMapId(), creature->GetPositionX(), creature->GetPositionY(),
