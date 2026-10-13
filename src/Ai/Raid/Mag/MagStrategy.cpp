@@ -30,7 +30,7 @@ void RaidMagtheridonStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("magtheridon should be tanked",
         { NextAction("magtheridon main tank position boss", ACTION_RAID + 1) }));
 
-    triggers.push_back(new TriggerNode("magtheridon should spread ranged",
+    triggers.push_back(new TriggerNode("magtheridon ranged should spread",
         { NextAction("magtheridon spread ranged", ACTION_RAID + 1) }));
 
     triggers.push_back(new TriggerNode("magtheridon standing in debris",

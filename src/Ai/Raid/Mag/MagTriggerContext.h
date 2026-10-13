@@ -36,8 +36,8 @@ public:
         creators["magtheridon should be tanked"] =
             &RaidMagtheridonTriggerContext::magtheridon_should_be_tanked;
 
-        creators["magtheridon should spread ranged"] =
-            &RaidMagtheridonTriggerContext::magtheridon_should_spread_ranged;
+        creators["magtheridon ranged should spread"] =
+            &RaidMagtheridonTriggerContext::magtheridon_ranged_should_spread;
 
         creators["magtheridon standing in debris"] =
             &RaidMagtheridonTriggerContext::magtheridon_standing_in_debris;
@@ -78,9 +78,9 @@ private:
     {
         return new MagtheridonShouldBeTankedTrigger(botAI);
     }
-    static Trigger* magtheridon_should_spread_ranged(PlayerbotAI* botAI)
+    static Trigger* magtheridon_ranged_should_spread(PlayerbotAI* botAI)
     {
-        return new MagtheridonShouldSpreadRangedTrigger(botAI);
+        return new MagtheridonRangedShouldSpreadTrigger(botAI);
     }
     static Trigger* magtheridon_standing_in_debris(PlayerbotAI* botAI)
     {

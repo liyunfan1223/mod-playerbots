@@ -78,7 +78,7 @@ bool MagtheridonShouldBeTankedTrigger::IsActiveInEncounter()
     return magtheridon->GetVictim() == bot || PlayerbotAI::IsMainTank(bot);
 }
 
-bool MagtheridonShouldSpreadRangedTrigger::IsActiveInEncounter()
+bool MagtheridonRangedShouldSpreadTrigger::IsActiveInEncounter()
 {
     if (!PlayerbotAI::IsRanged(bot))
         return false;

@@ -96,11 +96,11 @@ protected:
     bool IsActiveInEncounter() override;
 };
 
-class MagtheridonShouldSpreadRangedTrigger : public MagtheridonEncounterTrigger
+class MagtheridonRangedShouldSpreadTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonShouldSpreadRangedTrigger(PlayerbotAI* botAI)
-        : MagtheridonEncounterTrigger(botAI, "magtheridon should spread ranged") {}
+    MagtheridonRangedShouldSpreadTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon ranged should spread") {}
 
 protected:
     bool IsActiveInEncounter() override;
