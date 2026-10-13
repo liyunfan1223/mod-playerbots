@@ -8,8 +8,11 @@
 #define PLAYERBOTS_PLAYERBOTAICONFIG_H
 
 #include "DBCEnums.h"
+#include "PvpLoadoutEp.h"
+#include "PvpLoadoutRules.h"
 #include "SharedDefines.h"
 #include <algorithm>
+#include <array>
 #include <map>
 #include <mutex>
 #include <set>
@@ -453,6 +456,17 @@ public:
     int32 AutoGearCommand, AutoGearCommandAltBots, AutoGearQualityLimit, AutoGearScoreLimit;
     int32 AutoGearBisCommand;
 
+    bool PvpLoadoutSwap;
+    uint32 PvpLoadoutMinRating;
+    uint32 PvpLoadoutRatingMargin;
+    int32 PvpLoadoutQualityLimit;  // -1: RandomGearQualityLimit
+    int32 PvpLoadoutScoreLimit;    // -1: RandomGearScoreLimit
+    bool PvpLoadoutAnnounce;
+    bool PvpLoadoutDebug;
+    std::array<PvpLoadout::Profile, 4> PvpProfiles;  // indexed by PvpLoadout::Role
+    std::vector<PvpLoadout::CurveStep> PvpLoadoutPveIlvlCurve;
+    std::array<int32, PvpLoadout::TALENT_TAB_COUNT> PvpSpecNoByTab[MAX_CLASSES];
+
     uint32 UseGroundMountAtMinLevel;
     uint32 UseFastGroundMountAtMinLevel;
     uint32 UseFlyMountAtMinLevel;
@@ -528,6 +542,8 @@ private:
 
     PlayerbotAIConfig(PlayerbotAIConfig&&) = delete;
     PlayerbotAIConfig& operator=(PlayerbotAIConfig&&) = delete;
+
+    std::array<int32, PvpLoadout::TALENT_TAB_COUNT> BuildPvpSpecNoByTab(uint32 cls) const;
 };
 
 #define sPlayerbotAIConfig PlayerbotAIConfig::Instance()

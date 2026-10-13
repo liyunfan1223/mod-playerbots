@@ -91,3 +91,13 @@ std::map<uint8, uint32> BisListMgr::GetBisForNearest(uint16 requestedIlvl, uint1
         *outResolved = 0;
     return {};
 }
+
+std::vector<uint16> BisListMgr::GetTiers(uint8 cls, uint8 tab) const
+{
+    std::vector<uint16> tiers;
+    for (auto const& [autoGearScoreLimit, combos] : _bis)
+        if (combos.count(MakeKey(cls, tab)))
+            tiers.push_back(autoGearScoreLimit);
+
+    return tiers;
+}

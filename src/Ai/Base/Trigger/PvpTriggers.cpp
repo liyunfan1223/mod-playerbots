@@ -10,6 +10,7 @@
 #include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
 #include "Playerbots.h"
+#include "PvpLoadoutMgr.h"
 #include "ServerFacade.h"
 
 namespace
@@ -320,3 +321,11 @@ bool VehicleNearTrigger::IsActive()
 }
 
 bool InVehicleTrigger::IsActive() { return botAI->IsInVehicle(); }
+
+bool PvpLoadoutMismatchTrigger::IsActive()
+{
+    if (!_loadout)
+        _loadout = context->GetValue<std::optional<PvpLoadout::Snapshot>>("pvp loadout");
+
+    return PvpLoadoutMgr::GetTransition(bot, _loadout->RefGet()) != PvpLoadout::Transition::None;
+}

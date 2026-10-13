@@ -9,6 +9,7 @@
 
 #include "Define.h"
 #include <map>
+#include <vector>
 
 class BisListMgr
 {
@@ -29,6 +30,9 @@ public:
     // outResolved receives the matched ilvl (0 if nothing matched within the window).
     std::map<uint8, uint32> GetBisForNearest(uint16 requestedIlvl, uint16 maxDrop, uint8 cls, uint8 tab,
                                              uint8 faction, uint16* outResolved = nullptr) const;
+
+    // The auto_gear_score_limit tiers with rows for this class and tab, ascending.
+    std::vector<uint16> GetTiers(uint8 cls, uint8 tab) const;
 
 private:
     BisListMgr() = default;

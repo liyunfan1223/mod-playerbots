@@ -56,3 +56,6 @@ local.properties
 #
 .agents/plans/**
 .claude/settings.local.json
+
+# graphify knowledge graph output, wherever /graphify is run
+graphify-out/

@@ -18,6 +18,7 @@
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "PriestAiObjectContext.h"
+#include "PvpLoadoutRules.h"
 #include "ReactionEngine.h"
 #include "RogueAiObjectContext.h"
 #include "ShamanAiObjectContext.h"
@@ -712,6 +713,12 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->removeStrategy("mount", false);
         }
     }
+
+    // Added last so no branch above drops it; kept with the option off while a loadout still awaits restore.
+    if (facade && sRandomPlayerbotMgr.IsRandomBot(player) &&
+        (sPlayerbotAIConfig.PvpLoadoutSwap ||
+         facade->GetAiObjectContext()->GetValue<std::optional<PvpLoadout::Snapshot>>("pvp loadout")->RefGet()))
+        nonCombatEngine->addStrategy("pvp loadout", false);
 }
 
 Engine* AiFactory::createNonCombatEngine(Player* player, PlayerbotAI* const facade, AiObjectContext* aiObjectContext)

@@ -119,6 +119,13 @@ void PlayerbotsDatabaseConnection::DoPrepareStatements()
 
     PrepareStatement(PLAYERBOTS_SEL_BIS_GEAR, "SELECT class, tab, slot, faction, auto_gear_score_limit, item_id FROM playerbots_bis_gear", CONNECTION_SYNCH);
 
+    PrepareStatement(PLAYERBOTS_SEL_PVP_LOADOUT, "SELECT guid, talent_link, glyphs, match_items, arena_instance_id FROM playerbots_pvp_loadout", CONNECTION_SYNCH);
+    PrepareStatement(PLAYERBOTS_REP_PVP_LOADOUT, "REPLACE INTO playerbots_pvp_loadout (guid, talent_link, glyphs, match_items, arena_instance_id) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(PLAYERBOTS_DEL_PVP_LOADOUT, "DELETE FROM playerbots_pvp_loadout WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(PLAYERBOTS_SEL_PVP_LOADOUT_ITEMS, "SELECT guid, slot, item_guid, item_entry, creator_guid, gift_creator_guid, flags, duration, charges, enchantments, random_property_id, durability, played_time, text FROM playerbots_pvp_loadout_item", CONNECTION_SYNCH);
+    PrepareStatement(PLAYERBOTS_INS_PVP_LOADOUT_ITEM, "INSERT INTO playerbots_pvp_loadout_item (guid, slot, item_guid, item_entry, creator_guid, gift_creator_guid, flags, duration, charges, enchantments, random_property_id, durability, played_time, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(PLAYERBOTS_DEL_PVP_LOADOUT_ITEMS, "DELETE FROM playerbots_pvp_loadout_item WHERE guid = ?", CONNECTION_ASYNC);
+
     PrepareStatement(PLAYERBOTS_DEL_GUILD_TASKS_ALL, "DELETE FROM playerbots_guild_tasks", CONNECTION_SYNCH);
 
     PrepareStatement(PLAYERBOTS_SEL_PREFERRED_MOUNTS, "SELECT guid, spellid, type FROM playerbots_preferred_mounts", CONNECTION_SYNCH);

@@ -525,8 +525,11 @@ void RandomPlayerbotFactory::CreateRandomBots()
         // Clean up orphaned entries in playerbots_guild_tasks
         PlayerbotsDatabase.DirectExecute("DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM " + characterDBName + ".characters)");
 
-        // Clean up orphaned entries in playerbots_db_store (explicit id list, no cross-database subquery)
+        // Clean up orphaned entries in playerbots_db_store and playerbots_pvp_loadout (explicit id list, no cross-database subquery)
         PlayerbotsDatabase.DirectExecute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM " + characterDBName + ".characters WHERE account NOT IN (" + botAccountIds + "))");
+        PlayerbotsDatabase.DirectExecute("DELETE FROM playerbots_pvp_loadout WHERE guid NOT IN (SELECT guid FROM " + characterDBName + ".characters WHERE account NOT IN (" + botAccountIds + "))");
+        PlayerbotsDatabase.DirectExecute(
+            "DELETE FROM playerbots_pvp_loadout_item WHERE guid NOT IN (SELECT guid FROM playerbots_pvp_loadout)");
 
         // Clean up orphaned records in character-related tables
         CharacterDatabase.Execute("DELETE FROM arena_team_member WHERE guid NOT IN (SELECT guid FROM characters)");

@@ -244,19 +244,16 @@ void TalentSpec::SortTalents(std::vector<TalentListEntry>& talents, uint32 sortB
 // Set the talent ranks to the current rank of the player.
 void TalentSpec::ReadTalents(Player* bot)
 {
+    // HasSpell misses passive talents; the talent map holds every learned talent at its current rank.
     for (auto& entry : talents)
         for (uint8 rank = 0; rank < MAX_TALENT_RANK; ++rank)
         {
             uint32 spellId = entry.talentInfo->RankID[rank];
-            if (!spellId)
-                continue;
-
-            if (bot->HasSpell(spellId))
-            {
+            if (spellId && bot->HasTalent(spellId, bot->GetActiveSpec()))
                 entry.rank = rank + 1;
-                points += 1;
-            }
         }
+
+    points = GetTalentPoints(talents, 0) + GetTalentPoints(talents, 1) + GetTalentPoints(talents, 2);
 }
 
 // Set the talent ranks to the ranks of the link.

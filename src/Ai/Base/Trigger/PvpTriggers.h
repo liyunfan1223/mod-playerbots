@@ -7,7 +7,10 @@
 #ifndef PLAYERBOTS_PVPTRIGGERS_H
 #define PLAYERBOTS_PVPTRIGGERS_H
 
+#include "PvpLoadoutRules.h"
 #include "Trigger.h"
+#include "Value.h"
+#include <optional>
 
 class PlayerbotAI;
 
@@ -115,6 +118,18 @@ public:
     PlayerIsInBattlegroundWithoutFlag(PlayerbotAI* botAI) : Trigger(botAI, "in Battleground without flag") {}
 
     bool IsActive() override;
+};
+
+// The bot's PvP loadout does not match where it is: entering an arena, a new arena, or no longer in one.
+class PvpLoadoutMismatchTrigger : public Trigger
+{
+public:
+    PvpLoadoutMismatchTrigger(PlayerbotAI* botAI) : Trigger(botAI, "pvp loadout mismatch", 2) {}
+
+    bool IsActive() override;
+
+private:
+    Value<std::optional<PvpLoadout::Snapshot>>* _loadout = nullptr;
 };
 
 class PlayerWantsInBattlegroundTrigger : public Trigger

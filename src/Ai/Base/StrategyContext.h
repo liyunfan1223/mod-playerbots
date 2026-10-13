@@ -39,6 +39,7 @@
 #include "NonCombatStrategy.h"
 #include "PassiveStrategy.h"
 #include "PullStrategy.h"
+#include "PvpLoadoutStrategy.h"
 #include "QuestStrategies.h"
 #include "RTSCStrategy.h"
 #include "RacialsStrategy.h"
@@ -111,6 +112,7 @@ public:
         creators["eye"] = &StrategyContext::eye;
         creators["isle"] = &StrategyContext::isle;
         creators["arena"] = &StrategyContext::arena;
+        creators["pvp loadout"] = &StrategyContext::pvp_loadout;
         creators["mount"] = &StrategyContext::mount;
         creators["rtsc"] = &StrategyContext::rtsc;
         creators["attack tagged"] = &StrategyContext::attack_tagged;
@@ -187,6 +189,7 @@ private:
     static Strategy* eye(PlayerbotAI* botAI) { return new EyeStrategy(botAI); }
     static Strategy* isle(PlayerbotAI* botAI) { return new IsleStrategy(botAI); }
     static Strategy* arena(PlayerbotAI* botAI) { return new ArenaStrategy(botAI); }
+    static Strategy* pvp_loadout(PlayerbotAI* botAI) { return new PvpLoadoutStrategy(botAI); }
     static Strategy* rtsc(PlayerbotAI* botAI) { return new RTSCStrategy(botAI); }
     static Strategy* attack_tagged(PlayerbotAI* botAI) { return new AttackTaggedStrategy(botAI); }
     static Strategy* debug(PlayerbotAI* botAI) { return new DebugStrategy(botAI); }

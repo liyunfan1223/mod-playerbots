@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "PlayerbotAI.h"
 #include <string>
+#include <unordered_set>
 #include <utility>
 
 class Item;
@@ -32,6 +33,18 @@ struct EnchantTemplate
 };
 
 typedef std::vector<EnchantTemplate> EnchantContainer;
+
+// Scores the gems and enchants ApplyEnchantAndGemsNew chooses from, in place of StatsWeightCalculator, and hears of
+// each one applied, so a caller can score towards targets as its totals change.
+class EnchantScorer
+{
+public:
+    virtual ~EnchantScorer() = default;
+
+    virtual float Score(uint32 enchantId) = 0;
+    // removedEnchantId is what the slot held before, 0 when it was empty.
+    virtual void Applied(uint32 removedEnchantId, uint32 addedEnchantId) = 0;
+};
 
 // TODO: more spec/role
 /* classid+talenttree
@@ -81,6 +94,9 @@ public:
     void InitPet();
     void InitAmmo();
     static uint32 CalcMixedGearScore(uint32 gs, uint32 quality);
+    // The slots whose armor must match the class's armor type; jewelry, cloaks, shields and relics are exempt.
+    static bool IsBodyArmorSlot(uint8 slot);
+    static std::vector<InventoryType> GetPossibleInventoryTypeListBySlot(EquipmentSlots slot);
     static void DestroyEquippedGear(Player* bot);
     static void AutoGear(Player* bot, uint32 itemQuality, uint32 ilvl, bool incremental, bool secondChance = false,
                         bool applyFinishers = true);
@@ -90,10 +106,15 @@ public:
     void InitConsumables();
     void InitPotions();
     void InitGlyphs(bool increment = false);
+    static void RemoveGlyphs(Player* bot);
+    static void ApplyGlyph(Player* bot, uint8 slot, uint32 glyphId);
     void InitFood();
     void InitMounts();
     void InitBags(bool destroyOld = true);
-    void ApplyEnchantAndGemsNew(bool destroyOld = true);
+    // onlyItems: enchant and gem just these item guid counters, for gear added to an otherwise kept loadout.
+    // scorer: scores the candidates instead of StatsWeightCalculator.
+    void ApplyEnchantAndGemsNew(bool destroyOld = true, std::unordered_set<uint32> const* onlyItems = nullptr,
+                                EnchantScorer* scorer = nullptr);
     void InitInstanceQuests();
     void UnbindInstance();
     void InitKeyring();
@@ -220,7 +241,6 @@ private:
     void LoadEnchantContainer();
     void ApplyEnchantTemplate();
     void ApplyEnchantTemplate(uint8 spec);
-    std::vector<InventoryType> GetPossibleInventoryTypeListBySlot(EquipmentSlots slot);
     void IterateItems(IterateItemsVisitor* visitor, IterateItemsMask mask = ITERATE_ITEMS_IN_BAGS);
     void IterateItemsInBags(IterateItemsVisitor* visitor);
     void IterateItemsInEquip(IterateItemsVisitor* visitor);

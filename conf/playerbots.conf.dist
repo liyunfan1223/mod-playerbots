@@ -623,6 +623,64 @@ Playerbots.AutoGearQualityLimit = 3
 # Default: 0 (no limit)
 Playerbots.AutoGearScoreLimit = 0
 
+# Enable/Disable the PvP loadout swap for random bots in arenas (rated and skirmish).
+# On entry a bot saves its talents, glyphs and gear, respecs to the PvP premade for its talent tree
+# (PremadeSpecName containing "pvp") and wears gear scaled to its opponents' rating: the opposing team's
+# matchmaking rating in rated matches, the highest personal rating among its opponents in skirmish.
+# On leaving the arena the saved loadout is restored and the match gear is destroyed.
+# Gear stays within PvpLoadoutQualityLimit and PvpLoadoutScoreLimit.
+# Bots already in a PvP loadout are restored on leaving even if this is switched off.
+# Default: 0 (disabled)
+Playerbots.PvpLoadoutSwap = 0
+
+# Opponent rating from which PvP items with a personal rating requirement may be worn.
+# Below it, bots wear PvE gear and PvP items that have no rating requirement.
+# Default: 1400
+Playerbots.PvpLoadoutMinRating = 1400
+
+# PvP items whose rating requirement is at most the opponents' rating plus this margin may be worn,
+# e.g. with 100, opponents rated 1930 face items requiring up to 2030.
+# Default: 100
+Playerbots.PvpLoadoutRatingMargin = 100
+
+# PvE item level worn per opponent rating, as "rating:itemLevel" pairs. Each step applies from its rating
+# up to the next one; item levels resolve to the nearest playerbots_bis_gear tier. In each slot the bot wears
+# whichever of this PvE item and its best eligible PvP item has the higher item level (PvP on a tie).
+# An invalid value falls back to the default.
+# Default: "0:200,1400:224,1600:245,1800:258,2000:264,2200:290"
+Playerbots.PvpLoadoutPveIlvlCurve = "0:200,1400:224,1600:245,1800:258,2000:264,2200:290"
+
+# Highest item quality the PvP loadout may use (1 = normal, 2 = uncommon, 3 = rare, 4 = epic, 5 = legendary).
+# -1 uses RandomGearQualityLimit. Most PvP gear is epic, so with a limit of 3 bots wear little of it whatever the
+# rating; set 4 to let arena bots wear epics while bots elsewhere keep RandomGearQualityLimit.
+# Default: -1 (RandomGearQualityLimit)
+Playerbots.PvpLoadoutQualityLimit = -1
+
+# Highest item level the PvP loadout may use (0 = no limit), measured as RandomGearScoreLimit is.
+# -1 uses RandomGearScoreLimit.
+# Default: -1 (RandomGearScoreLimit)
+Playerbots.PvpLoadoutScoreLimit = -1
+
+# In skirmishes, bots tell the real players on their team, in party chat, which PvP spec they play, their average
+# item level and the opponent rating their gear was scaled to.
+# Default: 0 (disabled)
+Playerbots.PvpLoadoutAnnounce = 0
+
+# Debug log lines (logger "playerbots", debug level) for the PvP loadout: the match rating, each cached loadout, each
+# bot's planned and equipped gear, its gems and enchants with their scores, and restores. Errors are always logged.
+# Default: 0 (disabled)
+Playerbots.PvpLoadoutDebug = 0
+
+# Stat targets the PvP loadout gears each role towards, as "hit:N,spellpen:N,resilience:N,priority:stat,stat,...".
+# Hit and spell penetration stop counting once reached; resilience is worth much less past its target; the
+# priority stats (most valuable first) take what is left. Roles come from the bot's talents.
+# Stats: hit, spellpen, resilience, stamina, strength, agility, attackpower, armorpen, spellpower, haste, crit, mp5,
+# spirit, intellect. An invalid line falls back to the defaults below.
+Playerbots.PvpProfile.Melee = "hit:164,spellpen:0,resilience:1000,priority:armorpen,strength,agility"
+Playerbots.PvpProfile.Hunter = "hit:164,spellpen:130,resilience:1050,priority:agility,armorpen,crit"
+Playerbots.PvpProfile.Caster = "hit:105,spellpen:130,resilience:1250,priority:spellpower,haste,crit"
+Playerbots.PvpProfile.Healer = "hit:0,spellpen:0,resilience:1400,priority:mp5,spirit,spellpower,haste"
+
 # Enable/Disable cheats for bots
 # "food" (bots eat or drink without using food or drinks from their inventory)
 # "gold" (bots have infinite gold)

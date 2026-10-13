@@ -74,6 +74,7 @@
 #include "PositionValue.h"
 #include "PossibleRpgTargetsValue.h"
 #include "PossibleTargetsValue.h"
+#include "PvpLoadoutValue.h"
 #include "PvpValues.h"
 #include "QuestValues.h"
 #include "RTSCValues.h"
@@ -233,6 +234,7 @@ public:
         creators["aoe count"] = &ValueContext::aoe_count;
         creators["aoe position"] = &ValueContext::aoe_position;
         creators["outfit list"] = &ValueContext::outfit_list_value;
+        creators["pvp loadout"] = &ValueContext::pvp_loadout_value;
 
         creators["random bot update"] = &ValueContext::random_bot_update_value;
         creators["nearest non bot players"] = &ValueContext::nearest_non_bot_players;
@@ -492,6 +494,7 @@ private:
     static UntypedValue* aoe_count(PlayerbotAI* botAI) { return new AoeCountValue(botAI); }
     static UntypedValue* aoe_position(PlayerbotAI* botAI) { return new AoePositionValue(botAI); }
     static UntypedValue* outfit_list_value(PlayerbotAI* botAI) { return new OutfitListValue(botAI); }
+    static UntypedValue* pvp_loadout_value(PlayerbotAI* botAI) { return new PvpLoadoutValue(botAI); }
     static UntypedValue* random_bot_update_value(PlayerbotAI* botAI) { return new RandomBotUpdateValue(botAI); }
     static UntypedValue* nearest_non_bot_players(PlayerbotAI* botAI) { return new NearestNonBotPlayersValue(botAI); }
     static UntypedValue* skip_spells_list_value(PlayerbotAI* botAI) { return new SkipSpellsListValue(botAI); }

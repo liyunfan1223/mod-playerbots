@@ -31,6 +31,7 @@
 #include "PlayerbotRepository.h"
 #include "PlayerbotSpellRepository.h"
 #include "Playerbots.h"
+#include "PvpLoadoutMgr.h"
 #include "QuestDef.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
@@ -831,6 +832,10 @@ void PlayerbotFactory::Randomize(bool incremental)
     LOG_DEBUG("playerbots", "{} randomizing {} (level {} class = {})...", (incremental ? "Incremental" : "Full"),
              bot->GetName().c_str(), level, bot->getClass());
     // LOG_DEBUG("playerbots", "Preparing to {} randomize...", (incremental ? "incremental" : "full"));
+    // A held PvP loadout is restored first, so it is never restored later over the build made here.
+    if (botAI)
+        PvpLoadoutMgr::Restore(botAI);
+
     uint32 oldLevel = bot->GetLevel();
     Prepare();
     LOG_DEBUG("playerbots", "Resetting player...");
@@ -1089,6 +1094,10 @@ void PlayerbotFactory::Randomize(bool incremental)
 
 void PlayerbotFactory::Refresh()
 {
+    // A held PvP loadout is restored first, so the refresh works on the bot's PvE talents and gear.
+    if (botAI)
+        PvpLoadoutMgr::Restore(botAI);
+
     // Prepare();
     // if (!sPlayerbotAIConfig.EquipAndSpecPersistence ||
     //     bot->GetLevel() < sPlayerbotAIConfig.EquipAndSpecPersistenceLevel)
@@ -1885,7 +1894,6 @@ void PlayerbotFactory::InitTalentsBySpecNo(Player* bot, int specNo, bool reset)
     }
 
     bot->SendTalentsInfoData(false);
-    sRandomPlayerbotMgr.SetValue(bot->GetGUID().GetCounter(), "specNo", (uint32)specNo + 1);
 }
 
 void PlayerbotFactory::InitTalentsByParsedSpecLink(Player* bot, std::vector<std::vector<uint32>> parsedSpecLink,
@@ -2515,12 +2523,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                         if (proto->Quality != uint32(desiredQuality))
                             continue;
 
-                        if (proto->Class == ITEM_CLASS_ARMOR &&
-                            (slot == EQUIPMENT_SLOT_HEAD || slot == EQUIPMENT_SLOT_SHOULDERS ||
-                             slot == EQUIPMENT_SLOT_CHEST || slot == EQUIPMENT_SLOT_WAIST ||
-                             slot == EQUIPMENT_SLOT_LEGS || slot == EQUIPMENT_SLOT_FEET ||
-                             slot == EQUIPMENT_SLOT_WRISTS || slot == EQUIPMENT_SLOT_HANDS) &&
-                            !CanEquipArmor(proto))
+                        if (proto->Class == ITEM_CLASS_ARMOR && IsBodyArmorSlot(slot) && !CanEquipArmor(proto))
                             continue;
 
                         if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(proto))
@@ -3975,6 +3978,24 @@ uint32 PlayerbotFactory::CalcMixedGearScore(uint32 gs, uint32 quality)
     return gs * PlayerbotAI::GetItemScoreMultiplier(ItemQualities(quality));
 }
 
+bool PlayerbotFactory::IsBodyArmorSlot(uint8 slot)
+{
+    switch (slot)
+    {
+        case EQUIPMENT_SLOT_HEAD:
+        case EQUIPMENT_SLOT_SHOULDERS:
+        case EQUIPMENT_SLOT_CHEST:
+        case EQUIPMENT_SLOT_WAIST:
+        case EQUIPMENT_SLOT_LEGS:
+        case EQUIPMENT_SLOT_FEET:
+        case EQUIPMENT_SLOT_WRISTS:
+        case EQUIPMENT_SLOT_HANDS:
+            return true;
+        default:
+            return false;
+    }
+}
+
 void PlayerbotFactory::DestroyEquippedGear(Player* bot)
 {
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -4485,34 +4506,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
         return;   // // Added for custom Glyphs - custom glyphs flag test
 
     if (!increment)
-    {
-        for (uint32 slotIndex = 0; slotIndex < MAX_GLYPH_SLOT_INDEX; ++slotIndex)
-        {
-            uint32 glyph = bot->GetGlyph(slotIndex);
-            if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
-            {
-                bot->RemoveAurasDueToSpell(glyphEntry->SpellId);
-
-                // Removed any triggered auras
-                Unit::AuraMap& ownedAuras = bot->GetOwnedAuras();
-                for (Unit::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
-                {
-                    Aura* aura = iter->second;
-                    if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
-                    {
-                        if (triggeredByAuraSpellInfo->Id == glyphEntry->SpellId)
-                        {
-                            bot->RemoveOwnedAura(iter);
-                            continue;
-                        }
-                    }
-                    ++iter;
-                }
-
-                bot->SetGlyph(slotIndex, 0, true);
-            }
-        }
-    }
+        RemoveGlyphs(bot);
 
     if (sPlayerbotAIConfig.LimitTalentsExpansion && bot->GetLevel() <= 70)
     {
@@ -4771,11 +4765,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
             {
                 continue;
             }
-            GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph);
-            bot->CastSpell(bot, glyphEntry->SpellId,
-                           TriggerCastFlags(TRIGGERED_FULL_MASK &
-                                            ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
-            bot->SetGlyph(realSlot, glyph, true);
+            ApplyGlyph(bot, realSlot, glyph);
             chosen.insert(glyph);
         }
         else
@@ -4810,18 +4800,55 @@ void PlayerbotFactory::InitGlyphs(bool increment)
                     continue;
 
                 chosen.insert(id);
-                GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(id);
-                bot->CastSpell(bot, glyphEntry->SpellId,
-                               TriggerCastFlags(TRIGGERED_FULL_MASK &
-                                                ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
-
-                bot->SetGlyph(realSlot, id, true);
+                ApplyGlyph(bot, realSlot, id);
                 //found = true; //not used, line marked for removal.
                 break;
             }
         }
     }
     bot->SendTalentsInfoData(false);
+}
+
+void PlayerbotFactory::RemoveGlyphs(Player* bot)
+{
+    for (uint32 slotIndex = 0; slotIndex < MAX_GLYPH_SLOT_INDEX; ++slotIndex)
+    {
+        uint32 glyph = bot->GetGlyph(slotIndex);
+        if (GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyph))
+        {
+            bot->RemoveAurasDueToSpell(glyphEntry->SpellId);
+
+            // Removed any triggered auras
+            Unit::AuraMap& ownedAuras = bot->GetOwnedAuras();
+            for (Unit::AuraMap::iterator iter = ownedAuras.begin(); iter != ownedAuras.end();)
+            {
+                Aura* aura = iter->second;
+                if (SpellInfo const* triggeredByAuraSpellInfo = aura->GetTriggeredByAuraSpellInfo())
+                {
+                    if (triggeredByAuraSpellInfo->Id == glyphEntry->SpellId)
+                    {
+                        bot->RemoveOwnedAura(iter);
+                        continue;
+                    }
+                }
+                ++iter;
+            }
+
+            bot->SetGlyph(slotIndex, 0, true);
+        }
+    }
+}
+
+void PlayerbotFactory::ApplyGlyph(Player* bot, uint8 slot, uint32 glyphId)
+{
+    GlyphPropertiesEntry const* glyphEntry = sGlyphPropertiesStore.LookupEntry(glyphId);
+    if (!glyphEntry)
+        return;
+
+    bot->CastSpell(
+        bot, glyphEntry->SpellId,
+        TriggerCastFlags(TRIGGERED_FULL_MASK & ~(TRIGGERED_IGNORE_SHAPESHIFT | TRIGGERED_IGNORE_CASTER_AURASTATE)));
+    bot->SetGlyph(slot, glyphId, true);
 }
 
 void PlayerbotFactory::CancelAuras() { bot->RemoveAllAuras(); }
@@ -5169,12 +5196,14 @@ void PlayerbotFactory::ApplyEnchantTemplate(uint8 spec)
     // const SpellItemEnchantmentEntry* a = sSpellItemEnchantmentStore.LookupEntry(1);
 }
 
-void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
+void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/, std::unordered_set<uint32> const* onlyItems,
+                                              EnchantScorer* scorer)
 {
     std::vector<uint32> curCount = GetCurrentGemsCount();
     uint8 jewelersCount = 0;
     int requiredActive = 2;
     std::vector<uint32> availableGems;
+    std::unordered_set<uint32> jewelersGemEnchants;
     for (uint32 const& enchantGem : enchantGemIdCache)
     {
         ItemTemplate const* gemTemplate = sObjectMgr->GetItemTemplate(enchantGem);
@@ -5184,6 +5213,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
         GemPropertiesEntry const* gemProperties = sGemPropertiesStore.LookupEntry(gemTemplate->GemProperties);
         if (!gemProperties)
             continue;
+
+        if (gemTemplate->ItemLimitCategory == 2 && gemProperties->spellitemenchantement)
+            jewelersGemEnchants.insert(gemProperties->spellitemenchantement);
 
         if (sPlayerbotAIConfig.LimitEnchantExpansion && bot->GetLevel() <= 70 && enchantGem >= 39900)
             continue;
@@ -5209,6 +5241,22 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
 
         availableGems.push_back(enchantGem);
     }
+
+    // Jeweler's gems already on the items this call leaves alone count towards the limit.
+    if (onlyItems)
+    {
+        for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+        {
+            Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            if (!item || onlyItems->count(item->GetGUID().GetCounter()))
+                continue;
+
+            for (uint32 socket = SOCK_ENCHANTMENT_SLOT; socket < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++socket)
+                if (jewelersGemEnchants.count(item->GetEnchantmentId(EnchantmentSlot(socket))))
+                    ++jewelersCount;
+        }
+    }
+
     StatsWeightCalculator calculator(bot);
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
@@ -5216,6 +5264,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
             continue;
         Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
         if (!item || !item->GetOwner())
+            continue;
+
+        if (onlyItems && !onlyItems->count(item->GetGUID().GetCounter()))
             continue;
 
         if (item->GetTemplate() && item->GetTemplate()->Quality < ITEM_QUALITY_UNCOMMON)
@@ -5264,7 +5315,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
                 if (enchant->requiredLevel > bot->GetLevel())
                     continue;
 
-                float score = calculator.CalculateEnchant(enchant_id);
+                float score = scorer ? scorer->Score(enchant_id) : calculator.CalculateEnchant(enchant_id);
                 if (score >= bestScore)
                 {
                     bestScore = score;
@@ -5275,6 +5326,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
         // enchant item
         if (bestEnchantId != -1)
         {
+            if (scorer)
+                scorer->Applied(item->GetEnchantmentId(PERM_ENCHANTMENT_SLOT), bestEnchantId);
+
             bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, false);
             item->SetEnchantment(PERM_ENCHANTMENT_SLOT, bestEnchantId, 0, 0, bot->GetGUID());
             bot->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, true);
@@ -5333,8 +5387,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
                 if (!enchant_id)
                     continue;
 
-                StatsWeightCalculator calculator(bot);
-                float score = calculator.CalculateEnchant(enchant_id);
+                float score = scorer ? scorer->Score(enchant_id) : calculator.CalculateEnchant(enchant_id);
                 if (curCount[0] != 0)
                 {
                     // Ensure meta gem activation
@@ -5358,6 +5411,9 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
             }
             if (enchantIdChosen == -1)
                 continue;
+            if (scorer)
+                scorer->Applied(item->GetEnchantmentId(EnchantmentSlot(enchant_slot)), enchantIdChosen);
+
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), false);
             item->SetEnchantment(EnchantmentSlot(enchant_slot), enchantIdChosen, 0, 0, bot->GetGUID());
             bot->ApplyEnchantment(item, EnchantmentSlot(enchant_slot), true);

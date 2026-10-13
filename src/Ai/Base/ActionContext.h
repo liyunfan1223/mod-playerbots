@@ -51,6 +51,7 @@
 #include "PetsAction.h"
 #include "PositionAction.h"
 #include "PullActions.h"
+#include "PvpLoadoutAction.h"
 #include "RandomBotUpdateAction.h"
 #include "ReachTargetActions.h"
 #include "ReleaseSpiritAction.h"
@@ -158,6 +159,7 @@ public:
         creators["say"] = &ActionContext::say;
         creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
         creators["outfit"] = &ActionContext::outfit;
+        creators["swap pvp loadout"] = &ActionContext::swap_pvp_loadout;
         creators["random bot update"] = &ActionContext::random_bot_update;
         creators["delay"] = &ActionContext::delay;
         creators["greet"] = &ActionContext::greet;
@@ -367,6 +369,7 @@ private:
     static Action* say(PlayerbotAI* botAI) { return new SayAction(botAI); }
     static Action* reveal_gathering_item(PlayerbotAI* botAI) { return new RevealGatheringItemAction(botAI); }
     static Action* outfit(PlayerbotAI* botAI) { return new OutfitAction(botAI); }
+    static Action* swap_pvp_loadout(PlayerbotAI* botAI) { return new SwapPvpLoadoutAction(botAI); }
     static Action* random_bot_update(PlayerbotAI* botAI) { return new RandomBotUpdateAction(botAI); }
     static Action* delay(PlayerbotAI* botAI) { return new DelayAction(botAI); }
 

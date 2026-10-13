@@ -27,7 +27,8 @@ enum StatsOverflowThreshold
 class StatsWeightCalculator
 {
 public:
-    StatsWeightCalculator(Player* player);
+    // roleBySpec reads healer/caster/tank from talents rather than the bot's current strategies.
+    StatsWeightCalculator(Player* player, bool roleBySpec = false);
     void Reset();
     float CalculateItem(uint32 itemId, int32 randomPropertyId = 0, int32 slot = -1);
     float CalculateEnchant(uint32 enchantId);
@@ -69,6 +70,7 @@ private:
     float weight_;
     float stats_weights_[STATS_TYPE_MAX];
     bool pvpSpec_ = false;
+    bool roleBySpec_ = false;
     bool exclude_resilience_ = false;
 };
 

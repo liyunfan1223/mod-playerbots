@@ -47,15 +47,15 @@ bool HasAnySpell(Player* player, uint32 const (&spellIds)[Size])
     return false;
 }
 
-StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
+StatsWeightCalculator::StatsWeightCalculator(Player* player, bool roleBySpec) : player_(player), roleBySpec_(roleBySpec)
 {
-    if (PlayerbotAI::IsHeal(player))
+    if (PlayerbotAI::IsHeal(player, roleBySpec))
         type_ = CollectorType::SPELL_HEAL;
-    else if (PlayerbotAI::IsCaster(player))
+    else if (PlayerbotAI::IsCaster(player, roleBySpec))
         type_ = CollectorType::SPELL_DMG;
-    else if (PlayerbotAI::IsTank(player))
+    else if (PlayerbotAI::IsTank(player, roleBySpec))
         type_ = CollectorType::MELEE_TANK;
-    else if (PlayerbotAI::IsMelee(player))
+    else if (PlayerbotAI::IsMelee(player, roleBySpec))
         type_ = CollectorType::MELEE_DMG;
     else
         type_ = CollectorType::RANGED;
@@ -292,7 +292,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.0f;
         stats_weights_[STATS_TYPE_MELEE_DPS] += 7.0f;
     }
-    else if (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL && !PlayerbotAI::IsTank(player))
+    else if (cls == CLASS_DRUID && tab == DRUID_TAB_FERAL && !PlayerbotAI::IsTank(player, roleBySpec_))
     {
         stats_weights_[STATS_TYPE_AGILITY] += 2.2f;
         stats_weights_[STATS_TYPE_STRENGTH] += 2.4f;

@@ -23,6 +23,7 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotCommandScript.h"
 #include "PlayerbotGuildMgr.h"
+#include "PlayerbotPvpLoadoutRepository.h"
 #include "PlayerbotSpellRepository.h"
 #include "PlayerbotWorldThreadProcessor.h"
 #include "RandomPlayerbotMgr.h"
@@ -547,6 +548,7 @@ public:
         PlayerbotHolder::UpdatePendingLogins();  // Headless sessions whose login holder is in flight
         sRandomPlayerbotMgr.UpdateSessions();  // Per-bot packet queues, world thread only
         PlayerbotWorldThreadProcessor::instance().Update(diff);
+        PlayerbotPvpLoadoutRepository::instance().ProcessCallbacks();  // Marks committed PvP loadout saves
         sRandomPlayerbotMgr.UpdateAI(diff);  // World thread only
     }
 
