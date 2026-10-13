@@ -539,7 +539,7 @@ bool PlayerbotAIConfig::Initialize()
             std::ostringstream osIdxBase;
             osIdxBase << "Playerbots.RandomClassSpecIndex." << cls << "." << spec;
             RandomClassSpecIndex[cls][spec] = sConfigMgr->GetOption<uint32>(osIdxBase.str().c_str(), spec, false);
-            
+
             std::vector<uint32> levelProbs(MAX_LEVEL, baseProb);
             std::vector<bool> levelHasProb(MAX_LEVEL, false);
             std::string currentLink = "";

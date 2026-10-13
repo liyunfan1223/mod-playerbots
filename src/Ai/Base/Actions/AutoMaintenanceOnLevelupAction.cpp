@@ -46,7 +46,7 @@ void AutoMaintenanceOnLevelupAction::AutoPickTalents()
 
     if (bot->GetFreeTalentPoints() <= 0)
         return;
-    
+
     bool resetTalents = true;
     bool increment = true;
 
