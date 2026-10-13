@@ -62,6 +62,10 @@ protected:
     bool TurnInQuest(Quest const* quest, ObjectGuid guid);
     bool OrganizeQuestLog();
 
+    /* STUCK / UNUSABLE AREA RECOVERY */
+    WorldPosition FindRecoveryAnchor();
+    bool RecoverToRpgArea();
+
 protected:
     bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete = false);
     static WorldPosition SelectRandomGrindPos(Player* bot);
