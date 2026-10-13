@@ -13,6 +13,7 @@
 #include "GossipDef.h"
 #include "GridTerrainData.h"
 #include "IVMapMgr.h"
+#include "GameGraveyard.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
@@ -1091,8 +1092,63 @@ bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, Wor
     return true;
 }
 
+WorldPosition NewRpgBaseAction::FindRecoveryAnchor()
+{
+    WorldPosition best{};
+    float bestDist = std::numeric_limits<float>::max();
+    auto consider = [&](WorldLocation const& loc)
+    {
+        if (bot->GetMapId() != loc.GetMapId())
+            return;
+
+        float dist = bot->GetExactDist(loc);
+        if (dist > 0.0f && dist < bestDist)
+        {
+            bestDist = dist;
+            best = WorldPosition(loc);
+        }
+    };
+
+    for (WorldLocation const& loc : sTravelMgr.GetValidQuestGiverLocations(bot))
+        consider(loc);
+    for (WorldLocation const& loc : sTravelMgr.GetCityLocations(bot))
+        consider(loc);
+    for (WorldLocation const& loc : sTravelMgr.GetTravelHubs(bot))
+        consider(loc);
+    if (TravelMgr::FlightMasterInfo const* info = sTravelMgr.GetNearestFlightMasterInfo(bot))
+        consider(info->pos);
+    if (GraveyardStruct const* graveyard = sGraveyard->GetClosestGraveyard(bot, bot->GetTeamId()))
+        consider(WorldPosition(graveyard->Map, graveyard->x, graveyard->y, graveyard->z));
+
+    return best;
+}
+
+bool NewRpgBaseAction::RecoverToRpgArea()
+{
+    // The bot is somewhere RPG progression cannot continue (e.g. swept out into The Great Sea):
+    // walk/swim back to the nearest regular anchor so normal behaviour can resume. Travelled via
+    // the camp status, which brings its own stuck handling.
+    WorldPosition anchor = FindRecoveryAnchor();
+    if (anchor == WorldPosition())
+        return false;
+
+    LOG_DEBUG("playerbots", "[New RPG] {} recovering to anchor Map:{} X:{} Y:{} Z:{} ({:.0f} yd away)", bot->GetName(),
+              anchor.GetMapId(), anchor.GetPositionX(), anchor.GetPositionY(), anchor.GetPositionZ(),
+              bot->GetExactDist(anchor));
+    botAI->rpgInfo.ChangeToGoCamp(anchor);
+    return true;
+}
+
 bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateStatus)
 {
+    // The bot is somewhere RPG progression cannot continue (e.g. swept out into The Great Sea):
+    // walk/swim back to the nearest regular anchor instead of idling or resting there.
+    if (SelectRandomGrindPos(bot) == WorldPosition() && SelectRandomCampPos(bot) == WorldPosition())
+    {
+        if (RecoverToRpgArea())
+            return true;
+    }
+
     std::vector<NewRpgStatus> availableStatus;
     uint32 probSum = 0;
     for (NewRpgStatus status : candidateStatus)
@@ -1106,9 +1162,12 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
             probSum += sPlayerbotAIConfig.RpgStatusProbWeight[status];
         }
     }
-    // Safety check. Default to "rest" if all RPG weights = 0
+    // Safety check. No usable status where the bot currently is: recover before resting.
     if (availableStatus.empty() || probSum == 0)
     {
+        if (RecoverToRpgArea())
+            return true;
+
         botAI->rpgInfo.ChangeToRest();
         bot->SetStandState(UNIT_STAND_STATE_SIT);
         return true;
