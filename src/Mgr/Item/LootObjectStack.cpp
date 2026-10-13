@@ -87,8 +87,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     GameObject* go = botAI->GetGameObject(lootGUID);
     if (go && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
     {
-        // Leave quest objects to the real players in the group. Skipping the quest item alone is not enough:
-        // releasing a consumable chest despawns it even with the quest item still inside.
+        // Releasing a consumable chest despawns it even with the quest item still inside.
         std::vector<Player*> const questLootReceivers = GetQuestLootReceivers(bot);
         bool const leavesQuestLoot = !questLootReceivers.empty();
         if (leavesQuestLoot &&
@@ -114,7 +113,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
 
             bool const botNeedsItem = IsNeededForQuest(bot, itemId);
 
-            // Covers gameobject_questitem entries that ActivateToQuest does not see in the loot template.
+            // gameobject_questitem entries are not in the loot template ActivateToQuest checks.
             if (leavesQuestLoot &&
                 (botNeedsItem ||
                  std::any_of(questLootReceivers.begin(), questLootReceivers.end(),
@@ -277,9 +276,7 @@ bool LootObject::IsNeededForQuest(Player* bot, uint32 itemId)
     return false;
 }
 
-// With Playerbots.SyncQuestWithPlayer a bot completes a quest the moment its master hands it in, so quest loot is
-// of no use to it and would only be taken from the players it travels with. Returns the players a grouped bot
-// leaves quest loot to: its master and the other real players in the group. Empty when the bot loots for itself.
+// A synced bot completes a quest when its master hands it in, so it leaves quest loot to the real players.
 std::vector<Player*> LootObject::GetQuestLootReceivers(Player* bot)
 {
     if (!sPlayerbotAIConfig.SyncQuestWithPlayer)
@@ -293,7 +290,7 @@ std::vector<Player*> LootObject::GetQuestLootReceivers(Player* bot)
     if (!IsRealPlayer(master) || !bot->IsInSameRaidWith(master))
         return {};
 
-    // The core shares quest loot only with members in reward distance; loot left for anyone else stays on the corpse.
+    // The core shares quest loot only with members in reward distance.
     std::vector<Player*> receivers = botAI->GetRealPlayersInGroup();
     std::erase_if(receivers,
                   [bot, master](Player* player) { return player != master && !player->IsAtGroupRewardDistance(bot); });

@@ -356,11 +356,10 @@ proto->Name1.c_str(), 1, bidPrice, buyoutPrice);
 }
 */
 
-// Loot a bot leaves to a quest loot receiver (see LootObject::GetQuestLootReceivers): only what the receiver can
-// still take, since an item left for nobody keeps the corpse lootable and the bot coming back to it.
+// Only what the receiver can still take: an item left for nobody keeps the corpse lootable.
 static bool IsQuestLoot(ItemTemplate const* proto, Player* receiver)
 {
-    // Every group member gets its own copy of a multi-drop item, so the bot's copy takes nothing from the receiver.
+    // Every group member gets its own copy of a multi-drop item.
     if (proto->HasFlag(ITEM_FLAG_MULTI_DROP))
         return false;
 
@@ -370,7 +369,7 @@ static bool IsQuestLoot(ItemTemplate const* proto, Player* receiver)
     if (!proto->StartQuest)
         return false;
 
-    // A quest starter is shown to the receiver under the same conditions as in LootItem::AllowedForPlayer.
+    // Same conditions as LootItem::AllowedForPlayer.
     uint32 prevQuestId = 0;
     if (Quest const* startQuest = sObjectMgr->GetQuestTemplate(proto->StartQuest))
         prevQuestId = startQuest->GetPrevQuestId();
