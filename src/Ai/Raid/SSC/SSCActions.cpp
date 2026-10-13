@@ -45,11 +45,8 @@ bool SscResetEncounterStatesAction::Execute(Event /*event*/)
 
     reset |= SscResetInstance(bot->GetInstanceId());
     reset |= ClearStrategyTargetIcon(bot, RtiTargetValue::skullIndex, {
-        Id(SscNpcs::NPC_SPITFIRE_TOTEM),
         Id(SscNpcs::NPC_FATHOM_GUARD_TIDALVESS),
         Id(SscNpcs::NPC_FATHOM_GUARD_SHARKKIS),
-        Id(SscNpcs::NPC_FATHOM_LURKER),
-        Id(SscNpcs::NPC_FATHOM_SPOREBAT),
         Id(SscNpcs::NPC_FATHOM_LORD_KARATHRESS),
     });
     reset |= ClearStrategyTargetIcon(
