@@ -17,7 +17,7 @@
 using namespace GruulHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool GruulsLairResetEncounterStatesAction::Execute(Event /*event*/)
 {
@@ -325,10 +325,10 @@ bool HighKingMaulgarMisdirectOgresToTanksAction::Execute(Event /*event*/)
     if (!ogre || !tank || !tank->IsAlive())
         return false;
 
-    if (botAI->CanCastSpell("misdirection", tank))
-        return botAI->CastSpell("misdirection", tank);
+    if (botAI->CanCastSpell(Id(GruulSpells::SPELL_MISDIRECTION), tank))
+        return botAI->CastSpell(Id(GruulSpells::SPELL_MISDIRECTION), tank);
 
-    if (!bot->HasAura(Id(GruulSpells::SPELL_MISDIRECTION)))
+    if (!bot->HasAura(Id(GruulSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", ogre) && botAI->CastSpell("steady shot", ogre);
