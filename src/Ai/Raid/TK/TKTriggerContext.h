@@ -94,7 +94,7 @@ public:
         creators["kael'thas sunstrider should hold phase 3 positions"] =
             &RaidTempestKeepTriggerContext::kaelthas_sunstrider_should_hold_phase_3_positions;
 
-        creators["kael'thas sunstrider determining advisor kill order"] =
+        creators["kael'thas sunstrider should assign advisor dps priority"] =
             &RaidTempestKeepTriggerContext::kaelthas_sunstrider_should_assign_advisor_dps_priority;
 
         creators["kael'thas sunstrider should manage advisor dps timer"] =

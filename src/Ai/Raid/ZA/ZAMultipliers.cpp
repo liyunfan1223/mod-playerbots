@@ -65,7 +65,10 @@ float ZulAmanDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
     for (char const* name : zulAmanBosses)
     {
         if (Unit* target = AI_VALUE2(Unit*, "find target", name))
+        {
             boss = target;
+            break;
+        }
     }
 
     if (!boss)
