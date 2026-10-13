@@ -552,7 +552,9 @@ bool IsAoeThreatAction(Player* bot, Action* action)
                 dynamic_cast<CastBloodBoilAction*>(action);
 
         case CLASS_DRUID:
-            return dynamic_cast<CastSwipeBearAction*>(action);
+            return dynamic_cast<CastSwipeBearAction*>(action) ||
+                dynamic_cast<CastMaulAction*>(action) || // Hits multiple targets with the Glyph
+                dynamic_cast<CastDemoralizingRoarAction*>(action);
 
         case CLASS_PALADIN:
             return dynamic_cast<CastAvengersShieldAction*>(action) ||
@@ -561,7 +563,9 @@ bool IsAoeThreatAction(Player* bot, Action* action)
         case CLASS_WARRIOR:
             return dynamic_cast<CastThunderClapAction*>(action) ||
                 dynamic_cast<CastShockwaveAction*>(action) ||
-                dynamic_cast<CastCleaveAction*>(action);
+                dynamic_cast<CastCleaveAction*>(action) ||
+                dynamic_cast<CastDemoralizingShoutAction*>(action) ||
+                dynamic_cast<CastDemoralizingShoutWithoutLifeTimeCheckAction*>(action);
 
         default:
             return false;
