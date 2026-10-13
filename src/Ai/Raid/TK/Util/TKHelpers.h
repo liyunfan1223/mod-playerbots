@@ -51,14 +51,16 @@ enum class TkSpells : uint32
 
     // Kael'thas Sunstrider
     SPELL_PERMANENT_FEIGN_DEATH     = 29266,
-    SPELL_GRAVITY_LAPSE_AURA        = 39432, // AC uses this name (SPELL_GRAVITY_LAPSE is 35941)
+    SPELL_EMBER_BLAST               = 34341, // For Phoenixes. Al'ar has this same aura.
     SPELL_MENTAL_PROTECTION_FIELD   = 36480, // Staff of Disintegration
     SPELL_ARCANE_BARRIER            = 36481, // Phaseshift Bulwark
     SPELL_KAELTHAS_MIND_CONTROL     = 36797,
     SPELL_SHOCK_BARRIER             = 36815,
+    SPELL_GRAVITY_LAPSE_AURA        = 39432, // AC uses this name (SPELL_GRAVITY_LAPSE is 35941)
 
     // Hunter
-    SPELL_MISDIRECTION              = 35079,
+    SPELL_MISDIRECTION              = 34477,
+    SPELL_MISDIRECTION_AURA         = 35079, // the aura on the hunter
 };
 
 enum class TkNpcs : uint32
@@ -75,6 +77,10 @@ enum class TkNpcs : uint32
 
     // Kael'thas Sunstrider
     NPC_KAELTHAS_SUNSTRIDER         = 19622,
+    NPC_LORD_SANGUINAR              = 20060,
+    NPC_GRAND_ASTROMANCER_CAPERNIAN = 20062,
+    NPC_MASTER_ENGINEER_TELONICUS   = 20063,
+    NPC_THALADRED_THE_DARKENER      = 20064,
     NPC_NETHERSTRAND_LONGBOW        = 21268,
     NPC_DEVASTATION                 = 21269,
     NPC_COSMIC_INFUSER              = 21270,
@@ -102,9 +108,10 @@ enum class TkItems : uint32
     ITEM_NETHER_SPIKES              = 30319,
 };
 
-// General
+// Shared
 
 inline constexpr uint32 TK_MAP_ID = 550;
+inline constexpr uint32 TK_CACHE_INTERVAL_MS = 200;
 
 std::pair<Unit*, Unit*> GetTargetUnitPair(PlayerbotAI* botAI, uint32 entry);
 Player* GetNearestNonTankPlayerInRadius(Player* bot, float radius);
@@ -206,9 +213,9 @@ struct ArcaneOrbData
 };
 
 inline constexpr uint32 ARCANE_ORB_DURATION_MS = 7000;
-// Actual hazard range is 20 yards; the rest is buffer for the escape & multiplier.
-inline constexpr float ARCANE_ORB_SAFE_DISTANCE = 22.0f;
-inline constexpr float ARCANE_ORB_BUFFER_DISTANCE = 30.0f;
+inline constexpr float ARCANE_ORB_HAZARD_RADIUS = 20.0f;
+inline constexpr float ARCANE_ORB_SAFE_DISTANCE = ARCANE_ORB_HAZARD_RADIUS + 2.0f;
+inline constexpr float ARCANE_ORB_BUFFER_DISTANCE = ARCANE_ORB_HAZARD_RADIUS + 10.0f;
 
 // Center of the room
 inline Position const VOID_REAVER_TANK_POSITION = { 423.845f, 371.733f, 14.897f };
@@ -244,7 +251,7 @@ inline constexpr uint32 KAELTHAS_DB_GUID = 158218;
 // To the left of the advisors' starting position (when facing them), up against the wall.
 inline Position const SANGUINAR_TANK_POSITION    = { 775.478f,  39.888f, 46.780f };
 inline Position const SANGUINAR_WAITING_POSITION = { 761.850f,  27.459f, 46.779f };
-// Next to Sanguinar
+// Next to Sanguinar.
 inline Position const TELONICUS_TANK_POSITION    = { 773.717f,  44.091f, 46.780f };
 inline Position const TELONICUS_WAITING_POSITION = { 754.347f,  31.739f, 46.796f };
 inline Position const CAPERNIAN_WAITING_POSITION = { 743.897f, -11.575f, 46.779f };
