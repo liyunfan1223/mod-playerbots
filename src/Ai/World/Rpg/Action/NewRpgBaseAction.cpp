@@ -328,6 +328,10 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
         if (!quest)
             continue;
 
+        // Dropped under log pressure: do not immediately re-accept it (accept->drop loops).
+        if (botAI->lowPriorityQuest.find(item.QuestId) != botAI->lowPriorityQuest.end())
+            continue;
+
         QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
         if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
             IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
@@ -729,6 +733,8 @@ bool NewRpgBaseAction::OrganizeQuestLog()
 
         Quest const* worstQuest = sObjectMgr->GetQuestTemplate(bot->GetQuestSlotQuestId(worstSlot));
         dropSlot(worstSlot, worstQuest, "log_pressure");
+        // Remember it so the accept menu does not instantly take it again.
+        botAI->lowPriorityQuest.insert(worstQuest->GetQuestId());
         freeSlotNum++;
     }
 
@@ -837,6 +843,7 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
         Quest const* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
         if (!quest)
             continue;
+
         QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
         if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
         {
