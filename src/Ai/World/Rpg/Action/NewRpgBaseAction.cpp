@@ -39,6 +39,7 @@
 #include "TravelMgr.h"
 #include "G3D/Vector2.h"
 #include <algorithm>
+#include <limits>
 
 bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
 {
@@ -612,8 +613,24 @@ bool NewRpgBaseAction::OrganizeQuestLog()
     if (freeSlotNum >= 2)
         return false;
 
-    int32 dropped = 0;
+    auto dropSlot = [&](uint16 slot, Quest const* quest, [[maybe_unused]] char const* reason)
+    {
+        LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), quest->GetQuestId());
+        WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
+        packet << (uint8)slot;
+        WorldPackets::Quest::QuestLogRemoveQuest removeQuest(std::move(packet));
+        removeQuest.Read();
+        bot->GetSession()->HandleQuestLogRemoveQuest(removeQuest);
+        if (botAI->GetMaster())
+            botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+                "new_rpg_quest_dropped",
+                "Quest dropped %quest",
+                {{"%quest", ChatHelper::FormatQuest(quest)}}));
+        botAI->rpgStatistic.questDropped++;
+    };
+
     // remove quests that not worth doing or not capable of doing
+    int32 dropped = 0;
     for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
     {
         uint32 questId = bot->GetQuestSlotQuestId(i);
@@ -624,77 +641,96 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         if (!IsQuestWorthDoing(bot, quest) || !IsQuestCapableDoing(bot, quest) ||
             bot->GetQuestStatus(questId) == QUEST_STATUS_FAILED)
         {
-            LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), questId);
-            WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-            packet << (uint8)i;
-            WorldPackets::Quest::QuestLogRemoveQuest removeQuest(std::move(packet));
-            removeQuest.Read();
-            bot->GetSession()->HandleQuestLogRemoveQuest(removeQuest);
-            if (botAI->GetMaster())
-                botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-                    "new_rpg_quest_dropped",
-                    "Quest dropped %quest",
-                    {{"%quest", ChatHelper::FormatQuest(quest)}}));
-            botAI->rpgStatistic.questDropped++;
+            dropSlot(i, quest, "not_worth_or_capable_or_failed");
             dropped++;
         }
     }
 
-    // drop more than 8 quests at once to avoid repeated accept and drop
-    if (dropped >= 8)
-        return true;
-
-    // remove festival/class quests and quests in different zone
-    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    if (!sPlayerbotAIConfig.CrossZoneQuests)
     {
-        uint32 questId = bot->GetQuestSlotQuestId(i);
-        if (!questId)
-            continue;
+        // Legacy: remove festival/class quests and quests in a different zone; clear the log when
+        // the two passes above did not free enough slots.
+        if (dropped >= 8)
+            return true;
 
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        const int64_t botZoneId = this->bot->GetZoneId();
-
-        if (quest->GetZoneOrSort() < 0 || (quest->GetZoneOrSort() > 0 && quest->GetZoneOrSort() != botZoneId))
+        for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
         {
-            LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), questId);
-            WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-            packet << (uint8)i;
-            WorldPackets::Quest::QuestLogRemoveQuest removeQuest(std::move(packet));
-            removeQuest.Read();
-            bot->GetSession()->HandleQuestLogRemoveQuest(removeQuest);
-            if (botAI->GetMaster())
-                botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-                    "new_rpg_quest_dropped",
-                    "Quest dropped %quest",
-                    {{"%quest", ChatHelper::FormatQuest(quest)}}));
-            botAI->rpgStatistic.questDropped++;
-            dropped++;
+            uint32 questId = bot->GetQuestSlotQuestId(i);
+            if (!questId)
+                continue;
+
+            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+            const int64_t botZoneId = this->bot->GetZoneId();
+
+            if (quest->GetZoneOrSort() < 0 || (quest->GetZoneOrSort() > 0 && quest->GetZoneOrSort() != botZoneId))
+            {
+                dropSlot(i, quest, "wrong_zone");
+                dropped++;
+            }
         }
+
+        if (dropped >= 8)
+            return true;
+
+        // clear quests log
+        for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+        {
+            uint32 questId = bot->GetQuestSlotQuestId(i);
+            if (!questId)
+                continue;
+
+            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+            dropSlot(i, quest, "clear_log");
+        }
+
+        return true;
     }
 
-    if (dropped >= 8)
-        return true;
-
-    // clear quests log
-    for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+    // Cross-zone questing: quests from other zones are kept, so free slots only under pressure by
+    // dropping the quest whose objective/turn-in is the furthest away. Class/sort quests
+    // (ZoneOrSort < 0) are never dropped.
+    freeSlotNum += dropped;
+    while (freeSlotNum < 2)
     {
-        uint32 questId = bot->GetQuestSlotQuestId(i);
-        if (!questId)
-            continue;
+        uint16 worstSlot = MAX_QUEST_LOG_SIZE;
+        float worstDist = -1.0f;
+        for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+        {
+            uint32 questId = bot->GetQuestSlotQuestId(i);
+            if (!questId)
+                continue;
 
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), questId);
-        WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
-        packet << (uint8)i;
-        WorldPackets::Quest::QuestLogRemoveQuest removeQuest(std::move(packet));
-        removeQuest.Read();
-        bot->GetSession()->HandleQuestLogRemoveQuest(removeQuest);
-        if (botAI->GetMaster())
-            botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-                "new_rpg_quest_dropped",
-                "Quest dropped %quest",
-                {{"%quest", ChatHelper::FormatQuest(quest)}}));
-        botAI->rpgStatistic.questDropped++;
+            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+            if (quest->GetZoneOrSort() < 0)
+                continue;
+
+            // Unprogressable by the bot (no POI data): drop it first.
+            float dist = std::numeric_limits<float>::max();
+            std::vector<POIInfo> poiInfo;
+            if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo,
+                                              bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE))
+            {
+                for (POIInfo const& poi : poiInfo)
+                {
+                    float d = bot->GetDistance2d(poi.pos.x, poi.pos.y);
+                    if (d < dist)
+                        dist = d;
+                }
+            }
+
+            if (dist > worstDist)
+            {
+                worstDist = dist;
+                worstSlot = i;
+            }
+        }
+
+        if (worstSlot == MAX_QUEST_LOG_SIZE)
+            break;
+
+        Quest const* worstQuest = sObjectMgr->GetQuestTemplate(bot->GetQuestSlotQuestId(worstSlot));
+        dropSlot(worstSlot, worstQuest, "log_pressure");
+        freeSlotNum++;
     }
 
     return true;

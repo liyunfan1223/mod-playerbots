@@ -116,6 +116,8 @@ public:
         TooCloseDistance, MeleeDistance, FollowDistance, WhisperDistance, ContactDistance, AoeRadius, RpgDistance,
         TargetPosRecalcDistance, FarDistance, HealDistance, AggroDistance, QuestGiverSearchDistance;
     bool PrioritiseQuestGivers;
+    bool CrossZoneQuests;
+    bool QuestAwareTaxi;
     uint32 CriticalHealth, LowHealth, MediumHealth, AlmostFullHealth;
     uint32 LowMana, MediumMana, HighMana;
     bool AutoSaveMana;

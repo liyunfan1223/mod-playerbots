@@ -421,6 +421,17 @@ Playerbots.PrioritiseQuestGivers = 0
 # Effective range is capped at Playerbots.RpgTargetSearchDistance (or the map visibility range when
 # that is 0), since the candidates come from the new RPG caches.
 Playerbots.QuestGiverSearchDistance = 80.0
+
+# Let bots keep and work on quests from other zones: the quest log no longer drops quests whose
+# zone differs from the bot's current zone (bots travel, including by flight paths, instead of
+# re-accepting dropped quests). Class/sort quests are never dropped. When the quest log runs out of
+# free slots, the quest with the furthest objective is dropped first ("log_pressure" in the stats).
+# Disable to restore the old behaviour (cross-zone quests dropped on sight).
+Playerbots.CrossZoneQuests = 1
+
+# Prefer flight path destinations that land near the bot's active quest objectives, turn-ins or
+# available quest givers (weighted random among the best three) instead of a fully random node.
+Playerbots.QuestAwareTaxi = 1
 Playerbots.FleeDistance = 5.0
 Playerbots.AggroDistance = 22
 Playerbots.TooCloseDistance = 5.0
