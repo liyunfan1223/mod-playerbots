@@ -14,6 +14,7 @@
 #include "Config.h"
 #include "DBUpdater.h"
 #include "DatabaseEnv.h"
+#include "GatherNodeMgr.h"
 #include "GlobalScript.h"
 #include "GuildTaskMgr.h"
 #include "HumanPlayerRoster.h"
