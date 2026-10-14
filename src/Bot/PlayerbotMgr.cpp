@@ -28,6 +28,7 @@
 #include "PlayerbotTextMgr.h"
 #include "PlayerbotWorldThreadProcessor.h"
 #include "Playerbots.h"
+#include "RBAC.h"
 #include "RandomPlayerbotMgr.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
@@ -448,12 +449,12 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
             // after the master's Player object has been deleted, causing the bot's logout to crash on the now deleted master.
             (masterWorldSessionPtr && masterWorldSessionPtr->IsSocketClosed()) ||
             (masterWorldSessionPtr && masterWorldSessionPtr->ShouldLogOut(time(nullptr))) ||
-            // If the bot's master has security clearance for `InstantLogout` in worldserver.conf, so does the bot.
+            // If the bot's master holds RBAC_PERM_INSTANT_LOGOUT, so does the bot.
             (master &&
                 (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ||
                  master->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
                  (masterWorldSessionPtr &&
-                  masterWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))));
+                  masterWorldSessionPtr->HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT))));
 
         if (!logout)
         {

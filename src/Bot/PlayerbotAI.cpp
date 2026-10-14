@@ -596,17 +596,13 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
 
         if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
             botWorldSessionPtr->HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT))
-        {
             logout = true;
-        }
 
         if (master &&
             (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || master->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
              (master->GetSession() &&
               master->GetSession()->HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT))))
-        {
             logout = true;
-        }
 
         if (logout)
         {
@@ -614,13 +610,9 @@ void PlayerbotAI::UpdateAIInternal([[maybe_unused]] uint32 elapsed, bool minimal
             if (master)
                 masterBotMgr = GET_PLAYERBOT_MGR(master);
             if (masterBotMgr)
-            {
                 masterBotMgr->LogoutPlayerBot(bot->GetGUID());
-            }
             else
-            {
                 sRandomPlayerbotMgr.LogoutPlayerBot(bot->GetGUID());
-            }
             return;
         }
 
