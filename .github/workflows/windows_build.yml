@@ -24,6 +24,7 @@ jobs:
       BOOST_ROOT: C:\local\boost_1_87_0
       CMAKE_GENERATOR: Ninja
       CTOOLS_BUILD: all
+      CXXFLAGS: "-WX -wd4996 -wd4244 -wd4267 -wd4305"
 
     steps:
       - name: Checkout AzerothCore
@@ -36,7 +37,6 @@ jobs:
       - name: Checkout Playerbot Module
         uses: actions/checkout@v4
         with:
-          repository: 'mod-playerbots/mod-playerbots'
           path: a/modules/mod-playerbots
 
       - name: Move source tree to short path

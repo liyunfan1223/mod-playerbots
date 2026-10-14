@@ -8,12 +8,13 @@
 #define PLAYERBOTS_HYJALSTRATEGY_H
 
 #include "Strategy.h"
+#include <string>
+#include <vector>
 
-class RaidHyjalSummitStrategy : public Strategy
+class RaidHyjalStrategy : public Strategy
 {
 public:
-    RaidHyjalSummitStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
-
+    RaidHyjalStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
     std::string const getName() override { return "hyjal"; }
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;

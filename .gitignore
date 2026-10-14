@@ -50,3 +50,9 @@ local.properties
 .cproject
 .vscode
 .idea
+
+#
+# Agent tooling
+#
+.agents/plans/**
+.claude/settings.local.json

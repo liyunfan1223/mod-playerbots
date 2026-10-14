@@ -15,17 +15,17 @@ class RaidMagtheridonTriggerContext : public NamedObjectContext<Trigger>
 public:
     RaidMagtheridonTriggerContext() : NamedObjectContext<Trigger>()
     {
-        creators["magtheridon first three channelers engaged by main tank"] =
-            &RaidMagtheridonTriggerContext::magtheridon_first_three_channelers_engaged_by_main_tank;
+        creators["magtheridon no encounter in progress"] =
+            &RaidMagtheridonTriggerContext::magtheridon_no_encounter_in_progress;
 
-        creators["magtheridon nw channeler engaged by first assist tank"] =
-            &RaidMagtheridonTriggerContext::magtheridon_nw_channeler_engaged_by_first_assist_tank;
+        creators["magtheridon main tank should tank channelers"] =
+            &RaidMagtheridonTriggerContext::magtheridon_main_tank_should_tank_channelers;
 
-        creators["magtheridon ne channeler engaged by second assist tank"] =
-            &RaidMagtheridonTriggerContext::magtheridon_ne_channeler_engaged_by_second_assist_tank;
+        creators["magtheridon assist tanks should tank channelers"] =
+            &RaidMagtheridonTriggerContext::magtheridon_assist_tanks_should_tank_channelers;
 
         creators["magtheridon pulling west and east channelers"] =
-            &RaidMagtheridonTriggerContext::magtheridon_pull_west_and_east_channelers;
+            &RaidMagtheridonTriggerContext::magtheridon_pulling_west_and_east_channelers;
 
         creators["magtheridon determining kill order"] =
             &RaidMagtheridonTriggerContext::magtheridon_determining_kill_order;
@@ -33,11 +33,11 @@ public:
         creators["magtheridon burning abyssal spawned"] =
             &RaidMagtheridonTriggerContext::magtheridon_burning_abyssal_spawned;
 
-        creators["magtheridon boss engaged by main tank"] =
-            &RaidMagtheridonTriggerContext::magtheridon_boss_engaged_by_main_tank;
+        creators["magtheridon should be tanked"] =
+            &RaidMagtheridonTriggerContext::magtheridon_should_be_tanked;
 
-        creators["magtheridon boss engaged by ranged"] =
-            &RaidMagtheridonTriggerContext::magtheridon_boss_engaged_by_ranged;
+        creators["magtheridon should spread ranged"] =
+            &RaidMagtheridonTriggerContext::magtheridon_should_spread_ranged;
 
         creators["magtheridon standing in debris"] =
             &RaidMagtheridonTriggerContext::magtheridon_standing_in_debris;
@@ -45,24 +45,21 @@ public:
         creators["magtheridon incoming blast nova"] =
             &RaidMagtheridonTriggerContext::magtheridon_incoming_blast_nova;
 
-        creators["magtheridon need to manage timers and assignments"] =
-            &RaidMagtheridonTriggerContext::magtheridon_need_to_manage_timers_and_assignments;
-
-        creators["magtheridon bot is not in combat"] =
-            &RaidMagtheridonTriggerContext::magtheridon_bot_is_not_in_combat;
+        creators["magtheridon should manage timers and assignments"] =
+            &RaidMagtheridonTriggerContext::magtheridon_should_manage_timers_and_assignments;
     }
 
 private:
-    static Trigger* magtheridon_first_three_channelers_engaged_by_main_tank(PlayerbotAI* botAI) {
-        return new MagtheridonFirstThreeChannelersEngagedByMainTankTrigger(botAI);
+    static Trigger* magtheridon_no_encounter_in_progress(PlayerbotAI* botAI) {
+        return new MagtheridonNoEncounterInProgressTrigger(botAI);
     }
-    static Trigger* magtheridon_nw_channeler_engaged_by_first_assist_tank(PlayerbotAI* botAI) {
-        return new MagtheridonNWChannelerEngagedByFirstAssistTankTrigger(botAI);
+    static Trigger* magtheridon_main_tank_should_tank_channelers(PlayerbotAI* botAI) {
+        return new MagtheridonMainTankShouldTankChannelersTrigger(botAI);
     }
-    static Trigger* magtheridon_ne_channeler_engaged_by_second_assist_tank(PlayerbotAI* botAI) {
-        return new MagtheridonNEChannelerEngagedBySecondAssistTankTrigger(botAI);
+    static Trigger* magtheridon_assist_tanks_should_tank_channelers(PlayerbotAI* botAI) {
+        return new MagtheridonAssistTanksShouldTankChannelersTrigger(botAI);
     }
-    static Trigger* magtheridon_pull_west_and_east_channelers(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_pulling_west_and_east_channelers(PlayerbotAI* botAI) {
         return new MagtheridonPullingWestAndEastChannelersTrigger(botAI);
     }
     static Trigger* magtheridon_determining_kill_order(PlayerbotAI* botAI) {
@@ -71,11 +68,11 @@ private:
     static Trigger* magtheridon_burning_abyssal_spawned(PlayerbotAI* botAI) {
         return new MagtheridonBurningAbyssalSpawnedTrigger(botAI);
     }
-    static Trigger* magtheridon_boss_engaged_by_main_tank(PlayerbotAI* botAI) {
-        return new MagtheridonBossEngagedByMainTankTrigger(botAI);
+    static Trigger* magtheridon_should_be_tanked(PlayerbotAI* botAI) {
+        return new MagtheridonShouldBeTankedTrigger(botAI);
     }
-    static Trigger* magtheridon_boss_engaged_by_ranged(PlayerbotAI* botAI) {
-        return new MagtheridonBossEngagedByRangedTrigger(botAI);
+    static Trigger* magtheridon_should_spread_ranged(PlayerbotAI* botAI) {
+        return new MagtheridonShouldSpreadRangedTrigger(botAI);
     }
     static Trigger* magtheridon_standing_in_debris(PlayerbotAI* botAI) {
         return new MagtheridonStandingInDebrisTrigger(botAI);
@@ -83,11 +80,8 @@ private:
     static Trigger* magtheridon_incoming_blast_nova(PlayerbotAI* botAI) {
         return new MagtheridonIncomingBlastNovaTrigger(botAI);
     }
-    static Trigger* magtheridon_need_to_manage_timers_and_assignments(PlayerbotAI* botAI) {
-        return new MagtheridonNeedToManageTimersAndAssignmentsTrigger(botAI);
-    }
-    static Trigger* magtheridon_bot_is_not_in_combat(PlayerbotAI* botAI) {
-        return new MagtheridonBotIsNotInCombatTrigger(botAI);
+    static Trigger* magtheridon_should_manage_timers_and_assignments(PlayerbotAI* botAI) {
+        return new MagtheridonShouldManageTimersAndAssignmentsTrigger(botAI);
     }
 };
 

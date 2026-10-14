@@ -7,16 +7,15 @@
 #ifndef PLAYERBOTS_HOLSTRATEGY_H
 #define PLAYERBOTS_HOLSTRATEGY_H
 
-#include "Multiplier.h"
 #include "Strategy.h"
 
 class WotlkDungeonHoLStrategy : public Strategy
 {
 public:
-    WotlkDungeonHoLStrategy(PlayerbotAI* ai) : Strategy(ai) {}
-    virtual std::string const getName() override { return "halls of lightning"; }
-    virtual void InitTriggers(std::vector<TriggerNode*> &triggers) override;
-    virtual void InitMultipliers(std::vector<Multiplier*> &multipliers) override;
+    WotlkDungeonHoLStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+    std::string const getName() override { return "wotlk-hol"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
 };
 
 #endif

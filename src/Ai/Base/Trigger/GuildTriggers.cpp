@@ -39,7 +39,7 @@ bool LeaveLargeGuildTrigger::IsActive()
 
     Player* leader = ObjectAccessor::FindPlayer(guild->GetLeaderGUID());
 
-    // Only leave the guild if the leader is a bot (but not a selfbot).
+    // Only leave the guild if the leader is a bot (but not a SelfBot).
     PlayerbotAI* leaderBotAI = leader ? GET_PLAYERBOT_AI(leader) : nullptr;
     if (!leaderBotAI || IsSelfBot(leader))
         return false;

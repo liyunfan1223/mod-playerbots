@@ -23,14 +23,14 @@ const Position uromSafePositions[3] =
 class AvoidUnstableSphereAction : public MovementAction
 {
 public:
-    AvoidUnstableSphereAction(PlayerbotAI* ai) : MovementAction(ai, "avoid unstable sphere") {}
+    AvoidUnstableSphereAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid unstable sphere") {}
     bool Execute(Event event) override;
 };
 
 class MountDrakeAction : public UseItemAction
 {
 public:
-    MountDrakeAction(PlayerbotAI* ai) : UseItemAction(ai, "mount drake") {}
+    MountDrakeAction(PlayerbotAI* botAI) : UseItemAction(botAI, "mount drake") {}
     bool Execute(Event event) override;
     bool isPossible() override;
 };
@@ -38,14 +38,14 @@ public:
 class DismountDrakeAction : public Action
 {
 public:
-    DismountDrakeAction(PlayerbotAI* ai) : Action(ai, "dismount drake") {}
+    DismountDrakeAction(PlayerbotAI* botAI) : Action(botAI, "dismount drake") {}
     bool Execute(Event event) override;
 };
 
 class OccFlyDrakeAction : public MovementAction
 {
 public:
-    OccFlyDrakeAction(PlayerbotAI* ai) : MovementAction(ai, "occ fly drake") {}
+    OccFlyDrakeAction(PlayerbotAI* botAI) : MovementAction(botAI, "occ fly drake") {}
     bool Execute(Event event) override;
 };
 
@@ -66,14 +66,14 @@ protected:
 class AvoidArcaneExplosionAction : public MovementAction
 {
 public:
-    AvoidArcaneExplosionAction(PlayerbotAI* ai) : MovementAction(ai, "avoid arcane explosion") {}
+    AvoidArcaneExplosionAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid arcane explosion") {}
     bool Execute(Event event) override;
 };
 
 class TimeBombSpreadAction : public MovementAction
 {
 public:
-    TimeBombSpreadAction(PlayerbotAI* ai) : MovementAction(ai, "time bomb spread") {}
+    TimeBombSpreadAction(PlayerbotAI* botAI) : MovementAction(botAI, "time bomb spread") {}
     bool Execute(Event event) override;
 };
 

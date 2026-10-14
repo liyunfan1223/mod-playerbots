@@ -71,10 +71,10 @@ public:
     RendDebuffTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "rend", 1, true) {}
 };
 
-class VigilanceTrigger : public BuffOnPartyTrigger
+class VigilanceTrigger : public BuffTrigger
 {
 public:
-    VigilanceTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "vigilance") {}
+    VigilanceTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "vigilance", 5 * IN_MILLISECONDS) {}
 
     bool IsActive() override;
 };
@@ -90,7 +90,7 @@ public:
 // class SlamTrigger : public HasAuraTrigger
 // {
 // public:
-//     SlamTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "slam!") {}
+//     SlamTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "slam!") {}
 // };
 
 #endif

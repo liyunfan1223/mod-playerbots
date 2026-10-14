@@ -15,7 +15,7 @@ static void HandleStrategyCommon(PlayerbotAI* botAI, std::string const& text, Bo
     std::vector<std::string> splitted = split(text, ',');
     for (std::vector<std::string>::iterator i = splitted.begin(); i != splitted.end(); i++)
     {
-        const char* name = i->c_str();
+        char const* name = i->c_str();
         switch (name[0])
         {
             case '+':

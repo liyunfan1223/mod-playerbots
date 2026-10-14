@@ -5,8 +5,10 @@
  */
 
 #include "BTHelpers.h"
+#include "EncounterHelpers.h"
 #include "Playerbots.h"
-#include "RaidBossHelpers.h"
+
+using namespace EncounterHelpers;
 
 namespace BlackTempleHelpers
 {
@@ -65,7 +67,7 @@ std::vector<std::vector<Player*>> GetGurtoggRangedRotationGroups(Player* bot)
         if (member && member->IsAlive())
         {
             PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
-            if (memberAI && memberAI->IsRanged(member))
+            if (memberAI && PlayerbotAI::IsRanged(member))
                 rangedMembers.push_back(member);
         }
     }
@@ -102,9 +104,9 @@ const Position SHAHRAZ_TRANSITION_POSITION = { 951.327f, 179.550f, 192.550f };
 const Position SHAHRAZ_RANGED_POSITION     = { 935.267f, 175.459f, 192.821f };
 std::unordered_map<ObjectGuid, TankPositionState> shahrazTankStep;
 
-TankPositionState GetShahrazTankPositionState(PlayerbotAI* botAI, Player* bot)
+TankPositionState GetShahrazTankPositionState(Player* bot)
 {
-    Player* mainTank = GetGroupMainTank(botAI, bot);
+    Player* mainTank = GetGroupMainTank(bot);
     if (!mainTank)
         return TankPositionState::Unknown;
 
@@ -424,7 +426,7 @@ EyeBlastDangerArea GetEyeBlastDangerArea(Player* bot)
     return { startPos, endPos, eyeBlastWidth };
 }
 
-bool IsPositionInEyeBlastDangerArea(const Position& pos, const EyeBlastDangerArea& area)
+bool IsPositionInEyeBlastDangerArea(Position const& pos, EyeBlastDangerArea const& area)
 {
     const float dx = area.end.GetPositionX() - area.start.GetPositionX();
     const float dy = area.end.GetPositionY() - area.start.GetPositionY();

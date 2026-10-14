@@ -17,6 +17,7 @@ public:
     ChangeChatAction(PlayerbotAI* botAI) : Action(botAI, "chat") {}
 
     bool Execute(Event event) override;
+    bool isUsefulWithoutControl() override { return true; }
 };
 
 #endif

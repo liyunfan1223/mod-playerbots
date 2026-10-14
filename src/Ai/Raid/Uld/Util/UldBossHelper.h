@@ -262,7 +262,7 @@ public:
     static void SetHarpoonOnCooldown(GameObject* harpoonGO);
     GameObject* FindNearestHarpoon(float x, float y, float z) const;
 
-    static const std::vector<HarpoonData>& GetHarpoonData();
+    static std::vector<HarpoonData> const& GetHarpoonData();
 
     void AssignRolesBasedOnHealth();
     bool AreRolesAssigned() const;

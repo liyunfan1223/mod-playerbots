@@ -21,9 +21,9 @@ bool TravelAction::Execute(Event /*event*/)
 
     Unit* newTarget = nullptr;
     std::list<Unit*> targets;
-    Acore::AnyUnitInObjectRangeCheck u_check(bot, sPlayerbotAIConfig.sightDistance * 2);
+    Acore::AnyUnitInObjectRangeCheck u_check(bot, sPlayerbotAIConfig.SightDistance * 2);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(bot, targets, u_check);
-    Cell::VisitObjects(bot, searcher, sPlayerbotAIConfig.sightDistance);
+    Cell::VisitObjects(bot, searcher, sPlayerbotAIConfig.SightDistance);
 
     for (Unit* unit : targets)
     {

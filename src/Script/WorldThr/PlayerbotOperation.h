@@ -85,7 +85,7 @@ public:
  */
 struct PlayerbotOperationComparator
 {
-    bool operator()(const std::unique_ptr<PlayerbotOperation>& a, const std::unique_ptr<PlayerbotOperation>& b) const
+    bool operator()(std::unique_ptr<PlayerbotOperation> const& a, std::unique_ptr<PlayerbotOperation> const& b) const
     {
         return a->GetPriority() < b->GetPriority();  // Lower priority goes to back of queue
     }

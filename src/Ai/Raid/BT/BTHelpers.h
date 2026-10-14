@@ -162,7 +162,7 @@ extern const Position SHAHRAZ_TANK_POSITION;
 extern const Position SHAHRAZ_TRANSITION_POSITION;
 extern const Position SHAHRAZ_RANGED_POSITION;
 extern std::unordered_map<ObjectGuid, TankPositionState> shahrazTankStep;
-TankPositionState GetShahrazTankPositionState(PlayerbotAI* botAI, Player* bot);
+TankPositionState GetShahrazTankPositionState(Player* bot);
 
 // Illidari Council
 constexpr float COUNCIL_FLOOR_Z_THRESHOLD = 270.000f;
@@ -208,7 +208,7 @@ struct EyeBlastDangerArea
     float width;
 };
 EyeBlastDangerArea GetEyeBlastDangerArea(Player* bot);
-bool IsPositionInEyeBlastDangerArea(const Position& pos, const EyeBlastDangerArea& area);
+bool IsPositionInEyeBlastDangerArea(Position const& pos, EyeBlastDangerArea const& area);
 GameObject* FindNearestTrap(PlayerbotAI* botAI, Player* bot);
 
 }

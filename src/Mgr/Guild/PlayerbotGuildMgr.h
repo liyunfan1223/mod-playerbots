@@ -29,7 +29,7 @@ public:
     bool CreateGuild(Player* player, std::string guildName);
     void OnGuildUpdate  (Guild* guild);
     bool SetGuildEmblem(uint32 guildId);
-    void DeleteBotGuilds();
+    void DeleteRandomBotGuilds();
     bool IsRealGuild(uint32 guildId);
     bool IsRealGuild(Player* bot);
 
@@ -37,8 +37,8 @@ private:
     PlayerbotGuildMgr() = default;
     ~PlayerbotGuildMgr() = default;
 
-    PlayerbotGuildMgr(const PlayerbotGuildMgr&) = delete;
-    PlayerbotGuildMgr& operator=(const PlayerbotGuildMgr&) = delete;
+    PlayerbotGuildMgr(PlayerbotGuildMgr const&) = delete;
+    PlayerbotGuildMgr& operator=(PlayerbotGuildMgr const&) = delete;
 
     PlayerbotGuildMgr(PlayerbotGuildMgr&&) = delete;
     PlayerbotGuildMgr& operator=(PlayerbotGuildMgr&&) = delete;

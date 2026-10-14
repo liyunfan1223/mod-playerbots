@@ -7,16 +7,15 @@
 #ifndef PLAYERBOTS_GDSTRATEGY_H
 #define PLAYERBOTS_GDSTRATEGY_H
 
-#include "Multiplier.h"
 #include "Strategy.h"
 
 class WotlkDungeonGDStrategy : public Strategy
 {
 public:
-    WotlkDungeonGDStrategy(PlayerbotAI* ai) : Strategy(ai) {}
-    virtual std::string const getName() override { return "gundrak"; }
-    virtual void InitTriggers(std::vector<TriggerNode*> &triggers) override;
-    virtual void InitMultipliers(std::vector<Multiplier*> &multipliers) override;
+    WotlkDungeonGDStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+    std::string const getName() override { return "wotlk-gd"; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
 };
 
 #endif

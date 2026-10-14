@@ -49,7 +49,7 @@ bool DropQuestAction::Execute(Event event)
 
     if (botAI->HasStrategy("debug quest", BotState::BOT_STATE_NON_COMBAT) || botAI->HasStrategy("debug rpg", BotState::BOT_STATE_COMBAT))
     {
-        const Quest* pQuest = sObjectMgr->GetQuestTemplate(entry);
+        Quest const* pQuest = sObjectMgr->GetQuestTemplate(entry);
         const std::string text_quest = ChatHelper::FormatQuest(pQuest);
         LOG_INFO("playerbots", "{} => Quest [ {} ] removed", bot->GetName(), pQuest->GetTitle());
         std::string text = PlayerbotTextMgr::instance().GetBotTextOrDefault(
@@ -70,7 +70,7 @@ bool CleanQuestLogAction::Execute(Event event)
     if (!requester)
         return false;
 
-    if (!sPlayerbotAIConfig.dropObsoleteQuests)
+    if (!sPlayerbotAIConfig.DropObsoleteQuests)
         return false;
 
     // Only output this message if "debug rpg" strategy is enabled
@@ -88,7 +88,7 @@ bool CleanQuestLogAction::Execute(Event event)
         if (!questId)
             continue;
 
-        const Quest* quest = sObjectMgr->GetQuestTemplate(questId);
+        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         if (!quest)
             continue;
 

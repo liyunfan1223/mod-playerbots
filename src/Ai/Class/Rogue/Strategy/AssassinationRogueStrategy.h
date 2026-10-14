@@ -7,18 +7,17 @@
 #ifndef PLAYERBOTS_ASSASSINATIONROGUESTRATEGY_H
 #define PLAYERBOTS_ASSASSINATIONROGUESTRATEGY_H
 
-#include "MeleeCombatStrategy.h"
+#include "GenericRogueStrategy.h"
 
-class AssassinationRogueStrategy : public MeleeCombatStrategy
+class AssassinationRogueStrategy : public GenericRogueStrategy
 {
 public:
-    AssassinationRogueStrategy(PlayerbotAI* ai);
+    AssassinationRogueStrategy(PlayerbotAI* botAI);
 
 public:
     virtual void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    virtual std::string const getName() override { return "melee"; }
+    virtual std::string const getName() override { return "assassin"; }
     virtual std::vector<NextAction> getDefaultActions() override;
-    uint32 GetType() const override { return MeleeCombatStrategy::GetType() | STRATEGY_TYPE_DPS; }
 };
 
 #endif

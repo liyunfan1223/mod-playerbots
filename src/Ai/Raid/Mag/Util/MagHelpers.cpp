@@ -6,58 +6,27 @@
 
 #include "MagHelpers.h"
 #include "Creature.h"
+#include "EncounterHelpers.h"
 #include "GameObject.h"
 #include "Map.h"
-#include "ObjectGuid.h"
 #include "Playerbots.h"
+#include <algorithm>
+#include <list>
 
-namespace MagtheridonHelpers
+using namespace EncounterHelpers;
+
+namespace MagHelpers
 {
 
-const Position WAITING_FOR_MAGTHERIDON_POSITION = { -31.962f,  -8.514f, -0.304f, 0.657f };
-const Position MAGTHERIDON_TANK_POSITION =        {  -6.147f, -37.812f, -0.411f,   0.0f };
-const Position NW_CHANNELER_TANK_POSITION =       { -11.764f,  30.818f, -0.411f,   0.0f };
-const Position NE_CHANNELER_TANK_POSITION =       { -12.490f, -26.211f, -0.411f,   0.0f };
-const Position RANGED_SPREAD_POSITION =           { -14.890f,   1.995f, -0.406f,   0.0f };
-const Position HEALER_SPREAD_POSITION =           {  -2.265f,   1.874f, -0.404f,   0.0f };
-
-std::unordered_map<uint32, time_t> blastNovaTimer;
-std::unordered_map<uint32, time_t> dpsWaitTimer;
-std::unordered_map<uint32, bool> ceilingCollapseApplied;
+std::unordered_map<uint32, uint32> magDpsWaitTimer;
+std::unordered_map<uint32, uint32> blastNovaTimer;
 std::unordered_map<uint32, bool> lastBlastNovaState;
-std::unordered_map<uint32, std::unordered_map<ObjectGuid, CubeInfo>>
-    botToCubeAssignments;
-std::unordered_map<uint32, std::vector<DebrisData>> activeDebrisPositions;
+std::unordered_set<uint32> ceilingCollapseApplied;
+std::unordered_map<uint32, std::unordered_map<ObjectGuid, CubeInfo>> botToCubeAssignments;
 
-// Identify channelers by their database GUIDs
-Creature* GetChanneler(Player* bot, uint32 dbGuid)
-{
-    Map* map = bot->GetMap();
-    if (!map)
-        return nullptr;
+std::vector<uint32> const MANTICRON_CUBE_DB_GUIDS = { 43157, 43158, 43159, 43160, 43161 };
 
-    auto it = map->GetCreatureBySpawnIdStore().find(dbGuid);
-    if (it == map->GetCreatureBySpawnIdStore().end())
-        return nullptr;
-
-    Creature* channeler = it->second;
-    if (!channeler->IsAlive())
-        return nullptr;
-
-    return channeler;
-}
-
-bool IsMagtheridonActive(Unit* magtheridon)
-{
-    return magtheridon && !magtheridon->HasAura(
-        static_cast<uint32>(MagtheridonSpells::SPELL_SHADOW_CAGE));
-}
-
-const std::vector<uint32> MANTICRON_CUBE_DB_GUIDS = { 43157, 43158, 43159, 43160, 43161 };
-
-// Get the positions of all Manticron Cubes by their database GUIDs
-std::vector<CubeInfo> GetAllCubeInfosByDbGuids(
-    Map* map, const std::vector<uint32>& cubeDbGuids)
+std::vector<CubeInfo> GetAllCubeInfosByDbGuids(Map* map, std::vector<uint32> const& cubeDbGuids)
 {
     std::vector<CubeInfo> cubes;
     if (!map)
@@ -84,30 +53,128 @@ std::vector<CubeInfo> GetAllCubeInfosByDbGuids(
     return cubes;
 }
 
-bool IsCubeClicker(Player* bot)
+// Identify channelers by their database GUIDs
+Creature* GetChanneler(Player* bot, uint32 dbGuid)
 {
-    auto mapIt = botToCubeAssignments.find(bot->GetMap()->GetInstanceId());
-    return mapIt != botToCubeAssignments.end() &&
-           mapIt->second.find(bot->GetGUID()) != mapIt->second.end();
+    Map* map = bot->GetMap();
+    if (!map)
+        return nullptr;
+
+    auto it = map->GetCreatureBySpawnIdStore().find(dbGuid);
+    if (it == map->GetCreatureBySpawnIdStore().end())
+        return nullptr;
+
+    Creature* channeler = it->second;
+    if (!channeler->IsAlive())
+        return nullptr;
+
+    return channeler;
 }
 
-bool IsPositionInActiveDebris(uint32 instanceId, float x, float y, float radius)
+// Sorted by GUID so every warlock indexes the same abyssal.
+GuidVector FindBurningAbyssalGuids(Player* bot)
 {
-    constexpr uint32 maxAgeMs = 8000;
+    constexpr float searchRadius = 100.0f;
+    std::list<Creature*> creatureList;
+    bot->GetCreatureListWithEntryInGrid(
+        creatureList, Id(MagNpcs::NPC_BURNING_ABYSSAL), searchRadius);
 
-    auto it = activeDebrisPositions.find(instanceId);
-    if (it == activeDebrisPositions.end())
+    GuidVector guids;
+    guids.reserve(creatureList.size());
+    for (Creature* creature : creatureList)
+    {
+        if (creature && creature->IsAlive())
+            guids.push_back(creature->GetGUID());
+    }
+
+    std::sort(guids.begin(), guids.end());
+    return guids;
+}
+
+std::vector<Unit*> GetBurningAbyssals(PlayerbotAI* botAI)
+{
+    GuidVector const& guids =
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("mag burning abyssals")->RefGet();
+
+    std::vector<Unit*> abyssals;
+    abyssals.reserve(guids.size());
+    for (ObjectGuid const guid : guids)
+    {
+        Unit* abyssal = botAI->GetUnit(guid);
+        if (abyssal && abyssal->IsAlive())
+            abyssals.push_back(abyssal);
+    }
+
+    return abyssals;
+}
+
+bool IsMagtheridonActive(Unit* magtheridon)
+{
+    return magtheridon && !magtheridon->HasAura(Id(MagSpells::SPELL_SHADOW_CAGE));
+}
+
+bool IsCubeClicker(Player* bot)
+{
+    auto mapIt = botToCubeAssignments.find(bot->GetInstanceId());
+    return mapIt != botToCubeAssignments.end() &&
+        mapIt->second.find(bot->GetGUID()) != mapIt->second.end();
+}
+
+bool IsBlastNovaCasting(Unit* magtheridon)
+{
+    return magtheridon && magtheridon->FindCurrentSpellBySpellId(Id(MagSpells::SPELL_BLAST_NOVA));
+}
+
+bool IsCeilingCollapsed(Player* bot)
+{
+    return ceilingCollapseApplied.contains(bot->GetInstanceId());
+}
+
+std::vector<Position> FindDebrisPositions(Player* bot)
+{
+    constexpr float searchRadius = 150.0f;
+    return GetDynamicObjectPositions(bot, searchRadius, Id(MagSpells::SPELL_DEBRIS_SPAWN));
+}
+
+bool GetActiveDebrisPosition(PlayerbotAI* botAI, Position& debris)
+{
+    std::vector<Position> const& debrisPositions = botAI->GetAiObjectContext()
+        ->GetValue<std::vector<Position>>("mag debris positions")->RefGet();
+    if (debrisPositions.empty())
         return false;
 
-    const uint32 now = getMSTime();
-    for (DebrisData const& debris : it->second)
+    debris = debrisPositions.front();
+    return true;
+}
+
+bool IsPositionInActiveDebris(PlayerbotAI* botAI, float x, float y, float radius)
+{
+    Position debris;
+    return GetActiveDebrisPosition(botAI, debris) && debris.GetExactDist2d(x, y) <= radius;
+}
+
+std::vector<GameObject*> GetActiveConflagrations(PlayerbotAI* botAI)
+{
+    std::vector<GameObject*> blazes;
+    auto const& gameObjects =
+        botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest game objects")->Get();
+    for (auto const& goGuid : gameObjects)
     {
-        if (getMSTimeDiff(debris.spawnTime, now) > maxAgeMs)
+        GameObject* go = botAI->GetGameObject(goGuid);
+        if (!go || !go->isSpawned() || go->GetEntry() != Id(MagObjects::GO_BLAZE))
             continue;
 
-        float dx = x - debris.position.GetPositionX();
-        float dy = y - debris.position.GetPositionY();
-        if ((dx * dx + dy * dy) < (radius * radius))
+        blazes.push_back(go);
+    }
+
+    return blazes;
+}
+
+bool IsPositionInConflagration(std::vector<GameObject*> const& blazes, float x, float y)
+{
+    for (GameObject* blaze : blazes)
+    {
+        if (blaze->GetDistance2d(x, y) < CONFLAGRATION_HAZARD_RADIUS)
             return true;
     }
 
@@ -116,24 +183,7 @@ bool IsPositionInActiveDebris(uint32 instanceId, float x, float y, float radius)
 
 bool IsPositionInActiveConflagration(PlayerbotAI* botAI, float x, float y)
 {
-    constexpr float conflagrationHazardRadius = 5.0f;
-    GuidVector const& gameObjects =
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest game objects")->Get();
-    for (auto const& goGuid : gameObjects)
-    {
-        GameObject* go = botAI->GetGameObject(goGuid);
-        if (!go || !go->isSpawned() ||
-            go->GetEntry() !=
-                static_cast<uint32>(MagtheridonHelpers::MagtheridonObjects::GO_BLAZE))
-        {
-            continue;
-        }
-
-        if (go->GetDistance2d(x, y) < conflagrationHazardRadius)
-            return true;
-    }
-
-    return false;
+    return IsPositionInConflagration(GetActiveConflagrations(botAI), x, y);
 }
 
 }

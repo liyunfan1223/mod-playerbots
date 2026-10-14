@@ -19,39 +19,47 @@
 
 bool TradeStatusAction::Execute(Event event)
 {
+    if (IsSelfBot(bot))
+        return false;
+
+    if (!bot->GetSession())
+        return false;
+
     Player* trader = bot->GetTrader();
-    Player* master = GetMaster();
     if (!trader)
         return false;
 
-    PlayerbotAI* traderBotAI = GET_PLAYERBOT_AI(trader);
+    bool const traderIsGameClientPlayer = IsRealPlayer(trader) || IsSelfBot(trader);
+    Player* master = GetMaster();
 
-    // Allow the master and group members to trade
-    if (trader != master && !traderBotAI && (!bot->GetGroup() || !bot->GetGroup()->IsMember(trader->GetGUID())))
+    // Bots refuse to trade with a person (whether active or using SelfBot) who is neither their
+    // master nor a group member. Bot traders (other than SelfBots) are handled further down.
+    if (trader != master && traderIsGameClientPlayer &&
+        (!bot->GetGroup() || !bot->GetGroup()->IsMember(trader->GetGUID())))
     {
         bot->Whisper(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                          "trade_busy_now", "I'm kind of busy now", {}),
                      LANG_UNIVERSAL, trader);
+        CancelTrade();
         return false;
     }
 
-    if (sPlayerbotAIConfig.enableRandomBotTrading == 0 && (sRandomPlayerbotMgr.IsRandomBot(bot)|| sRandomPlayerbotMgr.IsAddclassBot(bot)))
+    if (sPlayerbotAIConfig.EnableRandomBotTrading == 0 &&
+        (sRandomPlayerbotMgr.IsRandomBot(bot)|| sRandomPlayerbotMgr.IsAddclassBot(bot)))
     {
         bot->Whisper(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                          "trade_disabled", "Trading is disabled", {}),
                      LANG_UNIVERSAL, trader);
+        CancelTrade();
         return false;
     }
 
-    // Allow trades from group members or bots
+    // Bots also refuse their own master when ungrouped and security withholds full access.
     if ((!bot->GetGroup() || !bot->GetGroup()->IsMember(trader->GetGUID())) &&
         (trader != master || !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_ALLOW_ALL, true, master)) &&
-        !traderBotAI)
+        traderIsGameClientPlayer)
     {
-        WorldPacket p;
-        uint32 status = 0;
-        p << status;
-        bot->GetSession()->HandleCancelTradeOpcode(p);
+        CancelTrade();
         return false;
     }
 
@@ -60,7 +68,9 @@ bool TradeStatusAction::Execute(Event event)
     uint32 status;
     p >> status;
 
-    if (status == TRADE_STATUS_TRADE_ACCEPT || (status == TRADE_STATUS_BACK_TO_TRADE && trader->GetTradeData() && trader->GetTradeData()->IsAccepted()))
+    if (status == TRADE_STATUS_TRADE_ACCEPT ||
+        (status == TRADE_STATUS_BACK_TO_TRADE &&
+         trader->GetTradeData() && trader->GetTradeData()->IsAccepted()))
     {
         WorldPacket p;
         uint32 status = 0;
@@ -95,9 +105,7 @@ bool TradeStatusAction::Execute(Event event)
 
                 CraftData& craftData = AI_VALUE(CraftData&, "craft");
                 if (!craftData.IsEmpty() && craftData.IsRequired(itemId))
-                {
                     craftData.AddObtained(itemId, count);
-                }
 
                 GuildTaskMgr::instance().CheckItemTask(itemId, count, trader, bot);
             }
@@ -109,9 +117,7 @@ bool TradeStatusAction::Execute(Event event)
 
                 CraftData& craftData = AI_VALUE(CraftData&, "craft");
                 if (!craftData.IsEmpty() && craftData.itemId == itemId)
-                {
                     craftData.Crafted(count);
-                }
             }
 
             return true;
@@ -119,11 +125,10 @@ bool TradeStatusAction::Execute(Event event)
     }
     else if (status == TRADE_STATUS_BEGIN_TRADE)
     {
-        if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, trader, sPlayerbotAIConfig.sightDistance))
+        if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, trader, sPlayerbotAIConfig.SightDistance))
             bot->SetFacingToObject(trader);
 
         BeginTrade();
-
         return true;
     }
     return false;
@@ -132,7 +137,7 @@ bool TradeStatusAction::Execute(Event event)
 void TradeStatusAction::BeginTrade()
 {
     Player* trader = bot->GetTrader();
-    if (!trader || GET_PLAYERBOT_AI(bot->GetTrader()))
+    if (!trader || (GET_PLAYERBOT_AI(trader) && !IsSelfBot(trader)))
         return;
 
     WorldPacket p;
@@ -156,13 +161,20 @@ void TradeStatusAction::BeginTrade()
     }
 }
 
+void TradeStatusAction::CancelTrade()
+{
+    WorldPacket p;
+    bot->GetSession()->HandleCancelTradeOpcode(p);
+}
+
 bool TradeStatusAction::CheckTrade()
 {
     Player* trader = bot->GetTrader();
     if (!bot->GetTradeData() || !trader || !trader->GetTradeData())
         return false;
 
-    if (!IsRealPlayer(botAI->GetMaster()) && GET_PLAYERBOT_AI(bot->GetTrader()))
+    if (!botAI->HasGameClientMaster() && GET_PLAYERBOT_AI(bot->GetTrader()) &&
+        !IsSelfBot(bot->GetTrader()))
     {
         for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
         {
@@ -185,23 +197,24 @@ bool TradeStatusAction::CheckTrade()
         {
             if (bot->GetGroup() && bot->GetGroup()->IsMember(bot->GetTrader()->GetGUID()) &&
                 botAI->HasGameClientMaster())
+            {
                 botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                     "trade_thank_you_player",
                     "Thank you %player",
                     {{"%player", chat->FormatWorldobject(bot->GetTrader())}}));
+            }
             else
+            {
                 bot->Say(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                              "trade_thank_you_player",
                              "Thank you %player",
                              {{"%player", chat->FormatWorldobject(bot->GetTrader())}}),
                          (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
+            }
         }
         return isGettingItem;
     }
-    if (!bot->GetSession())
-    {
-        return false;
-    }
+
     uint32 accountId = bot->GetSession()->GetAccountId();
     if (!sPlayerbotAIConfig.IsInRandomAccountList(accountId))
     {
@@ -219,14 +232,16 @@ bool TradeStatusAction::CheckTrade()
     int32 botMoney = bot->GetTradeData()->GetMoney() + botItemsMoney;
     int32 playerItemsMoney = CalculateCost(trader, false);
     int32 playerMoney = trader->GetTradeData()->GetMoney() + playerItemsMoney;
-    if (botItemsMoney > 0 && sPlayerbotAIConfig.enableRandomBotTrading == 2 && (sRandomPlayerbotMgr.IsRandomBot(bot)|| sRandomPlayerbotMgr.IsAddclassBot(bot)))
+    if (botItemsMoney > 0 && sPlayerbotAIConfig.EnableRandomBotTrading == 2 &&
+        (sRandomPlayerbotMgr.IsRandomBot(bot)|| sRandomPlayerbotMgr.IsAddclassBot(bot)))
     {
         bot->Whisper(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                          "trade_selling_disabled", "Selling is disabled.", {}),
                      LANG_UNIVERSAL, trader);
         return false;
     }
-    if (playerItemsMoney && sPlayerbotAIConfig.enableRandomBotTrading == 3 && (sRandomPlayerbotMgr.IsRandomBot(bot)|| sRandomPlayerbotMgr.IsAddclassBot(bot)))
+    if (playerItemsMoney && sPlayerbotAIConfig.EnableRandomBotTrading == 3 &&
+        (sRandomPlayerbotMgr.IsRandomBot(bot)|| sRandomPlayerbotMgr.IsAddclassBot(bot)))
     {
         bot->Whisper(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                          "trade_buying_disabled", "Buying is disabled.", {}),

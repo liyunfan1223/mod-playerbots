@@ -30,10 +30,10 @@ public:
 
     std::string const getQualifier() { return qualifier; }
 
-    static std::string const MultiQualify(const std::vector<std::string>& qualifiers, const std::string& separator,
+    static std::string const MultiQualify(std::vector<std::string> const& qualifiers, std::string const& separator,
                                           const std::string_view brackets = "{}");
-    static std::vector<std::string> getMultiQualifiers(const std::string& qualifier1);
-    static int32 getMultiQualifier(const std::string& qualifier1, uint32 pos);
+    static std::vector<std::string> getMultiQualifiers(std::string const& qualifier1);
+    static int32 getMultiQualifier(std::string const& qualifier1, uint32 pos);
 
 protected:
     std::string qualifier;
@@ -43,7 +43,7 @@ template <class T>
 class NamedObjectFactory
 {
 public:
-    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
+    using ObjectCreator = std::function<T*(PlayerbotAI* botAI)>;
     std::unordered_map<std::string, ObjectCreator> creators;
 
 public:
@@ -135,7 +135,7 @@ template <class T>
 class SharedNamedObjectContextList
 {
 public:
-    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
+    using ObjectCreator = std::function<T*(PlayerbotAI* botAI)>;
     std::unordered_map<std::string, ObjectCreator> creators;
     std::vector<NamedObjectContext<T>*> contexts;
 
@@ -157,12 +157,12 @@ template <class T>
 class NamedObjectContextList
 {
 public:
-    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
-    const std::unordered_map<std::string, ObjectCreator>& creators;
-    const std::vector<NamedObjectContext<T>*>& contexts;
+    using ObjectCreator = std::function<T*(PlayerbotAI* botAI)>;
+    std::unordered_map<std::string, ObjectCreator> const& creators;
+    std::vector<NamedObjectContext<T>*> const& contexts;
     std::unordered_map<std::string, T*> created;
 
-    NamedObjectContextList(const SharedNamedObjectContextList<T>& shared)
+    NamedObjectContextList(SharedNamedObjectContextList<T> const& shared)
         : creators(shared.creators), contexts(shared.contexts)
     {
     }
@@ -191,7 +191,7 @@ public:
         if (creators.find(name) == creators.end())
             return nullptr;
 
-        const ObjectCreator& creator = creators.at(name);
+        ObjectCreator const& creator = creators.at(name);
 
         T* object = creator(botAI);
         Qualified* q = dynamic_cast<Qualified*>(object);
@@ -201,7 +201,7 @@ public:
         return object;
     }
 
-    T* GetContextObject(const std::string& name, PlayerbotAI* botAI)
+    T* GetContextObject(std::string const& name, PlayerbotAI* botAI)
     {
         if (created.find(name) == created.end())
         {
@@ -212,7 +212,7 @@ public:
         return created[name];
     }
 
-    std::set<std::string> GetSiblings(const std::string& name)
+    std::set<std::string> GetSiblings(std::string const& name)
     {
         for (auto i = contexts.begin(); i != contexts.end(); i++)
         {
@@ -258,7 +258,7 @@ template <class T>
 class NamedObjectFactoryList
 {
 public:
-    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
+    using ObjectCreator = std::function<T*(PlayerbotAI* botAI)>;
     std::vector<NamedObjectFactory<T>*> factories;
     std::unordered_map<std::string, ObjectCreator> creators;
 
@@ -281,7 +281,7 @@ public:
         if (creators.find(name) == creators.end())
             return nullptr;
 
-        const ObjectCreator& creator = creators[name];
+        ObjectCreator const& creator = creators[name];
 
         T* object = creator(botAI);
         Qualified* q = dynamic_cast<Qualified*>(object);
@@ -298,7 +298,7 @@ public:
             creators[iter.first] = iter.second;
     }
 
-    T* GetContextObject(const std::string& name, PlayerbotAI* botAI)
+    T* GetContextObject(std::string const& name, PlayerbotAI* botAI)
     {
         if (T* object = create(name, botAI))
             return object;

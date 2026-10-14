@@ -7,7 +7,7 @@
 #include "RogueAiObjectContext.h"
 #include "AiObjectContext.h"
 #include "AssassinationRogueStrategy.h"
-#include "DpsRogueStrategy.h"
+#include "CombatRogueStrategy.h"
 #include "GenericRogueNonCombatStrategy.h"
 #include "NamedObjectContext.h"
 #include "Playerbots.h"
@@ -47,13 +47,15 @@ class RogueCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
 public:
     RogueCombatStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
     {
-        creators["dps"] = &RogueCombatStrategyFactoryInternal::dps;
-        creators["melee"] = &RogueCombatStrategyFactoryInternal::melee;
+        creators["combat"] = &RogueCombatStrategyFactoryInternal::combat;
+        creators["assassin"] = &RogueCombatStrategyFactoryInternal::assassin;
+        // creators["subtlety"] = &RogueCombatStrategyFactoryInternal::subtlety;
     }
 
 private:
-    static Strategy* dps(PlayerbotAI* botAI) { return new DpsRogueStrategy(botAI); }
-    static Strategy* melee(PlayerbotAI* botAI) { return new AssassinationRogueStrategy(botAI); }
+    static Strategy* combat(PlayerbotAI* botAI) { return new CombatRogueStrategy(botAI); }
+    static Strategy* assassin(PlayerbotAI* botAI) { return new AssassinationRogueStrategy(botAI); }
+    // static Strategy* subtlety(PlayerbotAI* botAI) { return new SubtletyRogueStrategy(botAI); }
 };
 
 class RogueTriggerFactoryInternal : public NamedObjectContext<Trigger>
@@ -62,6 +64,7 @@ public:
     RogueTriggerFactoryInternal()
     {
         creators["kick"] = &RogueTriggerFactoryInternal::kick;
+        creators["riposte"] = &RogueTriggerFactoryInternal::riposte;
         creators["rupture"] = &RogueTriggerFactoryInternal::rupture;
         creators["slice and dice"] = &RogueTriggerFactoryInternal::slice_and_dice;
         creators["hunger for blood"] = &RogueTriggerFactoryInternal::hunger_for_blood;
@@ -73,34 +76,47 @@ public:
         creators["no stealth"] = &RogueTriggerFactoryInternal::no_stealth;
         creators["stealth"] = &RogueTriggerFactoryInternal::stealth;
         creators["sprint"] = &RogueTriggerFactoryInternal::sprint;
-        creators["main hand weapon no enchant"] = &RogueTriggerFactoryInternal::main_hand_weapon_no_enchant;
-        creators["off hand weapon no enchant"] = &RogueTriggerFactoryInternal::off_hand_weapon_no_enchant;
-        creators["tricks of the trade on main tank"] = &RogueTriggerFactoryInternal::tricks_of_the_trade_on_main_tank;
+        creators["main hand weapon no enchant"] =
+            &RogueTriggerFactoryInternal::main_hand_weapon_no_enchant;
+        creators["off hand weapon no enchant"] =
+            &RogueTriggerFactoryInternal::off_hand_weapon_no_enchant;
+        creators["tricks of the trade on main tank"] =
+            &RogueTriggerFactoryInternal::tricks_of_the_trade_on_main_tank;
         creators["adrenaline rush"] = &RogueTriggerFactoryInternal::adrenaline_rush;
-        creators["blade fury"] = &RogueTriggerFactoryInternal::blade_fury;
+        creators["blade flurry"] = &RogueTriggerFactoryInternal::blade_flurry;
     }
 
 private:
-    static Trigger* adrenaline_rush(PlayerbotAI* botAI) { return new AdrenalineRushTrigger(botAI); }
-    static Trigger* blade_fury(PlayerbotAI* botAI) { return new BladeFuryTrigger(botAI); }
     static Trigger* kick(PlayerbotAI* botAI) { return new KickInterruptSpellTrigger(botAI); }
+    static Trigger* riposte(PlayerbotAI* botAI) { return new RiposteAvailableTrigger(botAI); }
     static Trigger* rupture(PlayerbotAI* botAI) { return new RuptureTrigger(botAI); }
     static Trigger* slice_and_dice(PlayerbotAI* botAI) { return new SliceAndDiceTrigger(botAI); }
     static Trigger* hunger_for_blood(PlayerbotAI* botAI) { return new HungerForBloodTrigger(botAI); }
     static Trigger* expose_armor(PlayerbotAI* botAI) { return new ExposeArmorTrigger(botAI); }
-    static Trigger* kick_on_enemy_healer(PlayerbotAI* botAI) { return new KickInterruptEnemyHealerSpellTrigger(botAI); }
+    static Trigger* kick_on_enemy_healer(PlayerbotAI* botAI)
+    {
+        return new KickInterruptEnemyHealerSpellTrigger(botAI);
+    }
     static Trigger* unstealth(PlayerbotAI* botAI) { return new UnstealthTrigger(botAI); }
     static Trigger* sap(PlayerbotAI* botAI) { return new SapTrigger(botAI); }
     static Trigger* in_stealth(PlayerbotAI* botAI) { return new InStealthTrigger(botAI); }
     static Trigger* no_stealth(PlayerbotAI* botAI) { return new NoStealthTrigger(botAI); }
     static Trigger* stealth(PlayerbotAI* botAI) { return new StealthTrigger(botAI); }
     static Trigger* sprint(PlayerbotAI* botAI) { return new SprintTrigger(botAI); }
-    static Trigger* main_hand_weapon_no_enchant(PlayerbotAI* ai) { return new MainHandWeaponNoEnchantTrigger(ai); }
-    static Trigger* off_hand_weapon_no_enchant(PlayerbotAI* ai) { return new OffHandWeaponNoEnchantTrigger(ai); }
-    static Trigger* tricks_of_the_trade_on_main_tank(PlayerbotAI* ai)
+    static Trigger* main_hand_weapon_no_enchant(PlayerbotAI* botAI)
     {
-        return new TricksOfTheTradeOnMainTankTrigger(ai);
+        return new MainHandWeaponNoEnchantTrigger(botAI);
     }
+    static Trigger* off_hand_weapon_no_enchant(PlayerbotAI* botAI)
+    {
+        return new OffHandWeaponNoEnchantTrigger(botAI);
+    }
+    static Trigger* tricks_of_the_trade_on_main_tank(PlayerbotAI* botAI)
+    {
+        return new TricksOfTheTradeOnMainTankTrigger(botAI);
+    }
+    static Trigger* adrenaline_rush(PlayerbotAI* botAI) { return new AdrenalineRushTrigger(botAI); }
+    static Trigger* blade_flurry(PlayerbotAI* botAI) { return new BladeFlurryTrigger(botAI); }
 };
 
 class RogueAiObjectContextInternal : public NamedObjectContext<Action>
@@ -137,35 +153,54 @@ public:
         creators["sap"] = &RogueAiObjectContextInternal::sap;
         creators["check stealth"] = &RogueAiObjectContextInternal::check_stealth;
         creators["envenom"] = &RogueAiObjectContextInternal::envenom;
-        creators["tricks of the trade on main tank"] = &RogueAiObjectContextInternal::tricks_of_the_trade_on_main_tank;
-        creators["use instant poison on main hand"] = &RogueAiObjectContextInternal::use_instant_poison;
-        creators["use deadly poison on off hand"] = &RogueAiObjectContextInternal::use_deadly_poison;
-        creators["use instant poison on off hand"] = &RogueAiObjectContextInternal::use_instant_poison_off_hand;
+        creators["tricks of the trade on main tank"] =
+            &RogueAiObjectContextInternal::tricks_of_the_trade_on_main_tank;
+        creators["use instant poison on main hand"] =
+            &RogueAiObjectContextInternal::use_instant_poison;
+        creators["use deadly poison on off hand"] =
+            &RogueAiObjectContextInternal::use_deadly_poison;
+        creators["use instant poison on off hand"] =
+            &RogueAiObjectContextInternal::use_instant_poison_off_hand;
         creators["fan of knives"] = &RogueAiObjectContextInternal::fan_of_knives;
         creators["killing spree"] = &RogueAiObjectContextInternal::killing_spree;
         creators["cold blood"] = &RogueAiObjectContextInternal::cold_blood;
     }
 
 private:
-    static Action* adrenaline_rush(PlayerbotAI* botAI) { return new CastAdrenalineRushAction(botAI); }
+    static Action* adrenaline_rush(PlayerbotAI* botAI)
+    {
+        return new CastAdrenalineRushAction(botAI);
+    }
     static Action* blade_flurry(PlayerbotAI* botAI) { return new CastBladeFlurryAction(botAI); }
     static Action* riposte(PlayerbotAI* botAI) { return new CastRiposteAction(botAI); }
     static Action* mutilate(PlayerbotAI* botAI) { return new CastMutilateAction(botAI); }
-    static Action* sinister_strike(PlayerbotAI* botAI) { return new CastSinisterStrikeAction(botAI); }
+    static Action* sinister_strike(PlayerbotAI* botAI)
+    {
+        return new CastSinisterStrikeAction(botAI);
+    }
     static Action* gouge(PlayerbotAI* botAI) { return new CastGougeAction(botAI); }
     static Action* kidney_shot(PlayerbotAI* botAI) { return new CastKidneyShotAction(botAI); }
     static Action* rupture(PlayerbotAI* botAI) { return new CastRuptureAction(botAI); }
     static Action* slice_and_dice(PlayerbotAI* botAI) { return new CastSliceAndDiceAction(botAI); }
-    static Action* hunger_for_blood(PlayerbotAI* botAI) { return new CastHungerForBloodAction(botAI); }
+    static Action* hunger_for_blood(PlayerbotAI* botAI)
+    {
+        return new CastHungerForBloodAction(botAI);
+    }
     static Action* eviscerate(PlayerbotAI* botAI) { return new CastEviscerateAction(botAI); }
     static Action* vanish(PlayerbotAI* botAI) { return new CastVanishAction(botAI); }
     static Action* evasion(PlayerbotAI* botAI) { return new CastEvasionAction(botAI); }
-    static Action* cloak_of_shadows(PlayerbotAI* botAI) { return new CastCloakOfShadowsAction(botAI); }
+    static Action* cloak_of_shadows(PlayerbotAI* botAI)
+    {
+        return new CastCloakOfShadowsAction(botAI);
+    }
     static Action* kick(PlayerbotAI* botAI) { return new CastKickAction(botAI); }
     static Action* feint(PlayerbotAI* botAI) { return new CastFeintAction(botAI); }
     static Action* backstab(PlayerbotAI* botAI) { return new CastBackstabAction(botAI); }
     static Action* expose_armor(PlayerbotAI* botAI) { return new CastExposeArmorAction(botAI); }
-    static Action* kick_on_enemy_healer(PlayerbotAI* botAI) { return new CastKickOnEnemyHealerAction(botAI); }
+    static Action* kick_on_enemy_healer(PlayerbotAI* botAI)
+    {
+        return new CastKickOnEnemyHealerAction(botAI);
+    }
     static Action* ambush(PlayerbotAI* botAI) { return new CastAmbushAction(botAI); }
     static Action* stealth(PlayerbotAI* botAI) { return new CastStealthAction(botAI); }
     static Action* sprint(PlayerbotAI* botAI) { return new CastSprintAction(botAI); }
@@ -175,17 +210,26 @@ private:
     static Action* check_stealth(PlayerbotAI* botAI) { return new CheckStealthAction(botAI); }
     static Action* sap(PlayerbotAI* botAI) { return new CastSapAction(botAI); }
     static Action* unstealth(PlayerbotAI* botAI) { return new UnstealthAction(botAI); }
-    static Action* envenom(PlayerbotAI* ai) { return new CastEnvenomAction(ai); }
-    static Action* tricks_of_the_trade_on_main_tank(PlayerbotAI* ai)
+    static Action* envenom(PlayerbotAI* botAI) { return new CastEnvenomAction(botAI); }
+    static Action* tricks_of_the_trade_on_main_tank(PlayerbotAI* botAI)
     {
-        return new CastTricksOfTheTradeOnMainTankAction(ai);
+        return new CastTricksOfTheTradeOnMainTankAction(botAI);
     }
-    static Action* use_instant_poison(PlayerbotAI* ai) { return new UseInstantPoisonAction(ai); }
-    static Action* use_deadly_poison(PlayerbotAI* ai) { return new UseDeadlyPoisonAction(ai); }
-    static Action* use_instant_poison_off_hand(PlayerbotAI* ai) { return new UseInstantPoisonOffHandAction(ai); }
-    static Action* fan_of_knives(PlayerbotAI* ai) { return new FanOfKnivesAction(ai); }
-    static Action* killing_spree(PlayerbotAI* ai) { return new CastKillingSpreeAction(ai); }
-    static Action* cold_blood(PlayerbotAI* ai) { return new CastColdBloodAction(ai); }
+    static Action* use_instant_poison(PlayerbotAI* botAI)
+    {
+        return new UseInstantPoisonAction(botAI);
+    }
+    static Action* use_deadly_poison(PlayerbotAI* botAI)
+    {
+        return new UseDeadlyPoisonAction(botAI);
+    }
+    static Action* use_instant_poison_off_hand(PlayerbotAI* botAI)
+    {
+        return new UseInstantPoisonOffHandAction(botAI);
+    }
+    static Action* fan_of_knives(PlayerbotAI* botAI) { return new FanOfKnivesAction(botAI); }
+    static Action* killing_spree(PlayerbotAI* botAI) { return new CastKillingSpreeAction(botAI); }
+    static Action* cold_blood(PlayerbotAI* botAI) { return new CastColdBloodAction(botAI); }
 };
 
 SharedNamedObjectContextList<Strategy> RogueAiObjectContext::sharedStrategyContexts;
@@ -207,26 +251,30 @@ void RogueAiObjectContext::BuildSharedContexts()
     BuildSharedValueContexts(sharedValueContexts);
 }
 
-void RogueAiObjectContext::BuildSharedStrategyContexts(SharedNamedObjectContextList<Strategy>& strategyContexts)
+void RogueAiObjectContext::BuildSharedStrategyContexts(
+    SharedNamedObjectContextList<Strategy>& strategyContexts)
 {
     AiObjectContext::BuildSharedStrategyContexts(strategyContexts);
     strategyContexts.Add(new RogueStrategyFactoryInternal());
     strategyContexts.Add(new RogueCombatStrategyFactoryInternal());
 }
 
-void RogueAiObjectContext::BuildSharedActionContexts(SharedNamedObjectContextList<Action>& actionContexts)
+void RogueAiObjectContext::BuildSharedActionContexts(
+    SharedNamedObjectContextList<Action>& actionContexts)
 {
     AiObjectContext::BuildSharedActionContexts(actionContexts);
     actionContexts.Add(new RogueAiObjectContextInternal());
 }
 
-void RogueAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextList<Trigger>& triggerContexts)
+void RogueAiObjectContext::BuildSharedTriggerContexts(
+    SharedNamedObjectContextList<Trigger>& triggerContexts)
 {
     AiObjectContext::BuildSharedTriggerContexts(triggerContexts);
     triggerContexts.Add(new RogueTriggerFactoryInternal());
 }
 
-void RogueAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
+void RogueAiObjectContext::BuildSharedValueContexts(
+    SharedNamedObjectContextList<UntypedValue>& valueContexts)
 {
     AiObjectContext::BuildSharedValueContexts(valueContexts);
 }

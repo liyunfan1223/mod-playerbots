@@ -17,12 +17,16 @@ class WotlkDungeonGDActionContext : public NamedObjectContext<Action>
         WotlkDungeonGDActionContext() {
             creators["avoid poison nova"] = &WotlkDungeonGDActionContext::avoid_poison_nova;
             creators["attack snake wrap"] = &WotlkDungeonGDActionContext::attack_snake_wrap;
+            creators["slad'ran stack on tank"] = &WotlkDungeonGDActionContext::sladran_stack_on_tank;
+            creators["slad'ran tank hold"] = &WotlkDungeonGDActionContext::sladran_tank_hold;
             creators["avoid whirling slash"] = &WotlkDungeonGDActionContext::avoid_whirling_slash;
         }
     private:
-        static Action* avoid_poison_nova(PlayerbotAI* ai) { return new AvoidPoisonNovaAction(ai); }
-        static Action* attack_snake_wrap(PlayerbotAI* ai) { return new AttackSnakeWrapAction(ai); }
-        static Action* avoid_whirling_slash(PlayerbotAI* ai) { return new AvoidWhirlingSlashAction(ai); }
+        static Action* avoid_poison_nova(PlayerbotAI* botAI) { return new AvoidPoisonNovaAction(botAI); }
+        static Action* attack_snake_wrap(PlayerbotAI* botAI) { return new AttackSnakeWrapAction(botAI); }
+        static Action* sladran_stack_on_tank(PlayerbotAI* botAI) { return new SladranStackOnTankAction(botAI); }
+        static Action* sladran_tank_hold(PlayerbotAI* botAI) { return new SladranTankHoldAction(botAI); }
+        static Action* avoid_whirling_slash(PlayerbotAI* botAI) { return new AvoidWhirlingSlashAction(botAI); }
 };
 
 #endif

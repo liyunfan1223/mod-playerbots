@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
- * and/or modify it under version 3 of the License, or (at your option), any later version.
+ * This file is part of the mod-playerbots module for AzerothCore. See AUTHORS file for Copyright
+ * information; released under GNU GPL v2 license, redistribute/modify under version 2 of the License,
+ * or (at your option) any later version.
  */
 
 #ifndef PLAYERBOTS_PLAYERBOTAI_H
@@ -11,9 +12,11 @@
 #include "ChatHelper.h"
 #include "CreatureData.h"
 #include "Event.h"
+#include "ForceRebuff.h"
 #include "Item.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
+#include "ObjectGuid.h"
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSecurity.h"
@@ -23,14 +26,15 @@
 #include "WorldPacket.h"
 #include <stack>
 
+class Action;
 class AiObjectContext;
 class Creature;
 class Engine;
 class ExternalEventHelper;
 class Group;
+class ReactionEngine;
 class Gameobject;
 class Item;
-class ObjectGuid;
 class Player;
 class PlayerbotMgr;
 class Spell;
@@ -72,6 +76,7 @@ enum BotState
     BOT_STATE_COMBAT = 0,
     BOT_STATE_NON_COMBAT = 1,
     BOT_STATE_DEAD = 2,
+    BOT_STATE_REACTION = 3,
 
     BOT_STATE_MAX
 };
@@ -261,7 +266,8 @@ enum ActivityType
     PACKET_ACTIVITY = 5,
     DETAILED_MOVE_ACTIVITY = 6,
     PARTY_ACTIVITY = 7,
-    ALL_ACTIVITY = 8,
+    REACT_ACTIVITY = 8,
+    ALL_ACTIVITY = 9,
 
     MAX_ACTIVITY_TYPE
 };
@@ -359,30 +365,39 @@ private:
 class ChatCommandHolder
 {
 public:
-    ChatCommandHolder(std::string const command, Player* owner = nullptr, uint32 type = CHAT_MSG_WHISPER,
-                      time_t time = 0)
-        : command(command), owner(owner), type(type), time(time)
+    ChatCommandHolder(std::string const command, ObjectGuid owner, PlayerbotSecurityLevel requiredLevel,
+                      uint32 type = CHAT_MSG_WHISPER, time_t time = 0)
+        : command(command), owner(owner), requiredLevel(requiredLevel), type(type), time(time)
     {
     }
     ChatCommandHolder(ChatCommandHolder const& other)
-        : command(other.command), owner(other.owner), type(other.type), time(other.time)
+        : command(other.command),
+          owner(other.owner),
+          requiredLevel(other.requiredLevel),
+          type(other.type),
+          time(other.time)
     {
     }
 
-    const std::string& GetCommand() { return command; }
-    Player* GetOwner() { return owner; }
+    std::string const& GetCommand() { return command; }
+    ObjectGuid GetOwnerGuid() { return owner; }
+    PlayerbotSecurityLevel GetRequiredLevel() { return requiredLevel; }
     uint32& GetType() { return type; }
     time_t& GetTime() { return time; }
 
 private:
     std::string const command;
-    Player* owner;
+    ObjectGuid owner;
+    PlayerbotSecurityLevel requiredLevel;  // what the sender needed when the command was accepted
     uint32 type;
     time_t time;
 };
 
 class PlayerbotAI : public PlayerbotAIBase
 {
+    // Consumes queued chat commands from FindReaction(); needs HandleCommands().
+    friend class ReactionEngine;
+
 public:
     PlayerbotAI();
     PlayerbotAI(Player* bot);
@@ -390,6 +405,10 @@ public:
 
     void UpdateAI(uint32 elapsed, bool minimal = false) override;
     void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
+    bool UpdateAIReaction(uint32 elapsed, bool minimal, bool canControlSelf);
+    Engine* GetCurrentEngine() const { return currentEngine; }
+    void SetActionDuration(Action const* action);
+    using PlayerbotAIBase::SetActionDuration;
 
     std::string const HandleRemoteCommand(std::string const command);
     void HandleCommand(uint32 type, std::string const text, Player* fromPlayer);
@@ -410,6 +429,7 @@ public:
     std::vector<std::string> GetStrategies(BotState type);
     Strategy* GetStrategy(std::string const name, BotState type);
     void ApplyInstanceStrategies(uint32 mapId, bool tellMaster = false);
+    bool IsInNonRaidDungeon() const;
     bool HasTargetExclusions() const;
     void EvaluateHealerDpsStrategy();
     bool ContainsStrategy(StrategyType type);
@@ -433,9 +453,9 @@ public:
     static bool IsBotMainTank(Player* player);
     static uint32 GetGroupTankNum(Player* player);
     static bool IsAssistTank(Player* player);
-    static bool IsAssistTankOfIndex(Player* player, uint8 index, bool ignoreDeadPlayers = false);
-    static bool IsAssistHealOfIndex(Player* player, uint8 index, bool ignoreDeadPlayers = false);
-    static bool IsAssistRangedDpsOfIndex(Player* player, uint8 index, bool ignoreDeadPlayers = false);
+    static bool IsAssistTankOfIndex(Player* player, uint8 index, bool indexLivingOnly = false);
+    static bool IsAssistHealOfIndex(Player* player, uint8 index, bool indexLivingOnly = false);
+    static bool IsAssistRangedDpsOfIndex(Player* player, uint8 index, bool indexLivingOnly = false);
     bool HasAggro(Unit* unit);
     bool IsMovementImpaired(Unit* unit);
     static int32 GetAssistTankIndex(Player* player);
@@ -454,9 +474,9 @@ public:
     WorldObject* GetWorldObject(ObjectGuid guid);
     std::vector<Player*> GetAllPlayersInGroup();
     std::vector<Player*> GetRealPlayersInGroup();
-    const AreaTableEntry* GetCurrentArea();
-    const AreaTableEntry* GetCurrentZone();
-    static std::string GetLocalizedAreaName(const AreaTableEntry* entry);
+    AreaTableEntry const* GetCurrentArea();
+    AreaTableEntry const* GetCurrentZone();
+    static std::string GetLocalizedAreaName(AreaTableEntry const* entry);
     static std::string GetLocalizedCreatureName(uint32 entry);
     static std::string GetLocalizedGameObjectName(uint32 entry);
     bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
@@ -466,18 +486,17 @@ public:
     bool TellMasterNoFacing(std::string const text,
                             PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellError(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
-    bool SayToGuild(const std::string& msg);
-    bool SayToWorld(const std::string& msg);
-    bool SayToChannel(const std::string& msg, const ChatChannelId& chanId);
-    bool SayToParty(const std::string& msg);
-    bool SayToRaid(const std::string& msg);
-    bool Yell(const std::string& msg);
-    bool Say(const std::string& msg);
-    bool Whisper(const std::string& msg, const std::string& receiverName);
+    bool SayToGuild(std::string const& msg);
+    bool SayToWorld(std::string const& msg);
+    bool SayToChannel(std::string const& msg, ChatChannelId const& chanId);
+    bool SayToParty(std::string const& msg);
+    bool SayToRaid(std::string const& msg);
+    bool Yell(std::string const& msg);
+    bool Say(std::string const& msg);
+    bool Whisper(std::string const& msg, std::string const& receiverName);
 
     void SpellInterrupted(uint32 spellid);
     int32 CalculateGlobalCooldown(uint32 spellid);
-    void InterruptSpell();
     void RequestSpellInterrupt();
     void RemoveAura(std::string const name);
     void RemoveShapeshift();
@@ -498,7 +517,7 @@ public:
     void ImbueItem(Item* item, Unit* target);
     void ImbueItem(Item* item);
     void EnchantItemT(uint32 spellid, uint8 slot);
-    int32 GetNearGroupMemberCount(float dis = sPlayerbotAIConfig.sightDistance);
+    int32 GetNearGroupMemberCount(float dis = sPlayerbotAIConfig.SightDistance);
 
     virtual bool CanCastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
     virtual bool CastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
@@ -511,7 +530,7 @@ public:
     virtual bool HasAuraToDispel(Unit* player, uint32 dispelType);
     bool CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell = true, Item* itemTarget = nullptr,
                       Item* castItem = nullptr);
-    bool CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkHasSpell = true);
+    bool CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkHasSpell = true, Item* castItem = nullptr);
     bool CanCastSpell(uint32 spellid, float x, float y, float z, bool checkHasSpell = true,
                       Item* itemTarget = nullptr);
 
@@ -546,8 +565,8 @@ public:
     uint32 GetFixedBotNumber(uint32 maxNum = 100);
     GrouperType GetGrouperType();
     GuilderType GetGuilderType();
-    bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig.reactDistance);
-    bool HasPlayerNearby(float range = sPlayerbotAIConfig.reactDistance);
+    bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig.ReactDistance);
+    bool HasPlayerNearby(float range = sPlayerbotAIConfig.ReactDistance);
     bool AllowActive(ActivityType activityType);
     bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
     bool IsActivityAllowedCached() const { return allowActive[ALL_ACTIVITY]; }
@@ -558,12 +577,12 @@ public:
     bool IsSafe(WorldObject* obj);
     ChatChannelSource GetChatChannelSource(Player* bot, uint32 type, std::string channelName);
 
-    bool StarterLevelDistanceCheck(Player* player, const WorldLocation &loc, bool fromStartUp = false);
+    bool StarterLevelDistanceCheck(Player* player, WorldLocation const& loc, bool fromStartUp = false);
 
     bool HasCheat(BotCheatMask mask)
     {
         return ((uint32)mask & (uint32)cheatMask) != 0 ||
-               ((uint32)mask & (uint32)sPlayerbotAIConfig.botCheatMask) != 0;
+               ((uint32)mask & (uint32)sPlayerbotAIConfig.BotCheatMask) != 0;
     }
     BotCheatMask GetCheat() { return cheatMask; }
     void SetCheat(BotCheatMask mask) { cheatMask = mask; }
@@ -589,11 +608,11 @@ public:
     std::vector<Item*> GetInventoryItems();
     uint32 GetInventoryItemsCountWithId(uint32 itemId);
     bool HasItemInInventory(uint32 itemId);
-    std::vector<std::pair<const Quest*, uint32>> GetCurrentQuestsRequiringItemId(uint32 itemId);
+    std::vector<std::pair<Quest const*, uint32>> GetCurrentQuestsRequiringItemId(uint32 itemId);
     uint32 GetReactDelay();
 
-    std::vector<const Quest*> GetAllCurrentQuests();
-    std::vector<const Quest*> GetCurrentIncompleteQuests();
+    std::vector<Quest const*> GetAllCurrentQuests();
+    std::vector<Quest const*> GetCurrentIncompleteQuests();
     std::set<uint32> GetAllCurrentQuestIds();
     std::set<uint32> GetCurrentIncompleteQuestIds();
     void PetFollow();
@@ -604,6 +623,7 @@ public:
     NewRpgStatistic rpgStatistic;
     std::unordered_set<uint32> lowPriorityQuest;
     time_t bgReleaseAttemptTime = 0;
+    ForceRebuffState forceRebuff;
 
     // Schedules a callback to run once after <delayMs> milliseconds.
     void AddTimedEvent(std::function<void()> callback, uint32 delayMs);
@@ -615,12 +635,12 @@ private:
     void UpdateAIGroupMaster();
     Item* FindItemInInventory(std::function<bool(ItemTemplate const*)> checkItem) const;
     void HandleCommands();
-    void HandleCommand(uint32 type, const std::string& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
-    inline bool IsValidUnit(const Unit* unit) const
+    void HandleCommand(uint32 type, std::string const& text, Player& fromPlayer, const uint32 lang = LANG_UNIVERSAL);
+    inline bool IsValidUnit(Unit const* unit) const
     {
         return unit && unit->IsInWorld() && !unit->IsDuringRemoveFromWorld();
     }
-    inline bool IsValidPlayer(const Player* player) const
+    inline bool IsValidPlayer(Player const* player) const
     {
         return player && player->GetSession() && player->IsInWorld() && !player->IsDuringRemoveFromWorld() &&
                !player->IsBeingTeleported();
@@ -646,6 +666,7 @@ protected:
     static std::set<std::string> unsecuredCommands;
     bool allowActive[MAX_ACTIVITY_TYPE];
     time_t allowActiveCheckTimer[MAX_ACTIVITY_TYPE];
+    ReactionEngine* reactionEngine = nullptr;
     bool inCombat = false;
     BotCheatMask cheatMask = BotCheatMask::none;
     Position jumpDestination = Position();

@@ -26,7 +26,7 @@ private:
 class TellAuraAction : public Action
 {
 public:
-    TellAuraAction(PlayerbotAI* ai) : Action(ai, "aura") {}
+    TellAuraAction(PlayerbotAI* botAI) : Action(botAI, "aura") {}
 
     virtual bool Execute(Event event);
 };
@@ -34,7 +34,7 @@ public:
 class TellEstimatedDpsAction : public Action
 {
 public:
-    TellEstimatedDpsAction(PlayerbotAI* ai) : Action(ai, "tell estimated dps") {}
+    TellEstimatedDpsAction(PlayerbotAI* botAI) : Action(botAI, "tell estimated dps") {}
 
     virtual bool Execute(Event event);
 };
@@ -42,7 +42,7 @@ public:
 class TellCalculateItemAction : public Action
 {
 public:
-    TellCalculateItemAction(PlayerbotAI* ai) : Action(ai, "calculate item") {}
+    TellCalculateItemAction(PlayerbotAI* botAI) : Action(botAI, "calculate item") {}
 
     virtual bool Execute(Event event);
 };

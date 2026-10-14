@@ -56,7 +56,6 @@
 #include "LootValues.h"
 #include "MaintenanceValues.h"
 #include "ManaSaveLevelValue.h"
-#include "NearestAdsValue.h"
 #include "NearestCorpsesValue.h"
 #include "NearestFriendlyPlayersValue.h"
 #include "NearestGameObjects.h"
@@ -128,7 +127,6 @@ public:
         creators["possible rpg targets"] = &ValueContext::possible_rpg_targets;
         creators["possible new rpg targets"] = &ValueContext::possible_new_rpg_targets;
         creators["possible new rpg game objects"] = &ValueContext::possible_new_rpg_game_objects;
-        creators["nearest adds"] = &ValueContext::nearest_adds;
         creators["nearest corpses"] = &ValueContext::nearest_corpses;
         creators["log level"] = &ValueContext::log_level;
         creators["party member without aura"] = &ValueContext::party_member_without_aura;
@@ -325,8 +323,6 @@ public:
         creators["area debuff"] = &ValueContext::area_debuff;
         creators["nearest trap with damage"] = &ValueContext::nearest_trap_with_damange;
         creators["disperse distance"] = &ValueContext::disperse_distance;
-        creators["last flee angle"] = &ValueContext::last_flee_angle;
-        creators["last flee timestamp"] = &ValueContext::last_flee_timestamp;
         creators["recently flee info"] = &ValueContext::recently_flee_info;
 
         creators["can fish"] = &ValueContext::can_fish;
@@ -415,7 +411,7 @@ private:
     static UntypedValue* nearest_game_objects(PlayerbotAI* botAI) { return new NearestGameObjects(botAI); }
     static UntypedValue* nearest_game_objects_no_los(PlayerbotAI* botAI)
     {
-        return new NearestGameObjects(botAI, sPlayerbotAIConfig.sightDistance, true);
+        return new NearestGameObjects(botAI, sPlayerbotAIConfig.SightDistance, true);
     }
     static UntypedValue* closest_game_objects(PlayerbotAI* botAI)
     {
@@ -441,12 +437,11 @@ private:
     static UntypedValue* possible_triggers(PlayerbotAI* botAI) { return new PossibleTriggersValue(botAI); }
     static UntypedValue* possible_targets_no_los(PlayerbotAI* botAI)
     {
-        return new PossibleTargetsValue(botAI, "possible targets", sPlayerbotAIConfig.sightDistance, true);
+        return new PossibleTargetsValue(botAI, "possible targets", sPlayerbotAIConfig.SightDistance, true);
     }
     static UntypedValue* possible_adds(PlayerbotAI* botAI) { return new PossibleAddsValue(botAI); }
     static UntypedValue* prioritized_targets(PlayerbotAI* botAI) { return new PrioritizedTargetsValue(botAI); }
     static UntypedValue* all_targets(PlayerbotAI* botAI) { return new AllTargetsValue(botAI); }
-    static UntypedValue* nearest_adds(PlayerbotAI* botAI) { return new NearestAddsValue(botAI); }
     static UntypedValue* party_member_without_aura(PlayerbotAI* botAI)
     {
         return new PartyMemberWithoutAuraValue(botAI);
@@ -582,8 +577,6 @@ private:
     static UntypedValue* area_debuff(PlayerbotAI* botAI) { return new AreaDebuffValue(botAI); }
     static UntypedValue* nearest_trap_with_damange(PlayerbotAI* botAI) { return new NearestTrapWithDamageValue(botAI); }
     static UntypedValue* disperse_distance(PlayerbotAI* botAI) { return new DisperseDistanceValue(botAI); }
-    static UntypedValue* last_flee_angle(PlayerbotAI* botAI) { return new LastFleeAngleValue(botAI); }
-    static UntypedValue* last_flee_timestamp(PlayerbotAI* botAI) { return new LastFleeTimestampValue(botAI); }
     static UntypedValue* recently_flee_info(PlayerbotAI* botAI) { return new RecentlyFleeInfo(botAI); }
     static UntypedValue* can_fish(PlayerbotAI* botAI) { return new CanFishValue(botAI); }
     static UntypedValue* can_use_fishing_bobber(PlayerbotAI* botAI) { return new CanUseFishingBobberValue(botAI); }

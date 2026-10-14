@@ -5,355 +5,430 @@
  */
 
 #include "HyjalTriggers.h"
-#include "AiFactory.h"
-#include "HyjalActions.h"
+#include "EncounterHelpers.h"
 #include "HyjalHelpers.h"
 #include "Playerbots.h"
-#include "RaidBossHelpers.h"
 
-using namespace HyjalSummitHelpers;
+using namespace HyjalHelpers;
+using namespace EncounterHelpers;
 
 // General
 
-bool HyjalSummitBotIsNotInCombatTrigger::IsActive()
+bool HyjalNoEncounterInProgressTrigger::IsActive()
 {
-    return bot->GetMapId() == HYJAL_SUMMIT_MAP_ID &&
-           !AI_VALUE2(bool, "combat", "self target");
+    return !IsEncounterInProgress(bot, HYJAL_MAP_ID);
 }
 
-// Rage Winterchill
-
-bool RageWinterchillPullingBossTrigger::IsActive()
+bool HyjalPullingBossTrigger::IsActiveInEncounter()
 {
     if (bot->getClass() != CLASS_HUNTER)
         return false;
 
-    Unit* winterchill = AI_VALUE2(Unit*, "find target", "rage winterchill");
-    return winterchill && winterchill->GetHealthPct() > 95.0f;
+    Unit* boss = AI_VALUE2(Unit*, "find target", _bossName);
+    return boss && boss->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT;
 }
 
-bool RageWinterchillBossEngagedByMainTankTrigger::IsActive()
+bool HyjalBossShouldBeTankedTrigger::IsActiveInEncounter()
 {
-    return botAI->IsMainTank(bot) &&
-           AI_VALUE2(Unit*, "find target", "rage winterchill");
+    if (!PlayerbotAI::IsTank(bot))
+        return false;
+
+    // IsMainTank() does not require an actual tank (by strategy or spec), but the raid strategy
+    // assumes the main tank will be a tank.
+    if (_mainTankOnly && !PlayerbotAI::IsMainTank(bot))
+        return false;
+
+    Unit* boss = AI_VALUE2(Unit*, "find target", _bossName);
+    return boss && boss->GetHealthPct() > _activeAboveHealthPct;
 }
 
-bool RageWinterchillBossCastsDeathAndDecayOnRangedTrigger::IsActive()
+// Rage Winterchill
+
+bool RageWinterchillRangedShouldSpreadTrigger::IsActiveInEncounter()
 {
-    return botAI->IsRanged(bot) &&
-           AI_VALUE2(Unit*, "find target", "rage winterchill");
+    return PlayerbotAI::IsRanged(bot) && AI_VALUE2(Unit*, "find target", "rage winterchill");
 }
 
-bool RageWinterchillMeleeIsStandingInDeathAndDecayTrigger::IsActive()
+bool RageWinterchillMeleeNearDeathAndDecayTrigger::IsActiveInEncounter()
 {
-    if (botAI->IsRanged(bot))
+    if (!PlayerbotAI::IsMelee(bot))
         return false;
 
     Unit* winterchill = AI_VALUE2(Unit*, "find target", "rage winterchill");
     if (!winterchill || winterchill->GetVictim() == bot)
         return false;
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
         return false;
 
-    return IsInDeathAndDecay(bot, DEATH_AND_DECAY_SAFE_RADIUS);
+    return IsNearDeathAndDecay(botAI, DEATH_AND_DECAY_CONTROL_RADIUS);
+}
+
+bool RageWinterchillRangedInDeathAndDecayTrigger::IsActiveInEncounter()
+{
+    if (!PlayerbotAI::IsRanged(bot))
+        return false;
+
+    if (!AI_VALUE2(Unit*, "find target", "rage winterchill"))
+        return false;
+
+    return IsInDeathAndDecay(botAI);
 }
 
 // Anetheron
 
-bool AnetheronPullingBossOrInfernalTrigger::IsActive()
+bool AnetheronPullingBossOrInfernalTrigger::IsActiveInEncounter()
 {
-    return bot->getClass() == CLASS_HUNTER &&
-           AI_VALUE2(Unit*, "find target", "anetheron");
+    return bot->getClass() == CLASS_HUNTER && AI_VALUE2(Unit*, "find target", "anetheron");
 }
 
-bool AnetheronBossEngagedByMainTankTrigger::IsActive()
+bool AnetheronRangedShouldSpreadTrigger::IsActiveInEncounter()
 {
-    return botAI->IsMainTank(bot) && AI_VALUE2(Unit*, "find target", "anetheron");
-}
-
-bool AnetheronBossCastsCarrionSwarmTrigger::IsActive()
-{
-    if (botAI->IsMelee(bot))
+    if (!PlayerbotAI::IsRanged(bot))
         return false;
 
     Unit* anetheron = AI_VALUE2(Unit*, "find target", "anetheron");
     if (!anetheron)
         return false;
 
-    return GetInfernoTarget(anetheron) != bot;
-}
-
-bool AnetheronBotIsTargetedByInfernalTrigger::IsActive()
-{
-    Unit* anetheron = AI_VALUE2(Unit*, "find target", "anetheron");
-    if (!anetheron || botAI->IsMainTank(bot))
+    if (GetInfernoTarget(anetheron) == bot)
         return false;
 
-    return GetInfernoTarget(anetheron) == bot;
+    return !GetInfernalToAttack(botAI, anetheron);
 }
 
-bool AnetheronInfernalsNeedToBeKeptAwayFromRaidTrigger::IsActive()
+bool AnetheronNearInfernoTargetTrigger::IsActiveInEncounter()
 {
-    return botAI->IsAssistTankOfIndex(bot, 0, true) &&
-           AI_VALUE2(Unit*, "find target", "towering infernal");
+    Unit* anetheron = AI_VALUE2(Unit*, "find target", "anetheron");
+    if (!anetheron || anetheron->GetVictim() == bot)
+        return false;
+
+    Player* infernoTarget = GetInfernoTarget(anetheron);
+    if (!infernoTarget || infernoTarget == bot)
+        return false;
+
+    return bot->GetExactDist2d(infernoTarget) < INFERNAL_ESCAPE_DISTANCE;
 }
 
-bool AnetheronInfernalsContinueToSpawnTrigger::IsActive()
+bool AnetheronTargetedByInfernalTrigger::IsActiveInEncounter()
 {
-    return !botAI->IsTank(bot) && AI_VALUE2(Unit*, "find target", "anetheron");
+    Unit* anetheron = AI_VALUE2(Unit*, "find target", "anetheron");
+    if (!anetheron || anetheron->GetVictim() == bot)
+        return false;
+
+    if (GetInfernoTarget(anetheron) == bot)
+        return true;
+
+    if (IsInfernalTank(bot))
+        return false;
+
+    return GetInfernalTargetingBot(botAI);
+}
+
+bool AnetheronInfernalsPulseImmolationTrigger::IsActiveInEncounter()
+{
+    if (PlayerbotAI::IsTank(bot))
+        return false;
+
+    if (!AI_VALUE2(Unit*, "find target", "anetheron"))
+        return false;
+
+    Unit* infernal = GetNearestInfernal(botAI);
+    if (!infernal || infernal->GetVictim() == bot)
+        return false;
+
+    return bot->GetExactDist2d(infernal) < INFERNAL_DANGER_RADIUS;
+}
+
+bool AnetheronInfernalsShouldBeTankedAwayTrigger::IsActiveInEncounter()
+{
+    if (!IsInfernalTank(bot))
+        return false;
+
+    if (!AI_VALUE2(Unit*, "find target", "anetheron"))
+        return false;
+
+    Unit* infernal = GetInfernalTargetingBot(botAI);
+    return infernal && bot->IsWithinMeleeRange(infernal);
+}
+
+bool AnetheronShouldDivideDpsTrigger::IsActiveInEncounter()
+{
+    return PlayerbotAI::IsDps(bot) && AI_VALUE2(Unit*, "find target", "anetheron");
 }
 
 // Kaz'rogal
 
-bool KazrogalPullingBossTrigger::IsActive()
+bool KazrogalCanSplitMalevolentCleaveDamageTrigger::IsActiveInEncounter()
+{
+    if (!PlayerbotAI::IsAssistTank(bot))
+        return false;
+
+    if (!AI_VALUE2(Unit*, "find target", "kaz'rogal"))
+        return false;
+
+    if (bot->getClass() != CLASS_PALADIN)
+        return true;
+
+    return !AI_VALUE(bool, "kaz'rogal below mana threshold");
+}
+
+bool KazrogalRangedShouldAvoidWarStompTrigger::IsActiveInEncounter()
+{
+    if (!PlayerbotAI::IsRanged(bot))
+        return false;
+
+    if (!AI_VALUE2(Unit*, "find target", "kaz'rogal"))
+        return false;
+
+    return !AI_VALUE(bool, "kaz'rogal below mana threshold");
+}
+
+bool KazrogalLowOnManaTrigger::IsActiveInEncounter()
+{
+    if (!IsKazrogalManaUser(botAI))
+        return false;
+
+    // Hunters and Warlocks never run away. They rely only on Aspect of the Viper and Life Tap/
+    // Shadow Ward, respectively.
+    if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_WARLOCK)
+        return false;
+
+    Unit* kazrogal = AI_VALUE2(Unit*, "find target", "kaz'rogal");
+    if (!kazrogal || kazrogal->GetVictim() == bot)
+        return false;
+
+    if (bot->GetPower(POWER_MANA) <= MARK_DANGER_MANA)
+    {
+        SET_AI_VALUE(bool, "kaz'rogal below mana threshold", true);
+        return true;
+    }
+
+    return AI_VALUE(bool, "kaz'rogal below mana threshold");
+}
+
+bool KazrogalHunterShouldPreserveManaTrigger::IsActiveInEncounter()
 {
     if (bot->getClass() != CLASS_HUNTER)
         return false;
 
+    if (!AI_VALUE2(Unit*, "find target", "kaz'rogal"))
+        return false;
+
+    if (bot->HasAura(Id(HyjalSpells::SPELL_ASPECT_OF_THE_VIPER)))
+        return false;
+
+    // Eligible to switch back at MARK_REJOIN_MANA, per the multiplier.
+    return bot->GetPower(POWER_MANA) <= MARK_DANGER_MANA;
+}
+
+bool KazrogalMarkOnMageOrPaladinTrigger::IsActiveInEncounter()
+{
+    if (bot->getClass() != CLASS_MAGE && bot->getClass() != CLASS_PALADIN)
+        return false;
+
     Unit* kazrogal = AI_VALUE2(Unit*, "find target", "kaz'rogal");
-    return kazrogal && kazrogal->GetHealthPct() > 95.0f;
+    if (!kazrogal || kazrogal->GetVictim() == bot)
+        return false;
+
+    Aura* mark = bot->GetAura(Id(HyjalSpells::SPELL_MARK_OF_KAZROGAL));
+    if (!mark)
+        return false;
+
+    uint32 const mana = bot->GetPower(POWER_MANA);
+    if (mana >= MARK_FULL_DRAIN)
+        return false;
+
+    // Blowing Ice Block/Divine Shield is worth it only where the Mark outlasts mana.
+    //   2400-2999  needs 5s left      1200-1799  needs 3s left      0-599  needs 1s left
+    //   1800-2399  needs 4s left       600-1199  needs 2s left
+    int32 const requiredMs = static_cast<int32>((mana / MARK_TICK_DRAIN + 1) * IN_MILLISECONDS);
+    return mark->GetDuration() >= requiredMs;
 }
 
-bool KazrogalBossEngagedByMainTankTrigger::IsActive()
+bool KazrogalWarlockShouldManageManaTrigger::IsActiveInEncounter()
 {
-    return botAI->IsMainTank(bot) && AI_VALUE2(Unit*, "find target", "kaz'rogal");
-}
-
-bool KazrogalBossEngagedByAssistTanksTrigger::IsActive()
-{
-    if (!botAI->IsAssistTank(bot))
+    if (bot->getClass() != CLASS_WARLOCK)
         return false;
 
     if (!AI_VALUE2(Unit*, "find target", "kaz'rogal"))
         return false;
 
-    return bot->GetPower(POWER_MANA) > 3000;
-}
-
-bool KazrogalLowManaBotsNeedEscapePathTrigger::IsActive()
-{
-    if (bot->getClass() == CLASS_WARRIOR || bot->getClass() == CLASS_ROGUE ||
-        bot->getClass() == CLASS_DEATH_KNIGHT)
-        return false;
-
-    uint8 tab = AiFactory::GetPlayerSpecTab(bot);
-    if (bot->getClass() == CLASS_DRUID && tab == DRUID_TAB_FERAL)
-        return false;
-
-    if (!AI_VALUE2(Unit*, "find target", "kaz'rogal"))
-        return false;
-
-    if (bot->getClass() == CLASS_HUNTER)
-    {
-        return true;
-    }
-    else if (bot->GetPower(POWER_MANA) > 4000)
-    {
-        isBelowManaThreshold.erase(bot->GetGUID());
-        if (botAI->IsMelee(bot))
-            return false;
-        else
-            return true;
-    }
-
-    return false;
-}
-
-bool KazrogalBotIsLowOnManaTrigger::IsActive()
-{
-    if (bot->getClass() == CLASS_WARRIOR || bot->getClass() == CLASS_ROGUE ||
-        bot->getClass() == CLASS_DEATH_KNIGHT)
-        return false;
-
-    uint8 tab = AiFactory::GetPlayerSpecTab(bot);
-    if (bot->getClass() == CLASS_DRUID && tab == DRUID_TAB_FERAL)
-        return false;
-
-    if (!AI_VALUE2(Unit*, "find target", "kaz'rogal"))
-        return false;
-
-    if (botAI->HasAnyAuraOf(bot, "ice block", "divine shield", nullptr))
-        return false;
-
-    if (isBelowManaThreshold.count(bot->GetGUID()) ||
-        bot->GetPower(POWER_MANA) <= 3200)
+    if (bot->GetPower(POWER_MANA) <= MARK_LIFE_TAP_MANA)
         return true;
 
-    return false;
+    if (!HasMarkOfKazrogal(bot) || botAI->HasAura("shadow ward", bot))
+        return false;
+
+    return bot->GetPower(POWER_MANA) <= MARK_TICK_DRAIN;
 }
 
-bool KazrogalMarkDealsShadowDamageTrigger::IsActive()
+bool KazrogalImmunityNoLongerNeededTrigger::IsActiveInEncounter()
 {
-    if (bot->getClass() != CLASS_PALADIN && bot->getClass() != CLASS_WARLOCK)
+    if (bot->getClass() != CLASS_MAGE &&
+        (bot->getClass() != CLASS_PALADIN || PlayerbotAI::IsHeal(bot)))
+    {
+        return false;
+    }
+
+    uint32 const spellId = GetSelfImmunitySpell(bot);
+    if (!spellId || !bot->HasAura(spellId))
         return false;
 
-    if (!AI_VALUE2(Unit*, "find target", "kaz'rogal"))
+    if (HasMarkOfKazrogal(bot))
         return false;
 
-    if (bot->getClass() == CLASS_PALADIN &&
-        (botAI->HasAura("shadow resistance aura", bot) ||
-         botAI->HasAura("prayer of shadow protection", bot) ||
-         botAI->HasAura("shadow protection", bot)))
+    // 50% is a proxy for the bot potentially being in range of getting blown up by other bots,
+    // so don't wipe the immunity if below that HP.
+    constexpr float keepImmunityHealthPct = 50.0f;
+    if (bot->GetHealthPct() <= keepImmunityHealthPct)
         return false;
 
-    return bot->HasAura(
-        static_cast<uint32>(HyjalSummitSpells::SPELL_MARK_OF_KAZROGAL));
+    return AI_VALUE2(Unit*, "find target", "kaz'rogal");
 }
 
 // Azgalor
 
-bool AzgalorPullingBossTrigger::IsActive()
+bool AzgalorRangedShouldSpreadTrigger::IsActiveInEncounter()
 {
-    if (bot->getClass() != CLASS_HUNTER)
-        return false;
-
-    Unit* azgalor = AI_VALUE2(Unit*, "find target", "azgalor");
-    return azgalor && azgalor->GetHealthPct() > 95.0f;
-}
-
-bool AzgalorBossEngagedByMainTankTrigger::IsActive()
-{
-    return botAI->IsMainTank(bot) && AI_VALUE2(Unit*, "find target", "azgalor");
-}
-
-bool AzgalorMainTankIsPositioningBossTrigger::IsActive()
-{
-    if (botAI->IsRanged(bot))
+    if (!PlayerbotAI::IsRanged(bot))
         return false;
 
     Unit* azgalor = AI_VALUE2(Unit*, "find target", "azgalor");
     if (!azgalor || azgalor->GetVictim() == bot)
         return false;
 
-    Player* mainTank = GetGroupMainTank(botAI, bot);
-    if (!mainTank || !GET_PLAYERBOT_AI(mainTank) || botAI->IsMainTank(bot))
+    if (IsDoomed(bot))
         return false;
 
-    TankPositionState tankState = GetAzgalorTankPositionState(botAI, bot);
-    return tankState == TankPositionState::Unknown ||
-           tankState == TankPositionState::MovingToTransition;
+    return !IsNearRainOfFire(botAI, RAIN_OF_FIRE_CONTROL_RADIUS);
 }
 
-bool AzgalorBossEngagedByRangedTrigger::IsActive()
+bool AzgalorMeleeNearRainOfFireTrigger::IsActiveInEncounter()
 {
-    if (botAI->IsMelee(bot))
+    if (!PlayerbotAI::IsMelee(bot))
         return false;
 
     Unit* azgalor = AI_VALUE2(Unit*, "find target", "azgalor");
-    return azgalor && azgalor->GetVictim() != bot &&
-           !bot->HasAura(static_cast<uint32>(HyjalSummitSpells::SPELL_DOOM));
-}
-
-bool AzgalorBossCastsRainOfFireOnMeleeTrigger::IsActive()
-{
-    if (botAI->IsRanged(bot) || botAI->IsTank(bot))
+    if (!azgalor || azgalor->GetVictim() == bot)
         return false;
 
-    Unit* azgalor = AI_VALUE2(Unit*, "find target", "azgalor");
-    if (!azgalor || azgalor->GetVictim() == bot ||
-        bot->HasAura(static_cast<uint32>(HyjalSummitSpells::SPELL_DOOM)))
+    if (IsDoomed(bot))
         return false;
 
-    return IsInRainOfFire(bot, RAIN_OF_FIRE_RADIUS);
-}
-
-bool AzgalorBotIsDoomedTrigger::IsActive()
-{
-    return bot->HasAura(static_cast<uint32>(HyjalSummitSpells::SPELL_DOOM));
-}
-
-bool AzgalorDoomguardsMustBeControlledTrigger::IsActive()
-{
-    if (!botAI->IsAssistTank(bot) ||
-        !AI_VALUE2(Unit*, "find target", "azgalor"))
+    // The Doomguard tank is excluded due to needing to hold at the Doomguard tanking position.
+    // This isn't ideal, but special avoidance of a not-that-dangerous ability for one role that
+    // needs specific positioning is not worth the time and effort.
+    if (IsDoomguardTank(bot))
         return false;
 
-    if (botAI->IsAssistTankOfIndex(bot, 0, true))
-    {
-        return AI_VALUE2(Unit*, "find target", "lesser doomguard") ||
-               AnyGroupMemberHasDoom(bot);
-    }
-
-    if (botAI->IsAssistTankOfIndex(bot, 1, true))
-    {
-        // Trigger for second assist tank only if first assist tank has Doom
-        Player* firstAssistTank = GetGroupAssistTank(botAI, bot, 0);
-        if (firstAssistTank &&
-            !firstAssistTank->HasAura(static_cast<uint32>(HyjalSummitSpells::SPELL_DOOM)))
-            return false;
-
-        return AI_VALUE2(Unit*, "find target", "lesser doomguard") ||
-               AnyGroupMemberHasDoom(bot);
-    }
-
-    return false;
+    return IsNearRainOfFire(botAI, RAIN_OF_FIRE_CONTROL_RADIUS);
 }
 
-bool AzgalorDoomguardsMustDieTrigger::IsActive()
+bool AzgalorRangedInRainOfFireTrigger::IsActiveInEncounter()
 {
-    return botAI->IsRangedDps(bot) && AI_VALUE2(Unit*, "find target", "azgalor");
+    if (!PlayerbotAI::IsRanged(bot))
+        return false;
+
+    if (!AI_VALUE2(Unit*, "find target", "azgalor"))
+        return false;
+
+    if (IsDoomed(bot))
+        return false;
+
+    return IsInRainOfFire(botAI);
+}
+
+bool AzgalorBotIsDoomedTrigger::IsActiveInEncounter()
+{
+    return IsDoomed(bot);
+}
+
+bool AzgalorShouldControlDoomguardsTrigger::IsActiveInEncounter()
+{
+    if (!IsDoomguardTank(bot))
+        return false;
+
+    if (!AI_VALUE2(Unit*, "find target", "azgalor"))
+        return false;
+
+    if (AI_VALUE2(Unit*, "find target", "lesser doomguard"))
+        return true;
+
+    return AnyGroupMemberHasDoom(bot);
+}
+
+bool AzgalorShouldDivideDpsTrigger::IsActiveInEncounter()
+{
+    return PlayerbotAI::IsDps(bot) && AI_VALUE2(Unit*, "find target", "azgalor");
 }
 
 // Archimonde
 
-bool ArchimondePullingBossTrigger::IsActive()
+bool ArchimondeShamanShouldProtectAgainstFearTrigger::IsActiveInEncounter()
 {
-    if (bot->getClass() != CLASS_HUNTER)
+    if (bot->getClass() != CLASS_SHAMAN)
         return false;
 
     Unit* archimonde = AI_VALUE2(Unit*, "find target", "archimonde");
-    return archimonde && archimonde->GetHealthPct() > 95.0f;
-}
-
-bool ArchimondeBossEngagedByMainTankTrigger::IsActive()
-{
-    if (!botAI->IsMainTank(bot))
+    if (!archimonde || archimonde->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT)
         return false;
 
-    Unit* archimonde = AI_VALUE2(Unit*, "find target", "archimonde");
-    return archimonde && archimonde->GetHealthPct() > 95.0f;
+    return !HasProtectionOfElune(bot);
 }
 
-bool ArchimondeBossCastsFearTrigger::IsActive()
-{
-    if (bot->getClass() != CLASS_PRIEST &&
-        bot->getClass() != CLASS_SHAMAN)
-        return false;
-
-    Unit* archimonde = AI_VALUE2(Unit*, "find target", "archimonde");
-    return archimonde && archimonde->GetHealthPct() > 10.0f;
-}
-
-bool ArchimondeBossCastsAirBurstTrigger::IsActive()
+bool ArchimondeCastingAirBurstTrigger::IsActiveInEncounter()
 {
     Unit* archimonde = AI_VALUE2(Unit*, "find target", "archimonde");
-    if (!archimonde || archimonde->GetHealthPct() <= 10.0f ||
-        archimonde->GetVictim() == bot)
+    if (!archimonde || archimonde->GetVictim() == bot)
         return false;
 
-    return !botAI->IsMainTank(bot);
+    if (HasProtectionOfElune(bot))
+        return false;
+
+    AirBurstData airBurst;
+    return GetPendingAirBurstCast(bot->GetInstanceId(), airBurst);
 }
 
-bool ArchimondeBossSummonedDoomfireTrigger::IsActive()
+bool ArchimondeRangedShouldSpreadTrigger::IsActiveInEncounter()
 {
-    Unit* archimonde = AI_VALUE2(Unit*, "find target", "archimonde");
-    if (!archimonde || archimonde->GetHealthPct() <= 10.0f)
+    if (!PlayerbotAI::IsRanged(bot))
         return false;
 
-    // If I don't make an exception, bots actually refuse to enter the
-    // Doomfire even when feared
-    return !bot->HasAura(
-        static_cast<uint32>(HyjalSummitSpells::SPELL_ARCHIMONDE_FEAR));
+    if (!AI_VALUE2(Unit*, "find target", "archimonde"))
+        return false;
+
+    return !HasProtectionOfElune(bot);
 }
 
-bool ArchimondeBotStoodInDoomfireTrigger::IsActive()
+bool ArchimondeNearDoomfireTrigger::IsActiveInEncounter()
+{
+    if (!AI_VALUE2(Unit*, "find target", "archimonde"))
+        return false;
+
+    if (HasProtectionOfElune(bot))
+        return false;
+
+    return IsNearDoomfire(botAI, DOOMFIRE_CONTROL_RADIUS);
+}
+
+bool ArchimondeStoodInDoomfireTrigger::IsActiveInEncounter()
 {
     if (bot->getClass() != CLASS_MAGE && bot->getClass() != CLASS_ROGUE &&
         bot->getClass() != CLASS_PALADIN)
+    {
+        return false;
+    }
+
+    if (HasProtectionOfElune(bot))
         return false;
 
-    return bot->GetHealthPct() < 40.0f &&
-           (bot->HasAura(static_cast<uint32>(HyjalSummitSpells::SPELL_DOOMFIRE)) ||
-            bot->HasAura(static_cast<uint32>(HyjalSummitSpells::SPELL_DOOMFIRE_DOT)));
+    if (!bot->HasAura(Id(HyjalSpells::SPELL_DOOMFIRE)) &&
+        !bot->HasAura(Id(HyjalSpells::SPELL_DOOMFIRE_DOT)))
+    {
+        return false;
+    }
+
+    constexpr float dangerHealthPct = 40.0f;
+    return bot->GetHealthPct() < dangerHealthPct;
 }

@@ -9,7 +9,7 @@
 #include "Playerbots.h"
 #include "Vehicle.h"
 
-SpellIdValue::SpellIdValue(PlayerbotAI* botAI) : CalculatedValue<uint32>(botAI, "spell id", 20 * 1000) {}
+SpellIdValue::SpellIdValue(PlayerbotAI* botAI) : CalculatedValue<uint32>(botAI, "spell id", 20 * IN_MILLISECONDS) {}
 
 VehicleSpellIdValue::VehicleSpellIdValue(PlayerbotAI* botAI) : CalculatedValue<uint32>(botAI, "vehicle spell id") {}
 
@@ -107,7 +107,7 @@ uint32 SpellIdValue::Calculate()
         for (auto it = spellIds.rbegin(); it != spellIds.rend(); ++it)
         {
             auto spellId = *it;
-            const SpellInfo* pSpellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* pSpellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!pSpellInfo)
                 continue;
 

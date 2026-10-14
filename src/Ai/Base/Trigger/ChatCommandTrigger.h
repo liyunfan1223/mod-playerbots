@@ -18,6 +18,7 @@ class ChatCommandTrigger : public Trigger
 public:
     ChatCommandTrigger(PlayerbotAI* botAI, std::string const command);
 
+    using Trigger::ExternalEvent;  // keep the WorldPacket& overload visible
     void ExternalEvent(std::string const param, Player* owner = nullptr) override;
     Event Check() override;
     void Reset() override;

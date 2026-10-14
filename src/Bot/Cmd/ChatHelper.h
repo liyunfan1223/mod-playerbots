@@ -40,7 +40,7 @@ public:
     static ItemIds parseItems(std::string const text);
     static ItemWithRandomProperty parseItemWithRandomProperty(std::string const text);
     uint32 parseSpell(std::string const text);
-    static std::string parseValue(const std::string& type, const std::string& text);
+    static std::string parseValue(std::string const& type, std::string const& text);
 
     static std::string const FormatQuest(Quest const* quest);
     static std::string const FormatItem(ItemTemplate const* proto, uint32 count = 0, uint32 total = 0);
@@ -71,8 +71,8 @@ public:
 
     void eraseAllSubStr(std::string& mainStr, std::string const toErase);
 
-    static std::set<uint32> ExtractAllQuestIds(const std::string& text);
-    static std::set<uint32> ExtractAllItemIds(const std::string& text);
+    static std::set<uint32> ExtractAllQuestIds(std::string const& text);
+    static std::set<uint32> ExtractAllItemIds(std::string const& text);
 
 private:
     static std::map<std::string, uint32> consumableSubClasses;

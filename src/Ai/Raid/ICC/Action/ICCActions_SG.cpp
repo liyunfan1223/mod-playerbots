@@ -4,7 +4,6 @@
  * or (at your option) any later version.
  */
 
-#include "GenericActions.h"
 #include "GenericSpellActions.h"
 #include "ICCActions.h"
 #include "ICCTriggers.h"
@@ -80,7 +79,7 @@ bool IccSindragosaGroupPositionAction::Execute(Event /*event*/)
     // Both tanks hold the tank position for the whole ground fight so aggro
     // flips between them cannot turn or move the boss. Air phase never gets
     // here: the trigger is inactive while the boss is at the flying position.
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return HandleTankPositioning(boss);
 
     // Everyone else: boss is not targeting this bot
@@ -106,7 +105,7 @@ bool IccSindragosaGroupPositionAction::HandleTankPositioning(Unit* boss)
     else if (orientationDiff < -float(M_PI))
         orientationDiff += 2.0f * float(M_PI);
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         // Taunt the boss back whenever anyone else has her
         Unit* const victim = boss->GetVictim();
@@ -230,7 +229,7 @@ bool IccSindragosaGroupPositionAction::HandleNonTankPositioning()
     {
         for (Player* member : raidMembers)
         {
-            if (botAI->IsTank(member) && member->HasAura(SPELL_ICE_TOMB))
+            if (PlayerbotAI::IsTank(member) && member->HasAura(SPELL_ICE_TOMB))
             {
                 entombedTank = member;
                 break;
@@ -317,7 +316,7 @@ bool IccSindragosaGroupPositionAction::HandleNonTankPositioning()
             // Each DPS keeps its air phase group mark while that tomb lives,
             // then falls to the first live mark (skull first).
             std::string rtiValue = "skull";
-            if (!botAI->IsHeal(bot))
+            if (!PlayerbotAI::IsHeal(bot))
             {
                 auto const& assignments = IcecrownHelpers::IccState(bot->GetInstanceId()).sgGroupAssignments;
                 auto const it = assignments.find(bot->GetGUID());
@@ -343,7 +342,7 @@ bool IccSindragosaGroupPositionAction::HandleNonTankPositioning()
         }
     }
 
-    if (botAI->IsRanged(bot))
+    if (PlayerbotAI::IsRanged(bot))
     {
         static constexpr float RANGED_TOLERANCE = 9.0f;
         static constexpr float RANGED_MAX_STEP = 5.0f;
@@ -425,7 +424,7 @@ bool IccSindragosaFrostBeaconAction::TryDropTombFlares(Unit const* boss)
         PlayerbotAI* memberAI = sPlayerbotsMgr.GetPlayerbotAI(member);
         if (!memberAI)
             continue;  // real player
-        if (memberAI->IsTank(member))
+        if (PlayerbotAI::IsTank(member))
             continue;
         fallback.push_back(member);
         if (!member->HasAura(SPELL_FROST_BEACON))
@@ -552,7 +551,7 @@ bool IccSindragosaFrostBeaconAction::HandleSupportActions()
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
-            if (!member || !member->IsAlive() || !botAI->IsTank(member))
+            if (!member || !member->IsAlive() || !PlayerbotAI::IsTank(member))
             {
                 continue;
             }
@@ -570,7 +569,7 @@ bool IccSindragosaFrostBeaconAction::HandleSupportActions()
 
 bool IccSindragosaHotAction::Execute(Event /*event*/)
 {
-    if (!botAI->IsHeal(bot) || bot->HasAura(SPELL_FROST_BEACON))
+    if (!PlayerbotAI::IsHeal(bot) || bot->HasAura(SPELL_FROST_BEACON))
         return false;
 
     auto const members = AI_VALUE(GuidVector, "group members");
@@ -606,7 +605,7 @@ bool IccSindragosaHotAction::Execute(Event /*event*/)
     return false;
 }
 
-bool IccSindragosaFrostBeaconAction::HandleBeaconedPlayer(const Unit* boss)
+bool IccSindragosaFrostBeaconAction::HandleBeaconedPlayer(Unit const* boss)
 {
     // Phase 3 positioning (below 35% health, not flying)
     if (boss->HealthBelowPct(35) && !IsBossFlying(boss))
@@ -634,7 +633,7 @@ bool IccSindragosaFrostBeaconAction::HandleBeaconedPlayer(const Unit* boss)
     }
 
     std::sort(beaconedPlayers.begin(), beaconedPlayers.end(),
-              [](const Player* a, const Player* b) { return a->GetGUID() < b->GetGUID(); });
+              [](Player const* a, Player const* b) { return a->GetGUID() < b->GetGUID(); });
 
     // Find this bot's index
     auto const it = std::find(beaconedPlayers.begin(), beaconedPlayers.end(), bot);
@@ -663,14 +662,14 @@ bool IccSindragosaFrostBeaconAction::HandleBeaconedPlayer(const Unit* boss)
     }
 
     // Get tomb position and move if needed
-    static constexpr std::array<const Position*, 3> tombPositions = {
+    static constexpr std::array<Position const*, 3> tombPositions = {
         &ICC_SINDRAGOSA_THOMB1_POSITION, &ICC_SINDRAGOSA_THOMB2_POSITION, &ICC_SINDRAGOSA_THOMB3_POSITION};
 
-    const Position& tombPosition = *tombPositions[std::min(spot, tombPositions.size() - 1)];
+    Position const& tombPosition = *tombPositions[std::min(spot, tombPositions.size() - 1)];
     return MoveToPositionIfNeeded(tombPosition, TOMB_POSITION_TOLERANCE);
 }
 
-bool IccSindragosaFrostBeaconAction::HandleNonBeaconedPlayer(const Unit* boss)
+bool IccSindragosaFrostBeaconAction::HandleNonBeaconedPlayer(Unit const* boss)
 {
     // Collect beaconed players
     std::vector<Unit*> beaconedPlayers;
@@ -699,7 +698,7 @@ bool IccSindragosaFrostBeaconAction::HandleNonBeaconedPlayer(const Unit* boss)
             if (diff && (diff == RAID_DIFFICULTY_25MAN_NORMAL || diff == RAID_DIFFICULTY_25MAN_HEROIC))
                 is25Man = true;
 
-            const Position& safePosition = is25Man ? ICC_SINDRAGOSA_FBOMB_POSITION : ICC_SINDRAGOSA_FBOMB10_POSITION;
+            Position const& safePosition = is25Man ? ICC_SINDRAGOSA_FBOMB_POSITION : ICC_SINDRAGOSA_FBOMB10_POSITION;
 
             float const dist = bot->GetExactDist2d(safePosition.GetPositionX(), safePosition.GetPositionY());
             if (dist > MOVE_TOLERANCE)
@@ -708,15 +707,15 @@ bool IccSindragosaFrostBeaconAction::HandleNonBeaconedPlayer(const Unit* boss)
             }
 
         }
-        return botAI->IsHeal(bot);  // Continue for healers, wait for others
+        return PlayerbotAI::IsHeal(bot);  // Continue for healers, wait for others
     }
 
     // Ground phase: tanks hold the tank position, never the stack.
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     // Ground phase - position based on role and avoid beaconed players
-    bool const isRanged = botAI->IsRanged(bot) && !botAI->IsHeal(bot) /*(bot->GetExactDist2d(ICC_SINDRAGOSA_RANGED_POSITION.GetPositionX(),ICC_SINDRAGOSA_RANGED_POSITION.GetPositionY()) <
+    bool const isRanged = PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsHeal(bot) /*(bot->GetExactDist2d(ICC_SINDRAGOSA_RANGED_POSITION.GetPositionX(),ICC_SINDRAGOSA_RANGED_POSITION.GetPositionY()) <
                           bot->GetExactDist2d(ICC_SINDRAGOSA_MELEE_POSITION.GetPositionX(),ICC_SINDRAGOSA_MELEE_POSITION.GetPositionY()))*/;
 
     // Melee and healers stand 15y from the boss (out of tail range) instead of
@@ -739,7 +738,7 @@ bool IccSindragosaFrostBeaconAction::HandleNonBeaconedPlayer(const Unit* boss)
     return false;
 }
 
-bool IccSindragosaFrostBeaconAction::MoveToPositionIfNeeded(const Position& position, float tolerance)
+bool IccSindragosaFrostBeaconAction::MoveToPositionIfNeeded(Position const& position, float tolerance)
 {
     float const distance = bot->GetExactDist2d(position.GetPositionX(), position.GetPositionY());
     if (distance > tolerance)
@@ -749,7 +748,7 @@ bool IccSindragosaFrostBeaconAction::MoveToPositionIfNeeded(const Position& posi
     return distance <= tolerance;
 }
 
-bool IccSindragosaFrostBeaconAction::MoveToPosition(const Position& position)
+bool IccSindragosaFrostBeaconAction::MoveToPosition(Position const& position)
 {
     float posX = position.GetPositionX();
     float posY = position.GetPositionY();
@@ -761,7 +760,7 @@ bool IccSindragosaFrostBeaconAction::MoveToPosition(const Position& position)
                   true, false);
 }
 
-bool IccSindragosaFrostBeaconAction::IsBossFlying(const Unit* boss)
+bool IccSindragosaFrostBeaconAction::IsBossFlying(Unit const* boss)
 {
     return boss->GetExactDist2d(ICC_SINDRAGOSA_FLYING_POSITION.GetPositionX(),
                                 ICC_SINDRAGOSA_FLYING_POSITION.GetPositionY()) < 30.0f;
@@ -774,7 +773,7 @@ bool IccSindragosaBlisteringColdAction::Execute(Event /*event*/)
         return false;
 
     // Only non-tanks should move out
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
         return false;
 
    float dist = bot->GetExactDist2d(boss->GetPositionX(), boss->GetPositionY());
@@ -908,10 +907,10 @@ bool IccSindragosaMysticBuffetAction::Execute(Event /*event*/)
         // would catch them. Only move to LOS2 once the tomb has actually
         // formed (the branches below). During a beacon FrostBeaconAction
         // owns positioning, so leave that to it.
-        if (!botAI->IsHeal(bot) && !IccAnyGroupMemberHasAura(bot, SPELL_FROST_BEACON))
+        if (!PlayerbotAI::IsHeal(bot) && !IccAnyGroupMemberHasAura(bot, SPELL_FROST_BEACON))
         {
             Position const spread =
-                botAI->IsRanged(bot) ? ICC_SINDRAGOSA_RANGED_POSITION : SgSafeMeleeSpot(boss);
+                PlayerbotAI::IsRanged(bot) ? ICC_SINDRAGOSA_RANGED_POSITION : SgSafeMeleeSpot(boss);
             if (bot->GetExactDist2d(spread) > 3.0f)
                 return MoveTo(bot->GetMapId(), spread.GetPositionX(), spread.GetPositionY(), spread.GetPositionZ(),
                               false, false, false, true, MovementPriority::MOVEMENT_COMBAT);
@@ -926,7 +925,7 @@ bool IccSindragosaMysticBuffetAction::Execute(Event /*event*/)
     // No LOS2 move here — it would fight the beacon repositioning.
     if (IccAnyGroupMemberHasAura(bot, SPELL_FROST_BEACON))
     {
-        if (!botAI->IsHeal(bot))
+        if (!PlayerbotAI::IsHeal(bot))
         {
             if (SgMajorityLostMysticBuffet(bot, botAI))
             {
@@ -956,7 +955,7 @@ bool IccSindragosaMysticBuffetAction::Execute(Event /*event*/)
 
     // In place: healers are free to heal, only their movement is blocked
     // by the multiplier.
-    if (botAI->IsHeal(bot))
+    if (PlayerbotAI::IsHeal(bot))
         return false;
 
     // Waiting for the raid to shed Mystic Buffet. Bots are already parked at
@@ -1102,7 +1101,7 @@ bool IccSindragosaFrostBombAction::Execute(Event /*event*/)
                     continue;
                 pet->SetReactState(REACT_PASSIVE);
                 pet->AttackStop();
-                pet->InterruptNonMeleeSpells(true);
+                pet->CastStop();
                 pet->CombatStop();
                 pet->SetTarget(ObjectGuid::Empty);
                 if (CharmInfo* ci = pet->GetCharmInfo())
@@ -1248,7 +1247,7 @@ bool IccSindragosaFrostBombAction::Execute(Event /*event*/)
     if (myZoneAllProtected)
     {
         bot->AttackStop();
-        bot->InterruptNonMeleeSpells(true);
+        bot->CastStop();
         bot->SetTarget(ObjectGuid::Empty);
         bot->SetFacingTo(losTomb->GetAngle(bot));
     }

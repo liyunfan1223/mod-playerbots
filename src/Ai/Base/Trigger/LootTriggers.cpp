@@ -30,10 +30,6 @@ bool LootAvailableTrigger::IsActive()
     if (distanceCheck || AI_VALUE(GuidVector, "all targets").empty())
         return true;
 
-    // A target that became not loot-possible after being selected - the bot
-    // was pulled into combat while approaching it, or it despawned - never
-    // returns to range, so without this it stays selected forever and the
-    // loot action never gets to pick another. Report active so it can.
     LootObject lootTarget = AI_VALUE(LootObject, "loot target");
     return !lootTarget.IsEmpty() && !lootTarget.IsLootPossible(bot);
 }

@@ -15,7 +15,9 @@ bool WipeAction::Execute(Event event)
     if (owner != nullptr && master != nullptr && master->GetGUID() != owner->GetGUID())
         return false;
 
-    bot->Kill(bot, bot);
+    if (!bot->IsAlive())
+        return false;
 
+    bot->Kill(bot, bot);
     return true;
 }

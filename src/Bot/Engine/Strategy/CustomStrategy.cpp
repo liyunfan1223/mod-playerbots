@@ -5,6 +5,7 @@
  */
 
 #include "CustomStrategy.h"
+#include "PlayerbotsDatabase.h"
 #include "Playerbots.h"
 #include <regex>
 #include <stdexcept>
@@ -34,7 +35,7 @@ std::vector<NextAction> toNextActionArray(const std::string actions)
     const std::vector<std::string> tokens = split(actions, ',');
     std::vector<NextAction> res = {};
 
-    for (const std::string& token : tokens)
+    for (std::string const& token : tokens)
         res.push_back(toNextAction(token));
 
     return res;

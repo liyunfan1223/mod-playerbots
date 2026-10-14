@@ -104,9 +104,9 @@ public:
 
 private:
     Position FindSafestNearbyPosition(
-        const std::vector<Unit*>& volcanos, float maxRadius, float hazardRadius);
-    bool IsPathSafeFromVolcanos(const Position& start,
-        const Position& end, const std::vector<Unit*>& volcanos, float hazardRadius);
+        std::vector<Unit*> const& volcanos, float maxRadius, float hazardRadius);
+    bool IsPathSafeFromVolcanos(Position const& start,
+        Position const& end, std::vector<Unit*> const& volcanos, float hazardRadius);
     std::vector<Unit*> GetAllSupremusVolcanos();
 };
 
@@ -426,9 +426,9 @@ public:
 private:
     bool MoveToShadowTrap(GameObject* trap);
     Position FindSafestNearbyPosition(
-        const std::vector<Unit*>& flameCrashes, float maxRadius, float hazardRadius);
-    bool IsPathSafeFromFlameCrashes(const Position& start,
-        const Position& end, const std::vector<Unit*>& flameCrashes, float hazardRadius);
+        std::vector<Unit*> const& flameCrashes, float maxRadius, float hazardRadius);
+    bool IsPathSafeFromFlameCrashes(Position const& start,
+        Position const& end, std::vector<Unit*> const& flameCrashes, float hazardRadius);
 };
 
 class IllidanStormrageIsolateBotWithParasiteAction : public MovementAction
@@ -439,8 +439,8 @@ public:
     bool Execute(Event event) override;
 
 private:
-    bool InfectedBotMoveFromGroup(Unit* illidan, const Position& targetPos);
-    bool FreezeTrapShadowfiend(Player* bot, Unit* illidan, const Position& targetPos);
+    bool InfectedBotMoveFromGroup(Unit* illidan, Position const& targetPos);
+    bool FreezeTrapShadowfiend(Player* bot, Unit* illidan, Position const& targetPos);
 };
 
 class IllidanStormrageSetEarthbindTotemAction : public Action
@@ -459,7 +459,7 @@ public:
     bool Execute(Event event) override;
 
 private:
-    bool RepositionToAvoidEyeBlast(Unit* illidan, const BlackTempleHelpers::EyeBlastDangerArea& dangerArea);
+    bool RepositionToAvoidEyeBlast(Unit* illidan, BlackTempleHelpers::EyeBlastDangerArea const& dangerArea);
     bool RepositionToAvoidBlaze(Unit* eastFlame, Unit* westFlame);
 };
 

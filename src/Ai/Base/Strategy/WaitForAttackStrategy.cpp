@@ -41,7 +41,7 @@ bool WaitForAttackStrategy::ShouldWait(PlayerbotAI* botAI)
             AiObjectContext* context = botAI->GetAiObjectContext();
             time_t combatStartTime = context->GetValue<time_t>("combat start time")->Get();
 
-            if (bot->IsInCombat())
+            if (botAI->GetState() == BOT_STATE_COMBAT)
             {
                 if (combatStartTime == 0)
                 {
@@ -49,13 +49,7 @@ bool WaitForAttackStrategy::ShouldWait(PlayerbotAI* botAI)
                     context->GetValue<time_t>("combat start time")->Set(combatStartTime);
                 }
 
-                time_t elapsedTime = time(nullptr) - combatStartTime;
-                return elapsedTime < GetWaitTime(botAI);
-            }
-            else
-            {
-                if (combatStartTime != 0)
-                    context->GetValue<time_t>("combat start time")->Set(0);
+                return time(nullptr) - combatStartTime < GetWaitTime(botAI);
             }
         }
     }
@@ -70,7 +64,7 @@ uint8 WaitForAttackStrategy::GetWaitTime(PlayerbotAI* botAI)
 
 float WaitForAttackStrategy::GetSafeDistance()
 {
-    return sPlayerbotAIConfig.spellDistance;
+    return sPlayerbotAIConfig.SpellDistance;
 }
 
 float WaitForAttackMultiplier::GetValue(Action* action)

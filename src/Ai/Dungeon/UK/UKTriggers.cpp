@@ -28,19 +28,7 @@ bool DalronnDpsTrigger::IsActive()
     if (!boss || !boss->isTargetableForAttack()) { return false; }
 
     // This doesn't cause issues with healers currently and they will continue to heal even when included here
-    return !botAI->IsTank(bot);
-}
-
-bool IngvarStaggeringRoarTrigger::IsActive()
-{
-    Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss) { return false; }
-
-    if (boss->FindCurrentSpellBySpellId(SPELL_STAGGERING_ROAR))
-    {
-        return true;
-    }
-    return false;
+    return !PlayerbotAI::IsTank(bot);
 }
 
 bool IngvarDreadfulRoarTrigger::IsActive()
@@ -58,7 +46,7 @@ bool IngvarDreadfulRoarTrigger::IsActive()
 bool IngvarSmashTankTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss || !botAI->IsTank(bot)) { return false; }
+    if (!boss || !PlayerbotAI::IsTank(bot)) { return false; }
 
     if (boss->FindCurrentSpellBySpellId(SPELL_SMASH) ||
         boss->FindCurrentSpellBySpellId(SPELL_DARK_SMASH))
@@ -71,10 +59,10 @@ bool IngvarSmashTankTrigger::IsActive()
 bool IngvarSmashTankReturnTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    // if (!boss || !botAI->IsTank(bot) || boss->HasUnitState(UNIT_STATE_CASTING))
+    // if (!boss || !PlayerbotAI::IsTank(bot) || boss->HasUnitState(UNIT_STATE_CASTING))
     // Ignore casting state as Ingvar will sometimes chain-cast a roar after a smash..
     // We don't want this to prevent our tank from repositioning properly.
-    if (!boss || !botAI->IsTank(bot)) { return false; }
+    if (!boss || !PlayerbotAI::IsTank(bot)) { return false; }
 
     return true;
 }
@@ -82,7 +70,7 @@ bool IngvarSmashTankReturnTrigger::IsActive()
 bool NotBehindIngvarTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    if (!boss || botAI->IsTank(bot)) { return false; }
+    if (!boss || PlayerbotAI::IsTank(bot)) { return false; }
 
     return AI_VALUE2(bool, "behind", "current target");
 }

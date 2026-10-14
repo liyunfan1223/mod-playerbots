@@ -7,7 +7,7 @@
 #include "AKStrategy.h"
 #include "AKMultipliers.h"
 
-void WotlkDungeonOKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonOKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Elder Nadox
     triggers.push_back(new TriggerNode("nadox guardian",
@@ -33,7 +33,7 @@ void WotlkDungeonOKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // TODO: once I get to heroics
 }
 
-void WotlkDungeonOKStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonOKStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new ElderNadoxMultiplier(botAI));
     multipliers.push_back(new JedogaShadowseekerMultiplier(botAI));

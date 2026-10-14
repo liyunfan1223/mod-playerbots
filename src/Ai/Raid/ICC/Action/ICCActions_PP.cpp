@@ -4,7 +4,6 @@
  * or (at your option) any later version.
  */
 
-#include "GenericActions.h"
 #include "GenericSpellActions.h"
 #include "ICCActions.h"
 #include "ICCScripts.h"
@@ -26,13 +25,13 @@ bool IccPutricideMutatedPlagueAction::Execute(Event /*event*/)
     if (!boss)
         return false;
 
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
     {
         bot->AttackStop();
-        bot->InterruptNonMeleeSpells(true);
+        bot->CastStop();
         if (bot->GetTarget())
             bot->SetTarget(ObjectGuid::Empty);
         return false;
@@ -77,11 +76,11 @@ bool IccPutricideMutatedPlagueAction::Execute(Event /*event*/)
 
 bool IccPutricideGrowingOozePuddleAction::Execute(Event /*event*/)
 {
-    if (botAI->IsMainTank(bot) &&
+    if (PlayerbotAI::IsMainTank(bot) &&
         bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
     {
         bot->AttackStop();
-        bot->InterruptNonMeleeSpells(true);
+        bot->CastStop();
         if (bot->GetTarget())
             bot->SetTarget(ObjectGuid::Empty);
         if (Unit* master = botAI->GetMaster())
@@ -91,7 +90,7 @@ bool IccPutricideGrowingOozePuddleAction::Execute(Event /*event*/)
 
     // Phase 3: only MT avoids hazards. Non-MT bots stack on MT blindly so
     // they don't scatter when a puddle drops on the stack.
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
     {
         Unit* bossP3 = AI_VALUE2(Unit*, "find target", "professor putricide");
         if (bossP3 && bossP3->HealthBelowPct(35))
@@ -105,7 +104,7 @@ bool IccPutricideGrowingOozePuddleAction::Execute(Event /*event*/)
     // cone away from the puddle field. Stack bots line up behind the boss.
     // Phase 3: skip kite (MT idles near boss). Flee logic below still runs so
     // MT steps out of puddles.
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
         if (boss && boss->IsAlive() && boss->GetVictim() == bot && !boss->HealthBelowPct(35))
@@ -230,7 +229,7 @@ Unit* IccPutricideGrowingOozePuddleAction::FindClosestThreateningPuddle()
 
     // Phase 3: MT no longer kites, treat as regular bot for puddle avoidance.
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    bool const isMainTank = botAI->IsMainTank(bot) && !(boss && boss->HealthBelowPct(35));
+    bool const isMainTank = PlayerbotAI::IsMainTank(bot) && !(boss && boss->HealthBelowPct(35));
 
     Unit* closestPuddle = nullptr;
     float closestDistance = FLT_MAX;
@@ -271,8 +270,8 @@ Position IccPutricideGrowingOozePuddleAction::CalculateSafeMovePosition(Unit* cl
     constexpr float tankShoveDistance = 6.0f;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");
-    bool const isMainTank = botAI->IsMainTank(bot) && !(boss && boss->HealthBelowPct(35));
-    bool const isP3Tank = botAI->IsMainTank(bot) && boss && boss->HealthBelowPct(35);
+    bool const isMainTank = PlayerbotAI::IsMainTank(bot) && !(boss && boss->HealthBelowPct(35));
+    bool const isP3Tank = PlayerbotAI::IsMainTank(bot) && boss && boss->HealthBelowPct(35);
 
     float botX = bot->GetPositionX();
     float botY = bot->GetPositionY();
@@ -363,7 +362,7 @@ Position IccPutricideGrowingOozePuddleAction::CalculateSafeMovePosition(Unit* cl
             if (PathCrossesAnyPuddle(botX, botY, testX, testY, nullptr))
                 continue;
 
-            if (botAI->IsTank(bot))
+            if (PlayerbotAI::IsTank(bot))
             {
                 float awayDx = testX - closestPuddle->GetPositionX();
                 float awayDy = testY - closestPuddle->GetPositionY();
@@ -396,7 +395,7 @@ Position IccPutricideGrowingOozePuddleAction::CalculateSafeMovePosition(Unit* cl
             fallbackY = closestPuddle->GetPositionY() + gateDy * fallbackRadius;
         }
     }
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         float awayDx = fallbackX - closestPuddle->GetPositionX();
         float awayDy = fallbackY - closestPuddle->GetPositionY();
@@ -418,7 +417,7 @@ bool IccPutricideGrowingOozePuddleAction::PathCrossesAnyPuddle(float fromX, floa
     constexpr float stackMultiplier = 0.8f;
     constexpr float mainTankSafeDistance = 10.0f;
 
-    bool const useTankSafeDistance = botAI->IsMainTank(bot);
+    bool const useTankSafeDistance = PlayerbotAI::IsMainTank(bot);
 
     float segDx = toX - fromX;
     float segDy = toY - fromY;
@@ -463,7 +462,7 @@ bool IccPutricideGrowingOozePuddleAction::IsPositionTooCloseToOtherPuddles(float
     constexpr float stackMultiplier = 0.8f;
     constexpr float mainTankSafeDistance = 10.0f;
 
-    bool const isMainTank = botAI->IsMainTank(bot);
+    bool const isMainTank = PlayerbotAI::IsMainTank(bot);
 
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
     for (auto const& npc : npcs)
@@ -499,7 +498,7 @@ bool IccPutricideVolatileOozeAction::Execute(Event /*event*/)
     if (!boss)
         return false;
 
-    if (botAI->IsMainTank(bot) &&
+    if (PlayerbotAI::IsMainTank(bot) &&
         bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE &&
         bot->GetExactDist2d(ICC_PUTRICIDE_TANK_POSITION) > 20.0f &&
         !boss->HealthBelowPct(36) && boss->GetVictim() == bot)
@@ -527,7 +526,7 @@ bool IccPutricideVolatileOozeAction::Execute(Event /*event*/)
 
     MarkOozeWithSkull(ooze);
 
-    if (botAI->IsMelee(bot) && !botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsMainTank(bot))
     {
         if (bot->IsWithinMeleeRange(ooze))
         {
@@ -551,7 +550,7 @@ bool IccPutricideVolatileOozeAction::Execute(Event /*event*/)
         }
     }
 
-    if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
+    if (PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot))
     {
         constexpr float nearbyStackRange = 20.0f;
 
@@ -592,7 +591,7 @@ bool IccPutricideVolatileOozeAction::Execute(Event /*event*/)
                           stackTarget->GetPositionZ(), false, false, false, false, MovementPriority::MOVEMENT_COMBAT);
         }
 
-        if (ooze && !botAI->IsHeal(bot))
+        if (ooze && !PlayerbotAI::IsHeal(bot))
         {
             bot->SetTarget(ooze->GetGUID());
             bot->SetFacingToObject(ooze);
@@ -655,7 +654,7 @@ bool IccPutricideGasCloudAction::Execute(Event /*event*/)
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot) &&
+    if (PlayerbotAI::IsTank(bot) &&
         bot->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE &&
         bot->GetExactDist2d(ICC_PUTRICIDE_TANK_POSITION) > 20.0f && !boss->HealthBelowPct(36) &&
         boss->GetVictim() == bot)
@@ -663,7 +662,7 @@ bool IccPutricideGasCloudAction::Execute(Event /*event*/)
                       ICC_PUTRICIDE_TANK_POSITION.GetPositionY(), ICC_PUTRICIDE_TANK_POSITION.GetPositionZ(), false,
                       false, false, true, MovementPriority::MOVEMENT_COMBAT, true, false);
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
         return false;
 
     bool hasGaseousBloat = botAI->HasAura("Gaseous Bloat", bot);
@@ -1058,7 +1057,7 @@ bool IccPutricideGasCloudAction::HandleGaseousBloatMovement(Unit* gasCloud)
 bool IccPutricideGasCloudAction::HandleGroupAuraSituation(Unit* gasCloud)
 {
     Group* group = bot->GetGroup();
-    if (!group || botAI->IsHeal(bot))
+    if (!group || PlayerbotAI::IsHeal(bot))
         return false;
 
     constexpr float rangeMinSafeDistance = 15.0f;
@@ -1108,11 +1107,11 @@ bool IccPutricideAvoidMalleableGooAction::Execute(Event /*event*/)
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot) &&
+    if (PlayerbotAI::IsTank(bot) &&
         bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
     {
         bot->AttackStop();
-        bot->InterruptNonMeleeSpells(true);
+        bot->CastStop();
         if (bot->GetTarget())
             bot->SetTarget(ObjectGuid::Empty);
         if (Unit* master = botAI->GetMaster())
@@ -1263,7 +1262,7 @@ bool IccPutricideAvoidMalleableGooAction::Execute(Event /*event*/)
 
 bool IccPutricideAvoidMalleableGooAction::HandleTankPositioning(Unit* boss)
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     if (boss && boss->IsAlive() &&
@@ -1356,7 +1355,7 @@ bool IccPutricideAvoidMalleableGooAction::HandleUnboundPlague(Unit* boss)
 
 bool IccPutricideAvoidMalleableGooAction::HandleBossPositioning(Unit* boss)
 {
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
         return false;
 
     Unit* mainTank = AI_VALUE(Unit*, "main tank");
@@ -1397,7 +1396,7 @@ bool IccPutricideAvoidMalleableGooAction::HandleBossPositioning(Unit* boss)
 
     bot->SetFacingToObject(boss);
     return MoveTo(bot->GetMapId(), mainTank->GetPositionX(), mainTank->GetPositionY(), mainTank->GetPositionZ(),
-                  false, false, false, botAI->IsRanged(bot), MovementPriority::MOVEMENT_COMBAT);
+                  false, false, false, PlayerbotAI::IsRanged(bot), MovementPriority::MOVEMENT_COMBAT);
 }
 
 bool IccPutricideAvoidMalleableGooAction::HasObstacleBetween(Position const& from, Position const& to)
@@ -1590,7 +1589,7 @@ bool IccPutricideAbominationAction::TryEatOoze(Unit* abo, Unit* puddle)
 
 bool IccPutricideAbominationAction::Execute(Event /*event*/)
 {
-    if (!botAI->IsAssistTank(bot))
+    if (!PlayerbotAI::IsAssistTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "professor putricide");

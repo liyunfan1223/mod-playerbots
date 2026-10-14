@@ -9,7 +9,6 @@
 
 #include "Action.h"
 #include "AttackAction.h"
-#include "GenericActions.h"
 #include "MovementActions.h"
 #include "NaxxBossHelper.h"
 #include "PlayerbotAI.h"
@@ -18,8 +17,8 @@
 class GrobbulusGoBehindAction : public MovementAction
 {
 public:
-    GrobbulusGoBehindAction(PlayerbotAI* ai, float distance = 24.0f, float delta_angle = M_PI / 8)
-        : MovementAction(ai, "grobbulus go behind")
+    GrobbulusGoBehindAction(PlayerbotAI* botAI, float distance = 24.0f, float delta_angle = M_PI / 8)
+        : MovementAction(botAI, "grobbulus go behind")
     {
         this->distance = distance;
         this->delta_angle = delta_angle;
@@ -37,7 +36,7 @@ public:
         : RotateAroundTheCenterPointAction(botAI, "rotate grobbulus", 3281.23f, -3310.38f, 35.0f, 8, true, M_PI) {}
     virtual bool isUseful() override
     {
-        return RotateAroundTheCenterPointAction::isUseful() && botAI->IsMainTank(bot) &&
+        return RotateAroundTheCenterPointAction::isUseful() && PlayerbotAI::IsMainTank(bot) &&
                AI_VALUE2(bool, "has aggro", "boss target");
     }
     uint32 GetCurrWaypoint() override;
@@ -46,14 +45,14 @@ public:
 class GrobbulusMoveCenterAction : public MoveInsideAction
 {
 public:
-    GrobbulusMoveCenterAction(PlayerbotAI* ai) : MoveInsideAction(ai, 3281.23f, -3310.38f, 5.0f) {}
+    GrobbulusMoveCenterAction(PlayerbotAI* botAI) : MoveInsideAction(botAI, 3281.23f, -3310.38f, 5.0f) {}
 };
 
 class GrobbulusMoveAwayAction : public MovementAction
 {
 public:
-    GrobbulusMoveAwayAction(PlayerbotAI* ai, float distance = 18.0f)
-        : MovementAction(ai, "grobbulus move away"), distance(distance)
+    GrobbulusMoveAwayAction(PlayerbotAI* botAI, float distance = 18.0f)
+        : MovementAction(botAI, "grobbulus move away"), distance(distance)
     {
     }
     bool Execute(Event event) override;
@@ -62,61 +61,31 @@ private:
     float distance;
 };
 
-//class HeiganDanceAction : public MovementAction
-//{
-//public:
-//    HeiganDanceAction(PlayerbotAI* ai) : MovementAction(ai, "heigan dance")
-//    {
-//        this->last_eruption_ms = 0;
-//        this->platform_phase = false;
-//        ResetSafe();
-//        waypoints.push_back(std::make_pair(2794.88f, -3668.12f));
-//        waypoints.push_back(std::make_pair(2775.49f, -3674.43f));
-//        waypoints.push_back(std::make_pair(2762.30f, -3684.59f));
-//        waypoints.push_back(std::make_pair(2755.99f, -3703.96f));
-//        platform = std::make_pair(2794.26f, -3706.67f);
-//    }
-//
-//protected:
-//    bool CalculateSafe();
-//    void ResetSafe()
-//    {
-//        curr_safe = 0;
-//        curr_dir = 1;
-//    }
-//    void NextSafe()
-//    {
-//        curr_safe += curr_dir;
-//        if (curr_safe == 3 || curr_safe == 0)
-//        {
-//            curr_dir = -curr_dir;
-//        }
-//    }
-//    uint32 last_eruption_ms;
-//    bool platform_phase;
-//    uint32 curr_safe, curr_dir;
-//    std::vector<std::pair<float, float>> waypoints;
-//    std::pair<float, float> platform;
-//};
-//
-//class HeiganDanceMeleeAction : public HeiganDanceAction
-//{
-//public:
-//    HeiganDanceMeleeAction(PlayerbotAI* ai) : HeiganDanceAction(ai) {}
-//    virtual bool Execute(Event event);
-//};
-//
-//class HeiganDanceRangedAction : public HeiganDanceAction
-//{
-//public:
-//    HeiganDanceRangedAction(PlayerbotAI* ai) : HeiganDanceAction(ai) {}
-//    virtual bool Execute(Event event);
-//};
+// One action for both roles: melee (and tanks) dance every phase, ranged/healers wait on the platform during the
+// slow dance and only dance the fast one.
+class HeiganDanceAction : public MovementAction
+{
+public:
+    HeiganDanceAction(PlayerbotAI* botAI, bool ranged)
+        : MovementAction(botAI, ranged ? "heigan dance ranged" : "heigan dance melee"), helper(botAI), ranged(ranged)
+    {
+    }
+    bool Execute(Event event) override;
+
+private:
+    // Move to (near) the given dance waypoint. Returns true while a move had to be issued.
+    bool MoveToWaypoint(uint32 index, float distance);
+    bool MoveToPlatform(float distance);
+
+    HeiganBossHelper helper;
+    bool ranged;
+    int32 lastWaypoint = -1;
+};
 
 class ThaddiusAttackNearestPetAction : public AttackAction
 {
 public:
-    ThaddiusAttackNearestPetAction(PlayerbotAI* ai) : AttackAction(ai, "thaddius attack nearest pet"), helper(ai) {}
+    ThaddiusAttackNearestPetAction(PlayerbotAI* botAI) : AttackAction(botAI, "thaddius attack nearest pet"), helper(botAI) {}
     virtual bool Execute(Event event);
     virtual bool isUseful();
 
@@ -127,7 +96,7 @@ private:
 // class ThaddiusMeleeToPlaceAction : public MovementAction
 // {
 // public:
-//     ThaddiusMeleeToPlaceAction(PlayerbotAI* ai) : MovementAction(ai, "thaddius melee to place") {}
+//     ThaddiusMeleeToPlaceAction(PlayerbotAI* botAI) : MovementAction(botAI, "thaddius melee to place") {}
 //     virtual bool Execute(Event event);
 //     virtual bool isUseful();
 // };
@@ -135,7 +104,7 @@ private:
 // class ThaddiusRangedToPlaceAction : public MovementAction
 // {
 // public:
-//     ThaddiusRangedToPlaceAction(PlayerbotAI* ai) : MovementAction(ai, "thaddius ranged to place") {}
+//     ThaddiusRangedToPlaceAction(PlayerbotAI* botAI) : MovementAction(botAI, "thaddius ranged to place") {}
 //     virtual bool Execute(Event event);
 //     virtual bool isUseful();
 // };
@@ -143,7 +112,7 @@ private:
 class ThaddiusMoveToPlatformAction : public MovementAction
 {
 public:
-    ThaddiusMoveToPlatformAction(PlayerbotAI* ai) : MovementAction(ai, "thaddius move to platform") {}
+    ThaddiusMoveToPlatformAction(PlayerbotAI* botAI) : MovementAction(botAI, "thaddius move to platform") {}
     virtual bool Execute(Event event);
     virtual bool isUseful();
 };
@@ -151,7 +120,7 @@ public:
 class ThaddiusMovePolarityAction : public MovementAction
 {
 public:
-    ThaddiusMovePolarityAction(PlayerbotAI* ai) : MovementAction(ai, "thaddius move polarity") {}
+    ThaddiusMovePolarityAction(PlayerbotAI* botAI) : MovementAction(botAI, "thaddius move polarity") {}
     virtual bool Execute(Event event);
     virtual bool isUseful();
 };
@@ -159,8 +128,8 @@ public:
 class RazuviousUseObedienceCrystalAction : public MovementAction
 {
 public:
-    RazuviousUseObedienceCrystalAction(PlayerbotAI* ai)
-        : MovementAction(ai, "razuvious use obedience crystal"), helper(ai)
+    RazuviousUseObedienceCrystalAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "razuvious use obedience crystal"), helper(botAI)
     {
     }
     bool Execute(Event event) override;
@@ -172,7 +141,7 @@ private:
 class RazuviousTargetAction : public AttackAction
 {
 public:
-    RazuviousTargetAction(PlayerbotAI* ai) : AttackAction(ai, "razuvious target"), helper(ai) {}
+    RazuviousTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "razuvious target"), helper(botAI) {}
     bool Execute(Event event) override;
 
 private:
@@ -182,7 +151,7 @@ private:
 class FourHorsemenAttractAlternativelyAction : public AttackAction
 {
 public:
-    FourHorsemenAttractAlternativelyAction(PlayerbotAI* ai) : AttackAction(ai, "four horsemen attract alternatively"), helper(ai)
+    FourHorsemenAttractAlternativelyAction(PlayerbotAI* botAI) : AttackAction(botAI, "four horsemen attract alternatively"), helper(botAI)
     {
     }
     bool Execute(Event event) override;
@@ -194,7 +163,7 @@ protected:
 class FourHorsemenAttackInOrderAction : public AttackAction
 {
 public:
-    FourHorsemenAttackInOrderAction(PlayerbotAI* ai) : AttackAction(ai, "four horsemen attack in order"), helper(ai) {}
+    FourHorsemenAttackInOrderAction(PlayerbotAI* botAI) : AttackAction(botAI, "four horsemen attack in order"), helper(botAI) {}
     bool Execute(Event event) override;
 
 protected:
@@ -204,14 +173,14 @@ protected:
 // class SapphironGroundMainTankPositionAction : public MovementAction
 // {
 // public:
-//     SapphironGroundMainTankPositionAction(PlayerbotAI* ai) : MovementAction(ai, "sapphiron ground main tank
+//     SapphironGroundMainTankPositionAction(PlayerbotAI* botAI) : MovementAction(botAI, "sapphiron ground main tank
 //     position") {} virtual bool Execute(Event event);
 // };
 
 class SapphironGroundPositionAction : public MovementAction
 {
 public:
-    SapphironGroundPositionAction(PlayerbotAI* ai) : MovementAction(ai, "sapphiron ground position"), helper(ai) {}
+    SapphironGroundPositionAction(PlayerbotAI* botAI) : MovementAction(botAI, "sapphiron ground position"), helper(botAI) {}
     bool Execute(Event event) override;
 
 protected:
@@ -221,7 +190,7 @@ protected:
 class SapphironFlightPositionAction : public MovementAction
 {
 public:
-    SapphironFlightPositionAction(PlayerbotAI* ai) : MovementAction(ai, "sapphiron flight position"), helper(ai) {}
+    SapphironFlightPositionAction(PlayerbotAI* botAI) : MovementAction(botAI, "sapphiron flight position"), helper(botAI) {}
     bool Execute(Event event) override;
 
 protected:
@@ -232,14 +201,14 @@ protected:
 // class SapphironAvoidChillAction : public MovementAction
 // {
 // public:
-//     SapphironAvoidChillAction(PlayerbotAI* ai) : MovementAction(ai, "sapphiron avoid chill") {}
+//     SapphironAvoidChillAction(PlayerbotAI* botAI) : MovementAction(botAI, "sapphiron avoid chill") {}
 //     virtual bool Execute(Event event);
 // };
 
 class KelthuzadChooseTargetAction : public AttackAction
 {
 public:
-    KelthuzadChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "kel'thuzad choose target"), helper(ai) {}
+    KelthuzadChooseTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "kel'thuzad choose target"), helper(botAI) {}
     virtual bool Execute(Event event);
 
 private:
@@ -249,7 +218,7 @@ private:
 class KelthuzadPositionAction : public MovementAction
 {
 public:
-    KelthuzadPositionAction(PlayerbotAI* ai) : MovementAction(ai, "kel'thuzad position"), helper(ai) {}
+    KelthuzadPositionAction(PlayerbotAI* botAI) : MovementAction(botAI, "kel'thuzad position"), helper(botAI) {}
     virtual bool Execute(Event event);
 
 private:
@@ -259,22 +228,22 @@ private:
 class AnubrekhanChooseTargetAction : public AttackAction
 {
 public:
-    AnubrekhanChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "anub'rekhan choose target") {}
+    AnubrekhanChooseTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "anub'rekhan choose target") {}
     bool Execute(Event event) override;
 };
 
 class AnubrekhanPositionAction : public RotateAroundTheCenterPointAction
 {
 public:
-    AnubrekhanPositionAction(PlayerbotAI* ai)
-        : RotateAroundTheCenterPointAction(ai, "anub'rekhan position", 3272.49f, -3476.27f, 45.0f, 16) {}
+    AnubrekhanPositionAction(PlayerbotAI* botAI)
+        : RotateAroundTheCenterPointAction(botAI, "anub'rekhan position", 3272.49f, -3476.27f, 45.0f, 16) {}
     bool Execute(Event event) override;
 };
 
 class GluthChooseTargetAction : public AttackAction
 {
 public:
-    GluthChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "gluth choose target"), helper(ai) {}
+    GluthChooseTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "gluth choose target"), helper(botAI) {}
     bool Execute(Event event) override;
 
 private:
@@ -284,8 +253,8 @@ private:
 class GluthPositionAction : public RotateAroundTheCenterPointAction
 {
 public:
-    GluthPositionAction(PlayerbotAI* ai)
-        : RotateAroundTheCenterPointAction(ai, "gluth position", 3293.61f, -3149.01f, 12.0f, 12), helper(ai) {}
+    GluthPositionAction(PlayerbotAI* botAI)
+        : RotateAroundTheCenterPointAction(botAI, "gluth position", 3293.61f, -3149.01f, 12.0f, 12), helper(botAI) {}
     bool Execute(Event event) override;
 
 private:
@@ -295,7 +264,7 @@ private:
 class GluthSlowdownAction : public Action
 {
 public:
-    GluthSlowdownAction(PlayerbotAI* ai) : Action(ai, "gluth slowdown"), helper(ai) {}
+    GluthSlowdownAction(PlayerbotAI* botAI) : Action(botAI, "gluth slowdown"), helper(botAI) {}
     bool Execute(Event event) override;
 
 private:
@@ -305,7 +274,7 @@ private:
 class LoathebPositionAction : public MovementAction
 {
 public:
-    LoathebPositionAction(PlayerbotAI* ai) : MovementAction(ai, "loatheb position"), helper(ai) {}
+    LoathebPositionAction(PlayerbotAI* botAI) : MovementAction(botAI, "loatheb position"), helper(botAI) {}
     virtual bool Execute(Event event);
 
 private:
@@ -315,7 +284,7 @@ private:
 class LoathebChooseTargetAction : public AttackAction
 {
 public:
-    LoathebChooseTargetAction(PlayerbotAI* ai) : AttackAction(ai, "loatheb choose target"), helper(ai) {}
+    LoathebChooseTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "loatheb choose target"), helper(botAI) {}
     virtual bool Execute(Event event);
 
 private:
@@ -325,7 +294,7 @@ private:
 //class PatchwerkRangedPositionAction : public MovementAction
 //{
 //public:
-//    PatchwerkRangedPositionAction(PlayerbotAI* ai) : MovementAction(ai, "patchwerk ranged position") {}
+//    PatchwerkRangedPositionAction(PlayerbotAI* botAI) : MovementAction(botAI, "patchwerk ranged position") {}
 //    bool Execute(Event event) override;
 //};
 

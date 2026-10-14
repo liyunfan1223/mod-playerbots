@@ -7,7 +7,7 @@
 #include "CoSStrategy.h"
 #include "CoSMultipliers.h"
 
-void WotlkDungeonCoSStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonCoSStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Meathook
     // Can tank this in a fixed position to allow healer to LoS the stun, probably not necessary
@@ -26,7 +26,7 @@ void WotlkDungeonCoSStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // Infinite Corruptor (Heroic only)
 }
 
-void WotlkDungeonCoSStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonCoSStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new EpochMultiplier(botAI));
 }

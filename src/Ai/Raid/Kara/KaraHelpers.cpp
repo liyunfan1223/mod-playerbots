@@ -6,13 +6,16 @@
 
 #include "KaraHelpers.h"
 #include "Playerbots.h"
+#include <algorithm>
+#include <limits>
+#include <list>
 
 namespace KaraHelpers
 {
 
 // General
 
-bool IsSafePosition(float x, float y, const std::vector<Unit*>& hazards, float hazardRadius)
+bool IsSafePosition(float x, float y, std::vector<Unit*> const& hazards, float hazardRadius)
 {
     for (Unit* hazard : hazards)
     {

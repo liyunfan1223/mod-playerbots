@@ -22,7 +22,7 @@ constexpr uint32 SPELL_MASTER_POISONER_RANK_3 = 58410;
 bool CastStealthAction::isUseful()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    if (target && bot->GetDistance(target) >= sPlayerbotAIConfig.spellDistance)
+    if (target && bot->GetDistance(target) >= sPlayerbotAIConfig.SpellDistance)
         return false;
     return true;
 }
@@ -37,7 +37,7 @@ bool CastStealthAction::isPossible()
 bool UnstealthAction::Execute(Event /*event*/)
 {
     botAI->RemoveAura("stealth");
-    // botAI->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
+    // botAI->ChangeStrategy("+combat,-stealthed", BOT_STATE_COMBAT);
 
     return true;
 }
@@ -46,11 +46,11 @@ bool CheckStealthAction::Execute(Event /*event*/)
 {
     if (botAI->HasAura("stealth", bot))
     {
-        botAI->ChangeStrategy("-dps,+stealthed", BOT_STATE_COMBAT);
+        botAI->ChangeStrategy("-combat,+stealthed", BOT_STATE_COMBAT);
     }
     else
     {
-        botAI->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
+        botAI->ChangeStrategy("+combat,-stealthed", BOT_STATE_COMBAT);
     }
 
     return true;
@@ -81,118 +81,52 @@ bool CastTricksOfTheTradeOnMainTankAction::isUseful()
 
 bool UseDeadlyPoisonAction::Execute(Event /*event*/)
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
-    std::vector<Item*> items;
-    std::string poison_name;
-    for (std::string& suffix : poison_suffixs)
+    std::vector<Item*> const items =
+        AI_VALUE2(std::vector<Item*>, "inventory items", "Deadly Poison");
+    for (Item* const item : items)
     {
-        poison_name = "Deadly Poison" + suffix;
-        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
-        if (!items.empty())
-        {
-            break;
-        }
-    }
-    if (items.empty())
-    {
-        return false;
-    }
-    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-    return UseItem(*items.begin(), ObjectGuid::Empty, itemForSpell);
-    // return UseItemAuto(*items.begin());
-}
+        // This check is needed only if there is a name match. I think the only one is Handbook
+        // of Deadly Poison V, which might be restored by IP. Keeping this here just in case.
+        if (item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE)
+            continue;
 
-bool UseDeadlyPoisonAction::isPossible()
-{
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
-    std::vector<Item*> items;
-    std::string poison_name;
-    for (std::string& suffix : poison_suffixs)
-    {
-        poison_name = "Deadly Poison" + suffix;
-        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
-        if (!items.empty())
-        {
-            break;
-        }
+        Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+        return UseItem(item, ObjectGuid::Empty, itemForSpell);
     }
-    return !items.empty();
+
+    return false;
 }
 
 bool UseInstantPoisonAction::Execute(Event /*event*/)
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
-    std::vector<Item*> items;
-    std::string poison_name;
-    for (std::string& suffix : poison_suffixs)
+    std::vector<Item*> const items =
+        AI_VALUE2(std::vector<Item*>, "inventory items", "Instant Poison");
+    for (Item* const item : items)
     {
-        poison_name = "Instant Poison" + suffix;
-        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
-        if (!items.empty())
-        {
-            break;
-        }
-    }
-    if (items.empty())
-    {
-        return false;
-    }
-    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-    return UseItem(*items.begin(), ObjectGuid::Empty, itemForSpell);
-}
+        // Not necessary for instant but keeping for symmetry and to guide a potential refactor.
+        if (item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE)
+            continue;
 
-bool UseInstantPoisonAction::isPossible()
-{
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
-    std::vector<Item*> items;
-    std::string poison_name;
-    for (std::string& suffix : poison_suffixs)
-    {
-        poison_name = "Instant Poison" + suffix;
-        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
-        if (!items.empty())
-        {
-            break;
-        }
+        Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+        return UseItem(item, ObjectGuid::Empty, itemForSpell);
     }
-    return !items.empty();
+
+    return false;
 }
 
 bool UseInstantPoisonOffHandAction::Execute(Event /*event*/)
 {
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
-    std::vector<Item*> items;
-    std::string poison_name;
-    for (std::string& suffix : poison_suffixs)
+    std::vector<Item*> const items =
+        AI_VALUE2(std::vector<Item*>, "inventory items", "Instant Poison");
+    for (Item* const item : items)
     {
-        poison_name = "Instant Poison" + suffix;
-        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
-        if (!items.empty())
-        {
-            break;
-        }
-    }
-    if (items.empty())
-    {
-        return false;
-    }
-    Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-    return UseItem(*items.begin(), ObjectGuid::Empty, itemForSpell);
-}
+        // Not necessary for instant but keeping for symmetry and to guide a potential refactor.
+        if (item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE)
+            continue;
 
-bool UseInstantPoisonOffHandAction::isPossible()
-{
-    std::vector<std::string> poison_suffixs = {" IX", " VIII", " VII", " VI", " V", " IV", " III", " II", ""};
-    std::vector<Item*> items;
-    std::string poison_name;
-    for (std::string& suffix : poison_suffixs)
-    {
-        poison_name = "Instant Poison" + suffix;
-        items = AI_VALUE2(std::vector<Item*>, "inventory items", poison_name);
-        if (!items.empty())
-        {
-            break;
-        }
+        Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+        return UseItem(item, ObjectGuid::Empty, itemForSpell);
     }
-    return !items.empty();
+
+    return false;
 }

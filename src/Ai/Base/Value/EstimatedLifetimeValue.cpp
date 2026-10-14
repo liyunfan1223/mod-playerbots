@@ -41,7 +41,7 @@ float EstimatedGroupDpsValue::Calculate()
             if (member == bot)  // calculated
                 continue;
 
-            // Ignore real players and selfbots as they may not help with damage.
+            // Ignore real players and SelfBots as they may not help with damage.
             if (!GET_PLAYERBOT_AI(member) || IsSelfBot(member))
                 continue;
 
@@ -51,7 +51,7 @@ float EstimatedGroupDpsValue::Calculate()
             if (member->GetMapId() != bot->GetMapId())
                 continue;
 
-            if (member->GetExactDist(bot) > sPlayerbotAIConfig.sightDistance)
+            if (member->GetExactDist(bot) > sPlayerbotAIConfig.SightDistance)
                 continue;
 
             groupPlayer.push_back(member);
@@ -60,9 +60,9 @@ float EstimatedGroupDpsValue::Calculate()
     for (Player* player : groupPlayer)
     {
         float roleMultiplier;
-        if (botAI->IsTank(player))
+        if (PlayerbotAI::IsTank(player))
             roleMultiplier = 0.3f;
-        else if (botAI->IsHeal(player))
+        else if (PlayerbotAI::IsHeal(player))
             roleMultiplier = 0.1f;
         else
             roleMultiplier = 1.0f;

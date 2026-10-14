@@ -5,6 +5,7 @@
  */
 
 #include "PartyMemberWithoutAuraValue.h"
+#include "GenericBuffUtils.h"
 #include "Playerbots.h"
 
 extern std::vector<std::string> split(std::string const s, char delim);
@@ -25,7 +26,7 @@ public:
 
         for (std::vector<std::string>::iterator i = auras.begin(); i != auras.end(); ++i)
         {
-            if (botAI->HasAura(*i, unit))
+            if (!ai::buff::BuffBelowRefreshTarget(botAI, botAI->GetAura(*i, unit), 0))
                 return false;
         }
 

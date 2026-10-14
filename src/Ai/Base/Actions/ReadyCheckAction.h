@@ -20,6 +20,7 @@ public:
 
 protected:
     bool ReadyCheck();
+    void ReportReadinessToMaster();
 };
 
 class FinishReadyCheckAction : public ReadyCheckAction
@@ -27,6 +28,23 @@ class FinishReadyCheckAction : public ReadyCheckAction
 public:
     FinishReadyCheckAction(PlayerbotAI* botAI) : ReadyCheckAction(botAI, "finish ready check") {}
 
+    bool Execute(Event event) override;
+};
+
+class ForceRebuffAction : public Action
+{
+public:
+    ForceRebuffAction(PlayerbotAI* botAI) : Action(botAI, "force rebuff") {}
+
+    bool Execute(Event event) override;
+};
+
+class ReadyReplyAction : public Action
+{
+public:
+    ReadyReplyAction(PlayerbotAI* botAI) : Action(botAI, "ready reply") {}
+
+    bool isUseful() override;
     bool Execute(Event event) override;
 };
 

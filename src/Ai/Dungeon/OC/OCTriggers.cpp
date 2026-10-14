@@ -14,8 +14,8 @@ bool DrakosUnstableSphereTrigger::IsActive()
 {
     // Doesn't seem to be much point trying to get melee to dodge this,
     // they get hit anyway and it just causes a lot of running around and chaos
-    // if (botAI->IsMelee(bot)) { return false; }
-    if (botAI->IsTank(bot)) { return false; }
+    // if (PlayerbotAI::IsMelee(bot)) { return false; }
+    if (PlayerbotAI::IsTank(bot)) { return false; }
 
     GuidVector targets = AI_VALUE(GuidVector, "nearest hostile npcs");
     for (auto& target : targets)

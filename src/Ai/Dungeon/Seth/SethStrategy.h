@@ -8,16 +8,18 @@
 #define PLAYERBOTS_SETHSTRATEGY_H
 
 #include "Strategy.h"
+#include <string>
+#include <vector>
 
 class TbcDungeonSethekkHallsStrategy : public Strategy
 {
 public:
     TbcDungeonSethekkHallsStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
-    virtual std::string const getName() override { return "tbc-seth"; }
+    std::string const getName() override { return "tbc-seth"; }
 
-    virtual void InitTriggers(std::vector<TriggerNode*> &triggers) override;
-    virtual void InitMultipliers(std::vector<Multiplier*> &multipliers) override;
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
 };
 
 #endif

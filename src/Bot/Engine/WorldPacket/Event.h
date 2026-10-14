@@ -15,7 +15,8 @@ class Player;
 class Event
 {
 public:
-    Event(Event const& other) : source(other.source), param(other.param), packet(other.packet), owner(other.owner) {}
+    Event(Event const& other) = default;
+    Event& operator=(Event const& other) = default;
     Event() {}
     Event(std::string const source) : source(source) {}
     Event(std::string const source, std::string const param, Player* owner = nullptr)

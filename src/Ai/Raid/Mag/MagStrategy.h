@@ -8,12 +8,13 @@
 #define PLAYERBOTS_MAGSTRATEGY_H
 
 #include "Strategy.h"
+#include <string>
+#include <vector>
 
 class RaidMagtheridonStrategy : public Strategy
 {
 public:
     RaidMagtheridonStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
-
     std::string const getName() override { return "magtheridon"; }
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;

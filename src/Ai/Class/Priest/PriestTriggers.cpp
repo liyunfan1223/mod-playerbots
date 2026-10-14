@@ -7,7 +7,9 @@
 #include "PriestTriggers.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "TargetValue.h"
 
 bool ShadowProtectionTrigger::IsActive()
 {
@@ -32,19 +34,28 @@ bool InnerFireTrigger::IsActive()
     return SpellTrigger::IsActive() && !botAI->HasAura(spell, target);
 }
 
+bool FearWardOnMainTankTrigger::IsActive()
+{
+    uint32 const spellId = AI_VALUE2(uint32, "spell id", spell);
+    if (!spellId || bot->HasSpellCooldown(spellId))
+        return false;
+
+    return BuffOnMainTankTrigger::IsActive();
+}
+
 bool ShadowformTrigger::IsActive() { return !botAI->HasAura("shadowform", bot); }
 
 bool ShadowfiendTrigger::IsActive() { return BoostTrigger::IsActive() && !bot->HasSpellCooldown(34433); }
 
 BindingHealTrigger::BindingHealTrigger(PlayerbotAI* botAI)
-    : PartyMemberLowHealthTrigger(botAI, "binding heal", sPlayerbotAIConfig.lowHealth, 0)
+    : PartyMemberLowHealthTrigger(botAI, "binding heal", sPlayerbotAIConfig.LowHealth, 0)
 {
 }
 
 bool BindingHealTrigger::IsActive()
 {
     return PartyMemberLowHealthTrigger::IsActive() &&
-           AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.mediumHealth;
+           AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.MediumHealth;
 }
 
 const std::set<uint32> MindSearChannelCheckTrigger::MIND_SEAR_SPELL_IDS = {
@@ -61,10 +72,7 @@ bool MindSearChannelCheckTrigger::IsActive()
     {
         // Only trigger if the spell being channeled is Mind Sear
         if (MIND_SEAR_SPELL_IDS.count(spell->m_spellInfo->Id))
-        {
-            uint8 attackerCount = AI_VALUE(uint8, "attacker count");
-            return attackerCount < minEnemies;
-        }
+            return !HasEnoughAoeTargets(botAI, bot->GetPosition(), sPlayerbotAIConfig.SightDistance, minEnemies);
     }
 
     // Not channeling Mind Sear

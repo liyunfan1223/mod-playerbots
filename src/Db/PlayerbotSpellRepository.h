@@ -8,7 +8,14 @@
 #define PLAYERBOTS_PLAYERBOTSPELLREPOSITORY_H
 
 #include "DBCStructure.h"
+
 #include <cstdint>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <vector>
+
+class SpellInfo;
 
 class PlayerbotSpellRepository
 {
@@ -24,19 +31,23 @@ public:
 
     SkillLineAbilityEntry const* GetSkillLine(uint32_t spellId) const;
     bool IsItemBuyable(uint32_t itemId) const;
+    std::vector<uint32_t> const& GetOpeningSpells(uint32_t lockType) const;
+    uint32_t GetRequiredRidingSkill(SpellInfo const* mountSpell) const;
 
 private:
     PlayerbotSpellRepository() = default;
     ~PlayerbotSpellRepository() = default;
 
-    PlayerbotSpellRepository(const PlayerbotSpellRepository&) = delete;
-    PlayerbotSpellRepository& operator=(const PlayerbotSpellRepository&) = delete;
+    PlayerbotSpellRepository(PlayerbotSpellRepository const&) = delete;
+    PlayerbotSpellRepository& operator=(PlayerbotSpellRepository const&) = delete;
 
     PlayerbotSpellRepository(PlayerbotSpellRepository&&) = delete;
     PlayerbotSpellRepository& operator=(PlayerbotSpellRepository&&) = delete;
 
     std::map<uint32_t, SkillLineAbilityEntry const*> skillSpells;
     std::set<uint32_t> vendorItems;
+    std::map<uint32_t, std::vector<uint32_t>> _openingSpells;
+    std::unordered_map<uint32_t, uint32_t> _ridingSkillByMount;
 };
 
 #endif

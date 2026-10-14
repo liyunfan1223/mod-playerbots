@@ -21,6 +21,7 @@ public:
 
 private:
     void BeginTrade();
+    void CancelTrade();
     bool CheckTrade();
     int32 CalculateCost(Player* player, bool sell);
 };

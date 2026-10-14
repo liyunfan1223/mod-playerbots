@@ -8,13 +8,12 @@
 #define PLAYERBOTS_ACACTIONCONTEXT_H
 
 #include "ACActions.h"
-#include "Action.h"
 #include "NamedObjectContext.h"
 
 class TbcDungeonAuchenaiCryptsActionContext : public NamedObjectContext<Action>
 {
 public:
-    TbcDungeonAuchenaiCryptsActionContext() : NamedObjectContext<Action>(false, true)
+    TbcDungeonAuchenaiCryptsActionContext()
     {
         creators["shirrak tank position boss"] =
             &TbcDungeonAuchenaiCryptsActionContext::shirrak_tank_position_boss;
@@ -26,7 +25,6 @@ public:
             &TbcDungeonAuchenaiCryptsActionContext::shirrak_ranged_keep_distance;
     }
 private:
-
     static Action* shirrak_tank_position_boss(
         PlayerbotAI* botAI) { return new ShirrakTankPositionBossAction(botAI); }
 

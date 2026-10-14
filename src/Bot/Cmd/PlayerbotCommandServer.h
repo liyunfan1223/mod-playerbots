@@ -23,8 +23,8 @@ private:
     PlayerbotCommandServer() = default;
     ~PlayerbotCommandServer() = default;
 
-    PlayerbotCommandServer(const PlayerbotCommandServer&) = delete;
-    PlayerbotCommandServer& operator=(const PlayerbotCommandServer&) = delete;
+    PlayerbotCommandServer(PlayerbotCommandServer const&) = delete;
+    PlayerbotCommandServer& operator=(PlayerbotCommandServer const&) = delete;
 
     PlayerbotCommandServer(PlayerbotCommandServer&&) = delete;
     PlayerbotCommandServer& operator=(PlayerbotCommandServer&&) = delete;

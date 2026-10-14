@@ -14,7 +14,9 @@
 namespace NaxxSpellIds
 {
     // Heigan
-    static constexpr uint32 Eruption10 = 29371;
+    static constexpr uint32 Eruption10 = 29371;      // cast by the floor gameobjects, not by the boss
+    static constexpr uint32 PlagueCloud = 29350;     // 45s self-channel while Heigan is on his platform (fast dance)
+    static constexpr uint32 TeleportSelf = 30211;
 /*
     SPELL_SPELL_DISRUPTION          = 29310,
     SPELL_DECREPIT_FEVER            = 29998,

@@ -11,7 +11,7 @@
 
 class PlayerbotAI;
 
-enum ChatMsg : uint32;
+#include "SharedDefines.h"
 
 class ChatValue : public ManualSetValue<ChatMsg>
 {

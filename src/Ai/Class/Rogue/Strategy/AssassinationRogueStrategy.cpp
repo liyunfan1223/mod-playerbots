@@ -57,7 +57,8 @@ private:
     }
 };
 
-AssassinationRogueStrategy::AssassinationRogueStrategy(PlayerbotAI* ai) : MeleeCombatStrategy(ai)
+AssassinationRogueStrategy::AssassinationRogueStrategy(PlayerbotAI* botAI)
+    : GenericRogueStrategy(botAI)
 {
     actionNodeFactories.Add(new AssassinationRogueStrategyActionNodeFactory());
 }
@@ -71,7 +72,7 @@ std::vector<NextAction> AssassinationRogueStrategy::getDefaultActions()
 
 void AssassinationRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    MeleeCombatStrategy::InitTriggers(triggers);
+    GenericRogueStrategy::InitTriggers(triggers);
 
     triggers.push_back(
         new TriggerNode(

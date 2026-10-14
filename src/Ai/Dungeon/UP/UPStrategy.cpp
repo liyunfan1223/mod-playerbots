@@ -5,9 +5,10 @@
  */
 
 #include "UPStrategy.h"
+#include "ChooseTargetActions.h"
 #include "UPMultipliers.h"
 
-void WotlkDungeonUPStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonUPStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Svala Sorrowgrave
 
@@ -23,10 +24,10 @@ void WotlkDungeonUPStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // King Ymiron
     // May need to avoid orb.. unclear if the generic avoid AoE does this well
     triggers.push_back(new TriggerNode("ymiron bane",
-        { NextAction("stop attack", ACTION_RAID + 5) }));
+        { NextAction("drop target", ACTION_RAID + 5) }));
 }
 
-void WotlkDungeonUPStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonUPStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new SkadiMultiplier(botAI));
     multipliers.push_back(new YmironMultiplier(botAI));

@@ -10,7 +10,7 @@
 
 namespace BlackwingLairHelpers
 {
-    bool IsActiveSuppressionDeviceInRange(const GameObject* go, const Player* bot)
+    bool IsActiveSuppressionDeviceInRange(GameObject const* go, Player const* bot)
     {
         constexpr float suppressionDeviceInteractionDistance = 15.0f;
         return go &&
@@ -24,7 +24,7 @@ namespace BlackwingLairHelpers
         GuidVector gos = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest game objects")->Get();
         for (auto const& guid : gos)
         {
-            const GameObject* go = botAI->GetGameObject(guid);
+            GameObject const* go = botAI->GetGameObject(guid);
             if (go && go->GetEntry() == static_cast<uint32>(BlackwingLairGameObjects::GO_BLACK_DRAGON_EGG))
                 return true;
         }
@@ -36,15 +36,15 @@ namespace BlackwingLairHelpers
         return PlayerbotAI::IsAssistTankOfIndex(bot, 0, true);
     }
 
-    bool IsNonBABotNearPosition(const Player* bot, Position const& position, float distance)
+    bool IsNonBABotNearPosition(Player const* bot, Position const& position, float distance)
     {
-        const Group* group = bot->GetGroup();
+        Group const* group = bot->GetGroup();
         if (!group)
             return false;
 
-        for (const GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+        for (GroupReference const* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
-            const Player* p = gref->GetSource();
+            Player const* p = gref->GetSource();
             if (!p || p == bot || !p->IsAlive() || p->GetMapId() != bot->GetMapId())
                 continue;
 
@@ -56,5 +56,17 @@ namespace BlackwingLairHelpers
         }
 
         return false;
+    }
+
+    bool IsCorruptedWhelp(Unit const* unit)
+    {
+        if (!unit)
+            return false;
+
+        const uint32 entry = unit->GetEntry();
+        return entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_RED_WHELP) ||
+            entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_GREEN_WHELP) ||
+            entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_BLUE_WHELP) ||
+            entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_BRONZE_WHELP);
     }
 }

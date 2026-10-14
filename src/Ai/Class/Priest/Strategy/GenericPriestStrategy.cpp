@@ -6,7 +6,6 @@
 
 #include "GenericPriestStrategy.h"
 #include "GenericPriestStrategyActionNodeFactory.h"
-#include "HealPriestStrategy.h"
 #include "Playerbots.h"
 
 GenericPriestStrategy::GenericPriestStrategy(PlayerbotAI* botAI) : RangedCombatStrategy(botAI)
@@ -23,19 +22,17 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         ACTION_HIGH + 5) }));
     triggers.push_back(new TriggerNode(
         "critical health", { NextAction("power word: shield", ACTION_NORMAL) }));
-
+    triggers.push_back(new TriggerNode("fear ward on main tank",
+        { NextAction("fear ward on main tank", ACTION_HIGH + 3) }));
     triggers.push_back(
         new TriggerNode("low health", { NextAction("power word: shield", ACTION_HIGH) }));
-
     triggers.push_back(
         new TriggerNode("medium mana",
             {
                 NextAction("shadowfiend", ACTION_HIGH + 2),
                 NextAction("inner focus", ACTION_HIGH + 1) }));
-
     triggers.push_back(
         new TriggerNode("low mana", { NextAction("hymn of hope", ACTION_HIGH) }));
-
     triggers.push_back(new TriggerNode("enemy too close for spell",
                                        { NextAction("flee", ACTION_MOVE + 9) }));
     triggers.push_back(new TriggerNode("often", { NextAction("apply oil", 1.0f) }));

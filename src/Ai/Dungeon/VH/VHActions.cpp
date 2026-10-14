@@ -6,6 +6,7 @@
 
 #include "VHActions.h"
 #include "Playerbots.h"
+#include "VHTriggers.h"
 
 bool AttackErekemAction::Execute(Event /*event*/)
 {
@@ -28,7 +29,7 @@ bool AttackIchorGlobuleAction::Execute(Event /*event*/)
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
 
     // Tank prioritise boss if it's up
-    if (botAI->IsTank(bot) && !boss->HasAura(SPELL_DRAINED))
+    if (PlayerbotAI::IsTank(bot) && !boss->HasAura(SPELL_DRAINED))
     {
         if (AI_VALUE(Unit*, "current target") != boss)
         {
@@ -99,9 +100,4 @@ bool AttackVoidSentryAction::Execute(Event /*event*/)
     }
 
     return false;
-}
-
-bool StopAttackAction::Execute(Event /*event*/)
-{
-    return bot->AttackStop();
 }

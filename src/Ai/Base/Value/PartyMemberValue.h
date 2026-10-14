@@ -44,7 +44,7 @@ protected:
 class PartyMemberMainTankValue : public PartyMemberValue
 {
 public:
-    PartyMemberMainTankValue(PlayerbotAI* botAI) : PartyMemberValue(botAI, "main tank member", 2 * 1000) {}
+    PartyMemberMainTankValue(PlayerbotAI* botAI) : PartyMemberValue(botAI, "main tank member", 2 * IN_MILLISECONDS) {}
     virtual Unit* Calculate();
 };
 

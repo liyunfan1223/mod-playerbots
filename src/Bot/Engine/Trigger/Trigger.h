@@ -27,6 +27,8 @@ public:
     virtual void ExternalEvent([[maybe_unused]] std::string const param, [[maybe_unused]] Player* owner = nullptr) {}
     virtual void ExternalEvent([[maybe_unused]] WorldPacket& packet, [[maybe_unused]] Player* owner = nullptr) {}
     virtual bool IsActive() { return false; }
+    virtual bool IsBuffTrigger() { return false; }
+    virtual bool IsDebuffTrigger() { return false; }
     virtual std::vector<NextAction> getHandlers() { return {}; }
     void Update() {}
     virtual void Reset() {}
@@ -45,7 +47,7 @@ class TriggerNode
 {
 public:
     TriggerNode(
-        const std::string& name,
+        std::string const& name,
         std::vector<NextAction> handlers = {}
     ) :
     trigger(nullptr),

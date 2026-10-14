@@ -20,27 +20,27 @@ class ArcaneIntellectOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     ArcaneIntellectOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "arcane intellect", 4 * 2000) {}
+        : BuffOnPartyTrigger(botAI, "arcane intellect", 8 * IN_MILLISECONDS) {}
 };
 
 class ArcaneIntellectTrigger : public BuffTrigger
 {
 public:
-    ArcaneIntellectTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane intellect", 4 * 2000) {}
+    ArcaneIntellectTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane intellect", 8 * IN_MILLISECONDS) {}
     bool IsActive() override;
 };
 
 class MageArmorTrigger : public BuffTrigger
 {
 public:
-    MageArmorTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "mage armor", 5 * 2000) {}
+    MageArmorTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "mage armor", 10 * IN_MILLISECONDS) {}
     bool IsActive() override;
 };
 
 class MoltenArmorTrigger : public BuffTrigger
 {
 public:
-    MoltenArmorTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "molten armor", 5 * 2000) {}
+    MoltenArmorTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "molten armor", 10 * IN_MILLISECONDS) {}
     bool IsActive() override;
 };
 

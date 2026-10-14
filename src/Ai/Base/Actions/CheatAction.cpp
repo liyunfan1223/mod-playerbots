@@ -16,7 +16,7 @@ bool CheatAction::Execute(Event event)
     std::vector<std::string> splitted = split(param, ',');
     for (std::vector<std::string>::iterator i = splitted.begin(); i != splitted.end(); i++)
     {
-        const char* name = i->c_str();
+        char const* name = i->c_str();
         switch (name[0])
         {
             case '+':
@@ -86,7 +86,7 @@ void CheatAction::ListCheats()
     for (int i = 0; i < log2((uint32)BotCheatMask::maxMask); i++)
     {
         BotCheatMask cheatMask = BotCheatMask(1 << i);
-        if ((uint32)cheatMask & (uint32)sPlayerbotAIConfig.botCheatMask)
+        if ((uint32)cheatMask & (uint32)sPlayerbotAIConfig.BotCheatMask)
             out << "[conf:" << GetCheatName(BotCheatMask(cheatMask)) << "]";
         else if (botAI->HasCheat(cheatMask))
             out << "[" << GetCheatName(BotCheatMask(cheatMask)) << "]";

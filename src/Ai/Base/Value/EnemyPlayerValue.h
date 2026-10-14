@@ -17,7 +17,7 @@ class Unit;
 class NearestEnemyPlayersValue : public PossibleTargetsValue
 {
 public:
-    NearestEnemyPlayersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig.grindDistance)
+    NearestEnemyPlayersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig.GrindDistance)
         : PossibleTargetsValue(botAI, "nearest enemy players", range)
     {
     }
@@ -30,7 +30,7 @@ class EnemyPlayerValue : public UnitCalculatedValue
 {
 public:
     EnemyPlayerValue(PlayerbotAI* botAI, std::string const name = "enemy player")
-        : UnitCalculatedValue(botAI, name, 1 * 1000)
+        : UnitCalculatedValue(botAI, name, 1 * IN_MILLISECONDS)
     {
     }
 

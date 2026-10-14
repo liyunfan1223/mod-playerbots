@@ -311,7 +311,7 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
 bool BGJoinAction::isUseful()
 {
     // do not try if BG bots disabled
-    if (!sPlayerbotAIConfig.randomBotJoinBG)
+    if (!sPlayerbotAIConfig.RandomBotJoinBG)
         return false;
 
     // can't queue while in BG/Arena
@@ -742,10 +742,10 @@ bool BGStatusAction::Execute(Event event)
 {
     uint32 QueueSlot;
     uint32 instanceId;
-    uint32 mapId;
-    uint32 statusid;
-    uint32 Time1;
-    uint32 Time2;
+    uint32 mapId = 0;
+    uint32 statusid = 0;
+    uint32 Time1 = 0;
+    uint32 Time2 = 0;
     std::string _bgType;
 
     uint64 arenaByte;
@@ -797,12 +797,13 @@ bool BGStatusAction::Execute(Event event)
     if (!queueTypeId)
         return false;
 
-    BattlegroundBracketId bracketId;
     Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(_bgTypeId);
     mapId = bg->GetMapId();
     PvPDifficultyEntry const* pvpDiff = GetBattlegroundBracketByLevel(mapId, bot->GetLevel());
-    if (pvpDiff)
-        bracketId = pvpDiff->GetBracketId();
+    if (!pvpDiff)
+        return false;
+
+    BattlegroundBracketId bracketId = pvpDiff->GetBracketId();
 
     bool isArena = false;
     uint8 type = false;  // arenatype if arena
@@ -933,7 +934,7 @@ bool BGStatusAction::Execute(Event event)
         if (isArena)
             timer = TIME_TO_AUTOREMOVE;
         else
-            timer = TIME_TO_AUTOREMOVE + 1000 * (bg->GetMaxPlayersPerTeam() * 8);
+            timer = TIME_TO_AUTOREMOVE + IN_MILLISECONDS * (bg->GetMaxPlayersPerTeam() * 8);
 
         if (Time2 > timer && isArena)  // disabled for BG
             leaveQ = true;

@@ -91,7 +91,7 @@ public:
         : WorldLocation(mapid, x, y, z, orientation)
     {
     }
-    WorldPosition(uint32 mapId, const Position& pos);
+    WorldPosition(uint32 mapId, Position const& pos);
     WorldPosition(WorldObject const* wo);
     WorldPosition(std::vector<WorldPosition*> list, WorldPositionConst conType);
     WorldPosition(std::vector<WorldPosition> list, WorldPositionConst conType);
@@ -100,9 +100,9 @@ public:
     WorldPosition(uint32 mapid, mGridCoord grid);
 
     //Setters
-    void set(const WorldLocation& pos);
-    void set(const WorldObject* wo);
-    void set(const WorldPosition& pos);
+    void set(WorldLocation const& pos);
+    void set(WorldObject const* wo);
+    void set(WorldPosition const& pos);
     void setMapId(uint32 id);
     void setX(float x);
     void setY(float y);
@@ -115,8 +115,8 @@ public:
 
     // Getters
     operator bool() const;
-    friend bool operator==(WorldPosition const& p1, const WorldPosition& p2);
-    friend bool operator!=(WorldPosition const& p1, const WorldPosition& p2);
+    friend bool operator==(WorldPosition const& p1, WorldPosition const& p2);
+    friend bool operator!=(WorldPosition const& p1, WorldPosition const& p2);
 
     WorldPosition& operator=(WorldPosition const&) = default;
     WorldPosition& operator+=(WorldPosition const& p1);
@@ -126,7 +126,7 @@ public:
     std::string const print();
 
     std::string const to_string();
-    std::vector<std::string> split(const std::string& s, char delimiter);
+    std::vector<std::string> split(std::string const& s, char delimiter);
 
     void printWKT(std::vector<WorldPosition> points, std::ostringstream& out, uint32 dim = 0, bool loop = false);
     void printWKT(std::ostringstream& out) { printWKT({*this}, out); }
@@ -297,11 +297,11 @@ public:
 
     std::vector<WorldPosition> getPathTo(WorldPosition endPos, Unit* bot) { return endPos.getPathFrom(*this, bot); }
 
-    bool isPathTo(std::vector<WorldPosition> path, float maxDistance = sPlayerbotAIConfig.targetPosRecalcDistance)
+    bool isPathTo(std::vector<WorldPosition> path, float maxDistance = sPlayerbotAIConfig.TargetPosRecalcDistance)
     {
         return !path.empty() && distance(path.back()) < maxDistance;
     };
-    bool cropPathTo(std::vector<WorldPosition>& path, float maxDistance = sPlayerbotAIConfig.targetPosRecalcDistance);
+    bool cropPathTo(std::vector<WorldPosition>& path, float maxDistance = sPlayerbotAIConfig.TargetPosRecalcDistance);
     bool canPathTo(WorldPosition endPos, Unit* bot) { return endPos.isPathTo(getPathTo(endPos, bot)); }
 
     float getPathLength(std::vector<WorldPosition> points)
@@ -566,18 +566,18 @@ protected:
     uint32 visitors = 0;
     uint32 maxVisitors = 0;
     uint32 maxVisitorsPerPoint = 0;
-    uint32 expireDelay = 5 * 1000;
-    uint32 cooldownDelay = 60 * 1000;
+    uint32 expireDelay = 5 * IN_MILLISECONDS;
+    uint32 cooldownDelay = MINUTE * IN_MILLISECONDS;
 };
 
 // A travel target that is always inactive and jumps to cooldown.
 class NullTravelDestination : public TravelDestination
 {
 public:
-    NullTravelDestination(uint32 cooldownDelay1 = 5 * 60 * 1000) : TravelDestination()
+    NullTravelDestination(uint32 cooldownDelay1 = 5 * MINUTE * IN_MILLISECONDS) : TravelDestination()
     {
         cooldownDelay = cooldownDelay1;
-    };
+    }
 
     Quest const* GetQuestTemplate() override { return nullptr; }
 
@@ -881,7 +881,7 @@ public:
     std::vector<WorldLocation> GetCityLocations(Player* bot);
     std::vector<uint32> GetFlightNodesInZone(uint32 zoneId, TeamId team, uint32 excludeNode = 0) const;
     bool SelectAuctioneerByMap(Player* bot, NpcLocation& outAuctioneer);
-    const std::vector<WorldLocation>& GetLocsPerLevelCache(uint8 level) { return locsPerLevelCache[level]; }
+    std::vector<WorldLocation> const& GetLocsPerLevelCache(uint8 level) { return locsPerLevelCache[level]; }
 
     template <class D, class W, class URBG>
     void weighted_shuffle(D first, D last, W first_weight, W last_weight, URBG&& g)
@@ -967,8 +967,8 @@ private:
     TravelMgr() = default;
     ~TravelMgr() = default;
 
-    TravelMgr(const TravelMgr&) = delete;
-    TravelMgr& operator=(const TravelMgr&) = delete;
+    TravelMgr(TravelMgr const&) = delete;
+    TravelMgr& operator=(TravelMgr const&) = delete;
 
     TravelMgr(TravelMgr&&) = delete;
     TravelMgr& operator=(TravelMgr&&) = delete;

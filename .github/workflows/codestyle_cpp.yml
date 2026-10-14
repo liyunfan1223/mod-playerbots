@@ -6,39 +6,31 @@ on:
       - reopened
       - synchronize
       - ready_for_review
+    paths:
+      - src/**
+      - apps/codestyle/**
+      - .github/workflows/codestyle_cpp.yml
+      - "!README.md"
+      - "!docs/**"
 
 concurrency:
-  group: "codestyle-cppcheck-${{ github.event.pull_request.number }}"
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   triage:
     runs-on: ubuntu-latest
     name: C++
-    if: github.event.pull_request.draft == false
+    if: '!github.event.pull_request.draft'
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            cpp:
-              - 'src/**'
-              - '!README.md'
-              - '!docs/**'
-
+      - uses: actions/checkout@v7
       - name: Setup python
-        if: steps.filter.outputs.cpp == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.10'
       - name: AzerothCore codestyle
-        if: steps.filter.outputs.cpp == 'true'
         run: python ./apps/codestyle/codestyle-cpp.py
-        
       - name: C++ Advanced
-        if: steps.filter.outputs.cpp == 'true'
         run: |
           sudo apt update -y
           sudo apt install -y cppcheck

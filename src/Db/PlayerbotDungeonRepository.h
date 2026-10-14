@@ -39,8 +39,8 @@ private:
     PlayerbotDungeonRepository() = default;
     ~PlayerbotDungeonRepository() = default;
 
-    PlayerbotDungeonRepository(const PlayerbotDungeonRepository&) = delete;
-    PlayerbotDungeonRepository& operator=(const PlayerbotDungeonRepository&) = delete;
+    PlayerbotDungeonRepository(PlayerbotDungeonRepository const&) = delete;
+    PlayerbotDungeonRepository& operator=(PlayerbotDungeonRepository const&) = delete;
 
     PlayerbotDungeonRepository(PlayerbotDungeonRepository&&) = delete;
     PlayerbotDungeonRepository& operator=(PlayerbotDungeonRepository&&) = delete;

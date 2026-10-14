@@ -262,8 +262,8 @@ bool TotemicRecallTrigger::IsActive()
 }
 
 // Find the active totem strategy for this slot, and return the highest-rank spellId the bot knows for it
-static uint32 GetRequiredTotemSpellId(PlayerbotAI* botAI, const char* strategies[],
-    const uint32* spellList[], const size_t spellCounts[], size_t numStrategies)
+static uint32 GetRequiredTotemSpellId(PlayerbotAI* botAI, char const* strategies[],
+    uint32 const* spellList[], const size_t spellCounts[], size_t numStrategies)
 {
     Player* bot = botAI->GetBot();
     for (size_t i = 0; i < numStrategies; ++i)
@@ -303,8 +303,8 @@ bool NoEarthTotemTrigger::IsActive()
     }
 
     // Define supported earth totem strategies for this slot:
-    static const char* names[] = {"strength of earth", "stoneskin", "tremor", "earthbind"};
-    static const uint32* spells[] = {STRENGTH_OF_EARTH_TOTEM, STONESKIN_TOTEM, TREMOR_TOTEM, EARTHBIND_TOTEM};
+    static char const* names[] = {"strength of earth", "stoneskin", "tremor", "earthbind"};
+    static uint32 const* spells[] = {STRENGTH_OF_EARTH_TOTEM, STONESKIN_TOTEM, TREMOR_TOTEM, EARTHBIND_TOTEM};
     static const size_t counts[] = {STRENGTH_OF_EARTH_TOTEM_COUNT, STONESKIN_TOTEM_COUNT, TREMOR_TOTEM_COUNT,
                                     EARTHBIND_TOTEM_COUNT};
 
@@ -344,8 +344,8 @@ bool NoFireTotemTrigger::IsActive()
     }
 
     // Define supported fire totem strategies for this slot:
-    static const char* names[] = {"searing", "magma", "flametongue", "wrath", "frost resistance"};
-    static const uint32* spells[] = {SEARING_TOTEM, MAGMA_TOTEM, FLAMETONGUE_TOTEM, TOTEM_OF_WRATH,
+    static char const* names[] = {"searing", "magma", "flametongue", "wrath", "frost resistance"};
+    static uint32 const* spells[] = {SEARING_TOTEM, MAGMA_TOTEM, FLAMETONGUE_TOTEM, TOTEM_OF_WRATH,
                                      FROST_RESISTANCE_TOTEM};
     static const size_t counts[] = {SEARING_TOTEM_COUNT, MAGMA_TOTEM_COUNT, FLAMETONGUE_TOTEM_COUNT, TOTEM_OF_WRATH_COUNT,
                                     FROST_RESISTANCE_TOTEM_COUNT};
@@ -386,8 +386,8 @@ bool NoWaterTotemTrigger::IsActive()
     }
 
     // Define supported water totem strategies for this slot:
-    static const char* names[] = {"healing stream", "mana spring", "cleansing", "fire resistance"};
-    static const uint32* spells[] = {HEALING_STREAM_TOTEM, MANA_SPRING_TOTEM, CLEANSING_TOTEM, FIRE_RESISTANCE_TOTEM};
+    static char const* names[] = {"healing stream", "mana spring", "cleansing", "fire resistance"};
+    static uint32 const* spells[] = {HEALING_STREAM_TOTEM, MANA_SPRING_TOTEM, CLEANSING_TOTEM, FIRE_RESISTANCE_TOTEM};
     static const size_t counts[] = {HEALING_STREAM_TOTEM_COUNT, MANA_SPRING_TOTEM_COUNT, CLEANSING_TOTEM_COUNT,
                                     FIRE_RESISTANCE_TOTEM_COUNT};
 
@@ -429,8 +429,8 @@ bool NoAirTotemTrigger::IsActive()
     }
 
     // Define supported air totem strategies for this slot:
-    static const char* names[] = {"wrath of air", "windfury", "nature resistance", "grounding totem"};
-    static const uint32* spells[] = {WRATH_OF_AIR_TOTEM, WINDFURY_TOTEM, NATURE_RESISTANCE_TOTEM, GROUNDING_TOTEM};
+    static char const* names[] = {"wrath of air", "windfury", "nature resistance", "grounding totem"};
+    static uint32 const* spells[] = {WRATH_OF_AIR_TOTEM, WINDFURY_TOTEM, NATURE_RESISTANCE_TOTEM, GROUNDING_TOTEM};
     static const size_t counts[] = {WRATH_OF_AIR_TOTEM_COUNT, WINDFURY_TOTEM_COUNT, NATURE_RESISTANCE_TOTEM_COUNT,
                                     GROUNDING_TOTEM_COUNT};
 

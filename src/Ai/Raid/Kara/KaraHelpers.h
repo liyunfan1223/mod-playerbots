@@ -7,13 +7,18 @@
 #ifndef PLAYERBOTS_KARAHELPERS_H
 #define PLAYERBOTS_KARAHELPERS_H
 
-#include "AiObject.h"
+#include "Common.h"
+#include "ObjectGuid.h"
 #include "Position.h"
-#include "Unit.h"
 #include <array>
 #include <ctime>
+#include <tuple>
 #include <type_traits>
 #include <unordered_map>
+#include <vector>
+
+class Player;
+class Unit;
 
 namespace KaraHelpers
 {
@@ -88,7 +93,7 @@ enum class KaraNpcs : uint32
 
 // General
 inline constexpr uint32 KARA_MAP_ID = 532;
-bool IsSafePosition (float x, float y, const std::vector<Unit*>& hazards, float hazardRadius);
+bool IsSafePosition (float x, float y, std::vector<Unit*> const& hazards, float hazardRadius);
 
 // Attumen the Huntsman
 inline Position const ATTUMEN_TANK_POSITION = { -11123.762f, -1926.619f, 49.215f };

@@ -147,7 +147,7 @@ GameObject* RazorscaleBossHelper::FindNearestHarpoon(float x, float y, float z) 
     return nearestHarpoon;
 }
 
-const std::vector<RazorscaleBossHelper::HarpoonData>& RazorscaleBossHelper::GetHarpoonData()
+std::vector<RazorscaleBossHelper::HarpoonData> const& RazorscaleBossHelper::GetHarpoonData()
 {
     static const std::vector<HarpoonData> harpoonData =
     {
@@ -216,7 +216,7 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member || !botAI->IsTank(member, true) || !member->IsAlive())
+        if (!member || !PlayerbotAI::IsTank(member, true) || !member->IsAlive())
             continue;
 
         Aura* fuseArmor = member->GetAura(SPELL_FUSEARMOR);
@@ -247,7 +247,7 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (member && botAI->IsMainTank(member))
+        if (member && PlayerbotAI::IsMainTank(member))
             group->SetGroupMemberFlag(member->GetGUID(), false, MEMBER_FLAG_MAINTANK);
     }
 

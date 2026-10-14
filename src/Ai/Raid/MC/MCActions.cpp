@@ -8,16 +8,18 @@
 #include "MCHelpers.h"
 #include "Playerbots.h"
 #include "RtiTargetValue.h"
+#include <algorithm>
 
 static constexpr float LIVING_BOMB_DISTANCE = 20.0f;
 static constexpr float INFERNO_DISTANCE = 20.0f;
 
-// don't get hit by Arcane Explosion but still be in casting range
-static constexpr float ARCANE_EXPLOSION_DISTANCE = 26.0f;
-
 // dedicated tank positions; prevents assist tanks from positioning Core Ragers on steep walls on pull
 static const Position GOLEMAGG_TANK_POSITION{795.7308, -994.8848, -207.18661};
 static const Position CORE_RAGER_TANK_POSITION{846.6453, -1019.0639, -198.9819};
+
+// Midpoint of the two tank camps (56y apart): healers standing here reach both
+static const Position GOLEMAGG_HEALER_POSITION{821.2f, -1007.0f, -203.0f};
+static constexpr float HEALER_POSITION_TOLERANCE = 8.0f;
 
 static constexpr float GOLEMAGGS_TRUST_DISTANCE = 30.0f;
 static constexpr float CORE_RAGER_STEP_DISTANCE = 5.0f;
@@ -36,9 +38,9 @@ bool McMoveFromBaronGeddonAction::Execute(Event /*event*/)
         float distToTravel = INFERNO_DISTANCE - bot->GetDistance2d(boss);
         if (distToTravel > 0)
         {
-            // Stop current spell first
+            // Stop channeling spell first
             bot->AttackStop();
-            bot->InterruptNonMeleeSpells(false);
+            bot->CastStop();
 
             return MoveAway(boss, distToTravel);
         }
@@ -55,6 +57,76 @@ bool McShazzrahMoveAwayAction::Execute(Event /*event*/)
             return MoveAway(boss, distToTravel);
     }
     return false;
+}
+
+bool McMoveFromLavaAction::Execute(Event /*event*/)
+{
+    // Escape to the nearest raid member on dry ground: raids fight on the
+    // rock shelves, so a dry teammate marks the closest safe floor.
+    Unit* dryTarget = nullptr;
+    float bestDist = 100.0f;
+
+    if (Group* group = bot->GetGroup())
+    {
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member || member == bot || !member->IsAlive() || member->GetMapId() != bot->GetMapId())
+                continue;
+
+            if (member->GetLiquidData().Flags & MAP_LIQUID_TYPE_MAGMA)
+                continue;
+
+            float dist = bot->GetDistance(member);
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                dryTarget = member;
+            }
+        }
+    }
+
+    // No dry raid member in range: stay put and let the in-lava trigger fire
+    // again — any other destination (the current target included) can path
+    // straight back into the pool.
+    if (!dryTarget)
+        return false;
+
+    bot->CastStop();
+
+    if (!MoveTo(dryTarget->GetMapId(), dryTarget->GetPositionX(), dryTarget->GetPositionY(),
+                dryTarget->GetPositionZ(), false, false, false, true, MovementPriority::MOVEMENT_FORCED))
+        return false;
+
+    // Hold the AI so rotation/facing actions can't cancel the escape spline
+    // mid-lava. Capped at 2s on purpose: the in-lava trigger refires and
+    // re-issues the escape while the bot is still swimming.
+    constexpr uint32 MAX_ESCAPE_HOLD_MS = 2000;
+    constexpr float MIN_ESCAPE_SPEED = 0.1f;
+
+    float const speed = bot->GetSpeed(MOVE_RUN);
+    if (speed > MIN_ESCAPE_SPEED)
+        botAI->SetNextCheckDelay(
+            std::min(MAX_ESCAPE_HOLD_MS, uint32(IN_MILLISECONDS * bot->GetDistance(dryTarget) / speed)));
+
+    return true;
+}
+
+bool McGolemaggBackOffAction::Execute(Event /*event*/)
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", "golemagg the incinerator");
+    if (!boss)
+        return false;
+
+    // Out of swing range the stack stops growing and expires 30s after
+    // the last application; the multiplier blocks re-engaging until then.
+    bot->CastStop();
+
+    float distToTravel = MAGMA_SPLASH_BACK_OFF_DISTANCE - bot->GetDistance2d(boss);
+    if (distToTravel <= 0.0f)
+        return true;
+
+    return MoveAway(boss, distToTravel);
 }
 
 bool McGolemaggMarkBossAction::Execute(Event /*event*/)
@@ -74,7 +146,7 @@ bool McGolemaggMarkBossAction::Execute(Event /*event*/)
     return false;
 }
 
-bool McGolemaggTankAction::MoveUnitToPosition(Unit* target, const Position& tankPosition, float maxDistance,
+bool McGolemaggTankAction::MoveUnitToPosition(Unit* target, Position const& tankPosition, float maxDistance,
                                               float stepDistance)
 {
     if (bot->GetVictim() != target)
@@ -134,6 +206,16 @@ bool McGolemaggMainTankAttackGolemaggAction::Execute(Event /*event*/)
             return MoveUnitToPosition(boss, GOLEMAGG_TANK_POSITION, boss->GetCombatReach());
     }
     return false;
+}
+
+bool McGolemaggHealerPositionAction::Execute(Event /*event*/)
+{
+    if (bot->GetExactDist2d(GOLEMAGG_HEALER_POSITION) <= HEALER_POSITION_TOLERANCE)
+        return false;
+
+    return MoveTo(bot->GetMapId(), GOLEMAGG_HEALER_POSITION.GetPositionX(), GOLEMAGG_HEALER_POSITION.GetPositionY(),
+                  GOLEMAGG_HEALER_POSITION.GetPositionZ(), false, false, false, false,
+                  MovementPriority::MOVEMENT_COMBAT, true, false);
 }
 
 bool McGolemaggAssistTankAttackCoreRagerAction::Execute(Event event)

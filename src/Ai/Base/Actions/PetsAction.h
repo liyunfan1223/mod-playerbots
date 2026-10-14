@@ -15,12 +15,34 @@ class PlayerbotAI;
 class PetsAction : public Action
 {
 public:
-    PetsAction(PlayerbotAI* botAI, const std::string& defaultCmd = "") : Action(botAI, "pet"), defaultCmd(defaultCmd) {}
+    PetsAction(PlayerbotAI* botAI, std::string const& defaultCmd = "") : Action(botAI, "pet"), defaultCmd(defaultCmd) {}
 
     bool Execute(Event event) override;
 
 private:
     std::string defaultCmd;
+};
+
+class TogglePetSpellAutoCastAction : public Action
+{
+public:
+    TogglePetSpellAutoCastAction(PlayerbotAI* botAI) : Action(botAI, "toggle pet spell") {}
+    virtual bool Execute(Event event) override;
+};
+
+class PetAttackAction : public Action
+{
+public:
+    PetAttackAction(PlayerbotAI* botAI) : Action(botAI, "pet attack") {}
+    virtual bool Execute(Event event) override;
+};
+
+class SetPetStanceAction : public Action
+{
+public:
+    SetPetStanceAction(PlayerbotAI* botAI) : Action(botAI, "set pet stance") {}
+
+    bool Execute(Event event) override;
 };
 
 #endif

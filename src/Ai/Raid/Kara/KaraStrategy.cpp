@@ -8,7 +8,6 @@
 #include "AiObjectContext.h"
 #include "KaraHelpers.h"
 #include "KaraMultipliers.h"
-#include "PlayerbotAI.h"
 #include "Playerbots.h"
 
 void RaidKarazhanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -18,7 +17,7 @@ void RaidKarazhanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         { NextAction("karazhan reset encounter states", ACTION_EMERGENCY + 10) }
     ));
     triggers.push_back(new TriggerNode("karazhan enemies cast fear",
-        { NextAction("karazhan cast fear protection spell", ACTION_RAID) }
+        { NextAction("karazhan set tremor totem", ACTION_RAID) }
     ));
 
     // Trash

@@ -53,10 +53,32 @@ public:
     bool IsActive() override;
 };
 
+class McGolemaggIsHealerTrigger : public Trigger
+{
+public:
+    McGolemaggIsHealerTrigger(PlayerbotAI* botAI) : Trigger(botAI, "mc golemagg is healer") {}
+    bool IsActive() override;
+};
+
 class McCoreHoundMarkTrigger : public Trigger
 {
 public:
     McCoreHoundMarkTrigger(PlayerbotAI* botAI) : Trigger(botAI, "mc core hound mark") {}
+    bool IsActive() override;
+};
+
+// Standing/swimming in magma (knocked into a lava pool by Ragnaros' Wrath or an Eruption)
+class McInLavaTrigger : public Trigger
+{
+public:
+    McInLavaTrigger(PlayerbotAI* botAI) : Trigger(botAI, "mc in lava") {}
+    bool IsActive() override;
+};
+
+class McGolemaggMagmaSplashTrigger : public Trigger
+{
+public:
+    McGolemaggMagmaSplashTrigger(PlayerbotAI* botAI) : Trigger(botAI, "mc golemagg magma splash") {}
     bool IsActive() override;
 };
 

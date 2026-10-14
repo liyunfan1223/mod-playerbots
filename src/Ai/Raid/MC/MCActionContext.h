@@ -33,6 +33,9 @@ public:
         creators["mc majordomo shadow resistance"] = &RaidMcActionContext::majordomo_shadow_resistance;
         creators["mc ragnaros fire resistance"] = &RaidMcActionContext::ragnaros_fire_resistance;
         creators["mc core hound mark"] = &RaidMcActionContext::core_hound_mark;
+        creators["mc move from lava"] = &RaidMcActionContext::move_from_lava;
+        creators["mc golemagg back off"] = &RaidMcActionContext::golemagg_back_off;
+        creators["mc golemagg healer position"] = &RaidMcActionContext::golemagg_healer_position;
     }
 
 private:
@@ -52,6 +55,9 @@ private:
     static Action* majordomo_shadow_resistance(PlayerbotAI* botAI) { return new BossShadowResistanceAction(botAI, "majordomo executus"); }
     static Action* ragnaros_fire_resistance(PlayerbotAI* botAI) { return new BossFireResistanceAction(botAI, "ragnaros"); }
     static Action* core_hound_mark(PlayerbotAI* botAI) { return new McCoreHoundMarkAction(botAI); }
+    static Action* move_from_lava(PlayerbotAI* botAI) { return new McMoveFromLavaAction(botAI); }
+    static Action* golemagg_back_off(PlayerbotAI* botAI) { return new McGolemaggBackOffAction(botAI); }
+    static Action* golemagg_healer_position(PlayerbotAI* botAI) { return new McGolemaggHealerPositionAction(botAI); }
 };
 
 #endif

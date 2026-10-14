@@ -483,7 +483,9 @@ void TalentSpec::ShiftTalents(TalentSpec* currentSpec, uint32 level)
 
     for (auto& entry : deltaList)
     {
-        if (entry.rank < 0)  // We have to remove talents. Might as well reset and crop the new list.
+        // We have to remove talents. Might as well reset and crop the new list.
+        // rank is unsigned, so a removal (new < old) wraps around; read it as signed to detect that.
+        if (static_cast<int32>(entry.rank) < 0)
         {
             CropTalents(level);
             return;

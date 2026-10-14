@@ -5,79 +5,53 @@
  */
 
 #include "NaxxActions.h"
-#include "NaxxSpellIds.h"
+#include "LastMovementValue.h"
 #include "Playerbots.h"
-#include "Spell.h"
-#include "Timer.h"
 
-//bool HeiganDanceAction::CalculateSafe()
-//{
-//    Unit* boss = AI_VALUE2(Unit*, "find target", "heigan the unclean");
-//    if (!boss)
-//    {
-//        return false;
-//    }
-//    uint32 now = getMSTime();
-//    platform_phase = boss->IsWithinDist2d(platform.first, platform.second, 10.0f);
-//    if (last_eruption_ms != 0 && now - last_eruption_ms > 15000)
-//    {
-//        ResetSafe();
-//    }
-//    if (boss->HasUnitState(UNIT_STATE_CASTING))
-//    {
-//        Spell* spell = boss->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-//        if (!spell)
-//        {
-//            spell = boss->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
-//        }
-//        if (spell)
-//        {
-//            SpellInfo const* info = spell->GetSpellInfo();
-//            bool isEruption = NaxxSpellIds::MatchesAnySpellId(info, {NaxxSpellIds::Eruption10});
-//            if (!isEruption && info && info->SpellName[LOCALE_enUS])
-//            {
-//                // Fallback to name for custom spell data.
-//                isEruption = botAI->EqualLowercaseName(info->SpellName[LOCALE_enUS], "eruption");
-//            }
-//            if (isEruption)
-//            {
-//                if (last_eruption_ms == 0 || now - last_eruption_ms > 500)
-//                {
-//                    NextSafe();
-//                }
-//                last_eruption_ms = now;
-//            }
-//        }
-//    }
-//    return true;
-//}
-//
-//bool HeiganDanceMeleeAction::Execute(Event event)
-//{
-//    CalculateSafe();
-//    if (!platform_phase && botAI->IsMainTank(bot) && !AI_VALUE2(bool, "has aggro", "boss target"))
-//    {
-//        return false;
-//    }
-//    assert(curr_safe >= 0 && curr_safe <= 3);
-//    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(),
-//                      botAI->IsMainTank(bot) ? 0 : 0, MovementPriority::MOVEMENT_COMBAT);
-//}
-//
-//bool HeiganDanceRangedAction::Execute(Event event)
-//{
-//    CalculateSafe();
-//    if (!platform_phase)
-//    {
-//        if (MoveTo(bot->GetMapId(), platform.first, platform.second, 276.54f, false, false, false, false,
-//                   MovementPriority::MOVEMENT_COMBAT))
-//        {
-//            return true;
-//        }
-//        return MoveInside(bot->GetMapId(), platform.first, platform.second, 276.54f, 2.0f,
-//                          MovementPriority::MOVEMENT_COMBAT);
-//    }
-//    botAI->InterruptSpell();
-//    return MoveInside(bot->GetMapId(), waypoints[curr_safe].first, waypoints[curr_safe].second, bot->GetPositionZ(), 0,
-//                      MovementPriority::MOVEMENT_COMBAT);
-//}
+bool HeiganDanceAction::MoveToWaypoint(uint32 index, float distance)
+{
+    if (index >= HeiganBossHelper::WaypointCount)
+        return false;
+
+    if (int32(index) != lastWaypoint)
+    {
+        // New safe spot: forget the previous (same priority) move so we are not stuck waiting for it,
+        // and stop whatever we were casting.
+        lastWaypoint = int32(index);
+        AI_VALUE(LastMovement&, "last movement").Set(nullptr);
+        bot->CastStop();
+    }
+
+    return MoveInside(bot->GetMapId(), HeiganBossHelper::WaypointX[index], HeiganBossHelper::WaypointY[index],
+                      bot->GetPositionZ(), distance, MovementPriority::MOVEMENT_COMBAT);
+}
+
+bool HeiganDanceAction::MoveToPlatform(float distance)
+{
+    if (lastWaypoint != -1)
+    {
+        lastWaypoint = -1;
+        AI_VALUE(LastMovement&, "last movement").Set(nullptr);
+    }
+
+    return MoveInside(bot->GetMapId(), HeiganBossHelper::PlatformX, HeiganBossHelper::PlatformY,
+                      HeiganBossHelper::PlatformZ, distance, MovementPriority::MOVEMENT_COMBAT);
+}
+
+bool HeiganDanceAction::Execute(Event /*event*/)
+{
+    if (!helper.UpdateBossAI())
+        return false;
+
+    // Slow dance: the platform is safe from eruptions. Ranged leave it right after the last slow eruption
+    // so they are out of Plague Cloud range (and at the first fast spot) before the fast dance starts.
+    if (ranged)
+        return helper.ShouldRangedHoldPlatform() ? MoveToPlatform(2.0f)
+                                                 : MoveToWaypoint(helper.GetSafeWaypoint(), 1.5f);
+
+    // The boss follows the main tank, so the tank first has to hold him before it can lead the dance.
+    if (!helper.ShouldDance())
+        return false;
+
+    return MoveToWaypoint(helper.GetSafeWaypoint(), PlayerbotAI::IsMainTank(bot) ? 0.5f : 1.5f);
+}

@@ -18,21 +18,21 @@ const Position BRONJAHM_TANK_POSITION = Position(5297.920f, 2506.698f, 686.068f)
 class MoveFromBronjahmAction : public MovementAction
 {
 public:
-    MoveFromBronjahmAction(PlayerbotAI* ai) : MovementAction(ai, "move from bronjahm") {}
+    MoveFromBronjahmAction(PlayerbotAI* botAI) : MovementAction(botAI, "move from bronjahm") {}
     bool Execute(Event event) override;
 };
 
 class AttackCorruptedSoulFragmentAction : public AttackAction
 {
 public:
-    AttackCorruptedSoulFragmentAction(PlayerbotAI* ai) : AttackAction(ai, "attack corrupted soul fragment") {}
+    AttackCorruptedSoulFragmentAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack corrupted soul fragment") {}
     bool Execute(Event event) override;
 };
 
 class BronjahmGroupPositionAction : public AttackAction
 {
 public:
-    BronjahmGroupPositionAction(PlayerbotAI* ai) : AttackAction(ai, "bronjahm group position") {}
+    BronjahmGroupPositionAction(PlayerbotAI* botAI) : AttackAction(botAI, "bronjahm group position") {}
 
     bool Execute(Event event) override;
 
@@ -42,8 +42,8 @@ public:
 class DevourerOfSoulsAction : public AttackAction
 {
 public:
-    DevourerOfSoulsAction(PlayerbotAI * ai, float distance = 10.0f, float delta_angle = M_PI / 8)
-        : AttackAction(ai, "devourer of souls")
+    DevourerOfSoulsAction(PlayerbotAI* botAI, float distance = 10.0f, float delta_angle = M_PI / 8)
+        : AttackAction(botAI, "devourer of souls")
     {
         this->distance = distance;
         this->delta_angle = delta_angle;

@@ -15,15 +15,13 @@ class RaidGruulsLairActionContext : public NamedObjectContext<Action>
 public:
     RaidGruulsLairActionContext()
     {
-        // High King Maulgar
-        creators["high king maulgar main tank attack maulgar"] =
-            &RaidGruulsLairActionContext::high_king_maulgar_main_tank_attack_maulgar;
+        // General
+        creators["gruul's lair reset encounter states"] =
+            &RaidGruulsLairActionContext::gruuls_lair_reset_encounter_states;
 
-        creators["high king maulgar first assist tank attack olm"] =
-            &RaidGruulsLairActionContext::high_king_maulgar_first_assist_tank_attack_olm;
-
-        creators["high king maulgar second assist tank attack blindeye"] =
-            &RaidGruulsLairActionContext::high_king_maulgar_second_assist_tank_attack_blindeye;
+        // High King Maulgar <Lord of the Ogres>
+        creators["high king maulgar melee tanks position bosses"] =
+            &RaidGruulsLairActionContext::high_king_maulgar_melee_tanks_position_bosses;
 
         creators["high king maulgar mage tank attack krosh"] =
             &RaidGruulsLairActionContext::high_king_maulgar_mage_tank_attack_krosh;
@@ -37,8 +35,8 @@ public:
         creators["high king maulgar run away from whirlwind"] =
             &RaidGruulsLairActionContext::high_king_maulgar_run_away_from_whirlwind;
 
-        creators["high king maulgar move away from blast nova danger"] =
-            &RaidGruulsLairActionContext::high_king_maulgar_move_away_from_blast_nova_danger;
+        creators["high king maulgar back away from krosh"] =
+            &RaidGruulsLairActionContext::high_king_maulgar_back_away_from_krosh;
 
         creators["high king maulgar banish fel stalker"] =
             &RaidGruulsLairActionContext::high_king_maulgar_banish_fel_stalker;
@@ -53,20 +51,22 @@ public:
         creators["gruul the dragonkiller spread ranged"] =
             &RaidGruulsLairActionContext::gruul_the_dragonkiller_spread_ranged;
 
+        creators["gruul the dragonkiller get out of cave in"] =
+            &RaidGruulsLairActionContext::gruul_the_dragonkiller_get_out_of_cave_in;
+
         creators["gruul the dragonkiller shatter spread"] =
             &RaidGruulsLairActionContext::gruul_the_dragonkiller_shatter_spread;
     }
 
 private:
+    // General
+    static Action* gruuls_lair_reset_encounter_states(PlayerbotAI* botAI) {
+        return new GruulsLairResetEncounterStatesAction(botAI);
+    }
+
     // High King Maulgar
-    static Action* high_king_maulgar_main_tank_attack_maulgar(PlayerbotAI* botAI) {
-        return new HighKingMaulgarMainTankAttackMaulgarAction(botAI);
-    }
-    static Action* high_king_maulgar_first_assist_tank_attack_olm(PlayerbotAI* botAI) {
-        return new HighKingMaulgarFirstAssistTankAttackOlmAction(botAI);
-    }
-    static Action* high_king_maulgar_second_assist_tank_attack_blindeye(PlayerbotAI* botAI) {
-        return new HighKingMaulgarSecondAssistTankAttackBlindeyeAction(botAI);
+    static Action* high_king_maulgar_melee_tanks_position_bosses(PlayerbotAI* botAI) {
+        return new HighKingMaulgarMeleeTanksPositionBossesAction(botAI);
     }
     static Action* high_king_maulgar_mage_tank_attack_krosh(PlayerbotAI* botAI) {
         return new HighKingMaulgarMageTankAttackKroshAction(botAI);
@@ -75,13 +75,13 @@ private:
         return new HighKingMaulgarMoonkinTankAttackKigglerAction(botAI);
     }
     static Action* high_king_maulgar_assign_dps_priority(PlayerbotAI* botAI) {
-        return new HighKingMaulgarAssignDPSPriorityAction(botAI);
+        return new HighKingMaulgarAssignDpsPriorityAction(botAI);
     }
     static Action* high_king_maulgar_run_away_from_whirlwind(PlayerbotAI* botAI) {
         return new HighKingMaulgarRunAwayFromWhirlwindAction(botAI);
     }
-    static Action* high_king_maulgar_move_away_from_blast_nova_danger(PlayerbotAI* botAI) {
-        return new HighKingMaulgarMoveAwayFromBlastNovaDangerAction(botAI);
+    static Action* high_king_maulgar_back_away_from_krosh(PlayerbotAI* botAI) {
+        return new HighKingMaulgarBackAwayFromKroshAction(botAI);
     }
     static Action* high_king_maulgar_banish_fel_stalker(PlayerbotAI* botAI) {
         return new HighKingMaulgarBanishFelStalkerAction(botAI);
@@ -96,6 +96,9 @@ private:
     }
     static Action* gruul_the_dragonkiller_spread_ranged(PlayerbotAI* botAI) {
         return new GruulTheDragonkillerSpreadRangedAction(botAI);
+    }
+    static Action* gruul_the_dragonkiller_get_out_of_cave_in(PlayerbotAI* botAI) {
+        return new GruulTheDragonkillerGetOutOfCaveInAction(botAI);
     }
     static Action* gruul_the_dragonkiller_shatter_spread(PlayerbotAI* botAI) {
         return new GruulTheDragonkillerShatterSpreadAction(botAI);

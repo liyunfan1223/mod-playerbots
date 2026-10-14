@@ -10,268 +10,293 @@
 #include "Action.h"
 #include "AttackAction.h"
 #include "MovementActions.h"
+#include "Position.h"
+#include <string>
 
 // General
 
-class HyjalSummitEraseTrackersAction : public Action
+class HyjalResetEncounterStatesAction : public Action
 {
 public:
-    HyjalSummitEraseTrackersAction(
-        PlayerbotAI* botAI) : Action(botAI, "hyjal summit erase trackers") {}
+    HyjalResetEncounterStatesAction(PlayerbotAI* botAI)
+        : Action(botAI, "hyjal reset encounter states") {}
+    bool Execute(Event event) override;
+};
+
+class HyjalMisdirectBossToMainTankAction : public Action
+{
+public:
+    HyjalMisdirectBossToMainTankAction(
+        PlayerbotAI* botAI, std::string const& name, std::string const& bossName)
+        : Action(botAI, name), _bossName(bossName) {}
+    bool Execute(Event event) override;
+
+private:
+    std::string const _bossName;
+};
+
+// For all five bosses. _bailBelowHealthPct is the tank's own health, below which it stops walking
+// the boss.
+class HyjalMainTankPositionBossAction : public AttackAction
+{
+public:
+    HyjalMainTankPositionBossAction(
+        PlayerbotAI* botAI, std::string const& name, std::string const& bossName,
+        Position const& position, float bailBelowHealthPct = 0.0f)
+        : AttackAction(botAI, name), _bossName(bossName), _position(position),
+          _bailBelowHealthPct(bailBelowHealthPct) {}
+    bool Execute(Event event) override;
+
+private:
+    std::string const _bossName;
+    Position const _position;
+    float const _bailBelowHealthPct;
+};
+
+// Remove Mark of Kaz'rogal and Doomfire in certain cases
+class HyjalRemoveDangerousDotAction : public Action
+{
+public:
+    HyjalRemoveDangerousDotAction(PlayerbotAI* botAI)
+        : Action(botAI, "hyjal remove dangerous dot") {}
     bool Execute(Event event) override;
 };
 
 // Rage Winterchill
 
-class RageWinterchillMisdirectBossToMainTankAction : public AttackAction
+class RageWinterchillRangedGetOutOfDeathAndDecayAction : public MovementAction
 {
 public:
-    RageWinterchillMisdirectBossToMainTankAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "rage winterchill misdirect boss to main tank") {}
-    bool Execute(Event event) override;
-};
-
-class RageWinterchillMainTankPositionBossAction : public AttackAction
-{
-public:
-    RageWinterchillMainTankPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "rage winterchill main tank position boss") {}
+    RageWinterchillRangedGetOutOfDeathAndDecayAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "rage winterchill ranged get out of death and decay") {}
     bool Execute(Event event) override;
 };
 
 class RageWinterchillSpreadRangedInCircleAction : public MovementAction
 {
 public:
-    RageWinterchillSpreadRangedInCircleAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "rage winterchill spread ranged in circle") {}
+    RageWinterchillSpreadRangedInCircleAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "rage winterchill spread ranged in circle") {}
     bool Execute(Event event) override;
+    bool ResetWinterchillPositionReached()
+    {
+        if (!_winterchillPositionReached)
+            return false;
+        _winterchillPositionReached = false;
+        return true;
+    }
+
+private:
+    bool _winterchillPositionReached = false;
 };
 
-class RageWinterchillMeleeGetOutOfDeathAndDecayAction : public AttackAction
+class RageWinterchillMeleeManeuverThroughDeathAndDecayAction : public AttackAction
 {
 public:
-    RageWinterchillMeleeGetOutOfDeathAndDecayAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "rage winterchill melee get out of death and decay") {}
+    RageWinterchillMeleeManeuverThroughDeathAndDecayAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "rage winterchill melee maneuver through death and decay") {}
     bool Execute(Event event) override;
 };
 
 // Anetheron
 
-class AnetheronMisdirectBossAndInfernalsToTanksAction : public AttackAction
+class AnetheronMisdirectBossAndInfernalsToTanksAction : public Action
 {
 public:
-    AnetheronMisdirectBossAndInfernalsToTanksAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "anetheron misdirect boss and infernals to tanks") {}
-    bool Execute(Event event) override;
-};
-
-class AnetheronMainTankPositionBossAction : public AttackAction
-{
-public:
-    AnetheronMainTankPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "anetheron main tank position boss") {}
+    AnetheronMisdirectBossAndInfernalsToTanksAction(PlayerbotAI* botAI)
+        : Action(botAI, "anetheron misdirect boss and infernals to tanks") {}
     bool Execute(Event event) override;
 };
 
 class AnetheronSpreadRangedInCircleAction : public MovementAction
 {
 public:
-    AnetheronSpreadRangedInCircleAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "anetheron spread ranged in circle") {}
+    AnetheronSpreadRangedInCircleAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "anetheron spread ranged in circle") {}
+    bool Execute(Event event) override;
+    bool ResetAnetheronPositionReached()
+    {
+        if (!_anetheronPositionReached)
+            return false;
+        _anetheronPositionReached = false;
+        return true;
+    }
+
+private:
+    bool _anetheronPositionReached = false;
+};
+
+class AnetheronMoveAwayFromInfernoTargetAction : public MovementAction
+{
+public:
+    AnetheronMoveAwayFromInfernoTargetAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "anetheron move away from inferno target") {}
     bool Execute(Event event) override;
 };
 
 class AnetheronBringInfernalToInfernalTankAction : public MovementAction
 {
 public:
-    AnetheronBringInfernalToInfernalTankAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "anetheron bring infernal to infernal tank") {}
+    AnetheronBringInfernalToInfernalTankAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "anetheron bring infernal to infernal tank") {}
     bool Execute(Event event) override;
 };
 
-class AnetheronFirstAssistTankPickUpInfernalsAction : public AttackAction
+class AnetheronInfernalTankTakePositionAction : public MovementAction
 {
 public:
-    AnetheronFirstAssistTankPickUpInfernalsAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "anetheron first assist tank pick up infernals") {}
+    AnetheronInfernalTankTakePositionAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "anetheron infernal tank take position") {}
+    bool Execute(Event event) override;
+};
+
+class AnetheronGetOutOfImmolationAction : public MovementAction
+{
+public:
+    AnetheronGetOutOfImmolationAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "anetheron get out of immolation") {}
     bool Execute(Event event) override;
 };
 
 class AnetheronAssignDpsPriorityAction : public AttackAction
 {
 public:
-    AnetheronAssignDpsPriorityAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "anetheron assign dps priority") {}
+    AnetheronAssignDpsPriorityAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "anetheron assign dps priority") {}
     bool Execute(Event event) override;
 };
 
 // Kaz'rogal
 
-class KazrogalMisdirectBossToMainTankAction : public AttackAction
+class KazrogalAssistTanksMoveInFrontAction : public AttackAction
 {
 public:
-    KazrogalMisdirectBossToMainTankAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "kaz'rogal misdirect boss to main tank") {}
-    bool Execute(Event event) override;
-};
-
-class KazrogalMainTankPositionBossAction : public AttackAction
-{
-public:
-    KazrogalMainTankPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "kaz'rogal main tank position boss") {}
-    bool Execute(Event event) override;
-};
-
-class KazrogalAssistTanksMoveInFrontOfBossAction : public AttackAction
-{
-public:
-    KazrogalAssistTanksMoveInFrontOfBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "kaz'rogal assist tanks move in front of boss") {}
+    KazrogalAssistTanksMoveInFrontAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "kaz'rogal assist tanks move in front") {}
     bool Execute(Event event) override;
 };
 
 class KazrogalSpreadRangedInArcAction : public MovementAction
 {
 public:
-    KazrogalSpreadRangedInArcAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "kaz'rogal spread ranged in arc") {}
+    KazrogalSpreadRangedInArcAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "kaz'rogal spread ranged in arc") {}
     bool Execute(Event event) override;
 };
 
-class KazrogalLowManaBotTakeDefensiveMeasuresAction : public MovementAction
+class KazrogalMoveAwayFromGroupAction : public MovementAction
 {
 public:
-KazrogalLowManaBotTakeDefensiveMeasuresAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "kaz'rogal low mana bot take defensive measures") {}
+    KazrogalMoveAwayFromGroupAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "kaz'rogal move away from group") {}
     bool Execute(Event event) override;
 };
 
-class KazrogalCastShadowProtectionSpellAction : public Action
+class KazrogalActivateAspectOfTheViperAction : public Action
 {
 public:
-    KazrogalCastShadowProtectionSpellAction(
-        PlayerbotAI* botAI) : Action(botAI, "kaz'rogal cast shadow protection spell") {}
+    KazrogalActivateAspectOfTheViperAction(PlayerbotAI* botAI)
+        : Action(botAI, "kaz'rogal activate aspect of the viper") {}
+    bool Execute(Event event) override;
+};
+
+class KazrogalCancelImmunityAction : public Action
+{
+public:
+    KazrogalCancelImmunityAction(PlayerbotAI* botAI) : Action(botAI, "kaz'rogal cancel immunity") {}
+    bool Execute(Event event) override;
+};
+
+class KazrogalWarlockManageManaAction : public Action
+{
+public:
+    KazrogalWarlockManageManaAction(PlayerbotAI* botAI)
+        : Action(botAI, "kaz'rogal warlock manage mana") {}
     bool Execute(Event event) override;
 };
 
 // Azgalor
 
-class AzgalorMisdirectBossToMainTankAction : public AttackAction
-{
-public:
-    AzgalorMisdirectBossToMainTankAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "azgalor misdirect boss to main tank") {}
-    bool Execute(Event event) override;
-};
-
-class AzgalorMainTankPositionBossAction : public AttackAction
-{
-public:
-    AzgalorMainTankPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "azgalor main tank position boss") {}
-    bool Execute(Event event) override;
-};
-
-class AzgalorWaitAtSafePositionAction : public MovementAction
-{
-public:
-    AzgalorWaitAtSafePositionAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "azgalor wait at safe position") {}
-    bool Execute(Event event) override;
-};
-
 class AzgalorDisperseRangedAction : public MovementAction
 {
 public:
-    AzgalorDisperseRangedAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "azgalor disperse ranged") {}
+    AzgalorDisperseRangedAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "azgalor disperse ranged") {}
     bool Execute(Event event) override;
 };
 
-class AzgalorMeleeGetOutOfFireAndSwapTargetsAction : public AttackAction
+class AzgalorMeleeManeuverThroughFireAction : public MovementAction
 {
 public:
-    AzgalorMeleeGetOutOfFireAndSwapTargetsAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "azgalor melee get out of fire and swap targets") {}
+    AzgalorMeleeManeuverThroughFireAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "azgalor melee maneuver through fire") {}
+    bool Execute(Event event) override;
+};
+
+class AzgalorRangedGetOutOfRainOfFireAction : public MovementAction
+{
+public:
+    AzgalorRangedGetOutOfRainOfFireAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "azgalor ranged get out of rain of fire") {}
     bool Execute(Event event) override;
 };
 
 class AzgalorMoveToDoomguardTankAction : public MovementAction
 {
 public:
-    AzgalorMoveToDoomguardTankAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "azgalor move to doomguard tank") {}
+    AzgalorMoveToDoomguardTankAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "azgalor move to doomguard tank") {}
     bool Execute(Event event) override;
 };
 
-class AzgalorFirstAssistTankPositionDoomguardAction : public AttackAction
+// The Doomguard tank is the first assist tank, or the second when the first is Doomed.
+class AzgalorTankPositionDoomguardAction : public AttackAction
 {
 public:
-    AzgalorFirstAssistTankPositionDoomguardAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "azgalor first assist tank position doomguard") {}
+    AzgalorTankPositionDoomguardAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "azgalor tank position doomguard") {}
     bool Execute(Event event) override;
 };
 
-class AzgalorRangedDpsPrioritizeDoomguardsAction : public AttackAction
+class AzgalorDetermineDpsPriorityAction : public AttackAction
 {
 public:
-    AzgalorRangedDpsPrioritizeDoomguardsAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "azgalor ranged dps prioritize doomguards") {}
+    AzgalorDetermineDpsPriorityAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "azgalor determine dps priority") {}
     bool Execute(Event event) override;
 };
 
 // Archimonde
 
-class ArchimondeMisdirectBossToMainTankAction : public AttackAction
+class ArchimondeSetTremorTotemAction : public Action
 {
 public:
-    ArchimondeMisdirectBossToMainTankAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "archimonde misdirect boss to main tank") {}
+    ArchimondeSetTremorTotemAction(PlayerbotAI* botAI)
+        : Action(botAI, "archimonde set tremor totem") {}
     bool Execute(Event event) override;
 };
 
-class ArchimondeMoveBossToInitialPositionAction : public AttackAction
+class ArchimondeKeepAirBurstAwayFromTankAction : public MovementAction
 {
 public:
-    ArchimondeMoveBossToInitialPositionAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "archimonde move boss to initial position") {}
+    ArchimondeKeepAirBurstAwayFromTankAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "archimonde keep air burst away from tank") {}
     bool Execute(Event event) override;
 };
 
-class ArchimondeCastFearImmunitySpellAction : public Action
+class ArchimondeSpreadRangedAction : public MovementAction
 {
 public:
-    ArchimondeCastFearImmunitySpellAction(
-        PlayerbotAI* botAI) : Action(botAI, "archimonde cast fear immunity spell") {}
-    bool Execute(Event event) override;
-
-private:
-    bool CastFearWardOnMainTank();
-    bool UseTremorTotemStrategy();
-};
-
-class ArchimondeSpreadToAvoidAirBurstAction : public MovementAction
-{
-public:
-    ArchimondeSpreadToAvoidAirBurstAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "archimonde spread to avoid air burst") {}
+    ArchimondeSpreadRangedAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "archimonde spread ranged") {}
     bool Execute(Event event) override;
 };
 
 class ArchimondeAvoidDoomfireAction : public MovementAction
 {
 public:
-    ArchimondeAvoidDoomfireAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "archimonde avoid doomfire") {}
-    bool Execute(Event event) override;
-};
-
-class ArchimondeRemoveDoomfireDotAction : public Action
-{
-public:
-    ArchimondeRemoveDoomfireDotAction(
-        PlayerbotAI* botAI) : Action(botAI, "archimonde remove doomfire dot") {}
+    ArchimondeAvoidDoomfireAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "archimonde avoid doomfire") {}
     bool Execute(Event event) override;
 };
 

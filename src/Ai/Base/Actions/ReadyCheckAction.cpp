@@ -11,6 +11,14 @@
 #include <mutex>
 #include <vector>
 
+static void SendReadyConfirm(Player* bot)
+{
+    WorldPacket packet(MSG_RAID_READY_CHECK);
+    packet << bot->GetGUID();
+    packet << uint8(1);
+    bot->GetSession()->HandleRaidReadyCheckOpcode(packet);
+}
+
 std::string const formatPercent(std::string const name, uint8 value, float percent)
 {
     std::ostringstream out;
@@ -47,7 +55,7 @@ class HealthChecker : public ReadyChecker
 public:
     bool Check(PlayerbotAI* /*botAI*/, AiObjectContext* context) override
     {
-        return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.almostFullHealth;
+        return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.AlmostFullHealth;
     }
 
     std::string const getName() override { return "HP"; }
@@ -59,7 +67,7 @@ public:
     bool Check(PlayerbotAI* /*botAI*/, AiObjectContext* context) override
     {
         return !AI_VALUE2(bool, "has mana", "self target") ||
-               AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.mediumHealth;
+               AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.MediumHealth;
     }
 
     std::string const getName() override { return "MP"; }
@@ -73,7 +81,7 @@ public:
         Player* bot = botAI->GetBot();
         if (Player* master = botAI->GetMaster())
         {
-            bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig.sightDistance;
+            bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig.SightDistance;
             if (!distance)
             {
                 return false;
@@ -159,12 +167,21 @@ bool ReadyCheckAction::Execute(Event event)
         p >> player;
         if (player == bot->GetGUID())
             return false;
+
+        // Defer the ready reply until buffs are topped off.
+        if (sPlayerbotAIConfig.ForceRebuffOnReadyCheck && !bot->IsInCombat() &&
+            botAI->HasStrategy("force rebuff", BOT_STATE_NON_COMBAT))
+        {
+            ReportReadinessToMaster();
+            botAI->forceRebuff.Begin(true);
+            return true;
+        }
     }
 
     return ReadyCheck();
 }
 
-bool ReadyCheckAction::ReadyCheck()
+void ReadyCheckAction::ReportReadinessToMaster()
 {
     std::call_once(
         ReadyChecker::initFlag,
@@ -214,11 +231,15 @@ bool ReadyCheckAction::ReadyCheck()
     }
 
     botAI->TellMaster(out);
+}
 
-    WorldPacket packet(MSG_RAID_READY_CHECK);
-    packet << bot->GetGUID();
-    packet << uint8(1);
-    bot->GetSession()->HandleRaidReadyCheckOpcode(packet);
+bool ReadyCheckAction::ReadyCheck()
+{
+    ReportReadinessToMaster();
+
+    SendReadyConfirm(bot);
+
+    botAI->forceRebuff.End();
 
     botAI->ChangeStrategy("-ready check", BOT_STATE_NON_COMBAT);
 
@@ -226,3 +247,30 @@ bool ReadyCheckAction::ReadyCheck()
 }
 
 bool FinishReadyCheckAction::Execute(Event /*event*/) { return ReadyCheck(); }
+
+// Manual "rebuff" command: opens a rebuff window with no ready check to answer.
+bool ForceRebuffAction::Execute(Event /*event*/)
+{
+    if (bot->IsInCombat() || !botAI->HasStrategy("force rebuff", BOT_STATE_NON_COMBAT))
+        return false;
+
+    botAI->forceRebuff.Begin(false);
+    return true;
+}
+
+bool ReadyReplyAction::isUseful()
+{
+    ForceRebuffState const& rebuff = botAI->forceRebuff;
+    return rebuff.IsPending() && !rebuff.IsOnGlobalCooldown() &&
+           !bot->GetCurrentSpell(CURRENT_GENERIC_SPELL) && !bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) &&
+           !rebuff.IsBuffPendingThisCycle();
+}
+
+bool ReadyReplyAction::Execute(Event /*event*/)
+{
+    if (botAI->forceRebuff.ShouldReplyToReadyCheck())
+        SendReadyConfirm(bot);
+
+    botAI->forceRebuff.End();
+    return true;
+}

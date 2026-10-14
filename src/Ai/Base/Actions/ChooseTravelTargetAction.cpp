@@ -42,7 +42,7 @@ bool ChooseTravelTargetAction::Execute(Event /*event*/)
 void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget)
 {
     // Join groups members
-    bool foundTarget = foundTarget = SetGroupTarget(newTarget);
+    bool foundTarget = SetGroupTarget(newTarget);
 
     //Empty bags/repair
     if (!foundTarget && urand(1, 100) > 10 && bot->GetLevel() > 5)           //90% chance
@@ -362,7 +362,7 @@ bool ChooseTravelTargetAction::getBestDestination(std::vector<TravelDestination*
     if (availablePoints.empty())  // No points available.
         return false;
 
-    TravelDestination* targetDestination;
+    TravelDestination* targetDestination = nullptr;
 
     for (auto activeTarget : *activeDestinations)  // Pick the destination that has this point.
         if (activeTarget->distanceTo(availablePoints.front()) == 0)
@@ -963,8 +963,8 @@ bool ChooseTravelTargetAction::needForQuest(Unit* target)
     return false;
 }
 
-bool ChooseTravelTargetAction::needItemForQuest(uint32 itemId, const Quest* questTemplate,
-                                                const QuestStatusData* questStatus)
+bool ChooseTravelTargetAction::needItemForQuest(uint32 itemId, Quest const* questTemplate,
+                                                QuestStatusData const* questStatus)
 {
     for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
     {

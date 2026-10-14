@@ -7,7 +7,7 @@
 #include "GDStrategy.h"
 #include "GDMultipliers.h"
 
-void WotlkDungeonGDStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonGDStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Moorabi
 
@@ -20,6 +20,10 @@ void WotlkDungeonGDStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         { NextAction("avoid poison nova", ACTION_RAID + 5) }));
     triggers.push_back(new TriggerNode("snake wrap",
         { NextAction("attack snake wrap", ACTION_RAID + 4) }));
+    triggers.push_back(new TriggerNode("slad'ran stack on tank",
+        { NextAction("slad'ran stack on tank", ACTION_RAID + 1) }));
+    triggers.push_back(new TriggerNode("slad'ran tank hold",
+        { NextAction("slad'ran tank hold", ACTION_RAID + 1) }));
 
     // Gal'darah
     triggers.push_back(new TriggerNode("whirling slash",
@@ -28,7 +32,7 @@ void WotlkDungeonGDStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
     // Eck the Ferocious (Heroic only)
 }
 
-void WotlkDungeonGDStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonGDStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new SladranMultiplier(botAI));
     multipliers.push_back(new GaldarahMultiplier(botAI));

@@ -108,8 +108,8 @@ bool RsHalionTankPositionAction::Execute(Event )
 
     if (bot->GetExactDist2d(home) > 1.0f)
     {
-        if (committed && bot->IsNonMeleeSpellCast(false))
-            bot->InterruptNonMeleeSpells(false);
+        if (committed)
+            bot->CastStop();
 
         if (committed && !bot->HasAura(RS_SPELL_NITRO_BOOSTS))
             bot->AddAura(RS_SPELL_NITRO_BOOSTS, bot);
@@ -128,17 +128,17 @@ bool RsHalionAvoidConesAction::Execute(Event )
     if (PlayerbotAI::IsMainTank(bot))
         return false;
 
-    if (botAI->IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
+    if (PlayerbotAI::IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
         return false;
 
     Unit* boss = RsHalionAnyPhysicalBoss(botAI);
     if (!boss)
         return false;
 
-    bool const melee = botAI->IsMelee(bot);
+    bool const melee = PlayerbotAI::IsMelee(bot);
     bool const addsUp = RsHalionAnyAddAlive(botAI);
 
-    if (!botAI->IsTank(bot) && !addsUp && RsHalionRealmThrottled(botAI, bot) &&
+    if (!PlayerbotAI::IsTank(bot) && !addsUp && RsHalionRealmThrottled(botAI, bot) &&
         (RsHalionLeadingTooMuch(botAI, bot) || RsHalionInThrottledHalf(bot)))
     {
         if (bot->GetVictim())
@@ -255,7 +255,7 @@ bool RsHalionCombustionAction::Execute(Event )
 
 bool RsHalionMeteorAction::Execute(Event )
 {
-    if (botAI->IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
+    if (PlayerbotAI::IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
         return false;
 
     if (!RsHalionAnyPhysicalBoss(botAI))
@@ -264,8 +264,7 @@ bool RsHalionMeteorAction::Execute(Event )
     if (!RsHalionMeteorShouldRally(bot))
         return false;
 
-    if (bot->IsNonMeleeSpellCast(false))
-        bot->InterruptNonMeleeSpells(false);
+    bot->CastStop();
     botAI->Reset();
 
     Position const& target = RsHalionMeteorSpot(bot->GetInstanceId());
@@ -576,8 +575,7 @@ bool RsHalionP2AvoidConesAction::Execute(Event )
 
     if (RsHalionCutterBeamDanger(botAI, bot) && singleCutter && cutterFiring)
     {
-        if (bot->IsNonMeleeSpellCast(false))
-            bot->InterruptNonMeleeSpells(false);
+        bot->CastStop();
 
         Unit* na = pairs[0].first;
         Unit* nb = pairs[0].second;
@@ -609,13 +607,13 @@ bool RsHalionP2AvoidConesAction::Execute(Event )
     if (loose && bot->IsNonMeleeSpellCast(false, false, true))
         return false;
 
-    if (RsHalionCutterBeamDanger(botAI, bot) && cutterFiring && bot->IsNonMeleeSpellCast(false))
-        bot->InterruptNonMeleeSpells(false);
+    if (RsHalionCutterBeamDanger(botAI, bot) && cutterFiring)
+        bot->CastStop();
 
     float const bossX = boss->GetPositionX();
     float const bossY = boss->GetPositionY();
     float const bossToTank = std::atan2(tank->GetPositionY() - bossY, tank->GetPositionX() - bossX);
-    float const radius = botAI->IsMelee(bot) ? RS_HALION_P2_MELEE_DIST : RS_HALION_P2_RANGED_DIST;
+    float const radius = PlayerbotAI::IsMelee(bot) ? RS_HALION_P2_MELEE_DIST : RS_HALION_P2_RANGED_DIST;
     float slotAngle = bossToTank + static_cast<float>(M_PI) * 95.0f / 180.0f;
 
     if (singleCutter && cutterFiring)

@@ -38,8 +38,8 @@ private:
     GuildTaskMgr() = default;
     ~GuildTaskMgr() = default;
 
-    GuildTaskMgr(const GuildTaskMgr&) = delete;
-    GuildTaskMgr& operator=(const GuildTaskMgr&) = delete;
+    GuildTaskMgr(GuildTaskMgr const&) = delete;
+    GuildTaskMgr& operator=(GuildTaskMgr const&) = delete;
 
     GuildTaskMgr(GuildTaskMgr&&) = delete;
     GuildTaskMgr& operator=(GuildTaskMgr&&) = delete;

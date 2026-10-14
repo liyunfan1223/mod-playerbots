@@ -56,6 +56,23 @@ void FireMageStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
+
+    triggers.push_back(
+        new TriggerNode(
+            "enemy too close for spell",
+            {
+                NextAction("dragon's breath", ACTION_INTERRUPT + 1)
+            }
+        )
+    );
+    triggers.push_back(
+        new TriggerNode(
+            "enemy is close",
+            {
+                NextAction("blast wave", ACTION_INTERRUPT)
+            }
+        )
+    );
 }
 
 // Combat strategy to run to melee for Dragon's Breath and Blast Wave

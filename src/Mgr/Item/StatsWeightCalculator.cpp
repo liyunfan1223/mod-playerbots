@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
- * and/or modify it under version 3 of the License, or (at your option), any later version.
+ * This file is part of the mod-playerbots module for AzerothCore. See AUTHORS file for Copyright
+ * information; released under GNU GPL v2 license, redistribute/modify under version 2 of the License,
+ * or (at your option) any later version.
  */
 
 #include "StatsWeightCalculator.h"
@@ -61,7 +62,7 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
     cls = player->getClass();
     lvl = player->GetLevel();
     tab = AiFactory::GetPlayerSpecTab(player);
-    collector_ = std::make_unique<StatsCollector>(type_, cls);
+    collector_ = std::make_unique<StatsCollector>(type_, cls, lvl);
 
     if (cls == CLASS_DEATH_KNIGHT && tab == DEATH_KNIGHT_TAB_UNHOLY)
         hitOverflowType_ = CollectorType::SPELL;
@@ -74,7 +75,6 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
 
     enable_overflow_penalty_ = true;
     enable_item_set_bonus_ = true;
-    enable_quality_blend_ = true;
 }
 
 void StatsWeightCalculator::Reset()
@@ -117,19 +117,8 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
 
     CalculateSocketBonus(player_, proto);
 
-    if (enable_quality_blend_)
-    {
-        // Heirloom items scale with player level
-        // Use player level as effective item level for heirlooms - Quality EPIC
-        // Else - Blend with item quality and level for normal items
-        if (proto->Quality == ITEM_QUALITY_HEIRLOOM)
-            weight_ *= PlayerbotFactory::CalcMixedGearScore(lvl, ITEM_QUALITY_EPIC);
-        else
-            weight_ *= PlayerbotFactory::CalcMixedGearScore(proto->ItemLevel, proto->Quality);
-    }
-
     // Apply weapon speed governance if slot is provided and this is a weapon
-    if (sPlayerbotAIConfig.preferredSpecWeapons && slot >= 0 && proto->Class == ITEM_CLASS_WEAPON)
+    if (sPlayerbotAIConfig.PreferredSpecWeapons && slot >= 0 && proto->Class == ITEM_CLASS_WEAPON)
         weight_ *= ApplyPreferredSpecWeapons(proto, slot);
 
     return weight_;
@@ -313,7 +302,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_CRIT] += 1.5f;
         stats_weights_[STATS_TYPE_HASTE] += 2.1f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.1f;
-        stats_weights_[STATS_TYPE_MELEE_DPS] += 15.0f;
+        // Weapon DPS is taken into account as part of Attack Power for Cat Druids.
     }
     else if (cls == CLASS_ROGUE && (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY))
     {
@@ -516,7 +505,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_CRIT] += 1.3f;
         stats_weights_[STATS_TYPE_HASTE] += 2.3f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 3.7f;
-        stats_weights_[STATS_TYPE_MELEE_DPS] += 3.0f;
+        // Weapon DPS is taken into account as part of Attack Power for Bear Druids.
     }
 }
 
@@ -559,8 +548,6 @@ void StatsWeightCalculator::GenerateAdditionalWeights(Player* player)
 
     if (pvpSpec_ && !exclude_resilience_)
         stats_weights_[STATS_TYPE_RESILIENCE] += 7.0f;
-    else if (!pvpSpec_)
-        stats_weights_[STATS_TYPE_RESILIENCE] -= 3.0f;
 }
 
 void StatsWeightCalculator::CalculateItemSetMod(Player* player, ItemTemplate const* proto)
@@ -581,7 +568,7 @@ void StatsWeightCalculator::CalculateItemSetMod(Player* player, ItemTemplate con
             if (itemSet != setId)
                 continue;
 
-            const ItemSetEntry* setEntry = sItemSetStore.LookupEntry(setId);
+            ItemSetEntry const* setEntry = sItemSetStore.LookupEntry(setId);
             if (!setEntry)
                 continue;
 

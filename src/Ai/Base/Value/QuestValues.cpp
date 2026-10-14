@@ -5,9 +5,11 @@
  */
 
 #include "QuestValues.h"
+
 #include "MapMgr.h"
 #include "Playerbots.h"
 #include "SharedValueContext.h"
+#include <array>
 
 // What kind of a relation does this entry have with this quest.
 entryQuestRelationMap EntryQuestRelationMapValue::Calculate()
@@ -60,17 +62,34 @@ void FindQuestObjectData::GetObjectiveEntries()
     relationMap = GAI_VALUE(entryQuestRelationMap, "entry quest relation");
 }
 
+// Every entry a spawn point can hold: the base from `creature`, plus up to two
+// `creature_multispawn` alternates rolled between on respawn. 0 = no alternate.
+static std::array<uint32, 3> SpawnEntries(CreatureData const& creData)
+{
+    return { creData.id, creData.id2, creData.id3 };
+}
+
 // Data worker. Checks for a specific creature what quest they are needed for and puts them in the proper place in the
 // quest map.
 void FindQuestObjectData::operator()(CreatureData const& creData)
 {
-    uint32 entry = creData.id;
-
-    for (auto& relation : relationMap[entry])
+    // The GuidPosition keeps the spawn's base entry, which can disagree with the alternate it
+    // is filed under. It resolves by spawnId, and consumers read the map key.
+    for (uint32 entry : SpawnEntries(creData))
     {
-        uint32 questId = relation.first;
-        uint32 flag = relation.second;
-        data[questId][flag][entry].push_back(GuidPosition(creData));
+        if (!entry)
+            continue;
+
+        auto relations = relationMap.find(int32(entry));
+        if (relations == relationMap.end())
+            continue;
+
+        for (auto& relation : relations->second)
+        {
+            uint32 questId = relation.first;
+            uint32 flag = relation.second;
+            data[questId][flag][entry].push_back(GuidPosition(creData));
+        }
     }
 }
 

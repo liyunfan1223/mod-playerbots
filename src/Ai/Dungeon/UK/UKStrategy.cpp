@@ -7,7 +7,7 @@
 #include "UKStrategy.h"
 #include "UKMultipliers.h"
 
-void WotlkDungeonUKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonUKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Prince Keleseth
     triggers.push_back(new TriggerNode("keleseth frost tomb",
@@ -18,10 +18,6 @@ void WotlkDungeonUKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
              { NextAction("attack dalronn", ACTION_RAID + 1) }));
 
     // Ingvar the Plunderer
-
-    // Doesn't work yet, this action doesn't get processed until the existing cast finishes
-    // triggers.push_back(new TriggerNode("ingvar staggering roar",
-    //          { NextAction("ingvar stop casting", ACTION_RAID + 1) }));
 
     // No easy way to check LoS here, the pillars do not seem to count as gameobjects.
     // Not implemented for now, unsure if this is needed as a good group can probably burst through the boss
@@ -40,7 +36,7 @@ void WotlkDungeonUKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 
 }
 
-void WotlkDungeonUKStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonUKStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new PrinceKelesethMultiplier(botAI));
     multipliers.push_back(new SkarvaldAndDalronnMultiplier(botAI));

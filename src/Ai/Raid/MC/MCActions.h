@@ -36,6 +36,22 @@ public:
     bool Execute(Event event) override;
 };
 
+class McMoveFromLavaAction : public MovementAction
+{
+public:
+    McMoveFromLavaAction(PlayerbotAI* botAI, std::string const name = "mc move from lava")
+        : MovementAction(botAI, name) {}
+    bool Execute(Event event) override;
+};
+
+class McGolemaggBackOffAction : public MovementAction
+{
+public:
+    McGolemaggBackOffAction(PlayerbotAI* botAI, std::string const name = "mc golemagg back off")
+        : MovementAction(botAI, name) {}
+    bool Execute(Event event) override;
+};
+
 class McGolemaggMarkBossAction : public Action
 {
 public:
@@ -50,7 +66,7 @@ public:
     McGolemaggTankAction(PlayerbotAI* botAI, std::string const name)
         : AttackAction(botAI, name) {}
 protected:
-    bool MoveUnitToPosition(Unit* target, const Position& tankPosition, float maxDistance, float stepDistance = 3.0f);
+    bool MoveUnitToPosition(Unit* target, Position const& tankPosition, float maxDistance, float stepDistance = 3.0f);
     bool FindCoreRagers(Unit*& coreRager1, Unit*& coreRager2) const;
 };
 
@@ -67,6 +83,14 @@ class McGolemaggAssistTankAttackCoreRagerAction : public McGolemaggTankAction
 public:
     McGolemaggAssistTankAttackCoreRagerAction(PlayerbotAI* botAI, std::string const name = "mc golemagg assist tank attack core rager")
         : McGolemaggTankAction(botAI, name) {};
+    bool Execute(Event event) override;
+};
+
+class McGolemaggHealerPositionAction : public MovementAction
+{
+public:
+    McGolemaggHealerPositionAction(PlayerbotAI* botAI, std::string const name = "mc golemagg healer position")
+        : MovementAction(botAI, name) {}
     bool Execute(Event event) override;
 };
 

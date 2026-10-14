@@ -9,43 +9,25 @@
 
 #include "Action.h"
 #include "AttackAction.h"
-#include "GenericSpellActions.h"
-#include "PlayerbotAI.h"
-#include "Playerbots.h"
-#include "VHTriggers.h"
 
 class AttackErekemAction : public AttackAction
 {
 public:
-    AttackErekemAction(PlayerbotAI* ai) : AttackAction(ai, "attack erekem") {}
-    bool Execute(Event event) override;
-};
-
-class AttackIchoronElementalsAction : public AttackAction
-{
-public:
-    AttackIchoronElementalsAction(PlayerbotAI* ai) : AttackAction(ai, "attack ichoron elementals") {}
+    AttackErekemAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack erekem") {}
     bool Execute(Event event) override;
 };
 
 class AttackIchorGlobuleAction : public AttackAction
 {
 public:
-    AttackIchorGlobuleAction(PlayerbotAI* ai) : AttackAction(ai, "attack ichor globule") {}
+    AttackIchorGlobuleAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack ichor globule") {}
     bool Execute(Event event) override;
 };
 
 class AttackVoidSentryAction : public AttackAction
 {
 public:
-    AttackVoidSentryAction(PlayerbotAI* ai) : AttackAction(ai, "attack void sentry") {}
-    bool Execute(Event event) override;
-};
-
-class StopAttackAction : public Action
-{
-public:
-    StopAttackAction(PlayerbotAI* ai) : Action(ai, "stop attack") {}
+    AttackVoidSentryAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack void sentry") {}
     bool Execute(Event event) override;
 };
 

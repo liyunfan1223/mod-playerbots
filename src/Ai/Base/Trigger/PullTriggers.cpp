@@ -43,7 +43,7 @@ bool PullEndTrigger::IsActive()
 
     float distanceToPullTarget = bot->GetDistance(target);
     if (distanceToPullTarget > ATTACK_DISTANCE && !target->IsNonMeleeSpellCast(false, false, true) &&
-        (!botAI->IsRanged(bot) || distanceToPullTarget > botAI->GetRange("spell")))
+        (!PlayerbotAI::IsRanged(bot) || distanceToPullTarget > botAI->GetRange("spell")))
         return false;
 
     if (!botAI->HasStrategy("pull back", BOT_STATE_COMBAT))
@@ -67,5 +67,5 @@ bool ReturnToPullPositionTrigger::IsActive()
 
     PositionInfo pullPosition = AI_VALUE(PositionMap&, "position")["pull"];
     return pullPosition.isSet() && pullPosition.mapId == bot->GetMapId() &&
-           bot->GetDistance(pullPosition.x, pullPosition.y, pullPosition.z) > sPlayerbotAIConfig.followDistance;
+           bot->GetDistance(pullPosition.x, pullPosition.y, pullPosition.z) > sPlayerbotAIConfig.FollowDistance;
 }

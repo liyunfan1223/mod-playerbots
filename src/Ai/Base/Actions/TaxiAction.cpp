@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may redistribute it
- * and/or modify it under version 3 of the License, or (at your option), any later version.
+ * This file is part of the mod-playerbots module for AzerothCore. See AUTHORS file for Copyright
+ * information; released under GNU GPL v2 license, redistribute/modify under version 2 of the License,
+ * or (at your option) any later version.
  */
 
 #include "TaxiAction.h"
@@ -39,7 +40,7 @@ bool TaxiAction::Execute(Event event)
         if (!(npc->GetNpcFlags() & UNIT_NPC_FLAG_FLIGHTMASTER))
             continue;
 
-        if (bot->GetDistance(npc) > sPlayerbotAIConfig.farDistance)
+        if (bot->GetDistance(npc) > sPlayerbotAIConfig.FarDistance)
             continue;
 
         bot->GetSession()->SendLearnNewTaxiNode(npc);
@@ -62,11 +63,11 @@ bool TaxiAction::Execute(Event event)
         if (botAI->HasGameClientMaster())
         {
             uint32 index = botAI->GetGroupSlotIndex(bot);
-            uint32 delay = sPlayerbotAIConfig.botTaxiDelayMin +
-                          index * sPlayerbotAIConfig.botTaxiGapMs +
-                          urand(0, sPlayerbotAIConfig.botTaxiGapJitterMs);
+            uint32 delay = sPlayerbotAIConfig.BotTaxiDelayMin +
+                          index * sPlayerbotAIConfig.BotTaxiGapMs +
+                          urand(0, sPlayerbotAIConfig.BotTaxiGapJitterMs);
 
-            delay = std::min(delay, sPlayerbotAIConfig.botTaxiDelayMax);
+            delay = std::min(delay, sPlayerbotAIConfig.BotTaxiDelayMax);
 
             // Store the NPC's GUID so we can re-acquire the pointer later
             ObjectGuid npcGuid = npc->GetGUID();

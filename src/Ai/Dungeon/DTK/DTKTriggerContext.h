@@ -24,11 +24,11 @@ class WotlkDungeonDTKTriggerContext : public NamedObjectContext<Trigger>
 
         }
     private:
-        static Trigger* corpse_explode(PlayerbotAI* ai) { return new CorpseExplodeTrigger(ai); }
-        static Trigger* arcane_field(PlayerbotAI* ai) { return new ArcaneFieldTrigger(ai); }
-        // static Trigger* crystal_handler(PlayerbotAI* ai) { return new CrystalHandlerTrigger(ai); }
-        static Trigger* gift_of_tharonja(PlayerbotAI* ai) { return new GiftOfTharonjaTrigger(ai); }
-        static Trigger* tharonja_out_of_melee(PlayerbotAI* ai) { return new TwoTriggers(ai, "gift of tharon'ja", "enemy out of melee"); }
+        static Trigger* corpse_explode(PlayerbotAI* botAI) { return new CorpseExplodeTrigger(botAI); }
+        static Trigger* arcane_field(PlayerbotAI* botAI) { return new ArcaneFieldTrigger(botAI); }
+        // static Trigger* crystal_handler(PlayerbotAI* botAI) { return new CrystalHandlerTrigger(botAI); }
+        static Trigger* gift_of_tharonja(PlayerbotAI* botAI) { return new GiftOfTharonjaTrigger(botAI); }
+        static Trigger* tharonja_out_of_melee(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "gift of tharon'ja", "enemy out of melee"); }
 };
 
 #endif

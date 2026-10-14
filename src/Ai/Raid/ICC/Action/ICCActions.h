@@ -344,7 +344,7 @@ public:
         bool hasLowestGuid = false;
     };
     SporeInfo FindSporedPlayers();
-    Position DetermineTargetPosition(bool hasSpore, const SporeInfo& sporeInfo, const Position& spreadRangedPos);
+    Position DetermineTargetPosition(bool hasSpore, SporeInfo const& sporeInfo, Position const& spreadRangedPos);
     bool CheckMainTankSpore();
     bool GooNear(Position const& pos);
 };
@@ -552,7 +552,7 @@ public:
 
     bool HandleTankPosition(Unit* boss, Aura* frenzyAura, Aura* shadowAura);
     bool HandleShadowsMovement();
-    Position AdjustControlPoint(const Position& wall, const Position& center, float factor);
+    Position AdjustControlPoint(Position const& wall, Position const& center, float factor);
     Position CalculateBezierPoint(float t, const Position path[4]);
     bool HandleGroupPosition(Unit* boss, Aura* frenzyAura, Aura* shadowAura);
 
@@ -577,8 +577,8 @@ public:
         : MovementAction(botAI, "icc bql pact of darkfallen") {}
     bool Execute(Event event) override;
 
-    bool CalculateCenterPosition(Position& targetPos, const std::vector<Player*>& playersWithAura);
-    bool MoveToTargetPosition(const Position& targetPos, int auraCount);
+    bool CalculateCenterPosition(Position& targetPos, std::vector<Player*> const& playersWithAura);
+    bool MoveToTargetPosition(Position const& targetPos, int auraCount);
 };
 
 class IccBqlVampiricBiteAction : public AttackAction
@@ -673,7 +673,7 @@ public:
 
     bool HandleTankPositioning(Unit* boss);
     bool HandleNonTankPositioning();
-    bool MoveIncrementallyToPosition(const Position& targetPos, float maxStep);
+    bool MoveIncrementallyToPosition(Position const& targetPos, float maxStep);
 };
 
 class IccSindragosaFrostBeaconAction : public MovementAction
@@ -684,11 +684,11 @@ public:
     bool Execute(Event event) override;
 
     bool HandleSupportActions();
-    bool HandleBeaconedPlayer(const Unit* boss);
-    bool HandleNonBeaconedPlayer(const Unit* boss);
-    bool MoveToPositionIfNeeded(const Position& position, float tolerance);
-    bool MoveToPosition(const Position& position);
-    bool IsBossFlying(const Unit* boss);
+    bool HandleBeaconedPlayer(Unit const* boss);
+    bool HandleNonBeaconedPlayer(Unit const* boss);
+    bool MoveToPositionIfNeeded(Position const& position, float tolerance);
+    bool MoveToPosition(Position const& position);
+    bool IsBossFlying(Unit const* boss);
     bool TryDropTombFlares(Unit const* boss);
 
     private:

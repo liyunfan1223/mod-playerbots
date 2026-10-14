@@ -16,7 +16,7 @@
 float BjarngrimMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "general bjarngrim");
-    if (!boss || botAI->IsHeal(bot)) { return 1.0f; }
+    if (!boss || PlayerbotAI::IsHeal(bot)) { return 1.0f; }
 
     if (boss->HasUnitState(UNIT_STATE_CASTING) && boss->FindCurrentSpellBySpellId(SPELL_WHIRLWIND_BJARNGRIM))
     {
@@ -42,7 +42,7 @@ float BjarngrimMultiplier::GetValue(Action* action)
         }
     }
 
-    if (!boss_add || botAI->IsTank(bot)) { return 1.0f; }
+    if (!boss_add || PlayerbotAI::IsTank(bot)) { return 1.0f; }
 
     if (dynamic_cast<DpsAssistAction*>(action))
     {
@@ -60,7 +60,7 @@ float BjarngrimMultiplier::GetValue(Action* action)
 float VolkhanMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "volkhan");
-    if (!boss || botAI->IsTank(bot) || botAI->IsHeal(bot)) { return 1.0f; }
+    if (!boss || PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot)) { return 1.0f; }
 
     if (dynamic_cast<DpsAssistAction*>(action))
     {

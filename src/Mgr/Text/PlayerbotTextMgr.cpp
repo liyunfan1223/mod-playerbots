@@ -5,12 +5,13 @@
  */
 
 #include "PlayerbotTextMgr.h"
+#include "PlayerbotsDatabase.h"
 #include "DatabaseEnv.h"
 #include "QueryResult.h"    // Required due to a poor implementation by AC
 #include "Random.h"
 #include "WorldSessionMgr.h"
 
-void PlayerbotTextMgr::replaceAll(std::string& str, const std::string& from, const std::string& to)
+void PlayerbotTextMgr::replaceAll(std::string& str, std::string const& from, std::string const& to)
 {
     if (from.empty())
         return;
@@ -55,7 +56,8 @@ void PlayerbotTextMgr::LoadBotTextChance()
 {
     if (botTextChance.empty())
     {
-        QueryResult results = PlayerbotsDatabase.Query("SELECT name, probability FROM ai_playerbot_texts_chance");
+        PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_TEXT_CHANCE);
+        PreparedQueryResult results = PlayerbotsDatabase.Query(stmt);
         if (results)
         {
             do

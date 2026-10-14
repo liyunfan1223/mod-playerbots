@@ -8,7 +8,9 @@
 #include "GenericTriggers.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "TargetValue.h"
 
 static const uint32 SOUL_SHARD_ITEM_ID = 6265;
 
@@ -91,7 +93,7 @@ bool DecimationTrigger::IsActive()
 // Checks if the bot's mana is below 85% and health is above a low health threshold
 bool LifeTapTrigger::IsActive()
 {
-    if (AI_VALUE2(uint8, "health", "self target") <= sPlayerbotAIConfig.lowHealth)
+    if (AI_VALUE2(uint8, "health", "self target") <= sPlayerbotAIConfig.LowHealth)
         return false;
 
     if (!AI_VALUE2(bool, "has mana", "self target"))
@@ -163,7 +165,7 @@ bool CurseOfWeaknessTrigger::IsActive()
 
 struct WarlockPetDef
 {
-    const char* strategy;  // The strategy string as recognized by the AI (e.g., "imp", "voidwalker", etc.)
+    char const* strategy;  // The strategy string as recognized by the AI (e.g., "imp", "voidwalker", etc.)
     uint32 spellId;        // The spell ID required to summon this pet
     uint32 npcEntry;       // The NPC entry ID for the summoned pet creature
 };
@@ -184,9 +186,9 @@ bool WrongPetTrigger::IsActive()
     // Step 1: Count how many pet strategies are currently enabled for this bot.
     //         While doing so, also remember which pet strategy is the only enabled one (if that's the case).
     int enabledCount = 0;
-    const WarlockPetDef* enabledPet =
+    WarlockPetDef const* enabledPet =
         nullptr;  // Pointer to the pet definition of the enabled strategy, if only one is enabled
-    for (const WarlockPetDef& pd : pets)
+    for (WarlockPetDef const& pd : pets)
     {
         if (botAI->HasStrategy(pd.strategy, BOT_STATE_NON_COMBAT))
         {
@@ -247,10 +249,7 @@ bool RainOfFireChannelCheckTrigger::IsActive()
     {
         // Only trigger if the spell being channeled is Rain of Fire
         if (RAIN_OF_FIRE_SPELL_IDS.count(spell->m_spellInfo->Id))
-        {
-            uint8 attackerCount = AI_VALUE(uint8, "attacker count");
-            return attackerCount < minEnemies;
-        }
+            return !HasEnoughAoeTargets(botAI, bot->GetPosition(), sPlayerbotAIConfig.SightDistance, minEnemies);
     }
 
     // Not channeling Rain of Fire

@@ -19,6 +19,7 @@ class WorldPacketTrigger : public Trigger
 public:
     WorldPacketTrigger(PlayerbotAI* botAI, std::string const command) : Trigger(botAI, command), triggered(false) {}
 
+    using Trigger::ExternalEvent;  // keep the std::string overload visible
     void ExternalEvent(WorldPacket& packet, Player* owner = nullptr) override;
     Event Check() override;
     void Reset() override;

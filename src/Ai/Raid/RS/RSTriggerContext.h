@@ -46,34 +46,34 @@ public:
     }
 
 private:
-    static Trigger* rs_baltharus_brand(PlayerbotAI* ai) { return new RsBaltharusBrandTrigger(ai); }
-    static Trigger* rs_baltharus_tank_position(PlayerbotAI* ai) { return new RsBaltharusTankPositionTrigger(ai); }
-    static Trigger* rs_baltharus_avoid_front(PlayerbotAI* ai) { return new RsBaltharusAvoidFrontTrigger(ai); }
-    static Trigger* rs_baltharus_healer_position(PlayerbotAI* ai) { return new RsBaltharusHealerPositionTrigger(ai); }
-    static Trigger* rs_saviana_conflagration(PlayerbotAI* ai) { return new RsSavianaConflagrationTrigger(ai); }
-    static Trigger* rs_saviana_avoid_front(PlayerbotAI* ai) { return new RsSavianaAvoidFrontTrigger(ai); }
-    static Trigger* rs_saviana_tank_position(PlayerbotAI* ai) { return new RsSavianaTankPositionTrigger(ai); }
-    static Trigger* rs_saviana_melee_spread(PlayerbotAI* ai) { return new RsSavianaMeleeSpreadTrigger(ai); }
-    static Trigger* rs_zarithrian_adds(PlayerbotAI* ai) { return new RsZarithrianAddsTrigger(ai); }
-    static Trigger* rs_zarithrian_tank(PlayerbotAI* ai) { return new RsZarithrianTankTrigger(ai); }
-    static Trigger* rs_halion_tank_position(PlayerbotAI* ai) { return new RsHalionTankPositionTrigger(ai); }
-    static Trigger* rs_halion_avoid_cones(PlayerbotAI* ai) { return new RsHalionAvoidConesTrigger(ai); }
-    static Trigger* rs_halion_combustion(PlayerbotAI* ai) { return new RsHalionCombustionTrigger(ai); }
-    static Trigger* rs_halion_meteor(PlayerbotAI* ai) { return new RsHalionMeteorTrigger(ai); }
-    static Trigger* rs_halion_adds(PlayerbotAI* ai) { return new RsHalionAddsTrigger(ai); }
-    static Trigger* rs_halion_add_tank(PlayerbotAI* ai) { return new RsHalionAddTankTrigger(ai); }
-    static Trigger* rs_halion_start_position(PlayerbotAI* ai) { return new RsHalionStartPositionTrigger(ai); }
-    static Trigger* rs_halion_enter_portal(PlayerbotAI* ai) { return new RsHalionEnterPortalTrigger(ai); }
-    static Trigger* rs_halion_p2_tank_position(PlayerbotAI* ai) { return new RsHalionP2TankPositionTrigger(ai); }
-    static Trigger* rs_halion_p2_avoid_cones(PlayerbotAI* ai) { return new RsHalionP2AvoidConesTrigger(ai); }
-    static Trigger* rs_halion_consumption(PlayerbotAI* ai) { return new RsHalionConsumptionTrigger(ai); }
-    static Trigger* rs_halion_cutter(PlayerbotAI* ai) { return new RsHalionCutterTrigger(ai); }
-    static Trigger* rs_halion_heal_consumption(PlayerbotAI* ai) { return new RsHalionHealConsumptionTrigger(ai); }
-    static Trigger* rs_trash_adds(PlayerbotAI* ai) { return new RsTrashAddsTrigger(ai); }
-    static Trigger* rs_trash_main_tank(PlayerbotAI* ai) { return new RsTrashMainTankTrigger(ai); }
-    static Trigger* rs_trash_assist_tank(PlayerbotAI* ai) { return new RsTrashAssistTankTrigger(ai); }
-    static Trigger* rs_trash_ranged(PlayerbotAI* ai) { return new RsTrashRangedTrigger(ai); }
-    static Trigger* rs_trash_melee_flank(PlayerbotAI* ai) { return new RsTrashMeleeFlankTrigger(ai); }
+    static Trigger* rs_baltharus_brand(PlayerbotAI* botAI) { return new RsBaltharusBrandTrigger(botAI); }
+    static Trigger* rs_baltharus_tank_position(PlayerbotAI* botAI) { return new RsBaltharusTankPositionTrigger(botAI); }
+    static Trigger* rs_baltharus_avoid_front(PlayerbotAI* botAI) { return new RsBaltharusAvoidFrontTrigger(botAI); }
+    static Trigger* rs_baltharus_healer_position(PlayerbotAI* botAI) { return new RsBaltharusHealerPositionTrigger(botAI); }
+    static Trigger* rs_saviana_conflagration(PlayerbotAI* botAI) { return new RsSavianaConflagrationTrigger(botAI); }
+    static Trigger* rs_saviana_avoid_front(PlayerbotAI* botAI) { return new RsSavianaAvoidFrontTrigger(botAI); }
+    static Trigger* rs_saviana_tank_position(PlayerbotAI* botAI) { return new RsSavianaTankPositionTrigger(botAI); }
+    static Trigger* rs_saviana_melee_spread(PlayerbotAI* botAI) { return new RsSavianaMeleeSpreadTrigger(botAI); }
+    static Trigger* rs_zarithrian_adds(PlayerbotAI* botAI) { return new RsZarithrianAddsTrigger(botAI); }
+    static Trigger* rs_zarithrian_tank(PlayerbotAI* botAI) { return new RsZarithrianTankTrigger(botAI); }
+    static Trigger* rs_halion_tank_position(PlayerbotAI* botAI) { return new RsHalionTankPositionTrigger(botAI); }
+    static Trigger* rs_halion_avoid_cones(PlayerbotAI* botAI) { return new RsHalionAvoidConesTrigger(botAI); }
+    static Trigger* rs_halion_combustion(PlayerbotAI* botAI) { return new RsHalionCombustionTrigger(botAI); }
+    static Trigger* rs_halion_meteor(PlayerbotAI* botAI) { return new RsHalionMeteorTrigger(botAI); }
+    static Trigger* rs_halion_adds(PlayerbotAI* botAI) { return new RsHalionAddsTrigger(botAI); }
+    static Trigger* rs_halion_add_tank(PlayerbotAI* botAI) { return new RsHalionAddTankTrigger(botAI); }
+    static Trigger* rs_halion_start_position(PlayerbotAI* botAI) { return new RsHalionStartPositionTrigger(botAI); }
+    static Trigger* rs_halion_enter_portal(PlayerbotAI* botAI) { return new RsHalionEnterPortalTrigger(botAI); }
+    static Trigger* rs_halion_p2_tank_position(PlayerbotAI* botAI) { return new RsHalionP2TankPositionTrigger(botAI); }
+    static Trigger* rs_halion_p2_avoid_cones(PlayerbotAI* botAI) { return new RsHalionP2AvoidConesTrigger(botAI); }
+    static Trigger* rs_halion_consumption(PlayerbotAI* botAI) { return new RsHalionConsumptionTrigger(botAI); }
+    static Trigger* rs_halion_cutter(PlayerbotAI* botAI) { return new RsHalionCutterTrigger(botAI); }
+    static Trigger* rs_halion_heal_consumption(PlayerbotAI* botAI) { return new RsHalionHealConsumptionTrigger(botAI); }
+    static Trigger* rs_trash_adds(PlayerbotAI* botAI) { return new RsTrashAddsTrigger(botAI); }
+    static Trigger* rs_trash_main_tank(PlayerbotAI* botAI) { return new RsTrashMainTankTrigger(botAI); }
+    static Trigger* rs_trash_assist_tank(PlayerbotAI* botAI) { return new RsTrashAssistTankTrigger(botAI); }
+    static Trigger* rs_trash_ranged(PlayerbotAI* botAI) { return new RsTrashRangedTrigger(botAI); }
+    static Trigger* rs_trash_melee_flank(PlayerbotAI* botAI) { return new RsTrashMeleeFlankTrigger(botAI); }
 };
 
 #endif

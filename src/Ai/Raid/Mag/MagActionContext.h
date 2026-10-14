@@ -15,14 +15,14 @@ class RaidMagtheridonActionContext : public NamedObjectContext<Action>
 public:
     RaidMagtheridonActionContext()
     {
+        creators["magtheridon reset encounter states"] =
+            &RaidMagtheridonActionContext::magtheridon_reset_encounter_states;
+
         creators["magtheridon main tank attack first three channelers"] =
             &RaidMagtheridonActionContext::magtheridon_main_tank_attack_first_three_channelers;
 
-        creators["magtheridon first assist tank attack nw channeler"] =
-            &RaidMagtheridonActionContext::magtheridon_first_assist_tank_attack_nw_channeler;
-
-        creators["magtheridon second assist tank attack ne channeler"] =
-            &RaidMagtheridonActionContext::magtheridon_second_assist_tank_attack_ne_channeler;
+        creators["magtheridon assist tanks attack last two channelers"] =
+            &RaidMagtheridonActionContext::magtheridon_assist_tanks_attack_last_two_channelers;
 
         creators["magtheridon misdirect hellfire channelers to main tank"] =
             &RaidMagtheridonActionContext::magtheridon_misdirect_hellfire_channelers_to_main_tank;
@@ -45,22 +45,19 @@ public:
         creators["magtheridon use manticron cube"] =
             &RaidMagtheridonActionContext::magtheridon_use_manticron_cube;
 
-        creators["magtheridon manage timers and assignments"] =
-            &RaidMagtheridonActionContext::magtheridon_manage_timers_and_assignments;
-
-        creators["magtheridon erase timers and trackers"] =
-            &RaidMagtheridonActionContext::magtheridon_erase_timers_and_trackers;
+        creators["magtheridon update timers and assignments"] =
+            &RaidMagtheridonActionContext::magtheridon_update_timers_and_assignments;
     }
 
 private:
+    static Action* magtheridon_reset_encounter_states(PlayerbotAI* botAI) {
+        return new MagtheridonResetEncounterStatesAction(botAI);
+    }
     static Action* magtheridon_main_tank_attack_first_three_channelers(PlayerbotAI* botAI) {
         return new MagtheridonMainTankAttackFirstThreeChannelersAction(botAI);
     }
-    static Action* magtheridon_first_assist_tank_attack_nw_channeler(PlayerbotAI* botAI) {
-        return new MagtheridonFirstAssistTankAttackNWChannelerAction(botAI);
-    }
-    static Action* magtheridon_second_assist_tank_attack_ne_channeler(PlayerbotAI* botAI) {
-        return new MagtheridonSecondAssistTankAttackNEChannelerAction(botAI);
+    static Action* magtheridon_assist_tanks_attack_last_two_channelers(PlayerbotAI* botAI) {
+        return new MagtheridonAssistTanksAttackLastTwoChannelersAction(botAI);
     }
     static Action* magtheridon_misdirect_hellfire_channelers_to_main_tank(PlayerbotAI* botAI) {
         return new MagtheridonMisdirectHellfireChannelersToMainTankAction(botAI);
@@ -83,11 +80,8 @@ private:
     static Action* magtheridon_use_manticron_cube(PlayerbotAI* botAI) {
         return new MagtheridonUseManticronCubeAction(botAI);
     }
-    static Action* magtheridon_manage_timers_and_assignments(PlayerbotAI* botAI) {
-        return new MagtheridonManageTimersAndAssignmentsAction(botAI);
-    }
-    static Action* magtheridon_erase_timers_and_trackers(PlayerbotAI* botAI) {
-        return new MagtheridonEraseTimersAndTrackersAction(botAI);
+    static Action* magtheridon_update_timers_and_assignments(PlayerbotAI* botAI) {
+        return new MagtheridonUpdateTimersAndAssignmentsAction(botAI);
     }
 };
 

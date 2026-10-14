@@ -7,102 +7,134 @@
 #ifndef PLAYERBOTS_MAGTRIGGERS_H
 #define PLAYERBOTS_MAGTRIGGERS_H
 
-#include "PlayerbotAI.h"
+#include "EncounterHelpers.h"
+#include "MagHelpers.h"
 #include "Trigger.h"
+#include <string>
 
-class MagtheridonFirstThreeChannelersEngagedByMainTankTrigger : public Trigger
+class MagtheridonEncounterTrigger : public Trigger
 {
 public:
-    MagtheridonFirstThreeChannelersEngagedByMainTankTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon first three channelers engaged by main tank") {}
+    MagtheridonEncounterTrigger(PlayerbotAI* botAI, std::string const name, int32 checkInterval = 1)
+        : Trigger(botAI, name, checkInterval) {}
+
+    bool IsActive() final
+    {
+        return EncounterHelpers::IsEncounterInProgress(bot, MagHelpers::MAG_MAP_ID) &&
+            IsActiveInEncounter();
+    }
+
+protected:
+    virtual bool IsActiveInEncounter() = 0;
+};
+
+class MagtheridonNoEncounterInProgressTrigger : public Trigger
+{
+public:
+    // Throttled to once per second. This trigger is true for all trash and downtime and, being
+    // for between-encounter clean-up, has no real urgency to it.
+    MagtheridonNoEncounterInProgressTrigger(PlayerbotAI* botAI)
+        : Trigger(botAI, "magtheridon no encounter in progress", 1000) {};
     bool IsActive() override;
 };
 
-class MagtheridonNWChannelerEngagedByFirstAssistTankTrigger : public Trigger
+class MagtheridonMainTankShouldTankChannelersTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonNWChannelerEngagedByFirstAssistTankTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon nw channeler engaged by first assist tank") {}
-    bool IsActive() override;
+    MagtheridonMainTankShouldTankChannelersTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon main tank should tank channelers") {}
+
+protected:
+    bool IsActiveInEncounter() override;
 };
 
-class MagtheridonNEChannelerEngagedBySecondAssistTankTrigger : public Trigger
+class MagtheridonAssistTanksShouldTankChannelersTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonNEChannelerEngagedBySecondAssistTankTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon ne channeler engaged by second assist tank") {}
-    bool IsActive() override;
+    MagtheridonAssistTanksShouldTankChannelersTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon assist tanks should tank channelers") {}
+
+protected:
+    bool IsActiveInEncounter() override;
 };
 
-class MagtheridonPullingWestAndEastChannelersTrigger : public Trigger
+class MagtheridonPullingWestAndEastChannelersTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonPullingWestAndEastChannelersTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon pulling west and east channelers") {}
-    bool IsActive() override;
+    MagtheridonPullingWestAndEastChannelersTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon pulling west and east channelers") {}
+
+protected:
+    bool IsActiveInEncounter() override;
 };
 
-class MagtheridonDeterminingKillOrderTrigger : public Trigger
+class MagtheridonDeterminingKillOrderTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonDeterminingKillOrderTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon determining kill order") {}
-    bool IsActive() override;
+    MagtheridonDeterminingKillOrderTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon determining kill order") {}
+
+protected:
+    bool IsActiveInEncounter() override;
 };
 
-class MagtheridonBurningAbyssalSpawnedTrigger : public Trigger
+class MagtheridonBurningAbyssalSpawnedTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonBurningAbyssalSpawnedTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon burning abyssal spawned") {}
-    bool IsActive() override;
+    MagtheridonBurningAbyssalSpawnedTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon burning abyssal spawned") {}
+
+protected:
+    bool IsActiveInEncounter() override;
 };
 
-class MagtheridonBossEngagedByMainTankTrigger : public Trigger
+class MagtheridonShouldBeTankedTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonBossEngagedByMainTankTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon boss engaged by main tank") {}
-    bool IsActive() override;
+    MagtheridonShouldBeTankedTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon should be tanked") {}
+
+protected:
+    bool IsActiveInEncounter() override;
 };
 
-class MagtheridonBossEngagedByRangedTrigger : public Trigger
+class MagtheridonShouldSpreadRangedTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonBossEngagedByRangedTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon boss engaged by ranged") {}
-    bool IsActive() override;
+    MagtheridonShouldSpreadRangedTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon should spread ranged") {}
+
+protected:
+    bool IsActiveInEncounter() override;
+};
+class MagtheridonStandingInDebrisTrigger : public MagtheridonEncounterTrigger
+{
+public:
+    MagtheridonStandingInDebrisTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon standing in debris") {};
+
+protected:
+    bool IsActiveInEncounter() override;
 };
 
-class MagtheridonStandingInDebrisTrigger : public Trigger
+class MagtheridonIncomingBlastNovaTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonStandingInDebrisTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon standing in debris") {}
-    bool IsActive() override;
+    MagtheridonIncomingBlastNovaTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon incoming blast nova") {}
+
+protected:
+    bool IsActiveInEncounter() override;
 };
 
-class MagtheridonIncomingBlastNovaTrigger : public Trigger
+class MagtheridonShouldManageTimersAndAssignmentsTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonIncomingBlastNovaTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon incoming blast nova") {}
-    bool IsActive() override;
-};
+    MagtheridonShouldManageTimersAndAssignmentsTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon should manage timers and assignments") {}
 
-class MagtheridonNeedToManageTimersAndAssignmentsTrigger : public Trigger
-{
-public:
-    MagtheridonNeedToManageTimersAndAssignmentsTrigger(
-        PlayerbotAI* botAI) : Trigger(botAI, "magtheridon need to manage timers and assignments") {}
-    bool IsActive() override;
-};
-
-class MagtheridonBotIsNotInCombatTrigger : public Trigger
-{
-public:
-    MagtheridonBotIsNotInCombatTrigger(PlayerbotAI* botAI) : Trigger(botAI, "magtheridon bot is not in combat") {};
-    bool IsActive() override;
+protected:
+    bool IsActiveInEncounter() override;
 };
 
 #endif

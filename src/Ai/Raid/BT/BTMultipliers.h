@@ -11,11 +11,11 @@
 
 // High Warlord Naj'entus
 
-class HighWarlordNajentusDelayDpsCooldownsMultiplier : public Multiplier
+class BlackTempleDelayDpsCooldownsMultiplier : public Multiplier
 {
 public:
-    HighWarlordNajentusDelayDpsCooldownsMultiplier(
-        PlayerbotAI* botAI) : Multiplier(botAI, "high warlord naj'entus delay dps cooldowns multiplier") {}
+    BlackTempleDelayDpsCooldownsMultiplier(
+        PlayerbotAI* botAI) : Multiplier(botAI, "black temple delay dps cooldowns multiplier") {}
     float GetValue(Action* action) override;
 };
 
@@ -28,14 +28,6 @@ public:
 };
 
 // Supremus
-
-class SupremusDelayDpsCooldownsMultiplier : public Multiplier
-{
-public:
-    SupremusDelayDpsCooldownsMultiplier(
-        PlayerbotAI* botAI) : Multiplier(botAI, "supremus delay dps cooldowns multiplier") {}
-    float GetValue(Action* action) override;
-};
 
 class SupremusFocusOnAvoidanceInPhase2Multiplier : public Multiplier
 {
@@ -54,14 +46,6 @@ public:
 };
 
 // Teron Gorefiend
-
-class TeronGorefiendDelayDpsCooldownsMultiplier : public Multiplier
-{
-public:
-    TeronGorefiendDelayDpsCooldownsMultiplier(
-        PlayerbotAI* botAI) : Multiplier(botAI, "teron gorefiend delay dps cooldowns multiplier") {}
-    float GetValue(Action* action) override;
-};
 
 class TeronGorefiendControlMovementMultiplier : public Multiplier
 {
@@ -97,14 +81,6 @@ public:
 
 // Gurtogg Bloodboil
 
-class GurtoggBloodboilDelayDpsCooldownsMultiplier : public Multiplier
-{
-public:
-    GurtoggBloodboilDelayDpsCooldownsMultiplier(
-        PlayerbotAI* botAI) : Multiplier(botAI, "gurtogg bloodboil delay dps cooldowns multiplier") {}
-    float GetValue(Action* action) override;
-};
-
 class GurtoggBloodboilControlMovementMultiplier : public Multiplier
 {
 public:
@@ -115,14 +91,6 @@ public:
 
 // Reliquary of Souls
 
-class ReliquaryOfSoulsDelayDpsCooldownsMultiplier : public Multiplier
-{
-public:
-    ReliquaryOfSoulsDelayDpsCooldownsMultiplier(
-        PlayerbotAI* botAI) : Multiplier(botAI, "reliquary of souls delay dps cooldowns multiplier") {}
-    float GetValue(Action* action) override;
-};
-
 class ReliquaryOfSoulsDontWasteHealingMultiplier : public Multiplier
 {
 public:
@@ -132,14 +100,6 @@ public:
 };
 
 // Mother Shahraz
-
-class MotherShahrazDelayDpsCooldownsMultiplier : public Multiplier
-{
-public:
-    MotherShahrazDelayDpsCooldownsMultiplier(
-        PlayerbotAI* botAI) : Multiplier(botAI, "mother shahraz delay dps cooldowns multiplier") {}
-    float GetValue(Action* action) override;
-};
 
 class MotherShahrazControlMovementMultiplier : public Multiplier
 {
@@ -158,14 +118,6 @@ public:
 };
 
 // Illidari Council
-
-class IllidariCouncilDelayDpsCooldownsMultiplier : public Multiplier
-{
-public:
-    IllidariCouncilDelayDpsCooldownsMultiplier(
-        PlayerbotAI* botAI) : Multiplier(botAI, "illidari council delay dps cooldowns multiplier") {}
-    float GetValue(Action* action) override;
-};
 
 class IllidariCouncilDisableTankActionsMultiplier : public Multiplier
 {

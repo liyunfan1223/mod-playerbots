@@ -9,7 +9,6 @@
 
 #include "ACTriggers.h"
 #include "NamedObjectContext.h"
-#include "TriggerContext.h"
 
 class TbcDungeonAuchenaiCryptsTriggerContext : public NamedObjectContext<Trigger>
 {

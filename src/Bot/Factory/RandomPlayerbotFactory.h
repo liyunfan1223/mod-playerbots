@@ -7,16 +7,18 @@
 #ifndef PLAYERBOTS_RANDOMPLAYERBOTFACTORY_H
 #define PLAYERBOTS_RANDOMPLAYERBOTFACTORY_H
 
+#include "ArenaTeam.h"
+#include "Battleground.h"
 #include "Common.h"
 #include "DBCEnums.h"
+#include "SharedDefines.h"
 #include <map>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
 class Player;
 class WorldSession;
-
-enum ArenaType : uint8;
 
 class RandomPlayerbotFactory
 {
@@ -51,15 +53,33 @@ public:
 
     Player* CreateRandomBot(WorldSession* session, uint8 cls, std::unordered_map<NameRaceAndGender, std::vector<std::string>>& names);
     static void CreateRandomBots();
-    static void CreateRandomArenaTeams(ArenaType slot, uint32 count);
     static std::string const CreateRandomGuildName();
     static uint32 CalculateTotalAccountCount();
     static uint32 CalculateAvailableCharsPerAccount();
+    static std::string GetLocalizedNameSelector(std::string const& column);
+
+    // Arena team management
+    static void AssignBotToArenaTeam(Player* bot);
+    static void DeleteBotArenaTeams();
+    static uint32 GetBotArenaTeamCount(ArenaType type);
+    static void LoadArenaTeamData();
 
 private:
+    friend class ArenaTeamAssignOperation;
+
     static bool IsValidRaceClassCombination(uint8 race, uint8 class_, uint32 expansion);
     std::string const CreateRandomBotName(NameRaceAndGender raceAndGender);
-    static std::string const CreateRandomArenaTeamName();
+
+    static bool IsEligibleForBotArenaTeam(Player* bot);
+    static void AssignBotToArenaTeamInternal(Player* bot);
+    static void CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, std::vector<ArenaTeam*>& out);
+    static void CreateBotArenaTeam(Player* bot, ArenaType type);
+    static bool IsBotArenaTeam(ArenaTeam const* team);
+    static std::string CreateRandomArenaTeamName();
+
+    static inline std::vector<std::string> _availableArenaTeamNames;
+    static inline std::map<ArenaType, std::vector<uint32>> _botArenaTeamRegistry;
+    static inline std::map<ArenaType, uint32> _configTargets;
 };
 
 #endif

@@ -283,12 +283,6 @@ public:
     CastArcaneTorrentAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane torrent") {}
 };
 
-class CastManaTapAction : public CastBuffSpellAction
-{
-public:
-    CastManaTapAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "mana tap") {}
-};
-
 class CastWarStompAction : public CastMeleeSpellAction
 {
 public:
@@ -488,8 +482,8 @@ private:
 class BuffOnMainTankAction : public CastBuffSpellAction, public MainTankActionNameSupport
 {
 public:
-    BuffOnMainTankAction(PlayerbotAI* ai, std::string spell, bool checkIsOwner = false)
-        : CastBuffSpellAction(ai, spell, checkIsOwner), MainTankActionNameSupport(spell) {}
+    BuffOnMainTankAction(PlayerbotAI* botAI, std::string spell, bool checkIsOwner = false)
+        : CastBuffSpellAction(botAI, spell, checkIsOwner), MainTankActionNameSupport(spell) {}
 
 public:
     virtual Value<Unit*>* GetTargetValue();

@@ -27,8 +27,8 @@ protected:
 class NeglectThreatResetValue : public ManualSetValue<bool>
 {
 public:
-    NeglectThreatResetValue(PlayerbotAI* ai, bool defaultValue = false, std::string name = "neglect threat")
-        : ManualSetValue<bool>(ai, defaultValue, name)
+    NeglectThreatResetValue(PlayerbotAI* botAI, bool defaultValue = false, std::string name = "neglect threat")
+        : ManualSetValue<bool>(botAI, defaultValue, name)
     {
     }
     virtual bool Get()

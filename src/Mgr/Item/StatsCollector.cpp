@@ -15,7 +15,10 @@
 #include "SpellMgr.h"
 #include "Util.h"
 
-StatsCollector::StatsCollector(CollectorType type, int32 cls) : type_(type), cls_(cls) { Reset(); }
+StatsCollector::StatsCollector(CollectorType type, int32 cls, int32 lvl) : type_(type), cls_(cls), lvl_(lvl)
+{
+    Reset();
+}
 
 void StatsCollector::Reset()
 {
@@ -27,24 +30,38 @@ void StatsCollector::Reset()
 
 void StatsCollector::CollectItemStats(ItemTemplate const* proto)
 {
-    if (proto->IsRangedWeapon())
+    // Heirlooms and other scaling items hold their real stats in DBC, keyed by wearer level (Player::_ApplyItemBonuses)
+    ScalingStatDistributionEntry const* ssd =
+        proto->ScalingStatDistribution ? sScalingStatDistributionStore.LookupEntry(proto->ScalingStatDistribution)
+                                       : nullptr;
+
+    uint32 ssdLevel = lvl_ > 0 ? uint32(lvl_) : 0;
+    if (ssd && ssdLevel > ssd->MaxLevel)
+        ssdLevel = ssd->MaxLevel;
+
+    // Without a wearer level (lvl_ -1) a scaling item keeps its template values.
+    ScalingStatValuesEntry const* ssv =
+        proto->ScalingStatValue && ssdLevel ? sScalingStatValuesStore.LookupEntry(ssdLevel) : nullptr;
+
+    CollectWeaponDamageStats(proto, ssv);
+    CollectItemStatValues(proto, ssd, ssv);
+
+    if (ssv)
     {
-        float val = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2 / proto->Delay;
-        stats[STATS_TYPE_RANGED_DPS] += val;
+        if (uint32 spellBonus = ssv->getSpellBonus(proto->ScalingStatValue))
+            CollectByItemStatType(ITEM_MOD_SPELL_POWER, spellBonus);
     }
-    else if (proto->IsWeapon())
+
+    uint32 armor = proto->Armor;
+    if (ssv)
     {
-        float val = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2 / proto->Delay;
-        stats[STATS_TYPE_MELEE_DPS] += val;
+        // An ssv entry exists only for scaling items, so the scaled armor always replaces the template value.
+        if (uint32 ssvArmor = ssv->getArmorMod(proto->ScalingStatValue))
+            armor = ssvArmor;
     }
-    stats[STATS_TYPE_ARMOR] += proto->Armor;
+
+    stats[STATS_TYPE_ARMOR] += armor;
     stats[STATS_TYPE_BLOCK_VALUE] += proto->Block;
-    for (uint32 i = 0; i < proto->StatsCount; i++)
-    {
-        const _ItemStat& stat = proto->ItemStat[i];
-        const int32& val = stat.ItemStatValue;
-        CollectByItemStatType(stat.ItemStatType, val);
-    }
     for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
     {
         switch (proto->Spells[j].SpellTrigger)
@@ -71,8 +88,73 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
 
     if (proto->socketBonus)
     {
-        if (const SpellItemEnchantmentEntry* enchant = sSpellItemEnchantmentStore.LookupEntry(proto->socketBonus))
+        if (SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(proto->socketBonus))
             CollectEnchantStats(enchant);
+    }
+}
+
+void StatsCollector::CollectWeaponDamageStats(ItemTemplate const* proto, ScalingStatValuesEntry const* ssv)
+{
+    if (!proto->IsWeapon() || proto->Delay == 0)
+        return;
+
+    int32 extraDps = ssv ? ssv->getDPSMod(proto->ScalingStatValue) : 0;
+    float dps = 0.0f;
+
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+    {
+        float minDamage = proto->Damage[i].DamageMin;
+        float maxDamage = proto->Damage[i].DamageMax;
+
+        // Scaling replaces the first damage entry: min 70% / max 130% of the scaled average, 80% / 120% two-hand.
+        if (extraDps && i == 0)
+        {
+            float average = extraDps * proto->Delay / 1000.0f;
+            float mod = ssv->IsTwoHand(proto->ScalingStatValue) ? 0.2f : 0.3f;
+
+            minDamage = (1.0f - mod) * average;
+            maxDamage = (1.0f + mod) * average;
+        }
+
+        dps += (minDamage + maxDamage) * 1000 / 2 / proto->Delay;
+    }
+
+    if (proto->IsRangedWeapon())
+    {
+        stats[STATS_TYPE_RANGED_DPS] += dps;
+        return;
+    }
+
+    stats[STATS_TYPE_MELEE_DPS] += dps;
+    // Feral forms convert weapon DPS into attack power, so treat it as attack power for Feral Druids.
+    if (cls_ == CLASS_DRUID && (type_ & CollectorType::MELEE))
+        stats[STATS_TYPE_ATTACK_POWER] += proto->getFeralBonus(extraDps);
+}
+
+void StatsCollector::CollectItemStatValues(ItemTemplate const* proto, ScalingStatDistributionEntry const* ssd,
+                                           ScalingStatValuesEntry const* ssv)
+{
+    if (ssv)
+    {
+        // A scaling item draws its stats from the distribution entry alone; its template stats are ignored, as in core.
+        if (!ssd)
+            return;
+
+        uint32 multiplier = ssv->getssdMultiplier(proto->ScalingStatValue);
+        for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+        {
+            if (ssd->StatMod[i] < 0)
+                continue;
+
+            CollectByItemStatType(ssd->StatMod[i], int32(multiplier * ssd->Modifier[i] / 10000));
+        }
+        return;
+    }
+
+    for (uint32 i = 0; i < proto->StatsCount; ++i)
+    {
+        _ItemStat const& stat = proto->ItemStat[i];
+        CollectByItemStatType(stat.ItemStatType, stat.ItemStatValue);
     }
 }
 
@@ -86,7 +168,11 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
     if (SpecialSpellFilter(spellId))
         return;
 
-    const SpellProcEntry* eventEntry = sSpellMgr->GetSpellProcEntry(spellInfo->Id);
+    // Form-restricted item auras (e.g., feral attack power, idol boosts) should be considered by Druids only.
+    if (spellInfo->Stances && cls_ != CLASS_DRUID)
+        return;
+
+    SpellProcEntry const* eventEntry = sSpellMgr->GetSpellProcEntry(spellInfo->Id);
 
     Milliseconds triggerCooldown = eventEntry ? eventEntry->Cooldown : 0ms;
 
@@ -125,7 +211,7 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
 
     for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
     {
-        const SpellEffectInfo& effectInfo = spellInfo->Effects[i];
+        SpellEffectInfo const& effectInfo = spellInfo->Effects[i];
         if (!effectInfo.Effect)
             continue;
         switch (effectInfo.Effect)
@@ -357,7 +443,7 @@ bool StatsCollector::SpecialEnchantFilter(uint32 enchantSpellId)
 
 bool StatsCollector::CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 procFlags, bool strict)
 {
-    const SpellProcEntry* eventEntry = sSpellMgr->GetSpellProcEntry(spellInfo->Id);
+    SpellProcEntry const* eventEntry = sSpellMgr->GetSpellProcEntry(spellInfo->Id);
     uint32 spellFamilyName = 0;
     if (eventEntry)
     {
@@ -552,7 +638,7 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
     }
 }
 
-void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float multiplier, bool canNextTrigger,
+void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, float multiplier, bool canNextTrigger,
                                      Milliseconds triggerCooldown)
 {
     if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
@@ -701,6 +787,7 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
                     }
                 }
             }
+            break;
         }
         case SPELL_AURA_MOD_POWER_REGEN:
         {
@@ -709,6 +796,7 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
             {
                 case POWER_MANA:
                     stats[STATS_TYPE_MANA_REGENERATION] += val * multiplier;
+                    break;
                 default:
                     break;
             }
@@ -747,7 +835,7 @@ void StatsCollector::HandleApplyAura(const SpellEffectInfo& effectInfo, float mu
     }
 }
 
-float StatsCollector::AverageValue(const SpellEffectInfo& effectInfo)
+float StatsCollector::AverageValue(SpellEffectInfo const& effectInfo)
 {
     // float basePointsPerLevel = effectInfo.RealPointsPerLevel; //not used, line marked for removal.
     float basePoints = effectInfo.BasePoints;

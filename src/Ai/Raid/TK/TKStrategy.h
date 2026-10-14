@@ -8,12 +8,13 @@
 #define PLAYERBOTS_TKSTRATEGY_H
 
 #include "Strategy.h"
+#include <string>
+#include <vector>
 
 class RaidTempestKeepStrategy : public Strategy
 {
 public:
     RaidTempestKeepStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
-
     std::string const getName() override { return "tempestkeep"; }
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;

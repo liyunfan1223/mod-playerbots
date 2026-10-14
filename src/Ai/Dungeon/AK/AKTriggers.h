@@ -30,21 +30,21 @@ enum OldKingdomIDs
 class NadoxGuardianTrigger : public Trigger
 {
 public:
-    NadoxGuardianTrigger(PlayerbotAI* ai) : Trigger(ai, "elder nadox guardian") {}
+    NadoxGuardianTrigger(PlayerbotAI* botAI) : Trigger(botAI, "elder nadox guardian") {}
     bool IsActive() override;
 };
 
 class JedogaVolunteerTrigger : public Trigger
 {
 public:
-    JedogaVolunteerTrigger(PlayerbotAI* ai) : Trigger(ai, "jedoga volunteer") {}
+    JedogaVolunteerTrigger(PlayerbotAI* botAI) : Trigger(botAI, "jedoga volunteer") {}
     bool IsActive() override;
 };
 
 class ShadowCrashTrigger : public Trigger
 {
 public:
-    ShadowCrashTrigger(PlayerbotAI* ai) : Trigger(ai, "shadow crash") {}
+    ShadowCrashTrigger(PlayerbotAI* botAI) : Trigger(botAI, "shadow crash") {}
     bool IsActive() override;
 };
 

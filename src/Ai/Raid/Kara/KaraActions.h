@@ -10,40 +10,37 @@
 #include "Action.h"
 #include "AttackAction.h"
 #include "MovementActions.h"
+#include <vector>
 
 class KarazhanResetEncounterStatesAction : public Action
 {
 public:
-    KarazhanResetEncounterStatesAction(
-        PlayerbotAI* botAI) : Action(botAI, "karazhan reset encounter states") {}
+    KarazhanResetEncounterStatesAction(PlayerbotAI* botAI)
+        : Action(botAI, "karazhan reset encounter states") {}
     bool Execute(Event event) override;
 };
 
-class KarazhanCastFearProtectionSpellAction : public Action
+class KarazhanSetTremorTotemAction : public Action
 {
 public:
-    KarazhanCastFearProtectionSpellAction(
-        PlayerbotAI* botAI) : Action(botAI, "karazhan cast fear protection spell") {}
+    KarazhanSetTremorTotemAction(PlayerbotAI* botAI)
+        : Action(botAI, "karazhan set tremor totem") {}
     bool Execute(Event event) override;
-
-private:
-    bool CastFearWardOnMainTank();
-    bool SetTremorTotem();
 };
 
 class ManaWarpStunCreatureBeforeWarpBreachAction : public AttackAction
 {
 public:
-    ManaWarpStunCreatureBeforeWarpBreachAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "mana warp stun creature before warp breach") {}
+    ManaWarpStunCreatureBeforeWarpBreachAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "mana warp stun creature before warp breach") {}
     bool Execute(Event event) override;
 };
 
 class AttumenTheHuntsmanHandlePhaseOneAction : public AttackAction
 {
 public:
-    AttumenTheHuntsmanHandlePhaseOneAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "attumen the huntsman handle phase one") {}
+    AttumenTheHuntsmanHandlePhaseOneAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "attumen the huntsman handle phase one") {}
     bool Execute(Event event) override;
 
 private:
@@ -53,8 +50,8 @@ private:
 class AttumenTheHuntsmanHandlePhaseTwoAction : public AttackAction
 {
 public:
-    AttumenTheHuntsmanHandlePhaseTwoAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "attumen the huntsman handle phase two") {}
+    AttumenTheHuntsmanHandlePhaseTwoAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "attumen the huntsman handle phase two") {}
     bool Execute(Event event) override;
 
 private:
@@ -65,24 +62,24 @@ private:
 class AttumenTheHuntsmanSetDpsTimerAction : public Action
 {
 public:
-    AttumenTheHuntsmanSetDpsTimerAction(
-        PlayerbotAI* botAI) : Action(botAI, "attumen the huntsman set dps timer") {}
+    AttumenTheHuntsmanSetDpsTimerAction(PlayerbotAI* botAI)
+        : Action(botAI, "attumen the huntsman set dps timer") {}
     bool Execute(Event event) override;
 };
 
 class MoroesMarkTargetAction : public Action
 {
 public:
-    MoroesMarkTargetAction(
-        PlayerbotAI* botAI) : Action(botAI, "moroes mark target") {}
+    MoroesMarkTargetAction(PlayerbotAI* botAI)
+        : Action(botAI, "moroes mark target") {}
     bool Execute(Event event) override;
 };
 
 class MaidenOfVirtueTankPositionBossAction : public AttackAction
 {
 public:
-    MaidenOfVirtueTankPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "maiden of virtue tank position boss") {}
+    MaidenOfVirtueTankPositionBossAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "maiden of virtue tank position boss") {}
     bool Execute(Event event) override;
 
 private:
@@ -92,32 +89,32 @@ private:
 class MaidenOfVirtuePositionRangedBetweenPillarsAction : public MovementAction
 {
 public:
-    MaidenOfVirtuePositionRangedBetweenPillarsAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "maiden of virtue position ranged between pillars") {}
+    MaidenOfVirtuePositionRangedBetweenPillarsAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "maiden of virtue position ranged between pillars") {}
     bool Execute(Event event) override;
 };
 
 class MaidenOfVirtueSetGroundingTotemAction : public Action
 {
 public:
-    MaidenOfVirtueSetGroundingTotemAction(
-        PlayerbotAI* botAI) : Action(botAI, "maiden of virtue set grounding totem") {}
+    MaidenOfVirtueSetGroundingTotemAction(PlayerbotAI* botAI)
+        : Action(botAI, "maiden of virtue set grounding totem") {}
     bool Execute(Event event) override;
 };
 
 class BigBadWolfPositionBossAction : public AttackAction
 {
 public:
-    BigBadWolfPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "big bad wolf position boss") {}
+    BigBadWolfPositionBossAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "big bad wolf position boss") {}
     bool Execute(Event event) override;
 };
 
 class BigBadWolfLittleRedRidingHoodRunAwayAction : public MovementAction
 {
 public:
-    BigBadWolfLittleRedRidingHoodRunAwayAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "big bad wolf little red riding hood run away") {}
+    BigBadWolfLittleRedRidingHoodRunAwayAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "big bad wolf little red riding hood run away") {}
     bool Execute(Event event) override;
     bool ResetRunIndex()
     {
@@ -134,96 +131,96 @@ private:
 class RomuloAndJulianneMarkTargetAction : public Action
 {
 public:
-    RomuloAndJulianneMarkTargetAction(
-        PlayerbotAI* botAI) : Action(botAI, "romulo and julianne mark target") {}
+    RomuloAndJulianneMarkTargetAction(PlayerbotAI* botAI)
+        : Action(botAI, "romulo and julianne mark target") {}
     bool Execute(Event event) override;
 };
 
 class WizardOfOzMarkTargetAction : public Action
 {
 public:
-    WizardOfOzMarkTargetAction(
-        PlayerbotAI* botAI) : Action(botAI, "wizard of oz mark target") {}
+    WizardOfOzMarkTargetAction(PlayerbotAI* botAI)
+        : Action(botAI, "wizard of oz mark target") {}
     bool Execute(Event event) override;
 };
 
 class WizardOfOzScorchStrawmanAction : public Action
 {
 public:
-    WizardOfOzScorchStrawmanAction(
-        PlayerbotAI* botAI) : Action(botAI, "wizard of oz scorch strawman") {}
+    WizardOfOzScorchStrawmanAction(PlayerbotAI* botAI)
+        : Action(botAI, "wizard of oz scorch strawman") {}
     bool Execute(Event event) override;
 };
 
 class TheCuratorMarkAstralFlareAction : public Action
 {
 public:
-    TheCuratorMarkAstralFlareAction(
-        PlayerbotAI* botAI) : Action(botAI, "the curator mark astral flare") {}
+    TheCuratorMarkAstralFlareAction(PlayerbotAI* botAI)
+        : Action(botAI, "the curator mark astral flare") {}
     bool Execute(Event event) override;
 };
 
 class TheCuratorPositionBossAction : public AttackAction
 {
 public:
-    TheCuratorPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "the curator position boss") {}
+    TheCuratorPositionBossAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "the curator position boss") {}
     bool Execute(Event event) override;
 };
 
 class TheCuratorSpreadRangedAction : public MovementAction
 {
 public:
-    TheCuratorSpreadRangedAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "the curator spread ranged") {}
+    TheCuratorSpreadRangedAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "the curator spread ranged") {}
     bool Execute(Event event) override;
 };
 
 class TerestianIllhoofMarkTargetAction : public Action
 {
 public:
-    TerestianIllhoofMarkTargetAction(
-        PlayerbotAI* botAI) : Action(botAI, "terestian illhoof mark target") {}
+    TerestianIllhoofMarkTargetAction(PlayerbotAI* botAI)
+        : Action(botAI, "terestian illhoof mark target") {}
     bool Execute(Event event) override;
 };
 
 class ShadeOfAranRunAwayFromArcaneExplosionAction : public MovementAction
 {
 public:
-    ShadeOfAranRunAwayFromArcaneExplosionAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "shade of aran run away from arcane explosion") {}
+    ShadeOfAranRunAwayFromArcaneExplosionAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "shade of aran run away from arcane explosion") {}
     bool Execute(Event event) override;
 };
 
 class ShadeOfAranStopMovingDuringFlameWreathAction : public MovementAction
 {
 public:
-    ShadeOfAranStopMovingDuringFlameWreathAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "shade of aran stop moving during flame wreath") {}
+    ShadeOfAranStopMovingDuringFlameWreathAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "shade of aran stop moving during flame wreath") {}
     bool Execute(Event event) override;
 };
 
 class ShadeOfAranMarkConjuredElementalAction : public Action
 {
 public:
-    ShadeOfAranMarkConjuredElementalAction(
-        PlayerbotAI* botAI) : Action(botAI, "shade of aran mark conjured elemental") {}
+    ShadeOfAranMarkConjuredElementalAction(PlayerbotAI* botAI)
+        : Action(botAI, "shade of aran mark conjured elemental") {}
     bool Execute(Event event) override;
 };
 
 class ShadeOfAranRangedMaintainDistanceAction : public MovementAction
 {
 public:
-    ShadeOfAranRangedMaintainDistanceAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "shade of aran ranged maintain distance") {}
+    ShadeOfAranRangedMaintainDistanceAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "shade of aran ranged maintain distance") {}
     bool Execute(Event event) override;
 };
 
 class NetherspiteBlockRedBeamAction : public MovementAction
 {
 public:
-    NetherspiteBlockRedBeamAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "netherspite block red beam") {}
+    NetherspiteBlockRedBeamAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "netherspite block red beam") {}
     bool Execute(Event event) override;
     bool ResetRedBeamState()
     {
@@ -246,8 +243,8 @@ private:
 class NetherspiteBlockBlueBeamAction : public MovementAction
 {
 public:
-    NetherspiteBlockBlueBeamAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "netherspite block blue beam") {}
+    NetherspiteBlockBlueBeamAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "netherspite block blue beam") {}
     bool Execute(Event event) override;
     bool ResetBlueBeamState()
     {
@@ -264,8 +261,8 @@ private:
 class NetherspiteBlockGreenBeamAction : public MovementAction
 {
 public:
-    NetherspiteBlockGreenBeamAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "netherspite block green beam") {}
+    NetherspiteBlockGreenBeamAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "netherspite block green beam") {}
     bool Execute(Event event) override;
     bool ResetGreenBeamState()
     {
@@ -282,8 +279,8 @@ private:
 class NetherspiteAvoidBeamAndVoidZoneAction : public MovementAction
 {
 public:
-    NetherspiteAvoidBeamAndVoidZoneAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "netherspite avoid beam and void zone") {}
+    NetherspiteAvoidBeamAndVoidZoneAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "netherspite avoid beam and void zone") {}
     bool Execute(Event event) override;
 
 private:
@@ -295,62 +292,62 @@ private:
         float dirY;
     };
     bool IsAwayFromBeams(
-        float x, float y, float botX, float botY, const std::vector<BeamAvoid>& beams);
+        float x, float y, float botX, float botY, std::vector<BeamAvoid> const& beams);
 };
 
 class NetherspiteBanishPhaseAvoidVoidZoneAction : public MovementAction
 {
 public:
-    NetherspiteBanishPhaseAvoidVoidZoneAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "netherspite banish phase avoid void zone") {}
+    NetherspiteBanishPhaseAvoidVoidZoneAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "netherspite banish phase avoid void zone") {}
     bool Execute(Event event) override;
 };
 
 class NetherspiteManageTimersAndTrackersAction : public Action
 {
 public:
-    NetherspiteManageTimersAndTrackersAction(
-        PlayerbotAI* botAI) : Action(botAI, "netherspite manage timers and trackers") {}
+    NetherspiteManageTimersAndTrackersAction(PlayerbotAI* botAI)
+        : Action(botAI, "netherspite manage timers and trackers") {}
     bool Execute(Event event) override;
 };
 
 class PrinceMalchezaarEnfeebledBotAvoidHazardAction : public MovementAction
 {
 public:
-    PrinceMalchezaarEnfeebledBotAvoidHazardAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "prince malchezaar enfeebled bot avoid hazard") {}
+    PrinceMalchezaarEnfeebledBotAvoidHazardAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "prince malchezaar enfeebled bot avoid hazard") {}
     bool Execute(Event event) override;
 };
 
 class PrinceMalchezaarNonTankAvoidInfernalAction : public MovementAction
 {
 public:
-    PrinceMalchezaarNonTankAvoidInfernalAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "prince malchezaar non tank avoid infernal") {}
+    PrinceMalchezaarNonTankAvoidInfernalAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "prince malchezaar non tank avoid infernal") {}
     bool Execute(Event event) override;
 };
 
 class PrinceMalchezaarTanksPositionBossAction : public AttackAction
 {
 public:
-    PrinceMalchezaarTanksPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "prince malchezaar tanks position boss") {}
+    PrinceMalchezaarTanksPositionBossAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "prince malchezaar tanks position boss") {}
     bool Execute(Event event) override;
 };
 
 class NightbaneGroundPhaseTanksPositionBossAction : public AttackAction
 {
 public:
-    NightbaneGroundPhaseTanksPositionBossAction(
-        PlayerbotAI* botAI) : AttackAction(botAI, "nightbane ground phase tanks position boss") {}
+    NightbaneGroundPhaseTanksPositionBossAction(PlayerbotAI* botAI)
+        : AttackAction(botAI, "nightbane ground phase tanks position boss") {}
     bool Execute(Event event) override;
 };
 
 class NightbaneGroundPhaseCoordinateRangedMovementAction : public MovementAction
 {
 public:
-    NightbaneGroundPhaseCoordinateRangedMovementAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "nightbane ground phase coordinate ranged movement") {}
+    NightbaneGroundPhaseCoordinateRangedMovementAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "nightbane ground phase coordinate ranged movement") {}
     bool Execute(Event event) override;
 
 private:
@@ -361,16 +358,16 @@ private:
 class NightbaneControlPetAggressionAction : public Action
 {
 public:
-    NightbaneControlPetAggressionAction(
-        PlayerbotAI* botAI) : Action(botAI, "nightbane control pet aggression") {}
+    NightbaneControlPetAggressionAction(PlayerbotAI* botAI)
+        : Action(botAI, "nightbane control pet aggression") {}
     bool Execute(Event event) override;
 };
 
 class NightbaneFlightPhaseStackAndMoveAction : public MovementAction
 {
 public:
-    NightbaneFlightPhaseStackAndMoveAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "nightbane flight phase stack and move") {}
+    NightbaneFlightPhaseStackAndMoveAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "nightbane flight phase stack and move") {}
     bool Execute(Event event) override;
     bool ResetRainOfBonesHit()
     {
@@ -387,16 +384,16 @@ private:
 class NightbaneTeleportBackToTerraceAction : public MovementAction
 {
 public:
-    NightbaneTeleportBackToTerraceAction(
-        PlayerbotAI* botAI) : MovementAction(botAI, "nightbane teleport back to terrace") {}
+    NightbaneTeleportBackToTerraceAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "nightbane teleport back to terrace") {}
     bool Execute(Event event) override;
 };
 
 class NightbaneManageTimersAndTrackersAction : public Action
 {
 public:
-    NightbaneManageTimersAndTrackersAction(
-        PlayerbotAI* botAI) : Action(botAI, "nightbane manage timers and trackers") {}
+    NightbaneManageTimersAndTrackersAction(PlayerbotAI* botAI)
+        : Action(botAI, "nightbane manage timers and trackers") {}
     bool Execute(Event event) override;
 };
 

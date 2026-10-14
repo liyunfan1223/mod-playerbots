@@ -6,6 +6,20 @@ import re
 # Get the src directory of the project
 src_directory = os.path.join(os.getcwd(), 'src')
 
+qualifier_align_regex = re.compile(
+    r'\bconst\s+('
+    r'(?:(?:unsigned|signed|long|short)\s+)*'
+    r'(?:::)?[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*'
+    r'(?:\s*<[^<>;{}]*(?:<[^<>;{}]*>[^<>;{}]*)*>)?'
+    r')\s*([&*])')
+
+literal_or_comment_regex = re.compile(
+    r'R"([^()\\ \t\r\n]{0,16})\(.*?\)\1"'
+    r'|//[^\n]*|/\*.*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'', re.DOTALL)
+
+def blank_non_code(text: str) -> str:
+    return literal_or_comment_regex.sub(lambda m: re.sub(r'\S', ' ', m.group()), text)
+
 # Global variables
 error_handler = False
 results = {
@@ -16,7 +30,8 @@ results = {
     "GetTypeId() check": "Passed",
     "NpcFlagHelpers check": "Passed",
     "ItemFlagHelpers check": "Passed",
-    "ItemTemplateFlagHelpers check": "Passed"
+    "ItemTemplateFlagHelpers check": "Passed",
+    "Qualifier alignment check": "Passed"
 }
 
 # Main function to parse all the files of the project
@@ -46,6 +61,7 @@ def parsing_file(directory: str) -> None:
                             itemflag_helpers_check(file, file_path)
                         if file_name != 'ItemTemplate.h':
                             itemtemplateflag_helpers_check(file, file_path)
+                        qualifier_alignment_check(file, file_path)
                 except UnicodeDecodeError:
                     print(f"\nCould not decode file {file_path}")
                     sys.exit(1)
@@ -214,6 +230,24 @@ def itemtemplateflag_helpers_check(file: io, file_path: str) -> None:
         error_handler = True
         results["ItemTemplateFlagHelpers check"] = "Failed"
 
+# Codestyle patterns enforcing east-const: "const T&" -> "T const&", "const T*" -> "T const*"
+def qualifier_alignment_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    # Blank out strings/comments so we never match inside them, then check line by line
+    masked_lines = blank_non_code(file.read()).split('\n')
+    for line_number, line in enumerate(masked_lines, start = 1):
+        for match in qualifier_align_regex.finditer(line):
+            type_name, symbol = match.group(1).strip(), match.group(2)
+            print(
+                f"Please use the '{type_name} const{symbol}' syntax instead of 'const {type_name}{symbol}': {file_path} at line {line_number}")
+            check_failed = True
+    # Handle the script error and update the result output
+    if check_failed:
+        error_handler = True
+        results["Qualifier alignment check"] = "Failed"
+
 # Codestyle patterns checking for various codestyle issues
 def misc_codestyle_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -229,14 +263,6 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
 
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        if 'const auto&' in line:
-            print(
-                f"Please use the 'auto const&' syntax instead of 'const auto&': {file_path} at line {line_number}")
-            check_failed = True
-        if re.search(r'\bconst\s+\w+\s*\*\b', line):
-            print(
-                f"Please use the 'Class/ObjectType const*' syntax instead of 'const Class/ObjectType*': {file_path} at line {line_number}")
-            check_failed = True
         if [match for match in [' if(', ' if ( '] if match in line]:
             print(
                 f"Please use the 'if (XXXX)' syntax instead of 'if(XXXX)': {file_path} at line {line_number}")

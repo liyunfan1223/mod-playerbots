@@ -168,14 +168,6 @@ void MageBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void MageCcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("polymorph", { NextAction("polymorph", 30.0f) }));
-
-    Player* bot = botAI->GetBot();
-    int tab = AiFactory::GetPlayerSpecTab(bot);
-    if (tab == MAGE_TAB_FIRE)
-    {
-        triggers.push_back(new TriggerNode("enemy too close for spell", {NextAction("dragon's breath", ACTION_INTERRUPT + 1)}));
-        triggers.push_back(new TriggerNode("enemy is close", {NextAction("blast wave", ACTION_INTERRUPT)}));
-    }
 }
 
 void MageAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

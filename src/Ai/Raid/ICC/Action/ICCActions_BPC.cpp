@@ -4,7 +4,6 @@
  * or (at your option) any later version.
  */
 
-#include "GenericActions.h"
 #include "GenericSpellActions.h"
 #include "ICCActions.h"
 #include "ICCTriggers.h"
@@ -33,7 +32,7 @@ bool IccBpcKelesethTankAction::Execute(Event /*event*/)
         return false;
     }
 
-    if (!botAI->IsAssistTank(bot))
+    if (!PlayerbotAI::IsAssistTank(bot))
     {
         // Non-assist-tank: pull toward center if too far
         static float const CENTER_MOVE_THRESHOLD = 30.0f;
@@ -58,7 +57,7 @@ bool IccBpcKelesethTankAction::Execute(Event /*event*/)
         }
     }
 
-    if (!botAI->IsAssistTank(bot))
+    if (!PlayerbotAI::IsAssistTank(bot))
         return false;
 
     bool const isBossVictim = boss->GetVictim() == bot;
@@ -122,9 +121,9 @@ bool IccBpcKelesethTankAction::Execute(Event /*event*/)
 
 bool IccBpcMainTankAction::Execute(Event /*event*/)
 {
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
     {
-        if (botAI->IsTank(bot))
+        if (PlayerbotAI::IsTank(bot))
             MarkEmpoweredPrince();
         return false;
     }
@@ -176,7 +175,7 @@ bool IccBpcMainTankAction::Execute(Event /*event*/)
     // lock a Ball of Flame / Kinetic Bomb onto the tank, breaking that mechanic.
 
     // Target marking for all tanks, called after main tank priority actions
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         MarkEmpoweredPrince();
 
     return false;
@@ -261,7 +260,7 @@ bool IccBpcEmpoweredVortexAction::MaintainRangedSpacing()
     static float const RADIUS_TOLERANCE = 3.0f;
     static float const MOVE_INCREMENT = 3.0f;
 
-    bool const isRanged = botAI->IsRanged(bot) || botAI->IsHeal(bot);
+    bool const isRanged = PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot);
     if (!isRanged)
         return false;
 
@@ -280,12 +279,12 @@ bool IccBpcEmpoweredVortexAction::MaintainRangedSpacing()
         Player* member = itr->GetSource();
         if (!member || !member->IsAlive())
             continue;
-        if (botAI->IsTank(member))
+        if (PlayerbotAI::IsTank(member))
             continue;
         PlayerbotAI* memberAI = GET_PLAYERBOT_AI(member);
         if (!memberAI)
             continue;
-        if (memberAI->IsRanged(member) || memberAI->IsHeal(member))
+        if (PlayerbotAI::IsRanged(member) || PlayerbotAI::IsHeal(member))
             rangedBots.push_back(member);
     }
 
@@ -396,7 +395,7 @@ bool IccBpcEmpoweredVortexAction::HandleEmpoweredVortexSpread()
     static float const SLOT_TOLERANCE = 2.0f;
     static float const MIN_SPACING = 13.0f;
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
@@ -430,7 +429,7 @@ bool IccBpcEmpoweredVortexAction::HandleEmpoweredVortexSpread()
         Player* member = itr->GetSource();
         if (!member || !member->IsAlive())
             continue;
-        if (botAI->IsTank(member))
+        if (PlayerbotAI::IsTank(member))
             continue;
         spreadBots.push_back(member);
     }
@@ -549,7 +548,7 @@ bool IccBpcEmpoweredVortexAction::HandleEmpoweredVortexSpread()
 
 bool IccBpcKineticBombAction::Execute(Event /*event*/)
 {
-    if (!botAI->IsRangedDps(bot))
+    if (!PlayerbotAI::IsRangedDps(bot))
         return false;
 
     static float const MAX_HEIGHT_DIFF = 30.0f;
@@ -626,7 +625,7 @@ Unit* IccBpcKineticBombAction::FindNearestBomb()
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
-            if (member && member->IsAlive() && GET_PLAYERBOT_AI(member) && botAI->IsRangedDps(member))
+            if (member && member->IsAlive() && GET_PLAYERBOT_AI(member) && PlayerbotAI::IsRangedDps(member))
                 rangedDps.push_back(member);
         }
     }
@@ -698,7 +697,7 @@ bool IccBpcBallOfFlameAction::Execute(Event /*event*/)
     if (infernoFlameUnit && infernoDist > 2.0f && infernoDist <= 10.0f && !hasInfernoFlame &&
         bot->getClass() != CLASS_HUNTER)
     {
-        if (!botAI->IsTank(bot) && infernoFlameUnit->GetVictim() != bot)
+        if (!PlayerbotAI::IsTank(bot) && infernoFlameUnit->GetVictim() != bot)
         {
             float flameX = infernoFlameUnit->GetPositionX();
             float flameY = infernoFlameUnit->GetPositionY();

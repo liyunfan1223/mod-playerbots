@@ -591,8 +591,8 @@ private:
     TravelNodeMap() = default;
     ~TravelNodeMap() = default;
 
-    TravelNodeMap(const TravelNodeMap&) = delete;
-    TravelNodeMap& operator=(const TravelNodeMap&) = delete;
+    TravelNodeMap(TravelNodeMap const&) = delete;
+    TravelNodeMap& operator=(TravelNodeMap const&) = delete;
 
     TravelNodeMap(TravelNodeMap&&) = delete;
     TravelNodeMap& operator=(TravelNodeMap&&) = delete;
@@ -602,7 +602,7 @@ private:
     void ComputeAllPaths();
     std::unordered_map<uint32, uint32> BFS(uint32 startNode);
     std::vector<uint32> BuildPath(uint32 fromNode, uint32 toNode,
-                                  const std::unordered_map<uint32, uint32>& parentMap);
+                                  std::unordered_map<uint32, uint32> const& parentMap);
 
     std::unordered_map<uint32, std::vector<uint32>> taxiGraph;
     std::map<uint32, std::map<uint32, std::vector<uint32>>> taxiPathCache;

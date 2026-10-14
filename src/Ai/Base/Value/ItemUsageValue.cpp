@@ -17,6 +17,8 @@
 #include "ServerFacade.h"
 #include "StatsWeightCalculator.h"
 
+#include <unordered_set>
+
 ItemUsage ItemUsageValue::Calculate()
 {
     ParsedItemUsage const parsed = GetItemIdFromQualifier();
@@ -52,7 +54,7 @@ ItemUsage ItemUsageValue::Calculate()
                 if (bot->HasSpell(proto->Spells[2].SpellId))
                     needItem = false;
                 else
-                    needItem = bot->BotCanUseItem(proto) == EQUIP_ERR_OK;
+                    needItem = bot->CanUseItem(proto) == EQUIP_ERR_OK;
             }
         }
 
@@ -117,7 +119,7 @@ ItemUsage ItemUsageValue::Calculate()
 
     Player* master = botAI->GetMaster();
     bool botNeedsItemForQuest = IsItemUsefulForQuest(bot, proto);
-    bool masterNeedsItemForQuest = master && sPlayerbotAIConfig.syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
+    bool masterNeedsItemForQuest = master && sPlayerbotAIConfig.SyncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
 
     // Identify the source of loot
     LootObject lootObject = AI_VALUE(LootObject, "loot target");
@@ -132,7 +134,7 @@ ItemUsage ItemUsageValue::Calculate()
     if (isLootFromItem && botNeedsItemForQuest)
         return ITEM_USAGE_QUEST;
 
-    // If this is not a selfbot acting alone and the master needs this quest item, defer to the master
+    // If this is not a SelfBot acting alone and the master needs this quest item, defer to the master
     if (!IsSelfBot(bot) && masterNeedsItemForQuest)
         return ITEM_USAGE_NONE;
 
@@ -160,13 +162,13 @@ ItemUsage ItemUsageValue::Calculate()
 
 ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, int32 randomPropertyId)
 {
-    if (bot->BotCanUseItem(itemProto) != EQUIP_ERR_OK)
+    if (bot->CanUseItem(itemProto) != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
 
     if (itemProto->InventoryType == INVTYPE_NON_EQUIP)
         return ITEM_USAGE_NONE;
 
-    Item* pItem = Item::CreateItem(itemProto->ItemId, 1, bot, false, 0, true);
+    Item* pItem = Item::CreateItem(itemProto->ItemId, 1, bot);
     if (!pItem)
         return ITEM_USAGE_NONE;
 
@@ -303,7 +305,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         {
             // uint32 oldStatWeight = sRandomItemMgr.GetLiveStatWeight(bot, oldItemProto->ItemId);
             if (itemScore || oldScore)
-                shouldEquipInSlot = itemScore > oldScore * sPlayerbotAIConfig.equipUpgradeThreshold;
+                shouldEquipInSlot = itemScore > oldScore * sPlayerbotAIConfig.EquipUpgradeThreshold;
         }
 
         // Bigger quiver
@@ -357,9 +359,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
                             return ITEM_USAGE_REPLACE;
                         else
                             return ITEM_USAGE_BAD_EQUIP;
-
-                        break;
                     }
+                    // A lower-subclass armor piece is handled by the default case below.
+                    [[fallthrough]];
                 default:
                 {
                     if (itemIsBroken && !oldItemIsBroken)
@@ -381,7 +383,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
 
 ItemUsage ItemUsageValue::QueryItemUsageForAmmo(ItemTemplate const* proto)
 {
-    if (bot->getClass() != CLASS_HUNTER || bot->getClass() != CLASS_ROGUE || bot->getClass() != CLASS_WARRIOR)
+    if (bot->getClass() != CLASS_HUNTER && bot->getClass() != CLASS_ROGUE && bot->getClass() != CLASS_WARRIOR)
         return ITEM_USAGE_NONE;
 
     Item* rangedWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
@@ -480,6 +482,12 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(player);
     if (!botAI)
         return false;
+
+    // Core loot gating predicate: also covers quest source items (ItemDrop,
+    // e.g. quest keys). The local objective check below is kept because this
+    // predicate skips non-raid quests for raid groups.
+    if (player->HasQuestForItem(proto->ItemId))
+        return true;
 
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
@@ -668,8 +676,43 @@ bool ItemUsageValue::IsItemUsefulForSkill(ItemTemplate const* proto)
     return false;
 }
 
+namespace
+{
+    // Crafting chains can be cyclic: Remember which items are already being evaluated
+    // further up the stack and stop as soon as a cycle closes.
+    thread_local std::unordered_set<uint32> itemsBeingEvaluated;
+
+    class UsefullSpellRecursionGuard
+    {
+    public:
+        explicit UsefullSpellRecursionGuard(uint32 itemId)
+            : _itemId(itemId), _entered(itemsBeingEvaluated.insert(itemId).second)
+        {
+        }
+
+        ~UsefullSpellRecursionGuard()
+        {
+            if (_entered)
+                itemsBeingEvaluated.erase(_itemId);
+        }
+
+        UsefullSpellRecursionGuard(UsefullSpellRecursionGuard const&) = delete;
+        UsefullSpellRecursionGuard& operator=(UsefullSpellRecursionGuard const&) = delete;
+
+        bool Entered() const { return _entered; }
+
+    private:
+        uint32 _itemId;
+        bool _entered;
+    };
+}
+
 bool ItemUsageValue::IsItemNeededForUsefullSpell(ItemTemplate const* proto, bool checkAllReagents)
 {
+    UsefullSpellRecursionGuard guard(proto->ItemId);
+    if (!guard.Entered())
+        return false;
+
     for (auto spellId : SpellsUsingItem(proto->ItemId, bot))
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);

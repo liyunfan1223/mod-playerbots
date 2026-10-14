@@ -5,9 +5,11 @@
  */
 
 #include "VHStrategy.h"
+#include "ChooseTargetActions.h"
+#include "MovementActions.h"
 #include "VHMultipliers.h"
 
-void WotlkDungeonVHStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonVHStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Erekem
     // This boss has many purgable buffs, purging/dispels could be merged into generic strats though
@@ -29,7 +31,7 @@ void WotlkDungeonVHStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 
     // Zuramat the Obliterator
     triggers.push_back(new TriggerNode("shroud of darkness",
-        { NextAction("stop attack", ACTION_HIGH + 5) }));
+        { NextAction("drop target", ACTION_HIGH + 5) }));
     triggers.push_back(new TriggerNode("void shift",
         { NextAction("attack void sentry", ACTION_RAID + 1) }));
 
@@ -38,7 +40,7 @@ void WotlkDungeonVHStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         { NextAction("rear flank", ACTION_MOVE + 5) }));
 }
 
-void WotlkDungeonVHStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonVHStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new ErekemMultiplier(botAI));
     multipliers.push_back(new IchoronMultiplier(botAI));

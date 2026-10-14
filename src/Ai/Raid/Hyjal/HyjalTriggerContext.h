@@ -7,218 +7,260 @@
 #ifndef PLAYERBOTS_HYJALTRIGGERCONTEXT_H
 #define PLAYERBOTS_HYJALTRIGGERCONTEXT_H
 
+#include "EncounterHelpers.h"
 #include "HyjalTriggers.h"
 #include "NamedObjectContext.h"
 
-class RaidHyjalSummitTriggerContext : public NamedObjectContext<Trigger>
+class RaidHyjalTriggerContext : public NamedObjectContext<Trigger>
 {
 public:
-    RaidHyjalSummitTriggerContext()
+    RaidHyjalTriggerContext()
     {
         // General
-        creators["hyjal summit bot is not in combat"] =
-            &RaidHyjalSummitTriggerContext::hyjal_summit_bot_is_not_in_combat;
+        creators["hyjal no encounter in progress"] =
+            &RaidHyjalTriggerContext::hyjal_no_encounter_in_progress;
 
         // Rage Winterchill
         creators["rage winterchill pulling boss"] =
-            &RaidHyjalSummitTriggerContext::rage_winterchill_pulling_boss;
+            &RaidHyjalTriggerContext::rage_winterchill_pulling_boss;
 
-        creators["rage winterchill boss engaged by main tank"] =
-            &RaidHyjalSummitTriggerContext::rage_winterchill_boss_engaged_by_main_tank;
+        creators["rage winterchill should be tanked"] =
+            &RaidHyjalTriggerContext::rage_winterchill_should_be_tanked;
 
-        creators["rage winterchill boss casts death and decay on ranged"] =
-            &RaidHyjalSummitTriggerContext::rage_winterchill_boss_casts_death_and_decay_on_ranged;
+        creators["rage winterchill ranged should spread"] =
+            &RaidHyjalTriggerContext::rage_winterchill_ranged_should_spread;
 
-        creators["rage winterchill melee is standing in death and decay"] =
-            &RaidHyjalSummitTriggerContext::rage_winterchill_melee_is_standing_in_death_and_decay;
+        creators["rage winterchill melee near death and decay"] =
+            &RaidHyjalTriggerContext::rage_winterchill_melee_near_death_and_decay;
+
+        creators["rage winterchill ranged in death and decay"] =
+            &RaidHyjalTriggerContext::rage_winterchill_ranged_in_death_and_decay;
 
         // Anetheron
         creators["anetheron pulling boss or infernal"] =
-            &RaidHyjalSummitTriggerContext::anetheron_pulling_boss_or_infernal;
+            &RaidHyjalTriggerContext::anetheron_pulling_boss_or_infernal;
 
-        creators["anetheron boss engaged by main tank"] =
-            &RaidHyjalSummitTriggerContext::anetheron_boss_engaged_by_main_tank;
+        creators["anetheron should be tanked"] =
+            &RaidHyjalTriggerContext::anetheron_should_be_tanked;
 
-        creators["anetheron boss casts carrion swarm"] =
-            &RaidHyjalSummitTriggerContext::anetheron_boss_casts_carrion_swarm;
+        creators["anetheron ranged should spread"] =
+            &RaidHyjalTriggerContext::anetheron_ranged_should_spread;
 
-        creators["anetheron bot is targeted by infernal"] =
-            &RaidHyjalSummitTriggerContext::anetheron_bot_is_targeted_by_infernal;
+        creators["anetheron near inferno target"] =
+            &RaidHyjalTriggerContext::anetheron_near_inferno_target;
 
-        creators["anetheron infernals need to be kept away from raid"] =
-            &RaidHyjalSummitTriggerContext::anetheron_infernals_need_to_be_kept_away_from_raid;
+        creators["anetheron targeted by infernal"] =
+            &RaidHyjalTriggerContext::anetheron_targeted_by_infernal;
 
-        creators["anetheron infernals continue to spawn"] =
-            &RaidHyjalSummitTriggerContext::anetheron_infernals_continue_to_spawn;
+        creators["anetheron infernals pulse immolation"] =
+            &RaidHyjalTriggerContext::anetheron_infernals_pulse_immolation;
+
+        creators["anetheron infernals should be tanked away"] =
+            &RaidHyjalTriggerContext::anetheron_infernals_should_be_tanked_away;
+
+        creators["anetheron should divide dps"] =
+            &RaidHyjalTriggerContext::anetheron_should_divide_dps;
 
         // Kaz'rogal
-        creators["kaz'rogal pulling boss"] =
-            &RaidHyjalSummitTriggerContext::kazrogal_pulling_boss;
+        creators["kaz'rogal pulling boss"] = &RaidHyjalTriggerContext::kazrogal_pulling_boss;
 
-        creators["kaz'rogal boss engaged by main tank"] =
-            &RaidHyjalSummitTriggerContext::kazrogal_boss_engaged_by_main_tank;
+        creators["kaz'rogal should be tanked"] =
+            &RaidHyjalTriggerContext::kazrogal_should_be_tanked;
 
-        creators["kaz'rogal boss engaged by assist tanks"] =
-            &RaidHyjalSummitTriggerContext::kazrogal_boss_engaged_by_assist_tanks;
+        creators["kaz'rogal can split malevolent cleave damage"] =
+            &RaidHyjalTriggerContext::kazrogal_can_split_malevolent_cleave_damage;
 
-        creators["kaz'rogal bot is low on mana"] =
-            &RaidHyjalSummitTriggerContext::kazrogal_bot_is_low_on_mana;
+        creators["kaz'rogal ranged should avoid war stomp"] =
+            &RaidHyjalTriggerContext::kazrogal_ranged_should_avoid_war_stomp;
 
-        creators["kaz'rogal low mana bots need escape path"] =
-            &RaidHyjalSummitTriggerContext::kazrogal_low_mana_bots_need_escape_path;
+        creators["kaz'rogal low on mana"] = &RaidHyjalTriggerContext::kazrogal_low_on_mana;
 
-        creators["kaz'rogal mark deals shadow damage"] =
-            &RaidHyjalSummitTriggerContext::kazrogal_mark_deals_shadow_damage;
+        creators["kaz'rogal hunter should preserve mana"] =
+            &RaidHyjalTriggerContext::kazrogal_hunter_should_preserve_mana;
+
+        creators["kaz'rogal mark on mage or paladin"] =
+            &RaidHyjalTriggerContext::kazrogal_mark_on_mage_or_paladin;
+
+        creators["kaz'rogal immunity no longer needed"] =
+            &RaidHyjalTriggerContext::kazrogal_immunity_no_longer_needed;
+
+        creators["kaz'rogal warlock should manage mana"] =
+            &RaidHyjalTriggerContext::kazrogal_warlock_should_manage_mana;
 
         // Azgalor
-        creators["azgalor pulling boss"] =
-            &RaidHyjalSummitTriggerContext::azgalor_pulling_boss;
+        creators["azgalor pulling boss"] = &RaidHyjalTriggerContext::azgalor_pulling_boss;
 
-        creators["azgalor boss engaged by main tank"] =
-            &RaidHyjalSummitTriggerContext::azgalor_boss_engaged_by_main_tank;
+        creators["azgalor should be tanked"] = &RaidHyjalTriggerContext::azgalor_should_be_tanked;
 
-        creators["azgalor main tank is positioning boss"] =
-            &RaidHyjalSummitTriggerContext::azgalor_main_tank_is_positioning_boss;
+        creators["azgalor ranged should spread"] =
+            &RaidHyjalTriggerContext::azgalor_ranged_should_spread;
 
-        creators["azgalor boss engaged by ranged"] =
-            &RaidHyjalSummitTriggerContext::azgalor_boss_engaged_by_ranged;
+        creators["azgalor melee near rain of fire"] =
+            &RaidHyjalTriggerContext::azgalor_melee_near_rain_of_fire;
 
-        creators["azgalor boss casts rain of fire on melee"] =
-            &RaidHyjalSummitTriggerContext::azgalor_boss_casts_rain_of_fire_on_melee;
+        creators["azgalor ranged in rain of fire"] =
+            &RaidHyjalTriggerContext::azgalor_ranged_in_rain_of_fire;
 
-        creators["azgalor bot is doomed"] =
-            &RaidHyjalSummitTriggerContext::azgalor_bot_is_doomed;
+        creators["azgalor bot is doomed"] = &RaidHyjalTriggerContext::azgalor_bot_is_doomed;
 
-        creators["azgalor doomguards must be controlled"] =
-            &RaidHyjalSummitTriggerContext::azgalor_doomguards_must_be_controlled;
+        creators["azgalor should control doomguards"] =
+            &RaidHyjalTriggerContext::azgalor_should_control_doomguards;
 
-        creators["azgalor doomguards must die"] =
-            &RaidHyjalSummitTriggerContext::azgalor_doomguards_must_die;
+        creators["azgalor should divide dps"] = &RaidHyjalTriggerContext::azgalor_should_divide_dps;
 
         // Archimonde
-        creators["archimonde pulling boss"] =
-            &RaidHyjalSummitTriggerContext::archimonde_pulling_boss;
+        creators["archimonde pulling boss"] = &RaidHyjalTriggerContext::archimonde_pulling_boss;
 
-        creators["archimonde boss engaged by main tank"] =
-            &RaidHyjalSummitTriggerContext::archimonde_boss_engaged_by_main_tank;
+        creators["archimonde should be tanked"] =
+            &RaidHyjalTriggerContext::archimonde_should_be_tanked;
 
-        creators["archimonde boss casts fear"] =
-            &RaidHyjalSummitTriggerContext::archimonde_boss_casts_fear;
+        creators["archimonde shaman should protect against fear"] =
+            &RaidHyjalTriggerContext::archimonde_shaman_should_protect_against_fear;
 
-        creators["archimonde boss casts air burst"] =
-            &RaidHyjalSummitTriggerContext::archimonde_boss_casts_air_burst;
+        creators["archimonde casting air burst"] =
+            &RaidHyjalTriggerContext::archimonde_casting_air_burst;
 
-        creators["archimonde boss summoned doomfire"] =
-            &RaidHyjalSummitTriggerContext::archimonde_boss_summoned_doomfire;
+        creators["archimonde ranged should spread"] =
+            &RaidHyjalTriggerContext::archimonde_ranged_should_spread;
 
-        creators["archimonde bot stood in doomfire"] =
-            &RaidHyjalSummitTriggerContext::archimonde_bot_stood_in_doomfire;
+        creators["archimonde near doomfire"] = &RaidHyjalTriggerContext::archimonde_near_doomfire;
+
+        creators["archimonde stood in doomfire"] =
+            &RaidHyjalTriggerContext::archimonde_stood_in_doomfire;
     }
 
 private:
     // General
-    static Trigger* hyjal_summit_bot_is_not_in_combat(PlayerbotAI* botAI) {
-        return new HyjalSummitBotIsNotInCombatTrigger(botAI);
+    static Trigger* hyjal_no_encounter_in_progress(PlayerbotAI* botAI) {
+        return new HyjalNoEncounterInProgressTrigger(botAI);
     }
 
     // Rage Winterchill
     static Trigger* rage_winterchill_pulling_boss(PlayerbotAI* botAI) {
-        return new RageWinterchillPullingBossTrigger(botAI);
+        return new HyjalPullingBossTrigger(
+            botAI, "rage winterchill pulling boss", "rage winterchill");
     }
-    static Trigger* rage_winterchill_boss_engaged_by_main_tank(PlayerbotAI* botAI) {
-        return new RageWinterchillBossEngagedByMainTankTrigger(botAI);
+    static Trigger* rage_winterchill_should_be_tanked(PlayerbotAI* botAI) {
+        return new HyjalBossShouldBeTankedTrigger(
+            botAI, "rage winterchill should be tanked", "rage winterchill", 0.0f, false);
     }
-    static Trigger* rage_winterchill_boss_casts_death_and_decay_on_ranged(PlayerbotAI* botAI) {
-        return new RageWinterchillBossCastsDeathAndDecayOnRangedTrigger(botAI);
+    static Trigger* rage_winterchill_ranged_should_spread(PlayerbotAI* botAI) {
+        return new RageWinterchillRangedShouldSpreadTrigger(botAI);
     }
-    static Trigger* rage_winterchill_melee_is_standing_in_death_and_decay(PlayerbotAI* botAI) {
-        return new RageWinterchillMeleeIsStandingInDeathAndDecayTrigger(botAI);
+    static Trigger* rage_winterchill_melee_near_death_and_decay(PlayerbotAI* botAI) {
+        return new RageWinterchillMeleeNearDeathAndDecayTrigger(botAI);
+    }
+    static Trigger* rage_winterchill_ranged_in_death_and_decay(PlayerbotAI* botAI) {
+        return new RageWinterchillRangedInDeathAndDecayTrigger(botAI);
     }
 
     // Anetheron
     static Trigger* anetheron_pulling_boss_or_infernal(PlayerbotAI* botAI) {
         return new AnetheronPullingBossOrInfernalTrigger(botAI);
     }
-    static Trigger* anetheron_boss_engaged_by_main_tank(PlayerbotAI* botAI) {
-        return new AnetheronBossEngagedByMainTankTrigger(botAI);
+    static Trigger* anetheron_should_be_tanked(PlayerbotAI* botAI) {
+        return new HyjalBossShouldBeTankedTrigger(
+            botAI, "anetheron should be tanked", "anetheron");
     }
-    static Trigger* anetheron_boss_casts_carrion_swarm(PlayerbotAI* botAI) {
-        return new AnetheronBossCastsCarrionSwarmTrigger(botAI);
+    static Trigger* anetheron_ranged_should_spread(PlayerbotAI* botAI) {
+        return new AnetheronRangedShouldSpreadTrigger(botAI);
     }
-    static Trigger* anetheron_bot_is_targeted_by_infernal(PlayerbotAI* botAI) {
-        return new AnetheronBotIsTargetedByInfernalTrigger(botAI);
+    static Trigger* anetheron_near_inferno_target(PlayerbotAI* botAI) {
+        return new AnetheronNearInfernoTargetTrigger(botAI);
     }
-    static Trigger* anetheron_infernals_need_to_be_kept_away_from_raid(PlayerbotAI* botAI) {
-        return new AnetheronInfernalsNeedToBeKeptAwayFromRaidTrigger(botAI);
+    static Trigger* anetheron_targeted_by_infernal(PlayerbotAI* botAI) {
+        return new AnetheronTargetedByInfernalTrigger(botAI);
     }
-    static Trigger* anetheron_infernals_continue_to_spawn(PlayerbotAI* botAI) {
-        return new AnetheronInfernalsContinueToSpawnTrigger(botAI);
+    static Trigger* anetheron_infernals_pulse_immolation(PlayerbotAI* botAI) {
+        return new AnetheronInfernalsPulseImmolationTrigger(botAI);
+    }
+    static Trigger* anetheron_infernals_should_be_tanked_away(PlayerbotAI* botAI) {
+        return new AnetheronInfernalsShouldBeTankedAwayTrigger(botAI);
+    }
+    static Trigger* anetheron_should_divide_dps(PlayerbotAI* botAI) {
+        return new AnetheronShouldDivideDpsTrigger(botAI);
     }
 
     // Kaz'rogal
     static Trigger* kazrogal_pulling_boss(PlayerbotAI* botAI) {
-        return new KazrogalPullingBossTrigger(botAI);
+        return new HyjalPullingBossTrigger(botAI, "kaz'rogal pulling boss", "kaz'rogal");
     }
-    static Trigger* kazrogal_boss_engaged_by_main_tank(PlayerbotAI* botAI) {
-        return new KazrogalBossEngagedByMainTankTrigger(botAI);
+    static Trigger* kazrogal_should_be_tanked(PlayerbotAI* botAI) {
+        return new HyjalBossShouldBeTankedTrigger(
+            botAI, "kaz'rogal should be tanked", "kaz'rogal");
     }
-    static Trigger* kazrogal_boss_engaged_by_assist_tanks(PlayerbotAI* botAI) {
-        return new KazrogalBossEngagedByAssistTanksTrigger(botAI);
+    static Trigger* kazrogal_can_split_malevolent_cleave_damage(PlayerbotAI* botAI) {
+        return new KazrogalCanSplitMalevolentCleaveDamageTrigger(botAI);
     }
-    static Trigger* kazrogal_low_mana_bots_need_escape_path(PlayerbotAI* botAI) {
-        return new KazrogalLowManaBotsNeedEscapePathTrigger(botAI);
+    static Trigger* kazrogal_ranged_should_avoid_war_stomp(PlayerbotAI* botAI) {
+        return new KazrogalRangedShouldAvoidWarStompTrigger(botAI);
     }
-    static Trigger* kazrogal_bot_is_low_on_mana(PlayerbotAI* botAI) {
-        return new KazrogalBotIsLowOnManaTrigger(botAI);
+    static Trigger* kazrogal_low_on_mana(PlayerbotAI* botAI) {
+        return new KazrogalLowOnManaTrigger(botAI);
     }
-    static Trigger* kazrogal_mark_deals_shadow_damage(PlayerbotAI* botAI) {
-        return new KazrogalMarkDealsShadowDamageTrigger(botAI);
+    static Trigger* kazrogal_hunter_should_preserve_mana(PlayerbotAI* botAI) {
+        return new KazrogalHunterShouldPreserveManaTrigger(botAI);
+    }
+    static Trigger* kazrogal_mark_on_mage_or_paladin(PlayerbotAI* botAI) {
+        return new KazrogalMarkOnMageOrPaladinTrigger(botAI);
+    }
+    static Trigger* kazrogal_immunity_no_longer_needed(PlayerbotAI* botAI) {
+        return new KazrogalImmunityNoLongerNeededTrigger(botAI);
+    }
+    static Trigger* kazrogal_warlock_should_manage_mana(PlayerbotAI* botAI) {
+        return new KazrogalWarlockShouldManageManaTrigger(botAI);
     }
 
     // Azgalor
     static Trigger* azgalor_pulling_boss(PlayerbotAI* botAI) {
-        return new AzgalorPullingBossTrigger(botAI);
+        return new HyjalPullingBossTrigger(botAI, "azgalor pulling boss", "azgalor");
     }
-    static Trigger* azgalor_boss_engaged_by_main_tank(PlayerbotAI* botAI) {
-        return new AzgalorBossEngagedByMainTankTrigger(botAI);
+    static Trigger* azgalor_should_be_tanked(PlayerbotAI* botAI) {
+        return new HyjalBossShouldBeTankedTrigger(
+            botAI, "azgalor should be tanked", "azgalor");
     }
-    static Trigger* azgalor_main_tank_is_positioning_boss(PlayerbotAI* botAI) {
-        return new AzgalorMainTankIsPositioningBossTrigger(botAI);
+    static Trigger* azgalor_ranged_should_spread(PlayerbotAI* botAI) {
+        return new AzgalorRangedShouldSpreadTrigger(botAI);
     }
-    static Trigger* azgalor_boss_engaged_by_ranged(PlayerbotAI* botAI) {
-        return new AzgalorBossEngagedByRangedTrigger(botAI);
+    static Trigger* azgalor_melee_near_rain_of_fire(PlayerbotAI* botAI) {
+        return new AzgalorMeleeNearRainOfFireTrigger(botAI);
     }
-    static Trigger* azgalor_boss_casts_rain_of_fire_on_melee(PlayerbotAI* botAI) {
-        return new AzgalorBossCastsRainOfFireOnMeleeTrigger(botAI);
+    static Trigger* azgalor_ranged_in_rain_of_fire(PlayerbotAI* botAI) {
+        return new AzgalorRangedInRainOfFireTrigger(botAI);
     }
     static Trigger* azgalor_bot_is_doomed(PlayerbotAI* botAI) {
         return new AzgalorBotIsDoomedTrigger(botAI);
     }
-    static Trigger* azgalor_doomguards_must_be_controlled(PlayerbotAI* botAI) {
-        return new AzgalorDoomguardsMustBeControlledTrigger(botAI);
+    static Trigger* azgalor_should_control_doomguards(PlayerbotAI* botAI) {
+        return new AzgalorShouldControlDoomguardsTrigger(botAI);
     }
-    static Trigger* azgalor_doomguards_must_die(PlayerbotAI* botAI) {
-        return new AzgalorDoomguardsMustDieTrigger(botAI);
+    static Trigger* azgalor_should_divide_dps(PlayerbotAI* botAI) {
+        return new AzgalorShouldDivideDpsTrigger(botAI);
     }
 
     // Archimonde
     static Trigger* archimonde_pulling_boss(PlayerbotAI* botAI) {
-        return new ArchimondePullingBossTrigger(botAI);
+        return new HyjalPullingBossTrigger(botAI, "archimonde pulling boss", "archimonde");
     }
-    static Trigger* archimonde_boss_engaged_by_main_tank(PlayerbotAI* botAI) {
-        return new ArchimondeBossEngagedByMainTankTrigger(botAI);
+    static Trigger* archimonde_should_be_tanked(PlayerbotAI* botAI) {
+        return new HyjalBossShouldBeTankedTrigger(
+            botAI, "archimonde should be tanked", "archimonde",
+            EncounterHelpers::BOSS_ENGAGED_HEALTH_PCT, false);
     }
-    static Trigger* archimonde_boss_casts_fear(PlayerbotAI* botAI) {
-        return new ArchimondeBossCastsFearTrigger(botAI);
+    static Trigger* archimonde_shaman_should_protect_against_fear(PlayerbotAI* botAI) {
+        return new ArchimondeShamanShouldProtectAgainstFearTrigger(botAI);
     }
-    static Trigger* archimonde_boss_casts_air_burst(PlayerbotAI* botAI) {
-        return new ArchimondeBossCastsAirBurstTrigger(botAI);
+    static Trigger* archimonde_casting_air_burst(PlayerbotAI* botAI) {
+        return new ArchimondeCastingAirBurstTrigger(botAI);
     }
-    static Trigger* archimonde_boss_summoned_doomfire(PlayerbotAI* botAI) {
-        return new ArchimondeBossSummonedDoomfireTrigger(botAI);
+    static Trigger* archimonde_ranged_should_spread(PlayerbotAI* botAI) {
+        return new ArchimondeRangedShouldSpreadTrigger(botAI);
     }
-    static Trigger* archimonde_bot_stood_in_doomfire(PlayerbotAI* botAI) {
-        return new ArchimondeBotStoodInDoomfireTrigger(botAI);
+    static Trigger* archimonde_near_doomfire(PlayerbotAI* botAI) {
+        return new ArchimondeNearDoomfireTrigger(botAI);
+    }
+    static Trigger* archimonde_stood_in_doomfire(PlayerbotAI* botAI) {
+        return new ArchimondeStoodInDoomfireTrigger(botAI);
     }
 };
 

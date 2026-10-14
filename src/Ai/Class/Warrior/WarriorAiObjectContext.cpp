@@ -27,7 +27,7 @@ public:
 
 private:
     static Strategy* nc(PlayerbotAI* botAI) { return new GenericWarriorNonCombatStrategy(botAI); }
-    static Strategy* warrior_aoe(PlayerbotAI* botAI) { return new WarrirorAoeStrategy(botAI); }
+    static Strategy* warrior_aoe(PlayerbotAI* botAI) { return new WarriorAoeStrategy(botAI); }
     static Strategy* pull(PlayerbotAI* botAI) { return new WarriorPullStrategy(botAI); }
 };
 
@@ -36,13 +36,14 @@ class WarriorCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
 public:
     WarriorCombatStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
     {
-        creators["tank"] = &WarriorCombatStrategyFactoryInternal::tank;
+        creators["prot"] = &WarriorCombatStrategyFactoryInternal::prot;
+        creators["tank"] = &WarriorCombatStrategyFactoryInternal::prot;
         creators["arms"] = &WarriorCombatStrategyFactoryInternal::arms;
         creators["fury"] = &WarriorCombatStrategyFactoryInternal::fury;
     }
 
 private:
-    static Strategy* tank(PlayerbotAI* botAI) { return new TankWarriorStrategy(botAI); }
+    static Strategy* prot(PlayerbotAI* botAI) { return new TankWarriorStrategy(botAI); }
     static Strategy* arms(PlayerbotAI* botAI) { return new ArmsWarriorStrategy(botAI); }
     static Strategy* fury(PlayerbotAI* botAI) { return new FuryWarriorStrategy(botAI); }
 };
@@ -93,13 +94,11 @@ public:
         creators["shockwave"] = &WarriorTriggerFactoryInternal::shockwave;
         creators["shockwave on snare target"] = &WarriorTriggerFactoryInternal::shockwave_on_snare_target;
         creators["taste for blood"] = &WarriorTriggerFactoryInternal::taste_for_blood;
-
         creators["thunder clap and rage"] = &WarriorTriggerFactoryInternal::thunderclap_and_rage;
         creators["intercept can cast"] = &WarriorTriggerFactoryInternal::intercept_can_cast;
         creators["intercept and far enemy"] = &WarriorTriggerFactoryInternal::intercept_and_far_enemy;
         creators["intercept and rage"] = &WarriorTriggerFactoryInternal::intercept_and_rage;
         // creators["slam"] = &WarriorTriggerFactoryInternal::slam;
-
         creators["vigilance"] = &WarriorTriggerFactoryInternal::vigilance;
         creators["shattering throw trigger"] = &WarriorTriggerFactoryInternal::shattering_throw_trigger;
     }
@@ -125,7 +124,6 @@ private:
     {
         return new ShieldBashInterruptEnemyHealerSpellTrigger(botAI);
     }
-
     static Trigger* thunderclap_and_rage(PlayerbotAI* botAI)
     {
         return new TwoTriggers(botAI, "thunder clap", "light rage available");
@@ -139,7 +137,6 @@ private:
     {
         return new TwoTriggers(botAI, "intercept and far enemy", "light rage available");
     }
-
     static Trigger* intercept_on_snare_target(PlayerbotAI* botAI) { return new InterceptSnareTrigger(botAI); }
     static Trigger* spell_reflection(PlayerbotAI* botAI) { return new SpellReflectionTrigger(botAI); }
     static Trigger* taste_for_blood(PlayerbotAI* botAI) { return new TasteForBloodTrigger(botAI); }
@@ -170,8 +167,7 @@ private:
     static Trigger* overpower(PlayerbotAI* botAI) { return new OverpowerAvailableTrigger(botAI); }
     static Trigger* revenge(PlayerbotAI* botAI) { return new RevengeAvailableTrigger(botAI); }
     static Trigger* sunder_armor(PlayerbotAI* botAI) { return new SunderArmorDebuffTrigger(botAI); }
-    // static Trigger* slam(PlayerbotAI* ai) { return new SlamTrigger(ai); }
-
+    // static Trigger* slam(PlayerbotAI* botAI) { return new SlamTrigger(botAI); }
     static Trigger* vigilance(PlayerbotAI* botAI) { return new VigilanceTrigger(botAI); }
     static Trigger* shattering_throw_trigger(PlayerbotAI* botAI) { return new ShatteringThrowTrigger(botAI); }
 };

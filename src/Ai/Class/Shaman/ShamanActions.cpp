@@ -108,7 +108,7 @@ bool SetTotemAction::Execute(Event /*event*/)
     if (!totemSpell)
         return false;
 
-    if (const ActionButton* button = bot->GetActionButton(actionButtonId);
+    if (ActionButton const* button = bot->GetActionButton(actionButtonId);
         button && button->GetType() == ACTION_BUTTON_SPELL &&
         button->GetAction() == totemSpell)
     {

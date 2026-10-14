@@ -205,37 +205,33 @@ void RaidBlackTempleStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void RaidBlackTempleStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
+    // General
+    multipliers.push_back(new BlackTempleDelayDpsCooldownsMultiplier(botAI));
+
     // High Warlord Naj'entus
-    multipliers.push_back(new HighWarlordNajentusDelayDpsCooldownsMultiplier(botAI));
     multipliers.push_back(new HighWarlordNajentusDisableCombatFormationMoveMultiplier(botAI));
 
     // Supremus
-    multipliers.push_back(new SupremusDelayDpsCooldownsMultiplier(botAI));
     multipliers.push_back(new SupremusFocusOnAvoidanceInPhase2Multiplier(botAI));
     multipliers.push_back(new SupremusHitboxIsBuggedMultiplier(botAI));
 
     // Teron Gorefiend
-    multipliers.push_back(new TeronGorefiendDelayDpsCooldownsMultiplier(botAI));
     multipliers.push_back(new TeronGorefiendControlMovementMultiplier(botAI));
     multipliers.push_back(new TeronGorefiendMarkedBotOnlyMoveToDieMultiplier(botAI));
     multipliers.push_back(new TeronGorefiendSpiritsAttackOnlyShadowyConstructsMultiplier(botAI));
     multipliers.push_back(new TeronGorefiendDisableAttackingConstructsMultiplier(botAI));
 
     // Gurtogg Bloodboil
-    multipliers.push_back(new GurtoggBloodboilDelayDpsCooldownsMultiplier(botAI));
     multipliers.push_back(new GurtoggBloodboilControlMovementMultiplier(botAI));
 
     // Reliquary of Souls
-    multipliers.push_back(new ReliquaryOfSoulsDelayDpsCooldownsMultiplier(botAI));
     multipliers.push_back(new ReliquaryOfSoulsDontWasteHealingMultiplier(botAI));
 
     // Mother Shahraz
-    multipliers.push_back(new MotherShahrazDelayDpsCooldownsMultiplier(botAI));
     multipliers.push_back(new MotherShahrazControlMovementMultiplier(botAI));
     multipliers.push_back(new MotherShahrazBotsWithFatalAttractionOnlyRunAwayMultiplier(botAI));
 
     // Illidari Council
-    multipliers.push_back(new IllidariCouncilDelayDpsCooldownsMultiplier(botAI));
     multipliers.push_back(new IllidariCouncilDisableTankActionsMultiplier(botAI));
     multipliers.push_back(new IllidariCouncilControlMovementMultiplier(botAI));
     multipliers.push_back(new IllidariCouncilControlMisdirectionMultiplier(botAI));

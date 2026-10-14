@@ -5,13 +5,21 @@
  */
 
 #include "KaraActions.h"
+#include "EncounterHelpers.h"
 #include "KaraHelpers.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
-#include "RaidBossHelpers.h"
+#include <algorithm>
 #include <array>
+#include <cmath>
+#include <ctime>
+#include <limits>
+#include <list>
+#include <map>
+#include <string>
 
 using namespace KaraHelpers;
+using namespace EncounterHelpers;
 
 // General
 
@@ -41,8 +49,7 @@ bool KarazhanResetEncounterStatesAction::Execute(Event /*event*/)
 
     if (!AI_VALUE2(Unit*, "find target", "the big bad wolf"))
     {
-        Action* wolfAction = botAI->GetAiObjectContext()->GetAction(
-            "big bad wolf little red riding hood run away");
+        Action* wolfAction = context->GetAction("big bad wolf little red riding hood run away");
         if (wolfAction &&
             static_cast<BigBadWolfLittleRedRidingHoodRunAwayAction*>(wolfAction)->ResetRunIndex())
         {
@@ -55,24 +62,21 @@ bool KarazhanResetEncounterStatesAction::Execute(Event /*event*/)
         if (isMechanicTracker && netherspiteDpsWaitTimer.erase(instanceId) > 0)
             reset = true;
 
-        Action* redAction = botAI->GetAiObjectContext()->GetAction(
-            "netherspite block red beam");
+        Action* redAction = context->GetAction("netherspite block red beam");
         if (redAction &&
             static_cast<NetherspiteBlockRedBeamAction*>(redAction)->ResetRedBeamState())
         {
             reset = true;
         }
 
-        Action* blueAction = botAI->GetAiObjectContext()->GetAction(
-            "netherspite block blue beam");
+        Action* blueAction = context->GetAction("netherspite block blue beam");
         if (blueAction &&
             static_cast<NetherspiteBlockBlueBeamAction*>(blueAction)->ResetBlueBeamState())
         {
             reset = true;
         }
 
-        Action* greenAction = botAI->GetAiObjectContext()->GetAction(
-            "netherspite block green beam");
+        Action* greenAction = context->GetAction("netherspite block green beam");
         if (greenAction &&
             static_cast<NetherspiteBlockGreenBeamAction*>(greenAction)->ResetGreenBeamState())
         {
@@ -92,39 +96,10 @@ bool KarazhanResetEncounterStatesAction::Execute(Event /*event*/)
     return reset;
 }
 
-bool KarazhanCastFearProtectionSpellAction::Execute(Event /*event*/)
+bool KarazhanSetTremorTotemAction::Execute(Event /*event*/)
 {
-    if (bot->getClass() == CLASS_PRIEST)
-        return CastFearWardOnMainTank();
-
-    return SetTremorTotem();
-}
-
-bool KarazhanCastFearProtectionSpellAction::CastFearWardOnMainTank()
-{
-    Player* mainTank = GetGroupMainTank(botAI, bot);
-    if (!mainTank || mainTank->HasAura(Id(KaraSpells::SPELL_FEAR_WARD)))
-        return false;
-
-    if (!botAI->CanCastSpell(Id(KaraSpells::SPELL_FEAR_WARD), mainTank))
-        return false;
-
-    return botAI->CastSpell(Id(KaraSpells::SPELL_FEAR_WARD), mainTank);
-}
-
-bool KarazhanCastFearProtectionSpellAction::SetTremorTotem()
-{
-    Unit* nightbane = AI_VALUE2(Unit*, "find target", "nightbane");
-    if (!nightbane || nightbane->GetPositionZ() > NIGHTBANE_FLIGHT_Z)
-        return false;
-
-    if (AI_VALUE2(bool, "has totem", "tremor totem"))
-        return false;
-
-    if (!botAI->CanCastSpell(Id(KaraSpells::SPELL_TREMOR_TOTEM), bot))
-        return false;
-
-    return botAI->CastSpell(Id(KaraSpells::SPELL_TREMOR_TOTEM), bot);
+    return botAI->CanCastSpell(Id(KaraSpells::SPELL_TREMOR_TOTEM), bot) &&
+        botAI->CastSpell(Id(KaraSpells::SPELL_TREMOR_TOTEM), bot);
 }
 
 // Trash
@@ -158,7 +133,7 @@ bool ManaWarpStunCreatureBeforeWarpBreachAction::Execute(Event /*event*/)
         "shockwave",
     };
 
-    for (const char* spell : spells)
+    for (char const* spell : spells)
     {
         if (botAI->CanCastSpell(spell, target) && botAI->CastSpell(spell, target))
             return true;
@@ -288,7 +263,7 @@ bool MoroesMarkTargetAction::Execute(Event /*event*/)
         "lord crispin ference",
     };
 
-    for (const char* name : moroesGuests)
+    for (char const* name : moroesGuests)
     {
         if (Unit* guest = AI_VALUE2(Unit*, "find target", name))
             return MarkTargetWithSkull(bot, guest);
@@ -466,7 +441,7 @@ bool BigBadWolfLittleRedRidingHoodRunAwayAction::Execute(Event /*event*/)
 
     Position const& position = BIG_BAD_WOLF_RUN_POSITIONS[_runIndex];
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, position.GetPositionX(), position.GetPositionY(), position.GetPositionZ(),
         false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -512,7 +487,7 @@ bool RomuloAndJulianneMarkTargetAction::Execute(Event /*event*/)
 
 bool WizardOfOzMarkTargetAction::Execute(Event /*event*/)
 {
-    for (const char* name : OZ_TARGETS)
+    for (char const* name : OZ_TARGETS)
     {
         if (Unit* target = AI_VALUE2(Unit*, "find target", name))
             return MarkTargetWithSkull(bot, target);
@@ -589,7 +564,7 @@ bool TerestianIllhoofMarkTargetAction::Execute(Event /*event*/)
     static constexpr std::array illhoofTargets = {
         "demon chains", "kil'rek", "terestian illhoof", };
 
-    for (const char* name : illhoofTargets)
+    for (char const* name : illhoofTargets)
     {
         if (Unit* target = AI_VALUE2(Unit*, "find target", name))
             return MarkTargetWithSkull(bot, target);
@@ -611,7 +586,7 @@ bool ShadeOfAranRunAwayFromArcaneExplosionAction::Execute(Event /*event*/)
     if (currentDistance >= safeDistance)
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveAway(aran, safeDistance - currentDistance);
 }
 
@@ -794,7 +769,7 @@ bool NetherspiteBlockBlueBeamAction::Execute(Event /*event*/)
     if (!FindBeamPosition(netherspite, bluePortal, voidZones, idealDistance, beamPos))
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, beamPos.GetPositionX(), beamPos.GetPositionY(), bot->GetPositionZ(),
         false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -846,7 +821,7 @@ bool NetherspiteBlockGreenBeamAction::Execute(Event /*event*/)
     if (!FindBeamPosition(netherspite, greenPortal, voidZones, idealDistance, beamPos))
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, beamPos.GetPositionX(), beamPos.GetPositionY(), bot->GetPositionZ(),
         false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -900,7 +875,6 @@ bool NetherspiteAvoidBeamAndVoidZoneAction::Execute(Event /*event*/)
         return false;
 
     constexpr uint8 numAngles = 36;
-    constexpr float maxSearchDist = 30.0f;
     constexpr float stepDist = 0.5f;
     constexpr uint8 numSteps = 56;
 
@@ -942,7 +916,7 @@ bool NetherspiteAvoidBeamAndVoidZoneAction::Execute(Event /*event*/)
     if (!found)
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, bestCandidate.GetPositionX(), bestCandidate.GetPositionY(),
         bestCandidate.GetPositionZ(), false, false, false, false,
@@ -950,7 +924,7 @@ bool NetherspiteAvoidBeamAndVoidZoneAction::Execute(Event /*event*/)
 }
 
 bool NetherspiteAvoidBeamAndVoidZoneAction::IsAwayFromBeams(
-     float x, float y, float botX, float botY, const std::vector<BeamAvoid>& beams)
+     float x, float y, float botX, float botY, std::vector<BeamAvoid> const& beams)
 {
     for (auto const& beam : beams)
     {
@@ -1008,21 +982,21 @@ bool NetherspiteManageTimersAndTrackersAction::Execute(Event /*event*/)
         if (isMechanicTracker && netherspiteDpsWaitTimer.erase(instanceId) > 0)
             didSomething = true;
 
-        Action* redAction = botAI->GetAiObjectContext()->GetAction("netherspite block red beam");
+        Action* redAction = context->GetAction("netherspite block red beam");
         if (redAction &&
             static_cast<NetherspiteBlockRedBeamAction*>(redAction)->ResetRedBeamState())
         {
             didSomething = true;
         }
 
-        Action* blueAction = botAI->GetAiObjectContext()->GetAction("netherspite block blue beam");
+        Action* blueAction = context->GetAction("netherspite block blue beam");
         if (blueAction &&
             static_cast<NetherspiteBlockBlueBeamAction*>(blueAction)->ResetBlueBeamState())
         {
             didSomething = true;
         }
 
-        Action* greenAction = botAI->GetAiObjectContext()->GetAction("netherspite block green beam");
+        Action* greenAction = context->GetAction("netherspite block green beam");
         if (greenAction &&
             static_cast<NetherspiteBlockGreenBeamAction*>(greenAction)->ResetGreenBeamState())
         {
@@ -1106,7 +1080,7 @@ bool PrinceMalchezaarEnfeebledBotAvoidHazardAction::Execute(Event /*event*/)
     if (!found)
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, bestDestX, bestDestY, bot->GetPositionZ(), false, false,
         false, false, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -1141,7 +1115,7 @@ bool PrinceMalchezaarNonTankAvoidInfernalAction::Execute(Event /*event*/)
     if (!found)
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, bestDestX, bestDestY, bot->GetPositionZ(), false, false,
         false, false, MovementPriority::MOVEMENT_COMBAT, true, false);
@@ -1328,7 +1302,7 @@ bool NightbaneGroundPhaseCoordinateRangedMovementAction::MoveRangedLeaderToSafeS
         float const distToBoss = bot->GetExactDist2d(nightbane);
         if (distToBoss < minBossDist)
         {
-            botAI->InterruptSpell();
+            bot->CastStop();
             return MoveAway(nightbane, minBossDist - distToBoss, true);
         }
 
@@ -1420,7 +1394,7 @@ bool NightbaneGroundPhaseCoordinateRangedMovementAction::MoveRangedLeaderToSafeS
     if (!found)
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, bestX, bestY, bot->GetPositionZ(), false, false,
         false, false, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -1431,7 +1405,7 @@ bool NightbaneGroundPhaseCoordinateRangedMovementAction::StackOnRangedLeader(Pla
     if (bot->GetExactDist2d(rangedLeader) < 0.5f)
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, rangedLeader->GetPositionX(), rangedLeader->GetPositionY(),
         rangedLeader->GetPositionZ(), false, false, false, false,
@@ -1472,7 +1446,7 @@ bool NightbaneFlightPhaseStackAndMoveAction::Execute(Event /*event*/)
     if (AI_VALUE(Unit*, "current target") == nightbane)
     {
         bot->AttackStop();
-        botAI->InterruptSpell();
+        bot->CastStop();
     }
 
     if (bot->HasAura(Id(KaraSpells::SPELL_RAIN_OF_BONES)))
@@ -1515,7 +1489,7 @@ bool NightbaneFlightPhaseStackAndMoveAction::Execute(Event /*event*/)
     if (bot->GetExactDist2d(destPos) < 0.5f)
         return false;
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         KARA_MAP_ID, destPos.GetPositionX(), destPos.GetPositionY(), destPos.GetPositionZ(),
         false, false, false, false, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -1543,8 +1517,7 @@ bool NightbaneManageTimersAndTrackersAction::Execute(Event /*event*/)
 
     if (nightbane->GetPositionZ() <= NIGHTBANE_FLIGHT_Z)
     {
-        Action* action = botAI->GetAiObjectContext()->GetAction(
-            "nightbane flight phase stack and move");
+        Action* action = context->GetAction("nightbane flight phase stack and move");
         if (action &&
             static_cast<NightbaneFlightPhaseStackAndMoveAction*>(action)->ResetRainOfBonesHit())
         {

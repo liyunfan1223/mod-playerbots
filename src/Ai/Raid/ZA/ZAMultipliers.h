@@ -7,162 +7,179 @@
 #ifndef PLAYERBOTS_ZAMULTIPLIERS_H
 #define PLAYERBOTS_ZAMULTIPLIERS_H
 
+#include "EncounterHelpers.h"
 #include "Multiplier.h"
+#include "ZAHelpers.h"
+#include <string>
+
+class ZulAmanEncounterMultiplier : public Multiplier
+{
+public:
+    ZulAmanEncounterMultiplier(PlayerbotAI* botAI, std::string const name)
+        : Multiplier(botAI, name) {}
+
+    float GetValue(Action* action) final
+    {
+        return EncounterHelpers::IsEncounterInProgress(bot, ZaHelpers::ZA_MAP_ID)
+            ? GetValueInEncounter(action) : 1.0f;
+    }
+
+protected:
+    virtual float GetValueInEncounter(Action* action) = 0;
+};
+
+// General
+
+class ZulAmanDelayDpsCooldownsMultiplier : public ZulAmanEncounterMultiplier
+{
+public:
+    ZulAmanDelayDpsCooldownsMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "zul'aman delay dps cooldowns") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
+};
+
+class ZulAmanDisableTankActionsMultiplier : public ZulAmanEncounterMultiplier
+{
+public:
+    ZulAmanDisableTankActionsMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "zul'aman disable tank actions") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
+};
+
+class ZulAmanControlMisdirectionMultiplier : public ZulAmanEncounterMultiplier
+{
+public:
+    ZulAmanControlMisdirectionMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "zul'aman control misdirection") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
+};
+
+class ZulAmanDisableCombatFormationMoveMultiplier : public ZulAmanEncounterMultiplier
+{
+public:
+    ZulAmanDisableCombatFormationMoveMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "zul'aman disable combat formation move") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
+};
+
+class ZulAmanAvoidWhirlwindMultiplier : public ZulAmanEncounterMultiplier
+{
+public:
+    ZulAmanAvoidWhirlwindMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "zul'aman avoid whirlwind") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
+};
 
 // Akil'zon <Eagle Avatar>
 
-class AkilzonDisableCombatFormationMoveMultiplier : public Multiplier
+class AkilzonStayInEyeOfTheStormMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    AkilzonDisableCombatFormationMoveMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "akil'zon disable combat formation move") {}
-    float GetValue(Action* action) override;
-};
+    AkilzonStayInEyeOfTheStormMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "akil'zon stay in eye of the storm") {}
 
-class AkilzonStayInEyeOfTheStormMultiplier : public Multiplier
-{
-public:
-    AkilzonStayInEyeOfTheStormMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "akil'zon stay in eye of the storm") {}
-    float GetValue(Action* action) override;
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
 // Nalorakk <Bear Avatar>
 
-class NalorakkDisableTankActionsMultiplier : public Multiplier
-{
-public:
-    NalorakkDisableTankActionsMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "nalorakk disable tank actions") {}
-    float GetValue(Action* action) override;
-};
-
-class NalorakkControlMisdirectionMultiplier : public Multiplier
-{
-public:
-    NalorakkControlMisdirectionMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "nalorakk control misdirection") {}
-    float GetValue(Action* action) override;
-};
-
 // Jan'alai <Dragonhawk Avatar>
 
-class JanalaiDisableTankActionsMultiplier : public Multiplier
+class JanalaiStayAwayFromFireBombsMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    JanalaiDisableTankActionsMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "jan'alai disable tank actions") {}
-    float GetValue(Action* action) override;
+    JanalaiStayAwayFromFireBombsMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "jan'alai stay away from fire bombs") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
-class JanalaiDisableCombatFormationMoveMultiplier : public Multiplier
+class JanalaiDoNotCrowdControlHatchersMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    JanalaiDisableCombatFormationMoveMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "jan'alai disable combat formation move") {}
-    float GetValue(Action* action) override;
-};
+    JanalaiDoNotCrowdControlHatchersMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "jan'alai do not crowd control hatchers") {}
 
-class JanalaiStayAwayFromFireBombsMultiplier : public Multiplier
-{
-public:
-    JanalaiStayAwayFromFireBombsMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "jan'alai stay away from fire bombs") {}
-    float GetValue(Action* action) override;
-};
-
-class JanalaiDoNotCrowdControlHatchersMultiplier : public Multiplier
-{
-public:
-    JanalaiDoNotCrowdControlHatchersMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "jan'alai do not crowd control hatchers") {}
-    float GetValue(Action* action) override;
-};
-
-class JanalaiDelayBloodlustAndHeroismMultiplier : public Multiplier
-{
-public:
-    JanalaiDelayBloodlustAndHeroismMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "jan'alai delay bloodlust and heroism") {}
-    float GetValue(Action* action) override;
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
 // Halazzi <Lynx Avatar>
 
-class HalazziDisableTankActionsMultiplier : public Multiplier
+class HalazziDisableAutoDpsTargetingMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    HalazziDisableTankActionsMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "halazzi disable tank actions") {}
-    float GetValue(Action* action) override;
-};
+    HalazziDisableAutoDpsTargetingMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "halazzi disable auto dps targeting") {}
 
-class HalazziControlMisdirectionMultiplier : public Multiplier
-{
-public:
-    HalazziControlMisdirectionMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "halazzi control misdirection") {}
-    float GetValue(Action* action) override;
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
 // Hex Lord Malacrass
 
-class HexLordMalacrassAvoidWhirlwindMultiplier : public Multiplier
+class HexLordMalacrassUnstableAfflictionMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    HexLordMalacrassAvoidWhirlwindMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "hex lord malacrass avoid whirlwind") {}
-    float GetValue(Action* action) override;
+    HexLordMalacrassUnstableAfflictionMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "hex lord malacrass unstable affliction") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
-class HexLordMalacrassDoNotDispelUnstableAfflictionMultiplier : public Multiplier
+class HexLordMalacrassSpellReflectionMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    HexLordMalacrassDoNotDispelUnstableAfflictionMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "hex lord malacrass do not dispel unstable affliction") {}
-    float GetValue(Action* action) override;
+    HexLordMalacrassSpellReflectionMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "hex lord malacrass spell reflection") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
-class HexLordMalacrassStopAttackingDuringSpellReflectionMultiplier : public Multiplier
+class HexLordMalacrassStayAwayFromFreezingTrapMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    HexLordMalacrassStopAttackingDuringSpellReflectionMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "hex lord malacrass stop attacking during spell reflection") {}
-    float GetValue(Action* action) override;
+    HexLordMalacrassStayAwayFromFreezingTrapMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "hex lord malacrass stay away from freezing trap") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
 // Zul'jin
 
-class ZuljinDisableTankFaceMultiplier : public Multiplier
+class ZuljinStopAttackingDuringPhaseChangeMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    ZuljinDisableTankFaceMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "zul'jin disable tank face") {}
-    float GetValue(Action* action) override;
+    ZuljinStopAttackingDuringPhaseChangeMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "zul'jin stop attacking during phase change") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
-class ZuljinAvoidWhirlwindMultiplier : public Multiplier
+class ZuljinEagleDisableAvoidAoeMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    ZuljinAvoidWhirlwindMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "zul'jin avoid whirlwind") {}
-    float GetValue(Action* action) override;
-};
+    ZuljinEagleDisableAvoidAoeMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "zul'jin eagle disable avoid aoe") {}
 
-class ZuljinDisableAvoidAoeMultiplier : public Multiplier
-{
-public:
-    ZuljinDisableAvoidAoeMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "zul'jin disable avoid aoe") {}
-    float GetValue(Action* action) override;
-};
-
-class ZuljinDelayBloodlustAndHeroismMultiplier : public Multiplier
-{
-public:
-    ZuljinDelayBloodlustAndHeroismMultiplier(PlayerbotAI* botAI) : Multiplier(
-        botAI, "zul'jin delay bloodlust and heroism") {}
-    float GetValue(Action* action) override;
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
 #endif

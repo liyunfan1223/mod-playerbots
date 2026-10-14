@@ -15,11 +15,11 @@ class PlayerbotAI;
 class ReleaseSpiritAction : public Action
 {
 public:
-    ReleaseSpiritAction(PlayerbotAI* botAI, const std::string& name = "release")
+    ReleaseSpiritAction(PlayerbotAI* botAI, std::string const& name = "release")
         : Action(botAI, name) {}
 
     bool Execute(Event event) override;
-    void LogRelease(const std::string& releaseType) const;
+    void LogRelease(std::string const& releaseType) const;
 
 protected:
     void IncrementDeathCount() const;
@@ -28,7 +28,7 @@ protected:
 class AutoReleaseSpiritAction : public ReleaseSpiritAction
 {
 public:
-    AutoReleaseSpiritAction(PlayerbotAI* botAI, const std::string& name = "auto release")
+    AutoReleaseSpiritAction(PlayerbotAI* botAI, std::string const& name = "auto release")
         : ReleaseSpiritAction(botAI, name) {}
 
     bool Execute(Event event) override;
@@ -45,7 +45,7 @@ private:
 class RepopAction : public SpiritHealerAction
 {
 public:
-    RepopAction(PlayerbotAI* botAI, const std::string& name = "repop")
+    RepopAction(PlayerbotAI* botAI, std::string const& name = "repop")
         : SpiritHealerAction(botAI, name) {}
 
     bool Execute(Event event) override;
@@ -53,14 +53,14 @@ public:
 
 private:
     int64 CalculateDeadTime() const;
-    void PerformGraveyardTeleport(const GraveyardStruct* graveyard) const;
+    void PerformGraveyardTeleport(GraveyardStruct const* graveyard) const;
 };
 
 // SelfResurrectAction action registration
 class SelfResurrectAction : public Action
 {
 public:
-    SelfResurrectAction(PlayerbotAI* ai) : Action(ai, "self resurrect") {}
+    SelfResurrectAction(PlayerbotAI* botAI) : Action(botAI, "self resurrect") {}
     virtual bool Execute(Event event) override;
     bool isUseful() override;
 };

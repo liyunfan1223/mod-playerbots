@@ -5,17 +5,20 @@
  */
 
 #include "SethActions.h"
+#include "EncounterHelpers.h"
 #include "Playerbots.h"
-#include "RaidBossHelpers.h"
-#include "SethData.h"
+#include "SethShared.h"
+#include <algorithm>
 #include <array>
+#include <cmath>
 
-using namespace SethData;
+using namespace SethShared;
+using namespace EncounterHelpers;
 
 bool TimeLostControllerMarkCharmingTotemWithSkullAction::Execute(Event /*event*/)
 {
     constexpr float searchRadius = 40.0f;
-    Unit* totem = bot->FindNearestCreature(Id(SethNpcs::NPC_CHARMING_TOTEM), searchRadius, true);
+    Unit* totem = bot->FindNearestCreature(Id(SethNpcs::NPC_CHARMING_TOTEM), searchRadius);
     return totem && MarkTargetWithSkull(bot, totem);
 }
 
@@ -55,7 +58,7 @@ bool AnzuAlternateMarksOnBossAction::Execute(Event /*event*/)
     return MarkTargetWithSkull(bot, anzu);
 }
 
-// Priority: Falcon (haste) > Eagle during Banish (damage all enemies) > Hawk (damage reduction)
+// Priority: Falcon (haste) -> Hawk (damage reduction) -> Eagle (damage all enemies).
 bool AnzuCastHealOverTimeSpellOnBirdSpiritAction::Execute(Event /*event*/)
 {
     constexpr float searchRadius = 60.0f;
@@ -69,7 +72,7 @@ bool AnzuCastHealOverTimeSpellOnBirdSpiritAction::Execute(Event /*event*/)
 
     for (uint32 entry : spiritEntries)
     {
-        Creature* spirit = bot->FindNearestCreature(entry, searchRadius, true);
+        Creature* spirit = bot->FindNearestCreature(entry, searchRadius);
         if (spirit && !spirit->GetAuraEffect(
                 SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, REJUVENATION_SPELL_ICON_ID, 0))
         {
@@ -93,39 +96,29 @@ bool TalonKingIkissTankMoveBossToPillarPositionAction::Execute(Event /*event*/)
     if (!ikiss)
         return false;
 
-    if (ikiss->GetHealthPct() > 95.0f)
+    if (ikiss->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT)
         _hasReachedPillarPosition = false;
 
     if (_hasReachedPillarPosition == true)
         return false;
 
     Position const& position = PILLAR_POSITION;
-    float const distToPosition = bot->GetExactDist2d(position);
+    constexpr float arrivalDist = 2.0f;
 
-    if (distToPosition <= 2.0f)
+    if (bot->GetExactDist2d(position) <= arrivalDist)
     {
         _hasReachedPillarPosition = true;
         return false;
     }
 
-    float const posX = position.GetPositionX();
-    float const posY = position.GetPositionY();
-    float const botX = bot->GetPositionX();
-    float const botY = bot->GetPositionY();
-    float const toPosX = posX - botX;
-    float const toPosY = posY - botY;
-
-    float const toBossX = ikiss->GetPositionX() - botX;
-    float const toBossY = ikiss->GetPositionY() - botY;
-    bool const backwards = (toPosX * toBossX + toPosY * toBossY) < 0.0f;
-
-    float const maxMoveDist = backwards ? 2.25f : 3.5f;
-    float const moveDist = std::min(maxMoveDist, distToPosition);
-    float const moveX = botX + (toPosX / distToPosition) * moveDist;
-    float const moveY = botY + (toPosY / distToPosition) * moveDist;
+    float moveX;
+    float moveY;
+    bool backwards;
+    if (!GetStepToPosition(bot, position, arrivalDist, ikiss, moveX, moveY, backwards))
+        return false;
 
     return MoveTo(
-        SETH_MAP_ID, moveX, moveY, position.GetPositionZ(), false, false,
+        SETH_MAP_ID, moveX, moveY, bot->GetPositionZ(), false, false,
         false, false, MovementPriority::MOVEMENT_COMBAT, true, backwards);
 }
 
@@ -154,7 +147,7 @@ bool TalonKingIkissRangedStayNearVictimOfBossAction::Execute(Event /*event*/)
         false, false, MovementPriority::MOVEMENT_COMBAT, true, false);
 }
 
-bool TalonKingIkissLosArcaneExplosionAction::Execute(Event event)
+bool TalonKingIkissLosArcaneExplosionAction::Execute(Event /*event*/)
 {
     Position const& pillarCenter = PILLAR_CENTER;
     float const botAngle = pillarCenter.GetAngle(bot);
@@ -177,7 +170,7 @@ bool TalonKingIkissLosArcaneExplosionAction::MoveToPillar(
     float const moveX = pillarCenter.GetPositionX() + targetRadius * cos(botAngle);
     float const moveY = pillarCenter.GetPositionY() + targetRadius * sin(botAngle);
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         SETH_MAP_ID, moveX, moveY, bot->GetPositionZ(), false, false,
         false, false, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -208,7 +201,7 @@ bool TalonKingIkissLosArcaneExplosionAction::MoveAroundPillar(
     float const moveX = pillarCenter.GetPositionX() + distToPillar * cos(stepAngle);
     float const moveY = pillarCenter.GetPositionY() + distToPillar * sin(stepAngle);
 
-    botAI->InterruptSpell();
+    bot->CastStop();
     return MoveTo(
         SETH_MAP_ID, moveX, moveY, bot->GetPositionZ(), false, false,
         false, false, MovementPriority::MOVEMENT_FORCED, true, false);

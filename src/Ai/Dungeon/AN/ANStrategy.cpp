@@ -7,7 +7,7 @@
 #include "ANStrategy.h"
 #include "ANMultipliers.h"
 
-void WotlkDungeonANStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonANStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Krik'thir the Gatewatcher
     // TODO: Add CC trigger while web wraps are casting?
@@ -30,7 +30,7 @@ void WotlkDungeonANStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         { NextAction("dodge pound", ACTION_MOVE + 5) }));
 }
 
-void WotlkDungeonANStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonANStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new KrikthirMultiplier(botAI));
 }

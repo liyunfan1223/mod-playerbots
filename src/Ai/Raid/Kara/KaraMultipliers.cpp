@@ -10,18 +10,19 @@
 #include "DKActions.h"
 #include "DruidActions.h"
 #include "FollowActions.h"
-#include "GenericActions.h"
 #include "HunterActions.h"
 #include "KaraActions.h"
 #include "KaraHelpers.h"
 #include "MageActions.h"
 #include "PaladinActions.h"
+#include "PetsAction.h"
 #include "Playerbots.h"
 #include "PriestActions.h"
 #include "ReachTargetActions.h"
 #include "RogueActions.h"
 #include "ShamanActions.h"
 #include "WarriorActions.h"
+#include <ctime>
 
 using namespace KaraHelpers;
 
@@ -29,6 +30,9 @@ using namespace KaraHelpers;
 
 float KarazhanSetTremorTotemMultiplier::GetValue(Action* action)
 {
+    if (botAI->GetState() == BOT_STATE_NON_COMBAT)
+        return 1.0f;
+
     if (bot->getClass() != CLASS_SHAMAN)
         return 1.0f;
 
@@ -45,7 +49,8 @@ float KarazhanSetTremorTotemMultiplier::GetValue(Action* action)
         return 0.0f;
 
     if (AI_VALUE2(Unit*, "find target", "spectral charger") ||
-        AI_VALUE2(Unit*, "find target", "the big bad wolf"))
+        AI_VALUE2(Unit*, "find target", "the big bad wolf") ||
+        AI_VALUE2(Unit*, "find target", "roar"))
     {
         return 0.0f;
     }
@@ -74,6 +79,9 @@ float AttumenTheHuntsmanDisableAutomaticTargetingMultiplier::GetValue(Action* ac
 
 float AttumenTheHuntsmanStayStackedMultiplier::GetValue(Action* action)
 {
+    if (PlayerbotAI::IsTank(bot))
+        return 1.0f;
+
     if (dynamic_cast<AttackAction*>(action) ||
         dynamic_cast<AttumenTheHuntsmanHandlePhaseTwoAction*>(action))
     {

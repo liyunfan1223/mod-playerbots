@@ -138,7 +138,7 @@ public:
 class CastEnvenomAction : public CastMeleeSpellAction
 {
 public:
-    CastEnvenomAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "envenom") {}
+    CastEnvenomAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "envenom") {}
 
     bool isUseful() override;
     bool isPossible() override;
@@ -147,7 +147,7 @@ public:
 class CastTricksOfTheTradeOnMainTankAction : public BuffOnMainTankAction
 {
 public:
-    CastTricksOfTheTradeOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "tricks of the trade", true) {}
+    CastTricksOfTheTradeOnMainTankAction(PlayerbotAI* botAI) : BuffOnMainTankAction(botAI, "tricks of the trade", true) {}
 
     bool isUseful() override;
 };
@@ -155,34 +155,35 @@ public:
 class UseDeadlyPoisonAction : public UseItemAction
 {
 public:
-    UseDeadlyPoisonAction(PlayerbotAI* ai) : UseItemAction(ai, "Deadly Poison") {}
+    UseDeadlyPoisonAction(PlayerbotAI* botAI) : UseItemAction(botAI, "Deadly Poison") {}
 
     bool Execute(Event event) override;
-    bool isPossible() override;
+    bool isPossible() override { return true; }
 };
 
 class UseInstantPoisonAction : public UseItemAction
 {
 public:
-    UseInstantPoisonAction(PlayerbotAI* ai) : UseItemAction(ai, "Instant Poison") {}
+    UseInstantPoisonAction(PlayerbotAI* botAI) : UseItemAction(botAI, "Instant Poison") {}
 
     bool Execute(Event event) override;
-    bool isPossible() override;
+    bool isPossible() override { return true; }
 };
 
 class UseInstantPoisonOffHandAction : public UseItemAction
 {
 public:
-    UseInstantPoisonOffHandAction(PlayerbotAI* ai) : UseItemAction(ai, "Instant Poison Off Hand") {}
+    UseInstantPoisonOffHandAction(PlayerbotAI* botAI)
+        : UseItemAction(botAI, "Instant Poison Off Hand") {}
 
     bool Execute(Event event) override;
-    bool isPossible() override;
+    bool isPossible() override { return true; }
 };
 
 class FanOfKnivesAction : public CastMeleeSpellAction
 {
 public:
-    FanOfKnivesAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "fan of knives") {}
+    FanOfKnivesAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "fan of knives") {}
 
     ActionThreatType getThreatType() override { return ActionThreatType::Aoe; }
 };

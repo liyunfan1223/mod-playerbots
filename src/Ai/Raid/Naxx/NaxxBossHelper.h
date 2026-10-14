@@ -20,7 +20,10 @@
 #include "SharedDefines.h"
 #include "Spell.h"
 #include "Timer.h"
+#include <array>
 #include <string>
+
+class Aura;
 
 const uint32 NAXX_MAP_ID = 533;
 
@@ -77,6 +80,95 @@ protected:
     BossAiType* _ai = nullptr;
     EventMap* _event_map = nullptr;
     uint32 _timer = 0;
+};
+
+// Heigan the Unclean ("safety dance").
+//
+// Everything here is derived from observable state only; the core boss script (boss_heigan.cpp) is not touched.
+// The fight is fully periodic:
+//   * slow dance (starts on pull, 90s): eruptions at 15s then every 10s (8 eruptions);
+//   * fast dance (45s): Heigan teleports onto his platform and channels Plague Cloud (29350, 45s aura, 1s after
+//     the teleport), eruptions at 7s then every 4s (10 eruptions); then back to the slow dance.
+// The eruption itself is cast by the floor gameobjects (never by the boss), so it cannot be seen as a boss cast;
+// instead the safe spot is computed from the phase clock. In each phase the safe section walks
+// waypoint 0 -> 1 -> 2 -> 3 -> 2 -> 1 -> 0 -> ... (the core's sections 3,2,1,0,1,2,3,...).
+// The phase clock is exact during the fast dance (Plague Cloud remaining duration) and derived from that for the
+// following slow dances; only the very first slow dance is anchored on the moment the raid saw the pull.
+// The clock is shared between all bots fighting the same Heigan so a bot that died and got resurrected mid-fight
+// (or joined late) picks the schedule up again.
+class HeiganBossHelper : public AiObject
+{
+public:
+    static constexpr uint32 WaypointCount = 4;
+    // Section centres, index 0 is the section that is safe at the first eruption of every phase.
+    static constexpr std::array<float, WaypointCount> WaypointX = {2794.88f, 2775.49f, 2762.30f, 2755.99f};
+    static constexpr std::array<float, WaypointCount> WaypointY = {-3668.12f, -3674.43f, -3684.59f, -3703.96f};
+    // Heigan's platform: ranged/healers stand here during the slow dance, nobody may be near it during the fast one.
+    static constexpr float PlatformX = 2794.26f;
+    static constexpr float PlatformY = -3706.67f;
+    static constexpr float PlatformZ = 276.54f;
+    static constexpr float PlatformRadius = 10.0f;
+
+    static constexpr uint32 SlowFirstEruptionMs = 15000;
+    static constexpr uint32 SlowEruptionIntervalMs = 10000;
+    static constexpr uint32 SlowEruptionCount = 8;
+    static constexpr uint32 SlowPhaseDurationMs = 90000;
+    static constexpr uint32 FastFirstEruptionMs = 7000;
+    static constexpr uint32 FastEruptionIntervalMs = 4000;
+    static constexpr uint32 FastEruptionCount = 10;
+    static constexpr uint32 FastPhaseDurationMs = 45000;
+    static constexpr uint32 PlagueCloudDelayMs = 1000;    // Plague Cloud is cast 1s after the teleport
+    // Do not leave the current safe spot until this long after the computed eruption time (scheduler jitter).
+    static constexpr uint32 EruptionSafetyMarginMs = 300;
+    static constexpr float SafeSpotTolerance = 4.0f;
+
+    struct FightState
+    {
+        bool fastPhase = false;
+        uint32 phaseStartMs = 0;
+        bool exact = false;   // phaseStartMs derived from the Plague Cloud aura (directly or via the phase length)
+        uint32 lastSeenMs = 0;
+    };
+
+    explicit HeiganBossHelper(PlayerbotAI* botAI) : AiObject(botAI) {}
+
+    // Finds Heigan and refreshes the shared fight clock. False when the bot is not fighting Heigan.
+    bool UpdateBossAI();
+    Unit* GetBoss() const { return _unit; }
+    bool IsFastPhase() const { return _fastPhase; }
+    uint32 GetPhaseElapsedMs() const { return _phaseElapsedMs; }
+    // Number of eruptions of the current phase that already happened (safety margin applied).
+    uint32 GetEruptionIndex() const;
+    // Waypoint (0..3) the bot has to stand at right now.
+    uint32 GetSafeWaypoint() const;
+    uint32 GetMsUntilNextEruption() const;
+    bool IsAtWaypoint(uint32 index, float tolerance = SafeSpotTolerance) const;
+    // Ranged bots wait on the platform during the slow dance until its last eruption is over, then head to the
+    // first fast-dance spot.
+    bool ShouldRangedHoldPlatform() const { return !_fastPhase && GetEruptionIndex() < SlowEruptionCount; }
+    // Melee always dance, ranged only during the fast dance. A main tank without aggro is free to go get it.
+    bool ShouldDance();
+    // Safe to stand still (e.g. cast) for the given time without missing the next move.
+    bool CanStandStillFor(uint32 ms);
+
+private:
+    void Reset()
+    {
+        _unit = nullptr;
+        _fastPhase = false;
+        _phaseElapsedMs = 0;
+    }
+
+    // Decide from the boss state whether the fast dance is on right now.
+    bool DetectFastPhase(FightState const& state, bool plagueCloudUp, bool idleOnPlatform, bool firstObservation,
+                         uint32 elapsed) const;
+    // Move the shared clock to the phase we just observed.
+    static void UpdateFightState(FightState& state, bool fast, Aura const* plagueCloud, bool firstObservation,
+                                 uint32 now);
+
+    Unit* _unit = nullptr;
+    bool _fastPhase = false;
+    uint32 _phaseElapsedMs = 0;
 };
 
 class KelthuzadBossHelper : public AiObject
@@ -224,7 +316,7 @@ public:
         uint32 index = botAI->GetGroupSlotIndex(bot);
         if (currentTarget)
         {
-            if (botAI->IsRanged(bot))
+            if (PlayerbotAI::IsRanged(bot))
             {
                 if (bot->GetExactDist2d(currentTarget) <= 45.0f)
                     angle = bot->GetAngle(dyn_obj) - M_PI + (rand_norm() - 0.5) * M_PI / 2;
@@ -406,10 +498,10 @@ public:
         Difficulty diff = bot->GetRaidDifficulty();
         if (diff == RAID_DIFFICULTY_25MAN_NORMAL)
         {
-            return botAI->IsAssistRangedDpsOfIndex(bot, 0) || botAI->IsAssistHealOfIndex(bot, 0) ||
-                   botAI->IsAssistHealOfIndex(bot, 1) || botAI->IsAssistHealOfIndex(bot, 2);
+            return PlayerbotAI::IsAssistRangedDpsOfIndex(bot, 0) || PlayerbotAI::IsAssistHealOfIndex(bot, 0) ||
+                   PlayerbotAI::IsAssistHealOfIndex(bot, 1) || PlayerbotAI::IsAssistHealOfIndex(bot, 2);
         }
-        return botAI->IsAssistRangedDpsOfIndex(bot, 0) || botAI->IsAssistHealOfIndex(bot, 0);
+        return PlayerbotAI::IsAssistRangedDpsOfIndex(bot, 0) || PlayerbotAI::IsAssistHealOfIndex(bot, 0);
     }
     void CalculatePosToGo(Player* bot)
     {
@@ -422,7 +514,7 @@ public:
             uint32 elapsed_ms = _combat_start_ms ? getMSTime() - _combat_start_ms : 0;
             // Interval: 24s - 15s - 15s - ...
             posToGo = !(elapsed_ms <= 9000 || ((elapsed_ms - 9000) / 67500) % 2 == 0);
-            if (botAI->IsAssistRangedDpsOfIndex(bot, 0) || (raid25 && botAI->IsAssistHealOfIndex(bot, 1)))
+            if (PlayerbotAI::IsAssistRangedDpsOfIndex(bot, 0) || (raid25 && PlayerbotAI::IsAssistHealOfIndex(bot, 1)))
                 posToGo = 1 - posToGo;
         }
     }
@@ -486,7 +578,11 @@ public:
         stalagg = AI_VALUE2(Unit*, "find target", "stalagg");
         return true;
     }
-    bool IsPhasePet() { return (feugen && feugen->IsAlive()) || (stalagg && stalagg->IsAlive()); }
+    // Stalagg and Feugen only feign death: they stay alive at 1 HP, flagged NOT_SELECTABLE, until
+    // Thaddius' tesla overload finishes them off or ACTION_RESTORE revives them. Testing IsAlive()
+    // alone would latch the pet phase on forever.
+    static bool IsPetActive(Unit* pet) { return pet && pet->IsAlive() && !pet->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE); }
+    bool IsPhasePet() { return IsPetActive(feugen) || IsPetActive(stalagg); }
     bool IsPhaseTransition()
     {
         if (IsPhasePet())
@@ -498,11 +594,11 @@ public:
     Unit* GetNearestPet()
     {
         Unit* unit = nullptr;
-        if (feugen && feugen->IsAlive())
+        if (IsPetActive(feugen))
             unit = feugen;
 
-        if (stalagg && stalagg->IsAlive() &&
-            (!feugen || !feugen->IsAlive() || bot->GetDistance(stalagg) < bot->GetDistance(feugen)))
+        if (IsPetActive(stalagg) &&
+            (!IsPetActive(feugen) || bot->GetDistance(stalagg) < bot->GetDistance(feugen)))
             unit = stalagg;
 
         return unit;

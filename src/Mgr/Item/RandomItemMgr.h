@@ -245,8 +245,8 @@ private:
     RandomItemMgr();
     ~RandomItemMgr();
 
-    RandomItemMgr(const RandomItemMgr&) = delete;
-    RandomItemMgr& operator=(const RandomItemMgr&) = delete;
+    RandomItemMgr(RandomItemMgr const&) = delete;
+    RandomItemMgr& operator=(RandomItemMgr const&) = delete;
 
     RandomItemMgr(RandomItemMgr&&) = delete;
     RandomItemMgr& operator=(RandomItemMgr&&) = delete;

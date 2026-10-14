@@ -19,8 +19,8 @@ public:
         creators["karazhan reset encounter states"] =
             &RaidKarazhanActionContext::karazhan_reset_encounter_states;
 
-        creators["karazhan cast fear protection spell"] =
-            &RaidKarazhanActionContext::karazhan_cast_fear_protection_spell;
+        creators["karazhan set tremor totem"] =
+            &RaidKarazhanActionContext::karazhan_set_tremor_totem;
 
         // Trash
         creators["mana warp stun creature before warp breach"] =
@@ -149,8 +149,8 @@ private:
     static Action* karazhan_reset_encounter_states(PlayerbotAI* botAI) {
         return new KarazhanResetEncounterStatesAction(botAI);
     }
-    static Action* karazhan_cast_fear_protection_spell(PlayerbotAI* botAI) {
-        return new KarazhanCastFearProtectionSpellAction(botAI);
+    static Action* karazhan_set_tremor_totem(PlayerbotAI* botAI) {
+        return new KarazhanSetTremorTotemAction(botAI);
     }
 
     // Trash

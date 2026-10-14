@@ -17,9 +17,6 @@ public:
     WipeAction(PlayerbotAI* botAI) : Action(botAI, "wipe") {}
 
     bool Execute(Event event) override;
-
-private:
-    std::string bossName;
 };
 
 #endif

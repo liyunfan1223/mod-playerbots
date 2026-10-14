@@ -457,14 +457,14 @@ public:
 class IccPutricideMalleableGooTrigger : public Trigger
 {
 public:
-    IccPutricideMalleableGooTrigger(PlayerbotAI* ai) : Trigger(ai, "icc putricide malleable goo") {}
+    IccPutricideMalleableGooTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc putricide malleable goo") {}
     bool IsActive() override;
 };
 
 class IccPutricideAbominationTrigger : public Trigger
 {
 public:
-    IccPutricideAbominationTrigger(PlayerbotAI* ai) : Trigger(ai, "icc putricide abomination") {}
+    IccPutricideAbominationTrigger(PlayerbotAI* botAI) : Trigger(botAI, "icc putricide abomination") {}
     bool IsActive() override;
 };
 
