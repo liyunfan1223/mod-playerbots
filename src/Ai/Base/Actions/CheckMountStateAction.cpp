@@ -207,6 +207,16 @@ bool CheckMountStateAction::isUseful()
                 return false;
     }
 
+    // Do not mount while loot is available nearby. Travel forms count as mounted; other forms
+    // (warrior stances, druid combat forms) can mount, so they must not bypass the gate.
+    if (sPlayerbotAIConfig.PrioritiseLooting && !bot->IsMounted() &&
+        (AI_VALUE(bool, "has available loot") || AI_VALUE(bool, "can loot")))
+    {
+        uint8 const form = bot->GetShapeshiftForm();
+        if (form != FORM_TRAVEL && form != FORM_FLIGHT && form != FORM_FLIGHT_EPIC)
+            return false;
+    }
+
     return true;
 }
 

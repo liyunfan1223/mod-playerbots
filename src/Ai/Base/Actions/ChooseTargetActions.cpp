@@ -133,6 +133,12 @@ bool AttackAnythingAction::isUseful()
     if (bot->IsInCombat())
         return false;
 
+    // Block new grind targets while loot is available or openable; unreachable loot is deferred
+    // by the move-to-loot watchdog, so no time based fail-open is needed.
+    if (sPlayerbotAIConfig.PrioritiseLooting &&
+        (AI_VALUE(bool, "has available loot") || AI_VALUE(bool, "can loot")))
+        return false;
+
     Unit* target = GetTarget();
     if (!target || !target->IsInWorld())  // Checks if the target is valid and in the world
         return false;
