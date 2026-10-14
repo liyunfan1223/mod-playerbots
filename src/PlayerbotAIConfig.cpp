@@ -114,6 +114,7 @@ bool PlayerbotAIConfig::Initialize()
     PrioritiseQuestGivers = sConfigMgr->GetOption<bool>("Playerbots.PrioritiseQuestGivers", false);
     CrossZoneQuests = sConfigMgr->GetOption<bool>("Playerbots.CrossZoneQuests", false);
     QuestAwareTaxi = sConfigMgr->GetOption<bool>("Playerbots.QuestAwareTaxi", false);
+    RpgAreaRecovery = sConfigMgr->GetOption<bool>("Playerbots.RpgAreaRecovery", false);
     FleeDistance = sConfigMgr->GetOption<float>("Playerbots.FleeDistance", 5.0f);
     AggroDistance = sConfigMgr->GetOption<float>("Playerbots.AggroDistance", 22.0f);
     TooCloseDistance = sConfigMgr->GetOption<float>("Playerbots.TooCloseDistance", 5.0f);
