@@ -4471,10 +4471,7 @@ std::vector<std::vector<uint32>> TravelMgr::GetOptimalFlightDestinations(Player*
             uint32 pickedNode = usableNodes[urand(0, usableNodes.size() - 1)];
             std::vector<uint32> path = sTravelNodeMap.FindTaxiPath(fromNode, pickedNode);
             if (!path.empty())
-            {
                 validDestinations.push_back(std::move(path));
-                return validDestinations;
-            }
         }
 
         candidateZones.erase(candidateZones.begin() + zoneIndex);

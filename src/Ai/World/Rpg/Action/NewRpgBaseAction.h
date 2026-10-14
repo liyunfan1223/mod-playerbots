@@ -67,7 +67,8 @@ protected:
     bool RecoverToRpgArea();
 
 protected:
-    bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete = false);
+    bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete = false,
+                                       bool includeDistant = false);
     static WorldPosition SelectRandomGrindPos(Player* bot);
     static WorldPosition SelectRandomCampPos(Player* bot);
     bool SelectRandomFlightTaxiNode(uint32& flightMasterEntry, WorldPosition& flightMasterPos,
@@ -88,9 +89,8 @@ protected:
     const uint32 stuckTime = 90 * IN_MILLISECONDS;
 
     /* FOR RECOVERY */
-    // A same-zone anchor closer than this means the bot is already in a serviced area
-    // (city, quest hub) whose level cache has no entries: recovering would only bounce it
-    // to a point at its feet.
+    // A same-zone anchor within this distance means a serviced area (empty level cache) where
+    // recovering would only bounce the bot to its feet.
     const float recoverySameZoneDistance = 500.0f;
 };
 

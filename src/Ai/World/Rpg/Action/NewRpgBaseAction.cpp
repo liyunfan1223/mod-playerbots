@@ -694,9 +694,8 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         return true;
     }
 
-    // Cross-zone questing: quests from other zones are kept, so free slots only under pressure by
-    // dropping the quest whose objective/turn-in is the furthest away. Class/sort quests
-    // (ZoneOrSort < 0) are never dropped.
+    // Free slots under pressure by dropping the quest with the furthest objective/turn-in;
+    // class/sort quests (ZoneOrSort < 0) are never dropped.
     freeSlotNum += dropped;
     while (freeSlotNum < 2)
     {
@@ -709,14 +708,18 @@ bool NewRpgBaseAction::OrganizeQuestLog()
                 continue;
 
             Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-            if (quest->GetZoneOrSort() < 0)
+            if (!quest || quest->GetZoneOrSort() < 0)
+                continue;
+
+            // Never pressure-drop a completed quest the bot can hand in right now.
+            if (bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
                 continue;
 
             // Unprogressable by the bot (no POI data): drop it first.
             float dist = std::numeric_limits<float>::max();
             std::vector<POIInfo> poiInfo;
             if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo,
-                                              bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE))
+                                              bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE, true))
             {
                 for (POIInfo const& poi : poiInfo)
                 {
@@ -902,7 +905,8 @@ static std::vector<float> GenerateRandomWeights(int n)
     return weights;
 }
 
-bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete)
+bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete,
+                                                     bool includeDistant)
 {
     Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
     if (!quest)
@@ -939,7 +943,7 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
                 dy += point.y * weights[i];
             }
 
-            if (bot->GetDistance2d(dx, dy) >= 1500.0f)
+            if (!includeDistant && bot->GetDistance2d(dx, dy) >= 1500.0f)
                 continue;
 
             float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
@@ -1012,7 +1016,7 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
             dy += point.y * weights[i];
         }
 
-        if (bot->GetDistance2d(dx, dy) >= 1500.0f)
+        if (!includeDistant && bot->GetDistance2d(dx, dy) >= 1500.0f)
             continue;
 
         float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
@@ -1180,7 +1184,7 @@ bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, Wor
 
                 std::vector<POIInfo> poiInfo;
                 if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo,
-                                                  bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE))
+                                                  bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE, true))
                 {
                     for (POIInfo const& poi : poiInfo)
                         consider(poi.pos.x, poi.pos.y);
@@ -1266,16 +1270,14 @@ WorldPosition NewRpgBaseAction::FindRecoveryAnchor()
 
 bool NewRpgBaseAction::RecoverToRpgArea()
 {
-    // The bot is somewhere RPG progression cannot continue (e.g. swept out into The Great Sea):
-    // walk/swim back to the nearest regular anchor so normal behaviour can resume. Travelled via
-    // the camp status, which brings its own stuck handling.
+    // Walk/swim back to the nearest anchor when RPG progression cannot continue here (e.g. swept
+    // into The Great Sea), via the camp status and its own stuck handling.
     WorldPosition anchor = FindRecoveryAnchor();
     if (anchor == WorldPosition())
         return false;
 
-    // The nearest anchor being in the bot's own zone and nearby means the bot is in a serviced
-    // area (city, quest hub) whose level cache simply has no entries: recovering would only bounce
-    // it to a point at its feet. Cross-zone anchors (The Great Sea -> land) still recover.
+    // A nearby same-zone anchor (serviced city/hub, empty level cache) would only bounce the bot to
+    // its feet, so skip those; cross-zone anchors (The Great Sea -> land) still recover.
     if (anchor.GetMapId() == bot->GetMapId() && bot->GetExactDist(anchor) < recoverySameZoneDistance &&
         bot->GetZoneId() == bot->GetMap()->GetZoneId(bot->GetPhaseMask(), anchor.GetPositionX(),
                                                     anchor.GetPositionY(), anchor.GetPositionZ()))
@@ -1296,7 +1298,7 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
     // walk/swim back to the nearest regular anchor instead of idling or resting there.
     if (SelectRandomGrindPos(bot) == WorldPosition() && SelectRandomCampPos(bot) == WorldPosition())
     {
-        if (RecoverToRpgArea())
+        if (sPlayerbotAIConfig.RpgAreaRecovery && RecoverToRpgArea())
             return true;
     }
 
@@ -1316,7 +1318,7 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
     // Safety check. No usable status where the bot currently is: recover before resting.
     if (availableStatus.empty() || probSum == 0)
     {
-        if (RecoverToRpgArea())
+        if (sPlayerbotAIConfig.RpgAreaRecovery && RecoverToRpgArea())
             return true;
 
         botAI->rpgInfo.ChangeToRest();
