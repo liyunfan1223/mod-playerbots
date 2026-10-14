@@ -168,7 +168,7 @@ public:
     void OnSpellCast(
         Spell* /*spell*/, Unit* caster, SpellInfo const* spellInfo, bool /*skipCheck*/) override
     {
-        Player* player = caster->ToPlayer();
+        Player* player = caster ? caster->ToPlayer() : nullptr;
         if (!player)
             return;
 
@@ -199,7 +199,7 @@ public:
 
     void OnSpellPrepare(Spell* spell, Unit* caster, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id != Id(SwpSpells::SPELL_ENCAPSULATE))
+        if (!caster || spellInfo->Id != Id(SwpSpells::SPELL_ENCAPSULATE))
             return;
 
         if (Player* target = GetFirstPlayerSpellTarget(spell, caster))
@@ -234,8 +234,8 @@ public:
 
     void OnSpellPrepare(Spell* spell, Unit* caster, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id != Id(SwpSpells::SPELL_CONFLAGRATION) &&
-            spellInfo->Id != Id(SwpSpells::SPELL_BLAZE))
+        if (!caster || (spellInfo->Id != Id(SwpSpells::SPELL_CONFLAGRATION) &&
+            spellInfo->Id != Id(SwpSpells::SPELL_BLAZE)))
         {
             return;
         }
@@ -259,7 +259,7 @@ public:
     void OnSpellCast(
         Spell* spell, Unit* caster, SpellInfo const* spellInfo, bool /*skipCheck*/) override
     {
-        if (spellInfo->Id != Id(SwpSpells::SPELL_ENTROPIUS_DARKNESS))
+        if (!caster || spellInfo->Id != Id(SwpSpells::SPELL_ENTROPIUS_DARKNESS))
             return;
 
         Player* target = GetFirstPlayerSpellTarget(spell, caster);
@@ -281,7 +281,7 @@ public:
     void OnSpellCast(
         Spell* /*spell*/, Unit* caster, SpellInfo const* spellInfo, bool /*skipCheck*/) override
     {
-        if (spellInfo->Id != Id(SwpSpells::SPELL_DARKNESS_OF_A_THOUSAND_SOULS))
+        if (!caster || spellInfo->Id != Id(SwpSpells::SPELL_DARKNESS_OF_A_THOUSAND_SOULS))
             return;
 
         Map::PlayerList const& players = caster->GetMap()->GetPlayers();
