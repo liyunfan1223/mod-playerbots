@@ -64,6 +64,18 @@ ReachPartyMemberToResurrectAction::ReachPartyMemberToResurrectAction(PlayerbotAI
 {
 }
 
+bool ReachPartyMemberToResurrectAction::isUseful()
+{
+    Battleground* bg = bot->GetBattleground();
+    return (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS) && ReachTargetAction::isUseful();
+}
+
+bool ReachPartyMemberToResurrectAction::isPossible()
+{
+    Battleground* bg = bot->GetBattleground();
+    return (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS) && ReachTargetAction::isPossible();
+}
+
 bool ReachPartyMemberToResurrectAction::Execute(Event event)
 {
     Battleground* bg = bot->GetBattleground();

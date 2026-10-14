@@ -221,6 +221,9 @@ public:
         creators["bg select objective"] = &ActionContext::bg_select_objective;
         creators["bg check objective"] = &ActionContext::bg_check_objective;
         creators["bg refresh wsg objective"] = &ActionContext::bg_refresh_wsg_objective;
+        creators["bg wsg route"] = &ActionContext::bg_wsg_route;
+        creators["attack wsg support"] = &ActionContext::attack_wsg_support;
+        creators["wsg regroup"] = &ActionContext::wsg_regroup;
         creators["bg attack fc"] = &ActionContext::bg_attack_fc;
         creators["bg protect fc"] = &ActionContext::bg_protect_fc;
         creators["bg use buff"] = &ActionContext::bg_use_buff;
@@ -425,12 +428,12 @@ private:
     static Action* bg_move_to_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "move to objective"); }
     static Action* bg_select_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "select objective"); }
     static Action* bg_check_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "check objective"); }
-    static Action* bg_refresh_wsg_objective(PlayerbotAI* botAI)
-    {
-        return new BGTactics(botAI, "refresh wsg objective");
-    }
+    static Action* bg_refresh_wsg_objective(PlayerbotAI* botAI) { return new WsgObjectiveRefreshAction(botAI); }
     static Action* bg_attack_fc(PlayerbotAI* botAI) { return new BGTactics(botAI, "attack fc"); }
-    static Action* bg_protect_fc(PlayerbotAI* botAI) { return new BGTactics(botAI, "protect fc"); }
+    static Action* bg_protect_fc(PlayerbotAI* botAI) { return new WsgEscortFollowAction(botAI); }
+    static Action* bg_wsg_route(PlayerbotAI* botAI) { return new WsgObjectiveRouteAction(botAI); }
+    static Action* attack_wsg_support(PlayerbotAI* botAI) { return new WsgSupportAttackAction(botAI); }
+    static Action* wsg_regroup(PlayerbotAI* botAI) { return new WsgRegroupAction(botAI); }
     static Action* attack_enemy_fc(PlayerbotAI* botAI) { return new AttackEnemyFlagCarrierAction(botAI); }
     static Action* bg_use_buff(PlayerbotAI* botAI) { return new BGTactics(botAI, "use buff"); }
     static Action* bg_check_flag(PlayerbotAI* botAI) { return new BGTactics(botAI, "check flag"); }

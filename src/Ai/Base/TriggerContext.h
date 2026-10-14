@@ -192,7 +192,6 @@ public:
         creators["team has flag"] = &TriggerContext::team_has_flag;
         creators["enemy team has flag"] = &TriggerContext::enemy_team_has_flag;
         creators["enemy flagcarrier near"] = &TriggerContext::enemy_flagcarrier_near;
-        creators["team flagcarrier near"] = &TriggerContext::team_flagcarrier_near;
         creators["wsg flag state changed"] = &TriggerContext::wsg_flag_state_changed;
         creators["wsg support threat"] = &TriggerContext::wsg_support_threat;
         creators["wsg escort separated"] = &TriggerContext::wsg_escort_separated;
@@ -417,7 +416,6 @@ private:
     static Trigger* team_has_flag(PlayerbotAI* botAI) { return new TeamHasFlag(botAI); }
     static Trigger* enemy_team_has_flag(PlayerbotAI* botAI) { return new EnemyTeamHasFlag(botAI); }
     static Trigger* enemy_flagcarrier_near(PlayerbotAI* botAI) { return new EnemyFlagCarrierNear(botAI); }
-    static Trigger* team_flagcarrier_near(PlayerbotAI* botAI) { return new TeamFlagCarrierNear(botAI); }
     static Trigger* wsg_flag_state_changed(PlayerbotAI* botAI) { return new WsgFlagStateChanged(botAI); }
     static Trigger* player_is_in_BATTLEGROUND(PlayerbotAI* botAI) { return new PlayerIsInBattleground(botAI); }
     static Trigger* player_is_in_BATTLEGROUND_no_flag(PlayerbotAI* botAI) { return new PlayerIsInBattlegroundWithoutFlag(botAI); }

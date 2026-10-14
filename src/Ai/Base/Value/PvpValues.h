@@ -18,6 +18,11 @@ class PlayerbotAI;
 class Unit;
 
 bool IsUnavailableWsgCombatTarget(Player const* player, Unit const* target);
+bool IsValidWsgCarrier(Player const* player, Unit const* carrier, bool friendly);
+bool CanRespondToWsgCarrier(PlayerbotAI* botAI, Unit* carrier);
+bool IsWsgEscortTargetAllowed(PlayerbotAI* botAI, Unit const* target);
+bool ShouldRegroupWsgEscort(PlayerbotAI* botAI);
+bool IsWsgSupportTarget(PlayerbotAI* botAI, Unit const* target);
 
 class BgTypeValue : public ManualSetValue<uint32>
 {
@@ -36,6 +41,7 @@ struct WsgTeamAssignment
     uint32 Role = 0;
     uint8 Defenders = 0;
     uint8 Escorts = 0;
+    uint8 EscortIndex = 0;
     bool Escort = false;
     bool BaseDefender = false;
     bool Defender = false;
@@ -63,13 +69,6 @@ class WsgSupportTargetValue : public CalculatedValue<ObjectGuid>
 {
 public:
     WsgSupportTargetValue(PlayerbotAI* botAI) : CalculatedValue<ObjectGuid>(botAI, "wsg support target", 250) {}
-    ObjectGuid Calculate() override;
-};
-
-class WsgHealTargetValue : public CalculatedValue<ObjectGuid>
-{
-public:
-    WsgHealTargetValue(PlayerbotAI* botAI) : CalculatedValue<ObjectGuid>(botAI, "wsg heal target", 250) {}
     ObjectGuid Calculate() override;
 };
 

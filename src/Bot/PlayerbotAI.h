@@ -435,6 +435,7 @@ public:
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(std::string const name, BotState type);
     BotState GetState() { return currentState; };
+    uint32 GetResurrectionCount() const { return _resurrectionCount; }
     void ResetStrategies(bool load = false);
     void ReInitCurrentEngine();
     void Reset(bool full = false);
@@ -629,6 +630,8 @@ public:
     void AddTimedEvent(std::function<void()> callback, uint32 delayMs);
 
 private:
+    uint32 _resurrectionCount = 0;
+
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,
                                    bool mixed = false);
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);

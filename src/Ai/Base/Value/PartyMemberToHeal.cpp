@@ -34,14 +34,16 @@ Unit* PartyMemberToHeal::Calculate()
 
     Group* group = bot->GetGroup();
     Battleground* bg = bot->GetBattleground();
-    bool isWarsong = bg && (bg->GetBgTypeID() == BATTLEGROUND_WS ||
-                            (bg->GetBgTypeID() == BATTLEGROUND_RB && bg->GetBgTypeID(true) == BATTLEGROUND_WS));
-    bool useWsgCarrierHealing = isWarsong;
-    if (!group && !useWsgCarrierHealing)
+    bool isWarsong = bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS;
+    ObjectGuid carrierGuid;
+    if (isWarsong && bg->GetStatus() == STATUS_IN_PROGRESS && PlayerbotAI::IsHeal(bot))
+        carrierGuid = static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId()));
+    if (!group)
         return bot;
 
     bool isRaid = group && group->isRaidGroup();
     MinValueCalculator calc(100);
+    MinValueCalculator urgentCalc(100);
 
     // If focus heal targets strategy is active, only heal those targets
     if (botAI->HasStrategy("focus heal targets", BOT_STATE_COMBAT))
@@ -76,33 +78,10 @@ Unit* PartyMemberToHeal::Calculate()
         return (Unit*)calc.param;
     }
 
-    if (useWsgCarrierHealing && PlayerbotAI::IsHeal(bot))
-    {
-        // BG teammates need not be members of the healer's ordinary party.
-        // The bounded roster scan is cached separately; resolve and recheck here.
-        ObjectGuid guid = context->GetValue<ObjectGuid>("wsg heal target")->Get();
-        Player* player = guid.IsEmpty() ? nullptr : ObjectAccessor::GetPlayer(bot->GetMap(), guid);
-        if (player && player->IsInWorld() && player->IsAlive() && player->GetMap() == bot->GetMap() &&
-            player->GetTeamId() == bot->GetTeamId() && player->GetHealthPct() < sPlayerbotAIConfig.MediumHealth &&
-            Check(player) && !IsTargetOfSpellCast(player, predicate))
-        {
-            constexpr float wsgCarrierPriority = 15.0f;
-            float probeValue = player->GetHealthPct() + player->GetDistance2d(bot) / 10.0f;
-            BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
-            if (warsong->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) == guid)
-                probeValue -= wsgCarrierPriority;
-            if (probeValue < calc.minValue)
-                calc.probe(probeValue, player);
-        }
-    }
-
-    if (!group)
-        return calc.param ? static_cast<Unit*>(calc.param) : bot;
-
     for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
     {
         Player* player = gref->GetSource();
-        if (player->IsGameMaster())
+        if (!player || player->IsGameMaster())
             continue;
         if (player && player->IsAlive())
         {
@@ -118,10 +97,21 @@ Unit* PartyMemberToHeal::Calculate()
                 {
                     probeValue = health + player->GetDistance2d(bot) / 10.0f;
                 }
+                constexpr float carrierPriority = 15.0f;
+                if (!carrierGuid.IsEmpty() && player->GetGUID() == carrierGuid &&
+                    player->GetHealthPct() < sPlayerbotAIConfig.MediumHealth &&
+                    player->GetDistance2d(bot) <= sPlayerbotAIConfig.HealDistance && player->IsInWorld() &&
+                    player->GetMap() == bot->GetMap())
+                    probeValue -= carrierPriority;
+                bool urgent = isWarsong && PlayerbotAI::IsHeal(bot) && health < sPlayerbotAIConfig.CriticalHealth &&
+                              player->IsInWorld() && player->GetMap() == bot->GetMap();
                 // delay Check player to here for better performance
-                if (probeValue < calc.minValue && Check(player))
+                if ((probeValue < calc.minValue || (urgent && probeValue < urgentCalc.minValue)) && Check(player))
                 {
-                    calc.probe(probeValue, player);
+                    if (probeValue < calc.minValue)
+                        calc.probe(probeValue, player);
+                    if (urgent)
+                        urgentCalc.probe(probeValue, player);
                 }
             }
         }
@@ -154,7 +144,7 @@ Unit* PartyMemberToHeal::Calculate()
             }
         }
     }
-    return (Unit*)calc.param;
+    return urgentCalc.param ? static_cast<Unit*>(urgentCalc.param) : static_cast<Unit*>(calc.param);
 }
 
 bool PartyMemberToHeal::Check(Unit* player)

@@ -468,7 +468,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         if (bgType == BATTLEGROUND_RB)
             bgType = player->GetBattleground()->GetBgTypeID(true);
 
-        if (bgType == BATTLEGROUND_WS)
+        if (player->GetBattleground()->GetBgTypeID(true) == BATTLEGROUND_WS)
             engine->addStrategy("warsong", false);
 
         if (bgType == BATTLEGROUND_AB)
@@ -691,7 +691,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             !player->InArena())  // do not add for not supported bg or arena
             nonCombatEngine->addStrategy("battleground", false);
 
-        if (bgType == BATTLEGROUND_WS)
+        if (player->GetBattleground()->GetBgTypeID(true) == BATTLEGROUND_WS)
             nonCombatEngine->addStrategy("warsong", false);
 
         if (bgType == BATTLEGROUND_AV)

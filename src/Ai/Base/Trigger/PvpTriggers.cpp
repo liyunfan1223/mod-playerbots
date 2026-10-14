@@ -5,7 +5,7 @@
  */
 
 #include "PvpTriggers.h"
-#include "BattleGroundTactics.h"
+
 #include "BattlegroundEY.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
@@ -43,24 +43,6 @@ bool PlayerHasNoFlag::IsActive()
     if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
         return static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) !=
                bot->GetGUID();
-
-    if (botAI->GetBot()->InBattleground())
-    {
-        if (RealBgType(botAI->GetBot()) == BattlegroundTypeId::BATTLEGROUND_WS)
-        {
-            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
-            if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER))
-                return true;
-
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
-            {
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
 
     return false;
 }
@@ -129,25 +111,7 @@ bool PlayerIsInBattlegroundWithoutFlag::IsActive()
         return static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) !=
                bot->GetGUID();
 
-    if (botAI->GetBot()->InBattleground())
-    {
-        if (RealBgType(botAI->GetBot()) == BattlegroundTypeId::BATTLEGROUND_WS)
-        {
-            BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
-            if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER))
-                return true;
-
-            if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    return false;
+    return bot->InBattleground();
 }
 
 bool PlayerHasFlag::IsActive()
@@ -159,7 +123,8 @@ bool PlayerHasFlag::IsCapturingFlag(Player* bot)
 {
     if (bot->InBattleground())
     {
-        if (RealBgType(bot) == BATTLEGROUND_WS)
+        Battleground* battleground = bot->GetBattleground();
+        if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_WS)
         {
             BattlegroundWS* bg = (BattlegroundWS*)bot->GetBattleground();
             // bot is horde and has ally flag
@@ -228,10 +193,11 @@ bool TeamHasFlag::IsActive()
     if (!botAI->GetBot()->InBattleground())
         return false;
 
-    if (RealBgType(botAI->GetBot()) != BattlegroundTypeId::BATTLEGROUND_WS)
+    Battleground* battleground = bot->GetBattleground();
+    if (!battleground || battleground->GetBgTypeID(true) != BATTLEGROUND_WS)
         return false;
 
-    BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
+    BattlegroundWS* bg = static_cast<BattlegroundWS*>(battleground);
 
     ObjectGuid botGuid = bot->GetGUID();
     TeamId teamId = bot->GetTeamId();
@@ -252,7 +218,8 @@ bool EnemyTeamHasFlag::IsActive()
 {
     if (botAI->GetBot()->InBattleground())
     {
-        if (RealBgType(botAI->GetBot()) == BattlegroundTypeId::BATTLEGROUND_WS)
+        Battleground* battleground = bot->GetBattleground();
+        if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_WS)
         {
             BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
 
@@ -279,21 +246,9 @@ bool EnemyFlagCarrierNear::IsActive()
     Unit* carrier = AI_VALUE(Unit*, "enemy flag carrier");
 
     Battleground* bg = bot->GetBattleground();
-    bool isWarsong = bg && (bg->GetBgTypeID() == BATTLEGROUND_WS ||
-                            (bg->GetBgTypeID() == BATTLEGROUND_RB && bg->GetBgTypeID(true) == BATTLEGROUND_WS));
+    bool isWarsong = bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS;
     if (isWarsong)
-    {
-        BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
-        if (!carrier || !carrier->IsPlayer() || !carrier->IsAlive() || !carrier->IsInWorld() ||
-            carrier->GetMap() != bot->GetMap() || carrier->ToPlayer()->GetTeamId() == bot->GetTeamId() ||
-            warsong->GetFlagPickerGUID(bot->GetTeamId()) != carrier->GetGUID() || !bot->CanSeeOrDetect(carrier))
-            return false;
-
-        WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
-        if (!assignment.Valid || !assignment.Returner ||
-            warsong->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) == bot->GetGUID())
-            return false;
-    }
+        return CanRespondToWsgCarrier(botAI, carrier);
 
     if (!carrier || !ServerFacade::instance().IsDistanceLessOrEqualThan(
                         ServerFacade::instance().GetDistance2d(bot, carrier), 100.f))
@@ -318,56 +273,12 @@ bool EnemyFlagCarrierNear::IsActive()
     return true;
 }
 
-bool TeamFlagCarrierNear::IsActive()
-{
-    Battleground* bg = bot->GetBattleground();
-    if (!bg || RealBgType(bot) != BATTLEGROUND_WS)
-        return false;
-
-    WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
-    if (!assignment.Valid || !assignment.Escort)
-        return false;
-    Unit* carrier = AI_VALUE(Unit*, "team flag carrier");
-
-    BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
-    return carrier && carrier != bot && carrier->IsPlayer() && carrier->IsAlive() && carrier->IsInWorld() &&
-           carrier->GetMap() == bot->GetMap() && carrier->ToPlayer()->GetTeamId() == bot->GetTeamId() &&
-           warsong->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) == carrier->GetGUID() &&
-           ServerFacade::instance().IsDistanceLessOrEqualThan(ServerFacade::instance().GetDistance2d(bot, carrier),
-                                                              200.0f);
-}
-
-bool WsgEscortSeparated::IsActive()
-{
-    Battleground* bg = bot->GetBattleground();
-    if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS || bg->GetStatus() != STATUS_IN_PROGRESS || !bot->IsAlive() ||
-        !bot->IsInCombat() || bot->IsNonMeleeSpellCast(false))
-        return false;
-    WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
-    if (!assignment.Valid || !assignment.Escort)
-        return false;
-    if (PlayerbotAI::IsHeal(bot) && !context->GetValue<ObjectGuid>("wsg heal target")->Get().IsEmpty())
-        return false;
-    Unit* carrier = AI_VALUE(Unit*, "team flag carrier");
-    Unit* enemy = AI_VALUE(Unit*, "current target");
-    BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
-    if (!carrier || !enemy || carrier == bot || !carrier->IsAlive() || !carrier->IsInWorld() ||
-        carrier->GetMap() != bot->GetMap() || !enemy->IsAlive() || !enemy->IsInWorld() ||
-        enemy->GetMap() != bot->GetMap() ||
-        warsong->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) != carrier->GetGUID())
-        return false;
-    constexpr float regroupDistance = 30.0f;
-    constexpr float threatDistance = 45.0f;
-    // Drop only a distant chase, not a carrier threat or immediate self-defense.
-    return !bot->IsWithinDistInMap(carrier, regroupDistance) && !enemy->IsWithinDistInMap(carrier, threatDistance) &&
-           !bot->IsWithinMeleeRange(enemy);
-}
+bool WsgEscortSeparated::IsActive() { return ShouldRegroupWsgEscort(botAI); }
 
 bool WsgFlagStateChanged::IsActive()
 {
     Battleground* bg = bot->GetBattleground();
-    bool isWarsong = bg && (bg->GetBgTypeID() == BATTLEGROUND_WS ||
-                            (bg->GetBgTypeID() == BATTLEGROUND_RB && bg->GetBgTypeID(true) == BATTLEGROUND_WS));
+    bool isWarsong = bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS;
     if (!isWarsong || bg->GetStatus() != STATUS_IN_PROGRESS || !bot->IsAlive())
     {
         _initialized = false;
@@ -395,8 +306,8 @@ bool WsgFlagStateChanged::IsActive()
         _allianceDropped != allianceDropped || _hordeDropped != hordeDropped ||
         _allianceBaseReady != allianceBaseReady || _hordeBaseReady != hordeBaseReady || _role != assignment.Role ||
         _defenders != assignment.Defenders || _escorts != assignment.Escorts || _escort != assignment.Escort ||
-        _baseDefender != assignment.BaseDefender || _defender != assignment.Defender ||
-        _attacker != assignment.Attacker || _returner != assignment.Returner ||
+        _escortIndex != assignment.EscortIndex || _baseDefender != assignment.BaseDefender ||
+        _defender != assignment.Defender || _attacker != assignment.Attacker || _returner != assignment.Returner ||
         _committedAttack != assignment.CommittedAttack || _assignmentValid != assignment.Valid;
 
     // The same X/Y marker is sent to players requesting BG positions. Sample only for
@@ -459,6 +370,7 @@ bool WsgFlagStateChanged::IsActive()
     _defenders = assignment.Defenders;
     _escorts = assignment.Escorts;
     _escort = assignment.Escort;
+    _escortIndex = assignment.EscortIndex;
     _baseDefender = assignment.BaseDefender;
     _defender = assignment.Defender;
     _attacker = assignment.Attacker;

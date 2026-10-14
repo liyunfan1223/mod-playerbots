@@ -8,12 +8,14 @@
 #define PLAYERBOTS_BATTLEGROUNDTACTICS_H
 
 #include "BattlegroundAV.h"
+#include "ChooseTargetActions.h"
 #include "MovementActions.h"
 
 class ChatHandler;
 class Battleground;
 class PlayerbotAI;
 struct Position;
+class PositionInfo;
 
 #define SPELL_CAPTURE_BANNER 21651
 
@@ -116,14 +118,30 @@ public:
     static void SetBotStrategies(uint32 instanceId, BGStrategyData const& data);
     static void ClearBotStrategies(uint32 instanceId);
     static uint8 GetWsgDefenderCount(Battleground* bg, TeamId teamId);
-    static bool IsUnsafeWsgCliffApproach(Player const* player, float destinationZ);
     static bool ShouldYieldWsgTactics(PlayerbotAI* botAI);
 
     BGTactics(PlayerbotAI* botAI, std::string const name = "bg tactics") : MovementAction(botAI, name) {}
 
     bool Execute(Event event) override;
+    bool isUseful() override;
+
+protected:
+    bool ExecuteWsgRoute();
+    bool RefreshWsgObjective();
+    bool protectFC();
+    bool ClearObsoleteWsgFollow();
+    void SuspendWsgRouteProgress();
+    void RecordWsgMove();
+    bool OwnsWsgMove() const;
 
 private:
+    enum class WsgJumpResult
+    {
+        NotApplicable,
+        Blocked,
+        Moved
+    };
+
     static std::string const HandleConsoleCommandPrivate(WorldSession* session, char const* args);
     bool moveToStart(bool force = false);
     bool selectObjective(bool reset = false);
@@ -131,35 +149,46 @@ private:
     bool selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths);
     bool moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 currentPoint, bool reverse = false);
     bool MoveToWsgWaypoint();
-    bool CheckWsgRouteProgress();
+    void ValidateWsgRoute();
+    void UpdateWsgRouteLane();
+    PositionInfo GetWsgRoutingGoal(PositionInfo goal) const;
+    void ClearWsgLane();
+    void CheckWsgRouteProgress();
     void ClearWsgRoute();
-    BattleBotPath const* GetWsgCliffBelowBot() const;
-    bool IsUnsafeWsgCliffApproach(float destinationZ) const;
-    bool MoveAwayFromWsgCliff();
+    void ClearWsgJump();
+    bool IsUnsafeWsgCliffApproach(float x, float y, float z) const;
     bool startNewPathBegin(std::vector<BattleBotPath*> const& vPaths);
     bool startNewPathFree(std::vector<BattleBotPath*> const& vPaths);
     bool resetObjective();
-    bool wsJumpDown();
+    WsgJumpResult WsJumpDown();
     bool eyJumpDown();
     bool atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<uint32> const& vFlagIds);
     bool flagTaken();
     bool teamFlagTaken();
-    bool protectFC();
-    bool ClearObsoleteWsgFollow();
     bool useBuff();
     uint32 getPlayersInArea(TeamId teamId, Position point, float range, bool combat = true);
     bool IsLockedInsideKeep();
 
     BattleBotPath* _wsgPath = nullptr;
     BattleBotPath* _wsgApproachPath = nullptr;
+    BattleBotPath* _wsgMidfieldPath = nullptr;
+    Position _wsgMidfieldGoal;
+    bool _wsgMidfieldReached = false;
     BattleBotPath* _wsgAvoidPath = nullptr;
     BattleBotPath* _wsgCompletedPath = nullptr;
     bool _wsgCompletedReverse = false;
     uint32 _wsgInstanceId = 0;
+    uint32 _wsgResurrectionCount = 0;
+    uint32 _wsgJumpNextPoint = 0;
+    bool _wsgGraveyardDeparture = false;
     uint32 _wsgNextPoint = 0;
     uint32 _wsgApproachMs = 0;
     uint32 _wsgAvoidMs = 0;
     uint32 _wsgProgressMs = 0;
+    uint32 _wsgLastProgressCheckMs = 0;
+    uint32 _wsgMoveMs = 0;
+    WorldPosition _wsgMoveDestination;
+    bool _wsgHasMove = false;
     float _wsgGoalX = 0.0f;
     float _wsgGoalY = 0.0f;
     float _wsgProgressDistance = 0.0f;
@@ -167,6 +196,52 @@ private:
     bool _wsgReverse = false;
     bool _wsgApproachReverse = false;
     bool _wsgCarrying = false;
+};
+
+class WsgObjectiveRefreshAction : public BGTactics
+{
+public:
+    WsgObjectiveRefreshAction(PlayerbotAI* botAI) : BGTactics(botAI, "refresh wsg objective") {}
+    bool isUseful() override;
+    bool Execute(Event event) override;
+};
+
+class WsgEscortFollowAction : public BGTactics
+{
+public:
+    WsgEscortFollowAction(PlayerbotAI* botAI) : BGTactics(botAI, "protect fc") {}
+    bool isUseful() override;
+    bool Execute(Event event) override;
+
+private:
+    uint8 _escortIndex = 0;
+    bool _hasEscortIndex = false;
+};
+
+class WsgObjectiveRouteAction : public BGTactics
+{
+public:
+    WsgObjectiveRouteAction(PlayerbotAI* botAI) : BGTactics(botAI, "bg wsg route") {}
+    bool isUseful() override;
+    bool Execute(Event event) override;
+};
+
+class WsgSupportAttackAction : public AttackAction
+{
+public:
+    WsgSupportAttackAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack wsg support") {}
+    Unit* GetTarget() override;
+    bool isUseful() override;
+    bool Execute(Event event) override;
+};
+
+class WsgRegroupAction : public DropTargetAction
+{
+public:
+    WsgRegroupAction(PlayerbotAI* botAI) : DropTargetAction(botAI) {}
+    std::string const getName() override { return "wsg regroup"; }
+    bool isUseful() override;
+    bool Execute(Event event) override;
 };
 
 class ArenaTactics : public MovementAction

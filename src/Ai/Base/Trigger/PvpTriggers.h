@@ -54,14 +54,6 @@ public:
     bool IsActive() override;
 };
 
-class TeamFlagCarrierNear : public Trigger
-{
-public:
-    TeamFlagCarrierNear(PlayerbotAI* botAI) : Trigger(botAI, "team flagcarrier near", 250) {}
-
-    bool IsActive() override;
-};
-
 class WsgEscortSeparated : public Trigger
 {
 public:
@@ -90,6 +82,7 @@ private:
     uint32 _role = 0;
     uint8 _defenders = 0;
     uint8 _escorts = 0;
+    uint8 _escortIndex = 0;
     bool _escort = false;
     bool _baseDefender = false;
     bool _defender = false;

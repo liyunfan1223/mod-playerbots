@@ -5,6 +5,9 @@
  */
 
 #include "PvpValues.h"
+
+#include <algorithm>
+
 #include "BattleGroundTactics.h"
 #include "BattlegroundEY.h"
 #include "BattlegroundMgr.h"
@@ -15,25 +18,101 @@
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "ServerFacade.h"
-#include "World.h"
-#include <algorithm>
 
 bool IsUnavailableWsgCombatTarget(Player const* player, Unit const* target)
 {
     Battleground const* bg = player ? player->GetBattleground() : nullptr;
     if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS)
         return false;
-    if (!target || !target->IsInWorld() || target->GetMap() != player->GetMap() || !target->IsAlive() ||
-        target->HasSpiritOfRedemptionAura() ||
-        (target->IsPlayer() && target->ToPlayer()->HasPlayerFlag(PLAYER_FLAGS_GHOST)))
-        return true;
-    if (BGTactics::IsUnsafeWsgCliffApproach(player, target->GetPositionZ()))
-        return true;
+    return !target || !target->IsInWorld() || target->GetMap() != player->GetMap() || !target->IsAlive() ||
+           target->HasSpiritOfRedemptionAura() ||
+           (target->IsPlayer() && target->ToPlayer()->HasPlayerFlag(PLAYER_FLAGS_GHOST));
+}
+
+bool IsValidWsgCarrier(Player const* player, Unit const* carrier, bool friendly)
+{
+    Battleground const* bg = player ? player->GetBattleground() : nullptr;
+    if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS || bg->GetStatus() != STATUS_IN_PROGRESS || !carrier ||
+        !carrier->IsPlayer() || IsUnavailableWsgCombatTarget(player, carrier))
+        return false;
+    TeamId flagTeam = friendly ? bg->GetOtherTeamId(player->GetTeamId()) : player->GetTeamId();
     BattlegroundWS const* warsong = static_cast<BattlegroundWS const*>(bg);
-    bool carrier = target->GetGUID() == warsong->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                   target->GetGUID() == warsong->GetFlagPickerGUID(TEAM_HORDE);
-    return target->IsPlayer() && !carrier &&
-           !player->IsWithinDistInMap(target, sWorld->getFloatConfig(CONFIG_SIGHT_MONSTER));
+    return (carrier->ToPlayer()->GetTeamId() == player->GetTeamId()) == friendly &&
+           warsong->GetFlagState(flagTeam) == BG_WS_FLAG_STATE_ON_PLAYER &&
+           warsong->GetFlagPickerGUID(flagTeam) == carrier->GetGUID();
+}
+
+bool CanRespondToWsgCarrier(PlayerbotAI* botAI, Unit* carrier)
+{
+    Player* bot = botAI->GetBot();
+    if (!IsValidWsgCarrier(bot, carrier, false) || !bot->CanSeeOrDetect(carrier) ||
+        !ServerFacade::instance().IsDistanceLessOrEqualThan(ServerFacade::instance().GetDistance2d(bot, carrier),
+                                                            VISIBILITY_DISTANCE_NORMAL) ||
+        BGTactics::ShouldYieldWsgTactics(botAI))
+        return false;
+    WsgTeamAssignment assignment =
+        botAI->GetAiObjectContext()->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
+    Battleground* bg = bot->GetBattleground();
+    return assignment.Valid && assignment.Returner &&
+           static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) != bot->GetGUID();
+}
+
+bool IsWsgEscortTargetAllowed(PlayerbotAI* botAI, Unit const* target)
+{
+    Player* bot = botAI->GetBot();
+    Battleground* bg = bot->GetBattleground();
+    if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS)
+        return true;
+    WsgTeamAssignment assignment =
+        botAI->GetAiObjectContext()->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
+    Unit* carrier = botAI->GetAiObjectContext()->GetValue<Unit*>("team flag carrier")->Get();
+    if (!assignment.Valid || !assignment.Escort || carrier == bot || !IsValidWsgCarrier(bot, carrier, true))
+        return true;
+    if (IsUnavailableWsgCombatTarget(bot, target))
+        return false;
+    constexpr float carrierThreatRadius = 45.0f;
+    constexpr float selfDefenseRadius = 15.0f;
+    return target->IsWithinDistInMap(carrier, carrierThreatRadius) || target->GetVictim() == carrier ||
+           bot->IsWithinMeleeRange(target) ||
+           (target->GetVictim() == bot && bot->IsWithinDistInMap(target, selfDefenseRadius));
+}
+
+bool ShouldRegroupWsgEscort(PlayerbotAI* botAI)
+{
+    Player* bot = botAI->GetBot();
+    Battleground* bg = bot->GetBattleground();
+    if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS || bg->GetStatus() != STATUS_IN_PROGRESS || !bot->IsAlive() ||
+        !bot->IsInCombat() || BGTactics::ShouldYieldWsgTactics(botAI))
+        return false;
+    AiObjectContext* context = botAI->GetAiObjectContext();
+    WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
+    Unit* carrier = context->GetValue<Unit*>("team flag carrier")->Get();
+    Unit* enemy = context->GetValue<Unit*>("current target")->Get();
+    constexpr float regroupDistance = 30.0f;
+    return assignment.Valid && assignment.Escort && carrier != bot && IsValidWsgCarrier(bot, carrier, true) && enemy &&
+           !IsUnavailableWsgCombatTarget(bot, enemy) && !bot->IsWithinDistInMap(carrier, regroupDistance) &&
+           !IsWsgEscortTargetAllowed(botAI, enemy);
+}
+
+bool IsWsgSupportTarget(PlayerbotAI* botAI, Unit const* target)
+{
+    Player* bot = botAI->GetBot();
+    Battleground* bg = bot->GetBattleground();
+    if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS || bg->GetStatus() != STATUS_IN_PROGRESS || !target ||
+        !target->IsPlayer() || IsUnavailableWsgCombatTarget(bot, target) || !bot->CanSeeOrDetect(target) ||
+        !bot->IsValidAttackTarget(target) || !bot->IsWithinLOSInMap(target))
+        return false;
+    WsgTeamAssignment assignment =
+        botAI->GetAiObjectContext()->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
+    if (!assignment.Valid)
+        return false;
+    Unit* carrier = botAI->GetAiObjectContext()->GetValue<Unit*>("team flag carrier")->Get();
+    constexpr float carrierThreatRadius = 30.0f;
+    constexpr float baseThreatRadius = 45.0f;
+    if (assignment.Escort && carrier != bot && IsValidWsgCarrier(bot, carrier, true))
+        return target->GetVictim() == carrier || target->IsWithinDistInMap(carrier, carrierThreatRadius);
+    GameObject* base = bg->GetBGObject(bot->GetTeamId() == TEAM_ALLIANCE ? BG_WS_OBJECT_A_FLAG : BG_WS_OBJECT_H_FLAG);
+    return assignment.Defender && !assignment.Escort && base && target->IsWithinDistInMap(base, baseThreatRadius);
 }
 
 WsgTeamAssignment WsgTeamAssignmentValue::Calculate()
@@ -64,8 +143,7 @@ WsgTeamAssignment WsgTeamAssignmentValue::Calculate()
     ObjectGuid friendlyCarrierGuid = carrierGuid;
     Player* friendlyCarrier =
         friendlyCarrierGuid.IsEmpty() ? nullptr : ObjectAccessor::GetPlayer(bg->GetBgMap(), friendlyCarrierGuid);
-    if (friendlyCarrier && (!friendlyCarrier->IsAlive() || !friendlyCarrier->IsInWorld() ||
-                            friendlyCarrier->GetTeamId() != bot->GetTeamId()))
+    if (!IsValidWsgCarrier(bot, friendlyCarrier, true))
         friendlyCarrier = nullptr;
     std::vector<ObjectGuid> bots;
     std::vector<ObjectGuid> allBots;
@@ -144,7 +222,10 @@ WsgTeamAssignment WsgTeamAssignmentValue::Calculate()
     assignment.Role = static_cast<uint32>(std::find(allBots.begin(), allBots.end(), bot->GetGUID()) - allBots.begin());
     assignment.Defenders = static_cast<uint8>(defenderQuota);
     assignment.Escorts = static_cast<uint8>(_escortGuids.size());
-    assignment.Escort = std::find(_escortGuids.begin(), _escortGuids.end(), bot->GetGUID()) != _escortGuids.end();
+    auto escort = std::find(_escortGuids.begin(), _escortGuids.end(), bot->GetGUID());
+    assignment.Escort = escort != _escortGuids.end();
+    if (assignment.Escort)
+        assignment.EscortIndex = static_cast<uint8>(escort - _escortGuids.begin());
     assignment.BaseDefender = bot->GetGUID() == baseGuard;
     assignment.Defender = std::find(defenders.begin(), defenders.end(), bot->GetGUID()) != defenders.end();
     assignment.Attacker = std::find(attackers.begin(), attackers.end(), bot->GetGUID()) != attackers.end();
@@ -222,70 +303,22 @@ ObjectGuid WsgSupportTargetValue::Calculate()
     Battleground* bg = bot->GetBattleground();
     if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS || bg->GetStatus() != STATUS_IN_PROGRESS || !bot->IsAlive())
         return ObjectGuid::Empty;
-    BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
-    ObjectGuid carrierGuid = warsong->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId()));
-    if (carrierGuid == bot->GetGUID())
+    if (static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) == bot->GetGUID())
         return ObjectGuid::Empty;
-    Player* carrier = carrierGuid.IsEmpty() ? nullptr : ObjectAccessor::GetPlayer(bot->GetMap(), carrierGuid);
-    if (carrier && (!carrier->IsAlive() || !carrier->IsInWorld() || carrier->GetMap() != bot->GetMap() ||
-                    carrier->GetTeamId() != bot->GetTeamId()))
-        carrier = nullptr;
     WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
-    if (!assignment.Valid)
+    if (!assignment.Valid || (!assignment.Defender && !assignment.Escort))
         return ObjectGuid::Empty;
-    bool defender = assignment.Defender && !assignment.Escort;
-    bool support = carrier && assignment.Escort;
-    if (!defender && !support)
-        return ObjectGuid::Empty;
-    GameObject* base = bg->GetBGObject(bot->GetTeamId() == TEAM_ALLIANCE ? BG_WS_OBJECT_A_FLAG : BG_WS_OBJECT_H_FLAG);
     ObjectGuid result;
     float bestDistance = sPlayerbotAIConfig.SightDistance;
-    constexpr float carrierThreatRadius = 30.0f;
-    constexpr float baseThreatRadius = 45.0f;
     for (ObjectGuid const& guid : AI_VALUE(GuidVector, "nearest enemy players"))
     {
         Player* enemy = ObjectAccessor::GetPlayer(bot->GetMap(), guid);
-        if (!enemy || IsUnavailableWsgCombatTarget(bot, enemy) || enemy->GetTeamId() == bot->GetTeamId() ||
-            !bot->CanSeeOrDetect(enemy) || !bot->IsValidAttackTarget(enemy) || !bot->IsWithinLOSInMap(enemy))
+        if (!IsWsgSupportTarget(botAI, enemy))
             continue;
-        bool threatensCarrier =
-            support && (enemy->GetVictim() == carrier || enemy->IsWithinDistInMap(carrier, carrierThreatRadius));
-        bool threatensBase = defender && base && enemy->IsWithinDistInMap(base, baseThreatRadius);
         float distance = bot->GetDistance(enemy);
-        if ((threatensCarrier || threatensBase) && distance < bestDistance)
+        if (distance < bestDistance)
         {
             bestDistance = distance;
-            result = guid;
-        }
-    }
-    return result;
-}
-
-ObjectGuid WsgHealTargetValue::Calculate()
-{
-    Battleground* bg = bot->GetBattleground();
-    if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS || bg->GetStatus() != STATUS_IN_PROGRESS || !bot->IsAlive() ||
-        !PlayerbotAI::IsHeal(bot))
-        return ObjectGuid::Empty;
-    BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
-    ObjectGuid carrier = warsong->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId()));
-    ObjectGuid result;
-    float bestScore = 100.0f;
-    constexpr float carrierBonus = 15.0f;
-    constexpr float distanceScale = 10.0f;
-    for (auto const& [guid, player] : bg->GetPlayers())
-    {
-        if (!player || !player->IsAlive() || !player->IsInWorld() || player->GetMap() != bot->GetMap() ||
-            player->GetTeamId() != bot->GetTeamId() || player->IsCharmed() ||
-            player->GetHealthPct() >= sPlayerbotAIConfig.MediumHealth ||
-            bot->GetDistance2d(player) > sPlayerbotAIConfig.HealDistance || !bot->IsWithinLOSInMap(player))
-            continue;
-        float score = player->GetHealthPct() + bot->GetDistance2d(player) / distanceScale;
-        if (guid == carrier)
-            score -= carrierBonus;
-        if (score < bestScore)
-        {
-            bestScore = score;
             result = guid;
         }
     }
@@ -311,30 +344,16 @@ Unit* FlagCarrierValue::Calculate()
     if (botAI->GetBot()->InBattleground())
     {
         Battleground* battleground = bot->GetBattleground();
-        if (RealBgType(bot) == BattlegroundTypeId::BATTLEGROUND_WS)
+        if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_WS)
         {
-            BattlegroundWS* bg = static_cast<BattlegroundWS*>(battleground);
-
-            if (!bg)
-                return nullptr;
-
-            if (((!sameTeam && bot->GetTeamId() == TEAM_HORDE) || (sameTeam && bot->GetTeamId() == TEAM_ALLIANCE)) &&
-                !bg->GetFlagPickerGUID(TEAM_HORDE).IsEmpty())
-                carrier = ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID(TEAM_HORDE));
-
-            if (((!sameTeam && bot->GetTeamId() == TEAM_ALLIANCE) || (sameTeam && bot->GetTeamId() == TEAM_HORDE)) &&
-                !bg->GetFlagPickerGUID(TEAM_ALLIANCE).IsEmpty())
-                carrier = ObjectAccessor::GetPlayer(bg->GetBgMap(), bg->GetFlagPickerGUID(TEAM_ALLIANCE));
-
-            if (carrier)
-            {
-                if (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig.SightDistance))
-                {
-                    return carrier;
-                }
-                else
-                    return nullptr;
-            }
+            BattlegroundWS* warsong = static_cast<BattlegroundWS*>(battleground);
+            TeamId flagTeam = sameTeam ? battleground->GetOtherTeamId(bot->GetTeamId()) : bot->GetTeamId();
+            ObjectGuid guid = warsong->GetFlagPickerGUID(flagTeam);
+            carrier = guid.IsEmpty() ? nullptr : ObjectAccessor::GetPlayer(bot->GetMap(), guid);
+            return IsValidWsgCarrier(bot, carrier, sameTeam) &&
+                           (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig.SightDistance))
+                       ? carrier
+                       : nullptr;
         }
 
         if (RealBgType(botAI->GetBot()) == BATTLEGROUND_EY)

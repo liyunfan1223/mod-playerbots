@@ -5,8 +5,8 @@
  */
 
 #include "ChooseTargetActions.h"
-#include "BattleGroundTactics.h"
-#include "BattlegroundWS.h"
+
+#include "Battleground.h"
 #include "ChooseRpgTargetAction.h"
 #include "Event.h"
 #include "LootObjectStack.h"
@@ -18,42 +18,8 @@
 #include "RtiTargetValue.h"
 #include "ServerFacade.h"
 
-Unit* AttackEnemyPlayerAction::GetTarget()
-{
-    Battleground* bg = bot->GetBattleground();
-    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
-    {
-        ObjectGuid guid = context->GetValue<ObjectGuid>("wsg support target")->Get();
-        Unit* supportTarget = guid.IsEmpty() ? nullptr : botAI->GetUnit(guid);
-        if (supportTarget && supportTarget->IsAlive() && supportTarget->IsInWorld() &&
-            supportTarget->GetMap() == bot->GetMap() && bot->CanSeeOrDetect(supportTarget) &&
-            bot->IsValidAttackTarget(supportTarget) && bot->IsWithinLOSInMap(supportTarget))
-            return supportTarget;
-
-        WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
-        Unit* carrier = AI_VALUE(Unit*, "team flag carrier");
-        if (assignment.Valid && assignment.Escort && carrier && carrier != bot && carrier->IsAlive() &&
-            carrier->IsInWorld() && carrier->GetMap() == bot->GetMap() &&
-            static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())) ==
-                carrier->GetGUID())
-        {
-            Unit* enemy = AttackAction::GetTarget();
-            constexpr float carrierThreatRadius = 30.0f;
-            constexpr float selfDefenseRadius = 15.0f;
-            if (enemy && enemy->IsAlive() && enemy->IsInWorld() && enemy->GetMap() == bot->GetMap() &&
-                (enemy->IsWithinDistInMap(carrier, carrierThreatRadius) || enemy->GetVictim() == carrier ||
-                 (enemy->GetVictim() == bot && bot->IsWithinDistInMap(enemy, selfDefenseRadius))))
-                return enemy;
-            return nullptr;
-        }
-    }
-    return AttackAction::GetTarget();
-}
-
 bool AttackEnemyPlayerAction::isUseful()
 {
-    if (BGTactics::ShouldYieldWsgTactics(botAI))
-        return false;
     if (PlayerHasFlag::IsCapturingFlag(bot))
         return false;
 
@@ -64,29 +30,11 @@ bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
     Battleground* bg = bot->GetBattleground();
-    bool isWarsong = bg && (bg->GetBgTypeID() == BATTLEGROUND_WS ||
-                            (bg->GetBgTypeID() == BATTLEGROUND_RB && bg->GetBgTypeID(true) == BATTLEGROUND_WS));
-    if (isWarsong)
+    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
     {
-        if (BGTactics::ShouldYieldWsgTactics(botAI))
-            return false;
-        WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
-        if (!assignment.Valid || !assignment.Returner)
-            return false;
         if (botAI->GetState() == BOT_STATE_COMBAT && AI_VALUE(Unit*, "current target") == target)
             return false;
-
-        BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
-        TeamId enemyTeam = bg->GetOtherTeamId(bot->GetTeamId());
-        if (!target || !target->IsPlayer() || !target->IsAlive() || !target->IsInWorld() ||
-            target->GetMap() != bot->GetMap() || target->ToPlayer()->GetTeamId() != enemyTeam ||
-            warsong->GetFlagState(bot->GetTeamId()) != BG_WS_FLAG_STATE_ON_PLAYER ||
-            warsong->GetFlagPickerGUID(bot->GetTeamId()) != target->GetGUID() ||
-            warsong->GetFlagPickerGUID(enemyTeam) == bot->GetGUID())
-            return false;
-
-        return bot->CanSeeOrDetect(target) && ServerFacade::instance().IsDistanceLessOrEqualThan(
-                                                  ServerFacade::instance().GetDistance2d(bot, target), 100.0f);
+        return CanRespondToWsgCarrier(botAI, target);
     }
 
     if (!target || !ServerFacade::instance().IsDistanceLessOrEqualThan(
@@ -94,6 +42,14 @@ bool AttackEnemyFlagCarrierAction::isUseful()
         return false;
 
     return PlayerHasFlag::IsCapturingFlag(bot);
+}
+
+bool AttackEnemyFlagCarrierAction::Execute(Event event)
+{
+    Battleground* bg = bot->GetBattleground();
+    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS && !CanRespondToWsgCarrier(botAI, GetTarget()))
+        return false;
+    return AttackAction::Execute(event);
 }
 
 bool AggressiveTargetAction::isUseful()

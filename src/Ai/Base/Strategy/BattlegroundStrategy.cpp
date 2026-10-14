@@ -6,6 +6,53 @@
 
 #include "BattlegroundStrategy.h"
 
+#include "BattleGroundTactics.h"
+#include "Battleground.h"
+#include "ChooseTargetActions.h"
+#include "Multiplier.h"
+#include "Playerbots.h"
+#include "PvpValues.h"
+#include "ReachTargetActions.h"
+
+namespace
+{
+class WarsongTacticsMultiplier : public Multiplier
+{
+public:
+    WarsongTacticsMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "warsong tactics") {}
+
+    float GetValue(Action* action) override
+    {
+        Battleground* bg = bot->GetBattleground();
+        if (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS)
+            return 1.0f;
+        if (auto* attack = dynamic_cast<AttackAction*>(action))
+        {
+            if (BGTactics::ShouldYieldWsgTactics(botAI) || !IsWsgEscortTargetAllowed(botAI, attack->GetTarget()))
+                return 0.0f;
+            if (dynamic_cast<AttackEnemyPlayerAction*>(action))
+            {
+                ObjectGuid guid = context->GetValue<ObjectGuid>("wsg support target")->Get();
+                Unit* support = guid.IsEmpty() ? nullptr : botAI->GetUnit(guid);
+                if (IsWsgSupportTarget(botAI, support))
+                    return 0.0f;
+            }
+        }
+        if (action->GetTargetName() == "current target" && !IsWsgEscortTargetAllowed(botAI, action->GetTarget()) &&
+            (dynamic_cast<ReachTargetAction*>(action) ||
+             (dynamic_cast<CastSpellAction*>(action) && !dynamic_cast<CastHealingSpellAction*>(action) &&
+              ShouldRegroupWsgEscort(botAI))))
+            return 0.0f;
+        return 1.0f;
+    }
+};
+}  // namespace
+
+void WarsongStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+{
+    multipliers.push_back(new WarsongTacticsMultiplier(botAI));
+}
+
 void BGStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("often", { NextAction("bg join", relevance)}));
@@ -26,18 +73,18 @@ void BattlegroundStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void WarsongStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
-        new TriggerNode("wsg flag state changed", {NextAction("bg refresh wsg objective", ACTION_BG + 3)}));
-    triggers.push_back(new TriggerNode("wsg support threat", {NextAction("attack enemy player", ACTION_DEFAULT + 1)}));
-    triggers.push_back(new TriggerNode("wsg escort separated", {NextAction("drop target", ACTION_MOVE - 1)}));
+        new TriggerNode("wsg flag state changed", {NextAction("bg refresh wsg objective", ACTION_BG + 3.0f)}));
+    triggers.push_back(new TriggerNode("wsg support threat", {NextAction("attack wsg support", ACTION_HIGH + 1.0f)}));
+    triggers.push_back(new TriggerNode("wsg escort separated", {NextAction("wsg regroup", ACTION_HIGH + 2.0f)}));
+    triggers.push_back(new TriggerNode("bg active", {NextAction("bg wsg route", ACTION_BG + 1.0f)}));
     triggers.push_back(new TriggerNode("bg active", {NextAction("bg check flag", ACTION_EMERGENCY)}));
     triggers.push_back(
         new TriggerNode("enemy flagcarrier near", {NextAction("attack enemy flag carrier", ACTION_RAID + 1.0f)}));
-    triggers.push_back(new TriggerNode("team flagcarrier near", {NextAction("bg protect fc", ACTION_BG + 2)}));
+    triggers.push_back(new TriggerNode("bg active", {NextAction("bg protect fc", ACTION_BG + 2.0f)}));
     triggers.push_back(new TriggerNode("often", {NextAction("bg use buff", ACTION_BG)}));
     triggers.push_back(new TriggerNode("low health", {NextAction("bg use buff", ACTION_MOVE)}));
     triggers.push_back(new TriggerNode("low mana", {NextAction("bg use buff", ACTION_MOVE)}));
-    triggers.push_back(new TriggerNode("player has flag", {NextAction("bg move to objective", ACTION_EMERGENCY)}));
-    triggers.push_back(new TriggerNode("timer bg", {NextAction("bg reset objective force", ACTION_EMERGENCY)}));
+    triggers.push_back(new TriggerNode("player has flag", {NextAction("bg wsg route", ACTION_EMERGENCY)}));
 }
 
 void AlteracStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
