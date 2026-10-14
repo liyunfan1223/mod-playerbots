@@ -1246,8 +1246,12 @@ WorldPosition NewRpgBaseAction::FindRecoveryAnchor()
         }
     };
 
-    for (WorldLocation const& loc : sTravelMgr.GetValidQuestGiverLocations(bot))
-        consider(loc);
+    // Nearby RPG targets (cached) act as the quest giver anchors.
+    for (ObjectGuid const& guid : AI_VALUE(GuidVector, "possible new rpg targets"))
+    {
+        if (WorldObject* object = ObjectAccessor::GetWorldObject(*bot, guid))
+            consider(WorldPosition(object));
+    }
     for (WorldLocation const& loc : sTravelMgr.GetCityLocations(bot))
         consider(loc);
     for (WorldLocation const& loc : sTravelMgr.GetTravelHubs(bot))
