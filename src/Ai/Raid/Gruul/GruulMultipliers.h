@@ -82,11 +82,22 @@ protected:
     float GetValueInEncounter(Action* action) override;
 };
 
-class HighKingMaulgarControlHunterActionsMultiplier : public GruulsLairEncounterMultiplier
+class HighKingMaulgarLetMageTankStealSpellShieldMultiplier : public GruulsLairEncounterMultiplier
 {
 public:
-    HighKingMaulgarControlHunterActionsMultiplier(PlayerbotAI* botAI)
-        : GruulsLairEncounterMultiplier(botAI, "high king maulgar control hunter actions") {}
+    HighKingMaulgarLetMageTankStealSpellShieldMultiplier(PlayerbotAI* botAI)
+        : GruulsLairEncounterMultiplier(
+            botAI, "high king maulgar let mage tank steal spell shield") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
+};
+
+class HighKingMaulgarControlMisdirectionMultiplier : public GruulsLairEncounterMultiplier
+{
+public:
+    HighKingMaulgarControlMisdirectionMultiplier(PlayerbotAI* botAI)
+        : GruulsLairEncounterMultiplier(botAI, "high king maulgar control misdirection") {}
 
 protected:
     float GetValueInEncounter(Action* action) override;

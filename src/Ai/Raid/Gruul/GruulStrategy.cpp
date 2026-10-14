@@ -62,7 +62,8 @@ void RaidGruulsLairStrategy::InitMultipliers(std::vector<Multiplier*>& multiplie
     multipliers.push_back(new HighKingMaulgarRestrictTauntingMultiplier(botAI));
     multipliers.push_back(new HighKingMaulgarDisableDpsAssistMultiplier(botAI));
     multipliers.push_back(new HighKingMaulgarAvoidWhirlwindMultiplier(botAI));
-    multipliers.push_back(new HighKingMaulgarControlHunterActionsMultiplier(botAI));
+    multipliers.push_back(new HighKingMaulgarLetMageTankStealSpellShieldMultiplier(botAI));
+    multipliers.push_back(new HighKingMaulgarControlMisdirectionMultiplier(botAI));
     multipliers.push_back(new HighKingMaulgarControlMageTankActionsMultiplier(botAI));
 
     // Gruul the Dragonkiller
