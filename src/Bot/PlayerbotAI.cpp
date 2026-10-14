@@ -259,17 +259,11 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     if (!bot || !bot->GetSession() || !bot->IsInWorld() || bot->IsBeingTeleported() || bot->IsDuringRemoveFromWorld())
         return;
 
-    // During timed logout countdown, cancel if bot enters combat (this cancellation is handled client-side for real players).
-    if (bot->GetSession()->IsLoggingOut())
+    // Cancel a timed logout if the bot is pulled into combat (real clients do this cancellation themselves).
+    if (bot->GetSession()->IsLoggingOut() && bot->IsInCombat() && !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
     {
-        bool canLogoutInCombat = bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
-        if (bot->IsInCombat() && !canLogoutInCombat)
-        {
-            WorldPackets::Character::LogoutCancel cancelData = WorldPacket(CMSG_LOGOUT_CANCEL);
-            bot->GetSession()->HandleLogoutCancelOpcode(cancelData);
-        }
-        else
-            return;
+        WorldPackets::Character::LogoutCancel cancelData = WorldPacket(CMSG_LOGOUT_CANCEL);
+        bot->GetSession()->HandleLogoutCancelOpcode(cancelData);
     }
 
     // Bots send no movement opcodes, so m_lastFallZ stays frozen and Player::IsFalling() (a Z test
@@ -1148,7 +1142,7 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
                 TellMaster(message);
             }
 
-            masterBotMgr->LogoutPlayerBot(bot->GetGUID());
+            masterBotMgr->LogoutPlayerBot(bot->GetGUID(), true);
         }
         else if (type == CHAT_MSG_WHISPER)
         {

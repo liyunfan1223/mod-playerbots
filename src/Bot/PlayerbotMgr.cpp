@@ -321,7 +321,7 @@ void PlayerbotHolder::HandleBotPackets(WorldSession* session)
     }
 }
 
-void PlayerbotHolder::LogoutAllBots()
+void PlayerbotHolder::LogoutAllBots(bool timed)
 {
     /*
     while (true)
@@ -352,7 +352,7 @@ void PlayerbotHolder::LogoutAllBots()
         if (session && session->IsLoggingOut())
             session->SetLogoutStartTime(1);
 
-        LogoutPlayerBot(bot->GetGUID());
+        LogoutPlayerBot(bot->GetGUID(), timed);
     }
 }
 
@@ -397,7 +397,7 @@ void PlayerbotMgr::CancelLogout()
     }
 }
 
-void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
+void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid, bool timed)
 {
     if (Player* bot = GetPlayerBot(guid))
     {
@@ -456,7 +456,7 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
                  (masterWorldSessionPtr &&
                   masterWorldSessionPtr->HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT))));
 
-        if (!logout)
+        if (timed && !logout)
         {
             // Start the 20-second logout countdown. CancelLogout() can interrupt this.
             WorldPackets::Character::LogoutRequest data = WorldPacket(CMSG_LOGOUT_REQUEST);
@@ -776,7 +776,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         if (!GetPlayerBot(guid))
             return "not your bot";
 
-        LogoutPlayerBot(guid);
+        LogoutPlayerBot(guid, true);
         return "ok";
     }
 
@@ -1578,15 +1578,6 @@ void PlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
 {
     SetNextCheckDelay(sPlayerbotAIConfig.ReactDelay);
     CheckTellErrors(elapsed);
-
-    // Complete timed logouts for added bots once the 20-second countdown has elapsed.
-    std::vector<ObjectGuid> expiredLogouts;
-    for (auto const& [botGuid, bot] : playerBots)
-        if (bot && bot->GetSession() && bot->GetSession()->ShouldLogOut(time(nullptr)))
-            expiredLogouts.push_back(botGuid);
-
-    for (ObjectGuid const& guid : expiredLogouts)
-        LogoutPlayerBot(guid);
 }
 
 void PlayerbotMgr::HandleCommand(uint32 type, std::string const text)
@@ -1664,12 +1655,10 @@ void PlayerbotMgr::HandleMasterIncomingPacket(WorldPacket const& packet)
                                         && master->isAFK();
 
                 if (preventAfkSanctuaryLogout || preventAfkLogout)
-                {
                     break;
-                }
             }
 
-            LogoutAllBots();
+            LogoutAllBots(true);
             break;
         }
         // if master cancelled logout, cancel too
