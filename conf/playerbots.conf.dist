@@ -1424,6 +1424,13 @@ Playerbots.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,23
 # Default: 1 (enabled)
 Playerbots.EnableNewRpgStrategy = 1
 
+# Search radius (yards) for the new RPG strategy's NPC and gameobject candidate caches.
+# Default: 150 (the historical hardcoded radius, so behaviour is unchanged out of the box)
+# Set to 0 to follow the map's visibility range (Visibility.Distance.Continents / Instances) instead.
+# Scan cost grows with the square of the radius, and the caches only see units in loaded map grids
+# (grid loading follows the visibility range), so radii beyond it may not find distant units.
+Playerbots.RpgTargetSearchDistance = 150.0
+
 # Control probability weights for RPG status of bots. Takes effect only when the status meets its premise.​
 # Sum of weights need not be 100. Set to 0 to disable the status.
 #
