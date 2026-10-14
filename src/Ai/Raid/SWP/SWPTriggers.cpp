@@ -336,7 +336,10 @@ bool FelmystEncapsulateOnMageOrPaladinTrigger::IsActiveInEncounter()
     if (!bot->HasAura(Id(SwpSpells::SPELL_ENCAPSULATE)))
         return false;
 
-    return isPaladin && !PlayerbotAI::IsMainTank(bot);
+    if (isPaladin)
+        return !PlayerbotAI::IsMainTank(bot);
+
+    return true;
 }
 
 bool FelmystNearEncapsulatedPlayerTrigger::IsActiveInEncounter()
