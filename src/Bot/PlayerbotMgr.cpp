@@ -347,11 +347,6 @@ void PlayerbotHolder::LogoutAllBots(bool timed)
         if (!botAI || IsSelfBot(bot))
             continue;
 
-        // Force ShouldLogOut() to return true so LogoutPlayerBot completes instant logout immediately.
-        WorldSession* session = bot->GetSession();
-        if (session && session->IsLoggingOut())
-            session->SetLogoutStartTime(1);
-
         LogoutPlayerBot(bot->GetGUID(), timed);
     }
 }
@@ -420,10 +415,10 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid, bool timed)
         WorldSession* botWorldSessionPtr = bot->GetSession();
         WorldSession* masterWorldSessionPtr = nullptr;
 
-        // If already in timed logout countdown, complete it once the 20-second timer expires.
+        // Already counting down: finish now for an instant logout, or once the 20-second timer expires.
         if (botWorldSessionPtr->IsLoggingOut())
         {
-            if (botWorldSessionPtr->ShouldLogOut(time(nullptr)))
+            if (!timed || botWorldSessionPtr->ShouldLogOut(time(nullptr)))
             {
                 std::string message = PlayerbotTextMgr::instance().GetBotTextOrDefault(
                     "goodbye", "Goodbye!", {});
