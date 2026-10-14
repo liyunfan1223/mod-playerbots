@@ -413,7 +413,8 @@ Playerbots.LootDistance = 15.0
 # Suppress new grind targets while a quest giver with something to accept or reward is within
 # Playerbots.QuestGiverSearchDistance; without it the nearby-giver interaction the new RPG actions
 # try first stays starved behind "attack anything" and bots keep grinding next to a turn-in.
-# Food, drink and looting keep their priority.
+# Loot pickup and its chase are held back the same way, so accepting or turning in comes first.
+# Food and drink keep their priority.
 # Default: 0 (opt-in)
 Playerbots.PrioritiseQuestGivers = 0
 
