@@ -428,11 +428,13 @@ Playerbots.QuestGiverSearchDistance = 80.0
 # re-accepting dropped quests). Class/sort quests are never dropped. When the quest log runs out of
 # free slots, the quest with the furthest objective is dropped first ("log_pressure" in the stats).
 # Disable to restore the old behaviour (cross-zone quests dropped on sight).
-Playerbots.CrossZoneQuests = 1
+# Default: 0 (opt-in)
+Playerbots.CrossZoneQuests = 0
 
-# Prefer flight path destinations that land near the bot's active quest objectives, turn-ins or
-# available quest givers (weighted random among the best three) instead of a fully random node.
-Playerbots.QuestAwareTaxi = 1
+# Prefer flight path destinations that land near the bot's active quest objectives or turn-ins
+# (weighted random among the best three) instead of a fully random node.
+# Default: 0 (opt-in)
+Playerbots.QuestAwareTaxi = 0
 Playerbots.FleeDistance = 5.0
 Playerbots.AggroDistance = 22
 Playerbots.TooCloseDistance = 5.0
