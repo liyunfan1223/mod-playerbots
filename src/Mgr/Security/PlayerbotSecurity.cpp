@@ -59,8 +59,8 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         }
 
         // In a BG random bots have no master and the team shares one raid, so the group check denies everyone
-        if (sPlayerbotAIConfig.AllowBattlegroundCommands && !ignoreGroup && bot->InBattleground() &&
-            bot->GetBattlegroundId() == from->GetBattlegroundId() && bot->GetBgTeamId() == from->GetBgTeamId() &&
+        if (sPlayerbotAIConfig.AllowBattlegroundCommands && !ignoreGroup && !botAI->GetMaster() &&
+            bot->InBattleground() && bot->GetBattlegroundId() == from->GetBattlegroundId() && bot->GetBgTeamId() == from->GetBgTeamId() &&
             (IsRealPlayer(from) || IsSelfBot(from)))
             return PLAYERBOT_SECURITY_ALLOW_ALL;
 
