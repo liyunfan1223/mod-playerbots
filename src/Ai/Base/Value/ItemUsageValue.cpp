@@ -145,25 +145,25 @@ ItemUsage ItemUsageValue::Calculate()
         return ITEM_USAGE_QUEST;
 
     // If the bot has the exact quest requirement amount, keep it to prevent a sell/buy cycle
-    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    for (auto const& questPair : botAI->GetCurrentQuestsRequiringItemId(proto->ItemId))
     {
-        uint32 entry = bot->GetQuestSlotQuestId(slot);
-        Quest const* quest = sObjectMgr->GetQuestTemplate(entry);
+        Quest const* quest = questPair.first;
         if (!quest)
             continue;
 
         for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
         {
-            if (quest->RequiredItemId[i] == proto->ItemId)
-            {
-                uint32 currentCount = AI_VALUE2(uint32, "item count", proto->Name1);
-                uint32 requiredCount = quest->RequiredItemCount[i];
+            if (quest->RequiredItemId[i] != proto->ItemId)
+                continue;
 
-                if (currentCount == requiredCount)
-                {
-                    LOG_DEBUG("playerbots", "{}: {} at exact quest requirement {} (quest {}), keeping", bot->GetName(), proto->Name1, requiredCount, entry);
-                    return ITEM_USAGE_KEEP;  // Have exact amount needed, keep it
-                }
+            uint32 currentCount = AI_VALUE2(uint32, "item count", proto->Name1);
+            uint32 requiredCount = quest->RequiredItemCount[i];
+
+            if (currentCount == requiredCount)
+            {
+                LOG_DEBUG("playerbots", "{}: {} at exact quest requirement {} (quest {}), keeping",
+                          bot->GetName(), proto->Name1, requiredCount, quest->GetQuestId());
+                return ITEM_USAGE_KEEP;  // Have exact amount needed, keep it
             }
         }
     }

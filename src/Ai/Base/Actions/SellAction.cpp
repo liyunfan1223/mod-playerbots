@@ -132,9 +132,8 @@ bool SellAction::Execute(Event event)
     {
         std::vector<Item*> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
         for (Item* item : items)
-        {
             Sell(item, true);
-        }
+
         return true;
     }
 
@@ -156,23 +155,16 @@ uint32 SellAction::GetQuestItemRequirement(uint32 itemId)
 {
     uint32 maxRequirement = 0;
 
-    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    for (auto const& questPair : botAI->GetCurrentQuestsRequiringItemId(itemId))
     {
-        uint32 questId = bot->GetQuestSlotQuestId(slot);
-        if (questId == 0)
-            continue;
-
-        Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
+        Quest const* quest = questPair.first;
         if (!quest)
             continue;
 
         for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
         {
-            if (quest->RequiredItemId[i] == itemId && quest->RequiredItemCount[i] > maxRequirement)
-            {
-                maxRequirement = quest->RequiredItemCount[i];
-                LOG_DEBUG("playerbots", "{}: item {} required {}x by active quest {}", bot->GetName(), itemId, maxRequirement, questId);
-            }
+            if (quest->RequiredItemId[i] == itemId)
+                maxRequirement = std::max(maxRequirement, quest->RequiredItemCount[i]);
         }
     }
 
