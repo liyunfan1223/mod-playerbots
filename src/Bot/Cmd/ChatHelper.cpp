@@ -446,7 +446,7 @@ std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count
         itemName = proto->Name1;
 
     std::ostringstream out;
-    out << "|c" << color << "|Hitem:" << proto->ItemId << ":0:0:0:0:0:0:0"
+    out << "|c" << color << "|Hitem:" << proto->ItemId << ":0:0:0:0:0:0:0:0"
         << "|h[" << itemName << "]|h|r";
 
     if (count > 1)
@@ -464,7 +464,7 @@ std::string const ChatHelper::FormatQItem(uint32 itemId)
     snprintf(color, sizeof(color), "%x", ItemQualityColors[0]);
 
     std::ostringstream out;
-    out << "|c" << color << "|Hitem:" << itemId << ":0:0:0:0:0:0:0"
+    out << "|c" << color << "|Hitem:" << itemId << ":0:0:0:0:0:0:0:0"
         << "|h[item"
         << "]|h|r";
 

@@ -7,7 +7,9 @@
 #include "PriestTriggers.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "TargetValue.h"
 
 bool ShadowProtectionTrigger::IsActive()
 {
@@ -70,10 +72,7 @@ bool MindSearChannelCheckTrigger::IsActive()
     {
         // Only trigger if the spell being channeled is Mind Sear
         if (MIND_SEAR_SPELL_IDS.count(spell->m_spellInfo->Id))
-        {
-            uint8 attackerCount = AI_VALUE(uint8, "attacker count");
-            return attackerCount < minEnemies;
-        }
+            return !HasEnoughAoeTargets(botAI, bot->GetPosition(), sPlayerbotAIConfig.SightDistance, minEnemies);
     }
 
     // Not channeling Mind Sear

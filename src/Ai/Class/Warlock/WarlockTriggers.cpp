@@ -8,7 +8,9 @@
 #include "GenericTriggers.h"
 #include "Player.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
+#include "TargetValue.h"
 
 static const uint32 SOUL_SHARD_ITEM_ID = 6265;
 
@@ -247,10 +249,7 @@ bool RainOfFireChannelCheckTrigger::IsActive()
     {
         // Only trigger if the spell being channeled is Rain of Fire
         if (RAIN_OF_FIRE_SPELL_IDS.count(spell->m_spellInfo->Id))
-        {
-            uint8 attackerCount = AI_VALUE(uint8, "attacker count");
-            return attackerCount < minEnemies;
-        }
+            return !HasEnoughAoeTargets(botAI, bot->GetPosition(), sPlayerbotAIConfig.SightDistance, minEnemies);
     }
 
     // Not channeling Rain of Fire
