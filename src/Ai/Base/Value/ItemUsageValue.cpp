@@ -175,21 +175,16 @@ ItemUsage ItemUsageValue::Calculate()
             return ammoUsage;
     }
 
-    // Temporary weapon enhancements (sharpening stones, weightstones, oils, poisons).
-    // Keep only the best stone/oil for each equipped weapon, or the best poison per family;
-    // obsolete or mismatched ones fall through to VENDOR/AH so the bot can sell them.
+    // Keep only the best stone/oil per weapon and the best poison per family; obsolete or
+    // mismatched enhancements fall through to VENDOR/AH.
     if (proto->Class == ITEM_CLASS_CONSUMABLE && IsTemporaryWeaponEnchantment(proto) && bot->CanUseItem(proto) == EQUIP_ERR_OK)
     {
-        // Rogue poisons: keep the best poison per family (a rogue applies one family per weapon;
-        // maintenance grants one instant + one other). Stones and oils also sit in subclass 8 but
-        // use generic spells (family 0 / no family flags), so they take the weapon branch below
-        // instead of being classified as poisons and sold.
+        // Rogue poisons only: stones/oils share consumable subclass 8 but use family-less spells,
+        // so they take the weapon branch below instead of being sold as obsolete poisons.
         if (IsRoguePoison(proto))
         {
-            // Keep the best poison of each family. KEEP stops the vendor buy/sell loop: with USE
-            // the bot bought up to 2 stacks, sold the excess past that (usage flipped to AH), and
-            // bought it back on the next visit. Maintenance refills the applied families
-            // (Instant and Deadly) through PlayerbotFactory::InitConsumables().
+            // KEEP stops a vendor buy/sell loop (USE bought 2 stacks, sold the excess as AH and
+            // bought it back next visit); maintenance refills the applied families.
             if (IsBestPoison(proto))
                 return ITEM_USAGE_KEEP;
         }
@@ -839,9 +834,8 @@ static SpellInfo const* GetTemporaryEnchantSpell(ItemTemplate const* proto)
     return nullptr;
 }
 
-// Rogue poisons are consumable-other items whose temporary enchant spell belongs to the rogue
-// family and carries a family flag per poison type. Sharpening stones, weightstones and oils are
-// the same subclass but use generic spells (family 0 / no flags).
+// True for rogue poisons: their temporary enchant spell is the rogue family and carries a
+// per-poison family flag (stones/oils share the subclass but use family-less spells).
 static bool IsRoguePoison(ItemTemplate const* proto)
 {
     if (proto->SubClass != ITEM_SUBCLASS_CONSUMABLE_OTHER)
@@ -859,16 +853,14 @@ bool ItemUsageValue::IsTemporaryWeaponEnchantment(ItemTemplate const* proto)
 
 bool ItemUsageValue::IsBestPoison(ItemTemplate const* proto)
 {
-    // Identify the poison family generically via the use spell's SpellFamilyFlags (distinct per
-    // family: instant/deadly/wound/crippling/mind-numbing/anesthetic), not hardcoded item ids.
+    // Family comes from the use spell's SpellFamilyFlags (per poison type), not item ids.
     if (!IsRoguePoison(proto))
         return false;
 
     SpellInfo const* useSpell = GetTemporaryEnchantSpell(proto);
 
-    // Keep only the best (highest item level) poison of each family: a rogue applies one family
-    // per weapon, and maintenance grants one instant + one other. Any lower-rank poison of the
-    // same family falls through to VENDOR/AH.
+    // Keep only the highest-item-level poison per family (one family per weapon); lower ranks
+    // fall through to VENDOR/AH.
     for (Item* item : botAI->GetInventoryItems())
     {
         ItemTemplate const* other = item->GetTemplate();
@@ -988,10 +980,8 @@ std::vector<uint32> ItemUsageValue::SpellsUsingItem(uint32 itemId, Player* bot)
         if (!spellInfo)
             continue;
 
-        // The server may skip the reagent cost for a spell (e.g. shaman's Reincarnation under
-        // the Glyph of Renewed Life's SPELL_AURA_NO_REAGENT_USE). Passive-flagged spells may still
-        // consume reagents when cast, so do not skip on SPELL_ATTR_PASSIVE - only skip spells
-        // for which the server itself will not take the reagent cost.
+        // Skip only spells the server itself will not charge reagents for (Glyph of Renewed Life);
+        // SPELL_ATTR_PASSIVE alone does not mean the reagent is unused.
         if (bot->CanNoReagentCast(spellInfo))
             continue;
 

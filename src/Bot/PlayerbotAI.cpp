@@ -5963,9 +5963,8 @@ void PlayerbotAI::ConsolidateItems()
 
         LOG_DEBUG("playerbots", "{}: consolidating item {} ({} stacks, max {})", bot->GetName(), entry, entryCount.second, proto->GetMaxStackSize());
 
-        // Merge partial stacks into the fullest stack, one move per pass, until at most one
-        // partial stack remains. Each pass re-collects the stacks: a move can delete a stack
-        // (source emptied) or fill one (target full).
+        // Merge partial stacks into the fullest stack one move per pass; each pass re-collects
+        // stacks because a move can empty the source or fill the target.
         for (uint8 pass = 0; pass < 128; ++pass)
         {
             std::vector<Item*> stacks;
@@ -6000,15 +5999,11 @@ void PlayerbotAI::ConsolidateItems()
             LOG_DEBUG("playerbots", "{}: consolidate item {}: move {} from bag {} slot {} to bag {} slot {} ({} -> {})",
                 bot->GetName(), entry, moveCount, source->GetBagSlot(), source->GetSlot(), target->GetBagSlot(), target->GetSlot(), target->GetCount(), target->GetCount() + moveCount);
 
-            // Move `moveCount` from the source stack to the target stack. The items are not
-            // consumed, only re-stacked, so no quest-progress adjustment.
+            // Re-stack the items (not consumed), so no quest-progress adjustment.
             if (source->GetCount() <= moveCount)
             {
-                // Do NOT use Player::DestroyItem here: it fires ItemRemovedQuestCheck, which
-                // decrements delivery-quest progress even though the items aren't consumed
-                // (the total count is unchanged after the merge). RemoveItem unlinks the
-                // stack without firing the quest hook; finish the removal the same way the
-                // core's stack-merge path does (Player::_StoreItem).
+                // Do NOT use Player::DestroyItem: ItemRemovedQuestCheck would decrement delivery-quest
+                // progress even though the total count is unchanged. Mirror the core's _StoreItem path.
                 bot->RemoveItem(source->GetBagSlot(), source->GetSlot(), true);
                 if (source->IsInWorld())
                 {
