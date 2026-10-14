@@ -41,6 +41,7 @@
 #include "TravelMgr.h"
 #include "G3D/Vector2.h"
 #include <algorithm>
+#include <cmath>
 #include <limits>
 #include <utility>
 
@@ -1152,9 +1153,8 @@ bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, Wor
 
     if (questAware && sPlayerbotAIConfig.QuestAwareTaxi)
     {
-        // Land near the bot's quests: score each destination node by the closest active objective,
-        // turn-in or available quest giver, then weighted-random among the best three.
-        std::vector<WorldLocation> const giverLocs = sTravelMgr.GetValidQuestGiverLocations(bot);
+        // Land near the bot's quests: score each destination node by the distance to its closest
+        // active objective or turn-in, then weighted-random among the best three.
         std::vector<std::pair<float, size_t>> scored;
         for (size_t i = 0; i < availablePaths.size(); ++i)
         {
@@ -1165,7 +1165,9 @@ bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, Wor
             float dist = std::numeric_limits<float>::max();
             auto consider = [&](float x, float y)
             {
-                float d = bot->GetDistance2d(x, y);
+                float const dx = node->x - x;
+                float const dy = node->y - y;
+                float const d = std::sqrt(dx * dx + dy * dy);
                 if (d < dist)
                     dist = d;
             };
@@ -1184,8 +1186,6 @@ bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, Wor
                         consider(poi.pos.x, poi.pos.y);
                 }
             }
-            for (WorldLocation const& loc : giverLocs)
-                consider(loc.GetPositionX(), loc.GetPositionY());
 
             if (dist < std::numeric_limits<float>::max())
                 scored.emplace_back(dist, i);
