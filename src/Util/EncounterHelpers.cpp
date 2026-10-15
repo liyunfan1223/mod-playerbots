@@ -71,6 +71,9 @@ bool CanTakeStepTowards(
     if (candidateZ <= INVALID_HEIGHT)
         candidateZ = botZ;
 
+    // The ninth parameter of CanReachPositionAndGetValidCoords(), failOnSlopes, returns false for a
+    // non-walkable slope, but in my experience, walking downhill is always possible, and thus the
+    // check needlessly rejects descents. This variable gets around that problem.
     bool const failOnSlopes = candidateZ > botZ;
 
     // This helper will return false on collision rather than clamping to the contact point so that

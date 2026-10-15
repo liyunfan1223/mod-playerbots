@@ -200,12 +200,16 @@ inline constexpr float ZULJIN_SPREAD_Z = 45.111f;
 
 // Centerish of the platform
 inline Position const ZULJIN_TANK_POSITION = { 120.210f, 705.564f, 45.111f };
+
+// Ranged are ordered by healers first. The healer positions are centered at (1) the bottom of the
+// stairs leading to Zul'jin's starting spot and (2) the top of the stairs leading to his battle
+// area. The intent is to allow each healer to reach every other bot's position (accordingly, every
+// position is within 39y of both healer positions).
 inline std::array<Position, 8> const ZULJIN_SPREAD_POSITIONS = {{
-    // Healer slots. Bottom of the stairs leading to Zul'jin's starting spot, and top of the stairs
-    // where his battle area begins.
+    // Healer positions.
     Position(120.462f, 728.502f, ZULJIN_SPREAD_Z),
     Position(119.984f, 693.188f, ZULJIN_SPREAD_Z),
-    // Ranged dps slots. Three positions each at opposite ends of the platform.
+    // Ranged dps positions. Three positions each at opposite ends of the platform.
     Position(94.939f, 713.698f, ZULJIN_SPREAD_Z),
     Position(145.286f, 713.034f, ZULJIN_SPREAD_Z),
     Position(103.869f, 728.703f, ZULJIN_SPREAD_Z),
