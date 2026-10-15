@@ -885,32 +885,53 @@ uint32 RandomPlayerbotMgr::RemoveRandomBots()
     uint32 toRemove = std::min(sPlayerbotAIConfig.RandomBotsPerInterval,
                                (uint32)(currentBots.size() - maxAllowedBotCount));
 
-    // Collect the online bots that are safe to log out, split by faction.
+    // Ineligible bots still count toward their faction, as they keep occupying its share.
     std::vector<ObjectGuid> allianceBots;
     std::vector<ObjectGuid> hordeBots;
+    uint32 onlineAlliance = 0;
+    uint32 onlineHorde = 0;
     for (auto const& [guid, bot] : playerBots)
     {
+        if (!IsRandomBot(bot))
+            continue;
+
+        bool isAlliance = IsAlliance(bot->getRace());
+        if (isAlliance)
+            onlineAlliance++;
+        else
+            onlineHorde++;
+
         if (!IsRemovableBot(bot))
             continue;
 
-        if (IsAlliance(bot->getRace()))
+        if (isAlliance)
             allianceBots.push_back(guid);
         else
             hordeBots.push_back(guid);
     }
 
-    // Split the removal across factions by the configured ratio. The resulting ratio might be skewed by a few
-    // percentages, as the approach used here is the same approach as AddRandomBots.
+    // Each faction is trimmed to its share of the target, so one at or below its share is left alone.
     uint32 totalRatio = sPlayerbotAIConfig.RandomBotAllianceRatio + sPlayerbotAIConfig.RandomBotHordeRatio;
-    uint32 removeAlliance = toRemove * sPlayerbotAIConfig.RandomBotAllianceRatio / totalRatio;
-    uint32 remainder = toRemove * sPlayerbotAIConfig.RandomBotAllianceRatio % totalRatio;
+    uint32 keepAlliance = maxAllowedBotCount * sPlayerbotAIConfig.RandomBotAllianceRatio / totalRatio;
+    uint32 remainder = maxAllowedBotCount * sPlayerbotAIConfig.RandomBotAllianceRatio % totalRatio;
     if (remainder && urand(1, totalRatio) <= remainder)
-        removeAlliance++;
-    uint32 removeHorde = toRemove - removeAlliance;
+        keepAlliance++;
+    uint32 keepHorde = maxAllowedBotCount - keepAlliance;
+
+    uint32 removeAlliance = onlineAlliance > keepAlliance ? onlineAlliance - keepAlliance : 0;
+    uint32 removeHorde = onlineHorde > keepHorde ? onlineHorde - keepHorde : 0;
 
     // Never remove more than are actually available in each faction this tick.
     removeAlliance = std::min(removeAlliance, (uint32)allianceBots.size());
     removeHorde = std::min(removeHorde, (uint32)hordeBots.size());
+
+    // Proportional split, so a budget-limited tick does not drain one faction first.
+    if (removeAlliance + removeHorde > toRemove)
+    {
+        uint32 budgetAlliance = toRemove * removeAlliance / (removeAlliance + removeHorde);
+        removeAlliance = std::min(removeAlliance, budgetAlliance);
+        removeHorde = std::min(removeHorde, toRemove - budgetAlliance);
+    }
 
     std::vector<ObjectGuid> toLogout;
     toLogout.insert(toLogout.end(), allianceBots.begin(), allianceBots.begin() + removeAlliance);
