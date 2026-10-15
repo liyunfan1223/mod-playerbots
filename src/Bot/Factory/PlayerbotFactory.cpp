@@ -3913,8 +3913,16 @@ static void DestroyObsoleteAmmo(Player* bot, ItemTemplate const* ammo)
         if (proto->Class != ITEM_CLASS_PROJECTILE || proto->ItemId == ammo->ItemId)
             return;
 
-        // Stronger ammo is left alone, it was handed over by a player
-        if (proto->SubClass != ammo->SubClass || proto->Damage[0].DamageMax < ammo->Damage[0].DamageMax)
+        if (proto->SubClass != ammo->SubClass)
+        {
+            obsolete.push_back(item);
+            return;
+        }
+
+        // Ranked as in RandomItemMgr::BuildCacheAmmo(); ammo above the stocked kind can only come from a player
+        uint32 const stack = proto->GetMaxStackSize();
+        uint32 const ammoStack = ammo->GetMaxStackSize();
+        if (stack < ammoStack || (stack == ammoStack && proto->ItemLevel <= ammo->ItemLevel))
             obsolete.push_back(item);
     };
 
