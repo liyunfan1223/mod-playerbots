@@ -859,13 +859,13 @@ bool RandomPlayerbotMgr::IsRemovableBot(Player* bot)
         if (botAI->HasGameClientMaster())
             return false;
 
-    // Grouped with a real player. (PR #2592 may fold this into the master check above.)
+    // Grouped with a human (including a selfbot).
     if (Group* group = bot->GetGroup())
     {
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->GetSource();
-            if (member && member != bot && !GET_PLAYERBOT_AI(member))
+            if (IsRealPlayer(member) || IsSelfBot(member))
                 return false;
         }
     }
