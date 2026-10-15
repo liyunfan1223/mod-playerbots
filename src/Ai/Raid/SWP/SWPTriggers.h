@@ -482,7 +482,7 @@ class MuruVoidSentinelShouldBeTankedTrigger : public SunwellEncounterTrigger
 {
 public:
     MuruVoidSentinelShouldBeTankedTrigger(PlayerbotAI* botAI)
-        : SunwellEncounterTrigger(botAI, "m'uru void sentinel pulses shadow") {}
+        : SunwellEncounterTrigger(botAI, "m'uru void sentinel should be tanked") {}
 
 protected:
     bool IsActiveInEncounter() override;

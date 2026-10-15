@@ -534,9 +534,6 @@ float EredarTwinsHoldDpsAtStartMultiplier::GetValueInEncounter(Action* action)
     if (dynamic_cast<CastHealingSpellAction*>(action))
         return 1.0f;
 
-    if (dynamic_cast<EredarTwinsMisdirectToTanksAction*>(action))
-        return 1.0f;
-
     if (PlayerbotAI::IsMelee(bot) && bot->GetPositionZ() > EREDAR_TWINS_BALCONY_Z)
         return 1.0f;
 
