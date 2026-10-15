@@ -142,7 +142,7 @@ float HighKingMaulgarLetMageTankStealSpellShieldMultiplier::GetValueInEncounter(
     }
 
     Unit* target = action->GetTarget();
-    return target && target->GetEntry() != Id(GruulNpcs::NPC_KROSH_FIREHAND) ? 0.0f : 1.0f;
+    return target && target->GetEntry() == Id(GruulNpcs::NPC_KROSH_FIREHAND) ? 0.0f : 1.0f;
 }
 
 float HighKingMaulgarControlMisdirectionMultiplier::GetValueInEncounter(Action* action)
