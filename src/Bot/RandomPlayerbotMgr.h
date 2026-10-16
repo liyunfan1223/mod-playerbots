@@ -256,7 +256,7 @@ private:
     std::unordered_map<uint32, BotEventCache> eventCache;
     std::unordered_set<uint32> currentBots;
     uint32 playersLevel;
-    // Real players' (map, zone), built on the world thread: teleports also run on map threads.
+    // Written on the world thread, read from map threads.
     std::set<std::pair<uint32, uint32>> _playerZones;
     std::mutex _playerZonesLock;
 

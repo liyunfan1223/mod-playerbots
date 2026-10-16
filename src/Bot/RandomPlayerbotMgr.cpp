@@ -1904,7 +1904,6 @@ std::vector<WorldLocation> RandomPlayerbotMgr::GetPlayerZoneTeleportLocations(st
                 continue;
         }
 
-        // Same reason: RandomTeleport also rejects maps outside RandomBotMaps and far starter-level spots.
         if (std::find(sPlayerbotAIConfig.RandomBotMaps.begin(), sPlayerbotAIConfig.RandomBotMaps.end(),
                       loc.GetMapId()) == sPlayerbotAIConfig.RandomBotMaps.end())
             continue;
@@ -1918,19 +1917,16 @@ std::vector<WorldLocation> RandomPlayerbotMgr::GetPlayerZoneTeleportLocations(st
     return filtered;
 }
 
-// World thread only: reads the players list and their positions.
+// World thread only.
 void RandomPlayerbotMgr::UpdatePlayerZones()
 {
     std::set<std::pair<uint32, uint32>> playerMapZones;
 
-    // players holds real players and their alt and addclass bots, never random bots: a pass over the online
-    // player list, not a world-wide scan.
     for (Player* player : players)
     {
         if (!player || !player->IsInWorld() || player->IsGameMaster())
             continue;
 
-        // Alt and addclass bots do not attract random bots, only human-controlled characters do.
         if (!IsRealPlayer(player) && !IsSelfBot(player))
             continue;
 
@@ -1938,12 +1934,10 @@ void RandomPlayerbotMgr::UpdatePlayerZones()
         if (!map)
             continue;
 
-        // A WorldLocation carries no instance id: a bot sent to a dungeon, raid or battleground map
-        // would land in another instance than the player's.
+        // WorldLocation has no instance id.
         if (map->Instanceable())
             continue;
 
-        // Unphased terrain, as for the candidate locations, so a player in a phased area matches its zone.
         uint32 zoneId =
             map->GetZoneId(PHASEMASK_NORMAL, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
         playerMapZones.insert(std::make_pair(map->GetId(), zoneId));

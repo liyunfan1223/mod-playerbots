@@ -4491,7 +4491,7 @@ const std::vector<WorldLocation> TravelMgr::GetTeleportLocations(Player* bot)
         : bot->GetTeamId() == TEAM_ALLIANCE      ? allianceHubsPerLevelCache
                                                  : hordeHubsPerLevelCache;
 
-    // find(), not operator[]: this is called from map threads and must not insert into the shared caches.
+    // Called from map threads: find() must not insert.
     auto itr = cache.find(static_cast<uint8>(level));
     return itr != cache.end() ? itr->second : std::vector<WorldLocation>();
 }
@@ -4879,5 +4879,15 @@ void TravelMgr::PrepareDestinationCache()
             break;
         }
     }
+
+    for (uint32 level = 1; level <= maxLevel; ++level)
+    {
+        uint8 const key = static_cast<uint8>(level);
+        locsPerLevelCache.try_emplace(key);
+        allianceHubsPerLevelCache.try_emplace(key);
+        hordeHubsPerLevelCache.try_emplace(key);
+        bankerLocsPerLevelCache.try_emplace(key);
+    }
+
     LOG_INFO("playerbots", ">> {} flight masters and {} innkeepers and {} banker locations for level collected.", flightMastersCount, innkeepersCount, bankerCount);
 }
