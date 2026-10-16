@@ -17,6 +17,7 @@
 #include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 #include "TravelMgr.h"
+#include <algorithm>
 #include <cctype>
 #include <iostream>
 #include <sstream>
@@ -220,6 +221,17 @@ bool PlayerbotAIConfig::Initialize()
                                            "3973,4085,4086,4087,4088,251"),
         PvpProhibitedAreaIds);
     FastReactInBG = sConfigMgr->GetOption<bool>("Playerbots.FastReactInBG", true);
+    PvpFlagInteractionDelayMin = sConfigMgr->GetOption<uint32>("Playerbots.PvpFlagInteractionDelayMin", 1000);
+    PvpFlagInteractionDelayMax = sConfigMgr->GetOption<uint32>("Playerbots.PvpFlagInteractionDelayMax", 3000);
+    PvpInterruptReactionDelayMin = sConfigMgr->GetOption<uint32>("Playerbots.PvpInterruptReactionDelayMin", 1000);
+    PvpInterruptReactionDelayMax = sConfigMgr->GetOption<uint32>("Playerbots.PvpInterruptReactionDelayMax", 3000);
+
+    if (PvpFlagInteractionDelayMin > PvpFlagInteractionDelayMax)
+        std::swap(PvpFlagInteractionDelayMin, PvpFlagInteractionDelayMax);
+
+    if (PvpInterruptReactionDelayMin > PvpInterruptReactionDelayMax)
+        std::swap(PvpInterruptReactionDelayMin, PvpInterruptReactionDelayMax);
+
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("Playerbots.RandomBotQuestIds", "3802,5505,6502,7761,7848,10277,10285,11492,"
                                            "13188,13189,24499,24511,24710,24712"),

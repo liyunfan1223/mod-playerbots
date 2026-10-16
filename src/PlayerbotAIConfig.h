@@ -306,6 +306,10 @@ public:
     std::vector<uint32> PvpProhibitedZoneIds;
     std::vector<uint32> PvpProhibitedAreaIds;
     bool FastReactInBG;
+    uint32 PvpFlagInteractionDelayMin;
+    uint32 PvpFlagInteractionDelayMax;
+    uint32 PvpInterruptReactionDelayMin;
+    uint32 PvpInterruptReactionDelayMax;
 
     bool RandomBotsWalkingRPG;
     bool RandomBotsWalkingRPGInDoors;

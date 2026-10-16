@@ -29,6 +29,7 @@
 #include "PositionValue.h"
 #include "PvpTriggers.h"
 #include "ServerFacade.h"
+#include "Timer.h"
 #include "Vehicle.h"
 #include <algorithm>
 
@@ -3318,6 +3319,8 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
 
 bool BGTactics::resetObjective()
 {
+    ResetFlagInteractionDelay();
+
     Battleground* bg = bot->GetBattleground();
     if (!bg)
         return false;
@@ -3351,6 +3354,44 @@ bool BGTactics::resetObjective()
     posMap["bg objective"] = pos;
 
     return selectObjective(true);
+}
+
+void BGTactics::ResetFlagInteractionDelay()
+{
+    _flagInteractionTarget.Clear();
+    _flagInteractionStartedAt = 0;
+    _flagInteractionDelay = 0;
+    _flagInteractionReady = false;
+}
+
+bool BGTactics::ShouldDelayFlagInteraction(GameObject* flag)
+{
+    uint32 const minDelay = sPlayerbotAIConfig.PvpFlagInteractionDelayMin;
+    uint32 const maxDelay = sPlayerbotAIConfig.PvpFlagInteractionDelayMax;
+    if (!flag || (!minDelay && !maxDelay))
+    {
+        ResetFlagInteractionDelay();
+        return false;
+    }
+
+    if (_flagInteractionTarget != flag->GetGUID())
+    {
+        _flagInteractionTarget = flag->GetGUID();
+        _flagInteractionStartedAt = getMSTime();
+        _flagInteractionDelay = urand(minDelay, maxDelay);
+        _flagInteractionReady = !_flagInteractionDelay;
+    }
+
+    if (!_flagInteractionReady && getMSTimeDiff(_flagInteractionStartedAt, getMSTime()) >= _flagInteractionDelay)
+        _flagInteractionReady = true;
+
+    if (_flagInteractionReady)
+        return false;
+
+    if (bot->isMoving())
+        bot->StopMoving();
+
+    return true;
 }
 
 bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 currentPoint, bool reverse)
@@ -3529,6 +3570,13 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
     BattlegroundTypeId bgType = bg->GetBgTypeID();
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
+
+    if (!_flagInteractionTarget.IsEmpty())
+    {
+        GameObject* reactionFlag = botAI->GetGameObject(_flagInteractionTarget);
+        if (!reactionFlag || !reactionFlag->isSpawned() || bot->GetDistance(reactionFlag) >= INTERACTION_DISTANCE)
+            ResetFlagInteractionDelay();
+    }
 
     // Initialize vectors for nearby objects and players
     GuidVector closeObjects;
@@ -3777,6 +3825,9 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
         if (isWsBaseFlag && bgType == BATTLEGROUND_WS &&
             !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG)))
             continue;
+
+        if (dist < INTERACTION_DISTANCE && ShouldDelayFlagInteraction(go))
+            return true;
 
         // Handle capture mechanics based on BG type
         switch (bgType)

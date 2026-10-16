@@ -49,6 +49,7 @@
 #include "ServerFacade.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "Transport.h"
@@ -4437,6 +4438,66 @@ bool PlayerbotAI::IsInterruptableSpellCasting(Unit* target, std::string const sp
     }
 
     return false;
+}
+
+bool PlayerbotAI::IsPvpInterruptReactionReady(Unit* target)
+{
+    if (!IsValidUnit(target) || !target->IsPlayer())
+        return true;
+
+    uint32 const minDelay = sPlayerbotAIConfig.PvpInterruptReactionDelayMin;
+    uint32 const maxDelay = sPlayerbotAIConfig.PvpInterruptReactionDelayMax;
+    if (!minDelay && !maxDelay)
+        return true;
+
+    Spell* currentSpell = target->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    if (!currentSpell)
+        currentSpell = target->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+
+    SpellInfo const* spellInfo = currentSpell ? currentSpell->GetSpellInfo() : nullptr;
+    if (!spellInfo)
+        return false;
+
+    uint32 const now = getMSTime();
+    ObjectGuid const targetGuid = target->GetGUID();
+    PvpInterruptReactionState* reaction = nullptr;
+    for (PvpInterruptReactionState& candidate : _pvpInterruptReactions)
+    {
+        if (candidate.target == targetGuid)
+        {
+            reaction = &candidate;
+            break;
+        }
+    }
+
+    if (!reaction)
+    {
+        reaction = &_pvpInterruptReactions[0];
+        for (PvpInterruptReactionState& candidate : _pvpInterruptReactions)
+        {
+            uint32 const candidateAge = getMSTimeDiff(candidate.lastSeenAt, now);
+            uint32 const oldestAge = getMSTimeDiff(reaction->lastSeenAt, now);
+            if (candidate.target.IsEmpty() || candidateAge > oldestAge)
+                reaction = &candidate;
+        }
+    }
+
+    int32 const castTimeRemaining = currentSpell->GetCastTimeRemaining();
+    bool const newCast = reaction->target != targetGuid || reaction->spellId != spellInfo->Id ||
+                         reaction->castCount != currentSpell->m_cast_count ||
+                         castTimeRemaining > reaction->castTimeRemaining;
+    if (newCast)
+    {
+        reaction->target = targetGuid;
+        reaction->spellId = spellInfo->Id;
+        reaction->castCount = currentSpell->m_cast_count;
+        reaction->startedAt = now;
+        reaction->delay = urand(minDelay, maxDelay);
+    }
+
+    reaction->castTimeRemaining = castTimeRemaining;
+    reaction->lastSeenAt = now;
+    return getMSTimeDiff(reaction->startedAt, now) >= reaction->delay;
 }
 
 bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
