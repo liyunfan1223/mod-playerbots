@@ -1142,7 +1142,13 @@ void PlayerbotAI::HandleCommand(uint32 type, std::string const text, Player* fro
                 TellMaster(message);
             }
 
-            masterBotMgr->LogoutPlayerBot(bot->GetGUID(), true);
+            // Logout is refused by core (bot is in combat, falling, dueling, or AFK).
+            if (!masterBotMgr->LogoutPlayerBot(bot->GetGUID(), true) && type == CHAT_MSG_WHISPER)
+            {
+                std::string message = PlayerbotTextMgr::instance().GetBotTextOrDefault(
+                    "logout_refused", "I can't log out right now!", {});
+                TellMaster(message);
+            }
         }
         else if (type == CHAT_MSG_WHISPER)
         {
