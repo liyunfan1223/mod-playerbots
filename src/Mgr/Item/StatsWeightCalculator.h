@@ -63,6 +63,8 @@ private:
     uint8 cls;
     uint8 lvl;
     int tab;
+    bool healSpec_;
+    bool casterSpec_;
     bool enable_overflow_penalty_;
     bool enable_item_set_bonus_;
 

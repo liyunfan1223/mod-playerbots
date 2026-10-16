@@ -46,9 +46,12 @@ enum StatsType : uint8
     // Stats for weapon dps
     STATS_TYPE_MELEE_DPS,
     STATS_TYPE_RANGED_DPS,
+    // Threat reduction in percent (+2% threat counts as -2) and resistance to all magic schools
+    STATS_TYPE_THREAT_REDUCTION,
+    STATS_TYPE_RESISTANCE,
     // Bonus for unrecognized stats
     STATS_TYPE_BONUS,
-    STATS_TYPE_MAX = 26
+    STATS_TYPE_MAX = 28
 };
 
 enum CollectorType : uint8
@@ -82,11 +85,12 @@ private:
     void CollectItemStatValues(ItemTemplate const* proto, ScalingStatDistributionEntry const* ssd,
                                ScalingStatValuesEntry const* ssv);
     void CollectByItemStatType(uint32 itemStatType, int32 val);
+    void CollectMagicResistance(uint32 schoolMask, float val);
     bool SpecialSpellFilter(uint32 spellId);
     bool SpecialEnchantFilter(uint32 enchantSpellId);
 
     void HandleApplyAura(SpellEffectInfo const& effectInfo, float multiplier, bool canNextTrigger,
-                         Milliseconds triggerCooldown);
+                         Milliseconds triggerCooldown, bool permanent);
     float AverageValue(SpellEffectInfo const& effectInfo);
 
 private:

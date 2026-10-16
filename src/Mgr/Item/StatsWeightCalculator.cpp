@@ -63,6 +63,9 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
     lvl = player->GetLevel();
     tab = AiFactory::GetPlayerSpecTab(player);
     collector_ = std::make_unique<StatsCollector>(type_, cls, lvl);
+    // By talent spec, like the weights in GenerateBasicWeights(); type_ follows the strategies
+    healSpec_ = PlayerbotAI::IsHeal(player, true);
+    casterSpec_ = !healSpec_ && PlayerbotAI::IsCaster(player, true);
 
     if (cls == CLASS_DEATH_KNIGHT && tab == DEATH_KNIGHT_TAB_UNHOLY)
         hitOverflowType_ = CollectorType::SPELL;
@@ -545,6 +548,21 @@ void StatsWeightCalculator::GenerateAdditionalWeights(Player* player)
         if (!HasAnySpell(player, SPELL_FEL_ARMOR_RANKS))
             stats_weights_[STATS_TYPE_SPIRIT] -= 0.4f;
     }
+
+    // Healers would rather survive the hits (Greater Resistance), casters shed threat (Enchant Cloak - Subtlety),
+    // tanks want more threat (Enchant Gloves - Threat). Melee and hunters weigh neither.
+    if (healSpec_)
+    {
+        stats_weights_[STATS_TYPE_THREAT_REDUCTION] += 2.0f;
+        stats_weights_[STATS_TYPE_RESISTANCE] += 1.0f;
+    }
+    else if (casterSpec_)
+    {
+        stats_weights_[STATS_TYPE_THREAT_REDUCTION] += 4.0f;
+        stats_weights_[STATS_TYPE_RESISTANCE] += 0.5f;
+    }
+    else if (type_ == CollectorType::MELEE_TANK)
+        stats_weights_[STATS_TYPE_THREAT_REDUCTION] -= 4.0f;
 
     if (pvpSpec_ && !exclude_resilience_)
         stats_weights_[STATS_TYPE_RESILIENCE] += 7.0f;
