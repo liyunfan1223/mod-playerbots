@@ -67,9 +67,6 @@ class ReachPartyMemberToResurrectAction : public ReachTargetAction
 public:
     ReachPartyMemberToResurrectAction(PlayerbotAI* botAI);
 
-    bool isUseful() override;
-    bool isPossible() override;
-    bool Execute(Event event) override;
     std::string const GetTargetName() override;
 };
 

@@ -61,9 +61,9 @@ Unit* EnemyPlayerValue::Calculate()
     for (auto const& [guid, combatRef] : bot->GetCombatManager().GetPvPCombatRefs())
     {
         Unit* pTarget = combatRef->GetOther(bot);
-        if (IsUnavailableWsgCombatTarget(bot, pTarget))
+        if (IsUnavailableCombatTarget(bot, pTarget))
             continue;
-        if (!pTarget || pTarget == pVictim || !pTarget->IsPlayer() ||
+        if (pTarget == pVictim || !pTarget->IsPlayer() ||
             !(bot->InBattleground() ? bot->CanSeeOrDetect(pTarget) : pTarget->CanSeeOrDetect(bot)) ||
             !bot->IsWithinDist(pTarget, VISIBILITY_DISTANCE_NORMAL))
             continue;
@@ -91,7 +91,7 @@ Unit* EnemyPlayerValue::Calculate()
     for (auto const& gTarget : players)
     {
         Unit* pUnit = botAI->GetUnit(gTarget);
-        if (!pUnit || IsUnavailableWsgCombatTarget(bot, pUnit))
+        if (!pUnit || IsUnavailableCombatTarget(bot, pUnit))
             continue;
 
         Player* pTarget = dynamic_cast<Player*>(pUnit);
@@ -141,7 +141,7 @@ Unit* EnemyPlayerValue::Calculate()
                     continue;
 
                 if (Unit* pAttacker = pMember->getAttackerForHelper())
-                    if (!IsUnavailableWsgCombatTarget(bot, pAttacker) && pAttacker->IsPlayer() &&
+                    if (!IsUnavailableCombatTarget(bot, pAttacker) && pAttacker->IsPlayer() &&
                         bot->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) && bot->IsWithinLOSInMap(pAttacker) &&
                         pAttacker != pVictim &&
                         (bot->InBattleground() ? bot->CanSeeOrDetect(pAttacker) : pAttacker->CanSeeOrDetect(bot)))

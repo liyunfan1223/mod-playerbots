@@ -13,7 +13,7 @@
 bool InvalidTargetValue::Calculate()
 {
     Unit* target = AI_VALUE(Unit*, qualifier);
-    if (IsUnavailableWsgCombatTarget(bot, target))
+    if (IsUnavailableCombatTarget(bot, target))
         return true;
 
     Unit* enemy = AI_VALUE(Unit*, "enemy player target");

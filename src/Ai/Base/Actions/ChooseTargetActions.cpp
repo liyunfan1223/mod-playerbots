@@ -30,10 +30,11 @@ bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
     Battleground* bg = bot->GetBattleground();
-    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
+    if (sPlayerbotAIConfig.EnableWsgTactics && bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
     {
         if (botAI->GetState() == BOT_STATE_COMBAT && AI_VALUE(Unit*, "current target") == target)
             return false;
+        // A queued action can outlive the trigger that selected the carrier.
         return CanRespondToWsgCarrier(botAI, target);
     }
 
@@ -42,14 +43,6 @@ bool AttackEnemyFlagCarrierAction::isUseful()
         return false;
 
     return PlayerHasFlag::IsCapturingFlag(bot);
-}
-
-bool AttackEnemyFlagCarrierAction::Execute(Event event)
-{
-    Battleground* bg = bot->GetBattleground();
-    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS && !CanRespondToWsgCarrier(botAI, GetTarget()))
-        return false;
-    return AttackAction::Execute(event);
 }
 
 bool AggressiveTargetAction::isUseful()

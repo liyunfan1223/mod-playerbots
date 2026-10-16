@@ -90,7 +90,6 @@ public:
 
     std::string const GetTargetName() override { return "enemy flag carrier"; }
     bool isUseful() override;
-    bool Execute(Event event) override;
 };
 
 class DropTargetAction : public Action

@@ -194,18 +194,16 @@ bool CheckMountStateAction::isUseful()
     if (bot->HasAuraType(SPELL_AURA_TRANSFORM) && bot->IsInDisallowedMountForm())
         return false;
 
+    // Mount attempts stop movement, including active jumps.
+    if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == EFFECT_MOTION_TYPE && bot->movespline &&
+        !bot->movespline->Finalized())
+        return false;
+
     // BG Logic
     if (bot->InBattleground())
     {
         // Do not use when carrying BG Flags
         if (bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) || bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL))
-            return false;
-
-        // Mount attempts stop movement; defer them during active WSG effects, including graveyard jumps.
-        Battleground* bg = bot->GetBattleground();
-        if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS &&
-            bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == EFFECT_MOTION_TYPE && bot->movespline &&
-            !bot->movespline->Finalized())
             return false;
 
         // Only mount if BG starts in less than 30 sec

@@ -384,6 +384,7 @@ bool PlayerbotAIConfig::Initialize()
     GuildRepliesRate = sConfigMgr->GetOption<int32>("Playerbots.GuildRepliesRate", 100);                 // 0-100
 
     RandomBotJoinBG = sConfigMgr->GetOption<bool>("Playerbots.RandomBotJoinBG", true);
+    EnableWsgTactics = sConfigMgr->GetOption<bool>("Playerbots.EnableWsgTactics", false);
     RandomBotAutoJoinBG = sConfigMgr->GetOption<bool>("Playerbots.RandomBotAutoJoinBG", false);
 
     RandomBotAutoJoinArenaBracket = sConfigMgr->GetOption<int32>("Playerbots.RandomBotAutoJoinArenaBracket", 14);

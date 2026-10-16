@@ -115,12 +115,14 @@ bool AttackAction::Attack(Unit* target, bool /*with_pet*/ /*true*/)
     {
         if (verbose)
             botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-                "attack_target_dead_error", "%target is dead.", {{"%target", target->GetName()}}));
+                "attack_target_dead_error",
+                "%target is dead.",
+                {{"%target", target->GetName()}}));
 
         return false;
     }
 
-    if (IsUnavailableWsgCombatTarget(bot, target))
+    if (IsUnavailableCombatTarget(bot, target))
         return false;
 
     if (!bot->IsWithinLOSInMap(target))

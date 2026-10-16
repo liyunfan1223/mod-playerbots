@@ -209,13 +209,13 @@ class ResurrectPartyMemberAction : public CastSpellAction
 public:
     ResurrectPartyMemberAction(PlayerbotAI* botAI, std::string const spell) : CastSpellAction(botAI, spell) {}
 
-    bool isUseful() override;
-    bool isPossible() override;
-    bool Execute(Event event) override;
     std::string const GetTargetName() override { return "party member to resurrect"; }
     std::vector<NextAction> getPrerequisites() override
     {
-        return NextAction::merge({NextAction("reach party member to resurrect")}, Action::getPrerequisites());
+        return NextAction::merge(
+            { NextAction("reach party member to resurrect") },
+            Action::getPrerequisites()
+        );
     }
 };
 

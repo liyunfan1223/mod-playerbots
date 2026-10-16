@@ -7,9 +7,11 @@
 #ifndef PLAYERBOTS_BATTLEGROUNDTACTICS_H
 #define PLAYERBOTS_BATTLEGROUNDTACTICS_H
 
+#include "AiObjectContext.h"
 #include "BattlegroundAV.h"
 #include "ChooseTargetActions.h"
 #include "MovementActions.h"
+#include "WsgRouteState.h"
 
 class ChatHandler;
 class Battleground;
@@ -59,23 +61,13 @@ enum EYBotStrategy : uint8
     EY_STRATEGY_MAX           = 4
 };
 
-typedef void (*BattleBotWaypointFunc)();
-
 struct BGStrategyData
 {
     uint8 allianceStrategy = 0;
     uint8 hordeStrategy = 0;
 };
 
-struct BattleBotWaypoint
-{
-    BattleBotWaypoint(float x_, float y_, float z_, BattleBotWaypointFunc func) : x(x_), y(y_), z(z_), pFunc(func){};
-
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    BattleBotWaypointFunc pFunc = nullptr;
-};
+extern std::unordered_map<uint32, BGStrategyData> bgStrategies;
 
 struct AVNodePositionData
 {
@@ -102,8 +94,6 @@ static std::unordered_map<uint8, AVNodePositionData> AVNodeMovementTargets = {
     {BG_AV_NODES_FROSTWOLF_WTOWER, {Position(-1300.648f, -267.356f, 114.151f), 0.0f}},
 };
 
-typedef std::vector<BattleBotWaypoint> BattleBotPath;
-
 extern std::vector<BattleBotPath*> const vPaths_WS;
 extern std::vector<BattleBotPath*> const vPaths_AB;
 extern std::vector<BattleBotPath*> const vPaths_AV;
@@ -115,24 +105,49 @@ class BGTactics : public MovementAction
 public:
     static bool HandleConsoleCommand(ChatHandler* handler, char const* args);
     uint8 static GetBotStrategyForTeam(Battleground* bg, TeamId teamId);
-    static void SetBotStrategies(uint32 instanceId, BGStrategyData const& data);
-    static void ClearBotStrategies(uint32 instanceId);
     static uint8 GetWsgDefenderCount(Battleground* bg, TeamId teamId);
     static bool ShouldYieldWsgTactics(PlayerbotAI* botAI);
 
-    BGTactics(PlayerbotAI* botAI, std::string const name = "bg tactics") : MovementAction(botAI, name) {}
+    BGTactics(PlayerbotAI* botAI, std::string const name = "bg tactics")
+        : MovementAction(botAI, name),
+          _wsgState(context->GetValue<WsgRouteState>("wsg route")->RefGet()),
+          _wsgPath(_wsgState._wsgPath),
+          _wsgApproachPath(_wsgState._wsgApproachPath),
+          _wsgMidfieldPath(_wsgState._wsgMidfieldPath),
+          _wsgMidfieldGoal(_wsgState._wsgMidfieldGoal),
+          _wsgMidfieldReached(_wsgState._wsgMidfieldReached),
+          _wsgAvoidPath(_wsgState._wsgAvoidPath),
+          _wsgCompletedPath(_wsgState._wsgCompletedPath),
+          _wsgCompletedReverse(_wsgState._wsgCompletedReverse),
+          _wsgInstanceId(_wsgState._wsgInstanceId),
+          _wsgJumpNextPoint(_wsgState._wsgJumpNextPoint),
+          _wsgGraveyardDeparture(_wsgState._wsgGraveyardDeparture),
+          _wsgNextPoint(_wsgState._wsgNextPoint),
+          _wsgApproachMs(_wsgState._wsgApproachMs),
+          _wsgAvoidMs(_wsgState._wsgAvoidMs),
+          _wsgProgressMs(_wsgState._wsgProgressMs),
+          _wsgLastProgressCheckMs(_wsgState._wsgLastProgressCheckMs),
+          _wsgGoalX(_wsgState._wsgGoalX),
+          _wsgGoalY(_wsgState._wsgGoalY),
+          _wsgProgressDistance(_wsgState._wsgProgressDistance),
+          _wsgStalledSamples(_wsgState._wsgStalledSamples),
+          _wsgReverse(_wsgState._wsgReverse),
+          _wsgApproachReverse(_wsgState._wsgApproachReverse),
+          _wsgCarrying(_wsgState._wsgCarrying)
+    {
+    }
 
     bool Execute(Event event) override;
     bool isUseful() override;
 
 protected:
     bool ExecuteWsgRoute();
+    bool CanStartWsgRouteFallback();
     bool RefreshWsgObjective();
     bool protectFC();
     bool ClearObsoleteWsgFollow();
     void SuspendWsgRouteProgress();
-    void RecordWsgMove();
-    bool OwnsWsgMove() const;
+    void ClearWsgRoute();
 
 private:
     enum class WsgJumpResult
@@ -145,8 +160,14 @@ private:
     static std::string const HandleConsoleCommandPrivate(WorldSession* session, char const* args);
     bool moveToStart(bool force = false);
     bool selectObjective(bool reset = false);
+    bool selectLegacyWsgObjective();
+    bool LegacyWsgJumpDown();
+
+protected:
     bool moveToObjective(bool ignoreDist);
     bool selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths);
+
+private:
     bool moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 currentPoint, bool reverse = false);
     bool MoveToWsgWaypoint();
     void ValidateWsgRoute();
@@ -154,7 +175,6 @@ private:
     PositionInfo GetWsgRoutingGoal(PositionInfo goal) const;
     void ClearWsgLane();
     void CheckWsgRouteProgress();
-    void ClearWsgRoute();
     void ClearWsgJump();
     bool IsUnsafeWsgCliffApproach(float x, float y, float z) const;
     bool startNewPathBegin(std::vector<BattleBotPath*> const& vPaths);
@@ -169,33 +189,31 @@ private:
     uint32 getPlayersInArea(TeamId teamId, Position point, float range, bool combat = true);
     bool IsLockedInsideKeep();
 
-    BattleBotPath* _wsgPath = nullptr;
-    BattleBotPath* _wsgApproachPath = nullptr;
-    BattleBotPath* _wsgMidfieldPath = nullptr;
-    Position _wsgMidfieldGoal;
-    bool _wsgMidfieldReached = false;
-    BattleBotPath* _wsgAvoidPath = nullptr;
-    BattleBotPath* _wsgCompletedPath = nullptr;
-    bool _wsgCompletedReverse = false;
-    uint32 _wsgInstanceId = 0;
-    uint32 _wsgResurrectionCount = 0;
-    uint32 _wsgJumpNextPoint = 0;
-    bool _wsgGraveyardDeparture = false;
-    uint32 _wsgNextPoint = 0;
-    uint32 _wsgApproachMs = 0;
-    uint32 _wsgAvoidMs = 0;
-    uint32 _wsgProgressMs = 0;
-    uint32 _wsgLastProgressCheckMs = 0;
-    uint32 _wsgMoveMs = 0;
-    WorldPosition _wsgMoveDestination;
-    bool _wsgHasMove = false;
-    float _wsgGoalX = 0.0f;
-    float _wsgGoalY = 0.0f;
-    float _wsgProgressDistance = 0.0f;
-    uint8 _wsgStalledSamples = 0;
-    bool _wsgReverse = false;
-    bool _wsgApproachReverse = false;
-    bool _wsgCarrying = false;
+protected:
+    WsgRouteState& _wsgState;
+    BattleBotPath*& _wsgPath;
+    BattleBotPath*& _wsgApproachPath;
+    BattleBotPath*& _wsgMidfieldPath;
+    Position& _wsgMidfieldGoal;
+    bool& _wsgMidfieldReached;
+    BattleBotPath*& _wsgAvoidPath;
+    BattleBotPath*& _wsgCompletedPath;
+    bool& _wsgCompletedReverse;
+    uint32& _wsgInstanceId;
+    uint32& _wsgJumpNextPoint;
+    bool& _wsgGraveyardDeparture;
+    uint32& _wsgNextPoint;
+    uint32& _wsgApproachMs;
+    uint32& _wsgAvoidMs;
+    uint32& _wsgProgressMs;
+    uint32& _wsgLastProgressCheckMs;
+    float& _wsgGoalX;
+    float& _wsgGoalY;
+    float& _wsgProgressDistance;
+    uint8& _wsgStalledSamples;
+    bool& _wsgReverse;
+    bool& _wsgApproachReverse;
+    bool& _wsgCarrying;
 };
 
 class WsgObjectiveRefreshAction : public BGTactics
@@ -221,7 +239,31 @@ private:
 class WsgObjectiveRouteAction : public BGTactics
 {
 public:
-    WsgObjectiveRouteAction(PlayerbotAI* botAI) : BGTactics(botAI, "bg wsg route") {}
+    WsgObjectiveRouteAction(PlayerbotAI* botAI, std::string const name = "bg wsg route") : BGTactics(botAI, name) {}
+    bool isUseful() override;
+    bool Execute(Event event) override;
+};
+
+class WsgObjectiveApproachAction : public WsgObjectiveRouteAction
+{
+public:
+    WsgObjectiveApproachAction(PlayerbotAI* botAI) : WsgObjectiveRouteAction(botAI, "bg wsg approach") {}
+    bool isUseful() override;
+    bool Execute(Event event) override;
+};
+
+class WsgObjectiveCorridorAction : public WsgObjectiveRouteAction
+{
+public:
+    WsgObjectiveCorridorAction(PlayerbotAI* botAI) : WsgObjectiveRouteAction(botAI, "bg wsg corridor") {}
+    bool isUseful() override;
+    bool Execute(Event event) override;
+};
+
+class WsgObjectiveDirectAction : public WsgObjectiveRouteAction
+{
+public:
+    WsgObjectiveDirectAction(PlayerbotAI* botAI) : WsgObjectiveRouteAction(botAI, "bg wsg direct") {}
     bool isUseful() override;
     bool Execute(Event event) override;
 };

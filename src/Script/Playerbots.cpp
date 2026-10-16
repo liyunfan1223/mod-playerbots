@@ -5,33 +5,32 @@
  */
 
 #include "Playerbots.h"
-#include "AllMapScript.h"
 #include "BattleGroundTactics.h"
 #include "BattlefieldScript.h"
-#include "BuiltInConfig.h"
 #include "Channel.h"
 #include "CheckMountStateAction.h"
 #include "Config.h"
+#include "BuiltInConfig.h"
 #include "DBUpdater.h"
 #include "DatabaseEnv.h"
+#include "PlayerbotsDatabase.h"
+#include <mysqld_error.h>
+#include "AllMapScript.h"
 #include "GatherNodeMgr.h"
 #include "GlobalScript.h"
 #include "GuildTaskMgr.h"
-#include "HumanPlayerRoster.h"
 #include "PlayerScript.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotCommandScript.h"
 #include "PlayerbotGuildMgr.h"
 #include "PlayerbotSpellRepository.h"
 #include "PlayerbotWorldThreadProcessor.h"
-#include "PlayerbotsDatabase.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
 #include "ServerScript.h"
 #include "SessionScript.h"
 #include "WorldScript.h"
 #include "cmath"
-#include <mysqld_error.h>
 
 class PlayerbotsDatabaseScript : public DatabaseScript
 {
@@ -148,7 +147,6 @@ public:
     {
         if (!player->GetSession()->IsHeadless())
         {
-            HumanPlayerRoster::Instance().Add(player->GetGUID());
             PlayerbotsMgr::instance().AddPlayerbotData(player, false);
             sRandomPlayerbotMgr.OnPlayerLogin(player);
 
@@ -175,7 +173,6 @@ public:
 
     void OnPlayerBeforeLogout(Player* player) override
     {
-        HumanPlayerRoster::Instance().Remove(player->GetGUID());
         if (PlayerbotMgr* playerbotMgr = GET_PLAYERBOT_MGR(player))
         {
             PlayerbotAI* botAI = PlayerbotsMgr::instance().GetPlayerbotAI(player);
@@ -596,13 +593,10 @@ public:
                 break;
         }
 
-        BGTactics::SetBotStrategies(bg->GetInstanceID(), data);
+        bgStrategies[bg->GetInstanceID()] = data;
     }
 
-    void OnBattlegroundEnd(Battleground* bg, TeamId /*winnerTeam*/) override
-    {
-        BGTactics::ClearBotStrategies(bg->GetInstanceID());
-    }
+    void OnBattlegroundEnd(Battleground* bg, TeamId /*winnerTeam*/) override { bgStrategies.erase(bg->GetInstanceID()); }
 };
 
 // Workaround for missing InitEnabledHooksIfNeeded for new BattlefieldScript in ScriptMgr

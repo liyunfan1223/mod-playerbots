@@ -17,7 +17,7 @@ class Player;
 class PlayerbotAI;
 class Unit;
 
-bool IsUnavailableWsgCombatTarget(Player const* player, Unit const* target);
+bool IsUnavailableCombatTarget(Player const* player, Unit const* target);
 bool IsValidWsgCarrier(Player const* player, Unit const* carrier, bool friendly);
 bool CanRespondToWsgCarrier(PlayerbotAI* botAI, Unit* carrier);
 bool IsWsgEscortTargetAllowed(PlayerbotAI* botAI, Unit const* target);

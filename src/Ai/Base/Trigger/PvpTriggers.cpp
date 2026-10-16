@@ -247,27 +247,21 @@ bool EnemyFlagCarrierNear::IsActive()
 
     Battleground* bg = bot->GetBattleground();
     bool isWarsong = bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS;
-    if (isWarsong)
+    if (isWarsong && sPlayerbotAIConfig.EnableWsgTactics)
         return CanRespondToWsgCarrier(botAI, carrier);
 
     if (!carrier || !ServerFacade::instance().IsDistanceLessOrEqualThan(
                         ServerFacade::instance().GetDistance2d(bot, carrier), 100.f))
         return false;
 
-    if (!isWarsong)
+    // Check if there is another enemy player target closer than the FC
+    Unit* nearbyEnemy = AI_VALUE(Unit*, "enemy player target");
+    if (nearbyEnemy)
     {
-        // Check if there is another enemy player target closer than the FC
-        Unit* nearbyEnemy = AI_VALUE(Unit*, "enemy player target");
-
-        if (nearbyEnemy)
-        {
-            float distToFC = ServerFacade::instance().GetDistance2d(bot, carrier);
-            float distToEnemy = ServerFacade::instance().GetDistance2d(bot, nearbyEnemy);
-
-            // If the other enemy is significantly closer, don't pursue FC
-            if (distToEnemy + 15.0f < distToFC)  // Add small buffer
-                return false;
-        }
+        float distToFC = ServerFacade::instance().GetDistance2d(bot, carrier);
+        float distToEnemy = ServerFacade::instance().GetDistance2d(bot, nearbyEnemy);
+        if (distToEnemy + 15.0f < distToFC)
+            return false;
     }
 
     return true;

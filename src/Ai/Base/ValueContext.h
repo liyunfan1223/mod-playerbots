@@ -95,6 +95,7 @@
 #include "TradeValues.h"
 #include "Value.h"
 #include "WaitForAttackTimeValue.h"
+#include "WsgRouteState.h"
 
 class PlayerbotAI;
 
@@ -261,6 +262,7 @@ public:
         creators["wsg team assignment"] = &ValueContext::wsg_team_assignment;
         creators["wsg support target"] = &ValueContext::wsg_support_target;
         creators["wsg follow carrier"] = &ValueContext::wsg_follow_carrier;
+        creators["wsg route"] = &ValueContext::wsg_route;
         creators["bg master"] = &ValueContext::bg_master;
         creators["enemy flag carrier"] = &ValueContext::enemy_fc;
         creators["team flag carrier"] = &ValueContext::team_fc;
@@ -509,6 +511,7 @@ private:
 
     static UntypedValue* bg_master(PlayerbotAI* botAI) { return new BgMasterValue(botAI); }
     static UntypedValue* bg_role(PlayerbotAI* botAI) { return new BgRoleValue(botAI); }
+    static UntypedValue* wsg_route(PlayerbotAI* botAI) { return new WsgRouteStateValue(botAI); }
     static UntypedValue* wsg_team_assignment(PlayerbotAI* botAI) { return new WsgTeamAssignmentValue(botAI); }
     static UntypedValue* wsg_support_target(PlayerbotAI* botAI) { return new WsgSupportTargetValue(botAI); }
     static UntypedValue* wsg_follow_carrier(PlayerbotAI* botAI)

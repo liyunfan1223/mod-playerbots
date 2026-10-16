@@ -181,26 +181,6 @@ bool CastSpellAction::Execute(Event /*event*/)
     return botAI->CastSpell(spell, GetTarget());
 }
 
-bool ResurrectPartyMemberAction::isUseful()
-{
-    Battleground* bg = bot->GetBattleground();
-    return (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS) && CastSpellAction::isUseful();
-}
-
-bool ResurrectPartyMemberAction::isPossible()
-{
-    Battleground* bg = bot->GetBattleground();
-    return (!bg || bg->GetBgTypeID(true) != BATTLEGROUND_WS) && CastSpellAction::isPossible();
-}
-
-bool ResurrectPartyMemberAction::Execute(Event event)
-{
-    Battleground* bg = bot->GetBattleground();
-    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
-        return false;
-    return CastSpellAction::Execute(event);
-}
-
 bool CastSpellAction::isUseful()
 {
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true))

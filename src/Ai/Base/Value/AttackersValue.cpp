@@ -137,7 +137,7 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float /*range
         return false;
 
     // Basic check
-    if (!attacker || IsUnavailableWsgCombatTarget(bot, attacker))
+    if (!attacker || IsUnavailableCombatTarget(bot, attacker))
         return false;
 
     // bool inCannon = botAI->IsInVehicle(false, true);
