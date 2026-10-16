@@ -2672,6 +2672,10 @@ void RandomItemMgr::BuildCachePotion()
             spellInfo->Effects[EFFECT_0].Effect != SPELL_EFFECT_ENERGIZE)
             continue;
 
+        if (spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_ENERGIZE &&
+            spellInfo->Effects[EFFECT_0].MiscValue != POWER_MANA)
+            continue;
+
         // do not accept potions/flasks with more than one spell effects, only
         // first one effect (EFFECT_0) should be set and eq. heal/energize
         bool hasOtherEffects = false;
