@@ -444,6 +444,8 @@ class FindStartQuestItemVisitor : public FindUsableItemVisitor
 public:
     FindStartQuestItemVisitor(Player* bot) : FindUsableItemVisitor(bot) {}
 
+    // Runs on every item the bot receives: the cheap StartQuest check comes before CanUseItem.
+    bool Visit(Item* item) override;
     bool Accept(ItemTemplate const* proto) override { return proto->StartQuest != 0; }
 };
 

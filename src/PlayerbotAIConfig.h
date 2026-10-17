@@ -391,6 +391,7 @@ public:
     int32 PetChatCommandDebug;
     bool AutoLearnTrainerSpells;
     bool AutoDoQuests;
+    bool UseStartQuestItems;
     bool EnableNewRpgStrategy;
     std::unordered_map<NewRpgStatus, uint32> RpgStatusProbWeight;
     bool SyncLevelWithPlayers;

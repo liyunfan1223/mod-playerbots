@@ -321,13 +321,12 @@ std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateIt
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 
-    // "start quest" is every usable item that opens a quest, regardless of item class.
-    // Equipped items are included: a start-quest item is not consumed by the quest, so it can
-    // be worn as an upgrade and still open the quest.
+    // "start quest" is every usable item that opens a quest, regardless of item class. Bags only:
+    // the core deletes the starting item on accept, so starters are never equipped.
     if (text == "start quest")
     {
         FindStartQuestItemVisitor visitor(bot);
-        IterateItems(&visitor, static_cast<IterateItemsMask>(ITERATE_ITEMS_IN_BAGS | ITERATE_ITEMS_IN_EQUIP));
+        IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 

@@ -298,11 +298,8 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     {
         if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId))
         {
-            // Same acceptance path as NPC/creature quest givers, with the module's grey-quest
-            // band enforced here so every caller of UseItem is covered.
-            if (!QuestAction::CanAcceptQuest(bot, qInfo))
-                return false;
-
+            // The master-driven "use <item>" path accepts what the player could; the automatic
+            // path filters with QuestAction::CanAcceptQuest before calling UseItem.
             AcceptQuestAction acceptQuestAction(botAI);
             return acceptQuestAction.AcceptQuest(qInfo, item_guid);
         }
@@ -617,4 +614,11 @@ bool UseStartQuestItem::isUseful()
     return !IsRealPlayer(botAI->GetMaster()) && !bot->InBattleground() && !bot->HasUnitState(UNIT_STATE_IN_FLIGHT);
 }
 
-bool UseStartQuestItem::isPossible() { return AI_VALUE2(uint32, "item count", "start quest") > 0; }
+bool UseStartQuestItem::isPossible()
+{
+    for (Item* questItem : AI_VALUE2(std::vector<Item*>, "inventory items", "start quest"))
+        if (QuestAction::CanAcceptQuest(bot, sObjectMgr->GetQuestTemplate(questItem->GetTemplate()->StartQuest)))
+            return true;
+
+    return false;
+}

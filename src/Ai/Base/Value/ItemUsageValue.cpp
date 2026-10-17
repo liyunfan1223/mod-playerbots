@@ -97,14 +97,14 @@ ItemUsage ItemUsageValue::Calculate()
     if (bot->GetGuildId() && GuildTaskMgr::instance().IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
+    // Starters the bot can take stay in the bags and are used from there; the core deletes the
+    // starting item on accept unless the quest also requires it, so they are never equipped.
+    if (IsStartQuestItemUsefulFor(bot, proto))
+        return ITEM_USAGE_QUEST;
+
     ItemUsage equip = QueryItemUsageForEquip(proto, randomPropertyId);
     if (equip != ITEM_USAGE_NONE)
         return equip;
-
-    // Equipping a start-quest item the bot can take is fine (the quest does not consume it), so
-    // only the disenchant path is blocked here; "start quest" also looks at equipped items.
-    if (IsStartQuestItemUsefulFor(bot, proto))
-        return ITEM_USAGE_QUEST;
 
     // Get item instance to check if it's soulbound
     Item* item = bot->GetItemByEntry(proto->ItemId);
@@ -546,10 +546,6 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
             }
         }
     }
-
-    // Keep items that start a quest the bot can take, so they are not sold or destroyed
-    if (IsStartQuestItemUsefulFor(player, proto))
-        return true; // Item starts a quest the bot can take
 
     return false; // Item is not useful for any active quests
 }
