@@ -412,6 +412,9 @@ public:
 
     std::string const HandleRemoteCommand(std::string const command);
     void HandleCommand(uint32 type, std::string const text, Player* fromPlayer);
+    // Non-mutating classifier for integrations which must not execute a
+    // Playerbot command while deciding how to handle a chat line.
+    bool IsChatCommand(std::string const text) const;
     void QueueChatResponse(const ChatQueuedReply reply);
     void HandleBotOutgoingPacket(WorldPacket const& packet);
     void HandleMasterIncomingPacket(WorldPacket const& packet);

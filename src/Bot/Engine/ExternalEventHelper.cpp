@@ -42,6 +42,26 @@ bool ExternalEventHelper::ParseChatCommand(std::string const command, Player* ow
     return true;
 }
 
+bool ExternalEventHelper::IsChatCommand(std::string const command) const
+{
+    if (aiObjectContext->GetTrigger(command))
+        return true;
+
+    size_t i = std::string::npos;
+    while (true)
+    {
+        size_t found = command.rfind(" ", i);
+        if (found == std::string::npos || !found)
+            break;
+
+        if (aiObjectContext->GetTrigger(command.substr(0, found)))
+            return true;
+        i = found - 1;
+    }
+
+    return ChatHelper::parseableItem(command);
+}
+
 void ExternalEventHelper::HandlePacket(std::map<uint16, std::string>& handlers, WorldPacket const& packet,
                                        Player* owner)
 {

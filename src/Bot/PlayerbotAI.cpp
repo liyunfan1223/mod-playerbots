@@ -665,6 +665,44 @@ void PlayerbotAI::HandleCommands()
     }
 }
 
+bool PlayerbotAI::IsChatCommand(std::string const text) const
+{
+    std::string filtered = text;
+    if (filtered.find("BOT\t") == 0)
+        filtered = filtered.substr(4);
+
+    if (!sPlayerbotAIConfig.commandSeparator.empty() &&
+        filtered.find(sPlayerbotAIConfig.commandSeparator) != std::string::npos)
+    {
+        std::vector<std::string> commands;
+        split(commands, filtered, sPlayerbotAIConfig.commandSeparator.c_str());
+        for (std::string const& command : commands)
+            if (IsChatCommand(command))
+                return true;
+        return false;
+    }
+
+    if (!sPlayerbotAIConfig.commandPrefix.empty())
+    {
+        if (filtered.find(sPlayerbotAIConfig.commandPrefix) != 0)
+            return false;
+        filtered = filtered.substr(sPlayerbotAIConfig.commandPrefix.size());
+    }
+
+    filtered = trim((std::string&)filtered);
+    if (filtered.empty())
+        return false;
+
+    if (filtered.find("debug ") == 0 || filtered == "reset" ||
+        (filtered.size() > 2 && filtered.substr(0, 2) == "d ") ||
+        (filtered.size() > 3 && filtered.substr(0, 3) == "do ") ||
+        ChatHelper::parseValue("command", filtered).substr(0, 3) == "do ")
+        return true;
+
+    ExternalEventHelper helper(aiObjectContext);
+    return helper.IsChatCommand(filtered);
+}
+
 std::map<std::string, ChatMsg> chatMap;
 void PlayerbotAI::HandleCommand(uint32 type, std::string const& text, Player& fromPlayer, const uint32 lang)
 {
