@@ -722,32 +722,50 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             if (quest->GetZoneOrSort() < 0)
                 continue;
 
-            // Rank candidates by their nearest reachable POI. A quest with POIs on another map
-            // is travelable (cross-zone retention), so it drops after every same-map candidate;
-            // a quest with no POI data at all is unprogressable and drops first.
+            // Rank candidates by their nearest reachable POI. Scoring needs x/y only: no height
+            // or zone lookup, so the map thread never loads terrain for a distant grid. A quest
+            // with POIs on another map is travelable (cross-zone retention) and drops after every
+            // same-map candidate; no POI data at all means unprogressable, so it drops first.
+            bool const complete = bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE;
             float dist = std::numeric_limits<float>::max();
-            std::vector<POIInfo> poiInfo;
-            if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo,
-                                              bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE))
+            bool hasSameMapPoi = false;
+            bool hasOtherMapPoi = false;
+            if (QuestPOIVector const* pois = sObjectMgr->GetQuestPOIVector(questId))
             {
-                for (POIInfo const& poi : poiInfo)
+                for (QuestPOI const& poi : *pois)
                 {
-                    float d = bot->GetDistance2d(poi.pos.x, poi.pos.y);
+                    // Completed quests are ranked by their turn-in POI (same filter as
+                    // GetQuestPOIPosAndObjectiveIdx).
+                    if (complete && poi.ObjectiveIndex != -1)
+                        continue;
+
+                    if (poi.points.empty())
+                        continue;
+
+                    if (poi.MapId != bot->GetMapId())
+                    {
+                        hasOtherMapPoi = true;
+                        continue;
+                    }
+
+                    float dx = 0.0f, dy = 0.0f;
+                    for (QuestPOIPoint const& point : poi.points)
+                    {
+                        dx += point.x;
+                        dy += point.y;
+                    }
+                    dx /= float(poi.points.size());
+                    dy /= float(poi.points.size());
+
+                    hasSameMapPoi = true;
+                    float const d = bot->GetDistance2d(dx, dy);
                     if (d < dist)
                         dist = d;
                 }
             }
-            else if (QuestPOIVector const* pois = sObjectMgr->GetQuestPOIVector(questId))
-            {
-                for (QuestPOI const& poi : *pois)
-                {
-                    if (poi.MapId != bot->GetMapId() && !poi.points.empty())
-                    {
-                        dist = 1.0e9f;
-                        break;
-                    }
-                }
-            }
+
+            if (!hasSameMapPoi)
+                dist = hasOtherMapPoi ? 1.0e9f : std::numeric_limits<float>::max();
 
             if (dist > worstDist)
             {
