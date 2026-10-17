@@ -278,7 +278,7 @@ struct TkInstanceState
 {
     std::optional<bool> lastRebirthState;
     std::optional<bool> isAlarInPhase2;
-    std::optional<std::vector<ArcaneOrbData>> voidReaverArcaneOrbs;
+    std::vector<ArcaneOrbData> voidReaverArcaneOrbs;
     std::optional<uint32> advisorDpsWaitTimer;
 };
 

@@ -287,13 +287,8 @@ std::vector<Position> GetActiveArcaneOrbs(uint32 instanceId)
 {
     std::vector<Position> activeOrbs;
 
-    std::optional<std::vector<ArcaneOrbData>> const& orbs =
-        TkState(instanceId).voidReaverArcaneOrbs;
-    if (!orbs)
-        return activeOrbs;
-
     uint32 const now = getMSTime();
-    for (ArcaneOrbData const& orb : *orbs)
+    for (ArcaneOrbData const& orb : TkState(instanceId).voidReaverArcaneOrbs)
     {
         if (getMSTimeDiff(orb.castTime, now) <= ARCANE_ORB_DURATION_MS)
             activeOrbs.push_back(orb.destination);
@@ -562,7 +557,7 @@ bool TkResetInstance(uint32 instanceId)
 
     TkInstanceState const& state = it->second;
     bool const wasSet = state.lastRebirthState || state.isAlarInPhase2 ||
-        state.voidReaverArcaneOrbs || state.advisorDpsWaitTimer;
+        !state.voidReaverArcaneOrbs.empty() || state.advisorDpsWaitTimer;
 
     tkStates.erase(it);
     return wasSet;
