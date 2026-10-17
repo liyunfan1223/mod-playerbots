@@ -20,9 +20,9 @@ class WotlkDungeonOKActionContext : public NamedObjectContext<Action>
             creators["avoid shadow crash"] = &WotlkDungeonOKActionContext::avoid_shadow_crash;
         }
     private:
-        static Action* attack_nadox_guardian(PlayerbotAI* ai) { return new AttackNadoxGuardianAction(ai); }
-        static Action* attack_jedoga_volunteer(PlayerbotAI* ai) { return new AttackJedogaVolunteerAction(ai); }
-        static Action* avoid_shadow_crash(PlayerbotAI* ai) { return new AvoidShadowCrashAction(ai); }
+        static Action* attack_nadox_guardian(PlayerbotAI* botAI) { return new AttackNadoxGuardianAction(botAI); }
+        static Action* attack_jedoga_volunteer(PlayerbotAI* botAI) { return new AttackJedogaVolunteerAction(botAI); }
+        static Action* avoid_shadow_crash(PlayerbotAI* botAI) { return new AvoidShadowCrashAction(botAI); }
 };
 
 #endif

@@ -26,28 +26,28 @@ enum VoAIDs
 class EmalonMarkBossTrigger : public Trigger
 {
 public:
-    EmalonMarkBossTrigger(PlayerbotAI* ai) : Trigger(ai, "emalon mark boss trigger") {}
+    EmalonMarkBossTrigger(PlayerbotAI* botAI) : Trigger(botAI, "emalon mark boss trigger") {}
     bool IsActive() override;
 };
 
 class EmalonLightingNovaTrigger : public Trigger
 {
 public:
-    EmalonLightingNovaTrigger(PlayerbotAI* ai) : Trigger(ai, "emalon lighting nova trigger") {}
+    EmalonLightingNovaTrigger(PlayerbotAI* botAI) : Trigger(botAI, "emalon lighting nova trigger") {}
     bool IsActive() override;
 };
 
 class EmalonOverchargeTrigger : public Trigger
 {
 public:
-    EmalonOverchargeTrigger(PlayerbotAI* ai) : Trigger(ai, "emalon overcharge trigger") {}
+    EmalonOverchargeTrigger(PlayerbotAI* botAI) : Trigger(botAI, "emalon overcharge trigger") {}
     bool IsActive() override;
 };
 
 class EmalonFallFromFloorTrigger : public Trigger
 {
 public:
-    EmalonFallFromFloorTrigger(PlayerbotAI* ai) : Trigger(ai, "emalon fall from floor trigger") {}
+    EmalonFallFromFloorTrigger(PlayerbotAI* botAI) : Trigger(botAI, "emalon fall from floor trigger") {}
     bool IsActive() override;
 };
 

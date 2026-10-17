@@ -55,7 +55,8 @@ enum class ZaSpells : uint32
     SPELL_CREEPING_PARALYSIS        = 43095,
 
     // Hunter
-    SPELL_MISDIRECTION              = 35079,
+    SPELL_MISDIRECTION              = 34477,
+    SPELL_MISDIRECTION_AURA         = 35079, // the aura on the hunter
 
     // Priest
     SPELL_MASS_DISPEL               = 32375,
@@ -98,25 +99,25 @@ enum class ZaObjects : uint32
     GO_FREEZING_TRAP                = 186669,
 };
 
-// General
+// Shared
 
 inline constexpr uint32 ZA_MAP_ID = 568;
 // For Hex Lord and Zul'jin. Whirlwind radius is 8y. Safe distance has 4y of MoveAway padding;
 // hold distance is for the don't run back in multiplier and adds another 3y of padding.
 inline constexpr float ZA_WHIRLWIND_SAFE_DISTANCE = 12.0f;
 inline constexpr float ZA_WHIRLWIND_HOLD_DISTANCE = 15.0f;
-// For Medicine Man totems, Halazzi totem, and Jan'alai Hatchers
+// For Medicine Man totems, Halazzi totem, and Jan'alai Hatchers.
 inline constexpr float ZA_CREATURE_SEARCH_RADIUS = 40.0f;
 
 // Akil'zon <Eagle Avatar>
 
 // Electrical Storm runs on a fixed 60s cycle once the encounter starts. Bots react from
 // AKILZON_STORM_LEAD_MS before each cast until the storm itself has expired.
-inline constexpr uint32 AKILZON_STORM_PERIOD_MS = 60000;
-inline constexpr uint32 AKILZON_STORM_LEAD_MS = 5000;
-inline constexpr uint32 AKILZON_STORM_DURATION_MS = 10000;
+inline constexpr uint32 AKILZON_STORM_PERIOD_MS = 60 * IN_MILLISECONDS;
+inline constexpr uint32 AKILZON_STORM_LEAD_MS = 5 * IN_MILLISECONDS;
+inline constexpr uint32 AKILZON_STORM_DURATION_MS = 10 * IN_MILLISECONDS;
 
-// Centerish of the platform
+// Centerish of the platform.
 inline Position const AKILZON_TANK_POSITION = { 378.369f, 1407.718f, 74.797f };
 
 extern std::unordered_map<uint32, uint32> akilzonStormTimer;
@@ -126,7 +127,7 @@ Player* GetElectricalStormTarget(Player* bot);
 
 // Nalorakk <Bear Avatar>
 
-// Toward the back, down the stairs from his starting position
+// Toward the back, down the stairs from his starting position.
 inline Position const NALORAKK_TANK_POSITION = { -80.208f, 1324.530f, 40.942f };
 
 bool IsNalorakkInBearForm(Unit* nalorakk);
@@ -134,21 +135,16 @@ bool IsNalorakkInBearForm(Unit* nalorakk);
 // Jan'alai <Dragonhawk Avatar>
 
 inline constexpr float JANALAI_PLATFORM_Z = 19.146f;
+inline constexpr float JANALAI_RANGED_SPREAD_RADIUS = 15.0f;
+inline constexpr float JANALAI_FIRE_BOMB_SEARCH_RADIUS = 40.0f;
+inline constexpr float JANALAI_FIRE_BOMB_SAFE_SPOT_SEARCH_RADIUS = 30.0f;
+// Fire Bomb (42630) has a 4y radius. The 1.5y extra padding is added for realism.
+inline constexpr float JANALAI_FIRE_BOMB_HAZARD_RADIUS = 4.0f;
+inline constexpr float JANALAI_FIRE_BOMB_SAFE_DISTANCE = JANALAI_FIRE_BOMB_HAZARD_RADIUS + 1.5f;
+inline constexpr uint32 FIRE_BOMB_CACHE_INTERVAL_MS = 1000;
 // Hatchers open eggs at increasing speed: 1 on the first tick, then 2, then 3, every 5s. There are
 // 20 eggs per side. Bloodlust is held until this many Hatchlings are active.
 inline constexpr uint32 JANALAI_BLOODLUST_HATCHLING_COUNT = 6;
-// Ranged spread evenly around the tank position to reduce players hit by Flame Breath.
-inline constexpr float JANALAI_RANGED_SPREAD_RADIUS = 15.0f;
-// How far bots search for a safe spot from Fire Bombs.
-inline constexpr float JANALAI_FIRE_BOMB_MAX_SEARCH_DISTANCE = 30.0f;
-// How far bots search for the Fire Bombs themselves, which obviously needs to be farther.
-inline constexpr float JANALAI_FIRE_BOMB_SEARCH_RADIUS = 40.0f;
-// Fire Bomb (42630) has a 4y radius. It does not include CombatReach so the 1.5y is just extra
-// padding. The padding is not needed strategically since bots are standing in place, but I don't
-// think humans would stand closer than this because it looks very dangerous, Thus, 5.5y is a
-// compromise to allow enough safe spots without looking too unrealistic.
-inline constexpr float JANALAI_FIRE_BOMB_SAFE_DISTANCE = 5.5f;
-inline constexpr uint32 FIRE_BOMB_CACHE_INTERVAL_MS = 1000;
 // Jan'alai hatches every remaining egg at once at 35% HP. If somehow a group killed both sides of
 // eggs incrementally and so fast that 6 Hatchlings were never up at a time, then Bloodlust goes out
 // at this point. Using 33% accounts for some delay for the hatching event to occur.
@@ -170,9 +166,7 @@ inline std::vector<Position> const JANALAI_SAFE_ZONE = {
 
 std::pair<Unit*, Unit*> GetAmanishiHatcherPair(PlayerbotAI* botAI);
 uint32 CountJanalaiHatchlingsByEntry(PlayerbotAI* botAI);
-// Jan'alai casts Fire Bomb Channel at the beginning of each Fire Bomb event until the bombs
-// detonate. This is the best check for the event being active because the bomb trigger NPCs stick
-// around for 4s after the detonation.
+// Jan'alai casts Fire Bomb Channel at the beginning of each Fire Bomb event until bombs detonate.
 bool IsJanalaiBombing(Unit* janalai);
 GuidVector FindNearbyFireBombGuids(Player* bot);
 std::vector<Unit*> GetNearbyFireBombs(PlayerbotAI* botAI);
@@ -183,18 +177,15 @@ bool FindSafeStepInJanalaiZone(
 
 // Halazzi <Lynx Avatar>
 
-// Right near his starting position
+// Right near his starting position.
 inline Position const HALAZZI_TANK_POSITION = { 370.733f, 1131.202f, 6.516f };
 
 // Hex Lord Malacrass
 
 // Freezing Trap (43448) stuns for 10s across a 10y radius, even though its trigger radius is much
-// shorter at 2.5y. Padded by 1y instead of 2y because without a dedicated tank spot, the boss tends
-// to be toward the back of the room, and bots can run through the door to Zul'jin if sent too far.
+// shorter at 2.5y.
 inline constexpr float ZA_FREEZING_TRAP_SAFE_DISTANCE = 11.0f;
-// Also used for HexLordMalacrassStayAwayFromFreezingTrapMultiplier.
 inline constexpr float ZA_FREEZING_TRAP_SEARCH_RADIUS = 16.0f;
-// For the "hex lord malacrass freezing trap" value.
 inline constexpr uint32 FREEZING_TRAP_CACHE_INTERVAL_MS = 200;
 
 ObjectGuid FindNearbyFreezingTrapGuid(Player* bot);
@@ -209,11 +200,16 @@ inline constexpr float ZULJIN_SPREAD_Z = 45.111f;
 
 // Centerish of the platform
 inline Position const ZULJIN_TANK_POSITION = { 120.210f, 705.564f, 45.111f };
+
+// Ranged are ordered by healers first. The healer positions are centered at (1) the bottom of the
+// stairs leading to Zul'jin's starting spot and (2) the top of the stairs leading to his battle
+// area. The intent is to allow each healer to reach every other bot's position (accordingly, every
+// position is within 39y of both healer positions).
 inline std::array<Position, 8> const ZULJIN_SPREAD_POSITIONS = {{
-    // Healer slots.
+    // Healer positions.
     Position(120.462f, 728.502f, ZULJIN_SPREAD_Z),
     Position(119.984f, 693.188f, ZULJIN_SPREAD_Z),
-    // Ranged dps slots.
+    // Ranged dps positions. Three positions each at opposite ends of the platform.
     Position(94.939f, 713.698f, ZULJIN_SPREAD_Z),
     Position(145.286f, 713.034f, ZULJIN_SPREAD_Z),
     Position(103.869f, 728.703f, ZULJIN_SPREAD_Z),
@@ -222,12 +218,7 @@ inline std::array<Position, 8> const ZULJIN_SPREAD_POSITIONS = {{
     Position(95.618f, 698.439f, ZULJIN_SPREAD_Z)
 }};
 
-// Ranged are ordered by healers first. The first two positions are centered at the bottom of the
-// stairs leading to Zul'jin's starting spot and the top of the stairs where his battle area begins.
-// Presumably, players will bring 2 healers, and the intent is to allow each healer to reach every
-// other bot's position (accordingly, no two spots are more than 39y apart).
 bool GetZuljinSpreadSlotIndex(Player* bot, size_t slotCount, size_t& slotIndex);
-// Find the closest target with Creeping Paralysis to cast Mass Dispel on.
 Player* GetZuljinCreepingParalysisDispelTarget(Player* bot);
 
 }

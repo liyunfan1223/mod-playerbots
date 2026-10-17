@@ -38,7 +38,7 @@ enum PitOfSaronIDs
 class IckAndKrickTrigger : public Trigger
 {
 public:
-    IckAndKrickTrigger(PlayerbotAI* ai) : Trigger(ai, "ick and krick") {}
+    IckAndKrickTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ick and krick") {}
 
     bool IsActive() override;
 };
@@ -46,7 +46,7 @@ public:
 class TyrannusTrigger : public Trigger
 {
 public:
-    TyrannusTrigger(PlayerbotAI* ai) : Trigger(ai, "tyrannus") {}
+    TyrannusTrigger(PlayerbotAI* botAI) : Trigger(botAI, "tyrannus") {}
 
     bool IsActive() override;
 };

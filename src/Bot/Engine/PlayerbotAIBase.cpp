@@ -36,7 +36,7 @@ void PlayerbotAIBase::SetNextCheckDelay(uint32 const delay)
 
     nextAICheckDelay = delay;
 
-    // if (nextAICheckDelay > sPlayerbotAIConfig.globalCoolDown)
+    // if (nextAICheckDelay > sPlayerbotAIConfig.GlobalCoolDown)
     // LOG_DEBUG("playerbots",  "std::set next check delay: {}", nextAICheckDelay);
 }
 
@@ -44,7 +44,7 @@ void PlayerbotAIBase::IncreaseNextCheckDelay(uint32 delay)
 {
     nextAICheckDelay += delay;
 
-    // if (nextAICheckDelay > sPlayerbotAIConfig.globalCoolDown)
+    // if (nextAICheckDelay > sPlayerbotAIConfig.GlobalCoolDown)
     //     LOG_DEBUG("playerbots",  "increase next check delay: {}", nextAICheckDelay);
 }
 
@@ -60,6 +60,16 @@ void PlayerbotAIBase::YieldThread(Player* bot, uint32 delay)
     }
 }
 
-bool PlayerbotAIBase::IsActive() { return nextAICheckDelay < sPlayerbotAIConfig.maxWaitForMove; }
+bool PlayerbotAIBase::IsActive() { return nextAICheckDelay < sPlayerbotAIConfig.MaxWaitForMove; }
 
 bool PlayerbotAIBase::IsBotAI() const { return _isBotAI; }
+
+void PlayerbotAIBase::SetActionDuration(uint32 duration)
+{
+    nextAICheckDelay = duration;
+}
+
+void PlayerbotAIBase::ResetActionDuration()
+{
+    nextAICheckDelay = 0;
+}

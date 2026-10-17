@@ -69,7 +69,7 @@ bool ShirrakRangedKeepDistanceAction::Execute(Event /*event*/)
     if (!shirrak)
         return false;
 
-    if (bot->GetExactDist(shirrak) - shirrak->GetCombatReach() > sPlayerbotAIConfig.spellDistance)
+    if (bot->GetExactDist(shirrak) - shirrak->GetCombatReach() > sPlayerbotAIConfig.SpellDistance)
         return false;
 
     Group* group = bot->GetGroup();

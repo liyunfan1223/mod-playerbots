@@ -61,7 +61,7 @@ Unit* RtiTargetValue::Calculate()
     Unit* unit = botAI->GetUnit(guid);
     if (!unit || unit->isDead() || !bot->IsWithinLOSInMap(unit) || !AttackersValue::IsValidTarget(unit, bot) ||
         ServerFacade::instance().IsDistanceGreaterThan(ServerFacade::instance().GetDistance2d(bot, unit),
-                                             sPlayerbotAIConfig.sightDistance))
+                                             sPlayerbotAIConfig.SightDistance))
         return nullptr;
 
     // Also prevent chasing raid icon targets that are too far away from the master,
@@ -70,7 +70,7 @@ Unit* RtiTargetValue::Calculate()
     {
         if (master->IsInWorld() && master->GetMapId() == unit->GetMapId() &&
             ServerFacade::instance().IsDistanceGreaterThan(ServerFacade::instance().GetDistance2d(master, unit),
-                sPlayerbotAIConfig.sightDistance))
+                sPlayerbotAIConfig.SightDistance))
             return nullptr;
     }
 

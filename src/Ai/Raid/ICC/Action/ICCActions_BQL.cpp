@@ -22,7 +22,7 @@ bool IccBqlGroupPositionAction::Execute(Event /*event*/)
 
     Aura* frenzyAura = botAI->GetAura("Frenzied Bloodthirst", bot);
     Aura* shadowAura = botAI->GetAura("Swarming Shadows", bot);
-    bool isTank = botAI->IsTank(bot);
+    bool isTank = PlayerbotAI::IsTank(bot);
     if (isTank && shadowAura)
     {
         bot->RemoveAurasDueToSpell(shadowAura->GetId());
@@ -50,7 +50,7 @@ bool IccBqlGroupPositionAction::HandleTankPosition(Unit* boss, Aura* frenzyAura,
         return false;
 
     // Main tank positioning
-    if (botAI->IsMainTank(bot) && botAI->HasAggro(boss))
+    if (PlayerbotAI::IsMainTank(bot) && botAI->HasAggro(boss))
     {
         if (bot->GetExactDist2d(ICC_BQL_TANK_POSITION) > 3.0f)
         {
@@ -61,7 +61,7 @@ bool IccBqlGroupPositionAction::HandleTankPosition(Unit* boss, Aura* frenzyAura,
     }
 
     // Assist tank positioning
-    if (botAI->IsAssistTank(bot) && !botAI->GetAura("Blood Mirror", bot))
+    if (PlayerbotAI::IsAssistTank(bot) && !botAI->GetAura("Blood Mirror", bot))
     {
         if (Unit* mainTank = AI_VALUE(Unit*, "main tank"))
         {
@@ -70,7 +70,7 @@ bool IccBqlGroupPositionAction::HandleTankPosition(Unit* boss, Aura* frenzyAura,
         }
     }
 
-    if (botAI->IsAssistTank(bot) && botAI->GetAura("Blood Mirror", bot) && boss && boss->HealthAbovePct(90))
+    if (PlayerbotAI::IsAssistTank(bot) && botAI->GetAura("Blood Mirror", bot) && boss && boss->HealthAbovePct(90))
         return true; // don't do anything to avoid taking bite
 
     return false;
@@ -82,7 +82,7 @@ bool IccBqlGroupPositionAction::HandleShadowsMovement()
     float const ARC_STEP = 0.05f;
     float const LANE_STEP = 0.15f;
     int const MAX_CURVES = 3;
-    float const maxClosestDist = botAI->IsMelee(bot) ? 25.0f : 20.0f;
+    float const maxClosestDist = PlayerbotAI::IsMelee(bot) ? 25.0f : 20.0f;
     Position const& center = ICC_BQL_CENTER_POSITION;
     float const OUTER_CURVE_PREFERENCE = 200.0f;   // Strong preference for outer curves
     float const CURVE_SWITCH_PENALTY = 50.0f;      // Penalty for switching curves
@@ -469,9 +469,9 @@ bool IccBqlGroupPositionAction::HandleGroupPosition(Unit* boss, Aura* frenzyAura
         return false;
 
     GuidVector members = AI_VALUE(GuidVector, "group members");
-    bool isRanged = botAI->IsRanged(bot);
-    bool isTank = botAI->IsTank(bot);
-    bool isMeleeDps = botAI->IsMelee(bot) && !isTank;
+    bool isRanged = PlayerbotAI::IsRanged(bot);
+    bool isTank = PlayerbotAI::IsTank(bot);
+    bool isMeleeDps = PlayerbotAI::IsMelee(bot) && !isTank;
 
     // Air-phase latch: only arm once boss has been anchored at tank pos (ground phase
     // established). Prevents false-trigger at pull when boss comes near center.
@@ -560,7 +560,7 @@ bool IccBqlGroupPositionAction::HandleGroupPosition(Unit* boss, Aura* frenzyAura
             // any slot they left.
             if (botAI->GetAura("Frenzied Bloodthirst", player))
                 continue;
-            if (botAI->IsTank(player))
+            if (PlayerbotAI::IsTank(player))
             {
                 tanks.push_back(player);
                 continue;
@@ -827,14 +827,14 @@ bool IccBqlGroupPositionAction::HandleGroupPosition(Unit* boss, Aura* frenzyAura
                 continue;
             if (!sPlayerbotsMgr.GetPlayerbotAI(player))
                 continue;
-            if (botAI->IsRanged(player))
+            if (PlayerbotAI::IsRanged(player))
             {
                 if (player->getClass() == CLASS_HUNTER)
                     hunters.push_back(player);
                 else
                     otherRanged.push_back(player);
             }
-            else if (botAI->IsMelee(player))
+            else if (PlayerbotAI::IsMelee(player))
             {
                 meleeBots.push_back(player);
             }
@@ -1034,7 +1034,7 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event /*event*/)
         if (botAI->GetAura("Pact of the Darkfallen", member))
         {
             playersWithAura.push_back(member);
-            if (botAI->IsTank(member))
+            if (PlayerbotAI::IsTank(member))
                 tankWithAura = member;
         }
     }
@@ -1047,7 +1047,7 @@ bool IccBqlPactOfDarkfallenAction::Execute(Event /*event*/)
     if (tankWithAura)
     {
         // If there's a tank with aura, everyone moves to the tank (including the tank itself for center positioning)
-        if (botAI->IsTank(bot))
+        if (PlayerbotAI::IsTank(bot))
         {
             // If current bot is the tank, stay put or move slightly for better positioning
             targetPos.Relocate(bot);
@@ -1191,9 +1191,9 @@ Player* IccBqlVampiricBiteAction::FindBestBiteTarget(Group* group)
             botAI->GetAura("Swarming Shadows", member))
             continue;
 
-        if (botAI->IsTank(member))
+        if (PlayerbotAI::IsTank(member))
             tankCandidates.push_back(member);
-        else if (botAI->IsDps(member) || botAI->IsHeal(member))
+        else if (PlayerbotAI::IsDps(member) || PlayerbotAI::IsHeal(member))
             dpsHealCandidates.push_back(member);
     }
 

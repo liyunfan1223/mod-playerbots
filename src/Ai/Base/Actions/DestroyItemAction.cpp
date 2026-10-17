@@ -8,6 +8,26 @@
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "Playerbots.h"
+#include <algorithm>
+
+namespace
+{
+// Percent of bag slots used at or above which smart destroy keeps going.
+constexpr uint8 BAG_SPACE_DESTROY_THRESHOLD = 90;
+
+std::vector<uint32> DistinctItemIds(std::vector<Item*> const& items)
+{
+    std::vector<uint32> itemIds;
+    for (Item* item : items)
+    {
+        uint32 const itemId = item->GetEntry();
+        if (std::find(itemIds.begin(), itemIds.end(), itemId) == itemIds.end())
+            itemIds.push_back(itemId);
+    }
+
+    return itemIds;
+}
+}  // namespace
 
 bool DestroyItemAction::Execute(Event event)
 {
@@ -43,27 +63,15 @@ bool SmartDestroyItemAction::Execute(Event /*event*/)
 {
     uint8 bagSpace = AI_VALUE(uint8, "bag space");
 
-    if (bagSpace < 90)
+    if (bagSpace < BAG_SPACE_DESTROY_THRESHOLD)
         return false;
 
     // Only destroy grey items when the master is a real player or SelfBot, and the bot is in a real guild.
     if (botAI->HasGameClientMaster() && botAI->IsInRealGuild())
     {
-        std::set<Item*> items;
         FindItemsToTradeByQualityVisitor visitor(ITEM_QUALITY_POOR, 5);
         IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
-        items.insert(visitor.GetResult().begin(), visitor.GetResult().end());
-
-        for (auto& item : items)
-        {
-            FindItemByIdVisitor visitor(item->GetTemplate()->ItemId);
-            DestroyItem(&visitor);
-
-            bagSpace = AI_VALUE(uint8, "bag space");
-
-            if (bagSpace < 90)
-                return true;
-        }
+        DestroyUntilBagSpace(DistinctItemIds(visitor.GetResult()));
         return true;
     }
 
@@ -90,16 +98,23 @@ bool SmartDestroyItemAction::Execute(Event /*event*/)
         std::vector<Item*> items = AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(usage));
         std::reverse(items.begin(), items.end());
 
-        for (auto& item : items)
-        {
-            FindItemByIdVisitor visitor(item->GetTemplate()->ItemId);
-            DestroyItem(&visitor);
+        if (DestroyUntilBagSpace(DistinctItemIds(items)))
+            return true;
+    }
 
-            bagSpace = AI_VALUE(uint8, "bag space");
+    return false;
+}
 
-            if (bagSpace < 90)
-                return true;
-        }
+bool SmartDestroyItemAction::DestroyUntilBagSpace(std::vector<uint32> const& itemIds)
+{
+    // Ids, not Item*: one destroy frees every stack of an id, including later entries.
+    for (uint32 const itemId : itemIds)
+    {
+        FindItemByIdVisitor visitor(itemId);
+        DestroyItem(&visitor);
+
+        if (AI_VALUE(uint8, "bag space") < BAG_SPACE_DESTROY_THRESHOLD)
+            return true;
     }
 
     return false;

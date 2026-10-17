@@ -52,35 +52,35 @@ public:
     }
 
 private:
-    static Trigger* mutating_injection_melee(PlayerbotAI* ai) { return new MutatingInjectionMeleeTrigger(ai); }
-    static Trigger* mutating_injection_ranged(PlayerbotAI* ai) { return new MutatingInjectionRangedTrigger(ai); }
-    static Trigger* mutating_injection_removed(PlayerbotAI* ai) { return new MutatingInjectionRemovedTrigger(ai); }
-    static Trigger* grobbulus_cloud(PlayerbotAI* ai) { return new GrobbulusCloudTrigger(ai); }
-    static Trigger* heigan_melee(PlayerbotAI* ai) { return new HeiganMeleeTrigger(ai); }
-    static Trigger* heigan_ranged(PlayerbotAI* ai) { return new HeiganRangedTrigger(ai); }
+    static Trigger* mutating_injection_melee(PlayerbotAI* botAI) { return new MutatingInjectionMeleeTrigger(botAI); }
+    static Trigger* mutating_injection_ranged(PlayerbotAI* botAI) { return new MutatingInjectionRangedTrigger(botAI); }
+    static Trigger* mutating_injection_removed(PlayerbotAI* botAI) { return new MutatingInjectionRemovedTrigger(botAI); }
+    static Trigger* grobbulus_cloud(PlayerbotAI* botAI) { return new GrobbulusCloudTrigger(botAI); }
+    static Trigger* heigan_melee(PlayerbotAI* botAI) { return new HeiganMeleeTrigger(botAI); }
+    static Trigger* heigan_ranged(PlayerbotAI* botAI) { return new HeiganRangedTrigger(botAI); }
 
-    static Trigger* thaddius_phase_pet(PlayerbotAI* ai) { return new ThaddiusPhasePetTrigger(ai); }
-    static Trigger* thaddius_phase_pet_lose_aggro(PlayerbotAI* ai) { return new ThaddiusPhasePetLoseAggroTrigger(ai); }
-    static Trigger* thaddius_phase_transition(PlayerbotAI* ai) { return new ThaddiusPhaseTransitionTrigger(ai); }
-    static Trigger* thaddius_phase_thaddius(PlayerbotAI* ai) { return new ThaddiusPhaseThaddiusTrigger(ai); }
-    static Trigger* razuvious_tank(PlayerbotAI* ai) { return new RazuviousTankTrigger(ai); }
-    static Trigger* razuvious_nontank(PlayerbotAI* ai) { return new RazuviousNontankTrigger(ai); }
+    static Trigger* thaddius_phase_pet(PlayerbotAI* botAI) { return new ThaddiusPhasePetTrigger(botAI); }
+    static Trigger* thaddius_phase_pet_lose_aggro(PlayerbotAI* botAI) { return new ThaddiusPhasePetLoseAggroTrigger(botAI); }
+    static Trigger* thaddius_phase_transition(PlayerbotAI* botAI) { return new ThaddiusPhaseTransitionTrigger(botAI); }
+    static Trigger* thaddius_phase_thaddius(PlayerbotAI* botAI) { return new ThaddiusPhaseThaddiusTrigger(botAI); }
+    static Trigger* razuvious_tank(PlayerbotAI* botAI) { return new RazuviousTankTrigger(botAI); }
+    static Trigger* razuvious_nontank(PlayerbotAI* botAI) { return new RazuviousNontankTrigger(botAI); }
 
-    static Trigger* four_horsemen_attractors(PlayerbotAI* ai) { return new FourHorsemenAttractorsTrigger(ai); }
-    static Trigger* four_horsemen_except_attractors(PlayerbotAI* ai) { return new FourHorsemenExceptAttractorsTrigger(ai); }
+    static Trigger* four_horsemen_attractors(PlayerbotAI* botAI) { return new FourHorsemenAttractorsTrigger(botAI); }
+    static Trigger* four_horsemen_except_attractors(PlayerbotAI* botAI) { return new FourHorsemenExceptAttractorsTrigger(botAI); }
 
-    static Trigger* sapphiron_ground(PlayerbotAI* ai) { return new SapphironGroundTrigger(ai); }
-    static Trigger* sapphiron_flight(PlayerbotAI* ai) { return new SapphironFlightTrigger(ai); }
-    static Trigger* kelthuzad(PlayerbotAI* ai) { return new KelthuzadTrigger(ai); }
-    static Trigger* anubrekhan(PlayerbotAI* ai) { return new AnubrekhanTrigger(ai); }
-    static Trigger* faerlina(PlayerbotAI* ai) { return new FaerlinaTrigger(ai); }
-    static Trigger* maexxna(PlayerbotAI* ai) { return new MaexxnaTrigger(ai); }
-    //static Trigger* patchwerk_tank(PlayerbotAI* ai) { return new PatchwerkTankTrigger(ai); }
-    //static Trigger* patchwerk_non_tank(PlayerbotAI* ai) { return new PatchwerkNonTankTrigger(ai); }
-    //static Trigger* patchwerk_ranged(PlayerbotAI* ai) { return new PatchwerkRangedTrigger(ai); }
-    static Trigger* gluth(PlayerbotAI* ai) { return new GluthTrigger(ai); }
-    static Trigger* gluth_main_tank_mortal_wound(PlayerbotAI* ai) { return new GluthMainTankMortalWoundTrigger(ai); }
-    static Trigger* loatheb(PlayerbotAI* ai) { return new LoathebTrigger(ai); }
+    static Trigger* sapphiron_ground(PlayerbotAI* botAI) { return new SapphironGroundTrigger(botAI); }
+    static Trigger* sapphiron_flight(PlayerbotAI* botAI) { return new SapphironFlightTrigger(botAI); }
+    static Trigger* kelthuzad(PlayerbotAI* botAI) { return new KelthuzadTrigger(botAI); }
+    static Trigger* anubrekhan(PlayerbotAI* botAI) { return new AnubrekhanTrigger(botAI); }
+    static Trigger* faerlina(PlayerbotAI* botAI) { return new FaerlinaTrigger(botAI); }
+    static Trigger* maexxna(PlayerbotAI* botAI) { return new MaexxnaTrigger(botAI); }
+    //static Trigger* patchwerk_tank(PlayerbotAI* botAI) { return new PatchwerkTankTrigger(botAI); }
+    //static Trigger* patchwerk_non_tank(PlayerbotAI* botAI) { return new PatchwerkNonTankTrigger(botAI); }
+    //static Trigger* patchwerk_ranged(PlayerbotAI* botAI) { return new PatchwerkRangedTrigger(botAI); }
+    static Trigger* gluth(PlayerbotAI* botAI) { return new GluthTrigger(botAI); }
+    static Trigger* gluth_main_tank_mortal_wound(PlayerbotAI* botAI) { return new GluthMainTankMortalWoundTrigger(botAI); }
+    static Trigger* loatheb(PlayerbotAI* botAI) { return new LoathebTrigger(botAI); }
 };
 
 #endif

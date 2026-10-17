@@ -30,10 +30,10 @@ namespace
             if (!member || !member->IsAlive())
                 continue;
 
-            if (!mainTank && botAI->IsMainTank(member))
+            if (!mainTank && PlayerbotAI::IsMainTank(member))
                 mainTank = member;
 
-            if (!assistTank && botAI->IsAssistTank(member))
+            if (!assistTank && PlayerbotAI::IsAssistTank(member))
                 assistTank = member;
 
             if (mainTank && assistTank)
@@ -96,7 +96,7 @@ namespace
                 if (member->GetMapId() != bot->GetMapId() || member->GetInstanceId() != bot->GetInstanceId())
                     continue;
 
-                if (botAI->IsTank(member) || !botAI->IsRanged(member))
+                if (PlayerbotAI::IsTank(member) || !PlayerbotAI::IsRanged(member))
                     continue;
 
                 sx += member->GetPositionX();
@@ -114,7 +114,7 @@ namespace
 
         Player* master = botAI->GetMaster();
         if (master && master->IsInWorld() && master->GetMapId() == bot->GetMapId() &&
-            master->GetInstanceId() == bot->GetInstanceId() && !botAI->IsTank(master))
+            master->GetInstanceId() == bot->GetInstanceId() && !PlayerbotAI::IsTank(master))
         {
             rx = master->GetPositionX();
             ry = master->GetPositionY();
@@ -140,7 +140,7 @@ namespace
         return true;
     }
 
-    bool MarkableAdd(PlayerbotAI* botAI, Unit* mob)
+    bool MarkableAdd(Unit* mob)
     {
         if (!mob || !mob->IsAlive())
             return false;
@@ -149,7 +149,7 @@ namespace
             return true;
 
         Unit* victim = mob->GetVictim();
-        return victim && victim->IsPlayer() && botAI->IsTank(victim->ToPlayer());
+        return victim && victim->IsPlayer() && PlayerbotAI::IsTank(victim->ToPlayer());
     }
 }
 
@@ -175,7 +175,7 @@ Unit* RsTrashAddsAction::FindPriorityAdd()
 
     std::vector<Unit*> markable;
     for (Unit* mob : mobs)
-        if (MarkableAdd(botAI, mob))
+        if (MarkableAdd(mob))
             markable.push_back(mob);
 
     if (markable.empty())
@@ -186,7 +186,7 @@ Unit* RsTrashAddsAction::FindPriorityAdd()
         bestRank = std::min(bestRank, RsTrashPriorityRank(mob->GetEntry()));
 
     Unit* current = botAI->GetUnit(group->GetTargetIcon(RtiTargetValue::skullIndex));
-    if (current && MarkableAdd(botAI, current) && RsTrashIsTrashEntry(current->GetEntry()) &&
+    if (current && MarkableAdd(current) && RsTrashIsTrashEntry(current->GetEntry()) &&
         RsTrashPriorityRank(current->GetEntry()) == bestRank)
         return current;
 
@@ -242,7 +242,7 @@ bool RsTrashTankAction::HoldAt(std::vector<Unit*> const& assigned, float spotX, 
 
 bool RsTrashMainTankAction::Execute(Event )
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     if (RsReleaseIfFollowing(bot))
@@ -320,7 +320,7 @@ bool RsTrashMainTankAction::Execute(Event )
 
 bool RsTrashAssistTankAction::Execute(Event )
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     if (RsReleaseIfFollowing(bot))
@@ -350,7 +350,7 @@ bool RsTrashAssistTankAction::Execute(Event )
 
 bool RsTrashRangedAction::Execute(Event )
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Group* group = bot->GetGroup();
@@ -365,7 +365,7 @@ bool RsTrashRangedAction::Execute(Event )
         if (!member || !member->IsAlive() || member == bot)
             continue;
 
-        if (!botAI->IsTank(member))
+        if (!PlayerbotAI::IsTank(member))
             continue;
 
         if (member->GetMapId() != bot->GetMapId() || member->GetInstanceId() != bot->GetInstanceId())

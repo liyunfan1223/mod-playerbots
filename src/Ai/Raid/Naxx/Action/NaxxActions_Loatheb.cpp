@@ -12,13 +12,13 @@ bool LoathebPositionAction::Execute(Event /*event*/)
     if (!helper.UpdateBossAI())
         return false;
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         if (AI_VALUE2(bool, "has aggro", "boss target"))
             return MoveTo(533, helper.mainTankPos.first, helper.mainTankPos.second, bot->GetPositionZ(), false, false, false, false,
                           MovementPriority::MOVEMENT_COMBAT);
     }
-    else if (botAI->IsRanged(bot))
+    else if (PlayerbotAI::IsRanged(bot))
         return MoveInside(533, helper.rangePos.first, helper.rangePos.second, bot->GetPositionZ(), 1.0f,
                           MovementPriority::MOVEMENT_COMBAT);
     return false;

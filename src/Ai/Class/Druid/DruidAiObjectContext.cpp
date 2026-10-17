@@ -61,16 +61,17 @@ public:
         creators["bear"] = &DruidDruidStrategyFactoryInternal::bear;
         creators["tank"] = &DruidDruidStrategyFactoryInternal::bear;
         creators["cat"] = &DruidDruidStrategyFactoryInternal::cat;
-        creators["balance"] = &DruidDruidStrategyFactoryInternal::balance;
         creators["dps"] = &DruidDruidStrategyFactoryInternal::cat;
-        creators["resto"] = &DruidDruidStrategyFactoryInternal::heal;
+        creators["balance"] = &DruidDruidStrategyFactoryInternal::balance;
+        creators["resto"] = &DruidDruidStrategyFactoryInternal::resto;
+        creators["heal"] = &DruidDruidStrategyFactoryInternal::resto;
     }
 
 private:
     static Strategy* bear(PlayerbotAI* botAI) { return new BearDruidStrategy(botAI); }
     static Strategy* cat(PlayerbotAI* botAI) { return new CatDruidStrategy(botAI); }
     static Strategy* balance(PlayerbotAI* botAI) { return new BalanceDruidStrategy(botAI); }
-    static Strategy* heal(PlayerbotAI* botAI) { return new RestoDruidStrategy(botAI); }
+    static Strategy* resto(PlayerbotAI* botAI) { return new RestoDruidStrategy(botAI); }
 };
 
 class DruidTriggerFactoryInternal : public NamedObjectContext<Trigger>
@@ -130,6 +131,8 @@ public:
         creators["prowl"] = &DruidTriggerFactoryInternal::prowl_trigger;
         creators["rejuvenation blanket"] = &DruidTriggerFactoryInternal::rejuvenation_blanket;
         creators["wild growth blanket"] = &DruidTriggerFactoryInternal::wild_growth_blanket;
+        creators["healer should attack and not blanketing"] =
+            &DruidTriggerFactoryInternal::healer_should_attack_and_not_blanketing;
         creators["aquatic form"] = &DruidTriggerFactoryInternal::aquatic_form;
     }
 
@@ -165,28 +168,38 @@ private:
     static Trigger* cat_form(PlayerbotAI* botAI) { return new CatFormTrigger(botAI); }
     static Trigger* tree_form(PlayerbotAI* botAI) { return new TreeFormTrigger(botAI); }
     static Trigger* bash_on_enemy_healer(PlayerbotAI* botAI) { return new BashInterruptEnemyHealerSpellTrigger(botAI); }
-    static Trigger* party_member_remove_curse(PlayerbotAI* ai) { return new DruidPartyMemberRemoveCurseTrigger(ai); }
+    static Trigger* party_member_remove_curse(PlayerbotAI* botAI) { return new DruidPartyMemberRemoveCurseTrigger(botAI); }
     static Trigger* mangle_bear_trigger(PlayerbotAI* botAI) { return new MangleBearTrigger(botAI); }
     static Trigger* lacerate_trigger(PlayerbotAI* botAI) { return new LacerateTrigger(botAI); }
     static Trigger* demoralize_roar(PlayerbotAI* botAI) { return new DemoralizeRoarTrigger(botAI); }
-    static Trigger* mangle_cat(PlayerbotAI* ai) { return new MangleCatTrigger(ai); }
-    static Trigger* ferocious_bite_time(PlayerbotAI* ai) { return new FerociousBiteTimeTrigger(ai); }
-    static Trigger* ferocious_bite_execute(PlayerbotAI* ai) { return new FerociousBiteExecuteTrigger(ai); }
-    static Trigger* hurricane_channel_check(PlayerbotAI* ai) { return new HurricaneChannelCheckTrigger(ai); }
-    static Trigger* no_healer_dps_strategy(PlayerbotAI* ai) { return new NoHealerDpsStrategyTrigger(ai); }
-    static Trigger* starfall(PlayerbotAI* ai) { return new StarfallTrigger(ai); }
-    static Trigger* force_of_nature(PlayerbotAI* ai) { return new ForceOfNatureTrigger(ai); }
-    static Trigger* cyclone(PlayerbotAI* ai) { return new CycloneTrigger(ai); }
-    static Trigger* predators_swiftness(PlayerbotAI* ai) { return new PredatorsSwiftnessTrigger(ai); }
-    static Trigger* predators_swiftness_and_cyclone(PlayerbotAI* ai) { return new TwoTriggers(ai, "predator's swiftness", "cyclone"); }
-    static Trigger* predators_swiftness_and_hibernate(PlayerbotAI* ai) { return new TwoTriggers(ai, "predator's swiftness", "hibernate"); }
-    static Trigger* predators_swiftness_and_entangling_roots(PlayerbotAI* ai) { return new TwoTriggers(ai, "predator's swiftness", "entangling roots"); }
-    static Trigger* predators_swiftness_and_combat_party_member_dead(PlayerbotAI* ai) { return new TwoTriggers(ai, "predator's swiftness", "combat party member dead"); }
-    static Trigger* clearcasting_and_medium_aoe(PlayerbotAI* ai) { return new TwoTriggers(ai, "clearcasting", "medium aoe"); }
-    static Trigger* prowl_trigger(PlayerbotAI* ai) { return new ProwlTrigger(ai); }
-    static Trigger* rejuvenation_blanket(PlayerbotAI* ai) { return new BuffOnPartyTrigger(ai, "rejuvenation"); }
-    static Trigger* wild_growth_blanket(PlayerbotAI* ai) { return new BuffOnPartyTrigger(ai, "wild growth"); }
-    static Trigger* aquatic_form(PlayerbotAI* ai) { return new AquaticFormTrigger(ai); }
+    static Trigger* mangle_cat(PlayerbotAI* botAI) { return new MangleCatTrigger(botAI); }
+    static Trigger* ferocious_bite_time(PlayerbotAI* botAI) { return new FerociousBiteTimeTrigger(botAI); }
+    static Trigger* ferocious_bite_execute(PlayerbotAI* botAI) { return new FerociousBiteExecuteTrigger(botAI); }
+    static Trigger* hurricane_channel_check(PlayerbotAI* botAI) { return new HurricaneChannelCheckTrigger(botAI); }
+    static Trigger* no_healer_dps_strategy(PlayerbotAI* botAI) { return new NoHealerDpsStrategyTrigger(botAI); }
+    static Trigger* starfall(PlayerbotAI* botAI) { return new StarfallTrigger(botAI); }
+    static Trigger* force_of_nature(PlayerbotAI* botAI) { return new ForceOfNatureTrigger(botAI); }
+    static Trigger* cyclone(PlayerbotAI* botAI) { return new CycloneTrigger(botAI); }
+    static Trigger* predators_swiftness(PlayerbotAI* botAI) { return new PredatorsSwiftnessTrigger(botAI); }
+    static Trigger* predators_swiftness_and_cyclone(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "predator's swiftness", "cyclone"); }
+    static Trigger* predators_swiftness_and_hibernate(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "predator's swiftness", "hibernate"); }
+    static Trigger* predators_swiftness_and_entangling_roots(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "predator's swiftness", "entangling roots"); }
+    static Trigger* predators_swiftness_and_combat_party_member_dead(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "predator's swiftness", "combat party member dead"); }
+    static Trigger* clearcasting_and_medium_aoe(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "clearcasting", "medium aoe"); }
+    static Trigger* prowl_trigger(PlayerbotAI* botAI) { return new ProwlTrigger(botAI); }
+    static Trigger* rejuvenation_blanket(PlayerbotAI* botAI)
+    {
+        return new BlanketHotTrigger(botAI, "rejuvenation blanket", "rejuvenation");
+    }
+    static Trigger* wild_growth_blanket(PlayerbotAI* botAI)
+    {
+        return new BlanketHotTrigger(botAI, "wild growth blanket", "wild growth");
+    }
+    static Trigger* healer_should_attack_and_not_blanketing(PlayerbotAI* botAI)
+    {
+        return new HealerShouldAttackAndNotBlanketingTrigger(botAI);
+    }
+    static Trigger* aquatic_form(PlayerbotAI* botAI) { return new AquaticFormTrigger(botAI); }
 };
 
 class DruidAiObjectContextInternal : public NamedObjectContext<Action>
@@ -372,17 +385,17 @@ private:
     static Action* prowl(PlayerbotAI* botAI) { return new CastProwlAction(botAI); }
     static Action* dash(PlayerbotAI* botAI) { return new CastDashAction(botAI); }
     static Action* shred(PlayerbotAI* botAI) { return new CastShredAction(botAI); }
-    static Action* wild_growth_on_party(PlayerbotAI* ai) { return new CastWildGrowthOnPartyAction(ai); }
-    static Action* swiftmend_on_party(PlayerbotAI* ai) { return new CastPartySwiftmendAction(ai); }
-    static Action* nourish_on_party(PlayerbotAI* ai) { return new CastPartyNourishAction(ai); }
-    static Action* remove_curse_on_party(PlayerbotAI* ai) { return new CastDruidRemoveCurseOnPartyAction(ai); }
-    static Action* insect_swarm_on_attacker(PlayerbotAI* ai) { return new CastInsectSwarmOnAttackerAction(ai); }
-    static Action* moonfire_on_attacker(PlayerbotAI* ai) { return new CastMoonfireOnAttackerAction(ai); }
-    static Action* enrage(PlayerbotAI* ai) { return new CastEnrageAction(ai); }
-    static Action* force_of_nature(PlayerbotAI* ai) { return new CastForceOfNatureAction(ai); }
-    static Action* typhoon(PlayerbotAI* ai) { return new CastTyphoonAction(ai); }
-    static Action* rejuvenation_blanket(PlayerbotAI* ai) { return new CastRejuvenationBlanketAction(ai); }
-    static Action* wild_growth_blanket(PlayerbotAI* ai) { return new CastWildGrowthBlanketAction(ai); }
+    static Action* wild_growth_on_party(PlayerbotAI* botAI) { return new CastWildGrowthOnPartyAction(botAI); }
+    static Action* swiftmend_on_party(PlayerbotAI* botAI) { return new CastPartySwiftmendAction(botAI); }
+    static Action* nourish_on_party(PlayerbotAI* botAI) { return new CastPartyNourishAction(botAI); }
+    static Action* remove_curse_on_party(PlayerbotAI* botAI) { return new CastDruidRemoveCurseOnPartyAction(botAI); }
+    static Action* insect_swarm_on_attacker(PlayerbotAI* botAI) { return new CastInsectSwarmOnAttackerAction(botAI); }
+    static Action* moonfire_on_attacker(PlayerbotAI* botAI) { return new CastMoonfireOnAttackerAction(botAI); }
+    static Action* enrage(PlayerbotAI* botAI) { return new CastEnrageAction(botAI); }
+    static Action* force_of_nature(PlayerbotAI* botAI) { return new CastForceOfNatureAction(botAI); }
+    static Action* typhoon(PlayerbotAI* botAI) { return new CastTyphoonAction(botAI); }
+    static Action* rejuvenation_blanket(PlayerbotAI* botAI) { return new CastRejuvenationBlanketAction(botAI); }
+    static Action* wild_growth_blanket(PlayerbotAI* botAI) { return new CastWildGrowthBlanketAction(botAI); }
 };
 
 SharedNamedObjectContextList<Strategy> DruidAiObjectContext::sharedStrategyContexts;
@@ -429,11 +442,13 @@ public:
     {
         creators["eclipse solar proc time"] = &DruidValueContextInternal::eclipse_solar_proc_time;
         creators["eclipse lunar proc time"] = &DruidValueContextInternal::eclipse_lunar_proc_time;
+        creators["blanket hot target"] = &DruidValueContextInternal::blanket_hot_target;
     }
 
 private:
     static UntypedValue* eclipse_solar_proc_time(PlayerbotAI* botAI) { return new EclipseSolarProcTimeValue(botAI); }
     static UntypedValue* eclipse_lunar_proc_time(PlayerbotAI* botAI) { return new EclipseLunarProcTimeValue(botAI); }
+    static UntypedValue* blanket_hot_target(PlayerbotAI* botAI) { return new BlanketHotTargetValue(botAI); }
 };
 
 void DruidAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)

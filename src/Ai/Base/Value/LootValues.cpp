@@ -5,10 +5,8 @@
  */
 
 #include "LootValues.h"
-#include "LootObjectStack.h"
 #include "Playerbots.h"
 #include "SharedValueContext.h"
-#include <set>
 
 LootTemplateAccess const* DropMapValue::GetLootTemplate(ObjectGuid guid, LootType type)
 {
@@ -133,36 +131,6 @@ std::vector<uint32> EntryLootListValue::Calculate()
             items.push_back(lItem->itemid);
 
     return items;
-}
-
-bool LootEntryUsefulValue::Calculate()
-{
-    uint32 lootId = stoi(getQualifier());
-    if (!lootId)
-        return false;
-
-    LootStrategy* lootStrategy = AI_VALUE(LootStrategy*, "loot strategy");
-    if (lootStrategy && lootStrategy->AlwaysLoot())
-        return true;
-
-    LootTemplate const* lootTemplate = LootTemplates_Gameobject.GetLootFor(lootId);
-    if (!lootTemplate)
-        return false;
-
-    LootObjectStack* lootStack = AI_VALUE(LootObjectStack*, "available loot");
-    if (!lootStack)
-        return false;
-
-    std::set<uint32> itemIds;
-    lootTemplate->CollectItemIds(itemIds);
-
-    for (uint32 itemId : itemIds)
-    {
-        if (lootStack->IsItemStoreable(itemId))
-            return true;
-    }
-
-    return false;
 }
 
 itemUsageMap EntryLootUsageValue::Calculate()

@@ -57,15 +57,6 @@ public:
     std::vector<uint32> Calculate() override;
 };
 
-// Whether a gameobject loot template holds anything this bot would store (2s cache per loot id).
-class LootEntryUsefulValue : public BoolCalculatedValue, public Qualified
-{
-public:
-    LootEntryUsefulValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "loot entry useful", 2 * IN_MILLISECONDS) {}
-
-    bool Calculate() override;
-};
-
 typedef std::unordered_map<ItemUsage, std::vector<uint32>> itemUsageMap;
 
 class EntryLootUsageValue : public CalculatedValue<itemUsageMap>, public Qualified

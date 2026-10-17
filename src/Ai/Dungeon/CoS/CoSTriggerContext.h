@@ -20,8 +20,8 @@ class WotlkDungeonCoSTriggerContext : public NamedObjectContext<Trigger>
 
         }
     private:
-        static Trigger* explode_ghoul(PlayerbotAI* ai) { return new ExplodeGhoulTrigger(ai); }
-        static Trigger* epoch_ranged(PlayerbotAI* ai) { return new EpochRangedTrigger(ai); }
+        static Trigger* explode_ghoul(PlayerbotAI* botAI) { return new ExplodeGhoulTrigger(botAI); }
+        static Trigger* epoch_ranged(PlayerbotAI* botAI) { return new EpochRangedTrigger(botAI); }
 };
 
 #endif

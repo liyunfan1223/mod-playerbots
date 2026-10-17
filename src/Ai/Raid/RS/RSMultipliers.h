@@ -12,84 +12,84 @@
 class RsSavianaBeaconMultiplier : public Multiplier
 {
 public:
-    RsSavianaBeaconMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs saviana beacon") {}
+    RsSavianaBeaconMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs saviana beacon") {}
     float GetValue(Action* action) override;
 };
 
 class RsBaltharusBrandSafeMultiplier : public Multiplier
 {
 public:
-    RsBaltharusBrandSafeMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs baltharus brand safe") {}
+    RsBaltharusBrandSafeMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs baltharus brand safe") {}
     float GetValue(Action* action) override;
 };
 
 class RsSavianaMeleeSpreadMultiplier : public Multiplier
 {
 public:
-    RsSavianaMeleeSpreadMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs saviana melee spread") {}
+    RsSavianaMeleeSpreadMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs saviana melee spread") {}
     float GetValue(Action* action) override;
 };
 
 class RsZarithrianAddsMultiplier : public Multiplier
 {
 public:
-    RsZarithrianAddsMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs zarithrian adds") {}
+    RsZarithrianAddsMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs zarithrian adds") {}
     float GetValue(Action* action) override;
 };
 
 class RsZarithrianTankSwapMultiplier : public Multiplier
 {
 public:
-    RsZarithrianTankSwapMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs zarithrian tank swap") {}
+    RsZarithrianTankSwapMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs zarithrian tank swap") {}
     float GetValue(Action* action) override;
 };
 
 class RsHalionCombustionMultiplier : public Multiplier
 {
 public:
-    RsHalionCombustionMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs halion combustion safe") {}
+    RsHalionCombustionMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs halion combustion safe") {}
     float GetValue(Action* action) override;
 };
 
 class RsHalionMeteorMultiplier : public Multiplier
 {
 public:
-    RsHalionMeteorMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs halion meteor") {}
+    RsHalionMeteorMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs halion meteor") {}
     float GetValue(Action* action) override;
 };
 
 class RsHalionMeleeFlankMultiplier : public Multiplier
 {
 public:
-    RsHalionMeleeFlankMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs halion melee flank") {}
+    RsHalionMeleeFlankMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs halion melee flank") {}
     float GetValue(Action* action) override;
 };
 
 class RsHalionP2Multiplier : public Multiplier
 {
 public:
-    RsHalionP2Multiplier(PlayerbotAI* ai) : Multiplier(ai, "rs halion p2") {}
+    RsHalionP2Multiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs halion p2") {}
     float GetValue(Action* action) override;
 };
 
 class RsHalionHpBalanceMultiplier : public Multiplier
 {
 public:
-    RsHalionHpBalanceMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs halion hp balance") {}
+    RsHalionHpBalanceMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs halion hp balance") {}
     float GetValue(Action* action) override;
 };
 
 class RsHalionRealmIsolationMultiplier : public Multiplier
 {
 public:
-    RsHalionRealmIsolationMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs halion realm isolation") {}
+    RsHalionRealmIsolationMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs halion realm isolation") {}
     float GetValue(Action* action) override;
 };
 
 class RsTrashAddsMultiplier : public Multiplier
 {
 public:
-    RsTrashAddsMultiplier(PlayerbotAI* ai) : Multiplier(ai, "rs trash adds") {}
+    RsTrashAddsMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "rs trash adds") {}
     float GetValue(Action* action) override;
 };
 

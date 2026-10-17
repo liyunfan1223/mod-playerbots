@@ -25,14 +25,14 @@ class WotlkDungeonNexTriggerContext : public NamedObjectContext<Trigger>
             creators["keristrasza positioning"] = &WotlkDungeonNexTriggerContext::keristrasza_positioning;
         }
     private:
-        static Trigger* faction_commander_whirlwind(PlayerbotAI* ai) { return new FactionCommanderWhirlwindTrigger(ai); }
-        static Trigger* telestra_firebomb(PlayerbotAI* ai) { return new TelestraFirebombTrigger(ai); }
-        static Trigger* telestra_split_phase(PlayerbotAI* ai) { return new TelestraSplitPhaseTrigger(ai); }
-        static Trigger* chaotic_rift(PlayerbotAI* ai) { return new ChaoticRiftTrigger(ai); }
-        static Trigger* ormorok_spikes(PlayerbotAI* ai) { return new OrmorokSpikesTrigger(ai); }
-        static Trigger* ormorok_stack(PlayerbotAI* ai) { return new OrmorokStackTrigger(ai); }
-        static Trigger* intense_cold(PlayerbotAI* ai) { return new IntenseColdTrigger(ai); }
-        static Trigger* keristrasza_positioning(PlayerbotAI* ai) { return new KeristraszaPositioningTrigger(ai); }
+        static Trigger* faction_commander_whirlwind(PlayerbotAI* botAI) { return new FactionCommanderWhirlwindTrigger(botAI); }
+        static Trigger* telestra_firebomb(PlayerbotAI* botAI) { return new TelestraFirebombTrigger(botAI); }
+        static Trigger* telestra_split_phase(PlayerbotAI* botAI) { return new TelestraSplitPhaseTrigger(botAI); }
+        static Trigger* chaotic_rift(PlayerbotAI* botAI) { return new ChaoticRiftTrigger(botAI); }
+        static Trigger* ormorok_spikes(PlayerbotAI* botAI) { return new OrmorokSpikesTrigger(botAI); }
+        static Trigger* ormorok_stack(PlayerbotAI* botAI) { return new OrmorokStackTrigger(botAI); }
+        static Trigger* intense_cold(PlayerbotAI* botAI) { return new IntenseColdTrigger(botAI); }
+        static Trigger* keristrasza_positioning(PlayerbotAI* botAI) { return new KeristraszaPositioningTrigger(botAI); }
 };
 
 #endif

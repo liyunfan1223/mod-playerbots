@@ -12,7 +12,7 @@
 #include "Trigger.h"
 #include <string>
 
-// General
+// Shared
 
 class HyjalEncounterTrigger : public Trigger
 {
@@ -33,8 +33,6 @@ protected:
 class HyjalNoEncounterInProgressTrigger : public Trigger
 {
 public:
-    // Throttled to once per second. This trigger is true for all trash and downtime and, being
-    // for between-encounter clean-up, has no real urgency to it.
     HyjalNoEncounterInProgressTrigger(PlayerbotAI* botAI)
         : Trigger(botAI, "hyjal no encounter in progress", 1000) {}
     bool IsActive() override;
@@ -42,10 +40,10 @@ public:
 
 // For Misdirection to the boss. Anetheron is not included because Misdirection is used there for
 // picking up Infernals as well.
-class HyjalPullingBossTrigger : public HyjalEncounterTrigger
+class HyjalHunterShouldMisdirectTrigger : public HyjalEncounterTrigger
 {
 public:
-    HyjalPullingBossTrigger(
+    HyjalHunterShouldMisdirectTrigger(
         PlayerbotAI* botAI, std::string const& name, std::string const& bossName)
         : HyjalEncounterTrigger(botAI, name), _bossName(bossName) {}
 
@@ -111,11 +109,11 @@ protected:
 
 // Anetheron
 
-class AnetheronPullingBossOrInfernalTrigger : public HyjalEncounterTrigger
+class AnetheronHunterShouldMisdirectTrigger : public HyjalEncounterTrigger
 {
 public:
-    AnetheronPullingBossOrInfernalTrigger(PlayerbotAI* botAI)
-        : HyjalEncounterTrigger(botAI, "anetheron pulling boss or infernal") {}
+    AnetheronHunterShouldMisdirectTrigger(PlayerbotAI* botAI)
+        : HyjalEncounterTrigger(botAI, "anetheron hunter should misdirect") {}
 
 protected:
     bool IsActiveInEncounter() override;

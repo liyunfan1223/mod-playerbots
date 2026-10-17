@@ -103,11 +103,11 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     Player* masterPlayer = masterSession ? masterSession->GetPlayer() : nullptr;
 
     bool isRndbot = !masterAccountId;
-    bool sameAccount = sPlayerbotAIConfig.allowAccountBots && accountId == masterAccountId;
+    bool sameAccount = sPlayerbotAIConfig.AllowAccountBots && accountId == masterAccountId;
     Guild* guild = masterPlayer ? sGuildMgr->GetGuildById(masterPlayer->GetGuildId()) : nullptr;
-    bool sameGuild = sPlayerbotAIConfig.allowGuildBots && guild && guild->GetMember(playerGuid);
+    bool sameGuild = sPlayerbotAIConfig.AllowGuildBots && guild && guild->GetMember(playerGuid);
     bool addClassBot = sRandomPlayerbotMgr.IsAddclassBot(playerGuid.GetCounter());
-    bool linkedAccount = sPlayerbotAIConfig.allowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId);
+    bool linkedAccount = sPlayerbotAIConfig.AllowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId);
 
     bool allowed = true;
     std::ostringstream out;
@@ -133,10 +133,10 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
                 ++loadingForMaster;
         }
         uint32 count = mgr->GetPlayerbotsCount() + loadingForMaster;
-        if (count >= uint32(PlayerbotAIConfig::instance().maxAddedBots))
+        if (count >= uint32(PlayerbotAIConfig::Instance().MaxAddedBots))
         {
             allowed = false;
-            out << "Failure: You have added too many bots (more than " << sPlayerbotAIConfig.maxAddedBots << ")";
+            out << "Failure: You have added too many bots (more than " << sPlayerbotAIConfig.MaxAddedBots << ")";
         }
     }
     if (!allowed)
@@ -545,7 +545,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 
             // Don't disband alt groups when master goes away
             // Controlled by config
-            if (sPlayerbotAIConfig.KeepAltsInGroup())
+            if (sPlayerbotAIConfig.KeepAltsInGroup)
             {
                 uint32 account = sCharacterCache->GetCharacterAccountIdByGuid(member);
                 if (!sPlayerbotAIConfig.IsInRandomAccountList(account))
@@ -626,11 +626,11 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     uint32 accountId = bot->GetSession()->GetAccountId();
     bool isRandomAccount = sPlayerbotAIConfig.IsInRandomAccountList(accountId);
 
-    if (isRandomAccount && sPlayerbotAIConfig.randomBotFixedLevel)
+    if (isRandomAccount && sPlayerbotAIConfig.RandomBotFixedLevel)
     {
         bot->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
     }
-    else if (isRandomAccount && !sPlayerbotAIConfig.randomBotFixedLevel)
+    else if (isRandomAccount && !sPlayerbotAIConfig.RandomBotFixedLevel)
     {
         bot->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
     }
@@ -642,7 +642,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         // PlayerbotFactory factory(bot, master->GetLevel());
         // factory.Randomize(false);
         uint32 mixedGearScore =
-            PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig.autoInitEquipLevelLimitRatio;
+            PlayerbotAI::GetMixedGearScore(master, true, false, 12) * sPlayerbotAIConfig.AutoInitEquipLevelLimitRatio;
         // work around: distinguish from 0 if no gear
         if (mixedGearScore == 0)
             mixedGearScore = 1;
@@ -667,7 +667,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     uint8 locale = BroadcastHelper::GetLocale();
     AreaTableEntry const* current_zone = GET_PLAYERBOT_AI(bot)->GetCurrentZone();
     ChannelMgr* cMgr = ChannelMgr::forTeam(bot->GetTeamId());
-    std::string current_zone_name = current_zone ? GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(current_zone) : "";
+    std::string current_zone_name = current_zone ? PlayerbotAI::GetLocalizedAreaName(current_zone) : "";
 
     if (current_zone && cMgr)
     {
@@ -698,7 +698,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
                     //but if you (actual player) logout in a city and log back in - you join "City" versions
                     constexpr uint32 AREA_ID_CITY = 3459;
                     std::string const cityName =
-                        GET_PLAYERBOT_AI(bot)->GetLocalizedAreaName(sAreaTableStore.LookupEntry(AREA_ID_CITY));
+                        PlayerbotAI::GetLocalizedAreaName(sAreaTableStore.LookupEntry(AREA_ID_CITY));
                     snprintf(new_channel_name_buf, 100, channel->pattern[locale], cityName.c_str());
                     new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
                     break;
@@ -722,7 +722,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
 std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, ObjectGuid guid, ObjectGuid masterguid,
                                                      bool admin, uint32 masterAccountId, uint32)
 {
-    if (!sPlayerbotAIConfig.enabled || guid.IsEmpty())
+    if (!sPlayerbotAIConfig.Enabled || guid.IsEmpty())
         return "bot system is disabled";
 
     //bool isRandomBot = sRandomPlayerbotMgr.IsRandomBot(guid.GetCounter()); //not used, line marked for removal.
@@ -743,8 +743,8 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
                 return "character not found";
             }
 
-            if (!sPlayerbotAIConfig.allowAccountBots && accountId != masterAccountId &&
-                !(sPlayerbotAIConfig.allowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId)))
+            if (!sPlayerbotAIConfig.AllowAccountBots && accountId != masterAccountId &&
+                !(sPlayerbotAIConfig.AllowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId)))
             {
                 return "you can only add bots from your own account or linked accounts";
             }
@@ -778,7 +778,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
     if (!addClassBot)
     {
-        if (!(cmd == "refresh=raid" && sPlayerbotAIConfig.resetInstanceIdForAltBots))
+        if (!(cmd == "refresh=raid" && sPlayerbotAIConfig.ResetInstanceIdForAltBots))
             return "ERROR: You can only use this command on addclass bots.";
     }
 
@@ -795,7 +795,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
     {
         if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
         {
-            if (master->GetSession()->GetSecurity() <= SEC_PLAYER && sPlayerbotAIConfig.autoInitOnly &&
+            if (master->GetSession()->GetSecurity() <= SEC_PLAYER && sPlayerbotAIConfig.AutoInitOnly &&
                 cmd != "init=auto")
             {
                 return "The command is not allowed, use init=auto instead.";
@@ -842,7 +842,7 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             else if (cmd == "init=auto")
             {
                 uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, true, false, 12) *
-                                        sPlayerbotAIConfig.autoInitEquipLevelLimitRatio;
+                                        sPlayerbotAIConfig.AutoInitEquipLevelLimitRatio;
                 // work around: distinguish from 0 if no gear
                 if (mixedGearScore == 0)
                     mixedGearScore = 1;
@@ -910,7 +910,7 @@ static uint8 GetOfflinePlayerGender(ObjectGuid guid)
 
 bool PlayerbotMgr::HandlePlayerbotMgrCommand(ChatHandler* handler, char const* args)
 {
-    if (!sPlayerbotAIConfig.enabled)
+    if (!sPlayerbotAIConfig.Enabled)
     {
         handler->PSendSysMessage("|cffff0000Playerbot system is currently disabled!");
         return false;
@@ -1089,11 +1089,11 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "tweak"))
     {
-        sPlayerbotAIConfig.tweakValue = sPlayerbotAIConfig.tweakValue++;
-        if (sPlayerbotAIConfig.tweakValue > 2)
-            sPlayerbotAIConfig.tweakValue = 0;
+        sPlayerbotAIConfig.TweakValue = sPlayerbotAIConfig.TweakValue++;
+        if (sPlayerbotAIConfig.TweakValue > 2)
+            sPlayerbotAIConfig.TweakValue = 0;
 
-        messages.push_back("Set tweakvalue to " + std::to_string(sPlayerbotAIConfig.tweakValue));
+        messages.push_back("Set tweakvalue to " + std::to_string(sPlayerbotAIConfig.TweakValue));
         return messages;
     }
 
@@ -1107,9 +1107,9 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
             if (master->isTaxiCheater())
                 master->SetTaxiCheater(false);
         }
-        else if (sPlayerbotAIConfig.selfBotLevel == 0)
+        else if (sPlayerbotAIConfig.SelfBotLevel == 0)
             messages.push_back("SelfBot is disabled server-wide.");
-        else if (sPlayerbotAIConfig.selfBotLevel == 1 && !master->CanBeGameMaster())
+        else if (sPlayerbotAIConfig.SelfBotLevel == 1 && !master->CanBeGameMaster())
             messages.push_back("SelfBot is restricted for this account.");
         else
         {
@@ -1130,7 +1130,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "addclass"))
     {
-        if (sPlayerbotAIConfig.addClassCommand == 0 && !master->CanBeGameMaster())
+        if (sPlayerbotAIConfig.AddClassCommand == 0 && !master->CanBeGameMaster())
         {
             messages.push_back("You do not have permission to create bot by addclass command");
             return messages;
@@ -1235,7 +1235,7 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
         // eligible character is always the same one. Walk a shuffled copy when a random one is wanted,
         // and the cache itself otherwise, so the default path copies nothing.
         ObjectGuid picked = ObjectGuid::Empty;
-        if (sPlayerbotAIConfig.addClassRandomCharacter)
+        if (sPlayerbotAIConfig.AddClassRandomCharacter)
         {
             std::vector<ObjectGuid> candidates(guidCache.begin(), guidCache.end());
             Acore::Containers::RandomShuffle(candidates);
@@ -1561,7 +1561,7 @@ PlayerbotMgr::~PlayerbotMgr()
 
 void PlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool /*minimal*/)
 {
-    SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
+    SetNextCheckDelay(sPlayerbotAIConfig.ReactDelay);
     CheckTellErrors(elapsed);
 }
 
@@ -1571,10 +1571,10 @@ void PlayerbotMgr::HandleCommand(uint32 type, std::string const text)
     if (!master)
         return;
 
-    if (text.find(sPlayerbotAIConfig.commandSeparator) != std::string::npos)
+    if (text.find(sPlayerbotAIConfig.CommandSeparator) != std::string::npos)
     {
         std::vector<std::string> commands;
-        split(commands, text, sPlayerbotAIConfig.commandSeparator.c_str());
+        split(commands, text, sPlayerbotAIConfig.CommandSeparator.c_str());
         for (std::vector<std::string>::iterator i = commands.begin(); i != commands.end(); ++i)
         {
             HandleCommand(type, *i);
@@ -1730,10 +1730,10 @@ void PlayerbotMgr::OnPlayerLogin(Player* player)
     // set locale priority for bot texts
     PlayerbotTextMgr::instance().AddLocalePriority(usedLocale);
 
-    if (sPlayerbotAIConfig.selfBotLevel > 2)
+    if (sPlayerbotAIConfig.SelfBotLevel > 2)
         HandlePlayerbotCommand("self", player);
 
-    if (!sPlayerbotAIConfig.botAutologin)
+    if (!sPlayerbotAIConfig.BotAutologin)
         return;
 
     uint32 accountId = session->GetAccountId();
@@ -1773,7 +1773,7 @@ void PlayerbotMgr::TellError(std::string const botName, std::string const text)
 void PlayerbotMgr::CheckTellErrors(uint32 /*elapsed*/)
 {
     time_t now = time(nullptr);
-    if ((now - lastErrorTell) < sPlayerbotAIConfig.errorDelay / 1000)
+    if ((now - lastErrorTell) < sPlayerbotAIConfig.ErrorDelay / 1000)
         return;
 
     lastErrorTell = now;
@@ -1857,7 +1857,7 @@ void PlayerbotsMgr::RemovePlayerBotData(ObjectGuid const& guid, bool is_AI)
 
 PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 {
-    if (!(sPlayerbotAIConfig.enabled) || !player)
+    if (!(sPlayerbotAIConfig.Enabled) || !player)
     {
         return nullptr;
     }
@@ -1877,7 +1877,7 @@ PlayerbotAI* PlayerbotsMgr::GetPlayerbotAI(Player* player)
 
 PlayerbotMgr* PlayerbotsMgr::GetPlayerbotMgr(Player* player)
 {
-    if (!(sPlayerbotAIConfig.enabled) || !player)
+    if (!(sPlayerbotAIConfig.Enabled) || !player)
     {
         return nullptr;
     }

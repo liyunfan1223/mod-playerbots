@@ -31,7 +31,7 @@ static bool IsValidLmMember(Player* member, Player* bot)
 }
 
 // Up to two lowest-GUID ranged bots in same instance, hunter-priority.
-static std::vector<Player*> PickBoneStormRangedTargets(Player* bot, PlayerbotAI* botAI)
+static std::vector<Player*> PickBoneStormRangedTargets(Player* bot)
 {
     std::vector<Player*> result;
 
@@ -45,9 +45,9 @@ static std::vector<Player*> PickBoneStormRangedTargets(Player* bot, PlayerbotAI*
         Player* member = ref->GetSource();
         if (!IsValidLmMember(member, bot))
             continue;
-        if (botAI->IsTank(member))
+        if (PlayerbotAI::IsTank(member))
             continue;
-        if (!botAI->IsRanged(member))
+        if (!PlayerbotAI::IsRanged(member))
             continue;
 
         ranged.push_back(member);
@@ -104,7 +104,7 @@ bool IccLmTankPositionAction::Execute(Event /*event*/)
 
     if (isBossInBoneStorm)
     {
-        std::vector<Player*> const rangedTargets = PickBoneStormRangedTargets(bot, botAI);
+        std::vector<Player*> const rangedTargets = PickBoneStormRangedTargets(bot);
         if (std::find(rangedTargets.begin(), rangedTargets.end(), bot) != rangedTargets.end())
         {
             float const anchorDist = bot->GetExactDist2d(ICC_LM_BONE_STORM_AT_POSITION.GetPositionX(),
@@ -181,7 +181,7 @@ bool IccLmTankPositionAction::Execute(Event /*event*/)
         float const tankLeash =
             ColdflameNearAnchor(bot, ICC_LM_TANK_POSITION, 10.0f) ? 10.0f : maxDistanceThreshold;
 
-        if (botAI->IsMainTank(bot))
+        if (PlayerbotAI::IsMainTank(bot))
         {
             float const distance =
                 bot->GetExactDist2d(ICC_LM_TANK_POSITION.GetPositionX(), ICC_LM_TANK_POSITION.GetPositionY());
@@ -190,7 +190,7 @@ bool IccLmTankPositionAction::Execute(Event /*event*/)
             return false;
         }
 
-        if (botAI->IsAssistTank(bot))
+        if (PlayerbotAI::IsAssistTank(bot))
         {
             float const distance =
                 bot->GetExactDist2d(ICC_LM_TANK_POSITION.GetPositionX(), ICC_LM_TANK_POSITION.GetPositionY());
@@ -213,7 +213,7 @@ bool IccLmTankPositionAction::Execute(Event /*event*/)
     float const tankLeash =
         ColdflameNearAnchor(bot, ICC_LM_TANK_POSITION, 10.0f) ? 10.0f : maxDistanceThreshold;
 
-    if (botAI->HasAggro(boss) && botAI->IsMainTank(bot) && boss->GetVictim() == bot)
+    if (botAI->HasAggro(boss) && PlayerbotAI::IsMainTank(bot) && boss->GetVictim() == bot)
     {
         float const distance =
             bot->GetExactDist2d(ICC_LM_TANK_POSITION.GetPositionX(), ICC_LM_TANK_POSITION.GetPositionY());
@@ -222,7 +222,7 @@ bool IccLmTankPositionAction::Execute(Event /*event*/)
             return MoveTowardPosition(ICC_LM_TANK_POSITION, maxDistanceThreshold);
     }
 
-    if (botAI->IsAssistTank(bot))
+    if (PlayerbotAI::IsAssistTank(bot))
     {
         float const distance =
             bot->GetExactDist2d(ICC_LM_TANK_POSITION.GetPositionX(), ICC_LM_TANK_POSITION.GetPositionY());
@@ -275,7 +275,7 @@ bool IccSpikeAction::Execute(Event /*event*/)
     HandleNoSpikesMarking(boss);
 
     // Melee non-tanks in front of boss should reposition
-    if (boss->isInFront(bot) && !botAI->IsTank(bot) && !isBossInBoneStorm)
+    if (boss->isInFront(bot) && !PlayerbotAI::IsTank(bot) && !isBossInBoneStorm)
     {
         Position const safePosition = {-390.6757f, 2230.5283f, 0.0f};
         float const distance = bot->GetExactDist2d(safePosition.GetPositionX(), safePosition.GetPositionY());
@@ -327,7 +327,7 @@ bool IccSpikeAction::HandleSpikeMarking(std::vector<Unit*> const& spikes, Unit* 
 
     // Check if the only spike left is a tank spike
     Player* firstSpikeVictim = spikes.size() == 1 ? GetSpikeVictim(spikes[0]) : nullptr;
-    bool const onlyTankSpike = firstSpikeVictim && botAI->IsTank(firstSpikeVictim);
+    bool const onlyTankSpike = firstSpikeVictim && PlayerbotAI::IsTank(firstSpikeVictim);
 
     if (onlyTankSpike)
     {
@@ -390,13 +390,13 @@ bool IccSpikeAction::HandleSpikeAssignment(std::vector<Unit*> const& spikes, Uni
     if (!group)
         return false;
 
-    bool const isMelee = botAI->IsMelee(bot) && !botAI->IsTank(bot);
-    bool const isAssistTank = botAI->IsAssistTank(bot);
+    bool const isMelee = PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsTank(bot);
+    bool const isAssistTank = PlayerbotAI::IsAssistTank(bot);
 
     auto isTankSpike = [&](Unit* spike) -> bool
     {
         Player* victim = GetSpikeVictim(spike);
-        return victim && botAI->IsTank(victim);
+        return victim && PlayerbotAI::IsTank(victim);
     };
 
     // Assist tank: only attack tank spike, ignore all others
@@ -468,10 +468,10 @@ bool IccSpikeAction::HandleSpikeAssignment(std::vector<Unit*> const& spikes, Uni
         if (!member || !member->IsAlive() || member->HasAura(SPELL_LM_IMPALED))
             continue;
 
-        if (botAI->IsMainTank(member) || botAI->IsAssistTank(member))
+        if (PlayerbotAI::IsMainTank(member) || PlayerbotAI::IsAssistTank(member))
             continue;
 
-        if (botAI->IsMelee(member) && !botAI->IsTank(member))
+        if (PlayerbotAI::IsMelee(member) && !PlayerbotAI::IsTank(member))
             continue;
 
         rangedMembers.push_back(member);

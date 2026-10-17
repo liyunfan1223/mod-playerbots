@@ -20,9 +20,9 @@ class WotlkDungeonVHActionContext : public NamedObjectContext<Action>
             creators["attack void sentry"] = &WotlkDungeonVHActionContext::attack_void_sentry;
         }
     private:
-        static Action* attack_erekem(PlayerbotAI* ai) { return new AttackErekemAction(ai); }
-        static Action* attack_ichor_globule(PlayerbotAI* ai) { return new AttackIchorGlobuleAction(ai); }
-        static Action* attack_void_sentry(PlayerbotAI* ai) { return new AttackVoidSentryAction(ai); }
+        static Action* attack_erekem(PlayerbotAI* botAI) { return new AttackErekemAction(botAI); }
+        static Action* attack_ichor_globule(PlayerbotAI* botAI) { return new AttackIchorGlobuleAction(botAI); }
+        static Action* attack_void_sentry(PlayerbotAI* botAI) { return new AttackVoidSentryAction(botAI); }
 };
 
 #endif

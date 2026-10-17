@@ -247,7 +247,7 @@ bool RazorscaleFuseArmorTrigger::IsActive()
     }
 
     // Only proceed if this bot can actually tank
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     Group* group = bot->GetGroup();
@@ -258,7 +258,7 @@ bool RazorscaleFuseArmorTrigger::IsActive()
     for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
     {
         Player* member = gref->GetSource();
-        if (!member || !botAI->IsMainTank(member))
+        if (!member || !PlayerbotAI::IsMainTank(member))
             continue;
 
         Aura* fuseArmor = member->GetAura(RazorscaleBossHelper::SPELL_FUSEARMOR);
@@ -287,7 +287,7 @@ bool IronAssemblyLightningTendrilsTrigger::IsActive()
 bool IronAssemblyOverloadTrigger::IsActive()
 {
     // Check if bot is tank
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     // Check boss and it is alive
@@ -316,7 +316,7 @@ bool IronAssemblyRuneOfPowerTrigger::IsActive()
     if (target->GetVictim() != bot)
         return false;
 
-    return botAI->IsTank(bot);
+    return PlayerbotAI::IsTank(bot);
 }
 
 bool KologarnMarkDpsTargetTrigger::IsActive()
@@ -327,7 +327,7 @@ bool KologarnMarkDpsTargetTrigger::IsActive()
         return false;
 
     // Only tank bot can mark target
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     // Get current raid dps target
@@ -476,7 +476,7 @@ bool KologarnAttackDpsTargetTrigger::IsActive()
     ObjectGuid skullTarget = group->GetTargetIcon(RtiTargetValue::skullIndex);
     ObjectGuid crossTarget = group->GetTargetIcon(RtiTargetValue::crossIndex);
 
-    if (crossTarget && (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0)))
+    if (crossTarget && (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0)))
     {
         return currentTarget->GetGUID() != crossTarget;
     }
@@ -496,7 +496,7 @@ bool KologarnRtiTargetTrigger::IsActive()
 
     std::string rtiMark = AI_VALUE(std::string, "rti");
 
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0))
+    if (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0))
         return rtiMark != "cross";
 
     return rtiMark != "skull";
@@ -594,7 +594,7 @@ bool FreyaMarkDpsTargetTrigger::IsActive()
         return false;
 
     // Only tank bot can mark target
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     // Get current raid dps target
@@ -727,7 +727,7 @@ bool FreyaMoveToHealingSporeTrigger::IsActive()
     if (!boss || !boss->IsAlive())
         return false;
 
-    if (!botAI->IsRanged(bot))
+    if (!PlayerbotAI::IsRanged(bot))
         return false;
 
     Unit* conservatory = AI_VALUE2(Unit*, "find target", "ancient conservator");
@@ -789,7 +789,7 @@ bool ThorimMarkDpsTargetTrigger::IsActive()
     if (!group)
         return false;
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         ObjectGuid currentSkullTarget = group->GetTargetIcon(RtiTargetValue::skullIndex);
         Unit* currentSkullUnit = botAI->GetUnit(currentSkullTarget);
@@ -828,13 +828,13 @@ bool ThorimMarkDpsTargetTrigger::IsActive()
 
         return false;
     }
-    else if (botAI->IsAssistTankOfIndex(bot, 0))
+    else if (PlayerbotAI::IsAssistTankOfIndex(bot, 0))
     {
         Player* mainTank = nullptr;
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (member && botAI->IsMainTank(member))
+            if (member && PlayerbotAI::IsMainTank(member))
             {
                 mainTank = member;
                 break;
@@ -910,21 +910,21 @@ bool ThorimGauntletPositioningTrigger::IsActive()
         if (!member)
             continue;
 
-        if (requiredDpsQuantity > 0 && botAI->IsDps(member))
+        if (requiredDpsQuantity > 0 && PlayerbotAI::IsDps(member))
         {
             requiredDpsQuantity--;
             if (bot->GetGUID() == member->GetGUID())
                 break;
         }
 
-        if (requiredAssistTankQuantity > 0 && botAI->IsAssistTankOfIndex(member, 0))
+        if (requiredAssistTankQuantity > 0 && PlayerbotAI::IsAssistTankOfIndex(member, 0))
         {
             requiredAssistTankQuantity--;
             if (bot->GetGUID() == member->GetGUID())
                 break;
         }
 
-        if (requiredHealerQuantity > 0 && botAI->IsHeal(member))
+        if (requiredHealerQuantity > 0 && PlayerbotAI::IsHeal(member))
         {
             requiredHealerQuantity--;
             if (bot->GetGUID() == member->GetGUID())
@@ -1030,21 +1030,21 @@ bool ThorimArenaPositioningTrigger::IsActive()
         if (!member)
             continue;
 
-        if (requiredDpsQuantity > 0 && botAI->IsDps(member))
+        if (requiredDpsQuantity > 0 && PlayerbotAI::IsDps(member))
         {
             requiredDpsQuantity--;
             if (bot->GetGUID() == member->GetGUID())
                 return false;
         }
 
-        if (requiredAssistTankQuantity > 0 && botAI->IsAssistTankOfIndex(member, 0))
+        if (requiredAssistTankQuantity > 0 && PlayerbotAI::IsAssistTankOfIndex(member, 0))
         {
             requiredAssistTankQuantity--;
             if (bot->GetGUID() == member->GetGUID())
                 return false;
         }
 
-        if (requiredHealerQuantity > 0 && botAI->IsHeal(member))
+        if (requiredHealerQuantity > 0 && PlayerbotAI::IsHeal(member))
         {
             requiredHealerQuantity--;
             if (bot->GetGUID() == member->GetGUID())
@@ -1090,7 +1090,7 @@ bool ThorimFallFromFloorTrigger::IsActive()
 
 bool ThorimPhase2PositioningTrigger::IsActive()
 {
-    if (!botAI->IsRanged(bot) && !botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsMainTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "thorim");
@@ -1106,7 +1106,7 @@ bool ThorimPhase2PositioningTrigger::IsActive()
     if (boss->GetPositionZ() > ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD)
         return false;
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         if (bot->GetDistance(ULDUAR_THORIM_PHASE2_TANK_SPOT) > 1.0f && boss->GetVictim() == bot)
             return true;
@@ -1125,7 +1125,7 @@ bool ThorimPhase2PositioningTrigger::IsActive()
         if (!member)
             continue;
 
-        if (botAI->IsRanged(member))
+        if (PlayerbotAI::IsRanged(member))
         {
             if (bot->GetGUID() == member->GetGUID())
                 break;
@@ -1164,7 +1164,7 @@ bool MimironShockBlastTrigger::IsActive()
         return false;
     }
 
-    if (botAI->IsMelee(bot))
+    if (PlayerbotAI::IsMelee(bot))
     {
         return true;
     }
@@ -1176,7 +1176,7 @@ bool MimironShockBlastTrigger::IsActive()
 
 bool MimironPhase1PositioningTrigger::IsActive()
 {
-    if (!botAI->IsRanged(bot))
+    if (!PlayerbotAI::IsRanged(bot))
     {
         return false;
     }
@@ -1258,10 +1258,10 @@ bool MimironRapidBurstTrigger::IsActive()
         leviathanMkII->FindCurrentSpellBySpellId(SPELL_SHOCK_BLAST))
         return false;
 
-    if (botAI->IsMainTank(bot) && leviathanMkII && leviathanMkII->IsAlive() && leviathanMkII->GetVictim() != bot)
+    if (PlayerbotAI::IsMainTank(bot) && leviathanMkII && leviathanMkII->IsAlive() && leviathanMkII->GetVictim() != bot)
         return false;
 
-    if (botAI->IsMelee(bot) && !botAI->IsMainTank(bot) && leviathanMkII && aerialCommandUnit)
+    if (PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsMainTank(bot) && leviathanMkII && aerialCommandUnit)
         return false;
 
     MimironP3Wx2LaserBarrageTrigger mimironP3Wx2LaserBarrageTrigger(botAI);
@@ -1282,7 +1282,7 @@ bool MimironRapidBurstTrigger::IsActive()
 
         if (bot->GetGUID() == member->GetGUID())
         {
-            if (botAI->IsRanged(bot))
+            if (PlayerbotAI::IsRanged(bot))
             {
                 switch (memberSpotNumber)
                 {
@@ -1301,7 +1301,7 @@ bool MimironRapidBurstTrigger::IsActive()
             }
             else
             {
-                if (botAI->IsMainTank(bot) && leviathanMkII)
+                if (PlayerbotAI::IsMainTank(bot) && leviathanMkII)
                 {
                     memberPosition = ULDUAR_MIMIRON_PHASE4_TANK_SPOT;
                 }
@@ -1385,10 +1385,10 @@ bool MimironAerialCommandUnitTrigger::IsActive()
     if (!aerialCommandUnit || !aerialCommandUnit->IsAlive() || leviathanMkII || vx001)
         return false;
 
-    if (!botAI->IsRanged(bot) && !botAI->IsMainTank(bot) && !botAI->IsAssistTankOfIndex(bot, 0))
+    if (!PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsMainTank(bot) && !PlayerbotAI::IsAssistTankOfIndex(bot, 0))
         return false;
 
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0))
+    if (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0))
     {
         Group* group = bot->GetGroup();
         if (!group)
@@ -1457,7 +1457,7 @@ bool MimironPhase4MarkDpsTrigger::IsActive()
     if (!leviathanMkII || !vx001 || !aerialCommandUnit)
         return false;
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         Unit* highestHealthUnit = nullptr;
         uint32 highestHealth = 0;
@@ -1492,7 +1492,7 @@ bool MimironCheatTrigger::IsActive()
     if (!botAI->HasCheat(BotCheatMask::raid))
         return false;
 
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
         return false;
 
     GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
@@ -1525,7 +1525,7 @@ bool VezaxCheatTrigger::IsActive()
     if (!AI_VALUE2(bool, "has mana", "self target"))
         return false;
 
-    return AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana;
+    return AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.LowMana;
 }
 
 bool VezaxShadowCrashTrigger::IsActive()
@@ -1637,7 +1637,7 @@ bool YoggSaronTrigger::IsInChamberOfTheAspectsIllusion()
 bool YoggSaronTrigger::IsMasterIsInIllusionGroup()
 {
     Player* master = botAI->GetMaster();
-    return master && !botAI->IsTank(master);
+    return master && !PlayerbotAI::IsTank(master);
 }
 
 bool YoggSaronTrigger::IsMasterIsInBrainRoom()
@@ -1749,7 +1749,7 @@ bool YoggSaronOminousCloudCheatTrigger::IsActive()
     if (!boss)
         return false;
 
-    if (!botAI->IsBotMainTank(bot))
+    if (!PlayerbotAI::IsBotMainTank(bot))
         return false;
 
     if (bot->GetDistance2d(boss->GetPositionX(), boss->GetPositionY()) > 50.0f)
@@ -1765,7 +1765,7 @@ bool YoggSaronGuardianPositioningTrigger::IsActive()
     if (!GetSaraIfAlive())
         return false;
 
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     GuidVector targets = AI_VALUE(GuidVector, "nearest npcs");
@@ -1782,7 +1782,7 @@ bool YoggSaronGuardianPositioningTrigger::IsActive()
             thereIsAnyGuardian = true;
             ObjectGuid unitTargetGuid = unit->GetTarget();
             Player* targetedPlayer = botAI->GetPlayer(unitTargetGuid);
-            if (!targetedPlayer || !botAI->IsTank(targetedPlayer))
+            if (!targetedPlayer || !PlayerbotAI::IsTank(targetedPlayer))
                 return false;
         }
     }
@@ -1828,7 +1828,7 @@ bool YoggSaronMarkTargetTrigger::IsActive()
     if (!IsYoggSaronFight())
         return false;
 
-    if (!botAI->IsBotMainTank(bot))
+    if (!PlayerbotAI::IsBotMainTank(bot))
         return false;
 
     Group* group = bot->GetGroup();
@@ -1937,7 +1937,7 @@ bool YoggSaronMoveToEnterPortalTrigger::IsActive()
     for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
     {
         Player* member = gref->GetSource();
-        if (!member || !member->IsAlive() || botAI->IsTank(member))
+        if (!member || !member->IsAlive() || PlayerbotAI::IsTank(member))
             continue;
 
         if (member->GetGUID() == bot->GetGUID())
@@ -2101,18 +2101,18 @@ bool YoggSaronPhase3PositioningTrigger::IsActive()
     if (sanityTrigger.IsActive())
         return false;
 
-    if (botAI->IsRanged(bot) && bot->GetDistance2d(ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionX(),
+    if (PlayerbotAI::IsRanged(bot) && bot->GetDistance2d(ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionX(),
                                                    ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT.GetPositionY()) > 15.0f)
         return true;
 
-    if (botAI->IsMelee(bot) && !botAI->IsTank(bot) &&
+    if (PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsTank(bot) &&
         bot->GetDistance2d(ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionX(),
             ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT.GetPositionY()) > 15.0f)
     {
         return true;
     }
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         if (bot->GetDistance(ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT) > 30.0f)
             return true;
@@ -2131,7 +2131,7 @@ bool YoggSaronPhase3PositioningTrigger::IsActive()
                 thereIsAnyGuardian = true;
                 ObjectGuid unitTargetGuid = unit->GetTarget();
                 Player* targetedPlayer = botAI->GetPlayer(unitTargetGuid);
-                if (!targetedPlayer || !botAI->IsTank(targetedPlayer))
+                if (!targetedPlayer || !PlayerbotAI::IsTank(targetedPlayer))
                     return false;
             }
         }

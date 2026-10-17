@@ -25,13 +25,13 @@ public:
     }
 
 private:
-    static Trigger* sartharion_tank(PlayerbotAI* ai) { return new SartharionTankTrigger(ai); }
-    static Trigger* flame_tsunami(PlayerbotAI* ai) { return new FlameTsunamiTrigger(ai); }
-    static Trigger* twilight_fissure(PlayerbotAI* ai) { return new TwilightFissureTrigger(ai); }
-    static Trigger* sartharion_dps(PlayerbotAI* ai) { return new SartharionDpsTrigger(ai); }
-    static Trigger* sartharion_melee(PlayerbotAI* ai) { return new SartharionMeleePositioningTrigger(ai); }
-    static Trigger* twilight_portal_enter(PlayerbotAI* ai) { return new TwilightPortalEnterTrigger(ai); }
-    static Trigger* twilight_portal_exit(PlayerbotAI* ai) { return new TwilightPortalExitTrigger(ai); }
+    static Trigger* sartharion_tank(PlayerbotAI* botAI) { return new SartharionTankTrigger(botAI); }
+    static Trigger* flame_tsunami(PlayerbotAI* botAI) { return new FlameTsunamiTrigger(botAI); }
+    static Trigger* twilight_fissure(PlayerbotAI* botAI) { return new TwilightFissureTrigger(botAI); }
+    static Trigger* sartharion_dps(PlayerbotAI* botAI) { return new SartharionDpsTrigger(botAI); }
+    static Trigger* sartharion_melee(PlayerbotAI* botAI) { return new SartharionMeleePositioningTrigger(botAI); }
+    static Trigger* twilight_portal_enter(PlayerbotAI* botAI) { return new TwilightPortalEnterTrigger(botAI); }
+    static Trigger* twilight_portal_exit(PlayerbotAI* botAI) { return new TwilightPortalExitTrigger(botAI); }
 };
 
 #endif

@@ -56,7 +56,7 @@ bool ForceRebuffState::BuffBelowRefreshTarget(int32 remaining, int32 maxDuration
             return false;
 
         // Anything refreshed after the rebuff began counts as topped off
-        uint32 const marginMs = std::max(sPlayerbotAIConfig.forceRebuffMarginSecs * IN_MILLISECONDS,
+        uint32 const marginMs = std::max(sPlayerbotAIConfig.ForceRebuffMarginSecs * IN_MILLISECONDS,
                                          getMSTimeDiff(beginMs, getMSTime()) + 5000);
         return uint32(remaining) + marginMs < uint32(maxDuration);
     }

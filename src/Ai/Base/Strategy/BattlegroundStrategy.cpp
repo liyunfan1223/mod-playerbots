@@ -38,7 +38,6 @@ void WarsongStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void AlteracStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("alliance no snowfall gy", { NextAction("bg move to objective", ACTION_EMERGENCY)}));
     triggers.push_back(new TriggerNode("timer bg", { NextAction("bg reset objective force", ACTION_EMERGENCY)}));
 }
 

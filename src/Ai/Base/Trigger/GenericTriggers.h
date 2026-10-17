@@ -213,7 +213,7 @@ public:
 class AttackerCountTrigger : public Trigger
 {
 public:
-    AttackerCountTrigger(PlayerbotAI* botAI, int32 amount, float distance = sPlayerbotAIConfig.sightDistance)
+    AttackerCountTrigger(PlayerbotAI* botAI, int32 amount, float distance = sPlayerbotAIConfig.SightDistance)
         : Trigger(botAI), amount(amount), distance(distance) {}
 
     bool IsActive() override;
@@ -542,14 +542,6 @@ private:
     uint8 threshold;
 };
 
-BEGIN_TRIGGER(PanicTrigger, Trigger) // cppcheck-suppress unknownMacro
-std::string const getName() override { return "panic"; }
-END_TRIGGER()
-
-BEGIN_TRIGGER(OutNumberedTrigger, Trigger)
-std::string const getName() override { return "outnumbered"; }
-END_TRIGGER()
-
 class NoPetTrigger : public Trigger
 {
 public:
@@ -782,14 +774,6 @@ public:
     bool IsActive() override;
 };
 
-class HasNearestAddsTrigger : public Trigger
-{
-public:
-    HasNearestAddsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "has nearest adds") {}
-
-    bool IsActive() override;
-};
-
 class HasItemForSpellTrigger : public Trigger
 {
 public:
@@ -863,7 +847,7 @@ private:
 class SitTrigger : public StayTimeTrigger
 {
 public:
-    SitTrigger(PlayerbotAI* botAI) : StayTimeTrigger(botAI, sPlayerbotAIConfig.sitDelay, "sit") {}
+    SitTrigger(PlayerbotAI* botAI) : StayTimeTrigger(botAI, sPlayerbotAIConfig.SitDelay, "sit") {}
 };
 
 class ReturnToStayPositionTrigger : public Trigger
@@ -877,7 +861,7 @@ public:
 class ReturnTrigger : public StayTimeTrigger
 {
 public:
-    ReturnTrigger(PlayerbotAI* botAI) : StayTimeTrigger(botAI, sPlayerbotAIConfig.returnDelay, "return") {}
+    ReturnTrigger(PlayerbotAI* botAI) : StayTimeTrigger(botAI, sPlayerbotAIConfig.ReturnDelay, "return") {}
 };
 
 class GiveItemTrigger : public Trigger

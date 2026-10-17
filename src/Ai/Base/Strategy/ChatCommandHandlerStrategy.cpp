@@ -78,8 +78,12 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("dps", { NextAction("tell estimated dps", relevance) }));
     triggers.push_back(new TriggerNode("disperse", { NextAction("disperse set", relevance) }));
     triggers.push_back(new TriggerNode("qi", { NextAction("query item usage", relevance) }));
-    triggers.push_back(new TriggerNode("qgo", { NextAction("query game object", relevance) }));
     triggers.push_back(new TriggerNode("focus heal", { NextAction("focus heal targets", relevance) }));
+}
+
+void ChatCommandHandlerStrategy::InitReactionTriggers(std::vector<TriggerNode*>& triggers)
+{
+    InitTriggers(triggers);
 }
 
 // Commands where trigger name == action name.

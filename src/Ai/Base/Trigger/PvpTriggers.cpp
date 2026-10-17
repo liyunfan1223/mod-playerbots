@@ -6,12 +6,23 @@
 
 #include "PvpTriggers.h"
 #include "BattleGroundTactics.h"
-#include "BattlegroundAV.h"
 #include "BattlegroundEY.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+
+namespace
+{
+// a game from the random queue records BATTLEGROUND_RB as the player's type: use the rolled map
+BattlegroundTypeId RealBgType(Player* bot)
+{
+    BattlegroundTypeId bgType = bot->GetBattlegroundTypeId();
+    if (bgType == BATTLEGROUND_RB && bot->GetBattleground())
+        bgType = bot->GetBattleground()->GetBgTypeID(true);
+    return bgType;
+}
+}  // namespace
 
 bool EnemyPlayerNear::IsActive() { return AI_VALUE(Unit*, "enemy player target"); }
 
@@ -19,7 +30,7 @@ bool PlayerHasNoFlag::IsActive()
 {
     if (botAI->GetBot()->InBattleground())
     {
-        if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
+        if (RealBgType(botAI->GetBot()) == BattlegroundTypeId::BATTLEGROUND_WS)
         {
             BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
             if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER))
@@ -99,14 +110,14 @@ bool PlayerIsInBattlegroundWithoutFlag::IsActive()
 {
     if (botAI->GetBot()->InBattleground())
     {
-        if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
+        if (RealBgType(botAI->GetBot()) == BattlegroundTypeId::BATTLEGROUND_WS)
         {
             BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
             if (!(bg->GetFlagState(bg->GetOtherTeamId(bot->GetTeamId())) == BG_WS_FLAG_STATE_ON_PLAYER))
                 return true;
 
             if (bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE) ||
-                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_ALLIANCE))
+                bot->GetGUID() == bg->GetFlagPickerGUID(TEAM_HORDE))
             {
                 return false;
             }
@@ -127,7 +138,7 @@ bool PlayerHasFlag::IsCapturingFlag(Player* bot)
 {
     if (bot->InBattleground())
     {
-        if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
+        if (RealBgType(bot) == BATTLEGROUND_WS)
         {
             BattlegroundWS* bg = (BattlegroundWS*)bot->GetBattleground();
             // bot is horde and has ally flag
@@ -161,7 +172,7 @@ bool PlayerHasFlag::IsCapturingFlag(Player* bot)
             return false;  // bot doesn't have flag
         }
 
-        if (bot->GetBattlegroundTypeId() == BATTLEGROUND_EY)
+        if (RealBgType(bot) == BATTLEGROUND_EY)
         {
             BattlegroundEY* bg = (BattlegroundEY*)bot->GetBattleground();
 
@@ -196,7 +207,7 @@ bool TeamHasFlag::IsActive()
     if (!botAI->GetBot()->InBattleground())
         return false;
 
-    if (botAI->GetBot()->GetBattlegroundTypeId() != BattlegroundTypeId::BATTLEGROUND_WS)
+    if (RealBgType(botAI->GetBot()) != BattlegroundTypeId::BATTLEGROUND_WS)
         return false;
 
     BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
@@ -220,7 +231,7 @@ bool EnemyTeamHasFlag::IsActive()
 {
     if (botAI->GetBot()->InBattleground())
     {
-        if (botAI->GetBot()->GetBattlegroundTypeId() == BattlegroundTypeId::BATTLEGROUND_WS)
+        if (RealBgType(botAI->GetBot()) == BattlegroundTypeId::BATTLEGROUND_WS)
         {
             BattlegroundWS* bg = (BattlegroundWS*)botAI->GetBot()->GetBattleground();
 
@@ -267,7 +278,7 @@ bool EnemyFlagCarrierNear::IsActive()
 
 bool TeamFlagCarrierNear::IsActive()
 {
-    if (bot->GetBattlegroundTypeId() == BATTLEGROUND_WS)
+    if (RealBgType(bot) == BATTLEGROUND_WS)
     {
         BattlegroundWS* bg = dynamic_cast<BattlegroundWS*>(bot->GetBattleground());
         if (bg)
@@ -309,28 +320,3 @@ bool VehicleNearTrigger::IsActive()
 }
 
 bool InVehicleTrigger::IsActive() { return botAI->IsInVehicle(); }
-
-bool AllianceNoSnowfallGY::IsActive()
-{
-    if (!bot || bot->GetTeamId() != TEAM_ALLIANCE)
-        return false;
-
-    Battleground* bg = bot->GetBattleground();
-    if (bg && BGTactics::GetBotStrategyForTeam(bg, TEAM_ALLIANCE) != AV_STRATEGY_BALANCED)
-        return false;
-
-    float botX = bot->GetPositionX();
-    if (botX <= -562.0f)
-        return false;
-
-    if (bot->GetBattlegroundTypeId() != BATTLEGROUND_AV)
-        return false;
-
-    if (BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg))
-    {
-        BG_AV_NodeInfo const& snowfall = av->GetAVNodeInfo(BG_AV_NODES_SNOWFALL_GRAVE);
-        return snowfall.OwnerId != TEAM_ALLIANCE; // Active if the Snowfall Graveyard is NOT fully controlled by the Alliance
-    }
-
-    return false;
-}

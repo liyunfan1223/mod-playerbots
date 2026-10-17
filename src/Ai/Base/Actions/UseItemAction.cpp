@@ -5,12 +5,16 @@
  */
 
 #include "UseItemAction.h"
+
 #include "ChatHelper.h"
 #include "Event.h"
 #include "ItemPackets.h"
 #include "ItemUsageValue.h"
+#include "LootObjectStack.h"
+#include "PlayerbotAIConfig.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
+#include "ServerFacade.h"
 
 static constexpr uint32 SPELL_LEARNING_1 = 483;
 static constexpr uint32 SPELL_LEARNING_2 = 55884;
@@ -39,24 +43,105 @@ bool UseItemAction::Execute(Event event)
             return UseItemOnGameObject(*items.begin(), *gos.begin());
     }
 
-    botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-        "use_item_none_available", "No items (or game objects) available", {}));
+    botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault("use_item_none_available",
+                                                                      "No items (or game objects) available", {}));
     return false;
 }
 
 bool UseItemAction::UseGameObject(ObjectGuid guid)
 {
-    GameObject* go = botAI->GetGameObject(guid);
-    if (!go || !go->isSpawned() /* || go->GetGoState() != GO_STATE_READY*/)
+    auto fail = [this](char const* name, char const* defaultText)
+    {
+        botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(name, defaultText, {}));
         return false;
+    };
 
-    go->Use(bot);
+    GameObject* go = botAI->GetGameObject(guid);
+    if (!go || !go->isSpawned())
+        return fail("gameobject_unavailable_error", "Game object is no longer available");
 
-    std::ostringstream out;
+    if (sPlayerbotAIConfig.DisallowedGameObjects.contains(go->GetEntry()))
+        return fail("gameobject_disallowed_error", "Game object is disallowed by configuration");
+
+    if (sPlayerbotAIConfig.LootDistance && bot->GetDistance(go) > sPlayerbotAIConfig.LootDistance)
+        return fail("gameobject_outside_loot_distance_error", "Game object is outside the configured loot distance");
+
+    if (go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE) ||
+        (go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND) && !go->ActivateToQuest(bot)))
+        return fail("gameobject_not_eligible_error", "Game object is not currently eligible for interaction");
+
+    if (!bot->IsAlive() || bot->IsInFlight() || bot->m_mover != bot || bot->IsNonMeleeSpellCast(false) ||
+        bot->GetLootGUID())
+        return fail("gameobject_cannot_interact_error",
+                    "Cannot interact while dead, flying, remotely controlled, casting, or looting");
+
+    if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST || go->GetGOInfo()->GetLootId())
+    {
+        LootObject loot(bot, guid);
+        if (!loot.IsLootPossible(bot))
+            return fail("gameobject_cannot_loot_error",
+                        "Cannot loot this object: check quest, skill, tools, key, and object state");
+
+        bool inRange = bot->GetDistance(go) <= INTERACTION_DISTANCE - 2.0f;
+        if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT) && bot->GetDistance(go) > CONTACT_DISTANCE)
+            return fail("gameobject_stay_out_of_range_error", "Game object is out of reach while staying");
+
+        bool canContinue =
+            botAI->HasStrategy("loot", BOT_STATE_NON_COMBAT) || botAI->HasStrategy("gather", BOT_STATE_NON_COMBAT);
+        if (!inRange && !canContinue)
+            return fail("gameobject_approach_unavailable_error",
+                        "Move closer or enable the loot or gather strategy to approach this object");
+
+        LootObject previous = AI_VALUE(LootObject, "loot target");
+        LootObjectStack* availableLoot = AI_VALUE(LootObjectStack*, "available loot");
+        bool added = availableLoot->Add(guid);
+        context->GetValue<LootObject>("loot target")->Set(loot);
+
+        bool retryGuaranteed = inRange && (bot->isMoving() || bot->IsMounted());
+        std::string objectName = chat->FormatGameobject(go);
+        bool requested = botAI->DoSpecificAction(inRange ? "open loot" : "move to loot", Event(), true);
+        if (!requested && !retryGuaranteed)
+        {
+            if (added && availableLoot->CanAttemptLoot(guid))
+                availableLoot->Remove(guid);
+            if (previous.guid != guid || availableLoot->CanAttemptLoot(previous.guid))
+                context->GetValue<LootObject>("loot target")->Set(previous);
+            else
+                context->GetValue<LootObject>("loot target")->Set(LootObject());
+            return fail("gameobject_open_failed_error", "Could not approach or open the game object");
+        }
+
+        botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+            inRange && requested ? "gameobject_open_requested" : "gameobject_loot_queued",
+            inRange && requested ? "Opening requested: %gameobject" : "Queued for looting: %gameobject",
+            {{"%gameobject", objectName}}));
+        return true;
+    }
+
+    if (go->GetGOInfo()->GetLockId() && go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED))
+        return fail("gameobject_nonloot_locked_error", "This non-loot object requires an opening spell or key");
+
+    if (!go->IsWithinDistInMap(bot, go->GetInteractionDistance()))
+        return fail("gameobject_interact_out_of_range_error", "Move closer to interact with this game object");
+
+    if (bot->isMoving())
+        bot->StopMoving();
+    ServerFacade::instance().SetFacingTo(bot, go);
+
+    WorldPacket use(CMSG_GAMEOBJ_USE, 8);
+    use << guid;
+    bot->GetSession()->HandleGameObjectUseOpcode(use);
+
+    go = botAI->GetGameObject(guid);
+    if (go && go->isSpawned() && go->IsWithinDistInMap(bot, INTERACTION_DISTANCE))
+    {
+        WorldPacket report(CMSG_GAMEOBJ_REPORT_USE, 8);
+        report << guid;
+        bot->GetSession()->HandleGameobjectReportUse(report);
+    }
+
     botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-        "use_gameobject",
-        "Using %gameobject",
-        {{"%gameobject", chat->FormatGameobject(go)}}));
+        "gameobject_interaction_requested", "Game object interaction requested", {}));
     return true;
 }
 
@@ -81,10 +166,14 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     uint32 glyphIndex = 0;
     uint8 castFlags = 0;
     uint32 targetFlag = TARGET_FLAG_NONE;
+    GameObject* goTarget = goGuid ? botAI->GetGameObject(goGuid) : nullptr;
+    if (goGuid && (!goTarget || !goTarget->isSpawned()))
+        return false;
+
     uint32 spellId = 0;
     ItemTemplate const* itemProto = item->GetTemplate();
-    bool const isGenericLearnItem = itemProto->Spells[0].SpellId == SPELL_LEARNING_1
-        || itemProto->Spells[0].SpellId == SPELL_LEARNING_2;
+    bool const isGenericLearnItem =
+        itemProto->Spells[0].SpellId == SPELL_LEARNING_1 || itemProto->Spells[0].SpellId == SPELL_LEARNING_2;
 
     if (isGenericLearnItem)
     {
@@ -125,7 +214,9 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         if (itemProto->Spells[i].SpellId > 0)
         {
             spellId = itemProto->Spells[i].SpellId;
-            if (!botAI->CanCastSpell(spellId, bot, false, itemTarget, item))
+            bool canCast = goTarget ? botAI->CanCastSpell(spellId, goTarget, false, item)
+                                    : botAI->CanCastSpell(spellId, bot, false, itemTarget, item);
+            if (!canCast)
                 return false;
         }
     }
@@ -147,17 +238,13 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
             itemText += " (the last one!)";
     }
 
-    if (goGuid)
+    if (goTarget)
     {
-        GameObject* go = botAI->GetGameObject(goGuid);
-        if (!go || !go->isSpawned())
-            return false;
-
         targetFlag = TARGET_FLAG_GAMEOBJECT;
 
         packet << targetFlag;
         packet << goGuid.WriteAsPacked();
-        targetText = chat->FormatGameobject(go);
+        targetText = chat->FormatGameobject(goTarget);
         targetSelected = true;
     }
 
@@ -167,8 +254,8 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         {
             bool fit = SocketItem(itemTarget, item) || SocketItem(itemTarget, item, true);
             if (!fit)
-                botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-                    "socket_does_not_fit", "Socket does not fit", {}));
+                botAI->TellMaster(
+                    PlayerbotTextMgr::instance().GetBotTextOrDefault("socket_does_not_fit", "Socket does not fit", {}));
 
             return fit;
         }
@@ -228,7 +315,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     if (bot->isMoving())
     {
         bot->StopMoving();
-        botAI->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
         return false;
     }
 
@@ -270,7 +357,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
                 targetText = chat->FormatItem(itemForSpell->GetTemplate());
             }
             uint32 castTime = spellInfo->CalcCastTime();
-            botAI->SetNextCheckDelay(castTime + sPlayerbotAIConfig.reactDelay);
+            botAI->SetNextCheckDelay(castTime + sPlayerbotAIConfig.ReactDelay);
         }
 
         break;
@@ -333,10 +420,10 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         }
 
         if (!bot->IsInCombat() && !bot->InBattleground())
-            botAI->SetNextCheckDelay(std::max(10.0f * IN_MILLISECONDS, 27.0f * IN_MILLISECONDS * (100 - p) / 100.0f));
+            SetDuration((uint32)std::max(10.0f * IN_MILLISECONDS, 27.0f * IN_MILLISECONDS * (100 - p) / 100.0f));
 
         if (!bot->IsInCombat() && bot->InBattleground())
-            botAI->SetNextCheckDelay(std::max(10.0f * IN_MILLISECONDS, 20.0f * IN_MILLISECONDS * (100 - p) / 100.0f));
+            SetDuration((uint32)std::max(10.0f * IN_MILLISECONDS, 20.0f * IN_MILLISECONDS * (100 - p) / 100.0f));
 
         // botAI->SetNextCheckDelay(27000.0f * (100 - p) / 100.0f);
         //  botAI->SetNextCheckDelay(20000);
@@ -348,12 +435,12 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     if (!spellId)
         return false;
 
-    // botAI->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
-    std::string useText = targetSelected
-        ? PlayerbotTextMgr::instance().GetBotTextOrDefault(
-            "use_item_on_target", "Using %item on %target", {{"%item", itemText}, {"%target", targetText}})
-        : PlayerbotTextMgr::instance().GetBotTextOrDefault(
-            "use_item", "Using %item", {{"%item", itemText}});
+    // botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
+    std::string useText =
+        targetSelected
+            ? PlayerbotTextMgr::instance().GetBotTextOrDefault("use_item_on_target", "Using %item on %target",
+                                                               {{"%item", itemText}, {"%target", targetText}})
+            : PlayerbotTextMgr::instance().GetBotTextOrDefault("use_item", "Using %item", {{"%item", itemText}});
     botAI->TellMasterNoFacing(useText);
     bot->GetSession()->HandleUseItemOpcode(packet);
     return true;
@@ -436,8 +523,7 @@ bool UseItemAction::SocketItem(Item* item, Item* gem, bool replace)
     if (fits)
     {
         botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-            "socketing_item_with_gem",
-            "Socketing %item with %gem",
+            "socketing_item_with_gem", "Socketing %item with %gem",
             {{"%item", chat->FormatItem(item->GetTemplate())}, {"%gem", chat->FormatItem(gem->GetTemplate())}}));
 
         WorldPackets::Item::SocketGems nicePacket(std::move(packet));
@@ -540,7 +626,7 @@ bool UseRandomQuestItem::Execute(Event /*event*/)
 
     bool used = UseItem(item, goTarget, nullptr, unitTarget);
     if (used)
-        botAI->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
 
     return used;
 }

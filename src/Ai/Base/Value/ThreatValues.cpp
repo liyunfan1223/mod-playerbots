@@ -54,7 +54,7 @@ uint8 ThreatValue::Calculate(Unit* target)
         if (!player || !player->IsAlive() || player == bot)
             continue;
 
-        if (botAI->IsTank(player))
+        if (PlayerbotAI::IsTank(player))
         {
             hasTank = true;
             float threat = target->GetThreatMgr().GetThreat(player);

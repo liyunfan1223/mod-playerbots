@@ -84,9 +84,9 @@ void RpgHelper::setFacing(GuidPosition guidPosition)
 void RpgHelper::setDelay(bool waitForGroup)
 {
     if (!botAI->HasGameClientMaster() || (waitForGroup && botAI->GetGroupLeader() == bot && bot->GetGroup()))
-        botAI->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig.RpgDelay);
     else
-        botAI->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay / 5);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig.RpgDelay / 5);
 }
 
 bool RpgSubAction::isPossible() { return rpg->guidP() && rpg->guidP().GetWorldObject(); }
@@ -459,7 +459,7 @@ bool RpgTradeUsefulAction::Execute(Event /*event*/)
                          {{"%player", chat->FormatWorldobject(player)}}),
                      (bot->GetTeamId() == TEAM_ALLIANCE ? LANG_COMMON : LANG_ORCISH));
 
-        botAI->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
+        botAI->SetNextCheckDelay(sPlayerbotAIConfig.RpgDelay);
         return true;
     }
 

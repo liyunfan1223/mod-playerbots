@@ -46,7 +46,7 @@ bool DrinkAction::Execute(Event event)
         if (bot->isMoving())
         {
             bot->StopMoving();
-            // botAI->SetNextCheckDelay(sPlayerbotAIConfig->globalCoolDown);
+            // botAI->SetNextCheckDelay(sPlayerbotAIConfig->GlobalCoolDown);
             // return false;
         }
         bot->SetStandState(UNIT_STAND_STATE_SIT);
@@ -62,7 +62,7 @@ bool DrinkAction::Execute(Event event)
         else
             delay = 12.0f * IN_MILLISECONDS * (100 - p) / 100.0f;
 
-        botAI->SetNextCheckDelay(delay);
+        SetDuration((uint32)delay);
 
         bot->AddAura(25990, bot);
         return true;
@@ -75,7 +75,7 @@ bool DrinkAction::Execute(Event event)
 bool DrinkAction::isUseful()
 {
     return UseItemAction::isUseful() && AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") < 100;
+           AI_VALUE2(uint8, "mana", "self target") < 85;
 }
 
 bool DrinkAction::isPossible()
@@ -105,7 +105,7 @@ bool EatAction::Execute(Event event)
         if (bot->isMoving())
         {
             bot->StopMoving();
-            // botAI->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+            // botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
             // return false;
         }
 
@@ -122,7 +122,7 @@ bool EatAction::Execute(Event event)
         else
             delay = 12.0f * IN_MILLISECONDS * (100 - p) / 100.0f;
 
-        botAI->SetNextCheckDelay(delay);
+        SetDuration((uint32)delay);
 
         bot->AddAura(25990, bot);
         return true;
@@ -131,7 +131,11 @@ bool EatAction::Execute(Event event)
     return UseItemAction::Execute(event);
 }
 
-bool EatAction::isUseful() { return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < 100; }
+bool EatAction::isUseful()
+{
+    return UseItemAction::isUseful() &&
+           AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.LowHealth;
+}
 
 bool EatAction::isPossible()
 {

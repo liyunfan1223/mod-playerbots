@@ -20,8 +20,8 @@ class WotlkDungeonPoSActionContext : public NamedObjectContext<Action>
             creators["tyrannus"] = &WotlkDungeonPoSActionContext::tyrannus;
         }
     private:
-        static Action* ick_and_krick(PlayerbotAI* ai) { return new IckAndKrickAction(ai); }
-        static Action* tyrannus(PlayerbotAI* ai) { return new TyrannusAction(ai); }
+        static Action* ick_and_krick(PlayerbotAI* botAI) { return new IckAndKrickAction(botAI); }
+        static Action* tyrannus(PlayerbotAI* botAI) { return new TyrannusAction(botAI); }
 };
 
 #endif

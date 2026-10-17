@@ -15,7 +15,7 @@ enum class GlyphKind : uint32 { MAJOR = 1, MINOR = 2 };
 class EquipGlyphsAction : public Action
 {
 public:
-    EquipGlyphsAction(PlayerbotAI* ai) : Action(ai, "glyph equip") {}
+    EquipGlyphsAction(PlayerbotAI* botAI) : Action(botAI, "glyph equip") {}
     bool Execute(Event event) override;
 
     /// ---- Rendu public pour être utilisable par le cache global ----

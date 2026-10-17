@@ -25,14 +25,14 @@ class WotlkDungeonDTKActionContext : public NamedObjectContext<Action>
             creators["touch of life"] = &WotlkDungeonDTKActionContext::touch_of_life;
         }
     private:
-        static Action* corpse_explode_spread(PlayerbotAI* ai) { return new CorpseExplodeSpreadAction(ai); }
-        static Action* avoid_arcane_field(PlayerbotAI* ai) { return new AvoidArcaneFieldAction(ai); }
-        static Action* novos_positioning(PlayerbotAI* ai) { return new NovosDefaultPositionAction(ai); }
-        static Action* novos_target_priority(PlayerbotAI* ai) { return new NovosTargetPriorityAction(ai); }
-        static Action* slaying_strike(PlayerbotAI* ai) { return new CastSlayingStrikeAction(ai); }
-        static Action* taunt(PlayerbotAI* ai) { return new CastTauntAction(ai); }
-        static Action* bone_armor(PlayerbotAI* ai) { return new CastBoneArmorAction(ai); }
-        static Action* touch_of_life(PlayerbotAI* ai) { return new CastTouchOfLifeAction(ai); }
+        static Action* corpse_explode_spread(PlayerbotAI* botAI) { return new CorpseExplodeSpreadAction(botAI); }
+        static Action* avoid_arcane_field(PlayerbotAI* botAI) { return new AvoidArcaneFieldAction(botAI); }
+        static Action* novos_positioning(PlayerbotAI* botAI) { return new NovosDefaultPositionAction(botAI); }
+        static Action* novos_target_priority(PlayerbotAI* botAI) { return new NovosTargetPriorityAction(botAI); }
+        static Action* slaying_strike(PlayerbotAI* botAI) { return new CastSlayingStrikeAction(botAI); }
+        static Action* taunt(PlayerbotAI* botAI) { return new CastTauntAction(botAI); }
+        static Action* bone_armor(PlayerbotAI* botAI) { return new CastBoneArmorAction(botAI); }
+        static Action* touch_of_life(PlayerbotAI* botAI) { return new CastTouchOfLifeAction(botAI); }
 };
 
 #endif

@@ -138,11 +138,9 @@ bool AutoReleaseSpiritAction::HandleBattlegroundSpiritHealer()
     for (auto const& guid : npcs)
     {
         Unit* unit = botAI->GetUnit(guid);
-        if (unit && unit->IsFriendlyTo(bot) && unit->IsSpiritService())
-        {
-            spiritHealer = unit;
-            break;
-        }
+        if (unit && unit->IsFriendlyTo(bot) && unit->IsSpiritService() &&
+            (!spiritHealer || bot->GetDistance(unit) < bot->GetDistance(spiritHealer)))
+            spiritHealer = unit;  // nearest: the list is not sorted
     }
 
     if (!spiritHealer)
@@ -192,7 +190,7 @@ bool AutoReleaseSpiritAction::ShouldAutoRelease() const
 
     return ServerFacade::instance().IsDistanceGreaterThan(
         AI_VALUE2(float, "distance", "group leader"),
-        sPlayerbotAIConfig.sightDistance);
+        sPlayerbotAIConfig.SightDistance);
 }
 
 bool AutoReleaseSpiritAction::ShouldDelayBattlegroundRelease() const

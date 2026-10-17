@@ -16,10 +16,10 @@
 
 enum class TargetValueExclusionType : uint8
 {
-    None = 0,
-    Tank,
-    Dps,
-    Attacker
+    TankTarget,
+    DpsTarget,     // also "dps aoe target"
+    DebuffTarget,  // "attacker without aura", "melee attacker without aura"
+    Aoe,
 };
 
 enum StrategyType : uint32
@@ -31,7 +31,8 @@ enum StrategyType : uint32
     STRATEGY_TYPE_DPS = 8,
     STRATEGY_TYPE_HEAL = 16,
     STRATEGY_TYPE_RANGED = 32,
-    STRATEGY_TYPE_MELEE = 64
+    STRATEGY_TYPE_MELEE = 64,
+    STRATEGY_TYPE_REACTION = 128
 };
 
 // enum ActionPriority
@@ -63,6 +64,7 @@ static constexpr float ACTION_LIGHT_HEAL = 10.0f;
 static constexpr float ACTION_MEDIUM_HEAL = 20.0f;
 static constexpr float ACTION_CRITICAL_HEAL = 30.0f;
 static constexpr float ACTION_EMERGENCY = 90.0f;
+static constexpr float ACTION_PASSTHROUGH = 100.0f;
 
 class Strategy : public PlayerbotAIAware
 {
@@ -73,6 +75,10 @@ public:
     virtual std::vector<NextAction> getDefaultActions() { return {}; }
     virtual void InitTriggers([[maybe_unused]] std::vector<TriggerNode*>& triggers) {}
     virtual void InitMultipliers([[maybe_unused]] std::vector<Multiplier*>& multipliers) {}
+    virtual void InitReactionTriggers([[maybe_unused]] std::vector<TriggerNode*>& triggers) {}
+    virtual void InitReactionMultipliers([[maybe_unused]] std::vector<Multiplier*>& multipliers) {}
+    // Ignoring type results in all four types of exclusions being applied. However, exclusions can
+    // also be filtered by adding checks where they are used in the strategies (role, class, etc.).
     virtual void AppendTargetExclusions([[maybe_unused]] GuidSet& exclusions,
                                         [[maybe_unused]] TargetValueExclusionType type) {}
     virtual bool HasTargetExclusions() const { return false; }

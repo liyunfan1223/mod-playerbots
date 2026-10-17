@@ -18,7 +18,7 @@ bool IccDogsTankPositionAction::Execute(Event /*event*/)
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         Aura* aura = botAI->GetAura("mortal wound", bot, false, true);
         bool const hasMortalWound = aura && aura->GetStackAmount() >= 8;
@@ -56,7 +56,7 @@ bool IccDogsTankPositionAction::Execute(Event /*event*/)
 
             Unit* victim = unit->GetVictim();
             Player* victimPlayer = victim ? victim->ToPlayer() : nullptr;
-            if (!victimPlayer || !botAI->IsTank(victimPlayer))
+            if (!victimPlayer || !PlayerbotAI::IsTank(victimPlayer))
             {
                 IccCastClassTaunt(bot, botAI,unit);
                 break;

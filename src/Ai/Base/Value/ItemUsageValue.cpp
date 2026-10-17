@@ -17,7 +17,6 @@
 #include "ServerFacade.h"
 #include "StatsWeightCalculator.h"
 
-#include <unordered_map>
 #include <unordered_set>
 
 ItemUsage ItemUsageValue::Calculate()
@@ -32,10 +31,6 @@ ItemUsage ItemUsageValue::Calculate()
     if (!proto)
         return ITEM_USAGE_NONE;
 
-    // No special MaxCount handling here: looting already stops at the cap (IsLootAllowed and
-    // StoreLootAction), and reporting capped items as NONE put unique quest items and keys in
-    // SmartDestroyItemAction's first destroy bucket. Capped armor/weapons still report
-    // DISENCHANT through IsDisenchantable() on the normal path below.
     if (IsRealPlayer(botAI->GetMaster()))
     {
         if (IsItemUsefulForSkill(proto) || IsItemNeededForSkill(proto))
@@ -109,12 +104,22 @@ ItemUsage ItemUsageValue::Calculate()
     Item* item = bot->GetItemByEntry(proto->ItemId);
     bool isSoulbound = item && item->IsSoulBound();
 
-    if (IsDisenchantable(proto, item))
-        return ITEM_USAGE_DISENCHANT;
+    if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) &&
+        botAI->HasSkill(SKILL_ENCHANTING) &&
+        proto->Quality >= ITEM_QUALITY_UNCOMMON)
+    {
+        // Retrieve the bot's Enchanting skill level
+        uint32 enchantingSkill = bot->GetSkillValue(SKILL_ENCHANTING);
+
+        // Only disenchant if skilled enough and binding allows it
+        if (enchantingSkill >= proto->RequiredDisenchantSkill &&
+            (proto->Bonding == BIND_WHEN_PICKED_UP || (proto->Bonding == BIND_WHEN_EQUIPPED && isSoulbound)))
+            return ITEM_USAGE_DISENCHANT;
+    }
 
     Player* master = botAI->GetMaster();
     bool botNeedsItemForQuest = IsItemUsefulForQuest(bot, proto);
-    bool masterNeedsItemForQuest = master && sPlayerbotAIConfig.syncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
+    bool masterNeedsItemForQuest = master && sPlayerbotAIConfig.SyncQuestWithPlayer && IsItemUsefulForQuest(master, proto);
 
     // Identify the source of loot
     LootObject lootObject = AI_VALUE(LootObject, "loot target");
@@ -153,21 +158,6 @@ ItemUsage ItemUsageValue::Calculate()
     }
 
     return ITEM_USAGE_NONE;
-}
-
-bool ItemUsageValue::IsDisenchantable(ItemTemplate const* proto, Item* item)
-{
-    if (proto->Class != ITEM_CLASS_ARMOR && proto->Class != ITEM_CLASS_WEAPON)
-        return false;
-
-    if (!botAI->HasSkill(SKILL_ENCHANTING) || proto->Quality < ITEM_QUALITY_UNCOMMON)
-        return false;
-
-    if (bot->GetSkillValue(SKILL_ENCHANTING) < proto->RequiredDisenchantSkill)
-        return false;
-
-    bool const isSoulbound = item && item->IsSoulBound();
-    return proto->Bonding == BIND_WHEN_PICKED_UP || (proto->Bonding == BIND_WHEN_EQUIPPED && isSoulbound);
 }
 
 ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, int32 randomPropertyId)
@@ -315,7 +305,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
         {
             // uint32 oldStatWeight = sRandomItemMgr.GetLiveStatWeight(bot, oldItemProto->ItemId);
             if (itemScore || oldScore)
-                shouldEquipInSlot = itemScore > oldScore * sPlayerbotAIConfig.equipUpgradeThreshold;
+                shouldEquipInSlot = itemScore > oldScore * sPlayerbotAIConfig.EquipUpgradeThreshold;
         }
 
         // Bigger quiver
@@ -393,7 +383,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
 
 ItemUsage ItemUsageValue::QueryItemUsageForAmmo(ItemTemplate const* proto)
 {
-    if (bot->getClass() != CLASS_HUNTER || bot->getClass() != CLASS_ROGUE || bot->getClass() != CLASS_WARRIOR)
+    if (bot->getClass() != CLASS_HUNTER && bot->getClass() != CLASS_ROGUE && bot->getClass() != CLASS_WARRIOR)
         return ITEM_USAGE_NONE;
 
     Item* rangedWeapon = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
@@ -715,34 +705,6 @@ namespace
         uint32 _itemId;
         bool _entered;
     };
-
-    // itemId -> CREATE_ITEM spells that consume it as a reagent. The spell store is static, so
-    // this is built once instead of scanning the bot's whole spellbook on every evaluation.
-    std::unordered_map<uint32, std::vector<uint32>> const& CreateItemSpellIndex()
-    {
-        static std::unordered_map<uint32, std::vector<uint32>> const index = []()
-        {
-            std::unordered_map<uint32, std::vector<uint32>> built;
-
-            for (uint32 spellId = 0; spellId < sSpellMgr->GetSpellInfoStoreSize(); ++spellId)
-            {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                if (!spellInfo || spellInfo->IsPassive())
-                    continue;
-
-                if (spellInfo->Effects[EFFECT_0].Effect != SPELL_EFFECT_CREATE_ITEM)
-                    continue;
-
-                for (uint8 i = 0; i < MAX_SPELL_REAGENTS; ++i)
-                    if (spellInfo->ReagentCount[i] > 0 && spellInfo->Reagent[i])
-                        built[uint32(spellInfo->Reagent[i])].push_back(spellId);
-            }
-
-            return built;
-        }();
-
-        return index;
-    }
 }
 
 bool ItemUsageValue::IsItemNeededForUsefullSpell(ItemTemplate const* proto, bool checkAllReagents)
@@ -867,20 +829,28 @@ std::vector<uint32> ItemUsageValue::SpellsUsingItem(uint32 itemId, Player* bot)
 {
     std::vector<uint32> retSpells;
 
-    auto const& index = CreateItemSpellIndex();
-    auto itr = index.find(itemId);
-    if (itr == index.end())
-        return retSpells;
-
     PlayerSpellMap const& spellMap = bot->GetSpellMap();
 
-    for (uint32 spellId : itr->second)
+    for (auto& spell : spellMap)
     {
-        PlayerSpellMap::const_iterator spell = spellMap.find(spellId);
-        if (spell == spellMap.end() || spell->second->State == PLAYERSPELL_REMOVED || !spell->second->Active)
+        uint32 spellId = spell.first;
+
+        if (spell.second->State == PLAYERSPELL_REMOVED || !spell.second->Active)
             continue;
 
-        retSpells.push_back(spellId);
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (!spellInfo)
+            continue;
+
+        if (spellInfo->IsPassive())
+            continue;
+
+        if (spellInfo->Effects[EFFECT_0].Effect != SPELL_EFFECT_CREATE_ITEM)
+            continue;
+
+        for (uint8 i = 0; i < MAX_SPELL_REAGENTS; i++)
+            if (spellInfo->ReagentCount[i] > 0 && uint32(spellInfo->Reagent[i]) == itemId)
+                retSpells.push_back(spellId);
     }
 
     return retSpells;

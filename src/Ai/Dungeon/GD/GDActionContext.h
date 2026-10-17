@@ -22,11 +22,11 @@ class WotlkDungeonGDActionContext : public NamedObjectContext<Action>
             creators["avoid whirling slash"] = &WotlkDungeonGDActionContext::avoid_whirling_slash;
         }
     private:
-        static Action* avoid_poison_nova(PlayerbotAI* ai) { return new AvoidPoisonNovaAction(ai); }
-        static Action* attack_snake_wrap(PlayerbotAI* ai) { return new AttackSnakeWrapAction(ai); }
-        static Action* sladran_stack_on_tank(PlayerbotAI* ai) { return new SladranStackOnTankAction(ai); }
-        static Action* sladran_tank_hold(PlayerbotAI* ai) { return new SladranTankHoldAction(ai); }
-        static Action* avoid_whirling_slash(PlayerbotAI* ai) { return new AvoidWhirlingSlashAction(ai); }
+        static Action* avoid_poison_nova(PlayerbotAI* botAI) { return new AvoidPoisonNovaAction(botAI); }
+        static Action* attack_snake_wrap(PlayerbotAI* botAI) { return new AttackSnakeWrapAction(botAI); }
+        static Action* sladran_stack_on_tank(PlayerbotAI* botAI) { return new SladranStackOnTankAction(botAI); }
+        static Action* sladran_tank_hold(PlayerbotAI* botAI) { return new SladranTankHoldAction(botAI); }
+        static Action* avoid_whirling_slash(PlayerbotAI* botAI) { return new AvoidWhirlingSlashAction(botAI); }
 };
 
 #endif

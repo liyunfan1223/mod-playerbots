@@ -62,7 +62,7 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
     cls = player->getClass();
     lvl = player->GetLevel();
     tab = AiFactory::GetPlayerSpecTab(player);
-    collector_ = std::make_unique<StatsCollector>(type_, cls);
+    collector_ = std::make_unique<StatsCollector>(type_, cls, lvl);
 
     if (cls == CLASS_DEATH_KNIGHT && tab == DEATH_KNIGHT_TAB_UNHOLY)
         hitOverflowType_ = CollectorType::SPELL;
@@ -118,7 +118,7 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
     CalculateSocketBonus(player_, proto);
 
     // Apply weapon speed governance if slot is provided and this is a weapon
-    if (sPlayerbotAIConfig.preferredSpecWeapons && slot >= 0 && proto->Class == ITEM_CLASS_WEAPON)
+    if (sPlayerbotAIConfig.PreferredSpecWeapons && slot >= 0 && proto->Class == ITEM_CLASS_WEAPON)
         weight_ *= ApplyPreferredSpecWeapons(proto, slot);
 
     return weight_;

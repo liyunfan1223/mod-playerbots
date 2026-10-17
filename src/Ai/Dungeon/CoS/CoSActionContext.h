@@ -19,8 +19,8 @@ class WotlkDungeonCoSActionContext : public NamedObjectContext<Action>
             creators["epoch stack"] = &WotlkDungeonCoSActionContext::epoch_stack;
         }
     private:
-        static Action* explode_ghoul_spread(PlayerbotAI* ai) { return new ExplodeGhoulSpreadAction(ai); }
-        static Action* epoch_stack(PlayerbotAI* ai) { return new EpochStackAction(ai); }
+        static Action* explode_ghoul_spread(PlayerbotAI* botAI) { return new ExplodeGhoulSpreadAction(botAI); }
+        static Action* epoch_stack(PlayerbotAI* botAI) { return new EpochStackAction(botAI); }
 };
 
 #endif

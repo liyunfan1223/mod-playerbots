@@ -43,7 +43,7 @@ bool MoveToTravelTargetAction::Execute(Event /*event*/)
 
             if (memberDistance < 50.0f)
                 continue;
-            if (memberDistance > sPlayerbotAIConfig.reactDistance * 20)
+            if (memberDistance > sPlayerbotAIConfig.ReactDistance * 20)
                 continue;
 
             // float memberAngle = botLocation.getAngleBetween(targetPos, memberPos);
@@ -65,9 +65,9 @@ bool MoveToTravelTargetAction::Execute(Event /*event*/)
                 botAI->TellMasterNoFacing(out);
             }
 
-            target->setExpireIn(target->getTimeLeft() + sPlayerbotAIConfig.maxWaitForMove);
+            target->setExpireIn(target->getTimeLeft() + sPlayerbotAIConfig.MaxWaitForMove);
 
-            botAI->SetNextCheckDelay(sPlayerbotAIConfig.maxWaitForMove);
+            botAI->SetNextCheckDelay(sPlayerbotAIConfig.MaxWaitForMove);
 
             return true;
         }
@@ -90,7 +90,7 @@ bool MoveToTravelTargetAction::Execute(Event /*event*/)
 
     if (target->getMaxTravelTime() > target->getTimeLeft())  // The bot is late. Speed it up.
     {
-        // distance = sPlayerbotAIConfig.fleeDistance;
+        // distance = sPlayerbotAIConfig.FleeDistance;
         // angle = bot->GetAngle(location.GetPositionX(), location.GetPositionY());
         // location = botLocation.getLocation();
     }

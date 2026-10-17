@@ -23,12 +23,12 @@ class WotlkDungeonNexActionContext : public NamedObjectContext<Action>
             creators["intense cold jump"] = &WotlkDungeonNexActionContext::intense_cold_jump;
         }
     private:
-        static Action* move_from_whirlwind(PlayerbotAI* ai) { return new MoveFromWhirlwindAction(ai); }
-        static Action* firebomb_spread(PlayerbotAI* ai) { return new FirebombSpreadAction(ai); }
-        static Action* telestra_split_target(PlayerbotAI* ai) { return new TelestraSplitTargetAction(ai); }
-        static Action* chaotic_rift_target(PlayerbotAI* ai) { return new ChaoticRiftTargetAction(ai); }
-        static Action* dodge_spikes(PlayerbotAI* ai) { return new DodgeSpikesAction(ai); }
-        static Action* intense_cold_jump(PlayerbotAI* ai) { return new IntenseColdJumpAction(ai); }
+        static Action* move_from_whirlwind(PlayerbotAI* botAI) { return new MoveFromWhirlwindAction(botAI); }
+        static Action* firebomb_spread(PlayerbotAI* botAI) { return new FirebombSpreadAction(botAI); }
+        static Action* telestra_split_target(PlayerbotAI* botAI) { return new TelestraSplitTargetAction(botAI); }
+        static Action* chaotic_rift_target(PlayerbotAI* botAI) { return new ChaoticRiftTargetAction(botAI); }
+        static Action* dodge_spikes(PlayerbotAI* botAI) { return new DodgeSpikesAction(botAI); }
+        static Action* intense_cold_jump(PlayerbotAI* botAI) { return new IntenseColdJumpAction(botAI); }
 };
 
 #endif

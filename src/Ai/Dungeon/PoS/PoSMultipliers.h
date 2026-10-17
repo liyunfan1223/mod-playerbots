@@ -12,7 +12,7 @@
 class IckAndKrickMultiplier : public Multiplier
 {
     public:
-    IckAndKrickMultiplier(PlayerbotAI* ai) : Multiplier(ai, "ick and krick") {}
+    IckAndKrickMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "ick and krick") {}
 
     public:
         float GetValue(Action* action) override;
@@ -21,7 +21,7 @@ class IckAndKrickMultiplier : public Multiplier
 class GarfrostMultiplier : public Multiplier
 {
 public:
-    GarfrostMultiplier(PlayerbotAI* ai) : Multiplier(ai, "garfrost") { }
+    GarfrostMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "garfrost") { }
 
     float GetValue(Action* action) override;
 };

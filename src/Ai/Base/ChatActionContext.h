@@ -48,7 +48,6 @@
 #include "PetsAction.h"
 #include "PositionAction.h"
 #include "PullActions.h"
-#include "QueryGameObjectAction.h"
 #include "QueryItemUsageAction.h"
 #include "QueryQuestAction.h"
 #include "RangeAction.h"
@@ -116,7 +115,6 @@ public:
         creators["share"] = &ChatActionContext::share;
         creators["query quest"] = &ChatActionContext::query_quest;
         creators["query item usage"] = &ChatActionContext::query_item_usage;
-        creators["query game object"] = &ChatActionContext::query_game_object;
         creators["ll"] = &ChatActionContext::ll;
         creators["ss"] = &ChatActionContext::ss;
         creators["add all loot"] = &ChatActionContext::add_all_loot;
@@ -292,7 +290,6 @@ private:
     static Action* release(PlayerbotAI* botAI) { return new ReleaseSpiritAction(botAI); }
     static Action* repop(PlayerbotAI* botAI) { return new RepopAction(botAI); }
     static Action* query_item_usage(PlayerbotAI* botAI) { return new QueryItemUsageAction(botAI); }
-    static Action* query_game_object(PlayerbotAI* botAI) { return new QueryGameObjectAction(botAI); }
     static Action* query_quest(PlayerbotAI* botAI) { return new QueryQuestAction(botAI); }
     static Action* drop(PlayerbotAI* botAI) { return new DropQuestAction(botAI); }
     static Action* clean_quest_log(PlayerbotAI* botAI) { return new CleanQuestLogAction(botAI); }
@@ -306,7 +303,7 @@ private:
     static Action* los(PlayerbotAI* botAI) { return new TellLosAction(botAI); }
     static Action* rpg_status(PlayerbotAI* botAI) { return new TellRpgStatusAction(botAI); }
     static Action* rpg_do_quest(PlayerbotAI* botAI) { return new StartRpgDoQuestAction(botAI); }
-    static Action* aura(PlayerbotAI* ai) { return new TellAuraAction(ai); }
+    static Action* aura(PlayerbotAI* botAI) { return new TellAuraAction(botAI); }
     static Action* ll(PlayerbotAI* botAI) { return new LootStrategyAction(botAI); }
     static Action* ss(PlayerbotAI* botAI) { return new SkipSpellsListAction(botAI); }
     static Action* add_all_loot(PlayerbotAI* botAI) { return new AddAllLootAction(botAI); }
@@ -320,15 +317,15 @@ private:
     static Action* guild_remove(PlayerbotAI* botAI) { return new GuildRemoveAction(botAI); }
     static Action* guild_leave(PlayerbotAI* botAI) { return new GuildLeaveAction(botAI); }
     static Action* rtsc(PlayerbotAI* botAI) { return new RTSCAction(botAI); }
-    static Action* naxx_chat_shortcut(PlayerbotAI* ai) { return new NaxxChatShortcutAction(ai); }
-    static Action* bwl_chat_shortcut(PlayerbotAI* ai) { return new BwlChatShortcutAction(ai); }
-    static Action* tell_estimated_dps(PlayerbotAI* ai) { return new TellEstimatedDpsAction(ai); }
-    static Action* join(PlayerbotAI* ai) { return new JoinGroupAction(ai); }
-    static Action* calc(PlayerbotAI* ai) { return new TellCalculateItemAction(ai); }
-    static Action* wipe(PlayerbotAI* ai) { return new WipeAction(ai); }
+    static Action* naxx_chat_shortcut(PlayerbotAI* botAI) { return new NaxxChatShortcutAction(botAI); }
+    static Action* bwl_chat_shortcut(PlayerbotAI* botAI) { return new BwlChatShortcutAction(botAI); }
+    static Action* tell_estimated_dps(PlayerbotAI* botAI) { return new TellEstimatedDpsAction(botAI); }
+    static Action* join(PlayerbotAI* botAI) { return new JoinGroupAction(botAI); }
+    static Action* calc(PlayerbotAI* botAI) { return new TellCalculateItemAction(botAI); }
+    static Action* wipe(PlayerbotAI* botAI) { return new WipeAction(botAI); }
     static Action* tame(PlayerbotAI* botAI) { return new TameAction(botAI); }
     static Action* glyphs(PlayerbotAI* botAI) { return new TellGlyphsAction(botAI); } // Added for custom Glyphs
-    static Action* glyph_equip(PlayerbotAI* ai) { return new EquipGlyphsAction(ai); } // Added for custom Glyphs
+    static Action* glyph_equip(PlayerbotAI* botAI) { return new EquipGlyphsAction(botAI); } // Added for custom Glyphs
     static Action* pet(PlayerbotAI* botAI) { return new PetsAction(botAI); }
     static Action* pet_attack(PlayerbotAI* botAI) { return new PetsAction(botAI, "attack"); }
     static Action* roll_action(PlayerbotAI* botAI) { return new RollAction(botAI); }

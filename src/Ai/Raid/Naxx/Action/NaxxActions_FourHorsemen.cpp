@@ -38,7 +38,7 @@ bool FourHorsemenAttackInOrderAction::Execute(Event /*event*/)
         fourth = AI_VALUE2(Unit*, "find target", "highlord mograine");
 
     std::vector<Unit*> attack_order;
-    if (botAI->IsAssistTank(bot))
+    if (PlayerbotAI::IsAssistTank(bot))
         attack_order = {fourth, thane, lady, sir};
     else
         attack_order = {thane, fourth, lady, sir};

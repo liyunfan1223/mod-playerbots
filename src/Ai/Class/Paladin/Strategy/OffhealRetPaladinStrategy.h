@@ -21,7 +21,7 @@ public:
     std::vector<NextAction> getDefaultActions() override;
     uint32 GetType() const override
     {
-        return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_HEAL | STRATEGY_TYPE_MELEE;
+        return STRATEGY_TYPE_DPS | STRATEGY_TYPE_HEAL | STRATEGY_TYPE_MELEE;
     }
 };
 

@@ -57,7 +57,7 @@ bool LootRollAction::Execute(Event /*event*/)
                 vote = GREED; // Not eligible, so "Greed"
         }
         else if (usage == ITEM_USAGE_DISENCHANT)
-            vote = sPlayerbotAIConfig.lootRollDisenchant ? DISENCHANT : GREED;
+            vote = sPlayerbotAIConfig.LootRollDisenchant ? DISENCHANT : GREED;
         else
         {
             switch (proto->Class)
@@ -70,7 +70,7 @@ bool LootRollAction::Execute(Event /*event*/)
                         vote = GREED;
                     break;
                 case ITEM_CLASS_RECIPE:
-                    if (!sPlayerbotAIConfig.lootRollRecipe)
+                    if (!sPlayerbotAIConfig.LootRollRecipe)
                         vote = PASS;
                     else if (usage == ITEM_USAGE_SKILL)
                         vote = NEED;  // Bot can learn this recipe
@@ -85,12 +85,12 @@ bool LootRollAction::Execute(Event /*event*/)
         }
         if (vote == NEED)
         {
-            if (sPlayerbotAIConfig.lootNeedRollLevel == 0 || RollUniqueCheck(proto, bot))
+            if (sPlayerbotAIConfig.LootNeedRollLevel == 0 || RollUniqueCheck(proto, bot))
                 vote = PASS;
-            else if (sPlayerbotAIConfig.lootNeedRollLevel == 1)
+            else if (sPlayerbotAIConfig.LootNeedRollLevel == 1)
                 vote = GREED;
         }
-        else if (vote == GREED && !sPlayerbotAIConfig.lootGreedRollLevel)
+        else if (vote == GREED && !sPlayerbotAIConfig.LootGreedRollLevel)
             vote = PASS;
 
         switch (group->GetLootMethod())
@@ -134,7 +134,7 @@ RollVote LootRollAction::CalculateRollVote(ItemTemplate const* proto, ItemUsage 
             needVote = GREED;
             break;
         case ITEM_USAGE_DISENCHANT:
-            needVote = sPlayerbotAIConfig.lootRollDisenchant ? DISENCHANT : GREED;
+            needVote = sPlayerbotAIConfig.LootRollDisenchant ? DISENCHANT : GREED;
             break;
         default:
             break;
@@ -217,7 +217,7 @@ bool RollAction::Execute(Event event)
 
     if (link.empty())
     {
-        bot->DoRandomRoll(0,100);
+        bot->DoRandomRoll(1, 100);
         return false;
     }
     ItemIds itemIds = chat->parseItems(link);
@@ -226,9 +226,8 @@ bool RollAction::Execute(Event event)
     uint32 itemId = *itemIds.begin();
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
     if (!proto)
-    {
         return false;
-    }
+
     std::string itemUsageParam;
     itemUsageParam = std::to_string(itemId);
 
@@ -238,9 +237,7 @@ bool RollAction::Execute(Event event)
         case ITEM_CLASS_WEAPON:
         case ITEM_CLASS_ARMOR:
         if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
-        {
-            bot->DoRandomRoll(0,100);
-        }
+            bot->DoRandomRoll(1, 100);
     }
     return true;
 }

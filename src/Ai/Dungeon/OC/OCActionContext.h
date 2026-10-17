@@ -24,13 +24,13 @@ class WotlkDungeonOccActionContext : public NamedObjectContext<Action>
             creators["time bomb spread"] = &WotlkDungeonOccActionContext::time_bomb_spread;
         }
     private:
-        static Action* avoid_unstable_sphere(PlayerbotAI* ai) { return new AvoidUnstableSphereAction(ai); }
-        static Action* mount_drake(PlayerbotAI* ai) { return new MountDrakeAction(ai); }
-        static Action* dismount_drake(PlayerbotAI* ai) { return new DismountDrakeAction(ai); }
-        static Action* occ_fly_drake(PlayerbotAI* ai) { return new OccFlyDrakeAction(ai); }
-        static Action* occ_drake_attack(PlayerbotAI* ai) { return new OccDrakeAttackAction(ai); }
-        static Action* avoid_arcane_explosion(PlayerbotAI* ai) { return new AvoidArcaneExplosionAction(ai); }
-        static Action* time_bomb_spread(PlayerbotAI* ai) { return new TimeBombSpreadAction(ai); }
+        static Action* avoid_unstable_sphere(PlayerbotAI* botAI) { return new AvoidUnstableSphereAction(botAI); }
+        static Action* mount_drake(PlayerbotAI* botAI) { return new MountDrakeAction(botAI); }
+        static Action* dismount_drake(PlayerbotAI* botAI) { return new DismountDrakeAction(botAI); }
+        static Action* occ_fly_drake(PlayerbotAI* botAI) { return new OccFlyDrakeAction(botAI); }
+        static Action* occ_drake_attack(PlayerbotAI* botAI) { return new OccDrakeAttackAction(botAI); }
+        static Action* avoid_arcane_explosion(PlayerbotAI* botAI) { return new AvoidArcaneExplosionAction(botAI); }
+        static Action* time_bomb_spread(PlayerbotAI* botAI) { return new TimeBombSpreadAction(botAI); }
 };
 
 #endif

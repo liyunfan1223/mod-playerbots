@@ -19,42 +19,42 @@ const Position DISPERSE_POSITION = Position(1161.152f, -261.584f, 53.223f);
 class BjarngrimTargetAction : public AttackAction
 {
 public:
-    BjarngrimTargetAction(PlayerbotAI* ai) : AttackAction(ai, "bjarngrim target") {}
+    BjarngrimTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "bjarngrim target") {}
     bool Execute(Event event) override;
 };
 
 class AvoidWhirlwindAction : public MovementAction
 {
 public:
-    AvoidWhirlwindAction(PlayerbotAI* ai) : MovementAction(ai, "avoid whirlwind") {}
+    AvoidWhirlwindAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid whirlwind") {}
     bool Execute(Event event) override;
 };
 
 class VolkhanTargetAction : public AttackAction
 {
 public:
-    VolkhanTargetAction(PlayerbotAI* ai) : AttackAction(ai, "volkhan target") {}
+    VolkhanTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "volkhan target") {}
     bool Execute(Event event) override;
 };
 
 class StaticOverloadSpreadAction : public MovementAction
 {
 public:
-    StaticOverloadSpreadAction(PlayerbotAI* ai) : MovementAction(ai, "static overload spread") {}
+    StaticOverloadSpreadAction(PlayerbotAI* botAI) : MovementAction(botAI, "static overload spread") {}
     bool Execute(Event event) override;
 };
 
 class BallLightningSpreadAction : public MovementAction
 {
 public:
-    BallLightningSpreadAction(PlayerbotAI* ai) : MovementAction(ai, "ball lightning spread") {}
+    BallLightningSpreadAction(PlayerbotAI* botAI) : MovementAction(botAI, "ball lightning spread") {}
     bool Execute(Event event) override;
 };
 
 class IonarTankPositionAction : public MovementAction
 {
 public:
-    IonarTankPositionAction(PlayerbotAI* ai) : MovementAction(ai, "ionar tank position") {}
+    IonarTankPositionAction(PlayerbotAI* botAI) : MovementAction(botAI, "ionar tank position") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -62,7 +62,7 @@ public:
 class DispersePositionAction : public MovementAction
 {
 public:
-    DispersePositionAction(PlayerbotAI* ai) : MovementAction(ai, "disperse position") {}
+    DispersePositionAction(PlayerbotAI* botAI) : MovementAction(botAI, "disperse position") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -70,7 +70,7 @@ public:
 class LokenStackAction : public MovementAction
 {
 public:
-    LokenStackAction(PlayerbotAI* ai) : MovementAction(ai, "loken stack") {}
+    LokenStackAction(PlayerbotAI* botAI) : MovementAction(botAI, "loken stack") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -78,7 +78,7 @@ public:
 class AvoidLightningNovaAction : public MovementAction
 {
 public:
-    AvoidLightningNovaAction(PlayerbotAI* ai) : MovementAction(ai, "avoid lightning nova") {}
+    AvoidLightningNovaAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid lightning nova") {}
     bool Execute(Event event) override;
 };
 

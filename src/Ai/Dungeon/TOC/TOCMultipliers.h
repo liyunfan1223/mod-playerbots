@@ -12,7 +12,7 @@
 class ToCJoustMultiplier : public Multiplier
 {
 public:
-    ToCJoustMultiplier(PlayerbotAI* ai) : Multiplier(ai, "toc joust") {}
+    ToCJoustMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "toc joust") {}
     float GetValue(Action* action) override;
 
 private:

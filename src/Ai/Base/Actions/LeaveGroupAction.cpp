@@ -153,7 +153,7 @@ bool LeaveFarAwayAction::isUseful()
     if (abs(int32(groupLeader->GetLevel() - bot->GetLevel())) > 4)
         return true;
 
-    if (bot->GetMapId() != groupLeader->GetMapId() || bot->GetDistance2d(groupLeader) >= 2 * sPlayerbotAIConfig.rpgDistance)
+    if (bot->GetMapId() != groupLeader->GetMapId() || bot->GetDistance2d(groupLeader) >= 2 * sPlayerbotAIConfig.RpgDistance)
     {
         return true;
     }

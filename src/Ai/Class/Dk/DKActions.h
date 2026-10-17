@@ -83,20 +83,20 @@ public:
 class CastPestilenceAction : public CastSpellAction
 {
 public:
-    CastPestilenceAction(PlayerbotAI* ai) : CastSpellAction(ai, "pestilence") {}
+    CastPestilenceAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "pestilence") {}
     ActionThreatType getThreatType() override { return ActionThreatType::None; }
 };
 
 class CastHowlingBlastAction : public CastSpellAction
 {
 public:
-    CastHowlingBlastAction(PlayerbotAI* ai) : CastSpellAction(ai, "howling blast") {}
+    CastHowlingBlastAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "howling blast") {}
 };
 
 class CastIcyTouchAction : public CastSpellAction
 {
 public:
-    CastIcyTouchAction(PlayerbotAI* ai) : CastSpellAction(ai, "icy touch") {}
+    CastIcyTouchAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "icy touch") {}
 };
 
 class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnAttackerAction
@@ -113,7 +113,7 @@ public:
 class CastPlagueStrikeAction : public CastSpellAction
 {
 public:
-    CastPlagueStrikeAction(PlayerbotAI* ai) : CastSpellAction(ai, "plague strike") {}
+    CastPlagueStrikeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "plague strike") {}
 };
 
 class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction

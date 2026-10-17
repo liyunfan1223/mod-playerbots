@@ -33,7 +33,7 @@ bool MalygosPositionAction::Execute(Event /*event*/)
         }
 
         // Position tank
-        if (botAI->IsMainTank(bot))
+        if (PlayerbotAI::IsMainTank(bot))
         {
             if (bot->GetDistance2d(MALYGOS_MAINTANK_POSITION.first, MALYGOS_MAINTANK_POSITION.second) > distance)
             {
@@ -80,7 +80,7 @@ bool MalygosTargetAction::Execute(Event /*event*/)
 
     if (phase == 1)
     {
-        if (botAI->IsHeal(bot)) { return false; }
+        if (PlayerbotAI::IsHeal(bot)) { return false; }
 
         // Init this as boss by default, if no better target is found just fall back to Malygos
         Unit* newTarget = boss;
@@ -97,7 +97,7 @@ bool MalygosTargetAction::Execute(Event /*event*/)
         //     }
         // }
 
-        // if (spark && botAI->IsRangedDps(bot))
+        // if (spark && PlayerbotAI::IsRangedDps(bot))
         // {
         //     newTarget = spark;
         // }
@@ -111,7 +111,7 @@ bool MalygosTargetAction::Execute(Event /*event*/)
     }
     else if (phase == 2)
     {
-        if (botAI->IsHeal(bot)) { return false; }
+        if (PlayerbotAI::IsHeal(bot)) { return false; }
 
         Unit* newTarget = nullptr;
         Unit* nexusLord = nullptr;
@@ -133,7 +133,7 @@ bool MalygosTargetAction::Execute(Event /*event*/)
             }
         }
 
-        if (botAI->IsRangedDps(bot) && scionOfEternity)
+        if (PlayerbotAI::IsRangedDps(bot) && scionOfEternity)
         {
             newTarget = scionOfEternity;
         }

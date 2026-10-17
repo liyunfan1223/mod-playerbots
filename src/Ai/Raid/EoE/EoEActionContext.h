@@ -25,12 +25,12 @@ public:
     }
 
 private:
-    static Action* position(PlayerbotAI* ai) { return new MalygosPositionAction(ai); }
-    static Action* target(PlayerbotAI* ai) { return new MalygosTargetAction(ai); }
-    // static Action* pull_power_spark(PlayerbotAI* ai) { return new PullPowerSparkAction(ai); }
-    // static Action* kill_power_spark(PlayerbotAI* ai) { return new KillPowerSparkAction(ai); }
-    static Action* eoe_fly_drake(PlayerbotAI* ai) { return new EoEFlyDrakeAction(ai); }
-    static Action* eoe_drake_attack(PlayerbotAI* ai) { return new EoEDrakeAttackAction(ai); }
+    static Action* position(PlayerbotAI* botAI) { return new MalygosPositionAction(botAI); }
+    static Action* target(PlayerbotAI* botAI) { return new MalygosTargetAction(botAI); }
+    // static Action* pull_power_spark(PlayerbotAI* botAI) { return new PullPowerSparkAction(botAI); }
+    // static Action* kill_power_spark(PlayerbotAI* botAI) { return new KillPowerSparkAction(botAI); }
+    static Action* eoe_fly_drake(PlayerbotAI* botAI) { return new EoEFlyDrakeAction(botAI); }
+    static Action* eoe_drake_attack(PlayerbotAI* botAI) { return new EoEDrakeAttackAction(botAI); }
 };
 
 #endif

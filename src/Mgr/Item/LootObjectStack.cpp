@@ -5,17 +5,18 @@
  */
 
 #include "LootObjectStack.h"
-#include "Log.h"
-#include "LootAction.h"
+
 #include "LootMgr.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "Playerbots.h"
-#include "ReputationMgr.h"
 #include "Unit.h"
-#include <set>
 
 #define MAX_LOOT_OBJECT_COUNT 200
+
+constexpr uint8 MAX_LOOT_RETRY_ATTEMPTS = 5;
+constexpr std::chrono::seconds LOOT_RETRY_MIN_DELAY(1);
+constexpr std::chrono::seconds LOOT_RETRY_MAX_DELAY(16);
 
 namespace
 {
@@ -24,28 +25,22 @@ bool IsGatheringSkill(uint32 skillId)
     return skillId == SKILL_SKINNING || skillId == SKILL_HERBALISM || skillId == SKILL_MINING ||
            skillId == SKILL_ENGINEERING;
 }
-}
+}  // namespace
 
 LootTarget::LootTarget(ObjectGuid guid) : guid(guid), asOfTime(time(nullptr)) {}
 
-LootTarget::LootTarget(LootTarget const& other)
-{
-    guid = other.guid;
-    asOfTime = other.asOfTime;
-}
-
-LootTarget& LootTarget::operator=(LootTarget const& other)
-{
-    if ((void*)this == (void*)&other)
-        return *this;
-
-    guid = other.guid;
-    asOfTime = other.asOfTime;
-
-    return *this;
-}
+LootTarget::LootTarget(ObjectGuid guid, time_t asOfTime) : guid(guid), asOfTime(asOfTime) {}
 
 bool LootTarget::operator<(LootTarget const& other) const { return guid < other.guid; }
+
+bool LootTarget::IsReady() const { return std::chrono::steady_clock::now() >= _retryUntil; }
+
+void LootTarget::Defer()
+{
+    _retryCount = std::min<uint8>(_retryCount + 1, MAX_LOOT_RETRY_ATTEMPTS);
+    _retryUntil = std::chrono::steady_clock::now() +
+                  std::min(LOOT_RETRY_MIN_DELAY * (1u << (_retryCount - 1)), LOOT_RETRY_MAX_DELAY);
+}
 
 void LootTargetList::shrink(time_t fromTime)
 {
@@ -58,27 +53,6 @@ void LootTargetList::shrink(time_t fromTime)
     }
 }
 
-bool IsGameObjectHostileTo(GameObject const* go, Player const* player)
-{
-    if (!go || !player)
-        return false;
-
-    FactionTemplateEntry const* goFaction = sFactionTemplateStore.LookupEntry(go->GetUInt32Value(GAMEOBJECT_FACTION));
-    if (!goFaction)
-        return false;
-
-    FactionTemplateEntry const* playerFaction = player->GetFactionTemplateEntry();
-    if (!playerFaction)
-        return false;
-
-    // A forced reaction (e.g. a disguise) overrides the faction template in both directions,
-    // exactly like the client's ActivateToQuest check.
-    if (ReputationRank const* forcedRank = player->GetReputationMgr().GetForcedRankIfAny(goFaction))
-        return *forcedRank <= REP_HOSTILE;
-
-    return goFaction->IsHostileTo(*playerFaction);
-}
-
 LootObject::LootObject(Player* bot, ObjectGuid guid) : guid(), skillId(SKILL_NONE), reqSkillValue(0), reqItem(0)
 {
     Refresh(bot, guid);
@@ -89,6 +63,9 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     skillId = SKILL_NONE;
     reqSkillValue = 0;
     reqItem = 0;
+    _lockRequirementCount = 0;
+    _lockType = 0;
+    _hasUnsupportedLockRequirement = false;
     guid.Clear();
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
@@ -118,8 +95,8 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     if (go && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
     {
         // The client refuses to interact with hostile game objects; check live so forced
-        // reactions (e.g. disguises) that drop hostility are honoured.
-        if (IsGameObjectHostileTo(go, bot))
+        // reputations are honored.
+        if (go->IsHostileTo(bot))
             return;
 
         bool onlyHasQuestItems = true;
@@ -136,10 +113,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
             if (!itemId)
                 continue;
 
-            // The client only marks the game object as holding a quest item when the player
-            // actually has a quest requiring it.
-            if (bot->HasQuestForItem(itemId))
-                hasAnyQuestItems = true;
+            hasAnyQuestItems = true;
 
             if (IsNeededForQuest(bot, itemId))
             {
@@ -166,109 +140,102 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
         if (lootEntry == 0)
             return;
 
-        // If the gameobject carries only quest items the bot has a quest for but does not need,
-        // skip it. The template walk only happens in this rare case.
-        if (!neededQuestItem && hasAnyQuestItems)
+        // Check the main loot template
+        if (LootTemplate const* lootTemplate = LootTemplates_Gameobject.GetLootFor(lootEntry))
         {
-            if (LootTemplate const* lootTemplate = LootTemplates_Gameobject.GetLootFor(lootEntry))
-            {
-                std::set<uint32> itemIds;
-                lootTemplate->CollectItemIds(itemIds);
+            Loot loot;
+            lootTemplate->Process(loot, LootTemplates_Gameobject, 1, bot);
 
-                for (uint32 itemId : itemIds)
+            for (LootItem const& item : loot.items)
+            {
+                uint32 itemId = item.itemid;
+                if (!itemId)
+                    continue;
+
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+                if (!proto)
+                    continue;
+
+                if (proto->Class != ITEM_CLASS_QUEST)
                 {
-                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
-                    if (proto && proto->Class != ITEM_CLASS_QUEST)
+                    onlyHasQuestItems = false;
+                    break;
+                }
+
+                // If this item references another loot table, process it
+                if (LootTemplate const* refLootTemplate = LootTemplates_Reference.GetLootFor(itemId))
+                {
+                    Loot refLoot;
+                    refLootTemplate->Process(refLoot, LootTemplates_Reference, 1, bot);
+
+                    for (LootItem const& refItem : refLoot.items)
                     {
-                        onlyHasQuestItems = false;
-                        break;
+                        uint32 refItemId = refItem.itemid;
+                        if (!refItemId)
+                            continue;
+
+                        ItemTemplate const* refProto = sObjectMgr->GetItemTemplate(refItemId);
+                        if (!refProto)
+                            continue;
+
+                        if (refProto->Class != ITEM_CLASS_QUEST)
+                        {
+                            onlyHasQuestItems = false;
+                            break;
+                        }
                     }
                 }
             }
-            else
-            {
-                onlyHasQuestItems = false;
-            }
-
-            if (onlyHasQuestItems)
-                return;
         }
 
-        // The bot walks to and opens only what it would actually store. A quest item it still
-        // needs bypasses the filter; the always-loot list and the all/* strategy are handled by
-        // the value itself.
-        if (!neededQuestItem)
-        {
-            Value<bool>* useful = botAI->GetAiObjectContext()->GetValue<bool>("loot entry useful", int32(lootEntry));
-            if (!useful || !useful->Get())
-                return;
-        }
+        // If gameobject has only quest items that bot doesn’t need, skip it.
+        if (!neededQuestItem && hasAnyQuestItems && onlyHasQuestItems)
+            return;
 
         // Otherwise, loot it.
         guid = lootGUID;
 
         uint32 goId = go->GetEntry();
         uint32 lockId = go->GetGOInfo()->GetLockId();
-        LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
-        if (!lockInfo)
+        if (!lockId)
             return;
 
-        // A lock opens when ANY case is satisfiable, and the client serves the non-skill cases
-        // (LOCKTYPE_OPEN/QUICK_OPEN/OPEN_TINKERING/OPEN_KNEELING/...) with its hidden "Opening"
-        // abilities (3365/6247/6477/6478). Track one so a gathering case on the same lock cannot
-        // make the object unusable for a bot without the profession.
-        bool skillFreeOpener = false;
+        LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
+        if (!lockInfo)
+        {
+            _hasUnsupportedLockRequirement = true;
+            return;
+        }
 
-        for (uint8 i = 0; i < 8; ++i)
+        for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
         {
             switch (lockInfo->Type[i])
             {
                 case LOCK_KEY_ITEM:
-                    if (lockInfo->Index[i] > 0)
-                    {
-                        reqItem = lockInfo->Index[i];
-                        guid = lootGUID;
-                    }
-                    break;
-
-                case LOCK_KEY_SKILL:
-                    if (goId == 13891 || goId == 19535)  // Serpentbloom
-                    {
-                        this->guid = lootGUID;
-                    }
-                    else if (SkillByLockType(LockType(lockInfo->Index[i])) > 0)
-                    {
-                        skillId = SkillByLockType(LockType(lockInfo->Index[i]));
-                        reqSkillValue = std::max((uint32)1, lockInfo->Skill[i]);
-                        guid = lootGUID;
-                    }
+                    if (lockInfo->Index[i])
+                        AddLockRequirement({SKILL_NONE, 0, lockInfo->Index[i], 0});
                     else
-                    {
-                        skillFreeOpener = true;
-                        guid = lootGUID;
-                    }
+                        _hasUnsupportedLockRequirement = true;
                     break;
+                case LOCK_KEY_SKILL:
+                    if (!lockInfo->Index[i])
+                    {
+                        _hasUnsupportedLockRequirement = true;
+                        break;
+                    }
 
+                    if (goId == 13891 || goId == 19535)
+                        AddLockRequirement({SKILL_NONE, 0, 0, lockInfo->Index[i]});
+                    else
+                        AddLockRequirement({uint32(SkillByLockType(LockType(lockInfo->Index[i]))),
+                                            std::max(1u, lockInfo->Skill[i]), 0, lockInfo->Index[i]});
+                    break;
                 case LOCK_KEY_NONE:
-                    guid = lootGUID;
+                    break;
+                default:
+                    _hasUnsupportedLockRequirement = true;
                     break;
             }
-        }
-
-        // The bot cannot satisfy the gathering case, but the client would open this with a plain
-        // opener instead (e.g. the Corrupted Flower's kneel case -> 6478), so drop the
-        // profession/key requirement and let GetOpeningSpell pick the matching spell.
-        // Locked objects (chests, strongboxes, coffers, ...) are excluded: their Open case is a
-        // convenience next to a Lockpicking/key case, and dropping the requirement would let the
-        // hidden opener bypass it (the cast path does not check GO_FLAG_LOCKED). It would also
-        // stop key holders from using their key.
-        bool const gatheringSatisfied = skillId != SKILL_NONE && botAI->HasSkill((SkillType)skillId) &&
-                                        bot->GetSkillValue(skillId) >= reqSkillValue;
-        if (skillFreeOpener && !gatheringSatisfied && !go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED))
-        {
-            skillId = SKILL_NONE;
-            reqSkillValue = 0;
-            reqItem = 0;
         }
     }
 }
@@ -324,12 +291,10 @@ WorldObject* LootObject::GetWorldObject(Player* bot)
     return nullptr;
 }
 
-LootObject::LootObject(LootObject const& other)
+void LootObject::AddLockRequirement(LootLockRequirement const& requirement)
 {
-    guid = other.guid;
-    skillId = other.skillId;
-    reqSkillValue = other.reqSkillValue;
-    reqItem = other.reqItem;
+    if (_lockRequirementCount < _lockRequirements.size())
+        _lockRequirements[_lockRequirementCount++] = requirement;
 }
 
 bool LootObject::IsLootPossible(Player* bot)
@@ -343,9 +308,6 @@ bool LootObject::IsLootPossible(Player* bot)
 
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     if (!botAI)
-        return false;
-
-    if (reqItem && !bot->HasItemCount(reqItem, 1))
         return false;
 
     if (abs(worldObj->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE - 2.0f)
@@ -366,72 +328,77 @@ bool LootObject::IsLootPossible(Player* bot)
     if (go && (go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE) || !go->isSpawned()))
         return false;
 
-    // Client parity: the client cannot interact with hostile game objects.
-    if (go && IsGameObjectHostileTo(go, bot))
-        return false;
-
     // Conditional objects (quest chests, goobers, ...) are gated client-side on quest state.
     // A bot has no client, so make the same call the server makes for one.
     if (go && go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND) && !go->ActivateToQuest(bot))
         return false;
 
-    //Prevents bot from getting stuck in an infinite loop of
-    //gathering herb/ore/skin -> bag too full, don't pick up -> gather again
-    bool gatheringObject = IsGatheringSkill(skillId);
-
-    Player* master = botAI->GetMaster();
-    bool hasActivePlayerMaster = master && !GET_PLAYERBOT_AI(master);
-    if (gatheringObject && !hasActivePlayerMaster)
+    auto canUseRequirement = [bot, botAI](LootLockRequirement const& requirement)
     {
-        uint8 bagUsage = botAI->GetAiObjectContext() ->GetValue<uint8>("bag space")->Get();
+        if (requirement.ReqItem)
+            return bot->HasItemCount(requirement.ReqItem, 1);
 
-        if (bagUsage > 80)
+        if (requirement.SkillId == SKILL_NONE)
+            return true;
+
+        bool const gatheringObject = requirement.SkillId == SKILL_HERBALISM || requirement.SkillId == SKILL_MINING ||
+                                     requirement.SkillId == SKILL_SKINNING || requirement.SkillId == SKILL_ENGINEERING;
+        Player* master = botAI->GetMaster();
+        bool const hasActivePlayerMaster = master && !GET_PLAYERBOT_AI(master);
+        if (gatheringObject && !hasActivePlayerMaster)
+        {
+            constexpr uint8 maxGatheringBagUsage = 80;
+            if (botAI->GetAiObjectContext()->GetValue<uint8>("bag space")->Get() > maxGatheringBagUsage)
+                return false;
+        }
+
+        if (requirement.SkillId == SKILL_FISHING || !botAI->HasSkill((SkillType)requirement.SkillId) ||
+            requirement.ReqSkillValue > uint32(bot->GetSkillValue(requirement.SkillId)))
             return false;
-    }
 
-    if (skillId == SKILL_NONE)
+        if (requirement.SkillId == SKILL_MINING && !bot->HasItemCount(756, 1) && !bot->HasItemCount(778, 1) &&
+            !bot->HasItemCount(1819, 1) && !bot->HasItemCount(1893, 1) && !bot->HasItemCount(1959, 1) &&
+            !bot->HasItemCount(2901, 1) && !bot->HasItemCount(9465, 1) && !bot->HasItemCount(20723, 1) &&
+            !bot->HasItemCount(40772, 1) && !bot->HasItemCount(40892, 1) && !bot->HasItemCount(40893, 1))
+            return false;
+
+        if (requirement.SkillId == SKILL_SKINNING && !bot->HasItemCount(7005, 1) && !bot->HasItemCount(40772, 1) &&
+            !bot->HasItemCount(40893, 1) && !bot->HasItemCount(12709, 1) && !bot->HasItemCount(19901, 1))
+            return false;
+
         return true;
+    };
 
-    if (skillId == SKILL_FISHING)
-        return false;
-
-    if (!botAI->HasSkill((SkillType)skillId))
-        return false;
-
-    if (!reqSkillValue)
-        return true;
-
-    uint32 skillValue = uint32(bot->GetSkillValue(skillId));
-    if (reqSkillValue > skillValue)
-        return false;
-
-    if (skillId == SKILL_MINING && !bot->HasItemCount(756, 1) && !bot->HasItemCount(778, 1) &&
-        !bot->HasItemCount(1819, 1) && !bot->HasItemCount(1893, 1) && !bot->HasItemCount(1959, 1) &&
-        !bot->HasItemCount(2901, 1) && !bot->HasItemCount(9465, 1) && !bot->HasItemCount(20723, 1) &&
-        !bot->HasItemCount(40772, 1) && !bot->HasItemCount(40892, 1) && !bot->HasItemCount(40893, 1))
+    if (_lockRequirementCount)
     {
-        return false;  // Bot is missing a mining pick
+        for (uint8 i = 0; i < _lockRequirementCount; ++i)
+        {
+            LootLockRequirement const& requirement = _lockRequirements[i];
+            if (go && go->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED) && !requirement.ReqItem &&
+                requirement.SkillId == SKILL_NONE)
+                continue;
+
+            if (!canUseRequirement(requirement))
+                continue;
+
+            skillId = requirement.SkillId;
+            reqSkillValue = requirement.ReqSkillValue;
+            reqItem = requirement.ReqItem;
+            _lockType = requirement.LockType;
+            return true;
+        }
+
+        return false;
     }
 
-    if (skillId == SKILL_SKINNING && !bot->HasItemCount(7005, 1) && !bot->HasItemCount(40772, 1) &&
-        !bot->HasItemCount(40893, 1) && !bot->HasItemCount(12709, 1) && !bot->HasItemCount(19901, 1))
-    {
-        return false;  // Bot is missing a skinning knife
-    }
-
-    return true;
+    return !_hasUnsupportedLockRequirement && canUseRequirement({skillId, reqSkillValue, reqItem, 0});
 }
 
 bool LootObjectStack::Add(ObjectGuid guid)
 {
-    skippedLoot.shrink(time(nullptr) - SkipDuration);
-
-    if (skippedLoot.count(guid))
-        return false;
-
     if (availableLoot.size() >= MAX_LOOT_OBJECT_COUNT)
     {
-        availableLoot.shrink(time(nullptr) - SkipDuration);
+        availableLoot.shrink(time(nullptr) - 30);
     }
 
     if (availableLoot.size() >= MAX_LOOT_OBJECT_COUNT)
@@ -452,63 +419,88 @@ void LootObjectStack::Remove(ObjectGuid guid)
         availableLoot.erase(i);
 }
 
-void LootObjectStack::Skip(ObjectGuid guid)
-{
-    if (skippedLoot.insert(guid).second)
-        LOG_DEBUG("playerbots", "LootObjectStack::Skip: bot={} guid={} entry={} for {}s", bot->GetName(),
-                  guid.ToString(), guid.GetEntry(), SkipDuration);
-}
-
-void LootObjectStack::Unskip(ObjectGuid guid)
-{
-    LootTargetList::iterator i = skippedLoot.find(guid);
-    if (i != skippedLoot.end())
-        skippedLoot.erase(i);
-}
-
 void LootObjectStack::Clear()
 {
     availableLoot.clear();
-    skippedLoot.clear();
+    CancelLoot(_pendingLoot);
 }
 
-bool LootObjectStack::IsItemStoreable(uint32 itemId)
+bool LootObjectStack::IsLootPending()
 {
-    uint32 const cacheTime = sPlayerbotAIConfig.lootItemStoreableCacheTime;
-    uint32 const cacheMaxSize = sPlayerbotAIConfig.lootItemStoreableCacheMaxSize;
-    bool const cacheEnabled = cacheTime > 0 && cacheMaxSize > 0;
-    time_t const now = time(nullptr);
+    if (!_pendingLoot)
+        return false;
 
-    if (cacheEnabled)
+    if (_awaitingRelease && bot->GetLootGUID() != _pendingLoot)
     {
-        auto itr = itemStoreableCache.find(itemId);
-        if (itr != itemStoreableCache.end() && now - itr->second.second < cacheTime)
-            return itr->second.first;
+        CancelLoot(_pendingLoot);
+        return false;
     }
 
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    bool const storeable = botAI && StoreLootAction::IsLootAllowed(itemId, botAI);
-
-    if (cacheEnabled)
+    if (std::chrono::steady_clock::now() >= _pendingUntil && !bot->IsNonMeleeSpellCast(false))
     {
-        if (itemStoreableCache.size() >= cacheMaxSize)
-        {
-            for (auto i = itemStoreableCache.begin(); i != itemStoreableCache.end();)
-            {
-                if (now - i->second.second >= cacheTime)
-                    i = itemStoreableCache.erase(i);
-                else
-                    ++i;
-            }
-
-            if (itemStoreableCache.size() >= cacheMaxSize)
-                itemStoreableCache.clear();
-        }
-
-        itemStoreableCache[itemId] = std::make_pair(storeable, now);
+        ObjectGuid const guid = _pendingLoot;
+        CancelLoot(guid);
+        DeferLoot(guid);
+        return false;
     }
 
-    return storeable;
+    return true;
+}
+
+void LootObjectStack::BeginLoot(ObjectGuid guid)
+{
+    _pendingLoot = guid;
+    _awaitingRelease = false;
+    _pendingUntil = std::chrono::steady_clock::now() + std::chrono::seconds(15);
+}
+
+void LootObjectStack::LootOpened(ObjectGuid guid)
+{
+    if (_pendingLoot != guid)
+        return;
+
+    _awaitingRelease = true;
+    _pendingUntil = std::chrono::steady_clock::now() + std::chrono::seconds(15);
+}
+
+void LootObjectStack::CancelLoot(ObjectGuid guid)
+{
+    if (_pendingLoot == guid)
+    {
+        _pendingLoot.Clear();
+        _awaitingRelease = false;
+    }
+}
+
+void LootObjectStack::RetryLoot(ObjectGuid guid)
+{
+    bool const wasPending = _pendingLoot == guid;
+    CancelLoot(guid);
+    if (wasPending)
+        DeferLoot(guid);
+}
+
+void LootObjectStack::DeferLoot(ObjectGuid guid)
+{
+    LootTargetList::iterator itr = availableLoot.find(guid);
+    if (itr == availableLoot.end())
+    {
+        LootTarget target(guid);
+        target.Defer();
+        availableLoot.insert(target);
+        return;
+    }
+
+    LootTarget target = *itr;
+    availableLoot.erase(itr);
+    target.Defer();
+    availableLoot.insert(target);
+}
+
+bool LootObjectStack::CanAttemptLoot(ObjectGuid guid) const
+{
+    LootTargetList::const_iterator itr = availableLoot.find(guid);
+    return itr == availableLoot.end() || itr->IsReady();
 }
 
 bool LootObjectStack::CanLoot(float maxDistance)
@@ -525,36 +517,46 @@ LootObject LootObjectStack::GetLoot(float maxDistance)
 
 LootObject LootObjectStack::GetNearest(float maxDistance)
 {
-    availableLoot.shrink(time(nullptr) - SkipDuration);
-    skippedLoot.shrink(time(nullptr) - SkipDuration);
+    availableLoot.shrink(time(nullptr) - 30);
 
     LootObject nearest;
     float nearestDistance = std::numeric_limits<float>::max();
 
-    LootTargetList safeCopy(availableLoot);
-    for (LootTargetList::iterator i = safeCopy.begin(); i != safeCopy.end(); i++)
+    for (LootTargetList::iterator i = availableLoot.begin(); i != availableLoot.end();)
     {
         ObjectGuid guid = i->guid;
 
-        if (skippedLoot.count(guid))
+        if (!i->IsReady())
+        {
+            ++i;
             continue;
+        }
 
         WorldObject* worldObj = ObjectAccessor::GetWorldObject(*bot, guid);
         if (!worldObj)
+        {
+            i = availableLoot.erase(i);
             continue;
+        }
 
         float distance = bot->GetDistance(worldObj);
 
         if (distance >= nearestDistance || (maxDistance && distance > maxDistance))
+        {
+            ++i;
             continue;
+        }
 
         LootObject lootObject(bot, guid);
-
         if (!lootObject.IsLootPossible(bot))
+        {
+            ++i;
             continue;
+        }
 
         nearestDistance = distance;
         nearest = lootObject;
+        ++i;
     }
 
     return nearest;
