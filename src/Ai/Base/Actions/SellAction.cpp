@@ -198,9 +198,7 @@ void SellAction::Sell(Item* item, bool force)
         uint32 totalCount = countVisitor.GetCount();
 
         if (totalCount <= keepRequirement)
-        {
             return;
-        }
 
         // Sell only the excess, keeping the required amount in the stack.
         uint32 excessCount = totalCount - keepRequirement;
@@ -235,9 +233,7 @@ void SellAction::Sell(Item* item, bool force)
 
         out << "Selling " << chat->FormatItem(proto);
         if (keepRequirement > 0)
-        {
             out << " (keeping " << keepRequirement << ")";
-        }
         botAI->TellMaster(out);
 
         bot->PlayDistanceSound(120);

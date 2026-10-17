@@ -433,16 +433,15 @@ bool NewRpgWanderNpcAction::Execute(Event /*event*/)
             {
                 uint32 npcFlags = creature->GetCreatureTemplate()->npcflag;
 
-                // Random bots sell junk and top up consumables at every vendor (maintainer
-                // request). Each step reuses the cached maintenance values, so the vendor
-                // logic only runs when the bot has something to sell or repair.
+                constexpr uint32 MIN_VENDOR_BALANCE = 1000;  // 10 silver
+
                 if ((npcFlags & UNIT_NPC_FLAG_VENDOR) && AI_VALUE(bool, "can sell"))
                 {
                     botAI->DoSpecificAction("sell", Event("sell", "vendor"));
 
                     // Buying sorts the vendor list through the weight calculator; skip it for
                     // bots without money for cheap consumables.
-                    if (bot->GetMoney() >= 1000)
+                    if (bot->GetMoney() >= MIN_VENDOR_BALANCE)
                         botAI->DoSpecificAction("buy", Event("buy", "vendor"));
                 }
 

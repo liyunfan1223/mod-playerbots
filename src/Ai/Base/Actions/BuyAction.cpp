@@ -97,10 +97,6 @@ bool BuyAction::Execute(Event event)
                 if (!proto)
                     continue;
 
-                // Skip items that are out of stock or that cost currencies (honor/arena/tokens) the bot lacks.
-                if (!CanAfford(tItem, proto, pCreature))
-                    continue;
-
                 if (proto->Class == ITEM_CLASS_CONSUMABLE || proto->Class == ITEM_CLASS_PROJECTILE)
                 {
                     maxPurchases = 10;  // Allow up to 10 purchases if it's a consumable or projectile
@@ -108,6 +104,10 @@ bool BuyAction::Execute(Event event)
 
                 for (uint32 i = 0; i < maxPurchases; i++)
                 {
+                    // Stock and currency costs change between purchases; recheck each time.
+                    if (!CanAfford(tItem, proto, pCreature))
+                        break;
+
                     ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
 
                     uint32 invType = proto->InventoryType;
