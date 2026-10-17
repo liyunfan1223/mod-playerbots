@@ -35,7 +35,9 @@ public:
         if (!target)
             return;
 
-        auto& orbs = voidReaverArcaneOrbs[caster->GetInstanceId()];
+        std::optional<std::vector<ArcaneOrbData>>& orbsField =
+            TkState(caster->GetInstanceId()).voidReaverArcaneOrbs;
+        std::vector<ArcaneOrbData>& orbs = orbsField ? *orbsField : orbsField.emplace();
         uint32 const now = getMSTime();
 
         ArcaneOrbData orbData;
