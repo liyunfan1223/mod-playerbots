@@ -26,29 +26,20 @@ bool LootAction::Execute(Event /*event*/)
         bot->IsNonMeleeSpellCast(false))
         return false;
 
-    if (!AI_VALUE(bool, "has available loot"))
+    LootObject lootObject = AI_VALUE(LootObject, "nearest loot");
+    if (lootObject.IsEmpty() || !AI_VALUE(LootObjectStack*, "available loot")->CanAttemptLoot(lootObject.guid))
         return false;
 
     LootObject prevLoot = AI_VALUE(LootObject, "loot target");
-    LootObject const& lootObject = AI_VALUE(LootObject, "nearest loot");
-
     if (!prevLoot.IsEmpty() && prevLoot.guid != lootObject.guid)
     {
         WorldPacket* packet = new WorldPacket(CMSG_LOOT_RELEASE, 8);
         *packet << prevLoot.guid;
         bot->GetSession()->QueuePacket(packet);
-        // bot->GetSession()->HandleLootReleaseOpcode(packet);
     }
 
-    if (lootObject.guid.IsGameObject() && sPlayerbotAIConfig.DisallowedGameObjects.contains(lootObject.guid.GetEntry()))
-    {
-        return false;  // Game object ID is disallowed, so do not proceed
-    }
-    else
-    {
-        context->GetValue<LootObject>("loot target")->Set(lootObject);
-        return true;
-    }
+    context->GetValue<LootObject>("loot target")->Set(lootObject);
+    return true;
 }
 
 bool LootAction::isUseful()

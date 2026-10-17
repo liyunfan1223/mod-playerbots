@@ -26,12 +26,11 @@ bool LootTarget::operator<(LootTarget const& other) const { return guid < other.
 
 bool LootTarget::IsReady() const { return std::chrono::steady_clock::now() >= _retryUntil; }
 
-void LootTarget::Defer(uint32 maxDelaySecs)
+void LootTarget::Defer()
 {
     _retryCount = std::min<uint8>(_retryCount + 1, MAX_LOOT_RETRY_ATTEMPTS);
-    std::chrono::seconds const maxDelay = maxDelaySecs ? std::chrono::seconds(maxDelaySecs) : LOOT_RETRY_MAX_DELAY;
     _retryUntil = std::chrono::steady_clock::now() +
-                  std::min(LOOT_RETRY_MIN_DELAY * (1u << (_retryCount - 1)), maxDelay);
+                  std::min(LOOT_RETRY_MIN_DELAY * (1u << (_retryCount - 1)), LOOT_RETRY_MAX_DELAY);
 }
 
 void LootTargetList::shrink(time_t fromTime)
@@ -492,20 +491,20 @@ void LootObjectStack::RetryLoot(ObjectGuid guid)
         DeferLoot(guid);
 }
 
-void LootObjectStack::DeferLoot(ObjectGuid guid, uint32 maxDelaySecs)
+void LootObjectStack::DeferLoot(ObjectGuid guid)
 {
     LootTargetList::iterator itr = availableLoot.find(guid);
     if (itr == availableLoot.end())
     {
         LootTarget target(guid);
-        target.Defer(maxDelaySecs);
+        target.Defer();
         availableLoot.insert(target);
         return;
     }
 
     LootTarget target = *itr;
     availableLoot.erase(itr);
-    target.Defer(maxDelaySecs);
+    target.Defer();
     availableLoot.insert(target);
 }
 
@@ -537,13 +536,6 @@ LootObject LootObjectStack::GetNearest(float maxDistance)
     for (LootTargetList::iterator i = availableLoot.begin(); i != availableLoot.end();)
     {
         ObjectGuid guid = i->guid;
-
-        // Disallowed objects are never lootable, so they must not be picked as the nearest target.
-        if (guid.IsGameObject() && sPlayerbotAIConfig.DisallowedGameObjects.contains(guid.GetEntry()))
-        {
-            ++i;
-            continue;
-        }
 
         if (!i->IsReady())
         {

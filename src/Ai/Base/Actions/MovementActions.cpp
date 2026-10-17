@@ -2618,7 +2618,7 @@ bool MoveToLootAction::Execute(Event /*event*/)
     float const distance = bot->GetDistance(target);
     uint32 const nowMs = getMSTime();
 
-    constexpr uint32 evalGapMs = 1000;     // restart the observation window after a pause
+    constexpr uint32 evalGapMs = 10000;    // longer than the slowest out-of-combat tick (1-3 s)
     constexpr uint32 noProgressMs = 5000;  // give up on a target after 5s without progress
     constexpr float reachedMargin = 2.0f;  // near-target distance jitter margin
 
@@ -2640,7 +2640,7 @@ bool MoveToLootAction::Execute(Event /*event*/)
     if (sPlayerbotAIConfig.LootWatchdog && distance > sPlayerbotAIConfig.ContactDistance + reachedMargin &&
         nowMs - lootWatchMs >= noProgressMs)
     {
-        availableLoot->DeferLoot(loot.guid, sPlayerbotAIConfig.PrioritiseLootingTimeout);
+        availableLoot->DeferLoot(loot.guid);
         if (AI_VALUE(LootObject, "loot target").guid == loot.guid)
             context->GetValue<LootObject>("loot target")->Set(LootObject());
         lootWatchGuid.Clear();

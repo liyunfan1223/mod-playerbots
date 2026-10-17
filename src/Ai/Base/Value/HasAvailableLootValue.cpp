@@ -10,6 +10,5 @@
 
 bool HasAvailableLootValue::Calculate()
 {
-    return !AI_VALUE(bool, "can loot") &&
-           AI_VALUE(LootObjectStack*, "available loot")->CanLoot(sPlayerbotAIConfig.LootDistance);
+    return !AI_VALUE(bool, "can loot") && !AI_VALUE(LootObject, "nearest loot").IsEmpty();
 }
