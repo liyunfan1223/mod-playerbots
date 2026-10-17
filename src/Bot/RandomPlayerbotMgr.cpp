@@ -1844,6 +1844,15 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     if (roll < sPlayerbotAIConfig.ProbTeleToQuestGivers * 100)
     {
         std::vector<WorldLocation> qlocs = sTravelMgr.GetValidQuestGiverLocations(bot);
+
+        // Concentrated servers keep bots near players: only givers in a player zone count, and
+        // otherwise the roll falls through to the hub path.
+        if (!qlocs.empty() && sPlayerbotAIConfig.RandomBotConcentrateInPlayerZone)
+        {
+            std::vector<WorldLocation> playerZoneLocs = GetPlayerZoneTeleportLocations(qlocs, bot);
+            qlocs = std::move(playerZoneLocs);
+        }
+
         if (!qlocs.empty())
         {
             LOG_DEBUG("playerbots", "Random teleporting bot {} to a quest giver ({} candidates)",

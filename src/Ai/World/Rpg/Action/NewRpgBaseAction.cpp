@@ -13,6 +13,7 @@
 #include "GridTerrainData.h"
 #include "IVMapMgr.h"
 #include "NewRpgInfo.h"
+#include "QuestLevelRules.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
@@ -572,7 +573,7 @@ bool NewRpgBaseAction::IsQuestWorthDoing(Quest const* quest)
 
 bool NewRpgBaseAction::IsQuestCapableDoing(Quest const* quest)
 {
-    bool highLevelQuest = bot->GetLevel() + 3 < bot->GetQuestLevel(quest);
+    bool highLevelQuest = bot->GetLevel() + QUEST_MAX_LEVELS_ABOVE_BOT < bot->GetQuestLevel(quest);
     if (highLevelQuest)
         return false;
 
