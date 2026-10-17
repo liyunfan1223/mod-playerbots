@@ -118,15 +118,13 @@ bool IsPositionInActiveConflagration(PlayerbotAI* botAI, float x, float y);
 
 // Shared encounter state
 
-using CubeAssignments = std::unordered_map<ObjectGuid, CubeInfo>;
-
 struct MagInstanceState
 {
     std::optional<uint32> magDpsWaitTimer;
     std::optional<uint32> blastNovaTimer;
     std::optional<bool> lastBlastNovaState;
     bool ceilingCollapseApplied = false;
-    std::optional<CubeAssignments> botToCubeAssignments;
+    std::unordered_map<ObjectGuid, CubeInfo> botToCubeAssignments;
 };
 
 MagInstanceState& MagState(uint32 instanceId);

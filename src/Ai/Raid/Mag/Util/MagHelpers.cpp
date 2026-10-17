@@ -13,7 +13,6 @@
 #include <algorithm>
 #include <list>
 #include <mutex>
-#include <unordered_map>
 
 using namespace EncounterHelpers;
 
@@ -119,8 +118,7 @@ bool IsMagtheridonActive(Unit* magtheridon)
 
 bool IsCubeClicker(Player* bot)
 {
-    std::optional<CubeAssignments> const& assignments = MagState(bot->GetInstanceId()).botToCubeAssignments;
-    return assignments && assignments->find(bot->GetGUID()) != assignments->end();
+    return MagState(bot->GetInstanceId()).botToCubeAssignments.contains(bot->GetGUID());
 }
 
 bool IsBlastNovaCasting(Unit* magtheridon)
@@ -206,7 +204,7 @@ bool MagResetInstance(uint32 instanceId)
 
     MagInstanceState const& state = it->second;
     bool const wasSet = state.magDpsWaitTimer || state.blastNovaTimer || state.lastBlastNovaState ||
-        state.ceilingCollapseApplied || state.botToCubeAssignments;
+        state.ceilingCollapseApplied || !state.botToCubeAssignments.empty();
 
     magStates.erase(it);
     return wasSet;

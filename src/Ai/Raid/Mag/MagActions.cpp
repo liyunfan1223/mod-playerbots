@@ -301,13 +301,9 @@ bool MagtheridonUseManticronCubeAction::Execute(Event /*event*/)
 
 CubeInfo const* MagtheridonUseManticronCubeAction::GetAssignedCube()
 {
-    std::optional<CubeAssignments> const& assignments =
-        MagState(bot->GetInstanceId()).botToCubeAssignments;
-    if (!assignments)
-        return nullptr;
-
-    auto it = assignments->find(bot->GetGUID());
-    return it != assignments->end() ? &it->second : nullptr;
+    auto const& assignments = MagState(bot->GetInstanceId()).botToCubeAssignments;
+    auto it = assignments.find(bot->GetGUID());
+    return it != assignments.end() ? &it->second : nullptr;
 }
 
 bool MagtheridonUseManticronCubeAction::HandleCubeRelease(Unit* magtheridon)
@@ -542,8 +538,7 @@ bool MagtheridonUpdateTimersAndAssignmentsAction::AssignCubeClickers(
     uint32 instanceId, Unit* magtheridon)
 {
     std::vector<CubeInfo> cubes = GetAllCubeInfosByDbGuids(bot->GetMap(), MANTICRON_CUBE_DB_GUIDS);
-    std::optional<CubeAssignments>& assignmentField = MagState(instanceId).botToCubeAssignments;
-    CubeAssignments& assignment = assignmentField ? *assignmentField : assignmentField.emplace();
+    auto& assignment = MagState(instanceId).botToCubeAssignments;
     Group* group = bot->GetGroup();
 
     if (!group || cubes.empty())
@@ -629,11 +624,11 @@ bool MagtheridonUpdateTimersAndAssignmentsAction::AssignCubeClickers(
 
 bool MagtheridonUpdateTimersAndAssignmentsAction::NeedsCubeReassignment(uint32 instanceId)
 {
-    std::optional<CubeAssignments> const& assignment = MagState(instanceId).botToCubeAssignments;
-    if (!assignment || assignment->empty())
+    auto const& assignment = MagState(instanceId).botToCubeAssignments;
+    if (assignment.empty())
         return true;
 
-    for (auto const& pair : *assignment)
+    for (auto const& pair : assignment)
     {
         Player* assigned = ObjectAccessor::FindPlayer(pair.first);
         if (!assigned || !assigned->IsAlive() || assigned->GetMapId() != MAG_MAP_ID)
