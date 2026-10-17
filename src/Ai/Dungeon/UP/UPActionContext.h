@@ -18,8 +18,8 @@ class WotlkDungeonUPActionContext : public NamedObjectContext<Action>
             creators["avoid skadi whirlwind"] = &WotlkDungeonUPActionContext::avoid_whirlwind;
         }
     private:
-        static Action* avoid_freezing_cloud(PlayerbotAI* ai) { return new AvoidFreezingCloudAction(ai); }
-        static Action* avoid_whirlwind(PlayerbotAI* ai) { return new AvoidSkadiWhirlwindAction(ai); }
+        static Action* avoid_freezing_cloud(PlayerbotAI* botAI) { return new AvoidFreezingCloudAction(botAI); }
+        static Action* avoid_whirlwind(PlayerbotAI* botAI) { return new AvoidSkadiWhirlwindAction(botAI); }
 };
 
 #endif

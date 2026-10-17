@@ -24,10 +24,10 @@ public:
 
     bool Execute(Event event) override;
     bool isPossible() override;
+    bool UseItemOnGameObject(Item* item, ObjectGuid go);
 
 protected:
     bool UseItemAuto(Item* item);
-    bool UseItemOnGameObject(Item* item, ObjectGuid go);
     bool UseItemOnItem(Item* item, Item* itemTarget);
     bool UseItem(Item* item, ObjectGuid go, Item* itemTarget, Unit* unitTarget = nullptr);
     bool UseGameObject(ObjectGuid guid);

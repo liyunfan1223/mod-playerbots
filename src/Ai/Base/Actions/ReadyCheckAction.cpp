@@ -55,7 +55,7 @@ class HealthChecker : public ReadyChecker
 public:
     bool Check(PlayerbotAI* /*botAI*/, AiObjectContext* context) override
     {
-        return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.almostFullHealth;
+        return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.AlmostFullHealth;
     }
 
     std::string const getName() override { return "HP"; }
@@ -67,7 +67,7 @@ public:
     bool Check(PlayerbotAI* /*botAI*/, AiObjectContext* context) override
     {
         return !AI_VALUE2(bool, "has mana", "self target") ||
-               AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.mediumHealth;
+               AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.MediumHealth;
     }
 
     std::string const getName() override { return "MP"; }
@@ -81,7 +81,7 @@ public:
         Player* bot = botAI->GetBot();
         if (Player* master = botAI->GetMaster())
         {
-            bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig.sightDistance;
+            bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig.SightDistance;
             if (!distance)
             {
                 return false;
@@ -169,7 +169,7 @@ bool ReadyCheckAction::Execute(Event event)
             return false;
 
         // Defer the ready reply until buffs are topped off.
-        if (sPlayerbotAIConfig.forceRebuffOnReadyCheck && !bot->IsInCombat() &&
+        if (sPlayerbotAIConfig.ForceRebuffOnReadyCheck && !bot->IsInCombat() &&
             botAI->HasStrategy("force rebuff", BOT_STATE_NON_COMBAT))
         {
             ReportReadinessToMaster();

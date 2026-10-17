@@ -17,6 +17,7 @@
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "SharedDefines.h"
+#include "TargetValue.h"
 #include "TemporarySummon.h"
 #include "ThreatManager.h"
 #include "Timer.h"
@@ -25,13 +26,13 @@
 bool LowManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana;
+           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.LowMana;
 }
 
 bool MediumManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.mediumMana;
+           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.MediumMana;
 }
 
 bool LowEnergyTrigger::IsActive()
@@ -72,7 +73,7 @@ bool PetAttackTrigger::IsActive()
 bool HighManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.highMana;
+           AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.HighMana;
 }
 
 bool AlmostFullManaTrigger::IsActive()
@@ -84,7 +85,7 @@ bool AlmostFullManaTrigger::IsActive()
 bool EnoughManaTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has mana", "self target") &&
-           AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.highMana;
+           AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.HighMana;
 }
 
 bool RageAvailable::IsActive() { return AI_VALUE2(uint8, "rage", "self target") >= amount; }
@@ -105,56 +106,15 @@ bool TargetWithComboPointsLowerHealTrigger::IsActive()
            (target->GetHealth() / AI_VALUE(float, "estimated group dps")) <= lifeTime;
 }
 
-bool LoseAggroTrigger::IsActive() { return !AI_VALUE2(bool, "has aggro", "current target"); }
+bool LoseAggroTrigger::IsActive()
+{
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (target && target->IsPlayer())
+        return false;  // players have no threat: taunts only waste the cooldown
+    return !AI_VALUE2(bool, "has aggro", "current target");
+}
 
 bool HasAggroTrigger::IsActive() { return AI_VALUE2(bool, "has aggro", "current target"); }
-
-bool PanicTrigger::IsActive()
-{
-    return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.criticalHealth &&
-           (!AI_VALUE2(bool, "has mana", "self target") ||
-            AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana);
-}
-
-bool OutNumberedTrigger::IsActive()
-{
-    if (bot->GetMap() && (bot->GetMap()->IsDungeon() || bot->GetMap()->IsRaid()))
-        return false;
-
-    if (bot->GetGroup() && bot->GetGroup()->isRaidGroup())
-        return false;
-
-    int32 botLevel = bot->GetLevel();
-    uint32 friendPower = 200;
-    uint32 foePower = 0;
-    for (auto& attacker : botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get())
-    {
-        Creature* creature = botAI->GetCreature(attacker);
-        if (!creature)
-            continue;
-
-        int32 dLevel = creature->GetLevel() - botLevel;
-        if (dLevel > -10)
-            foePower = std::max(100 + 10 * dLevel, dLevel * 200);
-    }
-
-    if (!foePower)
-        return false;
-
-    for (auto& helper : botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest friendly players")->Get())
-    {
-        Unit* player = botAI->GetUnit(helper);
-        if (!player || player == bot)
-            continue;
-
-        int32 dLevel = player->GetLevel() - botLevel;
-
-        if (dLevel > -10 && bot->GetDistance(player) < 10.0f)
-            friendPower += std::max(200 + 20 * dLevel, dLevel * 200);
-    }
-
-    return friendPower < foePower;
-}
 
 bool BuffTrigger::IsActive()
 {
@@ -217,12 +177,12 @@ bool MediumThreatTrigger::IsActive()
 
 bool LowTankThreatTrigger::IsActive()
 {
+    Unit* current_target = AI_VALUE(Unit*, "current target");
+    if (!current_target || current_target->IsPlayer())
+        return false;  // players have no threat: Tricks of the Trade / Misdirection would be wasted
+
     Unit* mainTank = AI_VALUE(Unit*, "main tank");
     if (!mainTank)
-        return false;
-
-    Unit* current_target = AI_VALUE(Unit*, "current target");
-    if (!current_target)
         return false;
 
     ThreatManager& mgr = current_target->GetThreatMgr();
@@ -237,18 +197,7 @@ bool AoeTrigger::IsActive()
     if (!current_target)
         return false;
 
-    GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
-    int attackers_count = 0;
-    for (ObjectGuid const guid : attackers)
-    {
-        Unit* unit = botAI->GetUnit(guid);
-        if (!unit || !unit->IsAlive())
-            continue;
-
-        if (unit->GetDistance(current_target->GetPosition()) <= range)
-            attackers_count++;
-    }
-    return attackers_count >= amount;
+    return HasEnoughAoeTargets(botAI, current_target->GetPosition(), range, static_cast<uint32>(amount));
 }
 
 bool NoFoodTrigger::IsActive()
@@ -321,11 +270,11 @@ RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 p
 
 bool RandomTrigger::IsActive()
 {
-    if (getMSTime() - lastCheck < sPlayerbotAIConfig.repeatDelay)
+    if (getMSTime() - lastCheck < sPlayerbotAIConfig.RepeatDelay)
         return false;
 
     lastCheck = getMSTime();
-    int32 k = (int32)(probability / sPlayerbotAIConfig.randomChangeMultiplier);
+    int32 k = (int32)(probability / sPlayerbotAIConfig.RandomChangeMultiplier);
     if (k < 1)
         k = 1;
 
@@ -386,10 +335,10 @@ bool GenericBoostTrigger::IsActive()
 
 bool HealerShouldAttackTrigger::IsActive()
 {
-    if (botAI->GetNearGroupMemberCount(sPlayerbotAIConfig.sightDistance) <= 1)
+    if (botAI->GetNearGroupMemberCount(sPlayerbotAIConfig.SightDistance) <= 1)
         return true;
 
-    if (AI_VALUE2(uint8, "health", "party member to heal") < sPlayerbotAIConfig.almostFullHealth)
+    if (AI_VALUE2(uint8, "health", "party member to heal") < sPlayerbotAIConfig.AlmostFullHealth)
         return false;
 
     if (bot->GetAura(33891)) // Tree of Life
@@ -404,9 +353,9 @@ bool HealerShouldAttackTrigger::IsActive()
     if (balance <= 50)
         manaThreshold = 85;
     else if (balance <= 100)
-        manaThreshold = sPlayerbotAIConfig.highMana;
+        manaThreshold = sPlayerbotAIConfig.HighMana;
     else
-        manaThreshold = sPlayerbotAIConfig.mediumMana;
+        manaThreshold = sPlayerbotAIConfig.MediumMana;
 
     if (AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < manaThreshold)
         return false;
@@ -634,12 +583,6 @@ bool NotDpsAoeTargetActiveTrigger::IsActive()
 
 bool IsSwimmingTrigger::IsActive() { return AI_VALUE2(bool, "swimming", "self target"); }
 
-bool HasNearestAddsTrigger::IsActive()
-{
-    GuidVector targets = AI_VALUE(GuidVector, "nearest adds");
-    return targets.size();
-}
-
 bool HasItemForSpellTrigger::IsActive()
 {
     std::string const spell = getName();
@@ -684,7 +627,7 @@ bool ReturnToStayPositionTrigger::IsActive()
     if (stayPosition.isSet())
     {
         const float distance = bot->GetDistance(stayPosition.x, stayPosition.y, stayPosition.z);
-        return distance > sPlayerbotAIConfig.followDistance;
+        return distance > sPlayerbotAIConfig.FollowDistance;
     }
 
     return false;

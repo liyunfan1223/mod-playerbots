@@ -13,7 +13,7 @@
 class IccLadyDeathwhisperMultiplier : public Multiplier
 {
 public:
-    IccLadyDeathwhisperMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc lady deathwhisper") {}
+    IccLadyDeathwhisperMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc lady deathwhisper") {}
     float GetValue(Action* action) override;
 };
 
@@ -21,7 +21,7 @@ public:
 class IccAddsDbsMultiplier : public Multiplier
 {
 public:
-    IccAddsDbsMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc adds dbs") {}
+    IccAddsDbsMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc adds dbs") {}
     float GetValue(Action* action) override;
 };
 
@@ -30,7 +30,7 @@ public:
 class IccDogsMultiplier : public Multiplier
 {
 public:
-    IccDogsMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc dogs") {}
+    IccDogsMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc dogs") {}
     float GetValue(Action* action) override;
 };
 
@@ -38,7 +38,7 @@ public:
 class IccFestergutMultiplier : public Multiplier
 {
 public:
-    IccFestergutMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc festergut") {}
+    IccFestergutMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc festergut") {}
     float GetValue(Action* action) override;
 };
 
@@ -46,14 +46,14 @@ public:
 class IccRotfaceMultiplier : public Multiplier
 {
 public:
-    IccRotfaceMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc rotface") {}
+    IccRotfaceMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc rotface") {}
     float GetValue(Action* action) override;
 };
 
 /*class IccRotfaceGroupPositionMultiplier : public Multiplier
 {
 public:
-    IccRotfaceGroupPositionMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc rotface group position") {}
+    IccRotfaceGroupPositionMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc rotface group position") {}
     float GetValue(Action* action) override;
 };*/
 
@@ -61,7 +61,7 @@ public:
 class IccAddsPutricideMultiplier : public Multiplier
 {
 public:
-    IccAddsPutricideMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc adds putricide") {}
+    IccAddsPutricideMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc adds putricide") {}
     float GetValue(Action* action) override;
 };
 
@@ -85,7 +85,7 @@ public:
 class IccValithriaDreamCloudMultiplier : public Multiplier
 {
 public:
-    IccValithriaDreamCloudMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc valithria dream cloud") {}
+    IccValithriaDreamCloudMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc valithria dream cloud") {}
     float GetValue(Action* action) override;
 };
 
@@ -93,7 +93,7 @@ public:
 class IccSindragosaMultiplier : public Multiplier
 {
 public:
-    IccSindragosaMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc sindragosa") {}
+    IccSindragosaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc sindragosa") {}
     float GetValue(Action* action) override;
 };
 
@@ -101,14 +101,14 @@ public:
 class IccLichKingAddsMultiplier : public Multiplier
 {
 public:
-    IccLichKingAddsMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc lich king adds") {}
+    IccLichKingAddsMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc lich king adds") {}
     float GetValue(Action* action) override;
 };
 
 class IccLichKingSpiritBombMultiplier : public Multiplier
 {
 public:
-    IccLichKingSpiritBombMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc lich king spirit bomb") {}
+    IccLichKingSpiritBombMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc lich king spirit bomb") {}
     float GetValue(Action* action) override;
 };
 
@@ -116,7 +116,7 @@ public:
 class IccGunshipMultiplier : public Multiplier
 {
 public:
-    IccGunshipMultiplier(PlayerbotAI* ai) : Multiplier(ai, "icc gunship") {}
+    IccGunshipMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "icc gunship") {}
     float GetValue(Action* action) override;
 };
 

@@ -29,7 +29,7 @@ private:
 class ChatReplyAction : public Action
 {
 public:
-    ChatReplyAction(PlayerbotAI* ai) : Action(ai, "chat message") {}
+    ChatReplyAction(PlayerbotAI* botAI) : Action(botAI, "chat message") {}
     virtual bool Execute(Event /*event*/) { return true; }
     bool isUseful() { return true; }
 

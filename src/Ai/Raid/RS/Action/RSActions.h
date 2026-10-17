@@ -631,7 +631,7 @@ inline bool RsHalionCombustionNotClear(Player* bot)
 
 inline bool RsHalionIsCombustionDispeller(PlayerbotAI* botAI)
 {
-    return botAI->IsHeal(botAI->GetBot()) && RsHalionCombustionNotClear(botAI->GetBot());
+    return PlayerbotAI::IsHeal(botAI->GetBot()) && RsHalionCombustionNotClear(botAI->GetBot());
 }
 
 inline constexpr float RS_HALION_CONSUMPTION_OUT_DIST = 46.0f;

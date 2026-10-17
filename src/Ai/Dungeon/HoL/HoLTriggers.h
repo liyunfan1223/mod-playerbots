@@ -38,63 +38,63 @@ enum HallsOfLightningIDs
 class StormforgedLieutenantTrigger : public Trigger
 {
 public:
-    StormforgedLieutenantTrigger(PlayerbotAI* ai) : Trigger(ai, "stormforged lieutenant") {}
+    StormforgedLieutenantTrigger(PlayerbotAI* botAI) : Trigger(botAI, "stormforged lieutenant") {}
     bool IsActive() override;
 };
 
 class BjarngrimWhirlwindTrigger : public Trigger
 {
 public:
-    BjarngrimWhirlwindTrigger(PlayerbotAI* ai) : Trigger(ai, "bjarngrim whirlwind") {}
+    BjarngrimWhirlwindTrigger(PlayerbotAI* botAI) : Trigger(botAI, "bjarngrim whirlwind") {}
     bool IsActive() override;
 };
 
 class VolkhanTrigger : public Trigger
 {
 public:
-    VolkhanTrigger(PlayerbotAI* ai) : Trigger(ai, "volkhan") {}
+    VolkhanTrigger(PlayerbotAI* botAI) : Trigger(botAI, "volkhan") {}
     bool IsActive() override;
 };
 
 class IonarStaticOverloadTrigger : public Trigger
 {
 public:
-    IonarStaticOverloadTrigger(PlayerbotAI* ai) : Trigger(ai, "ionar static overload") {}
+    IonarStaticOverloadTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ionar static overload") {}
     bool IsActive() override;
 };
 
 class IonarBallLightningTrigger : public Trigger
 {
 public:
-    IonarBallLightningTrigger(PlayerbotAI* ai) : Trigger(ai, "ionar ball lightning spread") {}
+    IonarBallLightningTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ionar ball lightning spread") {}
     bool IsActive() override;
 };
 
 class IonarTankAggroTrigger : public Trigger
 {
 public:
-    IonarTankAggroTrigger(PlayerbotAI* ai) : Trigger(ai, "ionar tank aggro") {}
+    IonarTankAggroTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ionar tank aggro") {}
     bool IsActive() override;
 };
 
 class IonarDisperseTrigger : public Trigger
 {
 public:
-    IonarDisperseTrigger(PlayerbotAI* ai) : Trigger(ai, "ionar disperse") {}
+    IonarDisperseTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ionar disperse") {}
     bool IsActive() override;
 };
 
 class LokenRangedTrigger : public Trigger
 {
 public:
-    LokenRangedTrigger(PlayerbotAI* ai) : Trigger(ai, "loken ranged") {}
+    LokenRangedTrigger(PlayerbotAI* botAI) : Trigger(botAI, "loken ranged") {}
     bool IsActive() override;
 };
 
 class LokenLightningNovaTrigger : public Trigger
 {
 public:
-    LokenLightningNovaTrigger(PlayerbotAI* ai) : Trigger(ai, "lightning nova") {}
+    LokenLightningNovaTrigger(PlayerbotAI* botAI) : Trigger(botAI, "lightning nova") {}
     bool IsActive() override;
 };
 

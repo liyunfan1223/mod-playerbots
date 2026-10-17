@@ -90,7 +90,7 @@ bool IccGunshipCannonNearTrigger::IsActive()
     if (friendlyCannon && friendlyCannon->HasAura(SPELL_BELOW_ZERO))
         return false;
 
-    if (!botAI->IsDps(bot))
+    if (!PlayerbotAI::IsDps(bot))
         return false;
 
     return true;
@@ -150,7 +150,7 @@ bool IccDbsMainTankRuneOfBloodTrigger::IsActive()
     if (!boss)
         return false;
 
-    if (!botAI->IsAssistTankOfIndex(bot, 0))
+    if (!PlayerbotAI::IsAssistTankOfIndex(bot, 0))
         return false;
 
     Unit* mt = AI_VALUE(Unit*, "main tank");
@@ -187,7 +187,7 @@ bool IccFestergutGroupPositionTrigger::IsActive()
 bool IccFestergutSporeTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "festergut");
-    if (!boss || botAI->IsTank(bot))
+    if (!boss || PlayerbotAI::IsTank(bot))
         return false;
 
     return IccAnyGroupMemberHasAura(bot, SPELL_GAS_SPORE);
@@ -201,7 +201,7 @@ bool IccFestergutAvoidMalleableGooTrigger::IsActive()
 
     // Tanks hold the boss at the fixed tank spot; goo can land on tanks but
     // moving would lose threat and let goo land on melee stack anyway.
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     // During spore phase, position switching handles goo avoidance — free-dodge
@@ -250,7 +250,7 @@ bool IccFestergutAvoidMalleableGooTrigger::IsActive()
 bool IccRotfaceTankPositionTrigger::IsActive()
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "rotface");
-    if (!boss || !(botAI->IsTank(bot) || botAI->IsMelee(bot)))
+    if (!boss || !(PlayerbotAI::IsTank(bot) || PlayerbotAI::IsMelee(bot)))
         return false;
 
     IccStripExperienced(bot);
@@ -401,7 +401,7 @@ bool IccPutricideMalleableGooTrigger::IsActive()
                 if (!member || !member->IsAlive() || !member->IsInWorld())
                     continue;
 
-                IccApplyHeroicBuffToMember(botAI, member, false, true);
+                IccApplyHeroicBuffToMember(member, false, true);
 
                 if (PlayerbotAI::IsTank(member) && !member->HasAura(SPELL_SPITEFULL_FURY) &&
                     boss->GetVictim() != member)
@@ -419,7 +419,7 @@ bool IccPutricideAbominationTrigger::IsActive()
     if (!boss)
         return false;
 
-    if (!botAI->IsAssistTank(bot))
+    if (!PlayerbotAI::IsAssistTank(bot))
         return false;
 
     // Already piloting - keep action firing until vehicle drops.
@@ -472,7 +472,7 @@ bool IccBpcKelesethTankTrigger::IsActive()
 
     IccStripExperienced(bot);
 
-    if (!botAI->IsAssistTank(bot))
+    if (!PlayerbotAI::IsAssistTank(bot))
         return false;
 
     Aura* aura = botAI->GetAura("Shadow Prison", bot, false, true);
@@ -485,7 +485,7 @@ bool IccBpcKelesethTankTrigger::IsActive()
 
 bool IccBpcMainTankTrigger::IsActive()
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     if (!IccAnyBloodPrincePresent(botAI))
@@ -499,7 +499,7 @@ bool IccBpcMainTankTrigger::IsActive()
 bool IccBpcEmpoweredVortexTrigger::IsActive()
 {
     // Tanks should ignore this mechanic
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTank(bot))
+    if (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTank(bot))
         return false;
 
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
@@ -523,7 +523,7 @@ bool IccBpcKineticBombTrigger::IsActive()
     if (!IccAnyBloodPrincePresent(botAI))
         return false;
 
-    if (!botAI->IsRanged(bot) || botAI->IsHeal(bot))
+    if (!PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot))
         return false;
 
     // Allow up to 18 stacks for bomb-assigned bots (multiplier handles assignment)
@@ -560,12 +560,12 @@ bool IccBpcKineticBombTrigger::IsActive()
             break;
     }
 
-    return botAI->IsRangedDps(bot) && bombFound;
+    return PlayerbotAI::IsRangedDps(bot) && bombFound;
 }
 
 bool IccBpcBallOfFlameTrigger::IsActive()
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* valanar = AI_VALUE2(Unit*, "find target", "prince valanar");
@@ -669,7 +669,7 @@ bool IccValithriaZombieKiteTrigger::IsActive()
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     std::list<Creature*> zombies;
@@ -694,7 +694,7 @@ bool IccValithriaPortalTrigger::IsActive()
         return false;
 
     // Only healers should use portals
-    if (!botAI->IsHeal(bot) || bot->HasAura(SPELL_DREAM_STATE))
+    if (!PlayerbotAI::IsHeal(bot) || bot->HasAura(SPELL_DREAM_STATE))
         return false;
 
     Creature* worm = bot->FindNearestCreature(NPC_ROT_WORM, 100.0f);
@@ -703,7 +703,7 @@ bool IccValithriaPortalTrigger::IsActive()
     if ((worm && worm->GetVictim() == bot) || (zombie && zombie->GetVictim() == bot))
         return false;
 
-    auto const shouldHealRaid = IccValithriaShouldHealRaid(bot, botAI);
+    auto const shouldHealRaid = IccValithriaShouldHealRaid(bot);
     if (!shouldHealRaid.has_value() || *shouldHealRaid)
         return false;
 
@@ -726,7 +726,7 @@ bool IccValithriaHealTrigger::IsActive()
         return false;
 
     // Only healers should use healing
-    if (!botAI->IsHeal(bot) || bot->HasAura(SPELL_DREAM_STATE) || bot->HealthBelowPct(50))
+    if (!PlayerbotAI::IsHeal(bot) || bot->HasAura(SPELL_DREAM_STATE) || bot->HealthBelowPct(50))
         return false;
 
     Creature* worm = bot->FindNearestCreature(NPC_ROT_WORM, 100.0f);
@@ -735,7 +735,7 @@ bool IccValithriaHealTrigger::IsActive()
     if ((worm && worm->GetVictim() == bot) || (zombie && zombie->GetVictim() == bot))
         return false;
 
-    auto const shouldHealRaid = IccValithriaShouldHealRaid(bot, botAI);
+    auto const shouldHealRaid = IccValithriaShouldHealRaid(bot);
     if (!shouldHealRaid.has_value() || *shouldHealRaid)
         return false;
 
@@ -784,9 +784,9 @@ bool IccSindragosaGroupPositionTrigger::IsActive()
                 if (!member || !member->IsAlive() || !member->IsInWorld())
                     continue;
 
-                IccApplyHeroicBuffToMember(botAI, member, false, true);
+                IccApplyHeroicBuffToMember(member, false, true);
 
-                if (botAI->IsMainTank(member) && boss->GetVictim() != member &&
+                if (PlayerbotAI::IsMainTank(member) && boss->GetVictim() != member &&
                     !member->HasAura(SPELL_SPITEFULL_FURY))
                     member->AddAura(SPELL_SPITEFULL_FURY, member);
             }
@@ -795,7 +795,7 @@ bool IccSindragosaGroupPositionTrigger::IsActive()
     }
 
     // Air phase: give all tanks nitro boosts so they can quickly reposition to tombs
-    if (boss->IsInCombat() && botAI->IsTank(bot) &&
+    if (boss->IsInCombat() && PlayerbotAI::IsTank(bot) &&
         boss->GetExactDist2d(ICC_SINDRAGOSA_FLYING_POSITION.GetPositionX(), ICC_SINDRAGOSA_FLYING_POSITION.GetPositionY()) < 50.0f)
     {
         if (!bot->HasAura(SPELL_NITRO_BOOSTS))
@@ -805,11 +805,11 @@ bool IccSindragosaGroupPositionTrigger::IsActive()
     // Last phase: the main tank must keep tanking, never run to a tomb spot.
     // Strip its Frost Beacon so the tomb-positioning logic doesn't apply. The
     // assist tank keeps its beacon and is allowed to move to the beacon spot.
-    if (botAI->IsMainTank(bot) && bot->HasAura(SPELL_FROST_BEACON) && boss->HealthBelowPct(35) &&
+    if (PlayerbotAI::IsMainTank(bot) && bot->HasAura(SPELL_FROST_BEACON) && boss->HealthBelowPct(35) &&
         boss->GetExactDist2d(ICC_SINDRAGOSA_FLYING_POSITION.GetPositionX(), ICC_SINDRAGOSA_FLYING_POSITION.GetPositionY()) >= 30.0f)
         bot->RemoveAura(SPELL_FROST_BEACON);
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         // Strip Mystic Buffet: the cheat that makes single-tanking P3 survivable.
         if (Aura* aura = botAI->GetAura("mystic buffet", bot, false, false))
@@ -833,7 +833,7 @@ bool IccSindragosaGroupPositionTrigger::IsActive()
             for (GroupReference* itr = group->GetFirstMember(); itr; itr = itr->next())
             {
                 Player* member = itr->GetSource();
-                if (member && member != bot && member->IsAlive() && botAI->IsMainTank(member))
+                if (member && member != bot && member->IsAlive() && PlayerbotAI::IsMainTank(member))
                 {
                     mtAlive = true;
                     break;
@@ -841,7 +841,7 @@ bool IccSindragosaGroupPositionTrigger::IsActive()
             }
         }
 
-        if (mtAlive && !botAI->IsMainTank(bot))
+        if (mtAlive && !PlayerbotAI::IsMainTank(bot))
         {
             if (!bot->HasAura(SPELL_NO_THREAT))
                 bot->AddAura(SPELL_NO_THREAT, bot);
@@ -885,7 +885,7 @@ bool IccSindragosaFrostBeaconTrigger::IsActive()
 
 bool IccSindragosaHotTrigger::IsActive()
 {
-    if (!botAI->IsHeal(bot))
+    if (!PlayerbotAI::IsHeal(bot))
         return false;
 
     if (bot->HasAura(SPELL_FROST_BEACON))
@@ -904,7 +904,7 @@ bool IccSindragosaBlisteringColdTrigger::IsActive()
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     // Don't move if any bot in group has ice tomb
@@ -968,7 +968,7 @@ bool IccSindragosaMysticBuffetTrigger::IsActive()
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     if (boss->GetVictim() == bot)
@@ -1025,7 +1025,7 @@ bool IccLichKingShadowTrapTrigger::IsActive()
     if (hasPlague)
         return false;
 
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
         return false;
 
     if (boss->HealthBelowPct(65))

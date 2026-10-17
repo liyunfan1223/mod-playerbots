@@ -30,7 +30,7 @@ public:
 
 protected:
     bool JumpTo(uint32 mapId, float x, float y, float z, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
-    bool MoveNear(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig.contactDistance,
+    bool MoveNear(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig.ContactDistance,
                   MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     bool MoveToLOS(WorldObject* target, bool ranged = false);
     bool MoveTo(uint32 mapId, float x, float y, float z, bool idle = false, bool react = false,
@@ -39,10 +39,10 @@ protected:
                 bool backwards = false);
     bool MoveTo(WorldObject* target, float distance = 0.0f,
                 MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
-    bool MoveNear(WorldObject* target, float distance = sPlayerbotAIConfig.contactDistance,
+    bool MoveNear(WorldObject* target, float distance = sPlayerbotAIConfig.ContactDistance,
                   MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     float GetFollowAngle();
-    bool Follow(Unit* target, float distance = sPlayerbotAIConfig.followDistance);
+    bool Follow(Unit* target, float distance = sPlayerbotAIConfig.FollowDistance);
     bool Follow(Unit* target, float distance, float angle);
     bool ChaseTo(WorldObject* obj, float distance = 0.0f);
     bool ReachCombatTo(Unit* target, float distance = 0.0f);
@@ -56,10 +56,10 @@ protected:
     bool Flee(Unit* target);
     void ClearIdleState();
     void UpdateMovementState();
-    bool MoveAway(Unit* target, float distance = sPlayerbotAIConfig.fleeDistance, bool backwards = false);
+    bool MoveAway(Unit* target, float distance = sPlayerbotAIConfig.FleeDistance, bool backwards = false);
     bool MoveFromGroup(float distance);
     bool Move(float angle, float distance);
-    bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig.followDistance,
+    bool MoveInside(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig.FollowDistance,
                     MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     void CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important = false);
     Position BestPositionForMeleeToFlee(Position pos, float radius);
@@ -134,8 +134,8 @@ public:
     bool Execute(Event event) override;
 
 protected:
-    Position AverageGroupPos(float dis = sPlayerbotAIConfig.sightDistance, bool ranged = false, bool self = false);
-    Player* NearestGroupMember(float dis = sPlayerbotAIConfig.sightDistance);
+    Position AverageGroupPos(float dis = sPlayerbotAIConfig.SightDistance, bool ranged = false, bool self = false);
+    Player* NearestGroupMember(float dis = sPlayerbotAIConfig.SightDistance);
     float AverageGroupAngle(Unit* from, bool ranged = false, bool self = false);
     Position GetNearestPosition(std::vector<Position> const& positions);
     int lastMoveTimer = 0;
@@ -261,7 +261,7 @@ public:
 class MoveInsideAction : public MovementAction
 {
 public:
-    MoveInsideAction(PlayerbotAI* ai, float x, float y, float distance = 5.0f) : MovementAction(ai, "move inside")
+    MoveInsideAction(PlayerbotAI* botAI, float x, float y, float distance = 5.0f) : MovementAction(botAI, "move inside")
     {
         this->x = x;
         this->y = y;
@@ -276,10 +276,10 @@ protected:
 class RotateAroundTheCenterPointAction : public MovementAction
 {
 public:
-    RotateAroundTheCenterPointAction(PlayerbotAI* ai, std::string name, float center_x, float center_y,
+    RotateAroundTheCenterPointAction(PlayerbotAI* botAI, std::string name, float center_x, float center_y,
                                      float radius = 40.0f, uint32 intervals = 16, bool clockwise = true,
                                      float start_angle = 0)
-        : MovementAction(ai, name)
+        : MovementAction(botAI, name)
     {
         this->center_x = center_x;
         this->center_y = center_y;

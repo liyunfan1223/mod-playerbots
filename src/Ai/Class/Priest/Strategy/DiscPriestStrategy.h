@@ -4,21 +4,21 @@
  * or (at your option) any later version.
  */
 
-#ifndef PLAYERBOTS_HEALPRIESTSTRATEGY_H
-#define PLAYERBOTS_HEALPRIESTSTRATEGY_H
+#ifndef PLAYERBOTS_DISCPRIESTSTRATEGY_H
+#define PLAYERBOTS_DISCPRIESTSTRATEGY_H
 
 #include "GenericPriestStrategy.h"
 
 class PlayerbotAI;
 
-class HealPriestStrategy : public GenericPriestStrategy
+class DiscPriestStrategy : public GenericPriestStrategy
 {
 public:
-    HealPriestStrategy(PlayerbotAI* botAI);
+    DiscPriestStrategy(PlayerbotAI* botAI);
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::vector<NextAction> getDefaultActions() override;
-    std::string const getName() override { return "heal"; }
+    std::string const getName() override { return "disc"; }
     uint32 GetType() const override { return STRATEGY_TYPE_HEAL | STRATEGY_TYPE_RANGED; }
 };
 

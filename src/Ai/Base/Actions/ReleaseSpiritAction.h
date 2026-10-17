@@ -60,7 +60,7 @@ private:
 class SelfResurrectAction : public Action
 {
 public:
-    SelfResurrectAction(PlayerbotAI* ai) : Action(ai, "self resurrect") {}
+    SelfResurrectAction(PlayerbotAI* botAI) : Action(botAI, "self resurrect") {}
     virtual bool Execute(Event event) override;
     bool isUseful() override;
 };

@@ -29,7 +29,7 @@ bool CheckMailAction::Execute(Event /*event*/)
             continue;
 
         uint32 account = owner->GetSession()->GetAccountId();
-        if (PlayerbotAIConfig::instance().IsInRandomAccountList(account))
+        if (PlayerbotAIConfig::Instance().IsInRandomAccountList(account))
             continue;
 
         ProcessMail(mail, owner, trans);

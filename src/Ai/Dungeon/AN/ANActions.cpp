@@ -7,7 +7,7 @@
 #include "ANActions.h"
 #include "Playerbots.h"
 
-bool AttackWebWrapAction::isUseful() { return !botAI->IsHeal(bot); }
+bool AttackWebWrapAction::isUseful() { return !PlayerbotAI::IsHeal(bot); }
 bool AttackWebWrapAction::Execute(Event /*event*/)
 {
     Unit* webWrap = nullptr;
@@ -33,7 +33,7 @@ bool AttackWebWrapAction::Execute(Event /*event*/)
     return Attack(webWrap);
 }
 
-bool WatchersTargetAction::isUseful() { return !botAI->IsHeal(bot); }
+bool WatchersTargetAction::isUseful() { return !PlayerbotAI::IsHeal(bot); }
 bool WatchersTargetAction::Execute(Event /*event*/)
 {
     // Always prioritise web wraps

@@ -35,7 +35,7 @@ float GrobbulusMultiplier::GetValue(Action* action)
         return 1.0f;
 
     if (dynamic_cast<AvoidAoeAction*>(action))
-        return botAI->IsMainTank(bot) ? 0.0f : 1.0f;
+        return PlayerbotAI::IsMainTank(bot) ? 0.0f : 1.0f;
 
     if (dynamic_cast<CombatFormationMoveAction*>(action))
         return 0.0f;
@@ -288,7 +288,7 @@ float GluthGenericMultiplier::GetValue(Action* action)
         return 0.0f;
     }
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         Aura* aura = NaxxSpellIds::GetAnyAura(bot, {NaxxSpellIds::MortalWound10, NaxxSpellIds::MortalWound25});
         if (!aura)

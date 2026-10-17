@@ -12,7 +12,7 @@
 class PrinceKelesethMultiplier : public Multiplier
 {
     public:
-        PrinceKelesethMultiplier(PlayerbotAI* ai) : Multiplier(ai, "prince keleseth") {}
+        PrinceKelesethMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "prince keleseth") {}
 
     public:
         float GetValue(Action* action) override;
@@ -21,7 +21,7 @@ class PrinceKelesethMultiplier : public Multiplier
 class SkarvaldAndDalronnMultiplier : public Multiplier
 {
     public:
-        SkarvaldAndDalronnMultiplier(PlayerbotAI* ai) : Multiplier(ai, "skarvald and dalronn") {}
+        SkarvaldAndDalronnMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "skarvald and dalronn") {}
 
     public:
         float GetValue(Action* action) override;
@@ -30,7 +30,7 @@ class SkarvaldAndDalronnMultiplier : public Multiplier
 class IngvarThePlundererMultiplier : public Multiplier
 {
     public:
-        IngvarThePlundererMultiplier(PlayerbotAI* ai) : Multiplier(ai, "ingvar the plunderer") {}
+        IngvarThePlundererMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "ingvar the plunderer") {}
 
     public:
         float GetValue(Action* action) override;

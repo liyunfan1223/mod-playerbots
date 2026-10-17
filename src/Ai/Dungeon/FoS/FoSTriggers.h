@@ -29,7 +29,7 @@ enum ForgeOfSoulsBronjahmIDs
 class MoveFromBronjahmTrigger : public Trigger
 {
 public:
-    MoveFromBronjahmTrigger(PlayerbotAI* ai) : Trigger(ai, "move from bronjahm") {}
+    MoveFromBronjahmTrigger(PlayerbotAI* botAI) : Trigger(botAI, "move from bronjahm") {}
 
     bool IsActive() override;
 };
@@ -37,7 +37,7 @@ public:
 class SwitchToSoulFragment : public Trigger
 {
 public:
-    SwitchToSoulFragment(PlayerbotAI* ai) : Trigger(ai, "switch to soul fragment") {}
+    SwitchToSoulFragment(PlayerbotAI* botAI) : Trigger(botAI, "switch to soul fragment") {}
 
     bool IsActive() override;
 };
@@ -45,14 +45,14 @@ public:
 class BronjahmPositionTrigger : public Trigger
 {
 public:
-    BronjahmPositionTrigger(PlayerbotAI* ai) : Trigger(ai, "bronjahm position") {}
+    BronjahmPositionTrigger(PlayerbotAI* botAI) : Trigger(botAI, "bronjahm position") {}
     bool IsActive() override;
 };
 
 class DevourerOfSoulsTrigger : public Trigger
 {
 public:
-    DevourerOfSoulsTrigger(PlayerbotAI* ai) : Trigger(ai, "devourer of souls") {}
+    DevourerOfSoulsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "devourer of souls") {}
     bool IsActive() override;
 };
 

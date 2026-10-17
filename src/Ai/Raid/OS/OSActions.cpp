@@ -44,7 +44,7 @@ bool SartharionTankPositionAction::Execute(Event /*event*/)
     // Adjustable, this is the acceptable distance to stack point that will be accepted as "safe"
     float looseDistance = 12.0f;
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         if (bot->GetExactDist2d(SARTHARION_MAINTANK_POSITION.first, SARTHARION_MAINTANK_POSITION.second) > looseDistance)
         {
@@ -139,7 +139,7 @@ bool AvoidFlameTsunamiAction::Execute(Event /*event*/)
                 if (wavePassed)
                     return false;
 
-                if (botAI->IsMelee(bot))
+                if (PlayerbotAI::IsMelee(bot))
                 {
                     if (bot->GetExactDist2d(currentPos.GetPositionX(), TSUNAMI_LEFT_SAFE_MELEE) > looseDistance)
                         return MoveTo(OS_MAP_ID, currentPos.GetPositionX(), TSUNAMI_LEFT_SAFE_MELEE, currentPos.GetPositionZ(),

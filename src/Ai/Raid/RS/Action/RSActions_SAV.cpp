@@ -134,7 +134,7 @@ bool RsSavianaConflagrationAction::Execute(Event )
 
 bool RsSavianaTankPositionAction::Execute(Event )
 {
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "saviana ragefire");
@@ -162,7 +162,7 @@ bool RsSavianaTankPositionAction::Execute(Event )
 
 bool RsSavianaAvoidFrontAction::Execute(Event )
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "saviana ragefire");
@@ -174,7 +174,7 @@ bool RsSavianaAvoidFrontAction::Execute(Event )
 
     float const step = 5.0f;
 
-    if (!botAI->IsMelee(bot))
+    if (!PlayerbotAI::IsMelee(bot))
     {
         float const bossX = boss->GetPositionX();
         float const bossY = boss->GetPositionY();

@@ -96,14 +96,14 @@ const std::vector<uint32> availableTargets = {
 class ToCLanceTrigger : public Trigger
 {
 public:
-    ToCLanceTrigger(PlayerbotAI* ai) : Trigger(ai, "toc lance", 500) {}
+    ToCLanceTrigger(PlayerbotAI* botAI) : Trigger(botAI, "toc lance", 500) {}
     bool IsActive() override;
 };
 
 class ToCUELanceTrigger : public Trigger
 {
 public:
-    ToCUELanceTrigger(PlayerbotAI* ai) : Trigger(ai, "toc ue lance", 500) {}
+    ToCUELanceTrigger(PlayerbotAI* botAI) : Trigger(botAI, "toc ue lance", 500) {}
     bool IsActive() override;
 };
 

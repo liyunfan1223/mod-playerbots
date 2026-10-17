@@ -40,7 +40,7 @@ public:
 
 class ConfirmQuestAction : public Action {
 public:
-    ConfirmQuestAction(PlayerbotAI* ai) : Action(ai, "confirm quest") {}
+    ConfirmQuestAction(PlayerbotAI* botAI) : Action(botAI, "confirm quest") {}
     bool Execute(Event event);
 };
 

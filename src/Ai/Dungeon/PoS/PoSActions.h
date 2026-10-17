@@ -18,7 +18,7 @@ const Position ICKANDKRICK_TANK_POSITION = Position(816.8508f, 102.331505f, 509.
 class IckAndKrickAction : public AttackAction
 {
 public:
-    IckAndKrickAction(PlayerbotAI* ai) : AttackAction(ai, "ick and krick") {}
+    IckAndKrickAction(PlayerbotAI* botAI) : AttackAction(botAI, "ick and krick") {}
     bool Execute(Event event) override;
 
     bool TankPosition(Unit* boss);
@@ -30,7 +30,7 @@ public:
 class TyrannusAction : public AttackAction
 {
 public:
-    TyrannusAction(PlayerbotAI* ai) : AttackAction(ai, "tyrannus") {}
+    TyrannusAction(PlayerbotAI* botAI) : AttackAction(botAI, "tyrannus") {}
     bool Execute(Event event) override;
 
     bool RangedSpread(bool rangedSpread);

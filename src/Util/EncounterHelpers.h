@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include "Position.h"
+#include <initializer_list>
 #include <string>
 #include <vector>
 
@@ -43,11 +44,11 @@ bool MarkTargetWithTriangle(Player* bot, Unit* target);
 bool MarkTargetWithCross(Player* bot, Unit* target);
 bool MarkTargetWithMoon(Player* bot, Unit* target);
 bool ClearTargetIcon(Player* bot, uint8 iconId);
+bool ClearStrategyTargetIcon(Player* bot, uint8 iconId, std::initializer_list<uint32> entries);
 void SetRtiTarget(PlayerbotAI* botAI, std::string const& rtiName);
 bool IsMechanicTrackerBot(Player* bot, uint32 mapId);
 Player* GetGroupMainTank(Player* bot);
 Player* GetGroupAssistTank(Player* bot, uint8 index);
-Unit* GetFirstAliveUnitByEntry(PlayerbotAI* botAI, uint32 entry); // DO NOT USE, WILL BE REMOVED
 Player* GetNearestPlayerInRadius(Player* bot, float radius);
 std::vector<Position> GetDynamicObjectPositions(Player* bot, float searchRadius, uint32 spellId);
 uint32 GetSelfImmunitySpell(Player* bot);

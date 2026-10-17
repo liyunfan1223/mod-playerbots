@@ -27,14 +27,14 @@
 class ToCLanceAction : public AttackAction
 {
 public:
-    ToCLanceAction(PlayerbotAI* ai) : AttackAction(ai, "toc lance") {}
+    ToCLanceAction(PlayerbotAI* botAI) : AttackAction(botAI, "toc lance") {}
     bool Execute(Event event) override;
 };
 
 class ToCUELanceAction : public AttackAction
 {
 public:
-    ToCUELanceAction(PlayerbotAI* ai) : AttackAction(ai, "toc ue lance") {}
+    ToCUELanceAction(PlayerbotAI* botAI) : AttackAction(botAI, "toc ue lance") {}
     bool Execute(Event event) override;
 };
 
@@ -94,7 +94,7 @@ public:
         : MovementAction(botAI, name) {}
     bool Execute(Event event) override;
     bool EnterVehicle(Unit* vehicleBase, bool moveIfFar);
-    static Unit* FindMount(PlayerbotAI* ai);
+    static Unit* FindMount(PlayerbotAI* botAI);
 };
 
 class ToCEadricAction : public MovementAction

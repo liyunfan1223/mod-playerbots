@@ -28,14 +28,14 @@ enum HallsOfStoneIDs
 class KrystallusGroundSlamTrigger : public Trigger
 {
 public:
-    KrystallusGroundSlamTrigger(PlayerbotAI* ai) : Trigger(ai, "krystallus ground slam") {}
+    KrystallusGroundSlamTrigger(PlayerbotAI* botAI) : Trigger(botAI, "krystallus ground slam") {}
     bool IsActive() override;
 };
 
 class SjonnirLightningRingTrigger : public Trigger
 {
 public:
-    SjonnirLightningRingTrigger(PlayerbotAI* ai) : Trigger(ai, "sjonnir lightning ring") {}
+    SjonnirLightningRingTrigger(PlayerbotAI* botAI) : Trigger(botAI, "sjonnir lightning ring") {}
     bool IsActive() override;
 };
 

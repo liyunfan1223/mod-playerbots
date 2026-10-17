@@ -30,7 +30,7 @@ bool IccRotfaceTankPositionAction::Execute(Event /*event*/)
 
     MarkBossWithSkull(boss);
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
     {
         bool assistTankAlive = false;
         if (Group* group = bot->GetGroup())
@@ -38,7 +38,7 @@ bool IccRotfaceTankPositionAction::Execute(Event /*event*/)
             for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* member = itr->GetSource();
-                if (member && member->IsAlive() && member != bot && botAI->IsAssistTank(member))
+                if (member && member->IsAlive() && member != bot && PlayerbotAI::IsAssistTank(member))
                 {
                     assistTankAlive = true;
                     break;
@@ -49,7 +49,7 @@ bool IccRotfaceTankPositionAction::Execute(Event /*event*/)
         Unit* bigOoze = bot->FindNearestCreature(NPC_BIG_OOZE, 100.0f);
         bool const bigOozeHandled = bigOoze && bigOoze->IsAlive() && bigOoze->GetVictim() &&
                                     bigOoze->GetVictim()->IsPlayer() &&
-                                    botAI->IsAssistTank(bigOoze->GetVictim()->ToPlayer());
+                                    PlayerbotAI::IsAssistTank(bigOoze->GetVictim()->ToPlayer());
 
         if (bigOoze && bigOoze->IsAlive() && !assistTankAlive && !bigOozeHandled)
             return HandleAssistTankPositioning(boss);
@@ -57,7 +57,7 @@ bool IccRotfaceTankPositionAction::Execute(Event /*event*/)
         return PositionMainTankAndMelee(boss, smallOoze);
     }
 
-    if (botAI->IsAssistTank(bot))
+    if (PlayerbotAI::IsAssistTank(bot))
         return HandleAssistTankPositioning(boss);
 
     return false;
@@ -75,7 +75,7 @@ bool IccRotfaceTankPositionAction::PositionMainTankAndMelee(Unit* boss, Unit*)
     if (boss && boss->HasUnitState(UNIT_STATE_CASTING))
         isBossCasting = true;
 
-    if (botAI->IsMainTank(bot) && boss && boss->GetVictim() == bot)
+    if (PlayerbotAI::IsMainTank(bot) && boss && boss->GetVictim() == bot)
     {
         bool const bossInPosition = boss->GetExactDist2d(ICC_ROTFACE_CENTER_POSITION_BOSS) <= 4.0f;
 
@@ -108,7 +108,7 @@ bool IccRotfaceTankPositionAction::PositionMainTankAndMelee(Unit* boss, Unit*)
         }
     }
 
-    if (boss && isBossCasting && !botAI->IsTank(bot))
+    if (boss && isBossCasting && !PlayerbotAI::IsTank(bot))
     {
         float const x = boss->GetPositionX();
         float const y = boss->GetPositionY();
@@ -326,7 +326,7 @@ bool IccRotfaceGroupPositionAction::Execute(Event /*event*/)
     bool const hasOozeFlood = botAI->HasAura("Ooze Flood", bot);
     Unit* smallOoze = AI_VALUE2(Unit*, "find target", "little ooze");
 
-    if (!botAI->IsTank(bot) && HandlePuddleAvoidance(boss))
+    if (!PlayerbotAI::IsTank(bot) && HandlePuddleAvoidance(boss))
         return true;
 
     if (HandleOozeTargeting())
@@ -400,7 +400,7 @@ bool IccRotfaceGroupPositionAction::MoveAwayFromPuddle(Unit* boss, Unit* puddle,
 
 bool IccRotfaceGroupPositionAction::HandleOozeTargeting()
 {
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
         return false;
 
     GuidVector npcs = AI_VALUE(GuidVector, "nearest hostile npcs");
@@ -411,7 +411,7 @@ bool IccRotfaceGroupPositionAction::HandleOozeTargeting()
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
-            if (!member || !member->IsAlive() || !botAI->IsMainTank(member))
+            if (!member || !member->IsAlive() || !PlayerbotAI::IsMainTank(member))
                 continue;
 
             for (auto const& guid : npcs)
@@ -436,7 +436,7 @@ bool IccRotfaceGroupPositionAction::HandleOozeTargeting()
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
-            if (!member || !member->IsAlive() || !botAI->IsAssistTank(member))
+            if (!member || !member->IsAlive() || !PlayerbotAI::IsAssistTank(member))
                 continue;
 
             for (auto const& guid : npcs)
@@ -505,7 +505,7 @@ bool IccRotfaceGroupPositionAction::HandleOozeMemberPositioning(Unit* /*mySmallO
         for (Unit* ooze : bigOozes)
         {
             Unit* victim = ooze->GetVictim();
-            if (victim && victim->IsPlayer() && botAI->IsAssistTank(victim->ToPlayer()))
+            if (victim && victim->IsPlayer() && PlayerbotAI::IsAssistTank(victim->ToPlayer()))
             {
                 float const dist = bot->GetExactDist2d(ooze);
                 if (dist < minDist)
@@ -529,7 +529,7 @@ bool IccRotfaceGroupPositionAction::HandleOozeMemberPositioning(Unit* /*mySmallO
             }
         }
 
-        if (target && bot->GetExactDist2d(target) > 2.0f && !botAI->IsAssistTank(bot))
+        if (target && bot->GetExactDist2d(target) > 2.0f && !PlayerbotAI::IsAssistTank(bot))
             return MoveTo(bot->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(),
                           false, false, false, true, MovementPriority::MOVEMENT_FORCED);
 
@@ -546,7 +546,7 @@ bool IccRotfaceGroupPositionAction::HandleOozeMemberPositioning(Unit* /*mySmallO
 
 bool IccRotfaceGroupPositionAction::PositionRangedAndHealers(Unit* boss, Unit* smallOoze)
 {
-    if (!(botAI->IsRanged(bot) || botAI->IsHeal(bot)))
+    if (!(PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot)))
         return false;
 
     if (smallOoze && smallOoze->GetVictim() == bot)
@@ -637,16 +637,16 @@ bool IccRotfaceGroupPositionAction::PositionHeroicGrid(Unit* boss)
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
-        if (!member || !member->IsAlive() || botAI->IsTank(member))
+        if (!member || !member->IsAlive() || PlayerbotAI::IsTank(member))
             continue;
 
         if (!GET_PLAYERBOT_AI(member))
             continue;
 
         ObjectGuid const guid = member->GetGUID();
-        if (botAI->IsHeal(member))
+        if (PlayerbotAI::IsHeal(member))
             healerGuids.push_back(guid);
-        else if (botAI->IsRanged(member))
+        else if (PlayerbotAI::IsRanged(member))
         {
             if (member->getClass() == CLASS_HUNTER)
                 hunterGuids.push_back(guid);
@@ -720,7 +720,7 @@ bool IccRotfaceGroupPositionAction::PositionHeroicGrid(Unit* boss)
             return moveTowardSpot(rangedSpots[tempSpots[displacedRank]]);
     }
 
-    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && !botAI->IsTank(bot))
+    if (boss && boss->HasUnitState(UNIT_STATE_CASTING) && !PlayerbotAI::IsTank(bot))
     {
         float const bx = boss->GetPositionX();
         float const by = boss->GetPositionY();
@@ -738,7 +738,7 @@ bool IccRotfaceGroupPositionAction::PositionHeroicGrid(Unit* boss)
             Player* member = itr->GetSource();
             if (!member || !member->IsAlive() || member == bot)
                 continue;
-            if (botAI->IsMainTank(member))
+            if (PlayerbotAI::IsMainTank(member))
             {
                 if (bot->getClass() == CLASS_HUNTER)
                 {
@@ -763,7 +763,7 @@ bool IccRotfaceGroupPositionAction::PositionHeroicGrid(Unit* boss)
 
 bool IccRotfaceMoveAwayFromExplosionAction::Execute(Event /*event*/)
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Creature* bigOoze = bot->FindNearestCreature(NPC_BIG_OOZE, 100.0f);

@@ -661,16 +661,16 @@ bool ToCMountAction::Execute(Event /*event*/)
     return EnterVehicle(vehicleToEnter, true);
 }
 
-Unit* ToCMountAction::FindMount(PlayerbotAI* ai)
+Unit* ToCMountAction::FindMount(PlayerbotAI* botAI)
 {
-    Player* player = ai->GetBot();
+    Player* player = botAI->GetBot();
     Unit* preferredMount = nullptr;
     Unit* otherMount = nullptr;
     uint32 preferredEntry = FactionMountEntry(player);
-    GuidVector npcs = ai->GetAiObjectContext()->GetValue<GuidVector>("nearest vehicles")->Get();
+    GuidVector npcs = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest vehicles")->Get();
     for (GuidVector::iterator i = npcs.begin(); i != npcs.end(); i++)
     {
-        Unit* vehicleBase = ai->GetUnit(*i);
+        Unit* vehicleBase = botAI->GetUnit(*i);
         if (!vehicleBase)
             continue;
 

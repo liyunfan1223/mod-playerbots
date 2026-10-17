@@ -19,7 +19,7 @@ constexpr uint32 SPELL_COMMANDING_PRESENCE_RANKS[] = { 12318, 12857, 12858, 1286
 
 bool BloodrageBuffTrigger::IsActive()
 {
-    return AI_VALUE2(uint8, "health", "self target") >= sPlayerbotAIConfig.mediumHealth &&
+    return AI_VALUE2(uint8, "health", "self target") >= sPlayerbotAIConfig.MediumHealth &&
            AI_VALUE2(uint8, "rage", "self target") < 20;
 }
 

@@ -12,7 +12,7 @@
 class WotlkDungeonToCStrategy : public Strategy
 {
 public:
-    WotlkDungeonToCStrategy(PlayerbotAI* ai) : Strategy(ai) {}
+    WotlkDungeonToCStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
     std::string const getName() override { return "wotlk-toc"; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     void InitMultipliers(std::vector<Multiplier*>& multipliers) override;

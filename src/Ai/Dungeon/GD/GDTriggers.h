@@ -48,35 +48,35 @@ Unit* GetTankHoldTarget(PlayerbotAI* botAI);
 class SladranPoisonNovaTrigger : public Trigger
 {
 public:
-    SladranPoisonNovaTrigger(PlayerbotAI* ai) : Trigger(ai, "slad'ran poison nova") {}
+    SladranPoisonNovaTrigger(PlayerbotAI* botAI) : Trigger(botAI, "slad'ran poison nova") {}
     bool IsActive() override;
 };
 
 class SladranSnakeWrapTrigger : public Trigger
 {
 public:
-    SladranSnakeWrapTrigger(PlayerbotAI* ai) : Trigger(ai, "slad'ran snake wrap") {}
+    SladranSnakeWrapTrigger(PlayerbotAI* botAI) : Trigger(botAI, "slad'ran snake wrap") {}
     bool IsActive() override;
 };
 
 class SladranStackOnTankTrigger : public Trigger
 {
 public:
-    SladranStackOnTankTrigger(PlayerbotAI* ai) : Trigger(ai, "slad'ran stack on tank") {}
+    SladranStackOnTankTrigger(PlayerbotAI* botAI) : Trigger(botAI, "slad'ran stack on tank") {}
     bool IsActive() override;
 };
 
 class SladranTankHoldTrigger : public Trigger
 {
 public:
-    SladranTankHoldTrigger(PlayerbotAI* ai) : Trigger(ai, "slad'ran tank hold") {}
+    SladranTankHoldTrigger(PlayerbotAI* botAI) : Trigger(botAI, "slad'ran tank hold") {}
     bool IsActive() override;
 };
 
 class GaldarahWhirlingSlashTrigger : public Trigger
 {
 public:
-    GaldarahWhirlingSlashTrigger(PlayerbotAI* ai) : Trigger(ai, "gal'darah whirling slash") {}
+    GaldarahWhirlingSlashTrigger(PlayerbotAI* botAI) : Trigger(botAI, "gal'darah whirling slash") {}
     bool IsActive() override;
 };
 

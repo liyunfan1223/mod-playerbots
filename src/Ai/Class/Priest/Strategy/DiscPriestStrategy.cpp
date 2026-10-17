@@ -4,23 +4,22 @@
  * or (at your option) any later version.
  */
 
-#include "HealPriestStrategy.h"
-#include "GenericPriestStrategyActionNodeFactory.h"
+#include "DiscPriestStrategy.h"
 #include "Playerbots.h"
 
-HealPriestStrategy::HealPriestStrategy(PlayerbotAI* botAI) : GenericPriestStrategy(botAI)
+DiscPriestStrategy::DiscPriestStrategy(PlayerbotAI* botAI) : GenericPriestStrategy(botAI)
 {
-    actionNodeFactories.Add(new GenericPriestStrategyActionNodeFactory());
+    // No custom ActionNodeFactory needed
 }
 
-std::vector<NextAction> HealPriestStrategy::getDefaultActions()
+std::vector<NextAction> DiscPriestStrategy::getDefaultActions()
 {
     return {
         NextAction("shoot", ACTION_DEFAULT)
     };
 }
 
-void HealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+void DiscPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPriestStrategy::InitTriggers(triggers);
 

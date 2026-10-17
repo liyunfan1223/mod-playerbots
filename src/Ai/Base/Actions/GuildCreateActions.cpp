@@ -182,11 +182,11 @@ bool PetitionOfferNearbyAction::Execute(Event /*event*/)
         }
         else
         {
-            if (!sPlayerbotAIConfig.randomBotGroupNearby)
+            if (!sPlayerbotAIConfig.RandomBotGroupNearby)
                 return false;
         }
 
-        if (ServerFacade::instance().GetDistance2d(bot, player) > sPlayerbotAIConfig.sightDistance)
+        if (ServerFacade::instance().GetDistance2d(bot, player) > sPlayerbotAIConfig.SightDistance)
             continue;
 
         // Parse rpg target to quest action.

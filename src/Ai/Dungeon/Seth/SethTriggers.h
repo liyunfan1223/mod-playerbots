@@ -49,19 +49,19 @@ public:
     bool IsActive() override;
 };
 
-class TalonKingIkissBossEngagedByTankTrigger : public Trigger
+class TalonKingIkissShouldBeTankedTrigger : public Trigger
 {
 public:
-    TalonKingIkissBossEngagedByTankTrigger(PlayerbotAI* botAI)
-        : Trigger(botAI, "talon king ikiss boss engaged by tank") {}
+    TalonKingIkissShouldBeTankedTrigger(PlayerbotAI* botAI)
+        : Trigger(botAI, "talon king ikiss should be tanked") {}
     bool IsActive() override;
 };
 
-class TalonKingIkissRangedPrepareForArcaneExplosionTrigger : public Trigger
+class TalonKingIkissRangedShouldStayNearTankTrigger : public Trigger
 {
 public:
-    TalonKingIkissRangedPrepareForArcaneExplosionTrigger(PlayerbotAI* botAI)
-        : Trigger(botAI, "talon king ikiss ranged prepare for arcane explosion") {}
+    TalonKingIkissRangedShouldStayNearTankTrigger(PlayerbotAI* botAI)
+        : Trigger(botAI, "talon king ikiss ranged should stay near tank") {}
     bool IsActive() override;
 };
 
@@ -73,11 +73,11 @@ public:
     bool IsActive() override;
 };
 
-class TalonKingIkissBossOutOfLosTrigger : public Trigger
+class TalonKingIkissOutOfLosTrigger : public Trigger
 {
 public:
-    TalonKingIkissBossOutOfLosTrigger(PlayerbotAI* botAI)
-        : Trigger(botAI, "talon king ikiss boss out of los") {}
+    TalonKingIkissOutOfLosTrigger(PlayerbotAI* botAI)
+        : Trigger(botAI, "talon king ikiss out of los") {}
     bool IsActive() override;
 };
 

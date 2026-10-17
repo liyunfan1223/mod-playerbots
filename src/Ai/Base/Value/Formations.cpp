@@ -64,8 +64,8 @@ WorldLocation MoveAheadFormation::GetLocation()
     // if (master->isMoving())
     // {
     //     float ori = master->GetOrientation();
-    //     float x1 = x + sPlayerbotAIConfig.tooCloseDistance * cos(ori);
-    //     float y1 = y + sPlayerbotAIConfig.tooCloseDistance * sin(ori);
+    //     float x1 = x + sPlayerbotAIConfig.TooCloseDistance * cos(ori);
+    //     float y1 = y + sPlayerbotAIConfig.TooCloseDistance * sin(ori);
     //     float ground = map->GetHeight(x1, y1, z);
     //     if (ground > INVALID_HEIGHT)
     //     {
@@ -111,7 +111,7 @@ public:
         if (!ValidateTargetContext(master, bot, map))
             return Formation::NullLocation;
 
-        float range = sPlayerbotAIConfig.followDistance;
+        float range = sPlayerbotAIConfig.FollowDistance;
         float angle = GetFollowAngle();
         float x = master->GetPositionX() + cos(angle) * range;
         float y = master->GetPositionY() + sin(angle) * range;
@@ -127,7 +127,7 @@ public:
         return WorldLocation(master->GetMapId(), x, y, z);
     }
 
-    float GetMaxDistance() override { return sPlayerbotAIConfig.followDistance; }
+    float GetMaxDistance() override { return sPlayerbotAIConfig.FollowDistance; }
 };
 
 class ChaosFormation : public MoveAheadFormation
@@ -142,7 +142,7 @@ public:
         if (!ValidateTargetContext(master, bot, map))
             return Formation::NullLocation;
 
-        float range = sPlayerbotAIConfig.followDistance;
+        float range = sPlayerbotAIConfig.FollowDistance;
         float angle = GetFollowAngle();
 
         time_t now = time(nullptr);
@@ -150,8 +150,8 @@ public:
         {
             lastChangeTime = now;
 
-            dx = (urand(0, 10) / 10.0f - 0.5f) * sPlayerbotAIConfig.tooCloseDistance;
-            dy = (urand(0, 10) / 10.0f - 0.5f) * sPlayerbotAIConfig.tooCloseDistance;
+            dx = (urand(0, 10) / 10.0f - 0.5f) * sPlayerbotAIConfig.TooCloseDistance;
+            dy = (urand(0, 10) / 10.0f - 0.5f) * sPlayerbotAIConfig.TooCloseDistance;
             dr = std::sqrt(dx * dx + dy * dy);
         }
 
@@ -173,7 +173,7 @@ public:
         return WorldLocation(master->GetMapId(), x, y, z);
     }
 
-    float GetMaxDistance() override { return sPlayerbotAIConfig.followDistance + dr; }
+    float GetMaxDistance() override { return sPlayerbotAIConfig.FollowDistance + dr; }
 
 private:
     time_t lastChangeTime;
@@ -210,11 +210,11 @@ public:
                 range = botAI->GetRange("flee");
                 break;
             case CLASS_DRUID:
-                if (!botAI->IsTank(bot))
+                if (!PlayerbotAI::IsTank(bot))
                     range = botAI->GetRange("flee");
                 break;
             case CLASS_SHAMAN:
-                if (botAI->IsHeal(bot))
+                if (PlayerbotAI::IsHeal(bot))
                     range = botAI->GetRange("flee");
                 break;
         }
@@ -287,7 +287,7 @@ public:
         if (!group)
             return Formation::NullLocation;
 
-        float range = sPlayerbotAIConfig.followDistance;
+        float range = sPlayerbotAIConfig.FollowDistance;
 
         Player* master = GetMaster();
         if (!master)
@@ -307,33 +307,33 @@ public:
             if (!member || member == master)
                 continue;
 
-            if (botAI->IsTank(member))
+            if (PlayerbotAI::IsTank(member))
                 tanks.push_back(member);
             else
                 dps.push_back(member);
         }
 
-        if (botAI->IsTank(master))
+        if (PlayerbotAI::IsTank(master))
             tanks.insert(tanks.begin() + (tanks.size() + 1) / 2, master);
         else
             dps.insert(dps.begin() + (dps.size() + 1) / 2, master);
 
-        if (botAI->IsTank(bot) && botAI->IsTank(master))
+        if (PlayerbotAI::IsTank(bot) && PlayerbotAI::IsTank(master))
             return MoveLine(tanks, 0.0f, x, y, z, orientation, range);
 
-        if (!botAI->IsTank(bot) && !botAI->IsTank(master))
+        if (!PlayerbotAI::IsTank(bot) && !PlayerbotAI::IsTank(master))
             return MoveLine(dps, 0.0f, x, y, z, orientation, range);
 
-        if (botAI->IsTank(bot) && !botAI->IsTank(master))
+        if (PlayerbotAI::IsTank(bot) && !PlayerbotAI::IsTank(master))
         {
-            float diff = (tanks.size() % 2 == 0) ? -sPlayerbotAIConfig.tooCloseDistance / 2.0f : 0.0f;
+            float diff = (tanks.size() % 2 == 0) ? -sPlayerbotAIConfig.TooCloseDistance / 2.0f : 0.0f;
             return MoveLine(tanks, diff, x + cos(orientation) * range, y + sin(orientation) * range, z, orientation,
                             range);
         }
 
-        if (!botAI->IsTank(bot) && botAI->IsTank(master))
+        if (!PlayerbotAI::IsTank(bot) && PlayerbotAI::IsTank(master))
         {
-            float diff = (dps.size() % 2 == 0) ? -sPlayerbotAIConfig.tooCloseDistance / 2.0f : 0.0f;
+            float diff = (dps.size() % 2 == 0) ? -sPlayerbotAIConfig.TooCloseDistance / 2.0f : 0.0f;
             return MoveLine(dps, diff, x - cos(orientation) * range, y - sin(orientation) * range, z, orientation,
                             range);
         }
@@ -354,8 +354,8 @@ public:
         if (!ValidateTargetContext(master, bot, map))
             return Formation::NullLocation;
 
-        float range = sPlayerbotAIConfig.farDistance;
-        float followRange = sPlayerbotAIConfig.followDistance;
+        float range = sPlayerbotAIConfig.FarDistance;
+        float followRange = sPlayerbotAIConfig.FollowDistance;
 
         if (ServerFacade::instance().GetDistance2d(bot, master) <= range)
             return Formation::NullLocation;
@@ -420,7 +420,6 @@ float Formation::GetFollowAngle()
 {
     Player* master = GetMaster();
     Group* group = bot->GetGroup();
-    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
 
     // If there's no master and no group
     if (!master && !group)
@@ -448,19 +447,19 @@ float Formation::GetFollowAngle()
                 continue;
 
             // Put DPS in the middle
-            if (!botAI->IsTank(member) && !botAI->IsHeal(member))
+            if (!PlayerbotAI::IsTank(member) && !PlayerbotAI::IsHeal(member))
             {
                 roster.insert(roster.begin() + roster.size() / 2, member);
             }
 
             // Put Healers in the middle
-            else if (botAI->IsHeal(member))
+            else if (PlayerbotAI::IsHeal(member))
             {
                 roster.insert(roster.begin() + roster.size() / 2, member);
             }
 
             // Handle tanks (alternate between front and back)
-            else if (botAI->IsTank(member))
+            else if (PlayerbotAI::IsTank(member))
             {
                 if (left)
                     roster.push_back(member);  // Place tank at the back

@@ -35,42 +35,42 @@ protected:
 class QuestUpdateCompleteAction : public Action
 {
 public:
-    QuestUpdateCompleteAction(PlayerbotAI* ai) : Action(ai, "quest update complete") {}
+    QuestUpdateCompleteAction(PlayerbotAI* botAI) : Action(botAI, "quest update complete") {}
     bool Execute(Event event) override;
 };
 
 class QuestUpdateAddKillAction : public Action
 {
 public:
-    QuestUpdateAddKillAction(PlayerbotAI* ai) : Action(ai, "quest update add kill") {}
+    QuestUpdateAddKillAction(PlayerbotAI* botAI) : Action(botAI, "quest update add kill") {}
     bool Execute(Event event) override;
 };
 
 class QuestUpdateAddItemAction : public Action
 {
 public:
-    QuestUpdateAddItemAction(PlayerbotAI* ai) : Action(ai, "quest update add item") {}
+    QuestUpdateAddItemAction(PlayerbotAI* botAI) : Action(botAI, "quest update add item") {}
     bool Execute(Event event) override;
 };
 
 class QuestUpdateFailedAction : public Action
 {
 public:
-    QuestUpdateFailedAction(PlayerbotAI* ai) : Action(ai, "quest update failed") {}
+    QuestUpdateFailedAction(PlayerbotAI* botAI) : Action(botAI, "quest update failed") {}
     bool Execute(Event event) override;
 };
 
 class QuestUpdateFailedTimerAction : public Action
 {
 public:
-    QuestUpdateFailedTimerAction(PlayerbotAI* ai) : Action(ai, "quest update failed timer") {}
+    QuestUpdateFailedTimerAction(PlayerbotAI* botAI) : Action(botAI, "quest update failed timer") {}
     bool Execute(Event event) override;
 };
 
 class QuestItemPushResultAction : public Action
 {
 public:
-    QuestItemPushResultAction(PlayerbotAI* ai) : Action(ai, "quest item push result") {}
+    QuestItemPushResultAction(PlayerbotAI* botAI) : Action(botAI, "quest item push result") {}
     bool Execute(Event event) override;
 };
 

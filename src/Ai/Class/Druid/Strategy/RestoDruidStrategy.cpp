@@ -91,13 +91,41 @@ void DruidTranquilityStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                                        { NextAction("tree form", 30.6f), NextAction("tranquility", 30.5f) }));
 }
 
+class DruidBlanketStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
+{
+public:
+    DruidBlanketStrategyActionNodeFactory()
+    {
+        creators["wild growth blanket"] = &wild_growth_blanket;
+        creators["rejuvenation blanket"] = &rejuvenation_blanket;
+    }
+
+private:
+    static ActionNode* wild_growth_blanket([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("wild growth blanket",
+                              /*P*/ { NextAction("tree form") },
+                              /*A*/ {},
+                              /*C*/ {});
+    }
+
+    static ActionNode* rejuvenation_blanket([[maybe_unused]] PlayerbotAI* botAI)
+    {
+        return new ActionNode("rejuvenation blanket",
+                              /*P*/ { NextAction("tree form") },
+                              /*A*/ {},
+                              /*C*/ {});
+    }
+};
+
+DruidBlanketStrategy::DruidBlanketStrategy(PlayerbotAI* botAI) : Strategy(botAI)
+{
+    actionNodeFactories.Add(new DruidBlanketStrategyActionNodeFactory());
+}
+
 void DruidBlanketStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode(
-        "wild growth blanket",
-        { NextAction("tree form", 8.1f), NextAction("wild growth blanket", 8.0f) }));
+    triggers.push_back(new TriggerNode("wild growth blanket", { NextAction("wild growth blanket", 8.0f) }));
 
-    triggers.push_back(new TriggerNode(
-        "rejuvenation blanket",
-        { NextAction("tree form", 6.1f), NextAction("rejuvenation blanket", 6.0f) }));
+    triggers.push_back(new TriggerNode("rejuvenation blanket", { NextAction("rejuvenation blanket", 6.0f) }));
 }

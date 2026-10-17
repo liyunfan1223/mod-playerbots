@@ -85,6 +85,7 @@ public:
     virtual std::vector<NextAction> getAlternatives() { return {}; }
     virtual std::vector<NextAction> getContinuers() { return {}; }
     virtual ActionThreatType getThreatType() { return ActionThreatType::None; }
+    virtual bool isUsefulWithoutControl() { return false; }
     void Update() {}
     void Reset() {}
     virtual Unit* GetTarget();
@@ -94,9 +95,20 @@ public:
     void setRelevance(uint32 relevance1) { relevance = relevance1; };
     virtual float getRelevance() { return relevance; }
 
+    // Reaction system
+    bool IsReaction() const { return reaction; }
+    void SetReaction(bool inReaction) { reaction = inReaction; }
+    uint32 GetDuration() const { return duration; }
+    void ResetDuration() { duration = 0; }
+    virtual bool ShouldReactionInterruptCast() const { return false; }
+    virtual bool ShouldReactionInterruptMovement() const { return false; }
+
 protected:
+    void SetDuration(uint32 inDuration) { duration = inDuration; }
     bool verbose;
     float relevance = 0;
+    bool reaction = false;
+    uint32 duration = 0;
 };
 
 class ActionNode
