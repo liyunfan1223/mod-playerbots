@@ -31,6 +31,7 @@
 #include "ServerFacade.h"
 #include "Vehicle.h"
 #include <algorithm>
+#include <optional>
 
 // common bg positions
 Position const WS_WAITING_POS_HORDE_1 = {944.981f, 1423.478f, 345.434f, 6.18f};
@@ -2150,10 +2151,19 @@ bool BGTactics::selectObjective(bool reset)
             if (enemyBoss && !enemyBoss->IsAlive())
                 enemyBoss = nullptr;
 
-            // Counts teammates already fighting there too, so late arrivals join a pull in progress
-            bool bossGroupReady = enemyBoss && (ownsFinalGY || getPlayersInArea(team, enemyBoss->GetPosition(), 200.0f) >= bossGatherCount);
+            // Counts teammates already fighting there too, so late arrivals join a pull in progress.
+            // Evaluated on first use only, since most picks settle on an objective before reaching it
+            std::optional<bool> bossGroupReadyCache;
+            auto bossGroupReady = [&]() -> bool
+            {
+                if (!bossGroupReadyCache)
+                    bossGroupReadyCache = enemyBoss &&
+                        (ownsFinalGY || getPlayersInArea(team, enemyBoss->GetPosition(), 200.0f) >= bossGatherCount);
 
-            if (!BgObjective && enemyBoss && pushPhase && bossGroupReady)
+                return *bossGroupReadyCache;
+            };
+
+            if (!BgObjective && enemyBoss && pushPhase && bossGroupReady())
                 BgObjective = enemyBoss;
 
             // --- Attacker Logic ---
@@ -2201,7 +2211,7 @@ bool BGTactics::selectObjective(bool reset)
                     posMap["bg objective"] = pos;
 
                     // Wait at the rally point instead of pulling the boss alone; arriving there re-checks the group
-                    if (!bossGroupReady)
+                    if (!bossGroupReady())
                         return true;
 
                     BgObjective = enemyBoss;
