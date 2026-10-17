@@ -1208,6 +1208,14 @@ Playerbots.PreferClassArmorType = 0
 # Default: 0 (disabled)
 Playerbots.PreferredSpecWeapons = 0
 
+# When enabled, a candidate item is valued by the set tier it actually activates (the tier is
+# counted only when the candidate would switch it on) instead of the legacy flat completeness
+# multiplier. The tier is valued after weights are generated; tiers whose weighted delta is zero
+# (most raid tier procs only produce an unrecognized-bonus point) fall back to the legacy
+# multiplier. Disabled by default so default scoring is unchanged.
+# Default: 0 (disabled)
+Playerbots.ItemSetSpellScoring = 0
+
 # Set minimum level of bots that will enchant and socket gems into their equipment with maintenance
 # If greater than RandomBotMaxlevel, bots will not automatically enchant equipment or socket gems
 # Default: 60

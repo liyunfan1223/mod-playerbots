@@ -7,6 +7,7 @@
 #include "StatsWeightCalculator.h"
 #include "AiFactory.h"
 #include "DBCStores.h"
+#include "Item.h"
 #include "ItemEnchantmentMgr.h"
 #include "ItemTemplate.h"
 #include "ObjectMgr.h"
@@ -98,6 +99,11 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
 
     collector_->CollectItemStats(proto);
 
+    bool const checkSetBonus = enable_item_set_bonus_ && sPlayerbotAIConfig.ItemSetSpellScoring;
+    std::array<float, STATS_TYPE_MAX> setBonusStats{};
+    if (checkSetBonus)
+        CollectItemSetBonus(player_, proto, slot, setBonusStats);
+
     if (randomPropertyIds != 0)
         CalculateRandomProperty(randomPropertyIds, itemId);
 
@@ -112,7 +118,19 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
 
     CalculateItemTypePenalty(proto);
 
-    if (enable_item_set_bonus_)
+    // Weight the tier only now that the weights exist. A tier whose weighted delta is zero
+    // (most raid tier procs only produce STATS_TYPE_BONUS) falls back to the legacy
+    // completeness multiplier so tier pieces are not undervalued.
+    float setBonusValue = 0.0f;
+    if (checkSetBonus)
+    {
+        for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+            if (i != STATS_TYPE_BONUS)
+                setBonusValue += stats_weights_[i] * setBonusStats[i];
+    }
+    bool const setBonusValued = setBonusValue > 0.0f;
+
+    if (enable_item_set_bonus_ && (!sPlayerbotAIConfig.ItemSetSpellScoring || !setBonusValued))
         CalculateItemSetMod(player_, proto);
 
     CalculateSocketBonus(player_, proto);
@@ -550,6 +568,60 @@ void StatsWeightCalculator::GenerateAdditionalWeights(Player* player)
         stats_weights_[STATS_TYPE_RESILIENCE] += 7.0f;
 }
 
+void StatsWeightCalculator::CollectItemSetBonus(Player* player, ItemTemplate const* proto, int32 slot,
+                                                std::array<float, STATS_TYPE_MAX>& setBonusStats)
+{
+    uint32 itemSet = proto->ItemSet;
+    if (!itemSet)
+        return;
+
+    ItemSetEntry const* setEntry = sItemSetStore.LookupEntry(itemSet);
+    if (!setEntry)
+        return;
+
+    // Pieces worn while the candidate is evaluated: the item currently in the candidate's
+    // slot (if it is from the same set) is replaced, so it must not count. The candidate
+    // itself adds one piece, so only the tier at (worn + 1) is newly activated.
+    uint32 worn = 0;
+    for (ItemSetEffect* eff : player->ItemSetEff)
+    {
+        if (eff && eff->setid == itemSet)
+        {
+            worn = eff->item_count;
+            break;
+        }
+    }
+
+    if (worn && slot >= 0 && slot < EQUIPMENT_SLOT_END)
+    {
+        if (Item* oldItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, uint8(slot)))
+        {
+            if (oldItem->GetTemplate()->ItemSet == itemSet)
+                --worn;
+        }
+    }
+
+    // Value only the tier this item switches on. Tiers that are already active stay
+    // credited to the item providing them, so candidates are compared on their delta.
+    // Keep the stats the tier adds and let the caller weigh them after GenerateWeights.
+    for (uint32 j = 0; j < MAX_ITEM_SET_SPELLS; ++j)
+    {
+        uint32 threshold = setEntry->items_to_triggerspell[j];
+        uint32 spellId = setEntry->spells[j];
+        if (!threshold || !spellId || threshold != worn + 1)
+            continue;
+
+        std::array<float, STATS_TYPE_MAX> before{};
+        for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+            before[i] = collector_->stats[i];
+
+        collector_->CollectSpellStats(spellId, 1.0f, Milliseconds(0));
+
+        for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+            setBonusStats[i] += collector_->stats[i] - before[i];
+    }
+}
+
 void StatsWeightCalculator::CalculateItemSetMod(Player* player, ItemTemplate const* proto)
 {
     uint32 itemSet = proto->ItemSet;
@@ -582,7 +654,7 @@ void StatsWeightCalculator::CalculateItemSetMod(Player* player, ItemTemplate con
             }
             else
             {
-                multiplier = 1.0f;  // All item set effect has been triggerred
+                multiplier = 1.0f;  // All item set effect has been triggered
             }
             break;
         }
