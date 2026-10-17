@@ -45,30 +45,17 @@ std::vector<Position> const& GetCachedHazardPositions(PlayerbotAI* botAI, char c
 
 } // end anonymous namespace
 
-// General
-
-bool ClearSscTargetIcon(Player* bot, uint8 iconId, std::initializer_list<uint32> entries)
-{
-    Group* group = bot->GetGroup();
-    if (!group)
-        return false;
-
-    uint32 const entry = group->GetTargetIcon(iconId).GetEntry();
-    if (std::find(entries.begin(), entries.end(), entry) == entries.end())
-        return false;
-
-    return ClearTargetIcon(bot, iconId);
-}
+// Shared
 
 bool MisdirectTargetToTank(PlayerbotAI* botAI, Unit* target, Player* tank)
 {
     if (!target || !tank)
         return false;
 
-    if (botAI->CanCastSpell(Id(SscSpells::SPELL_MISDIRECTION_CAST), tank))
-        return botAI->CastSpell(Id(SscSpells::SPELL_MISDIRECTION_CAST), tank);
+    if (botAI->CanCastSpell(Id(SscSpells::SPELL_MISDIRECTION), tank))
+        return botAI->CastSpell(Id(SscSpells::SPELL_MISDIRECTION), tank);
 
-    if (!botAI->GetBot()->HasAura(Id(SscSpells::SPELL_MISDIRECTION)))
+    if (!botAI->GetBot()->HasAura(Id(SscSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", target) && botAI->CastSpell("steady shot", target);
@@ -1706,7 +1693,7 @@ Player* GetVashjHandOfFreedomTarget(PlayerbotAI* botAI, Unit* vashj)
         bool const nearSpore = std::any_of(spores.begin(), spores.end(),
             [member](Position const& spore)
             {
-                return member->GetExactDist2d(spore) < TOXIC_SPORES_HIT_RADIUS;
+                return member->GetExactDist2d(spore) < TOXIC_SPORES_HAZARD_RADIUS;
             });
 
         if (nearSpore && (!inSpores || isMainTank(member)))
@@ -1879,7 +1866,10 @@ bool FindVashjTankBreakoutSpot(
 
             float inPools = 0.0f;
             for (Position const& spore : spores)
-                inPools += SegmentLengthInCircle(from, candidate, spore, TOXIC_SPORES_HIT_RADIUS);
+            {
+                inPools += SegmentLengthInCircle(
+                    from, candidate, spore, TOXIC_SPORES_HAZARD_RADIUS);
+            }
 
             float const cost = radius + poolYardCost * inPools;
             if (cost < bestCost)

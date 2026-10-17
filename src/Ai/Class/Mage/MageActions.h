@@ -303,11 +303,10 @@ public:
     CastFireBlastAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "fire blast") {}
 };
 
-class CastArcaneBlastAction : public CastBuffSpellAction
+class CastArcaneBlastAction : public CastSpellAction
 {
 public:
-    CastArcaneBlastAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "arcane blast") {}
-    std::string const GetTargetName() override { return "current target"; }
+    CastArcaneBlastAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "arcane blast") {}
 };
 
 class CastArcaneBarrageAction : public CastSpellAction

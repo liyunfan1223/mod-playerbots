@@ -31,8 +31,6 @@ protected:
 class MagtheridonNoEncounterInProgressTrigger : public Trigger
 {
 public:
-    // Throttled to once per second. This trigger is true for all trash and downtime and, being
-    // for between-encounter clean-up, has no real urgency to it.
     MagtheridonNoEncounterInProgressTrigger(PlayerbotAI* botAI)
         : Trigger(botAI, "magtheridon no encounter in progress", 1000) {};
     bool IsActive() override;
@@ -58,21 +56,21 @@ protected:
     bool IsActiveInEncounter() override;
 };
 
-class MagtheridonPullingWestAndEastChannelersTrigger : public MagtheridonEncounterTrigger
+class MagtheridonHunterShouldMisdirectChannelersTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonPullingWestAndEastChannelersTrigger(PlayerbotAI* botAI)
-        : MagtheridonEncounterTrigger(botAI, "magtheridon pulling west and east channelers") {}
+    MagtheridonHunterShouldMisdirectChannelersTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon hunter should misdirect channelers") {}
 
 protected:
     bool IsActiveInEncounter() override;
 };
 
-class MagtheridonDeterminingKillOrderTrigger : public MagtheridonEncounterTrigger
+class MagtheridonShouldAssignDpsPriorityTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonDeterminingKillOrderTrigger(PlayerbotAI* botAI)
-        : MagtheridonEncounterTrigger(botAI, "magtheridon determining kill order") {}
+    MagtheridonShouldAssignDpsPriorityTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon should assign dps priority") {}
 
 protected:
     bool IsActiveInEncounter() override;
@@ -98,11 +96,11 @@ protected:
     bool IsActiveInEncounter() override;
 };
 
-class MagtheridonShouldSpreadRangedTrigger : public MagtheridonEncounterTrigger
+class MagtheridonRangedShouldSpreadTrigger : public MagtheridonEncounterTrigger
 {
 public:
-    MagtheridonShouldSpreadRangedTrigger(PlayerbotAI* botAI)
-        : MagtheridonEncounterTrigger(botAI, "magtheridon should spread ranged") {}
+    MagtheridonRangedShouldSpreadTrigger(PlayerbotAI* botAI)
+        : MagtheridonEncounterTrigger(botAI, "magtheridon ranged should spread") {}
 
 protected:
     bool IsActiveInEncounter() override;

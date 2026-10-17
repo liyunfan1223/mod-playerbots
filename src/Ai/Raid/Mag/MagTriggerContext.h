@@ -24,11 +24,11 @@ public:
         creators["magtheridon assist tanks should tank channelers"] =
             &RaidMagtheridonTriggerContext::magtheridon_assist_tanks_should_tank_channelers;
 
-        creators["magtheridon pulling west and east channelers"] =
-            &RaidMagtheridonTriggerContext::magtheridon_pulling_west_and_east_channelers;
+        creators["magtheridon hunter should misdirect channelers"] =
+            &RaidMagtheridonTriggerContext::magtheridon_hunter_should_misdirect_channelers;
 
-        creators["magtheridon determining kill order"] =
-            &RaidMagtheridonTriggerContext::magtheridon_determining_kill_order;
+        creators["magtheridon should assign dps priority"] =
+            &RaidMagtheridonTriggerContext::magtheridon_should_assign_dps_priority;
 
         creators["magtheridon burning abyssal spawned"] =
             &RaidMagtheridonTriggerContext::magtheridon_burning_abyssal_spawned;
@@ -36,8 +36,8 @@ public:
         creators["magtheridon should be tanked"] =
             &RaidMagtheridonTriggerContext::magtheridon_should_be_tanked;
 
-        creators["magtheridon should spread ranged"] =
-            &RaidMagtheridonTriggerContext::magtheridon_should_spread_ranged;
+        creators["magtheridon ranged should spread"] =
+            &RaidMagtheridonTriggerContext::magtheridon_ranged_should_spread;
 
         creators["magtheridon standing in debris"] =
             &RaidMagtheridonTriggerContext::magtheridon_standing_in_debris;
@@ -50,37 +50,48 @@ public:
     }
 
 private:
-    static Trigger* magtheridon_no_encounter_in_progress(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_no_encounter_in_progress(PlayerbotAI* botAI)
+    {
         return new MagtheridonNoEncounterInProgressTrigger(botAI);
     }
-    static Trigger* magtheridon_main_tank_should_tank_channelers(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_main_tank_should_tank_channelers(PlayerbotAI* botAI)
+    {
         return new MagtheridonMainTankShouldTankChannelersTrigger(botAI);
     }
-    static Trigger* magtheridon_assist_tanks_should_tank_channelers(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_assist_tanks_should_tank_channelers(PlayerbotAI* botAI)
+    {
         return new MagtheridonAssistTanksShouldTankChannelersTrigger(botAI);
     }
-    static Trigger* magtheridon_pulling_west_and_east_channelers(PlayerbotAI* botAI) {
-        return new MagtheridonPullingWestAndEastChannelersTrigger(botAI);
+    static Trigger* magtheridon_hunter_should_misdirect_channelers(PlayerbotAI* botAI)
+    {
+        return new MagtheridonHunterShouldMisdirectChannelersTrigger(botAI);
     }
-    static Trigger* magtheridon_determining_kill_order(PlayerbotAI* botAI) {
-        return new MagtheridonDeterminingKillOrderTrigger(botAI);
+    static Trigger* magtheridon_should_assign_dps_priority(PlayerbotAI* botAI)
+    {
+        return new MagtheridonShouldAssignDpsPriorityTrigger(botAI);
     }
-    static Trigger* magtheridon_burning_abyssal_spawned(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_burning_abyssal_spawned(PlayerbotAI* botAI)
+    {
         return new MagtheridonBurningAbyssalSpawnedTrigger(botAI);
     }
-    static Trigger* magtheridon_should_be_tanked(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_should_be_tanked(PlayerbotAI* botAI)
+    {
         return new MagtheridonShouldBeTankedTrigger(botAI);
     }
-    static Trigger* magtheridon_should_spread_ranged(PlayerbotAI* botAI) {
-        return new MagtheridonShouldSpreadRangedTrigger(botAI);
+    static Trigger* magtheridon_ranged_should_spread(PlayerbotAI* botAI)
+    {
+        return new MagtheridonRangedShouldSpreadTrigger(botAI);
     }
-    static Trigger* magtheridon_standing_in_debris(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_standing_in_debris(PlayerbotAI* botAI)
+    {
         return new MagtheridonStandingInDebrisTrigger(botAI);
     }
-    static Trigger* magtheridon_incoming_blast_nova(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_incoming_blast_nova(PlayerbotAI* botAI)
+    {
         return new MagtheridonIncomingBlastNovaTrigger(botAI);
     }
-    static Trigger* magtheridon_should_manage_timers_and_assignments(PlayerbotAI* botAI) {
+    static Trigger* magtheridon_should_manage_timers_and_assignments(PlayerbotAI* botAI)
+    {
         return new MagtheridonShouldManageTimersAndAssignmentsTrigger(botAI);
     }
 };

@@ -9,6 +9,7 @@
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
 #include "CharacterCache.h"
+#include "DBCStores.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "DatabaseEnv.h"
@@ -905,6 +906,13 @@ bool RandomPlayerbotFactory::IsEligibleForBotArenaTeam(Player* bot)
     return true;
 }
 
+bool RandomPlayerbotFactory::SameArenaBracket(uint8 level, uint8 otherLevel)
+{
+    PvPDifficultyEntry const* a = GetBattlegroundBracketByLevel(559, level);  // arena brackets (Nagrand Arena)
+    PvPDifficultyEntry const* b = GetBattlegroundBracketByLevel(559, otherLevel);
+    return a && b && a->GetBracketId() == b->GetBracketId();
+}
+
 void RandomPlayerbotFactory::AssignBotToArenaTeam(Player* bot)
 {
     if (!IsEligibleForBotArenaTeam(bot))
@@ -945,7 +953,7 @@ void RandomPlayerbotFactory::AssignBotToArenaTeamInternal(Player* bot)
 
     std::vector<ArenaTeam*> candidates;
     for (ArenaType type : order)
-        CollectJoinableBotArenaTeams(type, botTeam, candidates);
+        CollectJoinableBotArenaTeams(type, botTeam, bot->GetLevel(), candidates);
 
     for (size_t i = candidates.size(); i > 0; --i)
     {
@@ -1027,7 +1035,8 @@ uint32 RandomPlayerbotFactory::GetBotArenaTeamCount(ArenaType type)
     return it != _botArenaTeamRegistry.end() ? static_cast<uint32>(it->second.size()) : 0;
 }
 
-void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, std::vector<ArenaTeam*>& out)
+void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, uint8 level,
+                                                          std::vector<ArenaTeam*>& out)
 {
     auto it = _botArenaTeamRegistry.find(type);
     if (it == _botArenaTeamRegistry.end())
@@ -1041,7 +1050,7 @@ void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId
             continue;
 
         CharacterCacheEntry const* entry = sCharacterCache->GetCharacterCacheByGuid(team->GetCaptain());
-        if (entry && Player::TeamIdForRace(entry->Race) == faction)
+        if (entry && Player::TeamIdForRace(entry->Race) == faction && SameArenaBracket(entry->Level, level))
             out.push_back(team);
     }
 }
