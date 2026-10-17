@@ -20,14 +20,8 @@ bool CombatStartTrigger::IsActive()
     bool const started = hasAttackers && !hadAttackers;
     hadAttackers = hasAttackers;
 
-    // Edge on the bot's own combat state: the cached "attackers" value can delay the reaction by
-    // up to a second while the bot is busy (looting, travelling).
-    bool const selfInCombat = bot->IsInCombat();
-    bool const selfStarted = selfInCombat && !hadSelfCombat;
-    hadSelfCombat = selfInCombat;
-
     if (botAI->GetState() == BOT_STATE_COMBAT || botAI->GetState() == BOT_STATE_DEAD)
         return false;
 
-    return started || selfStarted;
+    return started;
 }

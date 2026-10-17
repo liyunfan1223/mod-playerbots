@@ -14,8 +14,12 @@
 
 void ReactionStrategy::InitReactionTriggers(std::vector<TriggerNode*>& triggers)
 {
-    // Only the bot's own attacker may wake the combat engine: "wake on combat start" sets it as
-    // the current target and the transition happens in PlayerbotAI::DoNextAction, never targetless.
+    // Upstream cmangos switches engines from here (combat start/end, death, resurrect). This
+    // port keeps every engine switch on the existing paths (AttackAction, DropTargetAction,
+    // PlayerbotAI::DoNextAction) because entering the combat engine without a current target
+    // gets bounced straight back by "invalid target" -> "drop target". The reaction only wakes
+    // the main AI when the group's attackers first appear, so a bot that is eating, drinking
+    // or sitting out a long delay picks a target through "dps assist"/"tank assist" right away.
     triggers.push_back(
         new TriggerNode(
             "combat start",

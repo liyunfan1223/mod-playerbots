@@ -2597,11 +2597,6 @@ bool RunAwayAction::Execute(Event /*event*/) { return Flee(AI_VALUE(Unit*, "grou
 
 bool MoveToLootAction::Execute(Event /*event*/)
 {
-    // Do not keep walking to loot while fighting; combat movement takes over and the loot
-    // approach resumes once combat ends.
-    if (bot->IsInCombat())
-        return false;
-
     if (AI_VALUE(LootObjectStack*, "available loot")->IsLootPending() || bot->GetLootGUID())
         return false;
 

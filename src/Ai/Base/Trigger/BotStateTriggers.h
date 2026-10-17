@@ -20,7 +20,6 @@ public:
 
 private:
     bool hadAttackers = false;
-    bool hadSelfCombat = false;
 };
 
 #endif

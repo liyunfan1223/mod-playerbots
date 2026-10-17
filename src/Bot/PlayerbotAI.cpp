@@ -285,8 +285,14 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     bool isCasting = bot->IsNonMeleeSpellCast(true);
     if (bot->IsInCombat())
     {
-        if (!inCombat && !isCasting)
-            ResetActionDuration();
+        if (!inCombat)
+        {
+            // "attackers" is cached for 1 s; refresh it so the assist actions see the new attacker
+            // this tick.
+            aiObjectContext->GetValue<GuidVector>("attackers")->Reset();
+            if (!isCasting)
+                ResetActionDuration();
+        }
 
         inCombat = true;
     }
@@ -1598,14 +1604,6 @@ void PlayerbotAI::DoNextAction(bool min)
 
         ChangeEngine(BOT_STATE_NON_COMBAT);
         return;
-    }
-
-    // The reaction wake action sets the bot's own attacker as the current target; enter the
-    // combat engine here, before the target-clear below can drop it.
-    if (currentEngine == engines[BOT_STATE_NON_COMBAT] && bot->IsInCombat() &&
-        aiObjectContext->GetValue<Unit*>("current target")->Get())
-    {
-        ChangeEngine(BOT_STATE_COMBAT);
     }
 
     // Clear targets if in combat but sticking with old data
