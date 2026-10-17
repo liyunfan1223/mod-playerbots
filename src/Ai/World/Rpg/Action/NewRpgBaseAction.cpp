@@ -616,7 +616,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
     if (freeSlotNum >= 2)
         return false;
 
-    auto dropSlot = [&](uint16 slot, Quest const* quest, [[maybe_unused]] char const* reason)
+    auto dropSlot = [&](uint16 slot, Quest const* quest)
     {
         LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), quest->GetQuestId());
         WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
@@ -644,7 +644,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         if (!IsQuestWorthDoing(quest) || !IsQuestCapableDoing(quest) ||
             bot->GetQuestStatus(questId) == QUEST_STATUS_FAILED)
         {
-            dropSlot(i, quest, "not_worth_or_capable_or_failed");
+            dropSlot(i, quest);
             dropped++;
         }
     }
@@ -667,7 +667,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
 
             if (quest->GetZoneOrSort() < 0 || (quest->GetZoneOrSort() > 0 && quest->GetZoneOrSort() != botZoneId))
             {
-                dropSlot(i, quest, "wrong_zone");
+                dropSlot(i, quest);
                 dropped++;
             }
         }
@@ -683,7 +683,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
                 continue;
 
             Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-            dropSlot(i, quest, "clear_log");
+            dropSlot(i, quest);
         }
 
         return true;
@@ -693,6 +693,21 @@ bool NewRpgBaseAction::OrganizeQuestLog()
     // dropping the quest whose objective/turn-in is the furthest away. Class/sort quests
     // (ZoneOrSort < 0) are never dropped.
     freeSlotNum += dropped;
+    if (freeSlotNum < 2)
+    {
+        // The pressure pass only changes when the quest log does: the same scan would pick the
+        // same quest again. Re-run only after the log changed (accept, reward, drop).
+        uint64 logKey = 1469598103934665603ull;
+        for (uint16 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
+        {
+            logKey ^= bot->GetQuestSlotQuestId(i);
+            logKey *= 1099511628211ull;
+        }
+
+        if (botAI->rpgInfo.pressureLogKey == logKey)
+            return true;
+        botAI->rpgInfo.pressureLogKey = logKey;
+    }
     while (freeSlotNum < 2)
     {
         uint16 worstSlot = MAX_QUEST_LOG_SIZE;
@@ -732,7 +747,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             break;
 
         Quest const* worstQuest = sObjectMgr->GetQuestTemplate(bot->GetQuestSlotQuestId(worstSlot));
-        dropSlot(worstSlot, worstQuest, "log_pressure");
+        dropSlot(worstSlot, worstQuest);
         // Remember it so the accept menu does not instantly take it again.
         botAI->lowPriorityQuest.insert(worstQuest->GetQuestId());
         freeSlotNum++;
@@ -855,6 +870,9 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
         QuestMenuItem const& item = menu.GetItem(idx);
         Quest const* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
         if (!quest)
+            continue;
+
+        if (botAI->lowPriorityQuest.find(item.QuestId) != botAI->lowPriorityQuest.end())
             continue;
 
         QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
