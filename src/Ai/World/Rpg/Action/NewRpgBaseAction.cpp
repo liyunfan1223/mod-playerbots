@@ -722,7 +722,9 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             if (quest->GetZoneOrSort() < 0)
                 continue;
 
-            // Unprogressable by the bot (no POI data): drop it first.
+            // Rank candidates by their nearest reachable POI. A quest with POIs on another map
+            // is travelable (cross-zone retention), so it drops after every same-map candidate;
+            // a quest with no POI data at all is unprogressable and drops first.
             float dist = std::numeric_limits<float>::max();
             std::vector<POIInfo> poiInfo;
             if (GetQuestPOIPosAndObjectiveIdx(questId, poiInfo,
@@ -733,6 +735,17 @@ bool NewRpgBaseAction::OrganizeQuestLog()
                     float d = bot->GetDistance2d(poi.pos.x, poi.pos.y);
                     if (d < dist)
                         dist = d;
+                }
+            }
+            else if (QuestPOIVector const* pois = sObjectMgr->GetQuestPOIVector(questId))
+            {
+                for (QuestPOI const& poi : *pois)
+                {
+                    if (poi.MapId != bot->GetMapId() && !poi.points.empty())
+                    {
+                        dist = 1.0e9f;
+                        break;
+                    }
                 }
             }
 
