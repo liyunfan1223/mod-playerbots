@@ -100,7 +100,6 @@ public:
         creators["living bomb"] = &MageTriggerFactoryInternal::living_bomb;
         creators["living bomb on attackers"] = &MageTriggerFactoryInternal::living_bomb_on_attackers;
         creators["missile barrage"] = &MageTriggerFactoryInternal::missile_barrage;
-        creators["arcane blast"] = &MageTriggerFactoryInternal::arcane_blast;
         creators["counterspell on enemy healer"] = &MageTriggerFactoryInternal::counterspell_enemy_healer;
         creators["arcane power"] = &MageTriggerFactoryInternal::arcane_power;
         creators["presence of mind"] = &MageTriggerFactoryInternal::presence_of_mind;
@@ -154,7 +153,6 @@ private:
     static Trigger* living_bomb(PlayerbotAI* botAI) { return new LivingBombTrigger(botAI); }
     static Trigger* living_bomb_on_attackers(PlayerbotAI* botAI) { return new LivingBombOnAttackersTrigger(botAI); }
     static Trigger* missile_barrage(PlayerbotAI* botAI) { return new MissileBarrageTrigger(botAI); }
-    static Trigger* arcane_blast(PlayerbotAI* botAI) { return new ArcaneBlastTrigger(botAI); }
     static Trigger* counterspell_enemy_healer(PlayerbotAI* botAI) { return new CounterspellEnemyHealerTrigger(botAI); }
     static Trigger* arcane_blast_stack(PlayerbotAI* botAI) { return new ArcaneBlastStackTrigger(botAI); }
     static Trigger* mirror_image(PlayerbotAI* botAI) { return new MirrorImageTrigger(botAI); }
