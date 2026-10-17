@@ -46,11 +46,13 @@ public:
     }
 
 private:
-    static UntypedValue* janalai_fire_bombs(PlayerbotAI* botAI) {
+    static UntypedValue* janalai_fire_bombs(PlayerbotAI* botAI)
+    {
         return new JanalaiFireBombsValue(botAI);
     }
 
-    static UntypedValue* hex_lord_malacrass_freezing_trap(PlayerbotAI* botAI) {
+    static UntypedValue* hex_lord_malacrass_freezing_trap(PlayerbotAI* botAI)
+    {
         return new HexLordMalacrassFreezingTrapValue(botAI);
     }
 };

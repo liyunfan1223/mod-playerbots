@@ -15,7 +15,7 @@
 #include <utility>
 #include <vector>
 
-// General
+// Shared
 
 class TempestKeepResetEncounterStatesAction : public Action
 {

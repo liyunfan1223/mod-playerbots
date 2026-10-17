@@ -32,13 +32,10 @@ namespace EncounterHelpers
 
 // Calling InstanceScript::IsEncounterInProgress is a very cheap check to use as an initial gate
 // for triggers and multipliers that should run only during a boss fight. This will not work for
-// every single encounter, as some bosses are not scripted to report IN_PROGRESS (but at least in
-// TBC raids, that is rare: only Terestian Illhoof and Illidari Council do not). It's also possible
-// for a boss script to set IN_PROGRESS upon an event other than the pull; that's at least the case
-// with Kil'jaeden, who is set to IN_PROGRESS only after 1 of the 3 Hands of the Deceiver is killed
-// in phase 1. To avoid spamming this check across each trigger and multiplier, you can create a
-// derived class of Trigger or Multiplier to call this helper and then derive your triggers and
-// multipliers from the intermediate class.
+// every single encounter, as some bosses are not scripted to report IN_PROGRESS (though all TBC
+// raid bosses now do). It's also possible for a boss script to set IN_PROGRESS upon an event other
+// than the pull (e.g., Leotheras goes IN_PROGRESS when first hit, even while banished, or else
+// when the last Spellbinder dies, not when his Spellbinders are pulled).
 bool IsEncounterInProgress(Player* bot, uint32 mapId)
 {
     if (bot->GetMapId() != mapId)
@@ -74,14 +71,14 @@ bool CanTakeStepTowards(
     if (candidateZ <= INVALID_HEIGHT)
         candidateZ = botZ;
 
-    // The 9th parameter of CanReachPositionAndGetValidCoords(), failOnSlopes, returns false for a
+    // The ninth parameter of CanReachPositionAndGetValidCoords(), failOnSlopes, returns false for a
     // non-walkable slope, but in my experience, walking downhill is always possible, and thus the
     // check needlessly rejects descents. This variable gets around that problem.
     bool const failOnSlopes = candidateZ > botZ;
 
     // This helper will return false on collision rather than clamping to the contact point so that
     // the caller can try a different path. Clamping is useless for avoidance since the bot will die
-    // just the same if it is in the middle of a hazard vs. halfway out and returning true.
+    // just the same if it is in the middle of a hazard vs. halfway out and stuck returning true.
     float const requestedX = candidateX;
     float const requestedY = candidateY;
 
@@ -209,8 +206,7 @@ bool MarkTargetWithMoon(Player* bot, Unit* target)
     return MarkTargetWithIcon(bot, target, RtiTargetValue::moonIndex);
 }
 
-// For clearing marks outside of combat so bots don't Leeroy on sight. This is best used when gated
-// behind an out-of-combat check (such as with IsInCombatValue).
+// For clearing marks outside of combat and/or encounters so bots don't Leeroy on sight.
 bool ClearTargetIcon(Player* bot, uint8 iconId)
 {
     Group* group = bot->GetGroup();
@@ -225,6 +221,21 @@ bool ClearTargetIcon(Player* bot, uint8 iconId)
     }
 
     return false;
+}
+
+// Clears the icon only if it is on one of the given entries (i.e., one marked by the strategy).
+// This leaves icons players have put on other mobs (such as most trash) alone.
+bool ClearStrategyTargetIcon(Player* bot, uint8 iconId, std::initializer_list<uint32> entries)
+{
+    Group* group = bot->GetGroup();
+    if (!group)
+        return false;
+
+    uint32 const entry = group->GetTargetIcon(iconId).GetEntry();
+    if (std::find(entries.begin(), entries.end(), entry) == entries.end())
+        return false;
+
+    return ClearTargetIcon(bot, iconId);
 }
 
 // For bots to set their raid target icon to the specified icon
@@ -320,21 +331,6 @@ Player* GetGroupAssistTank(Player* bot, uint8 index)
     uint8 nonAssistantIndex = index - assistantCount;
     if (nonAssistantIndex < nonAssistantTanks.size())
         return nonAssistantTanks[nonAssistantIndex];
-
-    return nullptr;
-}
-
-// DO NOT USE. TO BE REMOVED HERE ONCE ALL CALL SITES ARE MODIFIED.
-Unit* GetFirstAliveUnitByEntry(PlayerbotAI* botAI, uint32 entry)
-{
-    auto const& units =
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets no los")->Get();
-    for (auto const& unitGuid : units)
-    {
-        Unit* unit = botAI->GetUnit(unitGuid);
-        if (unit && unit->IsAlive() && unit->GetEntry() == entry)
-            return unit;
-    }
 
     return nullptr;
 }
@@ -559,7 +555,9 @@ bool IsAoeThreatAction(Player* bot, Action* action)
                 dynamic_cast<CastBloodBoilAction*>(action);
 
         case CLASS_DRUID:
-            return dynamic_cast<CastSwipeBearAction*>(action);
+            return dynamic_cast<CastSwipeBearAction*>(action) ||
+                dynamic_cast<CastMaulAction*>(action) || // Hits multiple targets with the Glyph
+                dynamic_cast<CastDemoralizingRoarAction*>(action);
 
         case CLASS_PALADIN:
             return dynamic_cast<CastAvengersShieldAction*>(action) ||
@@ -568,7 +566,9 @@ bool IsAoeThreatAction(Player* bot, Action* action)
         case CLASS_WARRIOR:
             return dynamic_cast<CastThunderClapAction*>(action) ||
                 dynamic_cast<CastShockwaveAction*>(action) ||
-                dynamic_cast<CastCleaveAction*>(action);
+                dynamic_cast<CastCleaveAction*>(action) ||
+                dynamic_cast<CastDemoralizingShoutAction*>(action) ||
+                dynamic_cast<CastDemoralizingShoutWithoutLifeTimeCheckAction*>(action);
 
         default:
             return false;

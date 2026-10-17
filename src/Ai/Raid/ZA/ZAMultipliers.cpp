@@ -47,7 +47,7 @@ bool IsHazardousMovement(Action* action)
 
 }
 
-// General
+// Shared
 
 float ZulAmanDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
 {
@@ -58,16 +58,18 @@ float ZulAmanDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
         return 1.0f;
 
     Unit* boss = nullptr;
-    if (Unit* zuljin = AI_VALUE2(Unit*, "find target", "zul'jin"))
-        boss = zuljin;
-    else if (Unit* malacrass = AI_VALUE2(Unit*, "find target", "hex lord malacrass"))
-        boss = malacrass;
-    else if (Unit* janalai = AI_VALUE2(Unit*, "find target", "jan'alai"))
-        boss = janalai;
-    else if (Unit* nalorakk = AI_VALUE2(Unit*, "find target", "nalorakk"))
-        boss = nalorakk;
-    else if (Unit* akilzon = AI_VALUE2(Unit*, "find target", "akil'zon"))
-        boss = akilzon;
+    static constexpr std::array zulAmanBosses = {
+        "zul'jin", "hex lord malacrass", "halazzi", "jan'alai", "nalorakk", "akil'zon",
+    };
+
+    for (char const* name : zulAmanBosses)
+    {
+        if (Unit* target = AI_VALUE2(Unit*, "find target", name))
+        {
+            boss = target;
+            break;
+        }
+    }
 
     if (!boss)
         return 1.0f;
@@ -75,7 +77,7 @@ float ZulAmanDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
     if (boss->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT)
         return 0.0f;
 
-    // Further restrictions on Bloodlust for Zul'jin and Jan'alai
+    // Further restrictions on Bloodlust for Zul'jin and Jan'alai.
     if (bot->getClass() != CLASS_SHAMAN)
         return 1.0f;
 
@@ -85,7 +87,7 @@ float ZulAmanDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
         return 1.0f;
     }
 
-    // Zul'jin: hold until Phase 3 (or later)
+    // Zul'jin: hold until Phase 3 (or later).
     if (boss->GetEntry() == Id(ZaNpcs::NPC_ZULJIN))
     {
         return (boss->HasAura(Id(ZaSpells::SPELL_SHAPE_OF_THE_EAGLE)) ||
@@ -93,7 +95,7 @@ float ZulAmanDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
             boss->HasAura(Id(ZaSpells::SPELL_SHAPE_OF_THE_DRAGONHAWK))) ? 1.0f : 0.0f;
     }
 
-    // Jan'alai: hold until time to burn Hatchlings (see comments to the constants in ZAHelpers.h)
+    // Jan'alai: hold until time to burn Hatchlings (see comments to the constants in ZAHelpers.h).
     if (boss->GetEntry() == Id(ZaNpcs::NPC_JANALAI))
     {
         if (boss->GetHealthPct() <= JANALAI_HATCH_ALL_HEALTH_PCT)
@@ -106,7 +108,7 @@ float ZulAmanDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
     return 1.0f;
 }
 
-// Malacrass siphoning a Warrior soul and Zul'jin have very similar Whirlwinds
+// Malacrass siphoning a Warrior soul and Zul'jin in troll form have very similar Whirlwinds.
 float ZulAmanAvoidWhirlwindMultiplier::GetValueInEncounter(Action* action)
 {
     if (!IsApproachMovement(action) && !dynamic_cast<CastKillingSpreeAction*>(action))
@@ -375,7 +377,7 @@ float HexLordMalacrassStayAwayFromFreezingTrapMultiplier::GetValueInEncounter(Ac
 
 // Zul'jin
 
-float ZuljinStopAttackingDuringPhaseChangeMultiplier::GetValueInEncounter(Action* action)
+float ZuljinNoAttackingDuringPhaseChangeMultiplier::GetValueInEncounter(Action* action)
 {
     if (PlayerbotAI::IsTank(bot))
         return 1.0f;

@@ -2475,10 +2475,55 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
         if (urand(0, 100) < 100 * sPlayerbotAIConfig.RandomGearLoweringChance && desiredQuality > ITEM_QUALITY_NORMAL)
             desiredQuality--;
 
+        uint32 const windowFloor = uint32(std::max((int32)bot->GetLevel() - delta, 0));
+        uint32 levelTop = bot->GetLevel();
+        uint32 levelFloor = windowFloor;
+        int32 const topQuality = desiredQuality;
+        bool belowWindow = false;
+        bool foundWearable = false;  // a candidate under the gear score limit passes the equip checks below
+        // Nothing fits next to a two-hander, so searching on would only cost time.
+        bool const offhandBlocked = slot == EQUIPMENT_SLOT_OFFHAND && bot->IsTwoHandUsed() && !bot->CanTitanGrip();
+
+        auto hasWearableCandidate = [&]() -> bool
+        {
+            for (auto const& candidate : items[slot])
+            {
+                uint16 dest;
+                if (CanEquipItem(sObjectMgr->GetItemTemplate(candidate.first)) &&
+                    CanEquipUnseenItem(slot, dest, candidate.first))
+                    return true;
+            }
+            return false;
+        };
+
+        // After green: with a gear score limit and nothing green or better under it that the bot can wear in the
+        // usual window, search the lower required levels from the top quality again before white and grey.
+        auto nextSearchStep = [&]() -> bool
+        {
+            if (desiredQuality == ITEM_QUALITY_UNCOMMON)
+            {
+                if (gearScoreLimit != 0 && !offhandBlocked)
+                    foundWearable = hasWearableCandidate();
+                if (!belowWindow && gearScoreLimit != 0 && windowFloor > 0 && !offhandBlocked && !foundWearable)
+                {
+                    belowWindow = true;
+                    levelTop = windowFloor;
+                    levelFloor = 0;
+                    desiredQuality = std::min<int32>(topQuality, ITEM_QUALITY_EPIC);  // no legendary in the cache
+                    return true;
+                }
+                levelTop = bot->GetLevel();
+                levelFloor = windowFloor;
+            }
+            return desiredQuality-- > ITEM_QUALITY_POOR;
+        };
+
         do
         {
-            for (uint32 requiredLevel = bot->GetLevel(); requiredLevel > uint32(std::max((int32)bot->GetLevel() - delta, 0));
-                 requiredLevel--)
+            // Grey and white skip the limit only as a last resort, when no better quality found anything wearable.
+            bool const shouldCheckGS = desiredQuality > ITEM_QUALITY_NORMAL || foundWearable;
+
+            for (uint32 requiredLevel = levelTop; requiredLevel > levelFloor; requiredLevel--)
             {
                 for (InventoryType inventoryType : GetPossibleInventoryTypeListBySlot((EquipmentSlots)slot))
                 {
@@ -2501,8 +2546,6 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
                         if (!proto)
                             continue;
-
-                        bool shouldCheckGS = desiredQuality > ITEM_QUALITY_NORMAL;
 
                         if (shouldCheckGS && gearScoreLimit != 0 &&
                             CalcMixedGearScore(proto->ItemLevel, proto->Quality) > gearScoreLimit)
@@ -2537,7 +2580,7 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
                     }
                 }
             }
-        } while (items[slot].size() < 25 && desiredQuality-- > ITEM_QUALITY_POOR);
+        } while (items[slot].size() < 25 && nextSearchStep());
 
         std::vector<std::pair<uint32, int32>>& ids = items[slot];
         if (ids.empty())
@@ -3926,6 +3969,42 @@ void PlayerbotFactory::ClearAllItems()
     IterateItems(&visitor, ITERATE_ALL_ITEMS);
 }
 
+static void DestroyObsoleteAmmo(Player* bot, ItemTemplate const* ammo)
+{
+    std::vector<Item*> obsolete;
+    auto const collect = [&](Item* item)
+    {
+        ItemTemplate const* proto = item->GetTemplate();
+        if (proto->Class != ITEM_CLASS_PROJECTILE || proto->ItemId == ammo->ItemId)
+            return;
+
+        if (proto->SubClass != ammo->SubClass)
+        {
+            obsolete.push_back(item);
+            return;
+        }
+
+        // Ranked as in RandomItemMgr::BuildCacheAmmo(); ammo above the stocked kind can only come from a player
+        uint32 const stack = proto->GetMaxStackSize();
+        uint32 const ammoStack = ammo->GetMaxStackSize();
+        if (stack < ammoStack || (stack == ammoStack && proto->ItemLevel <= ammo->ItemLevel))
+            obsolete.push_back(item);
+    };
+
+    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+        if (Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            collect(item);
+
+    for (uint8 bagSlot = INVENTORY_SLOT_BAG_START; bagSlot < INVENTORY_SLOT_BAG_END; ++bagSlot)
+        if (Bag* bag = bot->GetBagByPos(bagSlot))
+            for (uint32 slot = 0; slot < bag->GetBagSize(); ++slot)
+                if (Item* item = bag->GetItemByPos(slot))
+                    collect(item);
+
+    for (Item* item : obsolete)
+        bot->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+}
+
 void PlayerbotFactory::InitAmmo()
 {
     uint8 const botClass = bot->getClass();
@@ -3958,13 +4037,25 @@ void PlayerbotFactory::InitAmmo()
     if (!entry)
         return;
 
+    ItemTemplate const* ammoProto = sObjectMgr->GetItemTemplate(entry);
+    if (!ammoProto)
+        return;
+
+    DestroyObsoleteAmmo(bot, ammoProto);
+
     uint32 count = bot->GetItemCount(entry);
     uint32 maxCount = botClass == CLASS_HUNTER ? 6000 : 1000;
 
     if (count < maxCount)
     {
-        if (Item* newItem = StoreNewItemInInventorySlot(bot, entry, maxCount - count))
-            newItem->AddToUpdateQueueOf(bot);
+        // Stock as much as fits: each stack destroyed above has freed a slot for a full stack of the new ammo
+        ItemPosCountVec dest;
+        bot->CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, dest, entry, maxCount - count);
+        if (!dest.empty())
+        {
+            if (Item* newItem = bot->StoreNewItem(dest, entry, true))
+                newItem->AddToUpdateQueueOf(bot);
+        }
     }
 
     bot->SetAmmo(entry);
@@ -5265,7 +5356,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
                     continue;
 
                 float score = calculator.CalculateEnchant(enchant_id);
-                if (score >= bestScore)
+                if (score > 0.0f && score >= bestScore)
                 {
                     bestScore = score;
                     bestEnchantId = enchant_id;

@@ -15,7 +15,7 @@
 using namespace SethShared;
 using namespace EncounterHelpers;
 
-bool TimeLostControllerMarkCharmingTotemWithSkullAction::Execute(Event /*event*/)
+bool TimeLostControllerMarkCharmingTotemAction::Execute(Event /*event*/)
 {
     constexpr float searchRadius = 40.0f;
     Unit* totem = bot->FindNearestCreature(Id(SethNpcs::NPC_CHARMING_TOTEM), searchRadius);
@@ -28,7 +28,7 @@ bool SethekkProphetSetTremorTotemAction::Execute(Event /*event*/)
         botAI->CastSpell(Id(SethSpells::SPELL_TREMOR_TOTEM), bot);
 }
 
-bool DarkweaverSythMarkElementalsWithSkullAction::Execute(Event /*event*/)
+bool DarkweaverSythMarkElementalsAction::Execute(Event /*event*/)
 {
     static constexpr std::array elementals = {
         "syth frost elemental",
@@ -90,7 +90,7 @@ bool AnzuCastHealOverTimeSpellOnBirdSpiritAction::Execute(Event /*event*/)
     return botAI->CastSpell(Id(SethSpells::SPELL_REJUVENATION_RANK_1), targetSpirit);
 }
 
-bool TalonKingIkissTankMoveBossToPillarPositionAction::Execute(Event /*event*/)
+bool TalonKingIkissPositionTankNearPillarAction::Execute(Event /*event*/)
 {
     Unit* ikiss = AI_VALUE2(Unit*, "find target", "talon king ikiss");
     if (!ikiss)
@@ -122,7 +122,7 @@ bool TalonKingIkissTankMoveBossToPillarPositionAction::Execute(Event /*event*/)
         false, false, MovementPriority::MOVEMENT_COMBAT, true, backwards);
 }
 
-bool TalonKingIkissRangedStayNearVictimOfBossAction::Execute(Event /*event*/)
+bool TalonKingIkissRangedMoveNearTankAction::Execute(Event /*event*/)
 {
     Unit* ikiss = AI_VALUE2(Unit*, "find target", "talon king ikiss");
     if (!ikiss || !ikiss->GetVictim())
@@ -160,13 +160,17 @@ bool TalonKingIkissLosArcaneExplosionAction::Execute(Event /*event*/)
 bool TalonKingIkissLosArcaneExplosionAction::MoveToPillar(
     Position const& pillarCenter, float botAngle, float distToPillar)
 {
-    constexpr float minRadius = 10.0f;
-    constexpr float maxRadius = 13.0f;
+    constexpr float minAcceptableRadius = 10.0f;
+    constexpr float maxAcceptableRadius = 13.0f;
 
-    if (distToPillar >= minRadius && distToPillar <= maxRadius)
+    if (distToPillar >= minAcceptableRadius && distToPillar <= maxAcceptableRadius)
         return false;
 
-    float const targetRadius = distToPillar < minRadius ? 11.0f : 12.0f;
+    constexpr float minDesiredRadius = 11.0f;
+    constexpr float maxDesiredRadius = 12.0f;
+
+    float const targetRadius = distToPillar < minAcceptableRadius ?
+        minDesiredRadius : maxDesiredRadius;
     float const moveX = pillarCenter.GetPositionX() + targetRadius * cos(botAngle);
     float const moveY = pillarCenter.GetPositionY() + targetRadius * sin(botAngle);
 
@@ -207,7 +211,7 @@ bool TalonKingIkissLosArcaneExplosionAction::MoveAroundPillar(
         false, false, MovementPriority::MOVEMENT_FORCED, true, false);
 }
 
-bool TalonKingIkissMoveToWithinLosAction::Execute(Event /*event*/)
+bool TalonKingIkissMoveWithinLosAction::Execute(Event /*event*/)
 {
     Unit* ikiss = AI_VALUE2(Unit*, "find target", "talon king ikiss");
     if (!ikiss)

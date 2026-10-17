@@ -9,6 +9,7 @@
 #include "AssassinationRogueStrategy.h"
 #include "CombatRogueStrategy.h"
 #include "GenericRogueNonCombatStrategy.h"
+#include "GenericRogueStrategy.h"
 #include "NamedObjectContext.h"
 #include "Playerbots.h"
 #include "PullStrategy.h"
