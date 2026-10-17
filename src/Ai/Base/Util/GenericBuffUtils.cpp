@@ -6,6 +6,7 @@
 
 #include "GenericBuffUtils.h"
 #include "AiObjectContext.h"
+#include "BossAuraTriggers.h"
 #include "GameTime.h"
 #include "Group.h"
 #include "Player.h"
@@ -304,6 +305,96 @@ namespace ai::buff
             *outMissingReagentGroupName = groupName;
 
         return baseName;
+    }
+
+    Unit* FindBossByName(PlayerbotAI* botAI, std::string const& bossName)
+    {
+        if (bossName.empty())
+            return nullptr;
+
+        for (ObjectGuid const& guid :
+             botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets no los")->Get())
+        {
+            Unit* unit = botAI->GetUnit(guid);
+            if (!unit)
+                continue;
+
+            std::wstring wnamepart;
+            if (!Utf8toWStr(unit->GetName(), wnamepart))
+                continue;
+
+            wstrToLower(wnamepart);
+            if (bossName.length() == wnamepart.length() && Utf8FitTo(bossName, wnamepart))
+                return unit;
+        }
+
+        return nullptr;
+    }
+
+    Player* GetNatureResistanceHunter(PlayerbotAI* botAI, Player* bot)
+    {
+        Group* group = bot ? bot->GetGroup() : nullptr;
+        if (!group || !group->isRaidGroup())
+            return nullptr;
+
+        static uint32 const ranks[] = {SPELL_ASPECT_OF_THE_WILD_RANK_4, SPELL_ASPECT_OF_THE_WILD_RANK_3,
+                                       SPELL_ASPECT_OF_THE_WILD_RANK_2, SPELL_ASPECT_OF_THE_WILD_RANK_1};
+
+        // Eligible only above the mana Aspect of the Viper takes over at, so the role moves on a real mana
+        // swing. The last fallback ignores that: the raid's resistance beats one hunter's mana.
+        uint32 const viperManaPct = sPlayerbotAIConfig.LowMana / 2;
+        Player* auraHolder = nullptr;
+        Player* staleHolder = nullptr;
+        Player* firstEligible = nullptr;
+        Player* firstCandidate = nullptr;
+
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* member = ref->GetSource();
+            if (!member || !member->IsAlive() || member->getClass() != CLASS_HUNTER ||
+                member->GetMapId() != bot->GetMapId())
+                continue;
+
+            bool knows = false;
+            for (uint32 rank : ranks)
+                if (member->HasActiveSpell(rank))
+                {
+                    knows = true;
+                    break;
+                }
+
+            if (!knows)
+                continue;
+
+            if (!firstCandidate)
+                firstCandidate = member;
+
+            bool const hasWild = botAI->HasAura("aspect of the wild", member);
+
+            if (botAI->HasAura("aspect of the viper", member) || member->GetPowerPct(POWER_MANA) < viperManaPct)
+            {
+                if (!staleHolder && hasWild)
+                    staleHolder = member;
+
+                continue;
+            }
+
+            if (!firstEligible)
+                firstEligible = member;
+
+            if (!auraHolder && hasWild)
+                auraHolder = member;
+        }
+
+        if (auraHolder)
+            return auraHolder;
+
+        // A holder too low for the role keeps the aura until it swaps to Viper, aspects being exclusive.
+        // Drafting another hunter before that stacks an exclusive raid aura for nothing.
+        if (staleHolder)
+            return nullptr;
+
+        return firstEligible ? firstEligible : firstCandidate;
     }
 }
 
