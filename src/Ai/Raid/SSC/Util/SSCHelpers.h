@@ -15,7 +15,6 @@
 #include <limits>
 #include <optional>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 class Creature;
@@ -835,24 +834,6 @@ struct SscInstanceState
 
 SscInstanceState& SscState(uint32 instanceId);
 bool SscResetInstance(uint32 instanceId);
-
-template <typename T, typename U>
-bool EmplaceIfUnset(std::optional<T>& field, U&& value)
-{
-    if (field)
-        return false;
-
-    field.emplace(std::forward<U>(value));
-    return true;
-}
-
-template <typename T>
-bool ResetIfSet(std::optional<T>& field)
-{
-    bool const wasSet = field.has_value();
-    field.reset();
-    return wasSet;
-}
 
 }
 
