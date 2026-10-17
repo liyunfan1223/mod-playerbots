@@ -328,13 +328,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
         if (!quest)
             continue;
 
-        // Dropped under log pressure: do not immediately re-accept it (accept->drop loops).
-        if (botAI->lowPriorityQuest.find(item.QuestId) != botAI->lowPriorityQuest.end())
-            continue;
-
-        QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
-        if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
-            IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
+        if (IsQuestAcceptableFromMenu(item.QuestId, quest))
         {
             AcceptQuest(quest, guid);
             if (botAI->GetMaster())
@@ -346,7 +340,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
             botAI->rpgStatistic.questAccepted++;
             LOG_DEBUG("playerbots", "[New RPG] {} accept quest {}", bot->GetName(), quest->GetQuestId());
         }
-        if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
+        if (bot->GetQuestStatus(item.QuestId) == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
         {
             TurnInQuest(quest, guid);
             if (botAI->GetMaster())
@@ -875,6 +869,16 @@ ObjectGuid NewRpgBaseAction::ChooseNpcOrGameObjectToInteract(bool questgiverOnly
     return ObjectGuid();
 }
 
+bool NewRpgBaseAction::IsQuestAcceptableFromMenu(uint32 questId, Quest const* quest)
+{
+    // Dropped under log pressure: do not immediately re-accept it (accept->drop loops).
+    if (botAI->lowPriorityQuest.find(questId) != botAI->lowPriorityQuest.end())
+        return false;
+
+    return bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) &&
+           bot->CanAddQuest(quest, false) && IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest);
+}
+
 bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
 {
     ObjectGuid guid = object->GetGUID();
@@ -891,7 +895,7 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
             continue;
 
         QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
-        if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
+        if (bot->GetQuestStatus(item.QuestId) == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
         {
             return true;
         }
@@ -903,15 +907,8 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
         if (!quest)
             continue;
 
-        if (botAI->lowPriorityQuest.find(item.QuestId) != botAI->lowPriorityQuest.end())
-            continue;
-
-        QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
-        if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
-            IsQuestWorthDoing(quest) && IsQuestCapableDoing(quest))
-        {
+        if (IsQuestAcceptableFromMenu(item.QuestId, quest))
             return true;
-        }
     }
     return false;
 }
@@ -931,6 +928,35 @@ static std::vector<float> GenerateRandomWeights(int n)
         weights[i] /= sum;
     }
     return weights;
+}
+
+bool NewRpgBaseAction::AddQuestPoi(QuestPOI const& qPoi, std::vector<POIInfo>& poiInfo)
+{
+    if (qPoi.points.empty())
+        return false;
+
+    float dx = 0.0f, dy = 0.0f;
+    std::vector<float> weights = GenerateRandomWeights(qPoi.points.size());
+    for (size_t i = 0; i < qPoi.points.size(); i++)
+    {
+        QuestPOIPoint const& point = qPoi.points[i];
+        dx += point.x * weights[i];
+        dy += point.y * weights[i];
+    }
+
+    if (bot->GetDistance2d(dx, dy) >= 1500.0f)
+        return false;
+
+    float const dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
+    if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
+        return false;
+
+    if (!sPlayerbotAIConfig.CrossZoneQuests &&
+        bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
+        return false;
+
+    poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
+    return true;
 }
 
 bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete)
@@ -958,31 +984,7 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
             if (qPoi.ObjectiveIndex != -1)
                 continue;
 
-            if (qPoi.points.size() == 0)
-                continue;
-
-            float dx = 0, dy = 0;
-            std::vector<float> weights = GenerateRandomWeights(qPoi.points.size());
-            for (size_t i = 0; i < qPoi.points.size(); i++)
-            {
-                QuestPOIPoint const& point = qPoi.points[i];
-                dx += point.x * weights[i];
-                dy += point.y * weights[i];
-            }
-
-            if (bot->GetDistance2d(dx, dy) >= 1500.0f)
-                continue;
-
-            float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
-
-            if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
-                continue;
-
-            if (!sPlayerbotAIConfig.CrossZoneQuests &&
-                bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
-                continue;
-
-            poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
+            AddQuestPoi(qPoi, poiInfo);
         }
 
         if (poiInfo.empty())
@@ -1032,30 +1034,7 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
         }
         if (!inComplete)
             continue;
-        if (qPoi.points.size() == 0)
-            continue;
-        float dx = 0, dy = 0;
-        std::vector<float> weights = GenerateRandomWeights(qPoi.points.size());
-        for (size_t i = 0; i < qPoi.points.size(); i++)
-        {
-            QuestPOIPoint const& point = qPoi.points[i];
-            dx += point.x * weights[i];
-            dy += point.y * weights[i];
-        }
-
-        if (bot->GetDistance2d(dx, dy) >= 1500.0f)
-            continue;
-
-        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
-
-        if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
-            continue;
-
-        if (!sPlayerbotAIConfig.CrossZoneQuests &&
-            bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
-            continue;
-
-        poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
+        AddQuestPoi(qPoi, poiInfo);
     }
 
     if (poiInfo.size() == 0)
