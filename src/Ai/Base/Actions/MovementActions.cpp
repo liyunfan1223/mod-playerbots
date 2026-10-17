@@ -166,21 +166,29 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
     return false;
 }
 
-bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool /*idle*/, bool /*react*/, bool normal_only,
+bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react, bool normal_only,
                             bool exact_waypoint, MovementPriority priority, bool lessDelay, bool backwards)
+{
+    return TryMoveTo(mapId, x, y, z, idle, react, normal_only, exact_waypoint, priority, lessDelay, backwards) ==
+           MoveOutcome::Issued;
+}
+
+MoveOutcome MovementAction::TryMoveTo(uint32 mapId, float x, float y, float z, bool /*idle*/, bool /*react*/,
+                                      bool normal_only, bool exact_waypoint, MovementPriority priority, bool lessDelay,
+                                      bool backwards)
 {
     UpdateMovementState();
     if (!IsMovingAllowed())
     {
-        return false;
+        return MoveOutcome::NotAllowed;
     }
     if (IsDuplicateMove(x, y, z))
     {
-        return false;
+        return MoveOutcome::Duplicate;
     }
     if (IsWaitingForLastMove(priority))
     {
-        return false;
+        return MoveOutcome::Waiting;
     }
 
     bool generatePath = !bot->IsFlying() && !bot->isSwimming();
@@ -193,7 +201,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool /*idle
         Unit* vehicleBase = vehicle->GetBase();
         generatePath = !vehicleBase || !vehicleBase->CanFly();
         if (!vehicleBase || !seat || !seat->CanControl())  // is passenger and cant move anyway
-            return false;
+            return MoveOutcome::NotAllowed;
 
         float distance = vehicleBase->GetExactDist(x, y, z);  // use vehicle distance, not bot
         if (distance > 0.01f)
@@ -208,7 +216,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool /*idle
             delay = std::max(.0f, delay);
             delay = std::min((float)sPlayerbotAIConfig.MaxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay, priority);
-            return true;
+            return MoveOutcome::Issued;
         }
     }
     else if (exact_waypoint || disableMoveSplinePath || !generatePath)
@@ -230,7 +238,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool /*idle
             delay = std::max(.0f, delay);
             delay = std::min((float)sPlayerbotAIConfig.MaxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement").Set(mapId, x, y, z, bot->GetOrientation(), delay, priority);
-            return true;
+            return MoveOutcome::Issued;
         }
     }
     else
@@ -239,7 +247,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool /*idle
         Movement::PointsArray path =
             SearchForBestPath(x, y, z, modifiedZ, sPlayerbotAIConfig.MaxMovementSearchTime, normal_only);
         if (modifiedZ == INVALID_HEIGHT)
-            return false;
+            return MoveOutcome::NoPath;
         float distance = bot->GetExactDist(x, y, modifiedZ);
         if (distance > 0.01f)
         {
@@ -258,11 +266,12 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool /*idle
             delay = std::min((float)sPlayerbotAIConfig.MaxWaitForMove, delay);
             AI_VALUE(LastMovement&, "last movement")
                 .Set(mapId, x, y, modifiedZ, bot->GetOrientation(), delay, priority);
-            return true;
+            return MoveOutcome::Issued;
         }
     }
 
-    return false;
+    // only reached when the bot already stands on the destination
+    return MoveOutcome::AlreadyThere;
     //
     // // LOG_DEBUG("playerbots", "IsMovingAllowed {}", IsMovingAllowed());
     // bot->AddUnitMovementFlag()

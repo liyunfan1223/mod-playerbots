@@ -23,6 +23,19 @@ struct Position;
 #define ANGLE_90_DEG M_PI_2
 #define ANGLE_120_DEG (2.f * static_cast<float>(M_PI) / 3.f)
 
+// Why a move command did or did not reach the MotionMaster. Duplicate and Waiting are normal while a
+// bot walks to a destination its action re-offers every tick, so neither one is a refusal.
+enum class MoveOutcome : uint8
+{
+    Issued,
+    Duplicate,
+    Waiting,
+    NotAllowed,
+    NoPath,
+    // MoveTo returns false here and callers branch on it, so kept apart from Issued
+    AlreadyThere,
+};
+
 class MovementAction : public Action
 {
 public:
@@ -37,6 +50,12 @@ protected:
                 bool normal_only = false, bool exact_waypoint = false,
                 MovementPriority priority = MovementPriority::MOVEMENT_NORMAL, bool lessDelay = false,
                 bool backwards = false);
+    // MoveTo with the reason a move didn't take, for code that tries another destination on NoPath
+    // but not while the bot is still walking to the last one
+    MoveOutcome TryMoveTo(uint32 mapId, float x, float y, float z, bool idle = false, bool react = false,
+                          bool normal_only = false, bool exact_waypoint = false,
+                          MovementPriority priority = MovementPriority::MOVEMENT_NORMAL, bool lessDelay = false,
+                          bool backwards = false);
     bool MoveTo(WorldObject* target, float distance = 0.0f,
                 MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
     bool MoveNear(WorldObject* target, float distance = sPlayerbotAIConfig.ContactDistance,
