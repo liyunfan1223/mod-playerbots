@@ -181,7 +181,10 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
             float bestScore = 0;
             for (uint32 id : bestIds)
             {
-                float score = calc.CalculateItem(quest->RewardChoiceItemId[id]);
+                uint32 const itemId = quest->RewardChoiceItemId[id];
+                ItemTemplate const* rewardProto = sObjectMgr->GetItemTemplate(itemId);
+                uint8 const rewardSlot = rewardProto ? botAI->FindEquipSlot(rewardProto, NULL_SLOT, true) : NULL_SLOT;
+                float score = calc.CalculateItem(itemId, 0, rewardSlot);
                 if (score > bestScore)
                 {
                     bestScore = score;
