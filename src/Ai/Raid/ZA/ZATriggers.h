@@ -12,7 +12,7 @@
 #include "ZAHelpers.h"
 #include <string>
 
-// General
+// Shared
 
 class ZulAmanEncounterTrigger : public Trigger
 {
@@ -30,13 +30,11 @@ protected:
     virtual bool IsActiveInEncounter() = 0;
 };
 
-// General
+// Shared
 
 class ZulAmanNoEncounterInProgressTrigger : public Trigger
 {
 public:
-    // Throttled to once per second. This trigger is true for all trash and downtime and, being
-    // for between-encounter clean-up, has no real urgency to it.
     ZulAmanNoEncounterInProgressTrigger(PlayerbotAI* botAI)
         : Trigger(botAI, "zul'aman no encounter in progress", 1000) {}
     bool IsActive() override;
@@ -52,11 +50,11 @@ public:
     bool IsActive() override;
 };
 
-// For Misdirection to the boss on the pull. Used by every boss.
-class ZulAmanPullingBossTrigger : public ZulAmanEncounterTrigger
+// For Misdirection to the boss after the pull. Used by every boss.
+class ZulAmanHunterShouldMisdirectTrigger : public ZulAmanEncounterTrigger
 {
 public:
-    ZulAmanPullingBossTrigger(
+    ZulAmanHunterShouldMisdirectTrigger(
         PlayerbotAI* botAI, std::string const& name, std::string const& bossName)
         : ZulAmanEncounterTrigger(botAI, name), _bossName(bossName) {}
 

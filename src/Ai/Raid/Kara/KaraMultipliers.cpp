@@ -26,7 +26,7 @@
 
 using namespace KaraHelpers;
 
-// General
+// Shared
 
 float KarazhanSetTremorTotemMultiplier::GetValue(Action* action)
 {

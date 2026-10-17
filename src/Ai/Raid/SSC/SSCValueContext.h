@@ -122,11 +122,9 @@ public:
     RaidSscValueContext()
     {
         creators["ssc toxic pool"] = &RaidSscValueContext::ssc_toxic_pool;
-        creators["ssc water elemental totem"] =
-            &RaidSscValueContext::ssc_water_elemental_totem;
+        creators["ssc water elemental totem"] = &RaidSscValueContext::ssc_water_elemental_totem;
         creators["ssc lurker guardians"] = &RaidSscValueContext::ssc_lurker_guardians;
-        creators["ssc lurker guardian tanks"] =
-            &RaidSscValueContext::ssc_lurker_guardian_tanks;
+        creators["ssc lurker guardian tanks"] = &RaidSscValueContext::ssc_lurker_guardian_tanks;
         creators["ssc leotheras"] = &RaidSscValueContext::ssc_leotheras;
         creators["ssc shadow of leotheras"] = &RaidSscValueContext::ssc_shadow_of_leotheras;
         creators["ssc spitfire totem"] = &RaidSscValueContext::ssc_spitfire_totem;

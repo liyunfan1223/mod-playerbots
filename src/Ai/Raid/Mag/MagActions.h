@@ -36,11 +36,11 @@ public:
     bool Execute(Event event) override;
 };
 
-class MagtheridonMisdirectHellfireChannelersToMainTankAction : public Action
+class MagtheridonMisdirectChannelersToMainTankAction : public Action
 {
 public:
-    MagtheridonMisdirectHellfireChannelersToMainTankAction(PlayerbotAI* botAI)
-        : Action(botAI, "magtheridon misdirect hellfire channelers to main tank") {}
+    MagtheridonMisdirectChannelersToMainTankAction(PlayerbotAI* botAI)
+        : Action(botAI, "magtheridon misdirect channelers to main tank") {}
     bool Execute(Event event) override;
 };
 

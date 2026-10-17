@@ -203,7 +203,7 @@ std::pair<size_t, size_t> GetBotCircleIndexAndCount(Player* bot, RangedGroups co
 
 } // end anonymous namespace
 
-// General
+// Shared
 
 bool GetMeleeHazardManeuverStep(
     Player* bot, Unit* boss, std::vector<Position> const& hazards, float hazardRadius,

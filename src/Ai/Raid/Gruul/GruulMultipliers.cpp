@@ -13,11 +13,12 @@
 #include "MageActions.h"
 #include "Playerbots.h"
 #include "ReachTargetActions.h"
+#include "ShamanActions.h"
 
 using namespace GruulHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 float GruulsLairDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
 {
@@ -126,7 +127,25 @@ float HighKingMaulgarAvoidWhirlwindMultiplier::GetValueInEncounter(Action* actio
     return bot->GetExactDist2d(maulgar) < MAULGAR_WHIRLWIND_HOLD_DISTANCE ? 0.0f : 1.0f;
 }
 
-float HighKingMaulgarControlHunterActionsMultiplier::GetValueInEncounter(Action* action)
+float HighKingMaulgarLetMageTankStealSpellShieldMultiplier::GetValueInEncounter(Action* action)
+{
+    if (botAI->GetState() == BOT_STATE_NON_COMBAT)
+        return 1.0f;
+
+    if (bot->getClass() != CLASS_HUNTER && bot->getClass() != CLASS_SHAMAN)
+        return 1.0f;
+
+    if (!dynamic_cast<CastPurgeAction*>(action) &&
+        !dynamic_cast<CastTranquilizingShotAction*>(action))
+    {
+        return 1.0f;
+    }
+
+    Unit* target = action->GetTarget();
+    return target && target->GetEntry() == Id(GruulNpcs::NPC_KROSH_FIREHAND) ? 0.0f : 1.0f;
+}
+
+float HighKingMaulgarControlMisdirectionMultiplier::GetValueInEncounter(Action* action)
 {
     if (botAI->GetState() == BOT_STATE_NON_COMBAT)
         return 1.0f;
@@ -134,21 +153,13 @@ float HighKingMaulgarControlHunterActionsMultiplier::GetValueInEncounter(Action*
     if (bot->getClass() != CLASS_HUNTER)
         return 1.0f;
 
-    bool const isMainTankMisdirect = dynamic_cast<CastMisdirectionOnMainTankAction*>(action);
-    if (!isMainTankMisdirect && !dynamic_cast<CastArcaneShotAction*>(action))
+    if (!dynamic_cast<CastMisdirectionOnMainTankAction*>(action))
         return 1.0f;
 
     // Krosh/Kiggler will be the last to die before Maulgar.
     // When only Maulgar is left, the standard Misdirection strategy is fine.
-    Unit* krosh = AI_VALUE2(Unit*, "find target", "krosh firehand");
-    if (isMainTankMisdirect &&
-        (krosh || AI_VALUE2(Unit*, "find target", "kiggler the crazed")))
-    {
-        return 0.0f;
-    }
-
-    // Arcane Shot removes Spell Shield, which the mage tank needs to survive.
-    return krosh && action->GetTarget() == krosh ? 0.0f : 1.0f;
+    return AI_VALUE2(Unit*, "find target", "krosh firehand") ||
+        AI_VALUE2(Unit*, "find target", "kiggler the crazed") ? 0.0f : 1.0f;
 }
 
 float HighKingMaulgarControlMageTankActionsMultiplier::GetValueInEncounter(Action* action)
