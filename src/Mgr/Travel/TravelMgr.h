@@ -875,7 +875,7 @@ public:
     void Init();
 
     FlightMasterInfo const* GetNearestFlightMasterInfo(Player* bot) const;
-    std::vector<std::vector<uint32>> GetOptimalFlightDestinations(Player* bot);
+    std::vector<std::vector<uint32>> GetOptimalFlightDestinations(Player* bot, bool collectAll = false);
     const std::vector<WorldLocation> GetTeleportLocations(Player* bot);
     const std::vector<WorldLocation> GetTravelHubs(Player* bot);
     std::vector<WorldLocation> GetCityLocations(Player* bot);
