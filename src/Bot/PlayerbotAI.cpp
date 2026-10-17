@@ -1610,14 +1610,6 @@ void PlayerbotAI::DoNextAction(bool min)
         }
     }
 
-    // A stuck combat engine (combat over, no target) would keep the non-combat engine from ever
-    // running; DropTargetAction only covers an invalid, non-null target.
-    if (currentEngine == engines[BOT_STATE_COMBAT] && !bot->IsInCombat() &&
-        !aiObjectContext->GetValue<Unit*>("current target")->Get())
-    {
-        ChangeEngine(BOT_STATE_NON_COMBAT);
-    }
-
     bool minimal = !this->AllowActivity();
 
     currentEngine->DoNextAction(nullptr, 0, (minimal || min));

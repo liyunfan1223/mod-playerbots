@@ -80,7 +80,7 @@ public:
     LootTarget& operator=(LootTarget const& other) = default;
     bool operator<(LootTarget const& other) const;
     bool IsReady() const;
-    void Defer(uint32 maxDelaySecs = 0);
+    void Defer();
 
 public:
     ObjectGuid guid;
@@ -113,8 +113,7 @@ public:
     void LootOpened(ObjectGuid guid);
     void CancelLoot(ObjectGuid guid);
     void RetryLoot(ObjectGuid guid);
-    // maxDelaySecs > 0 caps the exponential retry backoff for entries that are not reachable.
-    void DeferLoot(ObjectGuid guid, uint32 maxDelaySecs = 0);
+    void DeferLoot(ObjectGuid guid);
     bool CanAttemptLoot(ObjectGuid guid) const;
 
 private:
