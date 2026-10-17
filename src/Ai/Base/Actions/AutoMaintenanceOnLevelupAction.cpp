@@ -36,17 +36,18 @@ void AutoMaintenanceOnLevelupAction::AutoTeleportForLevel()
 
 void AutoMaintenanceOnLevelupAction::AutoPickTalents()
 {
-    bool isRandomBot = sRandomPlayerbotMgr.IsRandomBot(bot);
-    bool allowPlayerControlledTalents = sPlayerbotAIConfig.AutoPickTalentsForPlayerControlledBots && !isRandomBot;
-
-    if (!(isRandomBot ? sPlayerbotAIConfig.AutoPickTalents : allowPlayerControlledTalents))
+    bool const isRandomBot = sRandomPlayerbotMgr.IsRandomBot(bot);
+    if (!(isRandomBot ? sPlayerbotAIConfig.AutoPickTalents
+                      : sPlayerbotAIConfig.AutoPickTalentsForPlayerControlledBots))
         return;
 
     if (bot->GetFreeTalentPoints() <= 0)
         return;
 
     PlayerbotFactory factory(bot, bot->GetLevel());
-    factory.InitTalentsTree(true, true, true);
+    // Player-controlled bots keep their chosen talents; only free points are spent, matching
+    // "talents autopick" and "maintenance".
+    factory.InitTalentsTree(true, true, isRandomBot);
     factory.InitPetTalents();
 }
 
