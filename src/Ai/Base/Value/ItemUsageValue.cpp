@@ -160,9 +160,7 @@ ItemUsage ItemUsageValue::Calculate()
             uint32 requiredCount = quest->RequiredItemCount[i];
 
             if (currentCount == requiredCount)
-            {
                 return ITEM_USAGE_KEEP;  // Have exact amount needed, keep it
-            }
         }
     }
 
@@ -175,7 +173,8 @@ ItemUsage ItemUsageValue::Calculate()
 
     // Keep only the best stone/oil per weapon and the best poison per family; obsolete or
     // mismatched enhancements fall through to VENDOR/AH.
-    if (proto->Class == ITEM_CLASS_CONSUMABLE && IsTemporaryWeaponEnchantment(proto) && bot->CanUseItem(proto) == EQUIP_ERR_OK)
+    if (proto->Class == ITEM_CLASS_CONSUMABLE && IsTemporaryWeaponEnchantment(proto) &&
+        bot->CanUseItem(proto) == EQUIP_ERR_OK)
     {
         // Rogue poisons only: stones/oils share consumable subclass 8 but use family-less spells,
         // so they take the weapon branch below instead of being sold as obsolete poisons.
@@ -210,7 +209,7 @@ ItemUsage ItemUsageValue::Calculate()
             }
 
             if (isBest)
-                return ITEM_USAGE_USE;
+                return CurrentStacks(proto) < 1 ? ITEM_USAGE_USE : ITEM_USAGE_KEEP;
         }
     }
 
@@ -788,10 +787,8 @@ bool ItemUsageValue::IsItemNeededForUsefullSpell(ItemTemplate const* proto, bool
         if (checkAllReagents && !HasItemsNeededForSpell(spellId, proto))
             continue;
 
-        // Class utility spells (teleport, buff, resurrect, summon, etc.) consume reagents but
-        // neither create items nor grant skill-ups - keep the reagent for those too. Profession
-        // spells are generic-family and must not make every trainer recipe's reagent worth
-        // hoarding (enchants, embroideries, ...).
+        // Class spells consume reagents without creating items; generic profession spells
+        // must not make every trainer recipe's reagent worth hoarding.
         if (spellInfo->SpellFamilyName != SPELLFAMILY_GENERIC)
             return true;
 
@@ -869,8 +866,13 @@ bool ItemUsageValue::IsBestPoison(ItemTemplate const* proto)
         if (!IsRoguePoison(other))
             continue;
 
+        // Unusable higher ranks (level or class restriction) must not block a usable lower rank.
+        if (bot->CanUseItem(other) != EQUIP_ERR_OK)
+            continue;
+
         SpellInfo const* otherUseSpell = GetTemporaryEnchantSpell(other);
-        if (otherUseSpell && otherUseSpell->SpellFamilyFlags == useSpell->SpellFamilyFlags && other->ItemLevel > proto->ItemLevel)
+        if (otherUseSpell && otherUseSpell->SpellFamilyFlags == useSpell->SpellFamilyFlags &&
+            other->ItemLevel > proto->ItemLevel)
             return false;
     }
 
