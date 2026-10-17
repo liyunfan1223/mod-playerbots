@@ -155,20 +155,9 @@ bool MuruPositionRangedByPhaseAction::TryGetEntropiusInitialRangedPosition(
 bool MuruAssignDpsPriorityAction::Execute(Event /*event*/)
 {
     Unit* currentTarget = AI_VALUE(Unit*, "current target");
-    bool shouldDropTarget = false;
-    Unit* target = ResolveMuruDpsTarget(currentTarget, shouldDropTarget);
+    Unit* target = ResolveMuruDpsTarget(currentTarget);
     if (!target)
-    {
-        if (!shouldDropTarget || !currentTarget)
-            return false;
-
-        bot->AttackStop();
-        bot->InterruptSpell(CURRENT_MELEE_SPELL);
-        bot->CastStop();
-        context->GetValue<Unit*>("current target")->Set(nullptr);
-        bot->SetSelection(ObjectGuid());
-        return true;
-    }
+        return false;
 
     if (target->GetEntry() == Id(SwpNpcs::NPC_SHADOWSWORD_BERSERKER))
     {
@@ -188,7 +177,7 @@ bool MuruAssignDpsPriorityAction::Execute(Event /*event*/)
     return currentTarget != target && Attack(target);
 }
 
-Unit* MuruAssignDpsPriorityAction::ResolveMuruDpsTarget(Unit* currentTarget, bool& shouldDropTarget)
+Unit* MuruAssignDpsPriorityAction::ResolveMuruDpsTarget(Unit* currentTarget)
 {
     bool const isShadowPriest =
         bot->getClass() == CLASS_PRIEST && botAI->HasStrategy("shadow", BOT_STATE_COMBAT);
@@ -362,12 +351,7 @@ Unit* MuruAssignDpsPriorityAction::ResolveMuruDpsTarget(Unit* currentTarget, boo
     }
 
     if (!target)
-    {
-        if (isMelee)
-            shouldDropTarget = true;
-        else
-            target = AI_VALUE(Unit*, "dps target");
-    }
+        target = isMelee ? (isMuruPhase ? muru : nullptr) : AI_VALUE(Unit*, "dps target");
 
     return target;
 }
