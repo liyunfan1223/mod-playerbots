@@ -63,6 +63,11 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
                 break;
             case ITEM_SPELLTRIGGER_CHANCE_ON_HIT:
             {
+                // The core fires weapon procs only for the active weapon slot: ranged procs for
+                // RANGED_ATTACK, melee procs otherwise.
+                if (type_ == CollectorType::RANGED && proto->Class == ITEM_CLASS_WEAPON && !proto->IsRangedWeapon())
+                    break;
+
                 // Weapon on-hit procs trigger on melee/ranged attacks, not spell casts, so only
                 // value them for the collectors that can actually trigger them.
                 if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
@@ -82,7 +87,7 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     if (proto->socketBonus)
     {
         if (SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(proto->socketBonus))
-            CollectEnchantStats(enchant, 0, proto->Delay);
+            CollectEnchantStats(enchant, 0, proto->Delay, proto->IsRangedWeapon());
     }
 }
 
@@ -221,7 +226,8 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
     }
 }
 
-void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount, uint32 weaponDelay)
+void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount,
+                                          uint32 weaponDelay, bool isRanged)
 {
     for (int s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
     {
@@ -243,8 +249,17 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
             case ITEM_ENCHANTMENT_TYPE_DAMAGE:
             {
                 // Flat weapon-damage enchant is per swing; convert to DPS using the weapon delay.
-                if (type_ & CollectorType::MELEE && weaponDelay)
-                    stats[STATS_TYPE_MELEE_DPS] += enchant_amount * 1000.0f / weaponDelay;
+                if (!weaponDelay)
+                    break;
+
+                float const dps = enchant_amount * 1000.0f / weaponDelay;
+                if (isRanged)
+                {
+                    if (type_ & CollectorType::RANGED)
+                        stats[STATS_TYPE_RANGED_DPS] += dps;
+                }
+                else if (type_ & CollectorType::MELEE)
+                    stats[STATS_TYPE_MELEE_DPS] += dps;
                 break;
             }
             case ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL:
@@ -598,6 +613,10 @@ void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, SpellInf
             break;
         case SPELL_AURA_PERIODIC_DAMAGE:
         {
+            // Self-damage auras (e.g. Circle of Flame) must not score as attack/spell power.
+            if (effectInfo.TargetA.GetTarget() == TARGET_UNIT_CASTER)
+                break;
+
             // Value is damage per tick; Amplitude is the tick interval in ms.
             float perSecond = effectInfo.Amplitude ? (val * 1000.0f / effectInfo.Amplitude) : val;
             if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
@@ -608,6 +627,10 @@ void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, SpellInf
         }
         case SPELL_AURA_PERIODIC_HEAL:
         {
+            // Self-heals are not healing power for the bot's role.
+            if (effectInfo.TargetA.GetTarget() == TARGET_UNIT_CASTER)
+                break;
+
             float perSecond = effectInfo.Amplitude ? (val * 1000.0f / effectInfo.Amplitude) : val;
             stats[STATS_TYPE_HEAL_POWER] += perSecond * multiplier;
             break;
@@ -754,28 +777,10 @@ void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, SpellInf
             }
             break;
         }
-        case SPELL_AURA_MOD_REGEN:
-            // Health regeneration (mana is handled by SPELL_AURA_MOD_POWER_REGEN); per-5s value like ITEM_MOD_HEALTH_REGEN
-            stats[STATS_TYPE_HEALTH_REGENERATION] += val * multiplier;
-            break;
-        case SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT:
-            stats[STATS_TYPE_HEALTH_REGENERATION] += val * multiplier;
-            break;
         case SPELL_AURA_MOD_INCREASE_HEALTH_2:
             // Same as SPELL_AURA_MOD_INCREASE_HEALTH: flat max health -> stamina (15 hp per stamina)
             stats[STATS_TYPE_STAMINA] += val * multiplier / 15;
             break;
-        case SPELL_AURA_MOD_TARGET_RESISTANCE:
-        {
-            // The core adds this aura's signed amount to the enemy's resistance, so beneficial
-            // reduction is stored negative; negate to record penetration as positive. Only the
-            // spell school maps to a flat penetration stat; physical is a flat armor reduction
-            // that has no rating-based collector stat, so leave it unvalued.
-            int32 schoolType = effectInfo.MiscValue;
-            if ((schoolType & SPELL_SCHOOL_MASK_SPELL) == SPELL_SCHOOL_MASK_SPELL)
-                stats[STATS_TYPE_SPELL_PENETRATION] += -val * multiplier;
-            break;
-        }
         case SPELL_AURA_PROC_TRIGGER_SPELL:
         {
             if (canNextTrigger)

@@ -67,7 +67,7 @@ public:
     void Reset();
     void CollectItemStats(ItemTemplate const* proto);
     void CollectSpellStats(uint32 spellId, float multiplier = 1.0f, Milliseconds spellCooldown = -1ms);
-    void CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount = 0, uint32 weaponDelay = 0);
+    void CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount = 0, uint32 weaponDelay = 0, bool isRanged = false);
     bool CanBeTriggeredByType(SpellInfo const* spellInfo, uint32 procFlags, bool strict = true);
     bool CheckSpellValidation(uint32 spellFamilyName, flag96 spelFalimyFlags, bool strict = true);
 

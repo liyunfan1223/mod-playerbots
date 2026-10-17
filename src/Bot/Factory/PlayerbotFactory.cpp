@@ -5236,7 +5236,7 @@ void PlayerbotFactory::ApplyEnchantAndGemsNew(bool /*destroyOld*/)
                 if (enchant->requiredLevel > bot->GetLevel())
                     continue;
 
-                float score = calculator.CalculateEnchant(enchant_id, item->GetTemplate()->Delay);
+                float score = calculator.CalculateEnchant(enchant_id, item->GetTemplate()->Delay, item->GetTemplate()->IsRangedWeapon());
                 if (score >= bestScore)
                 {
                     bestScore = score;
