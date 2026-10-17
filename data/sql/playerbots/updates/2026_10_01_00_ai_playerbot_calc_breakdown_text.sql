@@ -26,7 +26,7 @@ VALUES (
 '明細：%breakdown（加權總和 %sum，倍率 x%mult）',
 'Desglose: %breakdown (suma ponderada %sum, multiplicadores x%mult)',
 'Desglose: %breakdown (suma ponderada %sum, multiplicadores x%mult)',
-'Разбивка: %breakdown (взвешенная сумма %sum)'
+'Разбивка: %breakdown (взвешенная сумма %sum, множители x%mult)'
 );
 
 INSERT INTO ai_playerbot_texts_chance (name, probability)

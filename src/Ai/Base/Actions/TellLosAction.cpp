@@ -12,6 +12,7 @@
 #include "Playerbots.h"
 #include "StatsWeightCalculator.h"
 #include "World.h"
+#include <charconv>
 #include <iterator>
 #include <sstream>
 
@@ -140,7 +141,26 @@ bool TellCalculateItemAction::Execute(Event event)
     std::string const text = event.getParam();
     ItemWithRandomProperty item = chat->parseItemWithRandomProperty(text);
     if (!item.itemId && text.find("Hitem:") == std::string::npos)
-        item.itemId = uint32(atol(text.c_str()));
+    {
+        // Accept only a complete bare item id; atol() would accept a numeric prefix.
+        char const* begin = text.c_str();
+        while (*begin == ' ' || *begin == '\t')
+            ++begin;
+
+        char const* digitsEnd = begin;
+        while (*digitsEnd >= '0' && *digitsEnd <= '9')
+            ++digitsEnd;
+        char const* tail = digitsEnd;
+        while (*tail == ' ' || *tail == '\t')
+            ++tail;
+
+        uint32 parsedId = 0;
+        auto const [ptr, ec] = std::from_chars(begin, digitsEnd, parsedId);
+        if (begin == digitsEnd || *tail != '\0' || ec != std::errc() || ptr != digitsEnd || parsedId == 0)
+            return false;
+
+        item.itemId = parsedId;
+    }
 
     StatsWeightCalculator calculator(bot);
 
