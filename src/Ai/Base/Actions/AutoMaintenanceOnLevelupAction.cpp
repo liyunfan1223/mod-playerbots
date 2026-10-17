@@ -45,8 +45,6 @@ void AutoMaintenanceOnLevelupAction::AutoPickTalents()
         return;
 
     PlayerbotFactory factory(bot, bot->GetLevel());
-    // Player-controlled bots keep their chosen talents; only free points are spent, matching
-    // "talents autopick" and "maintenance".
     factory.InitTalentsTree(true, true, isRandomBot);
     factory.InitPetTalents();
 }
