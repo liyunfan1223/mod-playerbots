@@ -14,8 +14,7 @@ class PlayerbotAI;
 class HasAvailableLootValue : public BoolCalculatedValue
 {
 public:
-    // 500ms cache: the stack walk is heavy and this value now gates combat and mounting.
-    HasAvailableLootValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "has available loot", 500) {}
+    HasAvailableLootValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "has available loot") {}
 
     bool Calculate() override;
 };

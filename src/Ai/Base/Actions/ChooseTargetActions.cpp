@@ -14,6 +14,7 @@
 #include "PvpTriggers.h"
 #include "RtiTargetValue.h"
 #include "ServerFacade.h"
+#include "Timer.h"
 
 bool AttackEnemyPlayerAction::isUseful()
 {
@@ -133,11 +134,23 @@ bool AttackAnythingAction::isUseful()
     if (bot->IsInCombat())
         return false;
 
-    // Block new grind targets while loot is available or openable; unreachable loot is deferred
-    // by the move-to-loot watchdog, so no time based fail-open is needed.
-    if (sPlayerbotAIConfig.PrioritiseLooting &&
-        (AI_VALUE(bool, "has available loot") || AI_VALUE(bool, "can loot")))
-        return false;
+    // Hold new grind targets only while the loot actions are working on something: a pending
+    // loot window, an openable entry, or a live target. Capped in time so an unreachable entry
+    // cannot stall grinding.
+    if (sPlayerbotAIConfig.PrioritiseLooting)
+    {
+        bool const lootActive = AI_VALUE(LootObjectStack*, "available loot")->IsLootPending() ||
+                                AI_VALUE(bool, "can loot") || !AI_VALUE(LootObject, "loot target").IsEmpty();
+        if (lootActive)
+        {
+            if (!lootHoldSince)
+                lootHoldSince = getMSTime();
+            if (GetMSTimeDiffToNow(lootHoldSince) <= lootHoldMax)
+                return false;
+        }
+        else
+            lootHoldSince = 0;
+    }
 
     Unit* target = GetTarget();
     if (!target || !target->IsInWorld())  // Checks if the target is valid and in the world

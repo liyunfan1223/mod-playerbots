@@ -16,7 +16,9 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSpellRepository.h"
 #include "Playerbots.h"
+#include "LootObjectStack.h"
 #include "ServerFacade.h"
+#include "Timer.h"
 #include "SpellAuraEffects.h"
 
 static constexpr uint32 SPELL_COLD_WEATHER_FLYING = 54197;
@@ -123,10 +125,24 @@ bool CheckMountStateAction::Execute(Event /*event*/)
     bool inBattleground = bot->InBattleground();
     bool const noRealMaster = (!master || master == bot);
 
+    // Hold mounting only while the loot actions are working on something; the cleanup and form
+    // handling above still run. Capped in time so unreachable loot cannot keep the bot unmounted.
+    bool const lootActive = sPlayerbotAIConfig.PrioritiseLooting &&
+                            (AI_VALUE(LootObjectStack*, "available loot")->IsLootPending() ||
+                             AI_VALUE(bool, "can loot") || !AI_VALUE(LootObject, "loot target").IsEmpty());
+    if (lootActive)
+    {
+        if (!lootHoldSince)
+            lootHoldSince = getMSTime();
+    }
+    else
+        lootHoldSince = 0;
+    bool const holdForLoot = lootActive && GetMSTimeDiffToNow(lootHoldSince) <= lootHoldMax;
+
     // If there is a master and bot not in BG, follow master's mount state regardless of group leader
     if (!noRealMaster && !inBattleground)
     {
-        if (ShouldFollowMasterMountState(master, noAttackers, shouldMount))
+        if (ShouldFollowMasterMountState(master, noAttackers, shouldMount) && !holdForLoot)
             return Mount();
 
         else if (ShouldDismountForMaster(master) && bot->IsMounted())
@@ -140,7 +156,7 @@ bool CheckMountStateAction::Execute(Event /*event*/)
 
     // No real master (random bot or SelfBot) OR bot in BG
     if ((noRealMaster || inBattleground) && !bot->IsMounted() &&
-        noAttackers && shouldMount && !bot->IsInCombat())
+        noAttackers && shouldMount && !bot->IsInCombat() && !holdForLoot)
         return Mount();
 
     if (!bot->IsFlying() && shouldDismount && bot->IsMounted() &&
@@ -205,16 +221,6 @@ bool CheckMountStateAction::isUseful()
         if (Battleground* bg = bot->GetBattleground())
             if (bg->GetStatus() == STATUS_WAIT_JOIN && bg->GetStartDelayTime() > BG_START_DELAY_30S)
                 return false;
-    }
-
-    // Do not mount while loot is available nearby. Travel forms count as mounted; other forms
-    // (warrior stances, druid combat forms) can mount, so they must not bypass the gate.
-    if (sPlayerbotAIConfig.PrioritiseLooting && !bot->IsMounted() &&
-        (AI_VALUE(bool, "has available loot") || AI_VALUE(bool, "can loot")))
-    {
-        uint8 const form = bot->GetShapeshiftForm();
-        if (form != FORM_TRAVEL && form != FORM_FLIGHT && form != FORM_FLIGHT_EPIC)
-            return false;
     }
 
     return true;

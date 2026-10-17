@@ -48,6 +48,8 @@ public:
 private:
     Player* master;
     ShapeshiftForm masterInShapeshiftForm;
+    uint32 lootHoldSince = 0;
+    const uint32 lootHoldMax = 30 * IN_MILLISECONDS;
     ShapeshiftForm botInShapeshiftForm;
     static std::unordered_map<uint32, PreferredMountCache> mountCache;
     float CalculateDismountDistance() const;
