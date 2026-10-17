@@ -48,6 +48,7 @@ PriestCureStrategy::PriestCureStrategy(PlayerbotAI* botAI) : Strategy(botAI)
 
 void PriestCureStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
+    triggers.push_back(new TriggerNode("mass dispel on enemy", {NextAction("mass dispel on enemy", ACTION_DISPEL)}));
     triggers.push_back(
         new TriggerNode("dispel magic", { NextAction("dispel magic", 41.0f) }));
     triggers.push_back(new TriggerNode("dispel magic on party",

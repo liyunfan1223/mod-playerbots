@@ -53,6 +53,17 @@ public:
 // disc 2.4.3
 SPELL_ACTION(CastMassDispelAction, "mass dispel");
 
+class CastMassDispelOnEnemyAction : public CastMassDispelAction
+{
+public:
+    CastMassDispelOnEnemyAction(PlayerbotAI* botAI) : CastMassDispelAction(botAI) {}
+
+    std::string const getName() override { return "mass dispel on enemy"; }
+    ActionThreatType getThreatType() override { return ActionThreatType::None; }
+    Unit* GetTarget() override;
+    bool isPossible() override;
+};
+
 // disc talents
 BUFF_ACTION(CastPowerInfusionAction, "power infusion");
 BUFF_PARTY_ACTION(CastPowerInfusionOnPartyAction, "power infusion");

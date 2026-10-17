@@ -5,6 +5,7 @@
  */
 
 #include "PriestAiObjectContext.h"
+
 #include "DiscPriestStrategy.h"
 #include "GenericPriestStrategy.h"
 #include "HolyPriestStrategy.h"
@@ -13,6 +14,7 @@
 #include "PriestActions.h"
 #include "PriestNonCombatStrategy.h"
 #include "PriestTriggers.h"
+#include "PriestValues.h"
 #include "PullStrategy.h"
 #include "ShadowPriestStrategy.h"
 
@@ -78,6 +80,7 @@ public:
         creators["shadow word: pain"] = &PriestTriggerFactoryInternal::shadow_word_pain;
         creators["shadow word: pain on attacker"] = &PriestTriggerFactoryInternal::shadow_word_pain_on_attacker;
         creators["dispel magic"] = &PriestTriggerFactoryInternal::dispel_magic;
+        creators["mass dispel on enemy"] = &PriestTriggerFactoryInternal::mass_dispel_on_enemy;
         creators["dispel magic on party"] = &PriestTriggerFactoryInternal::dispel_magic_party_member;
         creators["cure disease"] = &PriestTriggerFactoryInternal::cure_disease;
         creators["party member cure disease"] = &PriestTriggerFactoryInternal::party_member_cure_disease;
@@ -121,6 +124,7 @@ private:
         return new ShadowWordPainOnAttackerTrigger(botAI);
     }
     static Trigger* dispel_magic(PlayerbotAI* botAI) { return new DispelMagicTrigger(botAI); }
+    static Trigger* mass_dispel_on_enemy(PlayerbotAI* botAI) { return new MassDispelOnEnemyTrigger(botAI); }
     static Trigger* dispel_magic_party_member(PlayerbotAI* botAI) { return new DispelMagicPartyMemberTrigger(botAI); }
     static Trigger* cure_disease(PlayerbotAI* botAI) { return new CureDiseaseTrigger(botAI); }
     static Trigger* party_member_cure_disease(PlayerbotAI* botAI) { return new PartyMemberCureDiseaseTrigger(botAI); }
@@ -228,6 +232,7 @@ public:
         creators["shadow word: death"] = &PriestAiObjectContextInternal::shadow_word_death;
         creators["shadowfiend"] = &PriestAiObjectContextInternal::shadowfiend;
         creators["mass dispel"] = &PriestAiObjectContextInternal::mass_dispel;
+        creators["mass dispel on enemy"] = &PriestAiObjectContextInternal::mass_dispel_on_enemy;
         creators["pain suppression"] = &PriestAiObjectContextInternal::pain_suppression;
         creators["pain suppression on party"] = &PriestAiObjectContextInternal::pain_suppression_on_party;
         creators["prayer of mending on party"] = &PriestAiObjectContextInternal::prayer_of_mending;
@@ -328,6 +333,7 @@ private:
     static Action* pain_suppression_on_party(PlayerbotAI* botAI) { return new CastPainSuppressionProtectAction(botAI); }
     static Action* pain_suppression(PlayerbotAI* botAI) { return new CastPainSuppressionAction(botAI); }
     static Action* mass_dispel(PlayerbotAI* botAI) { return new CastMassDispelAction(botAI); }
+    static Action* mass_dispel_on_enemy(PlayerbotAI* botAI) { return new CastMassDispelOnEnemyAction(botAI); }
     static Action* shadowfiend(PlayerbotAI* botAI) { return new CastShadowfiendAction(botAI); }
     static Action* shadow_word_death(PlayerbotAI* botAI) { return new CastShadowWordDeathAction(botAI); }
     static Action* chastise(PlayerbotAI* botAI) { return new CastChastiseAction(botAI); }
@@ -338,6 +344,15 @@ private:
     static Action* divine_hymn(PlayerbotAI* botAI) { return new CastDivineHymnAction(botAI); }
     static Action* mind_sear(PlayerbotAI* botAI) { return new CastMindSearAction(botAI); }
     static Action* guardian_spirit_on_party(PlayerbotAI* botAI) { return new CastGuardianSpiritOnPartyAction(botAI); }
+};
+
+class PriestValueContextInternal : public NamedObjectContext<UntypedValue>
+{
+public:
+    PriestValueContextInternal() { creators["mass dispel target"] = &PriestValueContextInternal::mass_dispel_target; }
+
+private:
+    static UntypedValue* mass_dispel_target(PlayerbotAI* botAI) { return new MassDispelTargetValue(botAI); }
 };
 
 SharedNamedObjectContextList<Strategy> PriestAiObjectContext::sharedStrategyContexts;
@@ -380,4 +395,5 @@ void PriestAiObjectContext::BuildSharedTriggerContexts(SharedNamedObjectContextL
 void PriestAiObjectContext::BuildSharedValueContexts(SharedNamedObjectContextList<UntypedValue>& valueContexts)
 {
     AiObjectContext::BuildSharedValueContexts(valueContexts);
+    valueContexts.Add(new PriestValueContextInternal());
 }

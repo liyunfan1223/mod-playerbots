@@ -11,6 +11,8 @@
 #include "Playerbots.h"
 #include "TargetValue.h"
 
+bool MassDispelOnEnemyTrigger::IsActive() { return !AI_VALUE(ObjectGuid, "mass dispel target").IsEmpty(); }
+
 bool ShadowProtectionTrigger::IsActive()
 {
     return BuffTrigger::IsActive() && !botAI->HasAura("prayer of shadow protection", GetTarget());

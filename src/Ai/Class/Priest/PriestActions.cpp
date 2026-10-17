@@ -5,8 +5,28 @@
  */
 
 #include "PriestActions.h"
+
 #include "Event.h"
 #include "Playerbots.h"
+#include "PriestValues.h"
+
+Unit* CastMassDispelOnEnemyAction::GetTarget()
+{
+    Unit* target = botAI->GetUnit(AI_VALUE(ObjectGuid, "mass dispel target"));
+    return MassDispelTargetValue::IsValidTarget(botAI, target) ? target : nullptr;
+}
+
+bool CastMassDispelOnEnemyAction::isPossible()
+{
+    Unit* target = GetTarget();
+    if (!target || (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true)) ||
+        bot->HasUnitState(UNIT_STATE_LOST_CONTROL) || bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) || bot->isMoving())
+        return false;
+
+    // Mass Dispel is ground-targeted: check the destination, not a missing destination on a unit-only spell.
+    uint32 const spellId = AI_VALUE2(uint32, "spell id", spell);
+    return botAI->CanCastSpell(spellId, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+}
 
 bool CastRemoveShadowformAction::Execute(Event /*event*/)
 {

@@ -22,6 +22,15 @@ DEBUFF_ENEMY_TRIGGER(VampiricTouchOnAttackerTrigger, "vampiric touch on attacker
 BUFF_TRIGGER(VampiricEmbraceTrigger, "vampiric embrace");
 CURE_TRIGGER(DispelMagicTrigger, "dispel magic", DISPEL_MAGIC);
 CURE_PARTY_TRIGGER(DispelMagicPartyMemberTrigger, "dispel magic", DISPEL_MAGIC);
+
+class MassDispelOnEnemyTrigger : public Trigger
+{
+public:
+    MassDispelOnEnemyTrigger(PlayerbotAI* botAI) : Trigger(botAI, "mass dispel on enemy", IN_MILLISECONDS) {}
+
+    bool IsActive() override;
+};
+
 CURE_TRIGGER(CureDiseaseTrigger, "cure disease", DISPEL_DISEASE);
 CURE_PARTY_TRIGGER(PartyMemberCureDiseaseTrigger, "cure disease", DISPEL_DISEASE);
 BUFF_TRIGGER_A(InnerFireTrigger, "inner fire");
