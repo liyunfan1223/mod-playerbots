@@ -271,6 +271,8 @@ bool PlayerbotAIConfig::Initialize()
     MaxRandomBotsPriceChangeInterval =
         sConfigMgr->GetOption<int32>("Playerbots.MaxRandomBotsPriceChangeInterval", 48 * HOUR);
     RandomBotJoinLfg = sConfigMgr->GetOption<bool>("Playerbots.RandomBotJoinLfg", true);
+    RandomBotJoinLfgOutleveledExpansion =
+        sConfigMgr->GetOption<bool>("Playerbots.RandomBotJoinLfgOutleveledExpansion", true);
 
     RestrictHealerDPS = sConfigMgr->GetOption<bool>("Playerbots.HealerDPSMapRestriction", false);
     LoadList<std::vector<uint32>>(
@@ -633,6 +635,7 @@ bool PlayerbotAIConfig::Initialize()
     EquipAndSpecPersistence = sConfigMgr->GetOption<bool>("Playerbots.EquipAndSpecPersistence", true);
     EquipAndSpecPersistenceLevel = sConfigMgr->GetOption<int32>("Playerbots.EquipAndSpecPersistenceLevel", 1);
     GroupInvitationPermission = sConfigMgr->GetOption<int32>("Playerbots.GroupInvitationPermission", 1);
+    AllowBattlegroundCommands = sConfigMgr->GetOption<bool>("Playerbots.AllowBattlegroundCommands", false);
     KeepAltsInGroup = sConfigMgr->GetOption<bool>("Playerbots.KeepAltsInGroup", false);
     AllowSummonInCombat = sConfigMgr->GetOption<bool>("Playerbots.AllowSummonInCombat", true);
     AllowSummonWhenMasterIsDead = sConfigMgr->GetOption<bool>("Playerbots.AllowSummonWhenMasterIsDead", true);
@@ -738,6 +741,7 @@ bool PlayerbotAIConfig::Initialize()
     RpgStatusProbWeight[RPG_TRAVEL_FLIGHT] = sConfigMgr->GetOption<int32>("Playerbots.RpgStatusProbWeight.TravelFlight", 15);
     RpgStatusProbWeight[RPG_REST] = sConfigMgr->GetOption<int32>("Playerbots.RpgStatusProbWeight.Rest", 5);
     RpgStatusProbWeight[RPG_OUTDOOR_PVP] = sConfigMgr->GetOption<int32>("Playerbots.RpgStatusProbWeight.OutdoorPvp", 10);
+    RpgStatusProbWeight[RPG_DO_GATHER] = sConfigMgr->GetOption<int32>("Playerbots.RpgStatusProbWeight.DoGather", 15);
 
     SyncLevelWithPlayers = sConfigMgr->GetOption<bool>("Playerbots.SyncLevelWithPlayers", false);
     RandomBotConcentrateInPlayerZone =

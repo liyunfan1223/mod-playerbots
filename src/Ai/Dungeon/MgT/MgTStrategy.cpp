@@ -77,6 +77,9 @@ void TbcDungeonMagistersTerraceStrategy::InitMultipliers(std::vector<Multiplier*
 void TbcDungeonMagistersTerraceStrategy::AppendTargetExclusions(GuidSet& exclusions,
                                                                TargetValueExclusionType type)
 {
+    if (type == TargetValueExclusionType::Aoe)
+        return;
+
     AiObjectContext* context = botAI->GetAiObjectContext();
 
     for (ObjectGuid const guid : context->GetValue<GuidVector>("mgt delrissa pets")->Get())
@@ -85,7 +88,7 @@ void TbcDungeonMagistersTerraceStrategy::AppendTargetExclusions(GuidSet& exclusi
     for (ObjectGuid const guid : context->GetValue<GuidVector>("mgt melee phoenix exclusions")->Get())
         exclusions.insert(guid);
 
-    if (type != TargetValueExclusionType::Attacker)
+    if (type != TargetValueExclusionType::DebuffTarget)
         return;
 
     for (ObjectGuid const guid : context->GetValue<GuidVector>("mgt focus exclusions")->Get())

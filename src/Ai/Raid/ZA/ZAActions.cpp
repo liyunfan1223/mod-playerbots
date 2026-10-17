@@ -18,18 +18,23 @@
 using namespace ZaHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool ZulAmanResetEncounterStatesAction::Execute(Event /*event*/)
 {
     bool reset = false;
     reset |= akilzonStormTimer.erase(bot->GetInstanceId()) > 0;
-
-    if (!AI_VALUE2(bool, "combat", "self target"))
-    {
-        reset |= ClearTargetIcon(bot, RtiTargetValue::skullIndex);
-        reset |= ClearTargetIcon(bot, RtiTargetValue::moonIndex);
-    }
+    reset |= ClearStrategyTargetIcon(bot, RtiTargetValue::skullIndex, {
+        Id(ZaNpcs::NPC_LORD_RAADAN),
+        Id(ZaNpcs::NPC_ALYSON_ANTILLE),
+        Id(ZaNpcs::NPC_KORAGG),
+        Id(ZaNpcs::NPC_DARKHEART),
+        Id(ZaNpcs::NPC_FENSTALKER),
+        Id(ZaNpcs::NPC_GAZAKROTH),
+        Id(ZaNpcs::NPC_THURG),
+        Id(ZaNpcs::NPC_SLITHER),
+        Id(ZaNpcs::NPC_HEX_LORD_MALACRASS),
+    });
 
     return reset;
 }
@@ -44,10 +49,10 @@ bool ZulAmanMisdirectBossToMainTankAction::Execute(Event /*event*/)
     if (!mainTank || !mainTank->IsAlive())
         return false;
 
-    if (botAI->CanCastSpell("misdirection", mainTank))
-        return botAI->CastSpell("misdirection", mainTank);
+    if (botAI->CanCastSpell(Id(ZaSpells::SPELL_MISDIRECTION), mainTank))
+        return botAI->CastSpell(Id(ZaSpells::SPELL_MISDIRECTION), mainTank);
 
-    if (!bot->HasAura(Id(ZaSpells::SPELL_MISDIRECTION)))
+    if (!bot->HasAura(Id(ZaSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", boss) && botAI->CastSpell("steady shot", boss);
@@ -145,7 +150,6 @@ bool NalorakkTanksPositionBossAction::Execute(Event event)
     if (AI_VALUE(Unit*, "current target") != nalorakk)
         return Attack(nalorakk);
 
-    // Main tank takes bear, assist tank takes troll
     Player* nalorakkTank = nullptr;
     if (IsNalorakkInBearForm(nalorakk))
         nalorakkTank = GetGroupMainTank(bot);
@@ -245,12 +249,11 @@ bool JanalaiAvoidFireBombsAction::Execute(Event /*event*/)
         return false;
 
     constexpr float moveDist = 3.5f;
-
     float stepX;
     float stepY;
     float stepZ;
     if (!FindSafeStepInJanalaiZone(
-            bot, bombs, JANALAI_SAFE_ZONE, JANALAI_FIRE_BOMB_MAX_SEARCH_DISTANCE,
+            bot, bombs, JANALAI_SAFE_ZONE, JANALAI_FIRE_BOMB_SAFE_SPOT_SEARCH_RADIUS,
             JANALAI_FIRE_BOMB_SAFE_DISTANCE, moveDist, stepX, stepY, stepZ))
     {
         return false;
@@ -312,7 +315,7 @@ bool HalazziDpsAttackTotemAndBossAction::Execute(Event /*event*/)
     if (Unit* halazzi = AI_VALUE2(Unit*, "find target", "halazzi"))
         return AI_VALUE(Unit*, "current target") != halazzi && Attack(halazzi);
 
-    // Don't attack the Lynx
+    // Don't attack the Lynx.
     return false;
 }
 

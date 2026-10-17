@@ -16,7 +16,7 @@ using namespace EncounterHelpers;
 namespace TkHelpers
 {
 
-// General
+// Shared
 
 std::pair<Unit*, Unit*> GetTargetUnitPair(PlayerbotAI* botAI, uint32 entry)
 {

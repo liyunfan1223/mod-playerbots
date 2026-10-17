@@ -30,45 +30,54 @@ public:
         creators["anzu bird spirits provide buffs"] =
             &TbcDungeonSethekkHallsTriggerContext::anzu_bird_spirits_provide_buffs;
 
-        creators["talon king ikiss ranged prepare for arcane explosion"] =
-            &TbcDungeonSethekkHallsTriggerContext::talon_king_ikiss_ranged_prepare_for_arcane_explosion;
+        creators["talon king ikiss ranged should stay near tank"] =
+            &TbcDungeonSethekkHallsTriggerContext::talon_king_ikiss_ranged_should_stay_near_tank;
 
-        creators["talon king ikiss boss engaged by tank"] =
-            &TbcDungeonSethekkHallsTriggerContext::talon_king_ikiss_boss_engaged_by_tank;
+        creators["talon king ikiss should be tanked"] =
+            &TbcDungeonSethekkHallsTriggerContext::talon_king_ikiss_should_be_tanked;
 
         creators["talon king ikiss boss casting arcane explosion"] =
             &TbcDungeonSethekkHallsTriggerContext::talon_king_ikiss_boss_casting_arcane_explosion;
 
-        creators["talon king ikiss boss out of los"] =
-            &TbcDungeonSethekkHallsTriggerContext::talon_king_ikiss_boss_out_of_los;
+        creators["talon king ikiss out of los"] =
+            &TbcDungeonSethekkHallsTriggerContext::talon_king_ikiss_out_of_los;
     }
 private:
-    static Trigger* time_lost_controller_drops_charming_totem(PlayerbotAI* botAI) {
+    static Trigger* time_lost_controller_drops_charming_totem(PlayerbotAI* botAI)
+    {
         return new TimeLostControllerDropsCharmingTotemTrigger(botAI);
     }
-    static Trigger* sethekk_prophet_casts_fear(PlayerbotAI* botAI) {
+    static Trigger* sethekk_prophet_casts_fear(PlayerbotAI* botAI)
+    {
         return new SethekkProphetCastsFearTrigger(botAI);
     }
-    static Trigger* darkweaver_syth_boss_summons_elementals(PlayerbotAI* botAI) {
+    static Trigger* darkweaver_syth_boss_summons_elementals(PlayerbotAI* botAI)
+    {
         return new DarkweaverSythBossSummonsElementalsTrigger(botAI);
     }
-    static Trigger* anzu_encounter_has_two_phases(PlayerbotAI* botAI) {
+    static Trigger* anzu_encounter_has_two_phases(PlayerbotAI* botAI)
+    {
         return new AnzuEncounterHasTwoPhasesTrigger(botAI);
     }
-    static Trigger* anzu_bird_spirits_provide_buffs(PlayerbotAI* botAI) {
+    static Trigger* anzu_bird_spirits_provide_buffs(PlayerbotAI* botAI)
+    {
         return new AnzuBirdSpiritsProvideBuffsTrigger(botAI);
     }
-    static Trigger* talon_king_ikiss_ranged_prepare_for_arcane_explosion(PlayerbotAI* botAI) {
-        return new TalonKingIkissRangedPrepareForArcaneExplosionTrigger(botAI);
+    static Trigger* talon_king_ikiss_ranged_should_stay_near_tank(PlayerbotAI* botAI)
+    {
+        return new TalonKingIkissRangedShouldStayNearTankTrigger(botAI);
     }
-    static Trigger* talon_king_ikiss_boss_engaged_by_tank(PlayerbotAI* botAI) {
-        return new TalonKingIkissBossEngagedByTankTrigger(botAI);
+    static Trigger* talon_king_ikiss_should_be_tanked(PlayerbotAI* botAI)
+    {
+        return new TalonKingIkissShouldBeTankedTrigger(botAI);
     }
-    static Trigger* talon_king_ikiss_boss_casting_arcane_explosion(PlayerbotAI* botAI) {
+    static Trigger* talon_king_ikiss_boss_casting_arcane_explosion(PlayerbotAI* botAI)
+    {
         return new TalonKingIkissBossCastingArcaneExplosionTrigger(botAI);
     }
-    static Trigger* talon_king_ikiss_boss_out_of_los(PlayerbotAI* botAI) {
-        return new TalonKingIkissBossOutOfLosTrigger(botAI);
+    static Trigger* talon_king_ikiss_out_of_los(PlayerbotAI* botAI)
+    {
+        return new TalonKingIkissOutOfLosTrigger(botAI);
     }
 };
 

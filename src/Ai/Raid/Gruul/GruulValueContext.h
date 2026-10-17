@@ -86,19 +86,23 @@ public:
     }
 
 private:
-    static UntypedValue* high_king_maulgar_wild_fel_stalkers(PlayerbotAI* botAI) {
+    static UntypedValue* high_king_maulgar_wild_fel_stalkers(PlayerbotAI* botAI)
+    {
         return new HighKingMaulgarWildFelStalkersValue(botAI);
     }
 
-    static UntypedValue* high_king_maulgar_krosh_mage_tank(PlayerbotAI* botAI) {
+    static UntypedValue* high_king_maulgar_krosh_mage_tank(PlayerbotAI* botAI)
+    {
         return new HighKingMaulgarKroshMageTankValue(botAI);
     }
 
-    static UntypedValue* high_king_maulgar_kiggler_moonkin_tank(PlayerbotAI* botAI) {
+    static UntypedValue* high_king_maulgar_kiggler_moonkin_tank(PlayerbotAI* botAI)
+    {
         return new HighKingMaulgarKigglerMoonkinTankValue(botAI);
     }
 
-    static UntypedValue* gruul_the_dragonkiller_cave_in(PlayerbotAI* botAI) {
+    static UntypedValue* gruul_the_dragonkiller_cave_in(PlayerbotAI* botAI)
+    {
         return new GruulTheDragonkillerCaveInValue(botAI);
     }
 };

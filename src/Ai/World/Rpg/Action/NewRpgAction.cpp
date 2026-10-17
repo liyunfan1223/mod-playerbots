@@ -164,6 +164,19 @@ bool TellRpgStatusAction::Execute(Event event)
         WhisperStatusChange(owner, "OUTDOOR_PVP");
         return true;
     }
+    else if (status == RPG_DO_GATHER)
+    {
+        if (!botAI->HasSkill(SKILL_HERBALISM) && !botAI->HasSkill(SKILL_MINING))
+        {
+            std::string msg = PlayerbotTextMgr::instance().GetBotTextOrDefault(
+                "rpg_gather_no_profession_error", "I have neither Herbalism nor Mining, so I can't gather.", {});
+            bot->Whisper(msg, LANG_UNIVERSAL, owner);
+            return false;
+        }
+        info.ChangeToDoGather();
+        WhisperStatusChange(owner, "DO_GATHER");
+        return true;
+    }
     else if (status == RPG_DO_QUEST)
     {
         if (!questId)
@@ -206,7 +219,7 @@ bool TellRpgStatusAction::Execute(Event event)
     std::string msg = PlayerbotTextMgr::instance().GetBotTextOrDefault(
         "rpg_unknown_status_error",
         "Unknown rpg status. Options: idle, rest, wander random, wander npc, "
-        "go grind, go camp, do quest [<id>], travel flight, outdoor pvp.", {});
+        "go grind, go camp, do quest [<id>], travel flight, outdoor pvp, do gather.", {});
     bot->Whisper(msg, LANG_UNIVERSAL, owner);
     return false;
 }
@@ -239,7 +252,7 @@ bool NewRpgStatusUpdateAction::Execute(Event /*event*/)
     {
         case RPG_IDLE:
             return RandomChangeStatus({RPG_GO_CAMP, RPG_GO_GRIND, RPG_WANDER_RANDOM, RPG_WANDER_NPC, RPG_DO_QUEST,
-                                       RPG_TRAVEL_FLIGHT, RPG_REST, RPG_OUTDOOR_PVP});
+                                       RPG_TRAVEL_FLIGHT, RPG_REST, RPG_OUTDOOR_PVP, RPG_DO_GATHER});
 
         case RPG_GO_GRIND:
         {
@@ -320,6 +333,16 @@ bool NewRpgStatusUpdateAction::Execute(Event /*event*/)
         case RPG_OUTDOOR_PVP:
         {
             if (info.HasStatusPersisted(statusOutDoorPvPDuration))
+            {
+                info.ChangeToIdle();
+                return true;
+            }
+            break;
+        }
+        case RPG_DO_GATHER:
+        {
+            // DO_GATHER -> IDLE
+            if (info.HasStatusPersisted(statusDoGatherDuration))
             {
                 info.ChangeToIdle();
                 return true;
