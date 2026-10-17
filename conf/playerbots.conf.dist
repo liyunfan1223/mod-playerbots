@@ -1359,10 +1359,7 @@ Playerbots.AutoLearnTrainerSpells = 1
 # Default: 1 (enabled)
 Playerbots.AutoPickTalents = 1
 
-# Server-wide policy: player-controlled bots (altbots and selfbots, e.g. ".playerbots bot self")
-# automatically spend free talent points on levelup. This applies to every altbot and selfbot on the
-# server; individual players cannot opt in or out. Chosen talents are kept - only free points are
-# spent. This is separate from AutoPickTalents, which applies to random bots.
+# Player-controlled bots (altbots and selfbots) automatically spend free talent points on levelup.
 # Default: 0 (disabled)
 Playerbots.AutoPickTalentsForPlayerControlledBots = 0
 
