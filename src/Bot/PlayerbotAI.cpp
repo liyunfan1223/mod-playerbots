@@ -55,7 +55,9 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include <algorithm>
 #include <cmath>
+#include <map>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -5936,6 +5938,61 @@ uint32 PlayerbotAI::GetInventoryItemsCountWithId(uint32 itemId)
     }
 
     return count;
+}
+
+void PlayerbotAI::ConsolidateItems()
+{
+    if (!bot)
+        return;
+
+    // Only entries with two or more stacks in the bags can be consolidated.
+    std::map<uint32, uint32> entryCounts;
+    for (Item* item : GetInventoryItems())
+        if (item && item->GetCount() > 0)
+            ++entryCounts[item->GetEntry()];
+
+    for (auto const& [entry, stackCount] : entryCounts)
+    {
+        if (stackCount < 2)
+            continue;
+
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(entry);
+        if (!proto || proto->GetMaxStackSize() <= 1)
+            continue;
+
+        // Merge into the fullest partial stack through the core's drag-to-stack path, one move
+        // per pass; each pass re-collects because a move can empty the source or fill the target.
+        for (uint8 pass = 0; pass < 128; ++pass)
+        {
+            std::vector<Item*> stacks;
+            for (Item* item : GetInventoryItems())
+                if (item && item->GetEntry() == entry && item->GetCount() > 0)
+                    stacks.push_back(item);
+
+            if (stacks.size() < 2)
+                break;
+
+            // Target: the fullest stack that still has space.
+            Item* target = nullptr;
+            for (Item* item : stacks)
+                if (item->GetCount() < proto->GetMaxStackSize() && (!target || item->GetCount() > target->GetCount()))
+                    target = item;
+            if (!target)
+                break;  // all stacks are full
+
+            // Source: the largest other partial stack. A full stack must never be a source.
+            Item* source = nullptr;
+            for (Item* item : stacks)
+                if (item != target && item->GetCount() < proto->GetMaxStackSize() &&
+                    (!source || item->GetCount() > source->GetCount()))
+                    source = item;
+            if (!source)
+                break;
+
+            // The core merges as much as fits and leaves any remainder in the source slot.
+            bot->SwapItem(source->GetPos(), target->GetPos());
+        }
+    }
 }
 
 bool PlayerbotAI::HasItemInInventory(uint32 itemId)
