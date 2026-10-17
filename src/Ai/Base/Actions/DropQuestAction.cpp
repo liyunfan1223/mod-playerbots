@@ -118,8 +118,7 @@ bool CleanQuestLogAction::Execute(Event event)
                     {{"%title", quest->GetTitle()}}));
 
             // Remove quest
-            botAI->rpgStatistic.questDropped++;
-            botAI->RecordQuestDropped(questId, "manual_drop");
+            botAI->RecordQuestDropped(questId, QuestDropReason::Trivial);
             bot->SetQuestSlot(slot, 0);
             bot->TakeQuestSourceItem(questId, false);
             bot->SetQuestStatus(questId, QUEST_STATUS_NONE);

@@ -6730,47 +6730,43 @@ std::set<uint32> PlayerbotAI::GetCurrentIncompleteQuestIds()
 
 void PlayerbotAI::RecordQuestAccepted(uint32 questId)
 {
-    if (!sPlayerbotAIConfig.CollectDetailedQuestStats)
-        return;
-
-    std::lock_guard<std::mutex> guard(rpgStatisticMutex);
-    rpgStatistic.questAcceptedByID[questId]++;
+    ++rpgStatistic.questAccepted;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].accepted;
 }
 
 void PlayerbotAI::RecordQuestCompleted(uint32 questId)
 {
-    if (!sPlayerbotAIConfig.CollectDetailedQuestStats)
+    // Each completion counts once per bot and quest, until the quest is rewarded or dropped.
+    if (!countedQuestCompletions.insert(questId).second)
         return;
 
-    std::lock_guard<std::mutex> guard(rpgStatisticMutex);
-    rpgStatistic.questCompletedByID[questId]++;
+    ++rpgStatistic.questCompleted;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].completed;
 }
 
 void PlayerbotAI::RecordQuestRewarded(uint32 questId)
 {
-    if (!sPlayerbotAIConfig.CollectDetailedQuestStats)
-        return;
-
-    std::lock_guard<std::mutex> guard(rpgStatisticMutex);
-    rpgStatistic.questRewardedByID[questId]++;
+    countedQuestCompletions.erase(questId);
+    ++rpgStatistic.questRewarded;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].rewarded;
 }
 
-void PlayerbotAI::RecordQuestDropped(uint32 questId, std::string const& reason)
+void PlayerbotAI::RecordQuestDropped(uint32 questId, QuestDropReason reason)
 {
-    if (!sPlayerbotAIConfig.CollectDetailedQuestStats)
-        return;
-
-    std::lock_guard<std::mutex> guard(rpgStatisticMutex);
-    rpgStatistic.RecordDrop(questId, reason);
+    countedQuestCompletions.erase(questId);
+    ++rpgStatistic.questDropped;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].dropped[static_cast<size_t>(reason)];
 }
 
-void PlayerbotAI::RecordQuestAbandoned(uint32 questId, std::string const& reason)
+void PlayerbotAI::RecordQuestAbandoned(uint32 questId, QuestAbandonReason reason)
 {
-    if (!sPlayerbotAIConfig.CollectDetailedQuestStats)
-        return;
-
-    std::lock_guard<std::mutex> guard(rpgStatisticMutex);
-    rpgStatistic.RecordAbandon(questId, reason);
+    ++rpgStatistic.questAbandoned;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].abandoned[static_cast<size_t>(reason)];
 }
 
 uint32 PlayerbotAI::GetReactDelay()

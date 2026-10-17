@@ -2956,7 +2956,6 @@ void RandomPlayerbotMgr::PrintStats()
         if (sPlayerbotAIConfig.EnableNewRpgStrategy)
         {
             rpgStatusCount[botAI->rpgInfo.GetStatus()]++;
-            std::lock_guard<std::mutex> guard(botAI->rpgStatisticMutex);
             rpgStasticTotal += botAI->rpgStatistic;
             botAI->rpgStatistic = NewRpgStatistic();
         }
@@ -3040,30 +3039,6 @@ void RandomPlayerbotMgr::PrintStats()
 
         PrintQuestTotals(rpgStasticTotal);
 
-        if (sPlayerbotAIConfig.CollectDetailedQuestStats)
-        {
-            std::map<uint32, uint32> problemCounts;
-            for (auto const& [questId, count] : rpgStasticTotal.questDroppedByID)
-                problemCounts[questId] += count;
-            for (auto const& [questId, count] : rpgStasticTotal.questAbandonedByID)
-                problemCounts[questId] += count;
-
-            if (!problemCounts.empty())
-            {
-                std::vector<std::pair<uint32, uint32>> problems(problemCounts.begin(), problemCounts.end());
-                std::sort(problems.begin(), problems.end(), [](auto const& a, auto const& b) {
-                    return a.second > b.second;
-                });
-
-                LOG_INFO("playerbots", "Top quest problems (dropped + abandoned):");
-                for (size_t i = 0; i < problems.size() && i < 10; ++i)
-                {
-                    Quest const* quest = sObjectMgr->GetQuestTemplate(problems[i].first);
-                    LOG_INFO("playerbots", "    [{}] {} x{}", problems[i].first,
-                             quest ? quest->GetTitle() : "Unknown Quest", problems[i].second);
-                }
-            }
-        }
     }
 
     LOG_INFO("playerbots", "Bots engine:", dead);
@@ -3081,7 +3056,6 @@ NewRpgStatistic RandomPlayerbotMgr::CollectQuestStats()
         if (!botAI)
             continue;
 
-        std::lock_guard<std::mutex> guard(botAI->rpgStatisticMutex);
         total += botAI->rpgStatistic;
     }
     return total;
@@ -3123,59 +3097,95 @@ void RandomPlayerbotMgr::PrintQuestStats()
         return;
     }
 
-    if (!total.questDropReasons.empty())
+    constexpr size_t dropReasonCount = static_cast<size_t>(QuestDropReason::Count);
+    constexpr size_t abandonReasonCount = static_cast<size_t>(QuestAbandonReason::Count);
+    std::array<uint32, dropReasonCount> dropTotals{};
+    std::array<uint32, abandonReasonCount> abandonTotals{};
+    for (auto const& [questId, counters] : total.byQuest)
+    {
+        for (size_t i = 0; i < dropReasonCount; ++i)
+            dropTotals[i] += counters.dropped[i];
+        for (size_t i = 0; i < abandonReasonCount; ++i)
+            abandonTotals[i] += counters.abandoned[i];
+    }
+
+    uint32 dropTotal = 0;
+    for (uint32 count : dropTotals)
+        dropTotal += count;
+    if (dropTotal)
     {
         LOG_INFO("playerbots", "Quest drop reasons:");
-        for (auto const& [reason, count] : total.questDropReasons)
-            LOG_INFO("playerbots", "    {}: {}", reason, count);
+        for (size_t i = 0; i < dropReasonCount; ++i)
+            if (dropTotals[i])
+                LOG_INFO("playerbots", "    {}: {}", QuestDropReasonName(static_cast<QuestDropReason>(i)),
+                         dropTotals[i]);
         LOG_INFO("playerbots", "");
     }
 
-    if (!total.questAbandonReasons.empty())
+    uint32 abandonTotal = 0;
+    for (uint32 count : abandonTotals)
+        abandonTotal += count;
+    if (abandonTotal)
     {
         LOG_INFO("playerbots", "Quest abandon reasons:");
-        for (auto const& [reason, count] : total.questAbandonReasons)
-            LOG_INFO("playerbots", "    {}: {}", reason, count);
+        for (size_t i = 0; i < abandonReasonCount; ++i)
+            if (abandonTotals[i])
+                LOG_INFO("playerbots", "    {}: {}", QuestAbandonReasonName(static_cast<QuestAbandonReason>(i)),
+                         abandonTotals[i]);
         LOG_INFO("playerbots", "");
     }
 
-    auto printProblemQuests = [](std::map<uint32, uint32> const& counts,
-                                 std::map<uint32, std::map<std::string, uint32>> const& reasons, char const* label)
+    struct ProblemQuest
     {
-        if (counts.empty())
-            return;
-
-        std::vector<std::pair<uint32, uint32>> sorted(counts.begin(), counts.end());
-        std::sort(sorted.begin(), sorted.end(),
-                  [](std::pair<uint32, uint32> const& a, std::pair<uint32, uint32> const& b) {
-                      return a.second > b.second;
-                  });
-
-        LOG_INFO("playerbots", "{}:", label);
-        for (auto const& [questId, count] : sorted)
-        {
-            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-            std::string reasonSummary;
-
-            auto reasonsIt = reasons.find(questId);
-            if (reasonsIt != reasons.end())
-            {
-                for (auto const& [reason, reasonCount] : reasonsIt->second)
-                {
-                    if (!reasonSummary.empty())
-                        reasonSummary += ", ";
-                    reasonSummary += reason + " x" + std::to_string(reasonCount);
-                }
-            }
-
-            LOG_INFO("playerbots", "    [{}] {} x{} ({})", questId, quest ? quest->GetTitle() : "Unknown Quest", count,
-                     reasonSummary);
-        }
-        LOG_INFO("playerbots", "");
+        uint32 questId{0};
+        uint32 problems{0};
+        std::string reasons;
     };
 
-    printProblemQuests(total.questDroppedByID, total.questDropReasonsByID, "Dropped quests");
-    printProblemQuests(total.questAbandonedByID, total.questAbandonReasonsByID, "Abandoned quests");
+    std::vector<ProblemQuest> problems;
+    problems.reserve(total.byQuest.size());
+    for (auto const& [questId, counters] : total.byQuest)
+    {
+        uint32 problemCount = 0;
+        std::string reasons;
+        for (size_t i = 0; i < dropReasonCount; ++i)
+        {
+            if (!counters.dropped[i])
+                continue;
+            problemCount += counters.dropped[i];
+            if (!reasons.empty())
+                reasons += ", ";
+            reasons += std::string(QuestDropReasonName(static_cast<QuestDropReason>(i))) + " x" +
+                       std::to_string(counters.dropped[i]);
+        }
+        for (size_t i = 0; i < abandonReasonCount; ++i)
+        {
+            if (!counters.abandoned[i])
+                continue;
+            problemCount += counters.abandoned[i];
+            if (!reasons.empty())
+                reasons += ", ";
+            reasons += std::string(QuestAbandonReasonName(static_cast<QuestAbandonReason>(i))) + " x" +
+                       std::to_string(counters.abandoned[i]);
+        }
+
+        if (problemCount)
+            problems.push_back({questId, problemCount, std::move(reasons)});
+    }
+
+    if (!problems.empty())
+    {
+        std::sort(problems.begin(), problems.end(),
+                  [](ProblemQuest const& a, ProblemQuest const& b) { return a.problems > b.problems; });
+
+        LOG_INFO("playerbots", "Top quest problems (dropped + abandoned):");
+        for (size_t i = 0; i < problems.size() && i < 10; ++i)
+        {
+            Quest const* quest = sObjectMgr->GetQuestTemplate(problems[i].questId);
+            LOG_INFO("playerbots", "    [{}] {} x{} ({})", problems[i].questId,
+                     quest ? quest->GetTitle() : "Unknown Quest", problems[i].problems, problems[i].reasons);
+        }
+    }
 
     LOG_INFO("playerbots", "=== END QUEST STATISTICS REPORT ===");
 }
@@ -3196,16 +3206,21 @@ void RandomPlayerbotMgr::ExportQuestStatsToJson()
 
     NewRpgStatistic const total = CollectQuestStats();
 
-    auto reasonsJson = [](std::map<std::string, uint32> const& reasons)
+    auto dropName = [](size_t i) { return QuestDropReasonName(static_cast<QuestDropReason>(i)); };
+    auto abandonName = [](size_t i) { return QuestAbandonReasonName(static_cast<QuestAbandonReason>(i)); };
+
+    auto reasonsToJson = [](auto const& counts, auto nameFor)
     {
         std::ostringstream out;
         out << "{";
         bool first = true;
-        for (auto const& [reason, count] : reasons)
+        for (size_t i = 0; i < counts.size(); ++i)
         {
+            if (!counts[i])
+                continue;
             if (!first)
                 out << ", ";
-            out << "\"" << JsonEscape(reason) << "\": " << count;
+            out << "\"" << JsonEscape(nameFor(i)) << "\": " << counts[i];
             first = false;
         }
         out << "}";
@@ -3215,58 +3230,36 @@ void RandomPlayerbotMgr::ExportQuestStatsToJson()
     struct QuestRow
     {
         uint32 questId{0};
-        uint32 accepted{0};
-        uint32 completed{0};
-        uint32 rewarded{0};
-        uint32 dropped{0};
-        uint32 abandoned{0};
-        std::map<std::string, uint32> dropReasons;
-        std::map<std::string, uint32> abandonReasons;
-
-        uint32 Total() const { return completed + rewarded + dropped + abandoned; }
-    };
-
-    std::set<uint32> questIds;
-    for (auto const& [questId, count] : total.questAcceptedByID)
-        questIds.insert(questId);
-    for (auto const& [questId, count] : total.questCompletedByID)
-        questIds.insert(questId);
-    for (auto const& [questId, count] : total.questRewardedByID)
-        questIds.insert(questId);
-    for (auto const& [questId, count] : total.questDroppedByID)
-        questIds.insert(questId);
-    for (auto const& [questId, count] : total.questAbandonedByID)
-        questIds.insert(questId);
-
-    auto countFor = [](std::map<uint32, uint32> const& counts, uint32 questId) -> uint32
-    {
-        auto it = counts.find(questId);
-        return it != counts.end() ? it->second : 0;
+        QuestCounters counters;
+        uint32 Total() const
+        {
+            uint32 count = counters.accepted + counters.completed + counters.rewarded;
+            for (uint32 value : counters.dropped)
+                count += value;
+            for (uint32 value : counters.abandoned)
+                count += value;
+            return count;
+        }
     };
 
     std::vector<QuestRow> rows;
-    for (uint32 questId : questIds)
-    {
-        QuestRow row;
-        row.questId = questId;
-        row.accepted = countFor(total.questAcceptedByID, questId);
-        row.completed = countFor(total.questCompletedByID, questId);
-        row.rewarded = countFor(total.questRewardedByID, questId);
-        row.dropped = countFor(total.questDroppedByID, questId);
-        row.abandoned = countFor(total.questAbandonedByID, questId);
-
-        auto dropReasonsIt = total.questDropReasonsByID.find(questId);
-        if (dropReasonsIt != total.questDropReasonsByID.end())
-            row.dropReasons = dropReasonsIt->second;
-
-        auto abandonReasonsIt = total.questAbandonReasonsByID.find(questId);
-        if (abandonReasonsIt != total.questAbandonReasonsByID.end())
-            row.abandonReasons = abandonReasonsIt->second;
-
-        rows.push_back(row);
-    }
+    rows.reserve(total.byQuest.size());
+    for (auto const& [questId, counters] : total.byQuest)
+        rows.push_back({questId, counters});
 
     std::sort(rows.begin(), rows.end(), [](QuestRow const& a, QuestRow const& b) { return a.Total() > b.Total(); });
+
+    constexpr size_t dropReasonCount = static_cast<size_t>(QuestDropReason::Count);
+    constexpr size_t abandonReasonCount = static_cast<size_t>(QuestAbandonReason::Count);
+    std::array<uint32, dropReasonCount> dropTotals{};
+    std::array<uint32, abandonReasonCount> abandonTotals{};
+    for (QuestRow const& row : rows)
+    {
+        for (size_t i = 0; i < dropReasonCount; ++i)
+            dropTotals[i] += row.counters.dropped[i];
+        for (size_t i = 0; i < abandonReasonCount; ++i)
+            abandonTotals[i] += row.counters.abandoned[i];
+    }
 
     char stamp[32] = "";
     std::time_t const now = std::time(nullptr);
@@ -3284,25 +3277,31 @@ void RandomPlayerbotMgr::ExportQuestStatsToJson()
     out << "    \"dropped\": " << total.questDropped << ",\n";
     out << "    \"abandoned\": " << total.questAbandoned << "\n";
     out << "  },\n";
-    out << "  \"dropReasons\": " << reasonsJson(total.questDropReasons) << ",\n";
-    out << "  \"abandonReasons\": " << reasonsJson(total.questAbandonReasons) << ",\n";
+    out << "  \"dropReasons\": " << reasonsToJson(dropTotals, dropName) << ",\n";
+    out << "  \"abandonReasons\": " << reasonsToJson(abandonTotals, abandonName) << ",\n";
     out << "  \"quests\": [\n";
 
     for (size_t i = 0; i < rows.size(); ++i)
     {
         QuestRow const& row = rows[i];
         Quest const* quest = sObjectMgr->GetQuestTemplate(row.questId);
+        uint32 dropped = 0;
+        uint32 abandoned = 0;
+        for (uint32 value : row.counters.dropped)
+            dropped += value;
+        for (uint32 value : row.counters.abandoned)
+            abandoned += value;
 
         out << "    {\n";
         out << "      \"id\": " << row.questId << ",\n";
         out << "      \"name\": \"" << JsonEscape(quest ? quest->GetTitle() : "Unknown Quest") << "\",\n";
-        out << "      \"accepted\": " << row.accepted << ",\n";
-        out << "      \"completed\": " << row.completed << ",\n";
-        out << "      \"rewarded\": " << row.rewarded << ",\n";
-        out << "      \"dropped\": " << row.dropped << ",\n";
-        out << "      \"abandoned\": " << row.abandoned << ",\n";
-        out << "      \"dropReasons\": " << reasonsJson(row.dropReasons) << ",\n";
-        out << "      \"abandonReasons\": " << reasonsJson(row.abandonReasons) << "\n";
+        out << "      \"accepted\": " << row.counters.accepted << ",\n";
+        out << "      \"completed\": " << row.counters.completed << ",\n";
+        out << "      \"rewarded\": " << row.counters.rewarded << ",\n";
+        out << "      \"dropped\": " << dropped << ",\n";
+        out << "      \"abandoned\": " << abandoned << ",\n";
+        out << "      \"dropReasons\": " << reasonsToJson(row.counters.dropped, dropName) << ",\n";
+        out << "      \"abandonReasons\": " << reasonsToJson(row.counters.abandoned, abandonName) << "\n";
         out << "    }" << (i + 1 < rows.size() ? "," : "") << "\n";
     }
 

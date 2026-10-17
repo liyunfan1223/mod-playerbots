@@ -290,8 +290,6 @@ bool QuestUpdateCompleteAction::Execute(Event event)
         if (botAI->GetMaster())
             botAI->TellMasterNoFacing("Quest completed " + format);
         BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, qInfo);
-        botAI->rpgStatistic.questCompleted++;
-        botAI->RecordQuestCompleted(qInfo->GetQuestId());
         // LOG_DEBUG("playerbots", "[New rpg] {} complete quest {}", bot->GetName(), qInfo->GetQuestId());
         // botAI->rpgStatistic.questCompleted++;
     }
