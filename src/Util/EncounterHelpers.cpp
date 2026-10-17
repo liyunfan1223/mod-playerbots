@@ -6,6 +6,7 @@
 
 #include "EncounterHelpers.h"
 #include "CellImpl.h"
+#include "CreatureAI.h"
 #include "DKActions.h"
 #include "DruidActions.h"
 #include "DruidBearActions.h"
@@ -573,6 +574,49 @@ bool IsAoeThreatAction(Player* bot, Action* action)
         default:
             return false;
     }
+}
+
+// "pet attack" only runs as a chat command, so a fight that has to put the pet on a target uses this.
+void CommandPetAttack(PlayerbotAI* botAI, Unit* target)
+{
+    Player* bot = botAI->GetBot();
+    Guardian* pet = bot->GetGuardianPet();
+    if (!pet || !target)
+        return;
+
+    if (pet->GetReactState() == REACT_PASSIVE)
+        return;
+
+    if (!bot->IsValidAttackTarget(target))
+        return;
+
+    // re-issuing it every tick makes the pet stutter
+    if (pet->GetVictim() == target)
+        return;
+
+    pet->ClearUnitState(UNIT_STATE_FOLLOW);
+    pet->AttackStop();
+    pet->SetTarget(target->GetGUID());
+
+    pet->GetCharmInfo()->SetIsCommandAttack(true);
+    pet->GetCharmInfo()->SetIsAtStay(false);
+    pet->GetCharmInfo()->SetIsFollowing(false);
+    pet->GetCharmInfo()->SetIsCommandFollow(false);
+    pet->GetCharmInfo()->SetIsReturning(false);
+
+    pet->ToCreature()->AI()->AttackStart(target);
+}
+
+void StopPet(PlayerbotAI* botAI)
+{
+    Player* bot = botAI->GetBot();
+    Guardian* pet = bot->GetGuardianPet();
+    if (!pet)
+        return;
+
+    pet->AttackStop();
+    pet->SetTarget(ObjectGuid::Empty);
+    pet->GetCharmInfo()->SetIsCommandAttack(false);
 }
 
 }

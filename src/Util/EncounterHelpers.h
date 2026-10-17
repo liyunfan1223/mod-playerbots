@@ -55,6 +55,8 @@ uint32 GetSelfImmunitySpell(Player* bot);
 bool IsDpsCooldownAction(Player* bot, Action* action);
 bool IsTauntAction(Player* bot, Action* action);
 bool IsAoeThreatAction(Player* bot, Action* action);
+void CommandPetAttack(PlayerbotAI* botAI, Unit* target);
+void StopPet(PlayerbotAI* botAI);
 
 }
 

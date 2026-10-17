@@ -71,6 +71,23 @@ namespace
             gatePass = GatePass();
     }
 
+    // Set only while an inner trigger is being checked.
+    struct CheckScope
+    {
+        PlayerbotAI* botAI = nullptr;
+        uint32 passId = 0;
+    };
+
+    thread_local CheckScope checkScope;
+
+    struct CheckScopeGuard
+    {
+        CheckScope saved;
+
+        CheckScopeGuard(PlayerbotAI* botAI, uint32 passId) : saved(checkScope) { checkScope = {botAI, passId}; }
+        ~CheckScopeGuard() { checkScope = saved; }
+    };
+
     InstanceScript* InstanceOf(PlayerbotAI* botAI)
     {
         Player* bot = botAI ? botAI->GetBot() : nullptr;
@@ -234,6 +251,20 @@ bool BossStateGateOpen(PlayerbotAI* botAI, uint32 encounterId)
     return Rules::GateOpen(states, encounterId);
 }
 
+bool BossStateGateLive(PlayerbotAI* botAI, uint32 encounterId)
+{
+    InstanceScript* instance = InstanceOf(botAI);
+    if (!instance || encounterId >= instance->GetEncounterCount())
+        return false;
+
+    return instance->GetBossState(encounterId) == IN_PROGRESS;
+}
+
+uint32 EncounterTriggerPassId(PlayerbotAI* botAI)
+{
+    return botAI && checkScope.botAI == botAI ? checkScope.passId : 0;
+}
+
 // Name and check interval come off the inner trigger: Engine::ProcessTriggers calls needCheck on this
 // object, so the default interval of 1 would quietly run every throttled trigger every tick.
 EncounterGatedTrigger::EncounterGatedTrigger(PlayerbotAI* botAI, Trigger* inner, EncounterGate gate,
@@ -252,6 +283,7 @@ Event EncounterGatedTrigger::Check()
     if (!_inner || !_gate(botAI, _encounterId))
         return Event();
 
+    CheckScopeGuard const scope(botAI, CurrentGatePass(botAI));
     return _inner->Check();
 }
 
@@ -377,7 +409,7 @@ Rules::FamilyMask ClassifyAction(Action* action)
                  dynamic_cast<CastGrowlAction*>(action) || dynamic_cast<CastChallengingRoarAction*>(action) ||
                  dynamic_cast<CastHandOfReckoningAction*>(action) ||
                  dynamic_cast<CastRighteousDefenseAction*>(action) || dynamic_cast<CastDarkCommandAction*>(action) ||
-                 dynamic_cast<CastDeathGripAction*>(action))
+                 dynamic_cast<CastDeathGripAction*>(action) || dynamic_cast<CastMockingBlowAction*>(action))
             mask |= Family::Taunt;
 
         return mask;
@@ -446,6 +478,12 @@ void EncounterDefinition::AddMultipliers(PlayerbotAI* botAI, std::vector<Multipl
         multipliers.push_back(make(botAI));
 }
 
+void EncounterDefinition::OnTick(PlayerbotAI* botAI) const
+{
+    if (_tick && _gate(botAI, _encounterId))
+        _tick(botAI);
+}
+
 void EncounterBuilder::Node(std::string trigger, EncounterDefinition::TriggerCreator makeTrigger, std::string action,
                             EncounterDefinition::ActionCreator makeAction, float priority, EncounterRow flag)
 {
@@ -476,6 +514,8 @@ void EncounterBuilder::Exclusive(char const* name, RoleMask roles, Predicate pre
 {
     AddRule(name, roles, predicate, Rules::Exclusive(families, std::move(names)), false);
 }
+
+void EncounterBuilder::Tick(EncounterDefinition::TickFn tick) { _definition._tick = tick; }
 
 void EncounterBuilder::AddRule(char const* name, RoleMask roles, Predicate predicate, Rules::Rule rule, bool moverRows)
 {
