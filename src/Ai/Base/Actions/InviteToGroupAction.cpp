@@ -70,7 +70,7 @@ bool InviteNearbyToGroupAction::Execute(Event /*event*/)
         if (player->GetGroup())
             continue;
 
-        if (!PlayerbotAIConfig::instance().randomBotInvitePlayer && IsSelfBot(player))
+        if (!PlayerbotAIConfig::Instance().RandomBotInvitePlayer && IsSelfBot(player))
             continue;
 
         Group* group = bot->GetGroup();
@@ -96,7 +96,7 @@ bool InviteNearbyToGroupAction::Execute(Event /*event*/)
         if (abs(int32(player->GetLevel() - bot->GetLevel())) > 2)
             continue;
 
-        if (ServerFacade::instance().GetDistance2d(bot, player) > PlayerbotAIConfig::instance().sightDistance)
+        if (ServerFacade::instance().GetDistance2d(bot, player) > PlayerbotAIConfig::Instance().SightDistance)
             continue;
 
         // When inviting the 5th member of the group convert to raid for future invites.
@@ -107,7 +107,7 @@ bool InviteNearbyToGroupAction::Execute(Event /*event*/)
             PlayerbotWorldThreadProcessor::instance().QueueOperation(std::move(convertOp));
         }
 
-        if (PlayerbotAIConfig::instance().inviteChat && RandomPlayerbotMgr::instance().IsRandomBot(bot))
+        if (PlayerbotAIConfig::Instance().InviteChat && RandomPlayerbotMgr::instance().IsRandomBot(bot))
         {
             std::map<std::string, std::string> placeholders;
             placeholders["%player"] = player->GetName();
@@ -128,7 +128,7 @@ bool InviteNearbyToGroupAction::Execute(Event /*event*/)
 
 bool InviteNearbyToGroupAction::isUseful()
 {
-    if (!PlayerbotAIConfig::instance().randomBotGroupNearby)
+    if (!PlayerbotAIConfig::Instance().RandomBotGroupNearby)
         return false;
 
     if (bot->InBattleground())
@@ -192,7 +192,7 @@ bool InviteGuildToGroupAction::Execute(Event /*event*/)
         if (player->isDND())
             continue;
 
-        if (!PlayerbotAIConfig::instance().randomBotInvitePlayer && IsSelfBot(player))
+        if (!PlayerbotAIConfig::Instance().RandomBotInvitePlayer && IsSelfBot(player))
             continue;
 
         if (player->IsBeingTeleported())
@@ -227,7 +227,7 @@ bool InviteGuildToGroupAction::Execute(Event /*event*/)
             player->GetLevel() + 5)  // Do not invite members that too low level or risk dragging them to deadly places.
             continue;
 
-        if (!playerAi && ServerFacade::instance().GetDistance2d(bot, player) > PlayerbotAIConfig::instance().sightDistance)
+        if (!playerAi && ServerFacade::instance().GetDistance2d(bot, player) > PlayerbotAIConfig::Instance().SightDistance)
             continue;
 
         Group* group = bot->GetGroup();
@@ -239,7 +239,7 @@ bool InviteGuildToGroupAction::Execute(Event /*event*/)
             PlayerbotWorldThreadProcessor::instance().QueueOperation(std::move(convertOp));
         }
 
-        if (PlayerbotAIConfig::instance().inviteChat &&
+        if (PlayerbotAIConfig::Instance().InviteChat &&
             (RandomPlayerbotMgr::instance().IsRandomBot(bot) || !IsRealPlayer(botAI->GetMaster())))
         {
             BroadcastHelper::BroadcastGuildGroupOrRaidInvite(botAI, bot, player, group);
@@ -317,8 +317,9 @@ bool LfgAction::Execute(Event event)
     allowedRoles[BOT_ROLE_HEALER] = 1;
     allowedRoles[BOT_ROLE_DPS] = 3;
 
-    BotRoles role = botAI->IsTank(requester, true) ? BOT_ROLE_TANK
-                                                   : (botAI->IsHeal(requester, true) ? BOT_ROLE_HEALER : BOT_ROLE_DPS);
+    BotRoles role = PlayerbotAI::IsTank(requester, true)
+                        ? BOT_ROLE_TANK
+                        : (PlayerbotAI::IsHeal(requester, true) ? BOT_ROLE_HEALER : BOT_ROLE_DPS);
     Classes cls = (Classes)requester->getClass();
 
     if (group)
@@ -391,8 +392,8 @@ bool LfgAction::Execute(Event event)
             if (!botAI->IsSafe(player))
                 return false;
 
-            role = botAI->IsTank(player, true) ? BOT_ROLE_TANK
-                                               : (botAI->IsHeal(player, true) ? BOT_ROLE_HEALER : BOT_ROLE_DPS);
+            role = PlayerbotAI::IsTank(player, true) ? BOT_ROLE_TANK
+                                               : (PlayerbotAI::IsHeal(player, true) ? BOT_ROLE_HEALER : BOT_ROLE_DPS);
             cls = (Classes)player->getClass();
 
             if (allowedRoles[role] > 0)
@@ -411,7 +412,8 @@ bool LfgAction::Execute(Event event)
             allowedClassNr[cls][role]--;
     }
 
-    role = botAI->IsTank(bot, true) ? BOT_ROLE_TANK : (botAI->IsHeal(bot, true) ? BOT_ROLE_HEALER : BOT_ROLE_DPS);
+    role = PlayerbotAI::IsTank(bot, true) ? BOT_ROLE_TANK
+                                          : (PlayerbotAI::IsHeal(bot, true) ? BOT_ROLE_HEALER : BOT_ROLE_DPS);
     cls = (Classes)bot->getClass();
 
     if (allowedRoles[role] == 0)

@@ -12,7 +12,7 @@
 #include "Multiplier.h"
 #include <string>
 
-// General
+// Shared
 
 class HyjalEncounterMultiplier : public Multiplier
 {
@@ -22,8 +22,8 @@ public:
 
     float GetValue(Action* action) final
     {
-        return EncounterHelpers::IsEncounterInProgress(bot, HyjalHelpers::HYJAL_MAP_ID)
-            ? GetValueInEncounter(action) : 1.0f;
+        return EncounterHelpers::IsEncounterInProgress(bot, HyjalHelpers::HYJAL_MAP_ID) ?
+            GetValueInEncounter(action) : 1.0f;
     }
 
 protected:

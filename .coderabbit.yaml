@@ -129,9 +129,12 @@ reviews:
           SQLTransaction.
         - Namespace is `Acore::`; flag any `Trinity::` left over from ports.
 
-        Code comments: flag any new or changed comment longer than one line, and any comment
-        that restates what the code already says. A comment should only explain something
-        non-obvious, a core quirk, or hidden constraints.
+        Code comments: these should be used only where the code alone would mislead or context is
+        crucial to understanding it, such as a counterintuitive reason, an AzerothCore or spell-data
+        quirk, a known limitation, or an unusual game mechanic. They should never narrate change
+        history or conversations with the author. Flag any new or changed comment in violation of
+        these standards. Further, comments of more than two lines should be used only in exceptional
+        cases, and therefore flag any new or changed non-exceptional comment longer than two lines.
         The GPLv2 file header is exempt.
 
         mod-playerbots architecture rules (CLAUDE.md). The project's stated philosophy is

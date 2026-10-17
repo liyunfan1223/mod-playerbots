@@ -20,7 +20,7 @@ public:
     }
 
 private:
-    static Action* use_crystal(PlayerbotAI* ai) { return new Aq20UseCrystalAction(ai); }
+    static Action* use_crystal(PlayerbotAI* botAI) { return new Aq20UseCrystalAction(botAI); }
 };
 
 #endif

@@ -25,14 +25,14 @@ class WotlkDungeonOccTriggerContext : public NamedObjectContext<Trigger>
             creators["time bomb"] = &WotlkDungeonOccTriggerContext::time_bomb;
         }
     private:
-        static Trigger* unstable_sphere(PlayerbotAI* ai) { return new DrakosUnstableSphereTrigger(ai); }
-        static Trigger* drake_mount(PlayerbotAI* ai) { return new DrakeMountTrigger(ai); }
-        static Trigger* drake_dismount(PlayerbotAI* ai) { return new DrakeDismountTrigger(ai); }
-        static Trigger* group_flying(PlayerbotAI* ai) { return new GroupFlyingTrigger(ai); }
-        static Trigger* drake_combat(PlayerbotAI* ai) { return new DrakeCombatTrigger(ai); }
-        static Trigger* varos_cloudstrider(PlayerbotAI* ai) { return new VarosCloudstriderTrigger(ai); }
-        static Trigger* arcane_explosion(PlayerbotAI* ai) { return new UromArcaneExplosionTrigger(ai); }
-        static Trigger* time_bomb(PlayerbotAI* ai) { return new UromTimeBombTrigger(ai); }
+        static Trigger* unstable_sphere(PlayerbotAI* botAI) { return new DrakosUnstableSphereTrigger(botAI); }
+        static Trigger* drake_mount(PlayerbotAI* botAI) { return new DrakeMountTrigger(botAI); }
+        static Trigger* drake_dismount(PlayerbotAI* botAI) { return new DrakeDismountTrigger(botAI); }
+        static Trigger* group_flying(PlayerbotAI* botAI) { return new GroupFlyingTrigger(botAI); }
+        static Trigger* drake_combat(PlayerbotAI* botAI) { return new DrakeCombatTrigger(botAI); }
+        static Trigger* varos_cloudstrider(PlayerbotAI* botAI) { return new VarosCloudstriderTrigger(botAI); }
+        static Trigger* arcane_explosion(PlayerbotAI* botAI) { return new UromArcaneExplosionTrigger(botAI); }
+        static Trigger* time_bomb(PlayerbotAI* botAI) { return new UromTimeBombTrigger(botAI); }
 };
 
 #endif

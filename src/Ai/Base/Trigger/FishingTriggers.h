@@ -12,14 +12,14 @@
 class CanFishTrigger : public Trigger
 {
 public:
-    CanFishTrigger(PlayerbotAI* ai) : Trigger(ai, "can fish") {};
+    CanFishTrigger(PlayerbotAI* botAI) : Trigger(botAI, "can fish") {};
     bool IsActive() override;
 };
 
 class CanUseFishingBobberTrigger : public Trigger
 {
 public:
-    CanUseFishingBobberTrigger(PlayerbotAI* ai) : Trigger(ai, "can use fishing bobber") {};
+    CanUseFishingBobberTrigger(PlayerbotAI* botAI) : Trigger(botAI, "can use fishing bobber") {};
     bool IsActive() override;
 };
 

@@ -86,14 +86,14 @@ struct IccGuidLess
 bool IccCastClassTaunt(Player* bot, PlayerbotAI* botAI, Unit* target);
 std::optional<bool> IccTryClassCC(Player* bot, PlayerbotAI* botAI, Unit* target);
 void IccEnsureIconOn(Player* bot, PlayerbotAI* botAI, int8 icon, Unit* target);
-void IccApplyHeroicBuffToMember(PlayerbotAI* botAI, Player* member, bool applyPainSupp, bool applyNoThreat);
+void IccApplyHeroicBuffToMember(Player* member, bool applyPainSupp, bool applyNoThreat);
 void IccStripExperienced(Player* bot);
 bool IccBossCastingBlisteringCold(Unit* boss);
 bool IccBossHasRemorselessWinter(Unit* boss);
 bool IccBossCastingRemorselessWinter(Unit* boss);
 bool IccAnyGroupMemberHasAura(Player* bot, uint32 spellId);
 bool IccAnyBloodPrincePresent(PlayerbotAI* botAI);
-std::optional<bool> IccValithriaShouldHealRaid(Player* bot, PlayerbotAI* botAI);
+std::optional<bool> IccValithriaShouldHealRaid(Player* bot);
 std::vector<Creature*> IccGetCreaturesByEntries(WorldObject* searcher, std::initializer_list<uint32> entries,
                                                 float range);
 

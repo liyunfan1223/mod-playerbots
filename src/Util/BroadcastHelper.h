@@ -42,26 +42,26 @@ public:
 
     static uint8_t GetLocale();
     static bool BroadcastTest(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot
     );
     static bool BroadcastToChannelWithGlobalChance(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         std::string message,
         std::list<std::pair<ToChannel, uint32_t>> toChannels
     );
     static bool BroadcastLootingItem(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         ItemTemplate const* proto
     );
     static bool BroadcastQuestAccepted(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Quest const* quest
     );
     static bool BroadcastQuestUpdateAddKill(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Quest const* quest,
         uint32_t availableCount,
@@ -69,7 +69,7 @@ public:
         std::string obectiveName
     );
     static bool BroadcastQuestUpdateAddItem(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Quest const* quest,
         uint32_t availableCount,
@@ -77,87 +77,87 @@ public:
         ItemTemplate const* proto
     );
     static bool BroadcastQuestUpdateFailedTimer(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Quest const* quest
     );
     static bool BroadcastQuestUpdateComplete(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Quest const* quest
     );
     static bool BroadcastQuestTurnedIn(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Quest const* quest
     );
     static bool BroadcastKill(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Creature* creature
     );
     static bool BroadcastLevelup(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot
     );
     static bool BroadcastGuildMemberPromotion(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Player* player
     );
     static bool BroadcastGuildMemberDemotion(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Player* player
     );
     static bool BroadcastGuildGroupOrRaidInvite(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot,
         Player* player,
         Group* group
     );
     static bool BroadcastSuggestInstance(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         std::vector<std::string>& allowedInstances,
         Player* bot
     );
     static bool BroadcastSuggestQuest(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         std::vector<uint32>& quests,
         Player* bot
     );
     static bool BroadcastSuggestGrindMaterials(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         std::string item,
         Player* bot
     );
     static bool BroadcastSuggestGrindReputation(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         std::vector<std::string> levels,
         std::vector<std::string> allowedFactions,
         Player* bot
     );
     static bool BroadcastSuggestSell(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         ItemTemplate const* proto,
         uint32_t count,
         uint32_t price,
         Player* bot
     );
     static bool BroadcastSuggestSomething(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot
     );
     static bool BroadcastSuggestSomethingToxic(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot
     );
     static bool BroadcastSuggestToxicLinks(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot
     );
     static bool BroadcastSuggestThunderfury(
-        PlayerbotAI* ai,
+        PlayerbotAI* botAI,
         Player* bot
     );
 };

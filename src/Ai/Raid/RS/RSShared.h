@@ -79,7 +79,7 @@ inline bool RsIsDesignatedMarker(Player* bot)
         if (!memberAI)
             continue;
 
-        if (memberAI->IsTank(member) || memberAI->IsHeal(member))
+        if (PlayerbotAI::IsTank(member) || PlayerbotAI::IsHeal(member))
             continue;
 
         if (member->GetMapId() != bot->GetMapId() || member->GetInstanceId() != bot->GetInstanceId())

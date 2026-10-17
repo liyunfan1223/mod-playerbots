@@ -87,74 +87,74 @@ public:
     }
 
 private:
-    static Action* icc_lm_tank_position(PlayerbotAI* ai) { return new IccLmTankPositionAction(ai); }
-    static Action* icc_spike(PlayerbotAI* ai) { return new IccSpikeAction(ai); }
+    static Action* icc_lm_tank_position(PlayerbotAI* botAI) { return new IccLmTankPositionAction(botAI); }
+    static Action* icc_spike(PlayerbotAI* botAI) { return new IccSpikeAction(botAI); }
 
-    static Action* icc_dark_reckoning(PlayerbotAI* ai) { return new IccDarkReckoningAction(ai); }
-    static Action* icc_ranged_position_lady_deathwhisper(PlayerbotAI* ai) { return new IccRangedPositionLadyDeathwhisperAction(ai); }
-    static Action* icc_adds_lady_deathwhisper(PlayerbotAI* ai) { return new IccAddsLadyDeathwhisperAction(ai); }
-    static Action* icc_shade_lady_deathwhisper(PlayerbotAI* ai) { return new IccShadeLadyDeathwhisperAction(ai); }
+    static Action* icc_dark_reckoning(PlayerbotAI* botAI) { return new IccDarkReckoningAction(botAI); }
+    static Action* icc_ranged_position_lady_deathwhisper(PlayerbotAI* botAI) { return new IccRangedPositionLadyDeathwhisperAction(botAI); }
+    static Action* icc_adds_lady_deathwhisper(PlayerbotAI* botAI) { return new IccAddsLadyDeathwhisperAction(botAI); }
+    static Action* icc_shade_lady_deathwhisper(PlayerbotAI* botAI) { return new IccShadeLadyDeathwhisperAction(botAI); }
 
-    static Action* icc_rotting_frost_giant_tank_position(PlayerbotAI* ai) { return new IccRottingFrostGiantTankPositionAction(ai); }
-    static Action* icc_cannon_fire(PlayerbotAI* ai) { return new IccCannonFireAction(ai); }
-    static Action* icc_gunship_enter_cannon(PlayerbotAI* ai) { return new IccGunshipEnterCannonAction(ai); }
-    static Action* icc_gunship_rocket_jump(PlayerbotAI* ai) { return new IccGunshipRocketJumpAction(ai); }
-    static Action* icc_gunship_rocket_pack_setup(PlayerbotAI* ai) { return new IccGunshipRocketPackSetupAction(ai); }
+    static Action* icc_rotting_frost_giant_tank_position(PlayerbotAI* botAI) { return new IccRottingFrostGiantTankPositionAction(botAI); }
+    static Action* icc_cannon_fire(PlayerbotAI* botAI) { return new IccCannonFireAction(botAI); }
+    static Action* icc_gunship_enter_cannon(PlayerbotAI* botAI) { return new IccGunshipEnterCannonAction(botAI); }
+    static Action* icc_gunship_rocket_jump(PlayerbotAI* botAI) { return new IccGunshipRocketJumpAction(botAI); }
+    static Action* icc_gunship_rocket_pack_setup(PlayerbotAI* botAI) { return new IccGunshipRocketPackSetupAction(botAI); }
 
-    static Action* icc_dbs_tank_position(PlayerbotAI* ai) { return new IccDbsTankPositionAction(ai); }
-    static Action* icc_adds_dbs(PlayerbotAI* ai) { return new IccAddsDbsAction(ai); }
+    static Action* icc_dbs_tank_position(PlayerbotAI* botAI) { return new IccDbsTankPositionAction(botAI); }
+    static Action* icc_adds_dbs(PlayerbotAI* botAI) { return new IccAddsDbsAction(botAI); }
 
-    static Action* icc_dogs_tank_position(PlayerbotAI* ai) { return new IccDogsTankPositionAction(ai); }
+    static Action* icc_dogs_tank_position(PlayerbotAI* botAI) { return new IccDogsTankPositionAction(botAI); }
 
-    static Action* icc_festergut_group_position(PlayerbotAI* ai) { return new IccFestergutGroupPositionAction(ai); }
-    static Action* icc_festergut_spore(PlayerbotAI* ai) { return new IccFestergutSporeAction(ai); }
-    static Action* icc_festergut_avoid_malleable_goo(PlayerbotAI* ai) { return new IccFestergutAvoidMalleableGooAction(ai); }
+    static Action* icc_festergut_group_position(PlayerbotAI* botAI) { return new IccFestergutGroupPositionAction(botAI); }
+    static Action* icc_festergut_spore(PlayerbotAI* botAI) { return new IccFestergutSporeAction(botAI); }
+    static Action* icc_festergut_avoid_malleable_goo(PlayerbotAI* botAI) { return new IccFestergutAvoidMalleableGooAction(botAI); }
 
-    static Action* icc_rotface_tank_position(PlayerbotAI* ai) { return new IccRotfaceTankPositionAction(ai); }
-    static Action* icc_rotface_group_position(PlayerbotAI* ai) { return new IccRotfaceGroupPositionAction(ai); }
-    static Action* icc_rotface_move_away_from_explosion(PlayerbotAI* ai) { return new IccRotfaceMoveAwayFromExplosionAction(ai); }
-    static Action* icc_rotface_avoid_vile_gas(PlayerbotAI* ai) { return new IccRotfaceAvoidVileGasAction(ai); }
+    static Action* icc_rotface_tank_position(PlayerbotAI* botAI) { return new IccRotfaceTankPositionAction(botAI); }
+    static Action* icc_rotface_group_position(PlayerbotAI* botAI) { return new IccRotfaceGroupPositionAction(botAI); }
+    static Action* icc_rotface_move_away_from_explosion(PlayerbotAI* botAI) { return new IccRotfaceMoveAwayFromExplosionAction(botAI); }
+    static Action* icc_rotface_avoid_vile_gas(PlayerbotAI* botAI) { return new IccRotfaceAvoidVileGasAction(botAI); }
 
-    static Action* icc_putricide_mutated_plague(PlayerbotAI* ai) { return new IccPutricideMutatedPlagueAction(ai); }
-    static Action* icc_putricide_volatile_ooze(PlayerbotAI* ai) { return new IccPutricideVolatileOozeAction(ai); }
-    static Action* icc_putricide_gas_cloud(PlayerbotAI* ai) { return new IccPutricideGasCloudAction(ai); }
-    static Action* icc_putricide_growing_ooze_puddle(PlayerbotAI* ai) { return new IccPutricideGrowingOozePuddleAction(ai); }
-    static Action* icc_putricide_avoid_malleable_goo(PlayerbotAI* ai) { return new IccPutricideAvoidMalleableGooAction(ai); }
-    static Action* icc_putricide_abomination(PlayerbotAI* ai) { return new IccPutricideAbominationAction(ai); }
+    static Action* icc_putricide_mutated_plague(PlayerbotAI* botAI) { return new IccPutricideMutatedPlagueAction(botAI); }
+    static Action* icc_putricide_volatile_ooze(PlayerbotAI* botAI) { return new IccPutricideVolatileOozeAction(botAI); }
+    static Action* icc_putricide_gas_cloud(PlayerbotAI* botAI) { return new IccPutricideGasCloudAction(botAI); }
+    static Action* icc_putricide_growing_ooze_puddle(PlayerbotAI* botAI) { return new IccPutricideGrowingOozePuddleAction(botAI); }
+    static Action* icc_putricide_avoid_malleable_goo(PlayerbotAI* botAI) { return new IccPutricideAvoidMalleableGooAction(botAI); }
+    static Action* icc_putricide_abomination(PlayerbotAI* botAI) { return new IccPutricideAbominationAction(botAI); }
 
-    static Action* icc_bpc_keleseth_tank(PlayerbotAI* ai) { return new IccBpcKelesethTankAction(ai); }
-    static Action* icc_bpc_main_tank(PlayerbotAI* ai) { return new IccBpcMainTankAction(ai); }
-    static Action* icc_bpc_empowered_vortex(PlayerbotAI* ai) { return new IccBpcEmpoweredVortexAction(ai); }
-    static Action* icc_bpc_kinetic_bomb(PlayerbotAI* ai) { return new IccBpcKineticBombAction(ai); }
-    static Action* icc_bpc_ball_of_flame(PlayerbotAI* ai) { return new IccBpcBallOfFlameAction(ai); }
+    static Action* icc_bpc_keleseth_tank(PlayerbotAI* botAI) { return new IccBpcKelesethTankAction(botAI); }
+    static Action* icc_bpc_main_tank(PlayerbotAI* botAI) { return new IccBpcMainTankAction(botAI); }
+    static Action* icc_bpc_empowered_vortex(PlayerbotAI* botAI) { return new IccBpcEmpoweredVortexAction(botAI); }
+    static Action* icc_bpc_kinetic_bomb(PlayerbotAI* botAI) { return new IccBpcKineticBombAction(botAI); }
+    static Action* icc_bpc_ball_of_flame(PlayerbotAI* botAI) { return new IccBpcBallOfFlameAction(botAI); }
 
-    static Action* icc_bql_group_position(PlayerbotAI* ai) { return new IccBqlGroupPositionAction(ai); }
-    static Action* icc_bql_pact_of_darkfallen(PlayerbotAI* ai) { return new IccBqlPactOfDarkfallenAction(ai); }
-    static Action* icc_bql_vampiric_bite(PlayerbotAI* ai) { return new IccBqlVampiricBiteAction(ai); }
+    static Action* icc_bql_group_position(PlayerbotAI* botAI) { return new IccBqlGroupPositionAction(botAI); }
+    static Action* icc_bql_pact_of_darkfallen(PlayerbotAI* botAI) { return new IccBqlPactOfDarkfallenAction(botAI); }
+    static Action* icc_bql_vampiric_bite(PlayerbotAI* botAI) { return new IccBqlVampiricBiteAction(botAI); }
 
-    static Action* icc_valkyre_spear(PlayerbotAI* ai) { return new IccValkyreSpearAction(ai); }
-    static Action* icc_sister_svalna(PlayerbotAI* ai) { return new IccSisterSvalnaAction(ai); }
+    static Action* icc_valkyre_spear(PlayerbotAI* botAI) { return new IccValkyreSpearAction(botAI); }
+    static Action* icc_sister_svalna(PlayerbotAI* botAI) { return new IccSisterSvalnaAction(botAI); }
 
-    static Action* icc_valithria_group(PlayerbotAI* ai) { return new IccValithriaGroupAction(ai); }
-    static Action* icc_valithria_portal(PlayerbotAI* ai) { return new IccValithriaPortalAction(ai); }
-    static Action* icc_valithria_heal(PlayerbotAI* ai) { return new IccValithriaHealAction(ai); }
-    static Action* icc_valithria_dream_cloud(PlayerbotAI* ai) { return new IccValithriaDreamCloudAction(ai); }
-    static Action* icc_valithria_zombie_kite(PlayerbotAI* ai) { return new IccValithriaZombieKiteAction(ai); }
+    static Action* icc_valithria_group(PlayerbotAI* botAI) { return new IccValithriaGroupAction(botAI); }
+    static Action* icc_valithria_portal(PlayerbotAI* botAI) { return new IccValithriaPortalAction(botAI); }
+    static Action* icc_valithria_heal(PlayerbotAI* botAI) { return new IccValithriaHealAction(botAI); }
+    static Action* icc_valithria_dream_cloud(PlayerbotAI* botAI) { return new IccValithriaDreamCloudAction(botAI); }
+    static Action* icc_valithria_zombie_kite(PlayerbotAI* botAI) { return new IccValithriaZombieKiteAction(botAI); }
 
-    static Action* icc_sindragosa_group_position(PlayerbotAI* ai) { return new IccSindragosaGroupPositionAction(ai); }
-    static Action* icc_sindragosa_frost_beacon(PlayerbotAI* ai) { return new IccSindragosaFrostBeaconAction(ai); }
-    static Action* icc_sindragosa_hot(PlayerbotAI* ai) { return new IccSindragosaHotAction(ai); }
-    static Action* icc_sindragosa_blistering_cold(PlayerbotAI* ai) { return new IccSindragosaBlisteringColdAction(ai); }
-    static Action* icc_sindragosa_unchained_magic(PlayerbotAI* ai) { return new IccSindragosaUnchainedMagicAction(ai); }
-    static Action* icc_sindragosa_chilled_to_the_bone(PlayerbotAI* ai) { return new IccSindragosaChilledToTheBoneAction(ai); }
-    static Action* icc_sindragosa_mystic_buffet(PlayerbotAI* ai) { return new IccSindragosaMysticBuffetAction(ai); }
-    static Action* icc_sindragosa_frost_bomb(PlayerbotAI* ai) { return new IccSindragosaFrostBombAction(ai); }
+    static Action* icc_sindragosa_group_position(PlayerbotAI* botAI) { return new IccSindragosaGroupPositionAction(botAI); }
+    static Action* icc_sindragosa_frost_beacon(PlayerbotAI* botAI) { return new IccSindragosaFrostBeaconAction(botAI); }
+    static Action* icc_sindragosa_hot(PlayerbotAI* botAI) { return new IccSindragosaHotAction(botAI); }
+    static Action* icc_sindragosa_blistering_cold(PlayerbotAI* botAI) { return new IccSindragosaBlisteringColdAction(botAI); }
+    static Action* icc_sindragosa_unchained_magic(PlayerbotAI* botAI) { return new IccSindragosaUnchainedMagicAction(botAI); }
+    static Action* icc_sindragosa_chilled_to_the_bone(PlayerbotAI* botAI) { return new IccSindragosaChilledToTheBoneAction(botAI); }
+    static Action* icc_sindragosa_mystic_buffet(PlayerbotAI* botAI) { return new IccSindragosaMysticBuffetAction(botAI); }
+    static Action* icc_sindragosa_frost_bomb(PlayerbotAI* botAI) { return new IccSindragosaFrostBombAction(botAI); }
 
-    static Action* icc_lich_king_shadow_trap(PlayerbotAI* ai) { return new IccLichKingShadowTrapAction(ai); }
-    static Action* icc_lich_king_necrotic_plague(PlayerbotAI* ai) { return new IccLichKingNecroticPlagueAction(ai); }
-    static Action* icc_lich_king_winter(PlayerbotAI* ai) { return new IccLichKingWinterAction(ai); }
-    static Action* icc_lich_king_adds(PlayerbotAI* ai) { return new IccLichKingAddsAction(ai); }
-    static Action* icc_lich_king_spirit_bomb(PlayerbotAI* ai) { return new IccLichKingSpiritBombAction(ai); }
+    static Action* icc_lich_king_shadow_trap(PlayerbotAI* botAI) { return new IccLichKingShadowTrapAction(botAI); }
+    static Action* icc_lich_king_necrotic_plague(PlayerbotAI* botAI) { return new IccLichKingNecroticPlagueAction(botAI); }
+    static Action* icc_lich_king_winter(PlayerbotAI* botAI) { return new IccLichKingWinterAction(botAI); }
+    static Action* icc_lich_king_adds(PlayerbotAI* botAI) { return new IccLichKingAddsAction(botAI); }
+    static Action* icc_lich_king_spirit_bomb(PlayerbotAI* botAI) { return new IccLichKingSpiritBombAction(botAI); }
 
 };
 

@@ -15,7 +15,7 @@ class PlayerbotAI;
 class NearestFriendlyPlayersValue : public NearestUnitsValue
 {
 public:
-    NearestFriendlyPlayersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig.sightDistance)
+    NearestFriendlyPlayersValue(PlayerbotAI* botAI, float range = sPlayerbotAIConfig.SightDistance)
         : NearestUnitsValue(botAI, "nearest friendly players", range)
     {
     }

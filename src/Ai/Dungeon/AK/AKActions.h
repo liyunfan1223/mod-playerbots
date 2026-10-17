@@ -16,21 +16,21 @@
 class AttackNadoxGuardianAction : public AttackAction
 {
 public:
-    AttackNadoxGuardianAction(PlayerbotAI* ai) : AttackAction(ai, "attack nadox guardian") {}
+    AttackNadoxGuardianAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack nadox guardian") {}
     bool Execute(Event event) override;
 };
 
 class AttackJedogaVolunteerAction : public AttackAction
 {
 public:
-    AttackJedogaVolunteerAction(PlayerbotAI* ai) : AttackAction(ai, "attack jedoga volunteer") {}
+    AttackJedogaVolunteerAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack jedoga volunteer") {}
     bool Execute(Event event) override;
 };
 
 class AvoidShadowCrashAction : public MovementAction
 {
 public:
-    AvoidShadowCrashAction(PlayerbotAI* ai) : MovementAction(ai, "avoid shadow crash") {}
+    AvoidShadowCrashAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid shadow crash") {}
     bool Execute(Event event) override;
 };
 

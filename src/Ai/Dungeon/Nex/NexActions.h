@@ -16,21 +16,21 @@
 class MoveFromWhirlwindAction : public MovementAction
 {
 public:
-    MoveFromWhirlwindAction(PlayerbotAI* ai) : MovementAction(ai, "move from whirlwind") {}
+    MoveFromWhirlwindAction(PlayerbotAI* botAI) : MovementAction(botAI, "move from whirlwind") {}
     bool Execute(Event event) override;
 };
 
 class FirebombSpreadAction : public MovementAction
 {
 public:
-    FirebombSpreadAction(PlayerbotAI* ai) : MovementAction(ai, "firebomb spread") {}
+    FirebombSpreadAction(PlayerbotAI* botAI) : MovementAction(botAI, "firebomb spread") {}
     bool Execute(Event event) override;
 };
 
 class TelestraSplitTargetAction : public AttackAction
 {
 public:
-    TelestraSplitTargetAction(PlayerbotAI* ai) : AttackAction(ai, "telestra split target") {}
+    TelestraSplitTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "telestra split target") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -38,7 +38,7 @@ public:
 class ChaoticRiftTargetAction : public AttackAction
 {
 public:
-    ChaoticRiftTargetAction(PlayerbotAI* ai) : AttackAction(ai, "chaotic rift target") {}
+    ChaoticRiftTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "chaotic rift target") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -46,7 +46,7 @@ public:
 class DodgeSpikesAction : public MovementAction
 {
 public:
-    DodgeSpikesAction(PlayerbotAI* ai) : MovementAction(ai, "dodge spikes") {}
+    DodgeSpikesAction(PlayerbotAI* botAI) : MovementAction(botAI, "dodge spikes") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -54,7 +54,7 @@ public:
 class IntenseColdJumpAction : public MovementAction
 {
 public:
-    IntenseColdJumpAction(PlayerbotAI* ai) : MovementAction(ai, "intense cold jump") {}
+    IntenseColdJumpAction(PlayerbotAI* botAI) : MovementAction(botAI, "intense cold jump") {}
     bool Execute(Event event) override;
 };
 

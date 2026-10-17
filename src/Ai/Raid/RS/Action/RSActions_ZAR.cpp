@@ -138,7 +138,7 @@ bool RsZarithrianTankAction::RunAddsToBoss(Unit* boss, std::vector<Unit*> const&
 
 bool RsZarithrianTankAction::Execute(Event )
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* boss = FindBoss();
@@ -158,10 +158,10 @@ bool RsZarithrianTankAction::Execute(Event )
             if (!member || !member->IsAlive())
                 continue;
 
-            if (!mainTankPlayer && botAI->IsMainTank(member))
+            if (!mainTankPlayer && PlayerbotAI::IsMainTank(member))
                 mainTankPlayer = member;
 
-            if (!assistTankPlayer && botAI->IsAssistTank(member))
+            if (!assistTankPlayer && PlayerbotAI::IsAssistTank(member))
                 assistTankPlayer = member;
 
             if (mainTankPlayer && assistTankPlayer)

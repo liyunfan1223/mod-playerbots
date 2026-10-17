@@ -25,7 +25,7 @@ bool IccFestergutGroupPositionAction::Execute(Event /*event*/)
 
     bot->SetTarget(boss->GetGUID());
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         Aura* aura = botAI->GetAura("gastric bloat", bot, false, true);
         bool const hasGastricBloat = aura && aura->GetStackAmount() >= 6;
@@ -63,7 +63,7 @@ bool IccFestergutGroupPositionAction::Execute(Event /*event*/)
         return false;
 
     // No spore, no goo dodge - melee stack on main tank.
-    if (botAI->IsMelee(bot))
+    if (PlayerbotAI::IsMelee(bot))
     {
         Unit* mainTank = AI_VALUE(Unit*, "main tank");
         if (mainTank && bot->GetExactDist2d(mainTank) > 3.0f)
@@ -85,7 +85,7 @@ bool IccFestergutGroupPositionAction::HasSporesInGroup()
 bool IccFestergutGroupPositionAction::PositionNonTankMembers()
 {
     // Only position ranged and healers without spores
-    if (!(botAI->IsRanged(bot) || botAI->IsHeal(bot)))
+    if (!(PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot)))
         return false;
 
     Group* group = bot->GetGroup();
@@ -142,14 +142,14 @@ int32 IccFestergutGroupPositionAction::CalculatePositionIndex(Group* group)
     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* member = itr->GetSource();
-        if (!member || !member->IsAlive() || botAI->IsTank(member))
+        if (!member || !member->IsAlive() || PlayerbotAI::IsTank(member))
             continue;
 
         ObjectGuid memberGuid = member->GetGUID();
 
-        if (botAI->IsHeal(member))
+        if (PlayerbotAI::IsHeal(member))
             healerGuids.push_back(memberGuid);
-        else if (botAI->IsRanged(member))
+        else if (PlayerbotAI::IsRanged(member))
         {
             if (member->getClass() == CLASS_HUNTER)
                 hunterGuids.push_back(memberGuid);
@@ -326,7 +326,7 @@ Position IccFestergutSporeAction::DetermineTargetPosition(bool hasSpore, SporeIn
 {
     // No spores at all
     if (sporeInfo.sporedPlayers.empty())
-        return botAI->IsMelee(bot) ? ICC_FESTERGUT_MELEE_SPORE : spreadRangedPos;
+        return PlayerbotAI::IsMelee(bot) ? ICC_FESTERGUT_MELEE_SPORE : spreadRangedPos;
 
     bool mainTankHasSpore = CheckMainTankSpore();
 
@@ -337,10 +337,10 @@ Position IccFestergutSporeAction::DetermineTargetPosition(bool hasSpore, SporeIn
     if (gooAtMelee && !gooAtRanged)
     {
         // Goo at melee: tank + melee-spore bot hold, other melee flee to ranged slot 1.
-        bool isMeleeSporeBot = (hasSpore && bot->GetGUID() == sporeInfo.lowestGuid && !botAI->IsTank(bot) && !mainTankHasSpore);
-        if (botAI->IsMainTank(bot) || isMeleeSporeBot)
+        bool isMeleeSporeBot = (hasSpore && bot->GetGUID() == sporeInfo.lowestGuid && !PlayerbotAI::IsTank(bot) && !mainTankHasSpore);
+        if (PlayerbotAI::IsMainTank(bot) || isMeleeSporeBot)
             return ICC_FESTERGUT_MELEE_SPORE;
-        if (botAI->IsMelee(bot))
+        if (PlayerbotAI::IsMelee(bot))
             return ICC_FESTERGUT_RANGED_SPORE;
         return spreadRangedPos;
     }
@@ -348,19 +348,19 @@ Position IccFestergutSporeAction::DetermineTargetPosition(bool hasSpore, SporeIn
     if (gooAtRanged && !gooAtMelee)
     {
         // Goo at ranged: all ranged collapse to melee spot.
-        if (!botAI->IsMelee(bot))
+        if (!PlayerbotAI::IsMelee(bot))
             return ICC_FESTERGUT_MELEE_SPORE;
         return ICC_FESTERGUT_MELEE_SPORE;
     }
 
     // Normal spore logic (no overlap or both spots hit).
     if (!hasSpore)
-        return botAI->IsMelee(bot) ? ICC_FESTERGUT_MELEE_SPORE : spreadRangedPos;
+        return PlayerbotAI::IsMelee(bot) ? ICC_FESTERGUT_MELEE_SPORE : spreadRangedPos;
 
-    if (botAI->IsMainTank(bot))
+    if (PlayerbotAI::IsMainTank(bot))
         return ICC_FESTERGUT_MELEE_SPORE;
 
-    if (bot->GetGUID() == sporeInfo.lowestGuid && !botAI->IsTank(bot) && !mainTankHasSpore)
+    if (bot->GetGUID() == sporeInfo.lowestGuid && !PlayerbotAI::IsTank(bot) && !mainTankHasSpore)
         return ICC_FESTERGUT_MELEE_SPORE;
 
     return spreadRangedPos;
@@ -376,7 +376,7 @@ bool IccFestergutSporeAction::CheckMainTankSpore()
         if (!unit)
             continue;
 
-        if (botAI->IsMainTank(unit->ToPlayer()) && unit->HasAura(SPELL_GAS_SPORE))
+        if (PlayerbotAI::IsMainTank(unit->ToPlayer()) && unit->HasAura(SPELL_GAS_SPORE))
             return true;
     }
 
@@ -390,7 +390,7 @@ bool IccFestergutAvoidMalleableGooAction::Execute(Event /*event*/)
         return false;
 
     // Tanks hold aggro at the fixed tank spot - never dodge.
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     // Festergut heroic - Putricide throws Malleable Goo from the balcony at
@@ -439,7 +439,7 @@ bool IccFestergutAvoidMalleableGooAction::Execute(Event /*event*/)
             Player* member = itr->GetSource();
             if (!member || !member->IsAlive() || member->GetGUID() == botGuid)
                 continue;
-            if (sporeActive && botAI->IsMelee(member))
+            if (sporeActive && PlayerbotAI::IsMelee(member))
                 continue;
             alliesToSpace.push_back(member->GetPosition());
         }

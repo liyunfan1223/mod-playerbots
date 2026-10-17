@@ -98,15 +98,15 @@ private:
     static Trigger* loot_roll_won(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "loot roll won"); }
 
     // quest
-    static Trigger* quest_update_add_kill(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "quest update add kill"); }
-    static Trigger* quest_update_add_item(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "quest update add item"); }
-    static Trigger* quest_update_failed(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "quest update failed"); }
-    static Trigger* quest_update_failed_timer(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "quest update failed timer"); }
-    static Trigger* quest_update_complete(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "quest update complete"); }
+    static Trigger* quest_update_add_kill(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "quest update add kill"); }
+    static Trigger* quest_update_add_item(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "quest update add item"); }
+    static Trigger* quest_update_failed(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "quest update failed"); }
+    static Trigger* quest_update_failed_timer(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "quest update failed timer"); }
+    static Trigger* quest_update_complete(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "quest update complete"); }
     static Trigger* complete_quest(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "complete quest"); }
     static Trigger* accept_quest(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "accept quest"); }
     static Trigger* quest_confirm_accept(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "confirm quest"); }
-    static Trigger* quest_share(PlayerbotAI* ai) { return new WorldPacketTrigger(ai, "quest share"); }
+    static Trigger* quest_share(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "quest share"); }
     static Trigger* questgiver_quest_details(PlayerbotAI* botAI) { return new WorldPacketTrigger(botAI, "questgiver quest details"); }
 
     static Trigger* out_of_react_range(PlayerbotAI* botAI) { return new OutOfReactRangeTrigger(botAI); }

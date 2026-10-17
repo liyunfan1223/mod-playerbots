@@ -12,14 +12,14 @@
 class AvoidFreezingCloudAction : public MovementAction
 {
 public:
-    AvoidFreezingCloudAction(PlayerbotAI* ai) : MovementAction(ai, "avoid freezing cloud") {}
+    AvoidFreezingCloudAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid freezing cloud") {}
     bool Execute(Event event) override;
 };
 
 class AvoidSkadiWhirlwindAction : public MovementAction
 {
 public:
-    AvoidSkadiWhirlwindAction(PlayerbotAI* ai) : MovementAction(ai, "avoid skadi whirlwind") {}
+    AvoidSkadiWhirlwindAction(PlayerbotAI* botAI) : MovementAction(botAI, "avoid skadi whirlwind") {}
     bool Execute(Event event) override;
 };
 

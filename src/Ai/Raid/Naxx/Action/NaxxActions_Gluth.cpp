@@ -33,9 +33,9 @@ bool GluthChooseTargetAction::Execute(Event /*event*/)
         if (botAI->EqualLowercaseName(unit->GetName(), "gluth"))
             target_boss = unit;
     }
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0))
+    if (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0))
         target = target_boss;
-    else if (botAI->IsAssistTankOfIndex(bot, 1))
+    else if (PlayerbotAI::IsAssistTankOfIndex(bot, 1))
     {
         for (Unit* t : target_zombies)
         {
@@ -52,7 +52,7 @@ bool GluthChooseTargetAction::Execute(Event /*event*/)
         for (Unit* t : target_zombies)
         {
             if (t->GetHealthPct() > helper.decimatedZombiePct && t->GetVictim() == target_boss &&
-                t->GetDistance2d(bot) <= sPlayerbotAIConfig.spellDistance)
+                t->GetDistance2d(bot) <= sPlayerbotAIConfig.SpellDistance)
             {
                 if (!target || t->GetDistance2d(bot) < target->GetDistance2d(bot))
                     target = t;
@@ -92,7 +92,7 @@ bool GluthPositionAction::Execute(Event /*event*/)
         return false;
 
     bool raid25 = bot->GetRaidDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL;
-    if (botAI->IsMainTank(bot) || botAI->IsAssistTankOfIndex(bot, 0))
+    if (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0))
     {
         if (AI_VALUE2(bool, "has aggro", "boss target"))
         {
@@ -116,7 +116,7 @@ bool GluthPositionAction::Execute(Event /*event*/)
             }
         }
     }
-    else if (botAI->IsAssistTankOfIndex(bot, 1))
+    else if (PlayerbotAI::IsAssistTankOfIndex(bot, 1))
     {
         if (helper.BeforeDecimate())
         {
@@ -138,7 +138,7 @@ bool GluthPositionAction::Execute(Event /*event*/)
             }
         }
     }
-    else if (botAI->IsRangedDps(bot))
+    else if (PlayerbotAI::IsRangedDps(bot))
     {
         if (raid25)
         {
@@ -153,7 +153,7 @@ bool GluthPositionAction::Execute(Event /*event*/)
         return MoveInside(NAXX_MAP_ID, helper.rangedPos.first, helper.rangedPos.second, bot->GetPositionZ(), 3.0f,
                           MovementPriority::MOVEMENT_COMBAT);
     }
-    else if (botAI->IsHeal(bot))
+    else if (PlayerbotAI::IsHeal(bot))
         return MoveInside(NAXX_MAP_ID, helper.healPos.first, helper.healPos.second, bot->GetPositionZ(), 0.0f,
                           MovementPriority::MOVEMENT_COMBAT);
     return false;

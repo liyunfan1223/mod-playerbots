@@ -249,7 +249,7 @@ bool SuggestDungeonAction::Execute(Event /*event*/)
 {
     // TODO: use PlayerbotDungeonRepository::instance()
 
-    if (!sPlayerbotAIConfig.randomBotSuggestDungeons || bot->GetGroup())
+    if (!sPlayerbotAIConfig.RandomBotSuggestDungeons || bot->GetGroup())
         return false;
 
     if (instances.empty())

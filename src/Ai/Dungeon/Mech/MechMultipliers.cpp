@@ -43,7 +43,7 @@ float SepethreaFocusBossMultiplier::GetValue(Action* action)
         dynamic_cast<DpsAssistAction*>(action) ||
         dynamic_cast<TankAssistAction*>(action) ||
         dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
-        (action->getThreatType() == Action::ActionThreatType::Aoe && botAI->IsDps(bot) &&
+        (action->getThreatType() == Action::ActionThreatType::Aoe && PlayerbotAI::IsDps(bot) &&
          !dynamic_cast<CastHealingSpellAction*>(action));
     if (!suppressed)
         return 1.0f;

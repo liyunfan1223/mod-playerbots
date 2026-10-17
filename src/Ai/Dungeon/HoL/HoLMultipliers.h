@@ -12,7 +12,7 @@
 class BjarngrimMultiplier : public Multiplier
 {
     public:
-        BjarngrimMultiplier(PlayerbotAI* ai) : Multiplier(ai, "general bjarngrim") {}
+        BjarngrimMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "general bjarngrim") {}
 
     public:
         float GetValue(Action* action) override;
@@ -21,7 +21,7 @@ class BjarngrimMultiplier : public Multiplier
 class VolkhanMultiplier : public Multiplier
 {
     public:
-        VolkhanMultiplier(PlayerbotAI* ai) : Multiplier(ai, "volkhan") {}
+        VolkhanMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "volkhan") {}
 
     public:
         float GetValue(Action* action) override;
@@ -30,7 +30,7 @@ class VolkhanMultiplier : public Multiplier
 class IonarMultiplier : public Multiplier
 {
     public:
-        IonarMultiplier(PlayerbotAI* ai) : Multiplier(ai, "ionar") {}
+        IonarMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "ionar") {}
 
     public:
         float GetValue(Action* action) override;
@@ -39,7 +39,7 @@ class IonarMultiplier : public Multiplier
 class LokenMultiplier : public Multiplier
 {
     public:
-        LokenMultiplier(PlayerbotAI* ai) : Multiplier(ai, "loken") {}
+        LokenMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "loken") {}
 
     public:
         float GetValue(Action* action) override;

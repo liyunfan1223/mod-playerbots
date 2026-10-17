@@ -57,7 +57,7 @@ public:
 class EoEFlyDrakeAction : public MovementAction
 {
 public:
-    EoEFlyDrakeAction(PlayerbotAI* ai) : MovementAction(ai, "eoe fly drake") {}
+    EoEFlyDrakeAction(PlayerbotAI* botAI) : MovementAction(botAI, "eoe fly drake") {}
 
     bool Execute(Event event) override;
     bool isPossible() override;

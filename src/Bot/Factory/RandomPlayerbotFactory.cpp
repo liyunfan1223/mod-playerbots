@@ -9,6 +9,7 @@
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
 #include "CharacterCache.h"
+#include "DBCStores.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "DatabaseEnv.h"
@@ -23,7 +24,19 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
+#include "StringFormat.h"
 #include "Timer.h"
+#include "World.h"
+
+std::string RandomPlayerbotFactory::GetLocalizedNameSelector(std::string const& column)
+{
+    LocaleConstant locale = sWorld->GetDefaultDbcLocale();
+    if (locale == LOCALE_enUS || locale >= TOTAL_LOCALES)
+        return column;
+
+    // Fall back to the enUS column when the localized one is NULL or empty
+    return Acore::StringFormat("COALESCE(NULLIF({}_{}, ''), {})", column, localeNames[locale], column);
+}
 
 constexpr RandomPlayerbotFactory::NameRaceAndGender RandomPlayerbotFactory::CombineRaceAndGender(uint8 race,
                                                                                                 uint8 gender)
@@ -323,20 +336,20 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
 {
     // Reset account types if features are disabled
     // Reset is done here to precede needed accounts calculations
-    if (sPlayerbotAIConfig.maxRandomBots == 0 || sPlayerbotAIConfig.addClassAccountPoolSize == 0)
+    if (sPlayerbotAIConfig.MaxRandomBots == 0 || sPlayerbotAIConfig.AddClassAccountPoolSize == 0)
     {
-        if (sPlayerbotAIConfig.maxRandomBots == 0)
+        if (sPlayerbotAIConfig.MaxRandomBots == 0)
         {
             PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_UPD_ACCOUNT_TYPE_UNASSIGN);
             stmt->SetData(0, uint8(1));
-            PlayerbotsDatabase.Execute(stmt);
+            PlayerbotsDatabase.DirectExecute(stmt);
             LOG_INFO("playerbots", "MaxRandomBots set to 0, any RNDbot accounts (type 1) will be unassigned (type 0)");
         }
-        if (sPlayerbotAIConfig.addClassAccountPoolSize == 0)
+        if (sPlayerbotAIConfig.AddClassAccountPoolSize == 0)
         {
             PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_UPD_ACCOUNT_TYPE_UNASSIGN);
             stmt->SetData(0, uint8(2));
-            PlayerbotsDatabase.Execute(stmt);
+            PlayerbotsDatabase.DirectExecute(stmt);
             LOG_INFO("playerbots", "AddClassAccountPoolSize set to 0, any AddClass accounts (type 2) will be unassigned (type 0)");
         }
 
@@ -344,8 +357,8 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
         for (int waited = 0; waited < 1000; waited += 50)
         {
             PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_ACCOUNT_TYPE_COUNT_BY_TYPES);
-            stmt->SetData(0, int32(sPlayerbotAIConfig.maxRandomBots == 0 ? 1 : -1));
-            stmt->SetData(1, int32(sPlayerbotAIConfig.addClassAccountPoolSize == 0 ? 2 : -1));
+            stmt->SetData(0, int32(sPlayerbotAIConfig.MaxRandomBots == 0 ? 1 : -1));
+            stmt->SetData(1, int32(sPlayerbotAIConfig.AddClassAccountPoolSize == 0 ? 2 : -1));
             PreparedQueryResult res = PlayerbotsDatabase.Query(stmt);
 
             if (!res || res->Fetch()[0].Get<uint64>() == 0)
@@ -380,15 +393,15 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
     int divisor = CalculateAvailableCharsPerAccount();
 
     // Calculate max bots
-    int maxBots = sPlayerbotAIConfig.maxRandomBots;
+    int maxBots = sPlayerbotAIConfig.MaxRandomBots;
     // Take periodic online/offline into account
-    if (sPlayerbotAIConfig.enablePeriodicOnlineOffline)
-        maxBots *= sPlayerbotAIConfig.periodicOnlineOfflineRatio;
+    if (sPlayerbotAIConfig.EnablePeriodicOnlineOffline)
+        maxBots *= sPlayerbotAIConfig.PeriodicOnlineOfflineRatio;
 
     // Calculate number of accounts needed for RNDbots
     // Result is rounded up for maxBots not cleanly divisible by the divisor
     uint32 neededRndBotAccounts = (maxBots + divisor - 1) / divisor;
-    uint32 neededAddClassAccounts = sPlayerbotAIConfig.addClassAccountPoolSize;
+    uint32 neededAddClassAccounts = sPlayerbotAIConfig.AddClassAccountPoolSize;
 
     // Start with existing total
     uint32 existingTotal = existingRndBotAccounts + existingAddClassAccounts + existingUnassignedAccounts;
@@ -427,12 +440,12 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
     uint32 calculatedTotal = existingTotal + additionalAccountsNeeded;
 
     // Manually set randomBotAccountCount meets the requirements
-    if (sPlayerbotAIConfig.randomBotAccountCount >= calculatedTotal)
-        return sPlayerbotAIConfig.randomBotAccountCount;
+    if (sPlayerbotAIConfig.RandomBotAccountCount >= calculatedTotal)
+        return sPlayerbotAIConfig.RandomBotAccountCount;
     // Manually set randomBotAccountCount doesn't meet the requirements. Using calculated value
-    if (sPlayerbotAIConfig.randomBotAccountCount > 0)
+    if (sPlayerbotAIConfig.RandomBotAccountCount > 0)
         LOG_WARN("playerbots", "RandomBotAccountCount ({}) is lower than the required calculated value ({}). Using the calculated value instead.",
-            sPlayerbotAIConfig.randomBotAccountCount, calculatedTotal);
+            sPlayerbotAIConfig.RandomBotAccountCount, calculatedTotal);
 
     return calculatedTotal;
 }
@@ -440,12 +453,12 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
 uint32 RandomPlayerbotFactory::CalculateAvailableCharsPerAccount()
 {
     // Death Knight availability according to their login eligibility, and if WotLK is enabled at all.
-    bool noDK = sPlayerbotAIConfig.disableDeathKnightLogin || sWorld->getIntConfig(CONFIG_EXPANSION) != EXPANSION_WRATH_OF_THE_LICH_KING;
+    bool noDK = sPlayerbotAIConfig.DisableDeathKnightLogin || sWorld->getIntConfig(CONFIG_EXPANSION) != EXPANSION_WRATH_OF_THE_LICH_KING;
 
     uint32 availableChars = noDK ? 9 : 10;
 
-    uint32 hordeRatio = sPlayerbotAIConfig.randomBotHordeRatio;
-    uint32 allianceRatio = sPlayerbotAIConfig.randomBotAllianceRatio;
+    uint32 hordeRatio = sPlayerbotAIConfig.RandomBotHordeRatio;
+    uint32 allianceRatio = sPlayerbotAIConfig.RandomBotAllianceRatio;
 
     // horde : alliance = 50 : 50 -> 0%
     // horde : alliance = 0 : 50 -> 50%
@@ -464,14 +477,14 @@ void RandomPlayerbotFactory::CreateRandomBots()
 {
     /* multi-thread here is meaningless? since the async db operations */
 
-    if (sPlayerbotAIConfig.deleteRandomBotAccounts)
+    if (sPlayerbotAIConfig.DeleteRandomBotAccounts)
     {
         // Collect bot account ids from the login database so the cleanup below
         // never needs a cross-database subquery (the login database may live on
         // a different server than the character database)
         std::vector<uint32> botAccounts;
         QueryResult accountResult = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%' ORDER BY id",
-            sPlayerbotAIConfig.randomBotAccountPrefix.c_str());
+            sPlayerbotAIConfig.RandomBotAccountPrefix.c_str());
         if (accountResult)
         {
             do
@@ -494,8 +507,8 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
         // First execute all the cleanup SQL commands
         // Clear playerbots_random_bots and playerbots_account_type
-        PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
-        PlayerbotsDatabase.Execute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_ACCOUNT_TYPE));
+        PlayerbotsDatabase.DirectExecute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_RANDOM_BOTS));
+        PlayerbotsDatabase.DirectExecute(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_ACCOUNT_TYPE));
 
         // Get the character database name dynamically (used in same-server subqueries below)
         std::string characterDBName = CharacterDatabase.GetConnectionInfo()->database;
@@ -511,10 +524,10 @@ void RandomPlayerbotFactory::CreateRandomBots()
         std::this_thread::sleep_for(std::chrono::milliseconds(100));    // Extra 100ms fixed delay for safety.
 
         // Clean up orphaned entries in playerbots_guild_tasks
-        PlayerbotsDatabase.Execute("DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM " + characterDBName + ".characters)");
+        PlayerbotsDatabase.DirectExecute("DELETE FROM playerbots_guild_tasks WHERE owner NOT IN (SELECT guid FROM " + characterDBName + ".characters)");
 
         // Clean up orphaned entries in playerbots_db_store (explicit id list, no cross-database subquery)
-        PlayerbotsDatabase.Execute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM " + characterDBName + ".characters WHERE account NOT IN (" + botAccountIds + "))");
+        PlayerbotsDatabase.DirectExecute("DELETE FROM playerbots_db_store WHERE guid NOT IN (SELECT guid FROM " + characterDBName + ".characters WHERE account NOT IN (" + botAccountIds + "))");
 
         // Clean up orphaned records in character-related tables
         CharacterDatabase.Execute("DELETE FROM arena_team_member WHERE guid NOT IN (SELECT guid FROM characters)");
@@ -569,7 +582,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         // Finally, delete the bot accounts themselves
         LOG_INFO("playerbots", "Deleting random bot accounts...");
         QueryResult results = LoginDatabase.Query("SELECT id FROM account WHERE username LIKE '{}%%'",
-                                             sPlayerbotAIConfig.randomBotAccountPrefix.c_str());
+                                             sPlayerbotAIConfig.RandomBotAccountPrefix.c_str());
         int32 deletion_count = 0;
         if (results)
         {
@@ -587,7 +600,6 @@ void RandomPlayerbotFactory::CreateRandomBots()
         // After ALL deletions, make sure data is commited to DB
         LoginDatabase.Execute("COMMIT");
         CharacterDatabase.Execute("COMMIT");
-        PlayerbotsDatabase.Execute("COMMIT");
 
         // Wait for all pending database operations to complete
         while (LoginDatabase.QueueSize() || CharacterDatabase.QueueSize() || PlayerbotsDatabase.QueueSize())
@@ -599,10 +611,10 @@ void RandomPlayerbotFactory::CreateRandomBots()
         // Flush tables to ensure all data in memory are written to disk
         LoginDatabase.Execute("FLUSH TABLES");
         CharacterDatabase.Execute("FLUSH TABLES");
-        PlayerbotsDatabase.Execute("FLUSH TABLES");
+        PlayerbotsDatabase.DirectExecute("FLUSH TABLES");
 
         LOG_INFO("playerbots", ">> Random bot accounts and data deleted in {} ms", GetMSTimeDiffToNow(timer));
-        LOG_INFO("playerbots", "Please reset the AiPlayerbot.DeleteRandomBotAccounts to 0 and restart the server...");
+        LOG_INFO("playerbots", "Please reset the Playerbots.DeleteRandomBotAccounts to 0 and restart the server...");
         World::StopNow(SHUTDOWN_EXIT_CODE);
         return;
     }
@@ -619,7 +631,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
     {
         std::ostringstream out;
-        out << sPlayerbotAIConfig.randomBotAccountPrefix << accountNumber;
+        out << sPlayerbotAIConfig.RandomBotAccountPrefix << accountNumber;
         std::string const accountName = out.str();
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
@@ -631,7 +643,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         }
         account_creation++;
         std::string password = "";
-        if (sPlayerbotAIConfig.randomBotRandomPassword)
+        if (sPlayerbotAIConfig.RandomBotRandomPassword)
         {
             for (int i = 0; i < 10; i++)
             {
@@ -667,7 +679,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
     for (uint32 accountNumber = 0; accountNumber < totalAccountCount; ++accountNumber)
     {
         std::ostringstream out;
-        out << sPlayerbotAIConfig.randomBotAccountPrefix << accountNumber;
+        out << sPlayerbotAIConfig.RandomBotAccountPrefix << accountNumber;
         std::string const accountName = out.str();
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_ACCOUNT_ID_BY_USERNAME);
@@ -679,7 +691,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         Field* fields = result->Fetch();
         uint32 accountId = fields[0].Get<uint32>();
 
-        sPlayerbotAIConfig.randomBotAccounts.push_back(accountId);
+        sPlayerbotAIConfig.RandomBotAccounts.push_back(accountId);
 
         uint32 count = AccountMgr::GetCharactersCount(accountId);
         if (count >= 10)
@@ -764,13 +776,13 @@ void RandomPlayerbotFactory::CreateRandomBots()
     for (WorldSession* session : sessionBots)
         delete session;
 
-    for (uint32 accountId : sPlayerbotAIConfig.randomBotAccounts)
+    for (uint32 accountId : sPlayerbotAIConfig.RandomBotAccounts)
     {
         totalRandomBotChars += AccountMgr::GetCharactersCount(accountId);
     }
 
     LOG_INFO("server.loading", ">> {} random bot accounts with {} characters available",
-            sPlayerbotAIConfig.randomBotAccounts.size(), totalRandomBotChars);
+            sPlayerbotAIConfig.RandomBotAccounts.size(), totalRandomBotChars);
 }
 
 std::string const RandomPlayerbotFactory::CreateRandomGuildName()
@@ -788,10 +800,12 @@ std::string const RandomPlayerbotFactory::CreateRandomGuildName()
     uint32 maxId = fields[0].Get<uint32>();
 
     uint32 id = urand(0, maxId);
+    std::string nameExpr = GetLocalizedNameSelector("n.name");
     result = CharacterDatabase.Query(
-        "SELECT n.name FROM playerbots_guild_names n "
-        "LEFT OUTER JOIN guild e ON e.name = n.name WHERE e.guildid IS NULL AND n.name_id >= {} LIMIT 1",
-        id);
+        "SELECT {} FROM playerbots_guild_names n "
+        "LEFT OUTER JOIN guild e ON e.name = {} "
+        "WHERE e.guildid IS NULL AND n.name_id >= {} LIMIT 1",
+        nameExpr, nameExpr, id);
     if (!result)
     {
         LOG_ERROR("playerbots", "No more names left for random guilds");
@@ -820,9 +834,9 @@ bool RandomPlayerbotFactory::IsBotArenaTeam(ArenaTeam const* team)
 void RandomPlayerbotFactory::LoadArenaTeamData()
 {
     _configTargets = {
-        {ARENA_TYPE_2v2, sPlayerbotAIConfig.randomBotArenaTeam2v2Count},
-        {ARENA_TYPE_3v3, sPlayerbotAIConfig.randomBotArenaTeam3v3Count},
-        {ARENA_TYPE_5v5, sPlayerbotAIConfig.randomBotArenaTeam5v5Count},
+        {ARENA_TYPE_2v2, sPlayerbotAIConfig.RandomBotArenaTeam2v2Count},
+        {ARENA_TYPE_3v3, sPlayerbotAIConfig.RandomBotArenaTeam3v3Count},
+        {ARENA_TYPE_5v5, sPlayerbotAIConfig.RandomBotArenaTeam5v5Count},
     };
 
     _botArenaTeamRegistry.clear();
@@ -842,10 +856,13 @@ void RandomPlayerbotFactory::LoadArenaTeamData()
 
     _availableArenaTeamNames.clear();
 
+    // Join on the localized name so already-taken localized names are filtered out
+    std::string nameExpr = GetLocalizedNameSelector("n.name");
     QueryResult result = CharacterDatabase.Query(
-        "SELECT n.name FROM playerbots_arena_team_names n "
-        "LEFT OUTER JOIN arena_team e ON e.name = n.name "
-        "WHERE e.arenateamid IS NULL");
+        "SELECT {} FROM playerbots_arena_team_names n "
+        "LEFT OUTER JOIN arena_team e ON e.name = {} "
+        "WHERE e.arenateamid IS NULL",
+        nameExpr, nameExpr);
 
     if (!result)
     {
@@ -889,12 +906,19 @@ bool RandomPlayerbotFactory::IsEligibleForBotArenaTeam(Player* bot)
     return true;
 }
 
+bool RandomPlayerbotFactory::SameArenaBracket(uint8 level, uint8 otherLevel)
+{
+    PvPDifficultyEntry const* a = GetBattlegroundBracketByLevel(559, level);  // arena brackets (Nagrand Arena)
+    PvPDifficultyEntry const* b = GetBattlegroundBracketByLevel(559, otherLevel);
+    return a && b && a->GetBracketId() == b->GetBracketId();
+}
+
 void RandomPlayerbotFactory::AssignBotToArenaTeam(Player* bot)
 {
     if (!IsEligibleForBotArenaTeam(bot))
         return;
 
-    if (sPlayerbotAIConfig.deleteRandomBotArenaTeams)
+    if (sPlayerbotAIConfig.DeleteRandomBotArenaTeams)
         return;
 
     if (bot->GetLevel() < 70)
@@ -929,7 +953,7 @@ void RandomPlayerbotFactory::AssignBotToArenaTeamInternal(Player* bot)
 
     std::vector<ArenaTeam*> candidates;
     for (ArenaType type : order)
-        CollectJoinableBotArenaTeams(type, botTeam, candidates);
+        CollectJoinableBotArenaTeams(type, botTeam, bot->GetLevel(), candidates);
 
     for (size_t i = candidates.size(); i > 0; --i)
     {
@@ -988,7 +1012,7 @@ void RandomPlayerbotFactory::CreateBotArenaTeam(Player* bot, ArenaType type)
     }
 
     arenateam->SetRatingForAll(
-        urand(sPlayerbotAIConfig.randomBotArenaTeamMinRating, sPlayerbotAIConfig.randomBotArenaTeamMaxRating));
+        urand(sPlayerbotAIConfig.RandomBotArenaTeamMinRating, sPlayerbotAIConfig.RandomBotArenaTeamMaxRating));
 
     uint32 const backgroundColor = urand(0xFF000000, 0xFFFFFFFF);
     uint8 const emblemStyle = urand(0, 101);
@@ -1011,7 +1035,8 @@ uint32 RandomPlayerbotFactory::GetBotArenaTeamCount(ArenaType type)
     return it != _botArenaTeamRegistry.end() ? static_cast<uint32>(it->second.size()) : 0;
 }
 
-void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, std::vector<ArenaTeam*>& out)
+void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, uint8 level,
+                                                          std::vector<ArenaTeam*>& out)
 {
     auto it = _botArenaTeamRegistry.find(type);
     if (it == _botArenaTeamRegistry.end())
@@ -1025,7 +1050,7 @@ void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId
             continue;
 
         CharacterCacheEntry const* entry = sCharacterCache->GetCharacterCacheByGuid(team->GetCaptain());
-        if (entry && Player::TeamIdForRace(entry->Race) == faction)
+        if (entry && Player::TeamIdForRace(entry->Race) == faction && SameArenaBracket(entry->Level, level))
             out.push_back(team);
     }
 }

@@ -19,8 +19,8 @@ class WotlkDungeonHoSTriggerContext : public NamedObjectContext<Trigger>
             creators["lightning ring"] = &WotlkDungeonHoSTriggerContext::lightning_ring;
         }
     private:
-        static Trigger* ground_slam(PlayerbotAI* ai) { return new KrystallusGroundSlamTrigger(ai); }
-        static Trigger* lightning_ring(PlayerbotAI* ai) { return new SjonnirLightningRingTrigger(ai); }
+        static Trigger* ground_slam(PlayerbotAI* botAI) { return new KrystallusGroundSlamTrigger(botAI); }
+        static Trigger* lightning_ring(PlayerbotAI* botAI) { return new SjonnirLightningRingTrigger(botAI); }
 };
 
 #endif

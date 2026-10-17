@@ -12,7 +12,7 @@
 #include "Multiplier.h"
 #include <string>
 
-// General
+// Shared
 
 class GruulsLairEncounterMultiplier : public Multiplier
 {
@@ -22,8 +22,8 @@ public:
 
     float GetValue(Action* action) final
     {
-        return EncounterHelpers::IsEncounterInProgress(bot, GruulHelpers::GRUUL_MAP_ID)
-            ? GetValueInEncounter(action) : 1.0f;
+        return EncounterHelpers::IsEncounterInProgress(bot, GruulHelpers::GRUUL_MAP_ID) ?
+            GetValueInEncounter(action) : 1.0f;
     }
 
 protected:
@@ -82,11 +82,22 @@ protected:
     float GetValueInEncounter(Action* action) override;
 };
 
-class HighKingMaulgarControlHunterActionsMultiplier : public GruulsLairEncounterMultiplier
+class HighKingMaulgarLetMageTankStealSpellShieldMultiplier : public GruulsLairEncounterMultiplier
 {
 public:
-    HighKingMaulgarControlHunterActionsMultiplier(PlayerbotAI* botAI)
-        : GruulsLairEncounterMultiplier(botAI, "high king maulgar control hunter actions") {}
+    HighKingMaulgarLetMageTankStealSpellShieldMultiplier(PlayerbotAI* botAI)
+        : GruulsLairEncounterMultiplier(
+            botAI, "high king maulgar let mage tank steal spell shield") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
+};
+
+class HighKingMaulgarControlMisdirectionMultiplier : public GruulsLairEncounterMultiplier
+{
+public:
+    HighKingMaulgarControlMisdirectionMultiplier(PlayerbotAI* botAI)
+        : GruulsLairEncounterMultiplier(botAI, "high king maulgar control misdirection") {}
 
 protected:
     float GetValueInEncounter(Action* action) override;

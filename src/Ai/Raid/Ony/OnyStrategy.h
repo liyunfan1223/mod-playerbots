@@ -13,7 +13,7 @@
 class RaidOnyxiaStrategy : public Strategy
 {
 public:
-    RaidOnyxiaStrategy(PlayerbotAI* ai) : Strategy(ai) {}
+    RaidOnyxiaStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
     std::string const getName() override { return "onyxia"; }
 

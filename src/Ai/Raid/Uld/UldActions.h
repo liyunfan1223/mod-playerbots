@@ -202,7 +202,7 @@ public:
 class HodirBitingColdJumpAction : public MovementAction
 {
 public:
-    HodirBitingColdJumpAction(PlayerbotAI* ai) : MovementAction(ai, "hodir biting cold jump") {}
+    HodirBitingColdJumpAction(PlayerbotAI* botAI) : MovementAction(botAI, "hodir biting cold jump") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -226,7 +226,7 @@ public:
 class FreyaMoveToHealingSporeAction : public MovementAction
 {
 public:
-    FreyaMoveToHealingSporeAction(PlayerbotAI* ai) : MovementAction(ai, "freya move to healing spore action") {}
+    FreyaMoveToHealingSporeAction(PlayerbotAI* botAI) : MovementAction(botAI, "freya move to healing spore action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -235,7 +235,7 @@ public:
 class ThorimUnbalancingStrikeAction : public Action
 {
 public:
-    ThorimUnbalancingStrikeAction(PlayerbotAI* ai) : Action(ai, "thorim unbalancing strike action") {}
+    ThorimUnbalancingStrikeAction(PlayerbotAI* botAI) : Action(botAI, "thorim unbalancing strike action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -244,7 +244,7 @@ public:
 class ThorimMarkDpsTargetAction : public Action
 {
 public:
-    ThorimMarkDpsTargetAction(PlayerbotAI* ai) : Action(ai, "thorim mark dps target action") {}
+    ThorimMarkDpsTargetAction(PlayerbotAI* botAI) : Action(botAI, "thorim mark dps target action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -253,7 +253,7 @@ public:
 class ThorimArenaPositioningAction : public MovementAction
 {
 public:
-    ThorimArenaPositioningAction(PlayerbotAI* ai) : MovementAction(ai, "thorim arena positioning action") {}
+    ThorimArenaPositioningAction(PlayerbotAI* botAI) : MovementAction(botAI, "thorim arena positioning action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -262,7 +262,7 @@ public:
 class ThorimGauntletPositioningAction : public MovementAction
 {
 public:
-    ThorimGauntletPositioningAction(PlayerbotAI* ai) : MovementAction(ai, "thorim gauntlet positioning action") {}
+    ThorimGauntletPositioningAction(PlayerbotAI* botAI) : MovementAction(botAI, "thorim gauntlet positioning action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -279,7 +279,7 @@ public:
 class ThorimPhase2PositioningAction : public MovementAction
 {
 public:
-    ThorimPhase2PositioningAction(PlayerbotAI* ai) : MovementAction(ai, "thorim phase 2 positioning action") {}
+    ThorimPhase2PositioningAction(PlayerbotAI* botAI) : MovementAction(botAI, "thorim phase 2 positioning action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -288,7 +288,7 @@ public:
 class MimironShockBlastAction : public MovementAction
 {
 public:
-    MimironShockBlastAction(PlayerbotAI* ai) : MovementAction(ai, "mimiron shock blast action") {}
+    MimironShockBlastAction(PlayerbotAI* botAI) : MovementAction(botAI, "mimiron shock blast action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -297,7 +297,7 @@ public:
 class MimironPhase1PositioningAction : public MovementAction
 {
 public:
-    MimironPhase1PositioningAction(PlayerbotAI* ai) : MovementAction(ai, "mimiron phase 1 positioning action") {}
+    MimironPhase1PositioningAction(PlayerbotAI* botAI) : MovementAction(botAI, "mimiron phase 1 positioning action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -306,8 +306,8 @@ public:
 class MimironP3Wx2LaserBarrageAction : public MovementAction
 {
 public:
-    MimironP3Wx2LaserBarrageAction(PlayerbotAI* ai, float distance = 24.0f, float delta_angle = M_PI / 8)
-        : MovementAction(ai, "mimiron p3wx2 laser barrage action")
+    MimironP3Wx2LaserBarrageAction(PlayerbotAI* botAI, float distance = 24.0f, float delta_angle = M_PI / 8)
+        : MovementAction(botAI, "mimiron p3wx2 laser barrage action")
     {
         this->distance = distance;
         this->delta_angle = delta_angle;
@@ -321,7 +321,7 @@ protected:
 class MimironRapidBurstAction : public MovementAction
 {
 public:
-    MimironRapidBurstAction(PlayerbotAI* ai) : MovementAction(ai, "mimiron rapid burst action") {}
+    MimironRapidBurstAction(PlayerbotAI* botAI) : MovementAction(botAI, "mimiron rapid burst action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -330,7 +330,7 @@ public:
 class MimironAerialCommandUnitAction : public Action
 {
 public:
-    MimironAerialCommandUnitAction(PlayerbotAI* ai) : Action(ai, "mimiron aerial command unit action") {}
+    MimironAerialCommandUnitAction(PlayerbotAI* botAI) : Action(botAI, "mimiron aerial command unit action") {}
 
     bool Execute(Event event) override;
 };
@@ -338,7 +338,7 @@ public:
 class MimironRocketStrikeAction : public MovementAction
 {
 public:
-    MimironRocketStrikeAction(PlayerbotAI* ai) : MovementAction(ai, "mimiron rocket strike action") {}
+    MimironRocketStrikeAction(PlayerbotAI* botAI) : MovementAction(botAI, "mimiron rocket strike action") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;
@@ -347,7 +347,7 @@ public:
 class MimironPhase4MarkDpsAction : public Action
 {
 public:
-    MimironPhase4MarkDpsAction(PlayerbotAI* ai) : Action(ai, "mimiron phase 4 mark dps action") {}
+    MimironPhase4MarkDpsAction(PlayerbotAI* botAI) : Action(botAI, "mimiron phase 4 mark dps action") {}
 
     bool Execute(Event event) override;
 };
@@ -355,7 +355,7 @@ public:
 class MimironCheatAction : public Action
 {
 public:
-    MimironCheatAction(PlayerbotAI* ai) : Action(ai, "mimiron cheat action") {}
+    MimironCheatAction(PlayerbotAI* botAI) : Action(botAI, "mimiron cheat action") {}
 
     bool Execute(Event event) override;
 };
@@ -363,7 +363,7 @@ public:
 class VezaxCheatAction : public Action
 {
 public:
-    VezaxCheatAction(PlayerbotAI* ai) : Action(ai, "vezax cheat action") {}
+    VezaxCheatAction(PlayerbotAI* botAI) : Action(botAI, "vezax cheat action") {}
 
     bool Execute(Event event) override;
 };
@@ -371,7 +371,7 @@ public:
 class VezaxShadowCrashAction : public MovementAction
 {
 public:
-    VezaxShadowCrashAction(PlayerbotAI* ai) : MovementAction(ai, "vezax shadow crash action") {}
+    VezaxShadowCrashAction(PlayerbotAI* botAI) : MovementAction(botAI, "vezax shadow crash action") {}
 
     bool Execute(Event event) override;
 };
@@ -379,7 +379,7 @@ public:
 class VezaxMarkOfTheFacelessAction : public MovementAction
 {
 public:
-    VezaxMarkOfTheFacelessAction(PlayerbotAI* ai) : MovementAction(ai, "vezax mark of the faceless action") {}
+    VezaxMarkOfTheFacelessAction(PlayerbotAI* botAI) : MovementAction(botAI, "vezax mark of the faceless action") {}
 
     bool Execute(Event event) override;
 };
@@ -387,7 +387,7 @@ public:
 class YoggSaronOminousCloudCheatAction : public Action
 {
 public:
-    YoggSaronOminousCloudCheatAction(PlayerbotAI* ai) : Action(ai, "yogg-saron ominous cloud cheat action") {}
+    YoggSaronOminousCloudCheatAction(PlayerbotAI* botAI) : Action(botAI, "yogg-saron ominous cloud cheat action") {}
 
     bool Execute(Event event) override;
 };
@@ -395,7 +395,7 @@ public:
 class YoggSaronGuardianPositioningAction : public MovementAction
 {
 public:
-    YoggSaronGuardianPositioningAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron guardian positioning action") {}
+    YoggSaronGuardianPositioningAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron guardian positioning action") {}
 
     bool Execute(Event event) override;
 };
@@ -403,7 +403,7 @@ public:
 class YoggSaronSanityAction : public MovementAction
 {
 public:
-    YoggSaronSanityAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron sanity action") {}
+    YoggSaronSanityAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron sanity action") {}
 
     bool Execute(Event event) override;
 };
@@ -411,19 +411,19 @@ public:
 class YoggSaronDeathOrbAction : public MoveAwayFromCreatureAction
 {
 public:
-    YoggSaronDeathOrbAction(PlayerbotAI* ai) : MoveAwayFromCreatureAction(ai, "yogg-saron death orb action", NPC_DEATH_ORB, 10.0f) {}
+    YoggSaronDeathOrbAction(PlayerbotAI* botAI) : MoveAwayFromCreatureAction(botAI, "yogg-saron death orb action", NPC_DEATH_ORB, 10.0f) {}
 };
 
 class YoggSaronMaladyOfTheMindAction : public MoveAwayFromPlayerWithDebuffAction
 {
 public:
-    YoggSaronMaladyOfTheMindAction(PlayerbotAI* ai) : MoveAwayFromPlayerWithDebuffAction(ai, "yogg-saron malady of the mind action", SPELL_MALADY_OF_THE_MIND, 15.0f) {}
+    YoggSaronMaladyOfTheMindAction(PlayerbotAI* botAI) : MoveAwayFromPlayerWithDebuffAction(botAI, "yogg-saron malady of the mind action", SPELL_MALADY_OF_THE_MIND, 15.0f) {}
 };
 
 class YoggSaronMarkTargetAction : public Action
 {
 public:
-    YoggSaronMarkTargetAction(PlayerbotAI* ai) : Action(ai, "yogg-saron mark target action") {}
+    YoggSaronMarkTargetAction(PlayerbotAI* botAI) : Action(botAI, "yogg-saron mark target action") {}
 
     bool Execute(Event event) override;
 };
@@ -431,7 +431,7 @@ public:
 class YoggSaronBrainLinkAction : public MovementAction
 {
 public:
-    YoggSaronBrainLinkAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron brain link action") {}
+    YoggSaronBrainLinkAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron brain link action") {}
 
     bool Execute(Event event) override;
 };
@@ -439,7 +439,7 @@ public:
 class YoggSaronMoveToEnterPortalAction : public MovementAction
 {
 public:
-    YoggSaronMoveToEnterPortalAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron move to enter portal action") {}
+    YoggSaronMoveToEnterPortalAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron move to enter portal action") {}
 
     bool Execute(Event event) override;
 };
@@ -447,7 +447,7 @@ public:
 class YoggSaronFallFromFloorAction : public MovementAction
 {
 public:
-    YoggSaronFallFromFloorAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron fall from floor action") {}
+    YoggSaronFallFromFloorAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron fall from floor action") {}
 
     bool Execute(Event event) override;
 };
@@ -455,7 +455,7 @@ public:
 class YoggSaronBossRoomMovementCheatAction : public MovementAction
 {
 public:
-    YoggSaronBossRoomMovementCheatAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron boss room movement cheat action") {}
+    YoggSaronBossRoomMovementCheatAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron boss room movement cheat action") {}
 
     bool Execute(Event event) override;
 };
@@ -463,7 +463,7 @@ public:
 class YoggSaronUsePortalAction : public Action
 {
 public:
-    YoggSaronUsePortalAction(PlayerbotAI* ai) : Action(ai, "yogg-saron use portal action") {}
+    YoggSaronUsePortalAction(PlayerbotAI* botAI) : Action(botAI, "yogg-saron use portal action") {}
 
     bool Execute(Event event) override;
 };
@@ -471,7 +471,7 @@ public:
 class YoggSaronIllusionRoomAction : public MovementAction
 {
 public:
-    YoggSaronIllusionRoomAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron illusion room action") {}
+    YoggSaronIllusionRoomAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron illusion room action") {}
 
     bool Execute(Event event) override;
 
@@ -484,7 +484,7 @@ private:
 class YoggSaronMoveToExitPortalAction : public MovementAction
 {
 public:
-    YoggSaronMoveToExitPortalAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron move to exit portal action") {}
+    YoggSaronMoveToExitPortalAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron move to exit portal action") {}
 
     bool Execute(Event event) override;
 };
@@ -492,7 +492,7 @@ public:
 class YoggSaronLunaticGazeAction : public MovementAction
 {
 public:
-    YoggSaronLunaticGazeAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron lunatic gaze action") {}
+    YoggSaronLunaticGazeAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron lunatic gaze action") {}
 
     bool Execute(Event event) override;
 };
@@ -500,7 +500,7 @@ public:
 class YoggSaronPhase3PositioningAction : public MovementAction
 {
 public:
-    YoggSaronPhase3PositioningAction(PlayerbotAI* ai) : MovementAction(ai, "yogg-saron phase 3 positioning action") {}
+    YoggSaronPhase3PositioningAction(PlayerbotAI* botAI) : MovementAction(botAI, "yogg-saron phase 3 positioning action") {}
 
     bool Execute(Event event) override;
 };

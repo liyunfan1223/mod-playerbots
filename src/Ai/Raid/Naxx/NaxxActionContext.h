@@ -55,39 +55,39 @@ public:
     }
 
 private:
-    static Action* go_behind_the_boss(PlayerbotAI* ai) { return new GrobbulusGoBehindAction(ai); }
-    static Action* rotate_grobbulus(PlayerbotAI* ai) { return new GrobbulusRotateAction(ai); }
-    static Action* grobbulus_move_center(PlayerbotAI* ai) { return new GrobbulusMoveCenterAction(ai); }
-    static Action* grobbulus_move_away(PlayerbotAI* ai) { return new GrobbulusMoveAwayAction(ai); }
-    static Action* heigan_dance_melee(PlayerbotAI* ai) { return new HeiganDanceAction(ai, false); }
-    static Action* heigan_dance_ranged(PlayerbotAI* ai) { return new HeiganDanceAction(ai, true); }
-    static Action* thaddius_attack_nearest_pet(PlayerbotAI* ai) { return new ThaddiusAttackNearestPetAction(ai); }
-    // static Action* thaddius_tank_to_place(PlayerbotAI* ai) { return new ThaddiusMeleeToPlaceAction(ai); }
-    // static Action* thaddius_ranged_to_place(PlayerbotAI* ai) { return new ThaddiusRangedToPlaceAction(ai); }
-    static Action* thaddius_move_to_platform(PlayerbotAI* ai) { return new ThaddiusMoveToPlatformAction(ai); }
-    static Action* thaddius_move_polarity(PlayerbotAI* ai) { return new ThaddiusMovePolarityAction(ai); }
-    static Action* razuvious_target(PlayerbotAI* ai) { return new RazuviousTargetAction(ai); }
-    static Action* razuvious_use_obedience_crystal(PlayerbotAI* ai)
+    static Action* go_behind_the_boss(PlayerbotAI* botAI) { return new GrobbulusGoBehindAction(botAI); }
+    static Action* rotate_grobbulus(PlayerbotAI* botAI) { return new GrobbulusRotateAction(botAI); }
+    static Action* grobbulus_move_center(PlayerbotAI* botAI) { return new GrobbulusMoveCenterAction(botAI); }
+    static Action* grobbulus_move_away(PlayerbotAI* botAI) { return new GrobbulusMoveAwayAction(botAI); }
+    static Action* heigan_dance_melee(PlayerbotAI* botAI) { return new HeiganDanceAction(botAI, false); }
+    static Action* heigan_dance_ranged(PlayerbotAI* botAI) { return new HeiganDanceAction(botAI, true); }
+    static Action* thaddius_attack_nearest_pet(PlayerbotAI* botAI) { return new ThaddiusAttackNearestPetAction(botAI); }
+    // static Action* thaddius_tank_to_place(PlayerbotAI* botAI) { return new ThaddiusMeleeToPlaceAction(botAI); }
+    // static Action* thaddius_ranged_to_place(PlayerbotAI* botAI) { return new ThaddiusRangedToPlaceAction(botAI); }
+    static Action* thaddius_move_to_platform(PlayerbotAI* botAI) { return new ThaddiusMoveToPlatformAction(botAI); }
+    static Action* thaddius_move_polarity(PlayerbotAI* botAI) { return new ThaddiusMovePolarityAction(botAI); }
+    static Action* razuvious_target(PlayerbotAI* botAI) { return new RazuviousTargetAction(botAI); }
+    static Action* razuvious_use_obedience_crystal(PlayerbotAI* botAI)
     {
-        return new RazuviousUseObedienceCrystalAction(ai);
+        return new RazuviousUseObedienceCrystalAction(botAI);
     }
-    static Action* four_horsemen_attract_alternatively(PlayerbotAI* ai) { return new FourHorsemenAttractAlternativelyAction(ai); }
-    static Action* four_horsemen_attack_in_order(PlayerbotAI* ai) { return new FourHorsemenAttackInOrderAction(ai); }
-    // static Action* sapphiron_ground_main_tank_position(PlayerbotAI* ai) { return new
-    // SapphironGroundMainTankPositionAction(ai); }
-    static Action* sapphiron_ground_position(PlayerbotAI* ai) { return new SapphironGroundPositionAction(ai); }
-    static Action* sapphiron_flight_position(PlayerbotAI* ai) { return new SapphironFlightPositionAction(ai); }
-    // static Action* sapphiron_avoid_chill(PlayerbotAI* ai) { return new SapphironAvoidChillAction(ai); }
-    static Action* kelthuzad_choose_target(PlayerbotAI* ai) { return new KelthuzadChooseTargetAction(ai); }
-    static Action* kelthuzad_position(PlayerbotAI* ai) { return new KelthuzadPositionAction(ai); }
-    static Action* anubrekhan_choose_target(PlayerbotAI* ai) { return new AnubrekhanChooseTargetAction(ai); }
-    static Action* anubrekhan_position(PlayerbotAI* ai) { return new AnubrekhanPositionAction(ai); }
-    static Action* gluth_choose_target(PlayerbotAI* ai) { return new GluthChooseTargetAction(ai); }
-    static Action* gluth_position(PlayerbotAI* ai) { return new GluthPositionAction(ai); }
-    static Action* gluth_slowdown(PlayerbotAI* ai) { return new GluthSlowdownAction(ai); }
-    //static Action* patchwerk_ranged_position(PlayerbotAI* ai) { return new PatchwerkRangedPositionAction(ai); }
-    static Action* loatheb_position(PlayerbotAI* ai) { return new LoathebPositionAction(ai); }
-    static Action* loatheb_choose_target(PlayerbotAI* ai) { return new LoathebChooseTargetAction(ai); }
+    static Action* four_horsemen_attract_alternatively(PlayerbotAI* botAI) { return new FourHorsemenAttractAlternativelyAction(botAI); }
+    static Action* four_horsemen_attack_in_order(PlayerbotAI* botAI) { return new FourHorsemenAttackInOrderAction(botAI); }
+    // static Action* sapphiron_ground_main_tank_position(PlayerbotAI* botAI) { return new
+    // SapphironGroundMainTankPositionAction(botAI); }
+    static Action* sapphiron_ground_position(PlayerbotAI* botAI) { return new SapphironGroundPositionAction(botAI); }
+    static Action* sapphiron_flight_position(PlayerbotAI* botAI) { return new SapphironFlightPositionAction(botAI); }
+    // static Action* sapphiron_avoid_chill(PlayerbotAI* botAI) { return new SapphironAvoidChillAction(botAI); }
+    static Action* kelthuzad_choose_target(PlayerbotAI* botAI) { return new KelthuzadChooseTargetAction(botAI); }
+    static Action* kelthuzad_position(PlayerbotAI* botAI) { return new KelthuzadPositionAction(botAI); }
+    static Action* anubrekhan_choose_target(PlayerbotAI* botAI) { return new AnubrekhanChooseTargetAction(botAI); }
+    static Action* anubrekhan_position(PlayerbotAI* botAI) { return new AnubrekhanPositionAction(botAI); }
+    static Action* gluth_choose_target(PlayerbotAI* botAI) { return new GluthChooseTargetAction(botAI); }
+    static Action* gluth_position(PlayerbotAI* botAI) { return new GluthPositionAction(botAI); }
+    static Action* gluth_slowdown(PlayerbotAI* botAI) { return new GluthSlowdownAction(botAI); }
+    //static Action* patchwerk_ranged_position(PlayerbotAI* botAI) { return new PatchwerkRangedPositionAction(botAI); }
+    static Action* loatheb_position(PlayerbotAI* botAI) { return new LoathebPositionAction(botAI); }
+    static Action* loatheb_choose_target(PlayerbotAI* botAI) { return new LoathebChooseTargetAction(botAI); }
 };
 
 #endif

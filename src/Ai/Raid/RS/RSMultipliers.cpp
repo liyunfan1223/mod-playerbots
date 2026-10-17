@@ -58,7 +58,7 @@ float RsSavianaBeaconMultiplier::GetValue(Action* action)
 
 float RsBaltharusBrandSafeMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsTank(bot) || !bot->HasAura(SPELL_ENERVATING_BRAND))
+    if (PlayerbotAI::IsTank(bot) || !bot->HasAura(SPELL_ENERVATING_BRAND))
         return 1.0f;
 
     Group* group = bot->GetGroup();
@@ -84,7 +84,7 @@ float RsBaltharusBrandSafeMultiplier::GetValue(Action* action)
 
 float RsSavianaMeleeSpreadMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsTank(bot) || (!botAI->IsMelee(bot) && !botAI->IsHeal(bot)))
+    if (PlayerbotAI::IsTank(bot) || (!PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsHeal(bot)))
         return 1.0f;
 
     if (bot->HasAura(SPELL_FLAME_BEACON))
@@ -102,7 +102,7 @@ float RsSavianaMeleeSpreadMultiplier::GetValue(Action* action)
 
 float RsZarithrianAddsMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsTank(bot) || botAI->IsHeal(bot))
+    if (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot))
         return 1.0f;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "general zarithrian");
@@ -120,7 +120,7 @@ float RsZarithrianAddsMultiplier::GetValue(Action* action)
 
 float RsZarithrianTankSwapMultiplier::GetValue(Action* action)
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return 1.0f;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "general zarithrian");
@@ -151,7 +151,7 @@ float RsHalionCombustionMultiplier::GetValue(Action* action)
             return 0.0f;
     }
 
-    if (botAI->IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
+    if (PlayerbotAI::IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
         return 1.0f;
 
     if (!RsHalionHasCombustion(bot))
@@ -168,7 +168,7 @@ float RsHalionCombustionMultiplier::GetValue(Action* action)
 
 float RsHalionMeteorMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
+    if (PlayerbotAI::IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
         return 1.0f;
 
     if (RsHalionInTwilight(bot))
@@ -204,7 +204,7 @@ float RsHalionMeleeFlankMultiplier::GetValue(Action* action)
         (RsHalionEnteringTwilight(botAI, bot) || RsHalionPortalHeldForAdds(botAI)))
         return 1.0f;
 
-    if (botAI->IsTank(bot) && dynamic_cast<AvoidAoeAction*>(action))
+    if (PlayerbotAI::IsTank(bot) && dynamic_cast<AvoidAoeAction*>(action))
         return 0.0f;
 
     if (dynamic_cast<CastDisengageAction*>(action) || dynamic_cast<TankAssistAction*>(action) ||
@@ -229,7 +229,7 @@ float RsHalionMeleeFlankMultiplier::GetValue(Action* action)
         return 0.0f;
 
     if (physBoss)
-        if ((!botAI->IsTank(bot) || RsHalionAssistTankAsMelee(botAI)) && botAI->IsMelee(bot) &&
+        if ((!PlayerbotAI::IsTank(bot) || RsHalionAssistTankAsMelee(botAI)) && PlayerbotAI::IsMelee(bot) &&
             bot->GetExactDist2d(physBoss->GetPositionX(), physBoss->GetPositionY()) <= RS_HALION_LINE_MELEE_MAX &&
             dynamic_cast<ReachMeleeAction*>(action))
             return 0.0f;
@@ -239,7 +239,7 @@ float RsHalionMeleeFlankMultiplier::GetValue(Action* action)
 
 float RsHalionHpBalanceMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsTank(bot) || botAI->IsHeal(bot))
+    if (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot))
         return 1.0f;
 
     if (!RsHalionRealmThrottled(botAI, bot))
@@ -296,7 +296,7 @@ float RsHalionRealmIsolationMultiplier::GetValue(Action* action)
 
 float RsTrashAddsMultiplier::GetValue(Action* action)
 {
-    if (botAI->IsTank(bot) || botAI->IsHeal(bot))
+    if (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot))
         return 1.0f;
 
     if (!RsTrashActive(botAI, bot))

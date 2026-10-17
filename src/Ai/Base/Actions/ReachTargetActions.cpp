@@ -43,7 +43,7 @@ bool CastReachTargetSpellAction::isUseful()
     }
 
     return ServerFacade::instance().IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"),
-                                                (distance + sPlayerbotAIConfig.contactDistance));
+                                                (distance + sPlayerbotAIConfig.ContactDistance));
 }
 
 ReachSpellAction::ReachSpellAction(PlayerbotAI* botAI)

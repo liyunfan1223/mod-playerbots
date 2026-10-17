@@ -79,7 +79,7 @@ class EnemyOutOfMeleeTrigger : public OutOfRangeTrigger
 {
 public:
     EnemyOutOfMeleeTrigger(PlayerbotAI* botAI)
-        : OutOfRangeTrigger(botAI, "enemy out of melee range", sPlayerbotAIConfig.meleeDistance)
+        : OutOfRangeTrigger(botAI, "enemy out of melee range", sPlayerbotAIConfig.MeleeDistance)
     {
     }
 
@@ -125,7 +125,7 @@ public:
 class TooCloseToCreatureTrigger : public Trigger
 {
 public:
-    TooCloseToCreatureTrigger(PlayerbotAI* ai) : Trigger(ai, "too close to creature trigger") {}
+    TooCloseToCreatureTrigger(PlayerbotAI* botAI) : Trigger(botAI, "too close to creature trigger") {}
 
     bool TooCloseToCreature(uint32 creatureId, float range, bool alive = true);
 };
@@ -133,7 +133,7 @@ public:
 class TooCloseToPlayerWithDebuffTrigger : public Trigger
 {
 public:
-    TooCloseToPlayerWithDebuffTrigger(PlayerbotAI* ai) : Trigger(ai, "too cloose to player with debuff trigger") {}
+    TooCloseToPlayerWithDebuffTrigger(PlayerbotAI* botAI) : Trigger(botAI, "too cloose to player with debuff trigger") {}
 
     bool TooCloseToPlayerWithDebuff(uint32 spellId, float range);
 };
@@ -141,7 +141,7 @@ public:
 class TooFarFromPlayerWithAuraTrigger : public Trigger
 {
 public:
-    TooFarFromPlayerWithAuraTrigger(PlayerbotAI* ai) : Trigger(ai, "too far from player with aura trigger") {}
+    TooFarFromPlayerWithAuraTrigger(PlayerbotAI* botAI) : Trigger(botAI, "too far from player with aura trigger") {}
 
     bool TooFarFromPlayerWithAura(uint32 spellId, float range, bool selfInclude = false);
 };

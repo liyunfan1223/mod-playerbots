@@ -123,6 +123,7 @@ public:
     typedef PlayerbotsDatabaseStatements Statements;
 
     PlayerbotsDatabaseConnection(MySQLConnectionInfo& connInfo);
+    PlayerbotsDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* queue, MySQLConnectionInfo& connInfo);
     ~PlayerbotsDatabaseConnection() override;
 
     //! Loads database type specific prepared statements
@@ -142,6 +143,7 @@ public:
         return new PlayerbotsDatabasePreparedStatement(index, GetPreparedStatementParamCount(index));
     }
 
+    using ModuleDatabasePool::DirectExecute;
     using ModuleDatabasePool::Execute;
     using ModuleDatabasePool::Query;
 
@@ -152,19 +154,24 @@ public:
 
     void CommitTransaction(PlayerbotsDatabaseTransaction transaction)
     {
-        DirectCommitTransaction(transaction);
+        ModuleDatabasePool::CommitTransaction(transaction);
     }
 
-    //! The pool is synchronous; there is no async queue to warn about.
-    void WarnAboutSyncQueries([[maybe_unused]] bool apply) {}
-
-    //! Synchronous pool: nothing is ever queued.
-    [[nodiscard]] std::size_t QueueSize() const { return 0; }
+    void DirectCommitTransaction(PlayerbotsDatabaseTransaction transaction)
+    {
+        ModuleDatabasePool::DirectCommitTransaction(transaction);
+    }
 
 protected:
     MySQLConnection* CreateConnection(MySQLConnectionInfo& connInfo) override
     {
         return new PlayerbotsDatabaseConnection(connInfo);
+    }
+
+    MySQLConnection* CreateConnection(ProducerConsumerQueue<SQLOperation*>* queue,
+        MySQLConnectionInfo& connInfo) override
+    {
+        return new PlayerbotsDatabaseConnection(queue, connInfo);
     }
 };
 

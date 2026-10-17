@@ -16,7 +16,7 @@ class RaidHyjalActionContext : public NamedObjectContext<Action>
 public:
     RaidHyjalActionContext()
     {
-        // General
+        // Shared
         creators["hyjal reset encounter states"] =
             &RaidHyjalActionContext::hyjal_reset_encounter_states;
 
@@ -130,140 +130,177 @@ public:
     }
 
 private:
-    // General
-    static Action* hyjal_reset_encounter_states(PlayerbotAI* botAI) {
+    // Shared
+    static Action* hyjal_reset_encounter_states(PlayerbotAI* botAI)
+    {
         return new HyjalResetEncounterStatesAction(botAI);
     }
-    static Action* hyjal_remove_dangerous_dot(PlayerbotAI* botAI) {
+    static Action* hyjal_remove_dangerous_dot(PlayerbotAI* botAI)
+    {
         return new HyjalRemoveDangerousDotAction(botAI);
     }
 
     // Rage Winterchill
-    static Action* rage_winterchill_misdirect_boss_to_main_tank(PlayerbotAI* botAI) {
+    static Action* rage_winterchill_misdirect_boss_to_main_tank(PlayerbotAI* botAI)
+    {
         return new HyjalMisdirectBossToMainTankAction(
             botAI, "rage winterchill misdirect boss to main tank", "rage winterchill");
     }
-    static Action* rage_winterchill_main_tank_position_boss(PlayerbotAI* botAI) {
+    static Action* rage_winterchill_main_tank_position_boss(PlayerbotAI* botAI)
+    {
         return new HyjalMainTankPositionBossAction(
             botAI, "rage winterchill main tank position boss", "rage winterchill",
             HyjalHelpers::WINTERCHILL_TANK_POSITION);
     }
-    static Action* rage_winterchill_spread_ranged_in_circle(PlayerbotAI* botAI) {
+    static Action* rage_winterchill_spread_ranged_in_circle(PlayerbotAI* botAI)
+    {
         return new RageWinterchillSpreadRangedInCircleAction(botAI);
     }
-    static Action* rage_winterchill_ranged_get_out_of_death_and_decay(PlayerbotAI* botAI) {
+    static Action* rage_winterchill_ranged_get_out_of_death_and_decay(PlayerbotAI* botAI)
+    {
         return new RageWinterchillRangedGetOutOfDeathAndDecayAction(botAI);
     }
-    static Action* rage_winterchill_melee_maneuver_through_death_and_decay(PlayerbotAI* botAI) {
+    static Action* rage_winterchill_melee_maneuver_through_death_and_decay(PlayerbotAI* botAI)
+    {
         return new RageWinterchillMeleeManeuverThroughDeathAndDecayAction(botAI);
     }
 
     // Anetheron
-    static Action* anetheron_misdirect_boss_and_infernals_to_tanks(PlayerbotAI* botAI) {
+    static Action* anetheron_misdirect_boss_and_infernals_to_tanks(PlayerbotAI* botAI)
+    {
         return new AnetheronMisdirectBossAndInfernalsToTanksAction(botAI);
     }
-    static Action* anetheron_main_tank_position_boss(PlayerbotAI* botAI) {
+    static Action* anetheron_main_tank_position_boss(PlayerbotAI* botAI)
+    {
         return new HyjalMainTankPositionBossAction(
             botAI, "anetheron main tank position boss", "anetheron",
             HyjalHelpers::ANETHERON_TANK_POSITION);
     }
-    static Action* anetheron_spread_ranged_in_circle(PlayerbotAI* botAI) {
+    static Action* anetheron_spread_ranged_in_circle(PlayerbotAI* botAI)
+    {
         return new AnetheronSpreadRangedInCircleAction(botAI);
     }
-    static Action* anetheron_move_away_from_inferno_target(PlayerbotAI* botAI) {
+    static Action* anetheron_move_away_from_inferno_target(PlayerbotAI* botAI)
+    {
         return new AnetheronMoveAwayFromInfernoTargetAction(botAI);
     }
-    static Action* anetheron_bring_infernal_to_infernal_tank(PlayerbotAI* botAI) {
+    static Action* anetheron_bring_infernal_to_infernal_tank(PlayerbotAI* botAI)
+    {
         return new AnetheronBringInfernalToInfernalTankAction(botAI);
     }
-    static Action* anetheron_infernal_tank_take_position(PlayerbotAI* botAI) {
+    static Action* anetheron_infernal_tank_take_position(PlayerbotAI* botAI)
+    {
         return new AnetheronInfernalTankTakePositionAction(botAI);
     }
-    static Action* anetheron_get_out_of_immolation(PlayerbotAI* botAI) {
+    static Action* anetheron_get_out_of_immolation(PlayerbotAI* botAI)
+    {
         return new AnetheronGetOutOfImmolationAction(botAI);
     }
-    static Action* anetheron_assign_dps_priority(PlayerbotAI* botAI) {
+    static Action* anetheron_assign_dps_priority(PlayerbotAI* botAI)
+    {
         return new AnetheronAssignDpsPriorityAction(botAI);
     }
 
     // Kaz'rogal
-    static Action* kazrogal_misdirect_boss_to_main_tank(PlayerbotAI* botAI) {
+    static Action* kazrogal_misdirect_boss_to_main_tank(PlayerbotAI* botAI)
+    {
         return new HyjalMisdirectBossToMainTankAction(
             botAI, "kaz'rogal misdirect boss to main tank", "kaz'rogal");
     }
-    static Action* kazrogal_main_tank_position_boss(PlayerbotAI* botAI) {
+    static Action* kazrogal_main_tank_position_boss(PlayerbotAI* botAI)
+    {
         return new HyjalMainTankPositionBossAction(
             botAI, "kaz'rogal main tank position boss", "kaz'rogal",
             HyjalHelpers::KAZROGAL_TANK_POSITION);
     }
-    static Action* kazrogal_assist_tanks_move_in_front(PlayerbotAI* botAI) {
+    static Action* kazrogal_assist_tanks_move_in_front(PlayerbotAI* botAI)
+    {
         return new KazrogalAssistTanksMoveInFrontAction(botAI);
     }
-    static Action* kazrogal_spread_ranged_in_arc(PlayerbotAI* botAI) {
+    static Action* kazrogal_spread_ranged_in_arc(PlayerbotAI* botAI)
+    {
         return new KazrogalSpreadRangedInArcAction(botAI);
     }
-    static Action* kazrogal_move_away_from_group(PlayerbotAI* botAI) {
+    static Action* kazrogal_move_away_from_group(PlayerbotAI* botAI)
+    {
         return new KazrogalMoveAwayFromGroupAction(botAI);
     }
-    static Action* kazrogal_activate_aspect_of_the_viper(PlayerbotAI* botAI) {
+    static Action* kazrogal_activate_aspect_of_the_viper(PlayerbotAI* botAI)
+    {
         return new KazrogalActivateAspectOfTheViperAction(botAI);
     }
-    static Action* kazrogal_cancel_immunity(PlayerbotAI* botAI) {
+    static Action* kazrogal_cancel_immunity(PlayerbotAI* botAI)
+    {
         return new KazrogalCancelImmunityAction(botAI);
     }
-    static Action* kazrogal_warlock_manage_mana(PlayerbotAI* botAI) {
+    static Action* kazrogal_warlock_manage_mana(PlayerbotAI* botAI)
+    {
         return new KazrogalWarlockManageManaAction(botAI);
     }
 
     // Azgalor
-    static Action* azgalor_misdirect_boss_to_main_tank(PlayerbotAI* botAI) {
+    static Action* azgalor_misdirect_boss_to_main_tank(PlayerbotAI* botAI)
+    {
         return new HyjalMisdirectBossToMainTankAction(
             botAI, "azgalor misdirect boss to main tank", "azgalor");
     }
-    static Action* azgalor_main_tank_position_boss(PlayerbotAI* botAI) {
+    static Action* azgalor_main_tank_position_boss(PlayerbotAI* botAI)
+    {
         return new HyjalMainTankPositionBossAction(
             botAI, "azgalor main tank position boss", "azgalor",
             HyjalHelpers::AZGALOR_TANK_POSITION, 60.0f);
     }
-    static Action* azgalor_disperse_ranged(PlayerbotAI* botAI) {
+    static Action* azgalor_disperse_ranged(PlayerbotAI* botAI)
+    {
         return new AzgalorDisperseRangedAction(botAI);
     }
-    static Action* azgalor_melee_maneuver_through_fire(PlayerbotAI* botAI) {
+    static Action* azgalor_melee_maneuver_through_fire(PlayerbotAI* botAI)
+    {
         return new AzgalorMeleeManeuverThroughFireAction(botAI);
     }
-    static Action* azgalor_ranged_get_out_of_rain_of_fire(PlayerbotAI* botAI) {
+    static Action* azgalor_ranged_get_out_of_rain_of_fire(PlayerbotAI* botAI)
+    {
         return new AzgalorRangedGetOutOfRainOfFireAction(botAI);
     }
-    static Action* azgalor_move_to_doomguard_tank(PlayerbotAI* botAI) {
+    static Action* azgalor_move_to_doomguard_tank(PlayerbotAI* botAI)
+    {
         return new AzgalorMoveToDoomguardTankAction(botAI);
     }
-    static Action* azgalor_tank_position_doomguard(PlayerbotAI* botAI) {
+    static Action* azgalor_tank_position_doomguard(PlayerbotAI* botAI)
+    {
         return new AzgalorTankPositionDoomguardAction(botAI);
     }
-    static Action* azgalor_determine_dps_priority(PlayerbotAI* botAI) {
+    static Action* azgalor_determine_dps_priority(PlayerbotAI* botAI)
+    {
         return new AzgalorDetermineDpsPriorityAction(botAI);
     }
 
     // Archimonde
-    static Action* archimonde_misdirect_boss_to_main_tank(PlayerbotAI* botAI) {
+    static Action* archimonde_misdirect_boss_to_main_tank(PlayerbotAI* botAI)
+    {
         return new HyjalMisdirectBossToMainTankAction(
             botAI, "archimonde misdirect boss to main tank", "archimonde");
     }
-    static Action* archimonde_move_boss_to_initial_position(PlayerbotAI* botAI) {
+    static Action* archimonde_move_boss_to_initial_position(PlayerbotAI* botAI)
+    {
         return new HyjalMainTankPositionBossAction(
             botAI, "archimonde move boss to initial position", "archimonde",
             HyjalHelpers::ARCHIMONDE_INITIAL_POSITION, 60.0f);
     }
-    static Action* archimonde_set_tremor_totem(PlayerbotAI* botAI) {
+    static Action* archimonde_set_tremor_totem(PlayerbotAI* botAI)
+    {
         return new ArchimondeSetTremorTotemAction(botAI);
     }
-    static Action* archimonde_keep_air_burst_away_from_tank(PlayerbotAI* botAI) {
+    static Action* archimonde_keep_air_burst_away_from_tank(PlayerbotAI* botAI)
+    {
         return new ArchimondeKeepAirBurstAwayFromTankAction(botAI);
     }
-    static Action* archimonde_spread_ranged(PlayerbotAI* botAI) {
+    static Action* archimonde_spread_ranged(PlayerbotAI* botAI)
+    {
         return new ArchimondeSpreadRangedAction(botAI);
     }
-    static Action* archimonde_avoid_doomfire(PlayerbotAI* botAI) {
+    static Action* archimonde_avoid_doomfire(PlayerbotAI* botAI)
+    {
         return new ArchimondeAvoidDoomfireAction(botAI);
     }
 };

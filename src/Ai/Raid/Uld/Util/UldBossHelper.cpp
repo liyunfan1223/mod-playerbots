@@ -216,7 +216,7 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (!member || !botAI->IsTank(member, true) || !member->IsAlive())
+        if (!member || !PlayerbotAI::IsTank(member, true) || !member->IsAlive())
             continue;
 
         Aura* fuseArmor = member->GetAura(SPELL_FUSEARMOR);
@@ -247,7 +247,7 @@ void RazorscaleBossHelper::AssignRolesBasedOnHealth()
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
-        if (member && botAI->IsMainTank(member))
+        if (member && PlayerbotAI::IsMainTank(member))
             group->SetGroupMemberFlag(member->GetGUID(), false, MEMBER_FLAG_MAINTANK);
     }
 

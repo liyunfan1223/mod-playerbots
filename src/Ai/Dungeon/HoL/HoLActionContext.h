@@ -26,15 +26,15 @@ class WotlkDungeonHoLActionContext : public NamedObjectContext<Action>
             creators["avoid lightning nova"] = &WotlkDungeonHoLActionContext::avoid_lightning_nova;
         }
     private:
-        static Action* bjarngrim_target(PlayerbotAI* ai) { return new BjarngrimTargetAction(ai); }
-        static Action* avoid_whirlwind(PlayerbotAI* ai) { return new AvoidWhirlwindAction(ai); }
-        static Action* volkhan_target(PlayerbotAI* ai) { return new VolkhanTargetAction(ai); }
-        static Action* static_overload_spread(PlayerbotAI* ai) { return new StaticOverloadSpreadAction(ai); }
-        static Action* ball_lightning_spread(PlayerbotAI* ai) { return new BallLightningSpreadAction(ai); }
-        static Action* ionar_tank_position(PlayerbotAI* ai) { return new IonarTankPositionAction(ai); }
-        static Action* disperse_position(PlayerbotAI* ai) { return new DispersePositionAction(ai); }
-        static Action* loken_stack(PlayerbotAI* ai) { return new LokenStackAction(ai); }
-        static Action* avoid_lightning_nova(PlayerbotAI* ai) { return new AvoidLightningNovaAction(ai); }
+        static Action* bjarngrim_target(PlayerbotAI* botAI) { return new BjarngrimTargetAction(botAI); }
+        static Action* avoid_whirlwind(PlayerbotAI* botAI) { return new AvoidWhirlwindAction(botAI); }
+        static Action* volkhan_target(PlayerbotAI* botAI) { return new VolkhanTargetAction(botAI); }
+        static Action* static_overload_spread(PlayerbotAI* botAI) { return new StaticOverloadSpreadAction(botAI); }
+        static Action* ball_lightning_spread(PlayerbotAI* botAI) { return new BallLightningSpreadAction(botAI); }
+        static Action* ionar_tank_position(PlayerbotAI* botAI) { return new IonarTankPositionAction(botAI); }
+        static Action* disperse_position(PlayerbotAI* botAI) { return new DispersePositionAction(botAI); }
+        static Action* loken_stack(PlayerbotAI* botAI) { return new LokenStackAction(botAI); }
+        static Action* avoid_lightning_nova(PlayerbotAI* botAI) { return new AvoidLightningNovaAction(botAI); }
 };
 
 #endif

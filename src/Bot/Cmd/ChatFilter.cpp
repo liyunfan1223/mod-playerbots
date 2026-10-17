@@ -39,31 +39,31 @@ public:
         std::string msgLower = ToLower(message);
 
         bool tank = msgLower.find("@tank") == 0;
-        if (tank && !botAI->IsTank(bot))
+        if (tank && !PlayerbotAI::IsTank(bot))
             return "";
 
         bool dps = msgLower.find("@dps") == 0;
-        if (dps && (botAI->IsTank(bot) || botAI->IsHeal(bot)))
+        if (dps && (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot)))
             return "";
 
         bool heal = msgLower.find("@heal") == 0;
-        if (heal && !botAI->IsHeal(bot))
+        if (heal && !PlayerbotAI::IsHeal(bot))
             return "";
 
         bool ranged = msgLower.find("@ranged") == 0;
-        if (ranged && !botAI->IsRanged(bot))
+        if (ranged && !PlayerbotAI::IsRanged(bot))
             return "";
 
         bool melee = msgLower.find("@melee") == 0;
-        if (melee && botAI->IsRanged(bot))
+        if (melee && PlayerbotAI::IsRanged(bot))
             return "";
 
         bool rangeddps = msgLower.find("@rangeddps") == 0;
-        if (rangeddps && (!botAI->IsRanged(bot) || botAI->IsTank(bot) || botAI->IsHeal(bot)))
+        if (rangeddps && (!PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot)))
             return "";
 
         bool meleedps = msgLower.find("@meleedps") == 0;
-        if (meleedps && (!botAI->IsMelee(bot) || botAI->IsTank(bot) || botAI->IsHeal(bot)))
+        if (meleedps && (!PlayerbotAI::IsMelee(bot) || PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot)))
             return "";
 
         if (tank || dps || heal || ranged || melee)
@@ -137,15 +137,15 @@ public:
                     return "";
                 break;
             case CLASS_DRUID:
-                if (ranged && botAI->IsTank(bot))
+                if (ranged && PlayerbotAI::IsTank(bot))
                     return "";
-                if (melee && !botAI->IsTank(bot))
+                if (melee && !PlayerbotAI::IsTank(bot))
                     return "";
                 break;
             case CLASS_SHAMAN:
-                if (melee && botAI->IsHeal(bot))
+                if (melee && PlayerbotAI::IsHeal(bot))
                     return "";
-                if (ranged && !botAI->IsHeal(bot))
+                if (ranged && !PlayerbotAI::IsHeal(bot))
                     return "";
                 break;
         }
@@ -394,12 +394,12 @@ private:
         // For druids, specTab==1 is always feral; distinguish bear/cat at runtime by role
         if (cls == CLASS_DRUID && specTab == 1)
         {
-            botSpecClass = botAI->IsTank(bot) ? "bear" : "cat";
+            botSpecClass = PlayerbotAI::IsTank(bot) ? "bear" : "cat";
         }
         // For death knights, specTab==0 is always blood; distinguish tank/dps at runtime by role
         else if (cls == CLASS_DEATH_KNIGHT && specTab == 0)
         {
-            botSpecClass = botAI->IsTank(bot) ? "bdkt" : "bdkd";
+            botSpecClass = PlayerbotAI::IsTank(bot) ? "bdkt" : "bdkd";
         }
         else
         {

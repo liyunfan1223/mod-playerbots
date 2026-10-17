@@ -316,7 +316,7 @@ public:
         uint32 index = botAI->GetGroupSlotIndex(bot);
         if (currentTarget)
         {
-            if (botAI->IsRanged(bot))
+            if (PlayerbotAI::IsRanged(bot))
             {
                 if (bot->GetExactDist2d(currentTarget) <= 45.0f)
                     angle = bot->GetAngle(dyn_obj) - M_PI + (rand_norm() - 0.5) * M_PI / 2;
@@ -498,10 +498,10 @@ public:
         Difficulty diff = bot->GetRaidDifficulty();
         if (diff == RAID_DIFFICULTY_25MAN_NORMAL)
         {
-            return botAI->IsAssistRangedDpsOfIndex(bot, 0) || botAI->IsAssistHealOfIndex(bot, 0) ||
-                   botAI->IsAssistHealOfIndex(bot, 1) || botAI->IsAssistHealOfIndex(bot, 2);
+            return PlayerbotAI::IsAssistRangedDpsOfIndex(bot, 0) || PlayerbotAI::IsAssistHealOfIndex(bot, 0) ||
+                   PlayerbotAI::IsAssistHealOfIndex(bot, 1) || PlayerbotAI::IsAssistHealOfIndex(bot, 2);
         }
-        return botAI->IsAssistRangedDpsOfIndex(bot, 0) || botAI->IsAssistHealOfIndex(bot, 0);
+        return PlayerbotAI::IsAssistRangedDpsOfIndex(bot, 0) || PlayerbotAI::IsAssistHealOfIndex(bot, 0);
     }
     void CalculatePosToGo(Player* bot)
     {
@@ -514,7 +514,7 @@ public:
             uint32 elapsed_ms = _combat_start_ms ? getMSTime() - _combat_start_ms : 0;
             // Interval: 24s - 15s - 15s - ...
             posToGo = !(elapsed_ms <= 9000 || ((elapsed_ms - 9000) / 67500) % 2 == 0);
-            if (botAI->IsAssistRangedDpsOfIndex(bot, 0) || (raid25 && botAI->IsAssistHealOfIndex(bot, 1)))
+            if (PlayerbotAI::IsAssistRangedDpsOfIndex(bot, 0) || (raid25 && PlayerbotAI::IsAssistHealOfIndex(bot, 1)))
                 posToGo = 1 - posToGo;
         }
     }

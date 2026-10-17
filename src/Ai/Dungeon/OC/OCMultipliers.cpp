@@ -65,7 +65,7 @@ float UromMultiplier::GetValue(Action* action)
     }
 
     // Don't bother avoiding Frostbomb for melee
-    if (botAI->IsMelee(bot))
+    if (PlayerbotAI::IsMelee(bot))
     {
         if (dynamic_cast<AvoidAoeAction*>(action))
             return 0.0f;

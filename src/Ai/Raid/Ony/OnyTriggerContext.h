@@ -23,11 +23,11 @@ public:
     }
 
 private:
-    static Trigger* near_tail(PlayerbotAI* ai) { return new OnyxiaNearTailTrigger(ai); }
-    static Trigger* deep_breath(PlayerbotAI* ai) { return new OnyxiaDeepBreathTrigger(ai); }
-    static Trigger* fireball_splash(PlayerbotAI* ai) { return new RaidOnyxiaFireballSplashTrigger(ai); }
-    static Trigger* whelps_spawn(PlayerbotAI* ai) { return new RaidOnyxiaWhelpsSpawnTrigger(ai); }
-    static Trigger* avoid_eggs(PlayerbotAI* ai) { return new OnyxiaAvoidEggsTrigger(ai); }
+    static Trigger* near_tail(PlayerbotAI* botAI) { return new OnyxiaNearTailTrigger(botAI); }
+    static Trigger* deep_breath(PlayerbotAI* botAI) { return new OnyxiaDeepBreathTrigger(botAI); }
+    static Trigger* fireball_splash(PlayerbotAI* botAI) { return new RaidOnyxiaFireballSplashTrigger(botAI); }
+    static Trigger* whelps_spawn(PlayerbotAI* botAI) { return new RaidOnyxiaWhelpsSpawnTrigger(botAI); }
+    static Trigger* avoid_eggs(PlayerbotAI* botAI) { return new OnyxiaAvoidEggsTrigger(botAI); }
 };
 
 #endif

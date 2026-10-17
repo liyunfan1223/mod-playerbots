@@ -51,22 +51,24 @@ void PlayerbotRepository::Save(PlayerbotAI* botAI)
 {
     ObjectGuid::LowType guid = botAI->GetBot()->GetGUID().GetCounter();
 
-    Reset(botAI);
+    PlayerbotsDatabaseTransaction trans = PlayerbotsDatabase.BeginTransaction();
 
     PlayerbotsDatabasePreparedStatement* deleteStatement =
         PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_DB_STORE);
     deleteStatement->SetData(0, guid);
-    PlayerbotsDatabase.Execute(deleteStatement);
+    trans->Append(deleteStatement);
 
     std::vector<std::string> data = botAI->GetAiObjectContext()->Save();
     for (std::vector<std::string>::iterator i = data.begin(); i != data.end(); ++i)
     {
-        SaveValue(guid, "value", *i);
+        SaveValue(trans, guid, "value", *i);
     }
 
-    SaveValue(guid, "co", FormatStrategies("co", botAI->GetStrategies(BOT_STATE_COMBAT)));
-    SaveValue(guid, "nc", FormatStrategies("nc", botAI->GetStrategies(BOT_STATE_NON_COMBAT)));
-    SaveValue(guid, "dead", FormatStrategies("dead", botAI->GetStrategies(BOT_STATE_DEAD)));
+    SaveValue(trans, guid, "co", FormatStrategies("co", botAI->GetStrategies(BOT_STATE_COMBAT)));
+    SaveValue(trans, guid, "nc", FormatStrategies("nc", botAI->GetStrategies(BOT_STATE_NON_COMBAT)));
+    SaveValue(trans, guid, "dead", FormatStrategies("dead", botAI->GetStrategies(BOT_STATE_DEAD)));
+
+    PlayerbotsDatabase.DirectCommitTransaction(trans);
 }
 
 std::string const PlayerbotRepository::FormatStrategies(std::string const /*type*/, std::vector<std::string> strategies)
@@ -85,14 +87,15 @@ void PlayerbotRepository::Reset(PlayerbotAI* botAI)
 
     PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_DB_STORE);
     stmt->SetData(0, guid);
-    PlayerbotsDatabase.Execute(stmt);
+    PlayerbotsDatabase.DirectExecute(stmt);
 }
 
-void PlayerbotRepository::SaveValue(uint32 guid, std::string const key, std::string const value)
+void PlayerbotRepository::SaveValue(PlayerbotsDatabaseTransaction trans, uint32 guid, std::string const key,
+                                    std::string const value)
 {
     PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_INS_DB_STORE);
     stmt->SetData(0, guid);
     stmt->SetData(1, key);
     stmt->SetData(2, value);
-    PlayerbotsDatabase.Execute(stmt);
+    trans->Append(stmt);
 }

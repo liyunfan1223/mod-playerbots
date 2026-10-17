@@ -76,7 +76,7 @@ namespace ai::buff
         if (!group)
             return false;
 
-        switch (sPlayerbotAIConfig.autoPartyBuffs)
+        switch (sPlayerbotAIConfig.AutoPartyBuffs)
         {
             case AutoPartyBuffMode::RAID_ONLY:
                 return group->isRaidGroup();
@@ -228,14 +228,14 @@ namespace ai::buff
     bool TryAnnounceMissingBuffReagents(
         PlayerbotAI* botAI, std::string const& baseName, std::string const& groupName)
     {
-        if (!sPlayerbotAIConfig.tellWhenMissingBuffReagents)
+        if (!sPlayerbotAIConfig.TellWhenMissingBuffReagents)
             return false;
 
         Player* bot = botAI->GetBot();
         if (bot->InBattleground())
             return false;
 
-        auto const cooldownMs = sPlayerbotAIConfig.missingBuffReagentMessageCooldown * IN_MILLISECONDS;
+        auto const cooldownMs = sPlayerbotAIConfig.MissingBuffReagentMessageCooldown * IN_MILLISECONDS;
         auto const now = GameTime::GetGameTimeMS().count();
         auto& noticeTimes = botAI->GetAiObjectContext()
             ->GetValue<MissingBuffReagentNoticeMap&>("missing buff reagent notice")->Get();

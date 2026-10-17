@@ -152,16 +152,16 @@ private:
     static Action* equip_upgrades_packet_action(PlayerbotAI* botAI) { return new EquipUpgradesPacketAction(botAI); }
 
     // quest
-    static Action* quest_update_add_kill(PlayerbotAI* ai) { return new QuestUpdateAddKillAction(ai); }
-    static Action* quest_update_add_item(PlayerbotAI* ai) { return new QuestUpdateAddItemAction(ai); }
-    static Action* quest_update_failed(PlayerbotAI* ai) { return new QuestUpdateFailedAction(ai); }
-    static Action* quest_update_failed_timer(PlayerbotAI* ai) { return new QuestUpdateFailedTimerAction(ai); }
+    static Action* quest_update_add_kill(PlayerbotAI* botAI) { return new QuestUpdateAddKillAction(botAI); }
+    static Action* quest_update_add_item(PlayerbotAI* botAI) { return new QuestUpdateAddItemAction(botAI); }
+    static Action* quest_update_failed(PlayerbotAI* botAI) { return new QuestUpdateFailedAction(botAI); }
+    static Action* quest_update_failed_timer(PlayerbotAI* botAI) { return new QuestUpdateFailedTimerAction(botAI); }
     static Action* quest_update_complete(PlayerbotAI* botAI) { return new QuestUpdateCompleteAction(botAI); }
-    static Action* quest_item_push_result(PlayerbotAI* ai) { return new QuestItemPushResultAction(ai); }
+    static Action* quest_item_push_result(PlayerbotAI* botAI) { return new QuestItemPushResultAction(botAI); }
 
     static Action* turn_in_quest(PlayerbotAI* botAI) { return new TalkToQuestGiverAction(botAI); }
     static Action* accept_quest(PlayerbotAI* botAI) { return new AcceptQuestAction(botAI); }
-    static Action* confirm_quest(PlayerbotAI* ai) { return new ConfirmQuestAction(ai); }
+    static Action* confirm_quest(PlayerbotAI* botAI) { return new ConfirmQuestAction(botAI); }
     static Action* accept_all_quests(PlayerbotAI* botAI) { return new AcceptAllQuestsAction(botAI); }
     static Action* accept_quest_share(PlayerbotAI* botAI) { return new AcceptQuestShareAction(botAI); }
     static Action* turn_in_query_quest(PlayerbotAI* botAI) { return new TurnInQueryQuestAction(botAI); }

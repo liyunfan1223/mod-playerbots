@@ -25,7 +25,7 @@ const int ITEM_SOUL_SHARD = 6265;
 bool CastDrainSoulAction::isUseful() { return AI_VALUE2(uint32, "item count", "soul shard") < 26; }
 
 // Checks if the bot's health is above a certain threshold, and if so, allows casting Life Tap
-bool CastLifeTapAction::isUseful() { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.lowHealth; }
+bool CastLifeTapAction::isUseful() { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.LowHealth; }
 
 Value<Unit*>* CastBanishOnCcAction::GetTargetValue() { return context->GetValue<Unit*>("rti cc target"); }
 Value<Unit*>* CastFearOnCcAction::GetTargetValue() { return context->GetValue<Unit*>("rti cc target"); }
@@ -111,7 +111,8 @@ bool CastSoulshatterAction::isUseful()
 {
     if (botAI->HasStrategy("tank", BOT_STATE_COMBAT))
         return false;
-    return true;
+    Unit* target = AI_VALUE(Unit*, "current target");
+    return !(target && target->IsPlayer());  // players have no threat
 }
 
 // Checks if the bot has enough bag space to create a soul shard, then does so
@@ -317,7 +318,7 @@ bool UseSoulstoneTankAction::Execute(Event /*event*/)
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (member && member->IsAlive() && botAI->IsTank(member) && botAI->IsMainTank(member) &&
+            if (member && member->IsAlive() && PlayerbotAI::IsTank(member) && PlayerbotAI::IsMainTank(member) &&
                 !HasSoulstoneAura(member))
             {
                 std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
@@ -340,7 +341,7 @@ bool UseSoulstoneTankAction::Execute(Event /*event*/)
             for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
             {
                 Player* member = gref->GetSource();
-                if (member && member->IsAlive() && botAI->IsTank(member) && !HasSoulstoneAura(member))
+                if (member && member->IsAlive() && PlayerbotAI::IsTank(member) && !HasSoulstoneAura(member))
                 {
                     std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);
                     if (soulstoneReservations.count(member->GetGUID()) &&
@@ -383,7 +384,7 @@ bool UseSoulstoneHealerAction::Execute(Event /*event*/)
         for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
         {
             Player* member = gref->GetSource();
-            if (member && member->IsAlive() && botAI->IsHeal(member) && !HasSoulstoneAura(member))
+            if (member && member->IsAlive() && PlayerbotAI::IsHeal(member) && !HasSoulstoneAura(member))
             {
                 {
                     std::lock_guard<std::mutex> lock(soulstoneReservationsMutex);

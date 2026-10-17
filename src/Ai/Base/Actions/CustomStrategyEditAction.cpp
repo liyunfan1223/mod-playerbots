@@ -97,7 +97,7 @@ bool CustomStrategyEditAction::Edit(std::string const name, uint32 idx, std::str
             stmt->SetData(0, name);
             stmt->SetData(1, owner);
             stmt->SetData(2, idx);
-            PlayerbotsDatabase.Execute(stmt);
+            PlayerbotsDatabase.DirectExecute(stmt);
         }
         else
         {
@@ -106,7 +106,7 @@ bool CustomStrategyEditAction::Edit(std::string const name, uint32 idx, std::str
             stmt->SetData(1, name);
             stmt->SetData(2, owner);
             stmt->SetData(3, idx);
-            PlayerbotsDatabase.Execute(stmt);
+            PlayerbotsDatabase.DirectExecute(stmt);
         }
     }
     else
@@ -116,7 +116,7 @@ bool CustomStrategyEditAction::Edit(std::string const name, uint32 idx, std::str
         stmt->SetData(1, owner);
         stmt->SetData(2, idx);
         stmt->SetData(3, command);
-        PlayerbotsDatabase.Execute(stmt);
+        PlayerbotsDatabase.DirectExecute(stmt);
     }
 
     PrintActionLine(idx, command);

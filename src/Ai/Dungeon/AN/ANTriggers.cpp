@@ -10,7 +10,7 @@
 
 bool KrikthirWebWrapTrigger::IsActive()
 {
-    if (!botAI->IsDps(bot)) { return false; }
+    if (!PlayerbotAI::IsDps(bot)) { return false; }
 
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit name
@@ -30,7 +30,7 @@ bool KrikthirWebWrapTrigger::IsActive()
 
 bool KrikthirWatchersTrigger::IsActive()
 {
-    if (!botAI->IsDps(bot)) { return false; }
+    if (!PlayerbotAI::IsDps(bot)) { return false; }
 
     // Target is not findable from threat table using AI_VALUE2(),
     // therefore need to search manually for the unit name

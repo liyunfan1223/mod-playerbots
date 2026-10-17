@@ -12,8 +12,8 @@
 #include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
-#include "ServerFacade.h"
 #include "SharedDefines.h"
+#include "TargetValue.h"
 
 bool KillCommandTrigger::IsActive()
 {
@@ -72,7 +72,7 @@ bool HuntersPetLowHealthTrigger::IsActive()
 bool HuntersPetMediumHealthTrigger::IsActive()
 {
     Unit* pet = AI_VALUE(Unit*, "pet target");
-    return pet && AI_VALUE2(uint8, "health", "pet target") < sPlayerbotAIConfig.mediumHealth &&
+    return pet && AI_VALUE2(uint8, "health", "pet target") < sPlayerbotAIConfig.MediumHealth &&
            !AI_VALUE2(bool, "dead", "pet target") && !AI_VALUE2(bool, "mounted", "self target");
 }
 
@@ -90,7 +90,7 @@ bool HunterAspectOfTheViperTrigger::IsActive()
         return false;
 
     return BuffTrigger::IsActive() &&
-           AI_VALUE2(uint8, "mana", "self target") < (sPlayerbotAIConfig.lowMana / 2);
+           AI_VALUE2(uint8, "mana", "self target") < (sPlayerbotAIConfig.LowMana / 2);
 }
 
 bool HunterAspectOfThePackTrigger::IsActive()
@@ -107,22 +107,6 @@ bool HunterLowAmmoTrigger::IsActive()
 bool HunterHasAmmoTrigger::IsActive()
 {
     return !AmmoCountTrigger::IsActive();
-}
-
-bool SwitchToRangedTrigger::IsActive()
-{
-    Unit* target = AI_VALUE(Unit*, "current target");
-    return botAI->HasStrategy("close", BOT_STATE_COMBAT) && target &&
-           (target->GetVictim() != bot &&
-            ServerFacade::instance().IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
-}
-
-bool SwitchToMeleeTrigger::IsActive()
-{
-    Unit* target = AI_VALUE(Unit*, "current target");
-    return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && target &&
-           (target->GetVictim() == bot &&
-            ServerFacade::instance().IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
 }
 
 // Valid targets for "Improved Tracking".
@@ -181,8 +165,7 @@ bool VolleyChannelCheckTrigger::IsActive()
     if (Spell* spell = bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
         spell && VOLLEY_SPELL_IDS.count(spell->m_spellInfo->Id))
     {
-        uint8 attackerCount = AI_VALUE(uint8, "attacker count");
-        return attackerCount < minEnemies;
+        return !HasEnoughAoeTargets(botAI, bot->GetPosition(), sPlayerbotAIConfig.SightDistance, minEnemies);
     }
 
     return false;

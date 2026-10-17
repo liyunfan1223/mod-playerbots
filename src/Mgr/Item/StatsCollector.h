@@ -10,6 +10,9 @@
 #include "ItemTemplate.h"
 #include "SpellInfo.h"
 
+struct ScalingStatDistributionEntry;
+struct ScalingStatValuesEntry;
+
 enum StatsType : uint8
 {
     // Basic stats
@@ -75,6 +78,9 @@ public:
     float stats[STATS_TYPE_MAX];
 
 private:
+    void CollectWeaponDamageStats(ItemTemplate const* proto, ScalingStatValuesEntry const* ssv);
+    void CollectItemStatValues(ItemTemplate const* proto, ScalingStatDistributionEntry const* ssd,
+                               ScalingStatValuesEntry const* ssv);
     void CollectByItemStatType(uint32 itemStatType, int32 val);
     bool SpecialSpellFilter(uint32 spellId);
     bool SpecialEnchantFilter(uint32 enchantSpellId);
