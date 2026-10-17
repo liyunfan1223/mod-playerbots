@@ -120,7 +120,7 @@ bool MoveToPositionAction::isUseful()
 {
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()[qualifier];
     float distance = AI_VALUE2(float, "distance", std::string("position_") + qualifier);
-    return pos.isSet() && distance > sPlayerbotAIConfig.followDistance && distance < sPlayerbotAIConfig.reactDistance;
+    return pos.isSet() && distance > sPlayerbotAIConfig.FollowDistance && distance < sPlayerbotAIConfig.ReactDistance;
 }
 
 bool SetReturnPositionAction::Execute(Event /*event*/)
@@ -131,7 +131,7 @@ bool SetReturnPositionAction::Execute(Event /*event*/)
     if (returnPos.isSet() && !randomPos.isSet())
     {
         float angle = 2 * M_PI * urand(0, 1000) / 100.0f;
-        float dist = sPlayerbotAIConfig.followDistance * urand(0, 1000) / 1000.0f;
+        float dist = sPlayerbotAIConfig.FollowDistance * urand(0, 1000) / 1000.0f;
         float x = returnPos.x + cos(angle) * dist;
         float y = returnPos.y + sin(angle) * dist;
         float z = bot->GetPositionZ();
@@ -157,7 +157,7 @@ bool SetReturnPositionAction::isUseful()
 bool ReturnAction::isUseful()
 {
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()[qualifier];
-    return pos.isSet() && AI_VALUE2(float, "distance", "position_random") > sPlayerbotAIConfig.followDistance;
+    return pos.isSet() && AI_VALUE2(float, "distance", "position_random") > sPlayerbotAIConfig.FollowDistance;
 }
 
 bool ReturnToStayPositionAction::isPossible()
@@ -167,7 +167,7 @@ bool ReturnToStayPositionAction::isPossible()
     if (stayPosition.isSet())
     {
         const float distance = bot->GetDistance(stayPosition.x, stayPosition.y, stayPosition.z);
-        if (distance > sPlayerbotAIConfig.reactDistance)
+        if (distance > sPlayerbotAIConfig.ReactDistance)
         {
             botAI->TellMaster("The stay position is too far to return. I am going to stay where I am now");
 

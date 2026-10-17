@@ -36,7 +36,7 @@ Unit* MalygosSpellstealAction::GetHastedLord()
         if (!unit->HasAura(SPELL_HASTE))
             continue;
 
-        if (!bot->IsWithinCombatRange(unit, sPlayerbotAIConfig.spellDistance))
+        if (!bot->IsWithinCombatRange(unit, sPlayerbotAIConfig.SpellDistance))
             continue;
 
         float dist = bot->GetExactDist(unit);

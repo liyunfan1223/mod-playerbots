@@ -7,15 +7,14 @@
 #ifndef PLAYERBOTS_HOLYPRIESTSTRATEGY_H
 #define PLAYERBOTS_HOLYPRIESTSTRATEGY_H
 
-#include "GenericPriestStrategyActionNodeFactory.h"
-#include "HealPriestStrategy.h"
+#include "GenericPriestStrategy.h"
 
 class PlayerbotAI;
 
-class HolyPriestStrategy : public HealPriestStrategy
+class HolyDpsPriestStrategy : public GenericPriestStrategy
 {
 public:
-    HolyPriestStrategy(PlayerbotAI* botAI);
+    HolyDpsPriestStrategy(PlayerbotAI* botAI);
 
     std::vector<NextAction> getDefaultActions() override;
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;

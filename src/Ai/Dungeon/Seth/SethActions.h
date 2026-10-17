@@ -10,11 +10,11 @@
 #include "Action.h"
 #include "MovementActions.h"
 
-class TimeLostControllerMarkCharmingTotemWithSkullAction : public Action
+class TimeLostControllerMarkCharmingTotemAction : public Action
 {
 public:
-    TimeLostControllerMarkCharmingTotemWithSkullAction(PlayerbotAI* botAI)
-        : Action(botAI, "time-lost controller mark charming totem with skull") {}
+    TimeLostControllerMarkCharmingTotemAction(PlayerbotAI* botAI)
+        : Action(botAI, "time-lost controller mark charming totem") {}
     bool Execute(Event event) override;
 };
 
@@ -26,11 +26,11 @@ public:
     bool Execute(Event event) override;
 };
 
-class DarkweaverSythMarkElementalsWithSkullAction : public Action
+class DarkweaverSythMarkElementalsAction : public Action
 {
 public:
-    DarkweaverSythMarkElementalsWithSkullAction(PlayerbotAI* botAI)
-        : Action(botAI, "darkweaver syth mark elementals with skull") {}
+    DarkweaverSythMarkElementalsAction(PlayerbotAI* botAI)
+        : Action(botAI, "darkweaver syth mark elementals") {}
     bool Execute(Event event) override;
 };
 
@@ -50,22 +50,22 @@ public:
     bool Execute(Event event) override;
 };
 
-class TalonKingIkissTankMoveBossToPillarPositionAction : public MovementAction
+class TalonKingIkissPositionTankNearPillarAction : public MovementAction
 {
 public:
-    TalonKingIkissTankMoveBossToPillarPositionAction(PlayerbotAI* botAI)
-        : MovementAction(botAI, "talon king ikiss tank move boss to pillar position") {}
+    TalonKingIkissPositionTankNearPillarAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "talon king ikiss position tank near pillar") {}
     bool Execute(Event event) override;
 
 private:
     bool _hasReachedPillarPosition = false;
 };
 
-class TalonKingIkissRangedStayNearVictimOfBossAction : public MovementAction
+class TalonKingIkissRangedMoveNearTankAction : public MovementAction
 {
 public:
-    TalonKingIkissRangedStayNearVictimOfBossAction(PlayerbotAI* botAI)
-        : MovementAction(botAI, "talon king ikiss ranged stay near victim of boss") {}
+    TalonKingIkissRangedMoveNearTankAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "talon king ikiss ranged move near tank") {}
     bool Execute(Event event) override;
 };
 
@@ -81,11 +81,11 @@ private:
     bool MoveAroundPillar(Position const& pillarCenter, float distToPillar);
 };
 
-class TalonKingIkissMoveToWithinLosAction : public MovementAction
+class TalonKingIkissMoveWithinLosAction : public MovementAction
 {
 public:
-    TalonKingIkissMoveToWithinLosAction(PlayerbotAI* botAI)
-        : MovementAction(botAI, "talon king ikiss move to within los") {}
+    TalonKingIkissMoveWithinLosAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "talon king ikiss move within los") {}
     bool Execute(Event event) override;
 };
 

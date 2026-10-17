@@ -43,7 +43,7 @@ template <class T>
 class NamedObjectFactory
 {
 public:
-    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
+    using ObjectCreator = std::function<T*(PlayerbotAI* botAI)>;
     std::unordered_map<std::string, ObjectCreator> creators;
 
 public:
@@ -135,7 +135,7 @@ template <class T>
 class SharedNamedObjectContextList
 {
 public:
-    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
+    using ObjectCreator = std::function<T*(PlayerbotAI* botAI)>;
     std::unordered_map<std::string, ObjectCreator> creators;
     std::vector<NamedObjectContext<T>*> contexts;
 
@@ -157,7 +157,7 @@ template <class T>
 class NamedObjectContextList
 {
 public:
-    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
+    using ObjectCreator = std::function<T*(PlayerbotAI* botAI)>;
     std::unordered_map<std::string, ObjectCreator> const& creators;
     std::vector<NamedObjectContext<T>*> const& contexts;
     std::unordered_map<std::string, T*> created;
@@ -258,7 +258,7 @@ template <class T>
 class NamedObjectFactoryList
 {
 public:
-    using ObjectCreator = std::function<T*(PlayerbotAI* ai)>;
+    using ObjectCreator = std::function<T*(PlayerbotAI* botAI)>;
     std::vector<NamedObjectFactory<T>*> factories;
     std::unordered_map<std::string, ObjectCreator> creators;
 

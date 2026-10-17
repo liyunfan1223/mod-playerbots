@@ -22,10 +22,10 @@ class WotlkDungeonFoSActionContext : public NamedObjectContext<Action>
             creators["devourer of souls"] = &WotlkDungeonFoSActionContext::devourer_of_souls;
         }
     private:
-        static Action* move_from_bronjahm(PlayerbotAI* ai) { return new MoveFromBronjahmAction(ai); }
-        static Action* attack_corrupted_soul_fragment(PlayerbotAI* ai) { return new AttackCorruptedSoulFragmentAction(ai); }
-        static Action* bronjahm_group_position(PlayerbotAI* ai) { return new BronjahmGroupPositionAction(ai); }
-        static Action* devourer_of_souls(PlayerbotAI* ai) { return new DevourerOfSoulsAction(ai); }
+        static Action* move_from_bronjahm(PlayerbotAI* botAI) { return new MoveFromBronjahmAction(botAI); }
+        static Action* attack_corrupted_soul_fragment(PlayerbotAI* botAI) { return new AttackCorruptedSoulFragmentAction(botAI); }
+        static Action* bronjahm_group_position(PlayerbotAI* botAI) { return new BronjahmGroupPositionAction(botAI); }
+        static Action* devourer_of_souls(PlayerbotAI* botAI) { return new DevourerOfSoulsAction(botAI); }
 };
 
 #endif

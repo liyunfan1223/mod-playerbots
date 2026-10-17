@@ -56,9 +56,12 @@ public:
     static std::string const CreateRandomGuildName();
     static uint32 CalculateTotalAccountCount();
     static uint32 CalculateAvailableCharsPerAccount();
+    static std::string GetLocalizedNameSelector(std::string const& column);
 
     // Arena team management
     static void AssignBotToArenaTeam(Player* bot);
+    // Both levels are in the same arena bracket (a team can only queue when all its members are in the captain's)
+    static bool SameArenaBracket(uint8 level, uint8 otherLevel);
     static void DeleteBotArenaTeams();
     static uint32 GetBotArenaTeamCount(ArenaType type);
     static void LoadArenaTeamData();
@@ -71,7 +74,7 @@ private:
 
     static bool IsEligibleForBotArenaTeam(Player* bot);
     static void AssignBotToArenaTeamInternal(Player* bot);
-    static void CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, std::vector<ArenaTeam*>& out);
+    static void CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, uint8 level, std::vector<ArenaTeam*>& out);
     static void CreateBotArenaTeam(Player* bot, ArenaType type);
     static bool IsBotArenaTeam(ArenaTeam const* team);
     static std::string CreateRandomArenaTeamName();

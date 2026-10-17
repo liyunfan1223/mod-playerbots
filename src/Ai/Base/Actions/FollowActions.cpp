@@ -193,7 +193,7 @@ bool FollowAction::Execute(Event /*event*/)
                         return false;
 
                     float delay = IN_MILLISECONDS * MoveDelay(bot->GetExactDist(destX, destY, destZ));
-                    delay = std::clamp(delay, 0.0f, static_cast<float>(sPlayerbotAIConfig.maxWaitForMove));
+                    delay = std::clamp(delay, 0.0f, static_cast<float>(sPlayerbotAIConfig.MaxWaitForMove));
 
                     AI_VALUE(LastMovement&, "last movement")
                         .Set(mapId, destX, destY, destZ, bot->GetOrientation(), delay, priority);
@@ -229,7 +229,7 @@ bool FollowAction::Execute(Event /*event*/)
     //     botAI->PetFollow();
     // }
     // if (moved)
-    // botAI->SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
+    // botAI->SetNextCheckDelay(sPlayerbotAIConfig.ReactDelay);
 
     return moved;
 }
@@ -285,7 +285,7 @@ bool FollowAction::isUseful()
         distance = bot->GetDistance(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
     if (botAI->HasStrategy("master fishing", BOT_STATE_NON_COMBAT))
-        return ServerFacade::instance().IsDistanceGreaterThan(distance, sPlayerbotAIConfig.fishingDistanceFromMaster);
+        return ServerFacade::instance().IsDistanceGreaterThan(distance, sPlayerbotAIConfig.FishingDistanceFromMaster);
 
     return ServerFacade::instance().IsDistanceGreaterThan(distance, formation->GetMaxDistance());
 }
@@ -298,61 +298,6 @@ bool FollowAction::CanDeadFollow(Unit* target)
 
     // Move to corpse when dead and player is alive or not a ghost.
     if (!bot->IsAlive() && (target->IsAlive() || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
-        return false;
-
-    return true;
-}
-
-bool FleeToGroupLeaderAction::Execute(Event /*event*/)
-{
-    Unit* fTarget = AI_VALUE(Unit*, "group leader");
-    bool canFollow = Follow(fTarget);
-    if (!canFollow)
-    {
-        // botAI->SetNextCheckDelay(5000);
-        return false;
-    }
-
-    WorldPosition targetPos(fTarget);
-    WorldPosition bosPos(bot);
-    float distance = bosPos.fDist(targetPos);
-
-    if (distance < sPlayerbotAIConfig.reactDistance * 3)
-    {
-        if (!urand(0, 3))
-            botAI->TellMaster("I am close, wait for me!");
-    }
-    else if (distance < 1000)
-    {
-        if (!urand(0, 10))
-            botAI->TellMaster("I heading to your position.");
-    }
-    else if (!urand(0, 20))
-        botAI->TellMaster("I am traveling to your position.");
-
-    botAI->SetNextCheckDelay(3000);
-
-    return true;
-}
-
-bool FleeToGroupLeaderAction::isUseful()
-{
-    if (!botAI->GetGroupLeader())
-        return false;
-
-    if (botAI->GetGroupLeader() == bot)
-        return false;
-
-    Unit* target = AI_VALUE(Unit*, "current target");
-    if (target && botAI->GetGroupLeader()->GetTarget() == target->GetGUID())
-        return false;
-
-    if (!botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))
-        return false;
-
-    Unit* fTarget = AI_VALUE(Unit*, "group leader");
-
-    if (!CanDeadFollow(fTarget))
         return false;
 
     return true;

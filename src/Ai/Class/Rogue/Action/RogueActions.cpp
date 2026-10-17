@@ -22,7 +22,7 @@ constexpr uint32 SPELL_MASTER_POISONER_RANK_3 = 58410;
 bool CastStealthAction::isUseful()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    if (target && bot->GetDistance(target) >= sPlayerbotAIConfig.spellDistance)
+    if (target && bot->GetDistance(target) >= sPlayerbotAIConfig.SpellDistance)
         return false;
     return true;
 }

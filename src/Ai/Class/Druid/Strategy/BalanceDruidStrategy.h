@@ -20,7 +20,7 @@ public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override { return "balance"; }
     std::vector<NextAction> getDefaultActions() override;
-    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED; }
+    uint32 GetType() const override { return STRATEGY_TYPE_DPS | STRATEGY_TYPE_RANGED; }
 };
 
 #endif

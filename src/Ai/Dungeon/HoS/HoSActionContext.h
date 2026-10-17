@@ -19,8 +19,8 @@ class WotlkDungeonHoSActionContext : public NamedObjectContext<Action>
             creators["avoid lightning ring"] = &WotlkDungeonHoSActionContext::avoid_lightning_ring;
         }
     private:
-        static Action* shatter_spread(PlayerbotAI* ai) { return new ShatterSpreadAction(ai); }
-        static Action* avoid_lightning_ring(PlayerbotAI* ai) { return new AvoidLightningRingAction(ai); }
+        static Action* shatter_spread(PlayerbotAI* botAI) { return new ShatterSpreadAction(botAI); }
+        static Action* avoid_lightning_ring(PlayerbotAI* botAI) { return new AvoidLightningRingAction(botAI); }
 };
 
 #endif

@@ -36,13 +36,14 @@ class WarriorCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
 public:
     WarriorCombatStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
     {
-        creators["tank"] = &WarriorCombatStrategyFactoryInternal::tank;
+        creators["prot"] = &WarriorCombatStrategyFactoryInternal::prot;
+        creators["tank"] = &WarriorCombatStrategyFactoryInternal::prot;
         creators["arms"] = &WarriorCombatStrategyFactoryInternal::arms;
         creators["fury"] = &WarriorCombatStrategyFactoryInternal::fury;
     }
 
 private:
-    static Strategy* tank(PlayerbotAI* botAI) { return new TankWarriorStrategy(botAI); }
+    static Strategy* prot(PlayerbotAI* botAI) { return new TankWarriorStrategy(botAI); }
     static Strategy* arms(PlayerbotAI* botAI) { return new ArmsWarriorStrategy(botAI); }
     static Strategy* fury(PlayerbotAI* botAI) { return new FuryWarriorStrategy(botAI); }
 };
@@ -166,7 +167,7 @@ private:
     static Trigger* overpower(PlayerbotAI* botAI) { return new OverpowerAvailableTrigger(botAI); }
     static Trigger* revenge(PlayerbotAI* botAI) { return new RevengeAvailableTrigger(botAI); }
     static Trigger* sunder_armor(PlayerbotAI* botAI) { return new SunderArmorDebuffTrigger(botAI); }
-    // static Trigger* slam(PlayerbotAI* ai) { return new SlamTrigger(ai); }
+    // static Trigger* slam(PlayerbotAI* botAI) { return new SlamTrigger(botAI); }
     static Trigger* vigilance(PlayerbotAI* botAI) { return new VigilanceTrigger(botAI); }
     static Trigger* shattering_throw_trigger(PlayerbotAI* botAI) { return new ShatteringThrowTrigger(botAI); }
 };

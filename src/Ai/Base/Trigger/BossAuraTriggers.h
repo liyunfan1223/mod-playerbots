@@ -37,8 +37,8 @@ enum BossAuraIDs
 class BossFireResistanceTrigger : public Trigger
 {
 public:
-    BossFireResistanceTrigger(PlayerbotAI* ai, std::string const bossName)
-        : Trigger(ai, bossName + " fire resistance trigger"), bossName(bossName)
+    BossFireResistanceTrigger(PlayerbotAI* botAI, std::string const bossName)
+        : Trigger(botAI, bossName + " fire resistance trigger"), bossName(bossName)
     {
     }
     bool IsActive() override;
@@ -50,8 +50,8 @@ private:
 class BossFrostResistanceTrigger : public Trigger
 {
 public:
-    BossFrostResistanceTrigger(PlayerbotAI* ai, std::string const bossName)
-        : Trigger(ai, bossName + " frost resistance trigger"), bossName(bossName)
+    BossFrostResistanceTrigger(PlayerbotAI* botAI, std::string const bossName)
+        : Trigger(botAI, bossName + " frost resistance trigger"), bossName(bossName)
     {
     }
     bool IsActive() override;
@@ -63,8 +63,8 @@ private:
 class BossNatureResistanceTrigger : public Trigger
 {
 public:
-    BossNatureResistanceTrigger(PlayerbotAI* ai, std::string const bossName)
-        : Trigger(ai, " nature resistance trigger"), bossName(bossName)
+    BossNatureResistanceTrigger(PlayerbotAI* botAI, std::string const bossName)
+        : Trigger(botAI, " nature resistance trigger"), bossName(bossName)
     {
     }
     bool IsActive() override;
@@ -76,8 +76,8 @@ private:
 class BossShadowResistanceTrigger : public Trigger
 {
 public:
-    BossShadowResistanceTrigger(PlayerbotAI* ai, std::string const bossName)
-        : Trigger(ai, " shadow resistance trigger"), bossName(bossName)
+    BossShadowResistanceTrigger(PlayerbotAI* botAI, std::string const bossName)
+        : Trigger(botAI, " shadow resistance trigger"), bossName(bossName)
     {
     }
     bool IsActive() override;

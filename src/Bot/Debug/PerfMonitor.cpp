@@ -139,7 +139,7 @@ void RecordSample(PerformanceData* data, uint64 elapsed)
 }
 }  // namespace
 
-bool PerfMonitor::IsEnabled() { return sPlayerbotAIConfig.perfMonEnabled; }
+bool PerfMonitor::IsEnabled() { return sPlayerbotAIConfig.PerfMonEnabled; }
 
 PerformanceData* PerfMonitor::GetOrCreate(PerformanceMetric metric, std::string const& name)
 {
@@ -462,7 +462,7 @@ void PerfMonitor::DumpJson(bool perTick)
     out << "  \"generatedAt\": " << static_cast<uint64>(now) << ",\n";
     out << "  \"generatedAtUtc\": \"" << stamp << "\",\n";
     out << "  \"mode\": \"" << (perTick ? "tick" : "total") << "\",\n";
-    out << "  \"enabled\": " << (sPlayerbotAIConfig.perfMonEnabled ? "true" : "false") << ",\n";
+    out << "  \"enabled\": " << (sPlayerbotAIConfig.PerfMonEnabled ? "true" : "false") << ",\n";
     out << "  \"timeUnit\": \"microseconds\",\n";
     out << "  \"fullTickCount\": " << static_cast<uint64>(fullTickCount) << ",\n";
     out << "  \"fullTickTotalTime\": " << static_cast<uint64>(fullTickTotalTime) << ",\n";

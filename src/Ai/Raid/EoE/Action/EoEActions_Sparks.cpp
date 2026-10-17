@@ -60,7 +60,7 @@ bool KillPowerSparkAction::isUseful()
 {
     // Only a spark reachable standing still, nobody walks in P1. DK grips are PullPowerSparkAction.
     MalygosAggro const& aggro = GetMalygosAggro(botAI);
-    if (!botAI->IsDps(bot) || aggro.mainTank || aggro.victim)
+    if (!PlayerbotAI::IsDps(bot) || aggro.mainTank || aggro.victim)
         return false;
 
     Unit* spark = GetPowerSparkToKill(botAI, AI_VALUE(Unit*, "current target"));

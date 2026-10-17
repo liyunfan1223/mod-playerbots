@@ -25,7 +25,7 @@ public:
 class DruidBlanketStrategy : public Strategy
 {
 public:
-    DruidBlanketStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+    DruidBlanketStrategy(PlayerbotAI* botAI);
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override { return "blanketing"; }

@@ -48,7 +48,7 @@ class LowHealthTrigger : public HealthInRangeTrigger
 {
 public:
     LowHealthTrigger(PlayerbotAI* botAI, std::string const name = "low health",
-                     float value = sPlayerbotAIConfig.lowHealth, float minValue = 0)
+                     float value = sPlayerbotAIConfig.LowHealth, float minValue = 0)
         : HealthInRangeTrigger(botAI, name, value, minValue)
     {
     }
@@ -60,7 +60,7 @@ class CriticalHealthTrigger : public LowHealthTrigger
 {
 public:
     CriticalHealthTrigger(PlayerbotAI* botAI)
-        : LowHealthTrigger(botAI, "critical health", sPlayerbotAIConfig.criticalHealth, 0)
+        : LowHealthTrigger(botAI, "critical health", sPlayerbotAIConfig.CriticalHealth, 0)
     {
     }
 };
@@ -69,7 +69,7 @@ class MediumHealthTrigger : public LowHealthTrigger
 {
 public:
     MediumHealthTrigger(PlayerbotAI* botAI)
-        : LowHealthTrigger(botAI, "medium health", sPlayerbotAIConfig.mediumHealth, 0)
+        : LowHealthTrigger(botAI, "medium health", sPlayerbotAIConfig.MediumHealth, 0)
     {
     }
 };
@@ -78,8 +78,8 @@ class AlmostFullHealthTrigger : public LowHealthTrigger
 {
 public:
     AlmostFullHealthTrigger(PlayerbotAI* botAI)
-        : LowHealthTrigger(botAI, "almost full health", sPlayerbotAIConfig.almostFullHealth,
-                           sPlayerbotAIConfig.mediumHealth)
+        : LowHealthTrigger(botAI, "almost full health", sPlayerbotAIConfig.AlmostFullHealth,
+                           sPlayerbotAIConfig.MediumHealth)
     {
     }
 };
@@ -88,7 +88,7 @@ class PartyMemberLowHealthTrigger : public HealthInRangeTrigger
 {
 public:
     PartyMemberLowHealthTrigger(PlayerbotAI* botAI, std::string const name = "party member low health",
-                                float value = sPlayerbotAIConfig.lowHealth,
+                                float value = sPlayerbotAIConfig.LowHealth,
                                 float minValue = 0)
         : HealthInRangeTrigger(botAI, name, value, minValue)
     {
@@ -101,7 +101,7 @@ class PartyMemberCriticalHealthTrigger : public PartyMemberLowHealthTrigger
 {
 public:
     PartyMemberCriticalHealthTrigger(PlayerbotAI* botAI)
-        : PartyMemberLowHealthTrigger(botAI, "party member critical health", sPlayerbotAIConfig.criticalHealth, 0)
+        : PartyMemberLowHealthTrigger(botAI, "party member critical health", sPlayerbotAIConfig.CriticalHealth, 0)
     {
     }
 };
@@ -110,7 +110,7 @@ class PartyMemberMediumHealthTrigger : public PartyMemberLowHealthTrigger
 {
 public:
     PartyMemberMediumHealthTrigger(PlayerbotAI* botAI)
-        : PartyMemberLowHealthTrigger(botAI, "party member medium health", sPlayerbotAIConfig.mediumHealth,
+        : PartyMemberLowHealthTrigger(botAI, "party member medium health", sPlayerbotAIConfig.MediumHealth,
                                       0)
     {
     }
@@ -120,7 +120,7 @@ class PartyMemberAlmostFullHealthTrigger : public PartyMemberLowHealthTrigger
 {
 public:
     PartyMemberAlmostFullHealthTrigger(PlayerbotAI* botAI)
-        : PartyMemberLowHealthTrigger(botAI, "party member almost full health", sPlayerbotAIConfig.almostFullHealth,
+        : PartyMemberLowHealthTrigger(botAI, "party member almost full health", sPlayerbotAIConfig.AlmostFullHealth,
                                       0)
     {
     }
@@ -164,7 +164,7 @@ public:
 class CombatPartyMemberDeadTrigger : public Trigger
 {
 public:
-    CombatPartyMemberDeadTrigger(PlayerbotAI* ai) : Trigger(ai, "combat party member to resurrect", 1) {}
+    CombatPartyMemberDeadTrigger(PlayerbotAI* botAI) : Trigger(botAI, "combat party member to resurrect", 1) {}
     std::string const GetTargetName() override { return "party member to resurrect"; }
     bool IsActive() override;
 };
@@ -195,8 +195,8 @@ protected:
 class AoeInGroupTrigger : public Trigger
 {
 public:
-    AoeInGroupTrigger(PlayerbotAI* ai, std::string name, std::string type)
-        : Trigger(ai, name), type(type)
+    AoeInGroupTrigger(PlayerbotAI* botAI, std::string name, std::string type)
+        : Trigger(botAI, name), type(type)
     {
     }
     bool IsActive() override;

@@ -11,12 +11,13 @@
 #include "GuildMgr.h"
 #include "Player.h"
 #include "PlayerbotAIConfig.h"
+#include "RandomPlayerbotFactory.h"
 #include "ScriptMgr.h"
 
 void PlayerbotGuildMgr::Init()
 {
     _guildCache.clear();
-    if (sPlayerbotAIConfig.deleteRandomBotGuilds)
+    if (sPlayerbotAIConfig.DeleteRandomBotGuilds)
         DeleteRandomBotGuilds();
 
     LoadGuildNames();
@@ -42,7 +43,7 @@ bool PlayerbotGuildMgr::CreateGuild(Player* player, std::string guildName)
     entry.name = guildName;
     entry.memberCount = 1;
     entry.status = 1;
-    entry.maxMembers = sPlayerbotAIConfig.randomBotGuildSizeMax;
+    entry.maxMembers = sPlayerbotAIConfig.RandomBotGuildSizeMax;
     entry.faction = player->GetTeamId();
 
     _guildCache[guild->GetId()] = entry;
@@ -97,7 +98,7 @@ std::string PlayerbotGuildMgr::AssignToGuild(Player* player)
         }
         );
 
-    if (count < sPlayerbotAIConfig.randomBotGuildCount)
+    if (count < sPlayerbotAIConfig.RandomBotGuildCount)
     {
         for (auto& key : _shuffled_guild_keys)
         {
@@ -147,7 +148,12 @@ void PlayerbotGuildMgr::LoadGuildNames()
 {
     LOG_INFO("playerbots", "Loading guild names from playerbots_guild_names...");
 
-    QueryResult result = CharacterDatabase.Query("SELECT name_id, name FROM playerbots_guild_names");
+    _guildNames.clear();
+    _shuffled_guild_keys.clear();
+
+    QueryResult result = CharacterDatabase.Query(
+        "SELECT {} FROM playerbots_guild_names",
+        RandomPlayerbotFactory::GetLocalizedNameSelector("name"));
 
     if (!result)
     {
@@ -158,7 +164,10 @@ void PlayerbotGuildMgr::LoadGuildNames()
     do
     {
         Field* fields = result->Fetch();
-        _guildNames[fields[1].Get<std::string>()] = true;
+
+        std::string name = fields[0].Get<std::string>();
+        if (!name.empty())
+            _guildNames[name] = true;
     } while (result->NextRow());
 
     for (auto& pair : _guildNames)
@@ -195,7 +204,7 @@ void PlayerbotGuildMgr::ValidateGuildCache()
         uint32 guildId = it->first;
         GuildCache cache;
         cache.name = it->second;
-        cache.maxMembers = sPlayerbotAIConfig.randomBotGuildSizeMax;
+        cache.maxMembers = sPlayerbotAIConfig.RandomBotGuildSizeMax;
 
         Guild* guild = sGuildMgr ->GetGuildById(guildId);
         if (!guild)

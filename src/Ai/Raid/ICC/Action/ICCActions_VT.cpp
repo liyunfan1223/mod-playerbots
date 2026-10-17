@@ -46,7 +46,7 @@ bool IccValithriaGroupAction::Execute(Event /*event*/)
     // Tanks collect stray Gluttonous Abominations / Rot Worms anywhere.
     // Each tank picks NEAREST stray so two tanks naturally split work.
     // In taunt range -> taunt. Out of range -> step toward add to close gap.
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         constexpr float ADD_TAUNT_RANGE = 30.0f;
         constexpr float CHASE_STEP = 10.0f;
@@ -63,7 +63,7 @@ bool IccValithriaGroupAction::Execute(Event /*event*/)
 
             Unit* victim = unit->GetVictim();
             Player* victimPlayer = victim ? victim->ToPlayer() : nullptr;
-            if (victimPlayer && botAI->IsTank(victimPlayer))
+            if (victimPlayer && PlayerbotAI::IsTank(victimPlayer))
                 continue;
 
             float const d = bot->GetExactDist2d(unit);
@@ -101,7 +101,7 @@ bool IccValithriaGroupAction::Execute(Event /*event*/)
     }
 
     // Healers move toward the heal position when no portal is active
-    if (botAI->IsHeal(bot) && !portal && bot->GetExactDist2d(ICC_VDW_HEAL_POSITION) > 30.0f)
+    if (PlayerbotAI::IsHeal(bot) && !portal && bot->GetExactDist2d(ICC_VDW_HEAL_POSITION) > 30.0f)
     {
         return MoveTo(bot->GetMapId(), ICC_VDW_HEAL_POSITION.GetPositionX(), ICC_VDW_HEAL_POSITION.GetPositionY(),
                       ICC_VDW_HEAL_POSITION.GetPositionZ(), false, false, false, false,
@@ -125,7 +125,7 @@ bool IccValithriaGroupAction::Execute(Event /*event*/)
         }
     }
 
-    if (worm && worm->IsAlive() && worm->GetVictim() == bot && !botAI->IsTank(bot))
+    if (worm && worm->IsAlive() && worm->GetVictim() == bot && !PlayerbotAI::IsTank(bot))
     {
         botAI->Reset();
         FleePosition(worm->GetPosition(), 10.0f, 250U);
@@ -168,13 +168,13 @@ bool IccValithriaGroupAction::Execute(Event /*event*/)
 
     // Non-tank melee must never sit inside 15f of any zombie: the zombie can
     // flip victim at any time and at melee range the bot has no time to kite.
-    if (nearbyZombie && botAI->IsMelee(bot) && !botAI->IsTank(bot) && nearbyDist < 15.0f)
+    if (nearbyZombie && PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsTank(bot) && nearbyDist < 15.0f)
     {
         botAI->Reset();
         return FleePosition(nearbyZombie->GetPosition(), 15.0f, 250U);
     }
 
-    if (nearbyZombie && !botAI->IsMainTank(bot) && !botAI->IsHeal(bot) && nearbyZombie->GetVictim() != bot)
+    if (nearbyZombie && !PlayerbotAI::IsMainTank(bot) && !PlayerbotAI::IsHeal(bot) && nearbyZombie->GetVictim() != bot)
         ApplyCrowdControl(nearbyZombie);
 
     // Leash: every role stays within 35f of the boss anchor unless doing an
@@ -184,7 +184,7 @@ bool IccValithriaGroupAction::Execute(Event /*event*/)
     constexpr float LEASH_RADIUS = 35.0f;
     bool const inDreamState = bot->HasAura(SPELL_DREAM_STATE);
     bool hasPortalClaim = false;
-    if (botAI->IsHeal(bot))
+    if (PlayerbotAI::IsHeal(bot))
     {
         auto& claims = IcecrownHelpers::IccState(bot->GetMap()->GetInstanceId()).vtPortalClaim;
         if (claims.find(bot->GetGUID()) != claims.end())
@@ -193,7 +193,7 @@ bool IccValithriaGroupAction::Execute(Event /*event*/)
     bool const hasZombieThreat = nearbyZombie && nearbyZombie->GetVictim() == bot;
 
     Unit* const victim = bot->GetVictim();
-    bool const engagedDps = victim && !botAI->IsTank(bot) && !botAI->IsHeal(bot) &&
+    bool const engagedDps = victim && !PlayerbotAI::IsTank(bot) && !PlayerbotAI::IsHeal(bot) &&
                             victim->GetExactDist2d(ICC_VDW_HEAL_POSITION) <= 50.0f;
 
     if (!inDreamState && !hasPortalClaim && !hasZombieThreat && !engagedDps)
@@ -298,10 +298,10 @@ bool IccValithriaGroupAction::Handle25ManGroupLogic()
         if (!memberAI || IsSelfBot(member))
             continue;
 
-        if (memberAI->IsHeal(member) && member->HasAura(SPELL_DREAM_STATE))
+        if (PlayerbotAI::IsHeal(member) && member->HasAura(SPELL_DREAM_STATE))
             continue;
 
-        if (!memberAI->IsTank(member) && !memberAI->IsDps(member) && !memberAI->IsHeal(member))
+        if (!PlayerbotAI::IsTank(member) && !PlayerbotAI::IsDps(member) && !PlayerbotAI::IsHeal(member))
             continue;
 
         eligible.push_back(member);
@@ -332,11 +332,11 @@ bool IccValithriaGroupAction::Handle25ManGroupLogic()
             PlayerbotAI* pai = GET_PLAYERBOT_AI(p);
             if (!pai)
                 continue;
-            if (pai->IsTank(p))
+            if (PlayerbotAI::IsTank(p))
                 tanks.push_back(p);
-            else if (pai->IsHeal(p))
+            else if (PlayerbotAI::IsHeal(p))
                 healers.push_back(p);
-            else if (pai->IsMelee(p))
+            else if (PlayerbotAI::IsMelee(p))
                 meleeDps.push_back(p);
             else
                 rangedDps.push_back(p);
@@ -366,7 +366,7 @@ bool IccValithriaGroupAction::Handle25ManGroupLogic()
         inGroup2 = std::any_of(group2.begin(), group2.end(), [this](Player* p) { return p == bot; });
     }
 
-    if (botAI->IsTank(bot) || botAI->IsDps(bot) || botAI->IsHeal(bot))
+    if (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsDps(bot) || PlayerbotAI::IsHeal(bot))
         HandleMarkingLogic(inGroup1, inGroup2, singleMarkMode);
 
     return false;
@@ -420,8 +420,8 @@ bool IccValithriaGroupAction::HandleMarkingLogic(bool inGroup1, bool inGroup2, b
 
     context->GetValue<std::string>("rti")->Set(rtiValue);
 
-    bool const dispatchRti = !botAI->IsTank(bot) && !botAI->IsHeal(bot);
-    bool const isMeleeDps = botAI->IsMelee(bot) && !botAI->IsTank(bot);
+    bool const dispatchRti = !PlayerbotAI::IsTank(bot) && !PlayerbotAI::IsHeal(bot);
+    bool const isMeleeDps = PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsTank(bot);
 
     auto tryDispatchRti = [&](ObjectGuid rtiGuid)
     {
@@ -588,7 +588,7 @@ bool IccValithriaGroupAction::Handle10ManGroupLogic()
     PlayerbotAI* selfAI = GET_PLAYERBOT_AI(bot);
     if (!selfAI || IsSelfBot(bot))
         return false;
-    if (botAI->IsHeal(bot) && bot->HasAura(SPELL_DREAM_STATE))
+    if (PlayerbotAI::IsHeal(bot) && bot->HasAura(SPELL_DREAM_STATE))
         return false;
 
     constexpr float MARK_RADIUS = 45.0f;
@@ -601,8 +601,8 @@ bool IccValithriaGroupAction::Handle10ManGroupLogic()
 
     context->GetValue<std::string>("rti")->Set("skull");
 
-    bool const dispatchRti = !botAI->IsTank(bot) && !botAI->IsHeal(bot);
-    bool const isMeleeDps = botAI->IsMelee(bot) && !botAI->IsTank(bot);
+    bool const dispatchRti = !PlayerbotAI::IsTank(bot) && !PlayerbotAI::IsHeal(bot);
+    bool const isMeleeDps = PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsTank(bot);
 
     auto tryDispatchRti = [&](ObjectGuid rtiGuid)
     {
@@ -705,7 +705,7 @@ bool IccValithriaGroupAction::Handle10ManGroupLogic()
 
 bool IccValithriaPortalAction::Execute(Event /*event*/)
 {
-    if (!botAI->IsHeal(bot) || bot->HasAura(SPELL_DREAM_STATE))
+    if (!PlayerbotAI::IsHeal(bot) || bot->HasAura(SPELL_DREAM_STATE))
         return false;
 
     // Healer just dropped Dream State - if still airborne (portal exit leaves
@@ -845,7 +845,7 @@ bool IccValithriaPortalAction::Execute(Event /*event*/)
 
 bool IccValithriaHealAction::Execute(Event /*event*/)
 {
-    if (!botAI->IsHeal(bot))
+    if (!PlayerbotAI::IsHeal(bot))
         return false;
 
     // Snap to floor Z first - healer may have just dropped Dream State and be
@@ -1054,7 +1054,7 @@ std::vector<Creature*> IccValithriaDreamCloudAction::CollectClouds(uint32 entry,
 
 bool IccValithriaZombieKiteAction::Execute(Event /*event*/)
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* boss = bot->FindNearestCreature(NPC_VALITHRIA_DREAMWALKER, 100.0f);

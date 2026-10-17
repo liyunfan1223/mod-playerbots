@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "TargetValue.h"
 
 bool MarkOfTheWildTrigger::IsActive()
 {
@@ -31,11 +32,28 @@ bool BearFormTrigger::IsActive() { return !botAI->HasAnyAuraOf(bot, "bear form",
 
 bool TreeFormTrigger::IsActive()
 {
-    constexpr uint32 SPELL_TREE_OF_LIFE = 33891;
     return !bot->HasAura(SPELL_TREE_OF_LIFE);
 }
 
 bool CatFormTrigger::IsActive() { return !botAI->HasAura("cat form", bot); }
+
+bool HealerShouldAttackAndNotBlanketingTrigger::IsActive()
+{
+    if (bot->GetGroup() && bot->HasSpell(SPELL_TREE_OF_LIFE) && botAI->HasStrategy("blanketing", BOT_STATE_COMBAT))
+        return false;
+
+    return HealerShouldAttackTrigger::IsActive();
+}
+
+Unit* BlanketHotTrigger::GetTarget() { return botAI->GetUnit(AI_VALUE2(ObjectGuid, "blanket hot target", _spell)); }
+
+bool BlanketHotTrigger::IsActive()
+{
+    if (!bot->GetGroup() || !botAI->HasStrategy("resto", BOT_STATE_COMBAT))
+        return false;
+
+    return GetTarget();
+}
 
 bool AquaticFormTrigger::IsActive()
 {
@@ -107,19 +125,7 @@ bool HurricaneChannelCheckTrigger::IsActive()
             return false;
 
         // Count attackers actually inside the Hurricane AoE
-        float radius = dynObj->GetRadius();
-        GuidVector attackers = AI_VALUE(GuidVector, "attackers");
-        uint32 count = 0;
-        for (ObjectGuid const& guid : attackers)
-        {
-            Unit* unit = botAI->GetUnit(guid);
-            if (!unit || !unit->IsAlive())
-                continue;
-            if (unit->GetDistance(dynObj->GetPosition()) <= radius)
-                count++;
-        }
-
-        return count < minEnemies;
+        return !HasEnoughAoeTargets(botAI, dynObj->GetPosition(), dynObj->GetRadius(), minEnemies);
     }
 
     return false;

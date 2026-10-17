@@ -27,6 +27,12 @@ using EncounterGate = bool (*)(PlayerbotAI* botAI, uint32 encounterId);
 // Keyed by the InstanceScript boss index, rule in RaidEncounterRules::GateOpen. Gate on the fight, not
 // the unit: an add a boss calls in (Sartharion's drakes) never starts an encounter of its own.
 bool BossStateGateOpen(PlayerbotAI* botAI, uint32 encounterId);
+// The encounter itself is in progress. Unlike the open gate, false while nothing is engaged.
+bool BossStateGateLive(PlayerbotAI* botAI, uint32 encounterId);
+
+// Non-zero only inside a gated trigger's Check, unique per trigger pass. Triggers don't change the
+// world, so a read cached under one id holds for that pass; actions and multipliers always get 0.
+uint32 EncounterTriggerPassId(PlayerbotAI* botAI);
 
 // Wraps rather than subclasses, so the trigger classes and their IsActive bodies stay as they are.
 class EncounterGatedTrigger : public Trigger
@@ -64,13 +70,14 @@ enum class EncounterRow : uint8
 
 class EncounterBuilder;
 
-// One boss, declared once: its trigger/action rows, rules and hand-written multipliers. The raid's
-// contexts and strategy are built from it, and its gate covers all of it.
+// One boss, declared once: its trigger/action rows, rules, hand-written multipliers and tick. The
+// raid's contexts and strategy are built from it, and its gate covers all of it.
 class EncounterDefinition
 {
 public:
     using Define = void (*)(EncounterBuilder&);
     using Predicate = bool (*)(PlayerbotAI*);
+    using TickFn = void (*)(PlayerbotAI*);
     using TriggerCreator = std::function<Trigger*(PlayerbotAI*)>;
     using ActionCreator = std::function<Action*(PlayerbotAI*)>;
     using MultiplierCreator = std::function<Multiplier*(PlayerbotAI*)>;
@@ -82,6 +89,9 @@ public:
     void RegisterActions(std::unordered_map<std::string, ActionCreator>& creators) const;
     void AddTriggerNodes(std::vector<TriggerNode*>& triggers) const;
     void AddMultipliers(PlayerbotAI* botAI, std::vector<Multiplier*>& multipliers) const;
+
+    // Housekeeping for Strategy::OnTick. Runs only while the gate is open.
+    void OnTick(PlayerbotAI* botAI) const;
 
 private:
     friend class EncounterBuilder;
@@ -100,6 +110,7 @@ private:
     EncounterGate _gate;
     std::vector<Row> _rows;
     std::vector<MultiplierCreator> _multipliers;  // in declaration order, which is veto order
+    TickFn _tick = nullptr;
 };
 
 // What a definition function gets. Rules and multipliers keep the order they're declared in: the
@@ -153,6 +164,8 @@ public:
     {
         HandWritten(families, [args...](PlayerbotAI* botAI) -> ::Multiplier* { return new M(botAI, args...); });
     }
+
+    void Tick(EncounterDefinition::TickFn tick);
 
 private:
     friend class EncounterDefinition;

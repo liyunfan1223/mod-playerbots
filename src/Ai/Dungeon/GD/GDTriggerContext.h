@@ -22,11 +22,11 @@ class WotlkDungeonGDTriggerContext : public NamedObjectContext<Trigger>
             creators["whirling slash"] = &WotlkDungeonGDTriggerContext::whirling_slash;
         }
     private:
-        static Trigger* poison_nova(PlayerbotAI* ai) { return new SladranPoisonNovaTrigger(ai); }
-        static Trigger* snake_wrap(PlayerbotAI* ai) { return new SladranSnakeWrapTrigger(ai); }
-        static Trigger* sladran_stack_on_tank(PlayerbotAI* ai) { return new SladranStackOnTankTrigger(ai); }
-        static Trigger* sladran_tank_hold(PlayerbotAI* ai) { return new SladranTankHoldTrigger(ai); }
-        static Trigger* whirling_slash(PlayerbotAI* ai) { return new GaldarahWhirlingSlashTrigger(ai); }
+        static Trigger* poison_nova(PlayerbotAI* botAI) { return new SladranPoisonNovaTrigger(botAI); }
+        static Trigger* snake_wrap(PlayerbotAI* botAI) { return new SladranSnakeWrapTrigger(botAI); }
+        static Trigger* sladran_stack_on_tank(PlayerbotAI* botAI) { return new SladranStackOnTankTrigger(botAI); }
+        static Trigger* sladran_tank_hold(PlayerbotAI* botAI) { return new SladranTankHoldTrigger(botAI); }
+        static Trigger* whirling_slash(PlayerbotAI* botAI) { return new GaldarahWhirlingSlashTrigger(botAI); }
 };
 
 #endif

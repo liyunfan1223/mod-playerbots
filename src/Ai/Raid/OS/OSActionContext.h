@@ -25,12 +25,12 @@ public:
     }
 
 private:
-    static Action* tank_position(PlayerbotAI* ai) { return new SartharionTankPositionAction(ai); }
-    static Action* avoid_twilight_fissure(PlayerbotAI* ai) { return new AvoidTwilightFissureAction(ai); }
-    static Action* avoid_flame_tsunami(PlayerbotAI* ai) { return new AvoidFlameTsunamiAction(ai); }
-    static Action* attack_priority(PlayerbotAI* ai) { return new SartharionAttackPriorityAction(ai); }
-    static Action* enter_twilight_portal(PlayerbotAI* ai) { return new EnterTwilightPortalAction(ai); }
-    static Action* exit_twilight_portal(PlayerbotAI* ai) { return new ExitTwilightPortalAction(ai); }
+    static Action* tank_position(PlayerbotAI* botAI) { return new SartharionTankPositionAction(botAI); }
+    static Action* avoid_twilight_fissure(PlayerbotAI* botAI) { return new AvoidTwilightFissureAction(botAI); }
+    static Action* avoid_flame_tsunami(PlayerbotAI* botAI) { return new AvoidFlameTsunamiAction(botAI); }
+    static Action* attack_priority(PlayerbotAI* botAI) { return new SartharionAttackPriorityAction(botAI); }
+    static Action* enter_twilight_portal(PlayerbotAI* botAI) { return new EnterTwilightPortalAction(botAI); }
+    static Action* exit_twilight_portal(PlayerbotAI* botAI) { return new ExitTwilightPortalAction(botAI); }
 };
 
 #endif

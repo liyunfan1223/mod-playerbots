@@ -22,11 +22,11 @@ class WotlkDungeonToCActionContext : public NamedObjectContext<Action>
             creators["toc eadric"] = &WotlkDungeonToCActionContext::toc_eadric;
         }
     private:
-        static Action* toc_lance(PlayerbotAI* ai) { return new ToCLanceAction(ai); }
-        static Action* toc_ue_lance(PlayerbotAI* ai) { return new ToCUELanceAction(ai); }
-        static Action* toc_mount(PlayerbotAI* ai) { return new ToCMountAction(ai); }
-        static Action* toc_mounted(PlayerbotAI* ai) { return new ToCMountedAction(ai); }
-        static Action* toc_eadric(PlayerbotAI* ai) { return new ToCEadricAction(ai); }
+        static Action* toc_lance(PlayerbotAI* botAI) { return new ToCLanceAction(botAI); }
+        static Action* toc_ue_lance(PlayerbotAI* botAI) { return new ToCUELanceAction(botAI); }
+        static Action* toc_mount(PlayerbotAI* botAI) { return new ToCMountAction(botAI); }
+        static Action* toc_mounted(PlayerbotAI* botAI) { return new ToCMountedAction(botAI); }
+        static Action* toc_eadric(PlayerbotAI* botAI) { return new ToCEadricAction(botAI); }
 };
 
 #endif

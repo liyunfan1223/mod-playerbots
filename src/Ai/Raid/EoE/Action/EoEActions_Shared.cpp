@@ -46,7 +46,7 @@ bool MalygosPositionAction::Execute(Event /*event*/)
         // This action owns the walking in both directions; PullPowerSparkAction only casts.
         bool const gripDuty = !isBossTank && IsOnPowerSparkGripDuty(botAI);
         MalygosP1Layout const& layout = GetMalygosP1Layout(bot);
-        bool const hunter = botAI->IsRangedDps(bot) && bot->IsClass(CLASS_HUNTER);
+        bool const hunter = PlayerbotAI::IsRangedDps(bot) && bot->IsClass(CLASS_HUNTER);
         bool const onStack = !isBossTank && !gripDuty && !hunter;
         std::pair<float, float> const& spot = isBossTank ? layout.tank
                                               : gripDuty ? layout.grip
@@ -108,7 +108,7 @@ bool MalygosTargetAction::Execute(Event /*event*/)
 
     if (phase == MalygosPhase::P1)
     {
-        if (botAI->IsHeal(bot))
+        if (PlayerbotAI::IsHeal(bot))
             return false;
         if (!boss)
             return false;
@@ -119,7 +119,7 @@ bool MalygosTargetAction::Execute(Event /*event*/)
         Unit* newTarget = boss;
         MalygosAggro const& aggro = GetMalygosAggro(botAI);
         bool const isBossTank = aggro.mainTank || aggro.victim;
-        if (!isBossTank && botAI->IsDps(bot))
+        if (!isBossTank && PlayerbotAI::IsDps(bot))
         {
             if (Unit* spark = GetPowerSparkToKill(botAI, currentTarget))
                 newTarget = spark;
@@ -139,7 +139,7 @@ bool MalygosTargetAction::Execute(Event /*event*/)
                 StopPet(botAI);
         }
 
-        if (botAI->IsHeal(bot))
+        if (PlayerbotAI::IsHeal(bot))
             return false;
 
         if (bot->GetVehicle())
@@ -151,8 +151,8 @@ bool MalygosTargetAction::Execute(Event /*event*/)
         Unit* anyScion = nullptr;
 
         // IsWithinCombatRange, not a flat 2d distance: the Scions sit 20-30y up. Melee get no gate.
-        bool const gateByReach = botAI->IsRanged(bot);
-        float const reach = sPlayerbotAIConfig.spellDistance;
+        bool const gateByReach = PlayerbotAI::IsRanged(bot);
+        float const reach = sPlayerbotAIConfig.SpellDistance;
         float closestLord = std::numeric_limits<float>::max();
         float closestScion = std::numeric_limits<float>::max();
         float closestAnyLord = std::numeric_limits<float>::max();
@@ -203,7 +203,7 @@ bool MalygosTargetAction::Execute(Event /*event*/)
         }
 
         Unit* newTarget = nexusLord;
-        if (!newTarget && botAI->IsRangedDps(bot))
+        if (!newTarget && PlayerbotAI::IsRangedDps(bot))
             newTarget = scionOfEternity;
         if (!newTarget)
             return false;

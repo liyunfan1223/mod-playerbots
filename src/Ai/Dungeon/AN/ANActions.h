@@ -16,7 +16,7 @@
 class AttackWebWrapAction : public AttackAction
 {
 public:
-    AttackWebWrapAction(PlayerbotAI* ai) : AttackAction(ai, "attack web wrap") {}
+    AttackWebWrapAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack web wrap") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -24,7 +24,7 @@ public:
 class WatchersTargetAction : public AttackAction
 {
 public:
-    WatchersTargetAction(PlayerbotAI* ai) : AttackAction(ai, "krik'thir priority") {}
+    WatchersTargetAction(PlayerbotAI* botAI) : AttackAction(botAI, "krik'thir priority") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -32,7 +32,7 @@ public:
 class AnubarakDodgePoundAction : public AttackAction
 {
 public:
-    AnubarakDodgePoundAction(PlayerbotAI* ai) : AttackAction(ai, "anub'arak dodge pound") {}
+    AnubarakDodgePoundAction(PlayerbotAI* botAI) : AttackAction(botAI, "anub'arak dodge pound") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };

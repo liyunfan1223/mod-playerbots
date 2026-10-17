@@ -23,7 +23,7 @@ bool RsBaltharusBrandTrigger::IsActive()
 
 bool RsBaltharusTankPositionTrigger::IsActive()
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "baltharus the warborn");
@@ -32,7 +32,7 @@ bool RsBaltharusTankPositionTrigger::IsActive()
 
 bool RsBaltharusHealerPositionTrigger::IsActive()
 {
-    if (!botAI->IsHeal(bot) || botAI->IsTank(bot))
+    if (!PlayerbotAI::IsHeal(bot) || PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "baltharus the warborn");
@@ -41,7 +41,7 @@ bool RsBaltharusHealerPositionTrigger::IsActive()
 
 bool RsBaltharusAvoidFrontTrigger::IsActive()
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "baltharus the warborn");
@@ -59,7 +59,7 @@ bool RsSavianaConflagrationTrigger::IsActive()
 
 bool RsSavianaTankPositionTrigger::IsActive()
 {
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "saviana ragefire");
@@ -68,7 +68,7 @@ bool RsSavianaTankPositionTrigger::IsActive()
 
 bool RsSavianaAvoidFrontTrigger::IsActive()
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "saviana ragefire");
@@ -80,7 +80,7 @@ bool RsSavianaAvoidFrontTrigger::IsActive()
 
 bool RsSavianaMeleeSpreadTrigger::IsActive()
 {
-    if (botAI->IsTank(bot) || (!botAI->IsMelee(bot) && !botAI->IsHeal(bot)))
+    if (PlayerbotAI::IsTank(bot) || (!PlayerbotAI::IsMelee(bot) && !PlayerbotAI::IsHeal(bot)))
         return false;
 
     if (bot->HasAura(SPELL_FLAME_BEACON))
@@ -95,7 +95,7 @@ bool RsSavianaMeleeSpreadTrigger::IsActive()
 
 bool RsZarithrianAddsTrigger::IsActive()
 {
-    if (botAI->IsTank(bot) || botAI->IsHeal(bot))
+    if (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "general zarithrian");
@@ -107,7 +107,7 @@ bool RsZarithrianAddsTrigger::IsActive()
 
 bool RsZarithrianTankTrigger::IsActive()
 {
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* boss = AI_VALUE2(Unit*, "find target", "general zarithrian");
@@ -131,7 +131,7 @@ bool RsHalionAvoidConesTrigger::IsActive()
     if (RsHalionInTwilight(bot))
         return false;
 
-    if (botAI->IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
+    if (PlayerbotAI::IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
         return false;
 
     Unit* boss = RsHalionAnyPhysicalBoss(botAI);
@@ -159,7 +159,7 @@ bool RsHalionMeteorTrigger::IsActive()
     if (RsHalionInTwilight(bot))
         return false;
 
-    if (botAI->IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
+    if (PlayerbotAI::IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
         return false;
 
     Unit* boss = RsHalionAnyPhysicalBoss(botAI);
@@ -177,7 +177,7 @@ bool RsHalionAddsTrigger::IsActive()
     if (RsHalionInTwilight(bot))
         return false;
 
-    if (botAI->IsTank(bot) || botAI->IsHeal(bot) || botAI->IsMelee(bot))
+    if (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot) || PlayerbotAI::IsMelee(bot))
         return false;
 
     if (RsHalionHasCombustion(bot))
@@ -263,7 +263,7 @@ bool RsHalionCutterTrigger::IsActive()
 
 bool RsHalionHealConsumptionTrigger::IsActive()
 {
-    if (!botAI->IsHeal(bot) || !RsHalionInTwilight(bot))
+    if (!PlayerbotAI::IsHeal(bot) || !RsHalionInTwilight(bot))
         return false;
 
     if (!RsHalionIsPhase3(botAI))
@@ -274,7 +274,7 @@ bool RsHalionHealConsumptionTrigger::IsActive()
 
 bool RsTrashAddsTrigger::IsActive()
 {
-    if (botAI->IsTank(bot) || botAI->IsHeal(bot))
+    if (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot))
         return false;
 
     return RsTrashActive(botAI, bot);
@@ -282,7 +282,7 @@ bool RsTrashAddsTrigger::IsActive()
 
 bool RsTrashMainTankTrigger::IsActive()
 {
-    if (!botAI->IsMainTank(bot))
+    if (!PlayerbotAI::IsMainTank(bot))
         return false;
 
     return RsTrashActive(botAI, bot);
@@ -290,7 +290,7 @@ bool RsTrashMainTankTrigger::IsActive()
 
 bool RsTrashAssistTankTrigger::IsActive()
 {
-    if (!botAI->IsAssistTank(bot))
+    if (!PlayerbotAI::IsAssistTank(bot))
         return false;
 
     return RsTrashActive(botAI, bot);
@@ -298,10 +298,10 @@ bool RsTrashAssistTankTrigger::IsActive()
 
 bool RsTrashRangedTrigger::IsActive()
 {
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
         return false;
 
-    if (!botAI->IsRanged(bot) && !botAI->IsHeal(bot))
+    if (!PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsHeal(bot))
         return false;
 
     return RsTrashActive(botAI, bot);
@@ -309,7 +309,7 @@ bool RsTrashRangedTrigger::IsActive()
 
 bool RsTrashMeleeFlankTrigger::IsActive()
 {
-    if (botAI->IsTank(bot) || botAI->IsHeal(bot) || !botAI->IsMelee(bot))
+    if (PlayerbotAI::IsTank(bot) || PlayerbotAI::IsHeal(bot) || !PlayerbotAI::IsMelee(bot))
         return false;
 
     return RsTrashActive(botAI, bot);

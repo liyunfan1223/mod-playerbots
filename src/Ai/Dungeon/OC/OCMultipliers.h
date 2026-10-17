@@ -21,7 +21,7 @@ const float uromCoords[4][4] =
 class MountingDrakeMultiplier : public Multiplier
 {
     public:
-        MountingDrakeMultiplier(PlayerbotAI* ai) : Multiplier(ai, "mounting drake") {}
+        MountingDrakeMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "mounting drake") {}
 
     public:
         float GetValue(Action* action) override;
@@ -30,7 +30,7 @@ class MountingDrakeMultiplier : public Multiplier
 class OccFlyingMultiplier : public Multiplier
 {
     public:
-        OccFlyingMultiplier(PlayerbotAI* ai) : Multiplier(ai, "occ flying drake") {}
+        OccFlyingMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "occ flying drake") {}
 
     public:
         float GetValue(Action* action) override;
@@ -39,7 +39,7 @@ class OccFlyingMultiplier : public Multiplier
 class UromMultiplier : public Multiplier
 {
     public:
-        UromMultiplier(PlayerbotAI* ai) : Multiplier(ai, "mage-lord urom") {}
+        UromMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "mage-lord urom") {}
 
     public:
         float GetValue(Action* action) override;
@@ -50,7 +50,7 @@ class UromMultiplier : public Multiplier
 class EregosMultiplier : public Multiplier
 {
     public:
-        EregosMultiplier(PlayerbotAI* ai) : Multiplier(ai, "ley-guardian eregos") {}
+        EregosMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "ley-guardian eregos") {}
 
     public:
         float GetValue(Action* action) override;

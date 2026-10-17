@@ -93,9 +93,9 @@ bool SummonAction::Execute(Event /*event*/)
 bool SummonAction::SummonUsingGos(Player* summoner, Player* player, bool preserveAuras)
 {
     std::list<GameObject*> targets;
-    AnyGameObjectInObjectRangeCheck u_check(summoner, sPlayerbotAIConfig.sightDistance);
+    AnyGameObjectInObjectRangeCheck u_check(summoner, sPlayerbotAIConfig.SightDistance);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(summoner, targets, u_check);
-    Cell::VisitObjects(summoner, searcher, sPlayerbotAIConfig.sightDistance);
+    Cell::VisitObjects(summoner, searcher, sPlayerbotAIConfig.SightDistance);
 
     for (GameObject* go : targets)
     {
@@ -112,13 +112,13 @@ bool SummonAction::SummonUsingGos(Player* summoner, Player* player, bool preserv
 
 bool SummonAction::SummonUsingNpcs(Player* summoner, Player* player, bool preserveAuras)
 {
-    if (!sPlayerbotAIConfig.summonAtInnkeepersEnabled)
+    if (!sPlayerbotAIConfig.SummonAtInnkeepersEnabled)
         return false;
 
     std::list<Unit*> targets;
-    Acore::AnyUnitInObjectRangeCheck u_check(summoner, sPlayerbotAIConfig.sightDistance);
+    Acore::AnyUnitInObjectRangeCheck u_check(summoner, sPlayerbotAIConfig.SightDistance);
     Acore::UnitListSearcher<Acore::AnyUnitInObjectRangeCheck> searcher(summoner, targets, u_check);
-    Cell::VisitObjects(summoner, searcher, sPlayerbotAIConfig.sightDistance);
+    Cell::VisitObjects(summoner, searcher, sPlayerbotAIConfig.SightDistance);
 
     for (Unit* unit : targets)
     {
@@ -180,16 +180,16 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
         for (float angle = followAngle - M_PI; angle <= followAngle + M_PI; angle += M_PI / 4)
         {
             uint32 mapId = summoner->GetMapId();
-            float x = summoner->GetPositionX() + cos(angle) * sPlayerbotAIConfig.followDistance;
-            float y = summoner->GetPositionY() + sin(angle) * sPlayerbotAIConfig.followDistance;
+            float x = summoner->GetPositionX() + cos(angle) * sPlayerbotAIConfig.FollowDistance;
+            float y = summoner->GetPositionY() + sin(angle) * sPlayerbotAIConfig.FollowDistance;
             float z = summoner->GetPositionZ();
 
             if (summoner->IsWithinLOS(x, y, z))
             {
-                if (sPlayerbotAIConfig.botRepairWhenSummon)  // .conf option to repair bot gear when summoned 0 = off, 1 = on
+                if (sPlayerbotAIConfig.BotRepairWhenSummon)  // .conf option to repair bot gear when summoned 0 = off, 1 = on
                     bot->DurabilityRepairAll(false, 1.0f, false);
 
-                if (summoner->IsInCombat() && !sPlayerbotAIConfig.allowSummonInCombat)
+                if (summoner->IsInCombat() && !sPlayerbotAIConfig.AllowSummonInCombat)
                 {
                     botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                         "meeting_stone_cannot_summon_master_in_combat",
@@ -198,7 +198,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
                     return false;
                 }
 
-                if (!summoner->IsAlive() && !sPlayerbotAIConfig.allowSummonWhenMasterIsDead)
+                if (!summoner->IsAlive() && !sPlayerbotAIConfig.AllowSummonWhenMasterIsDead)
                 {
                     botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                         "meeting_stone_cannot_summon_master_dead",
@@ -208,7 +208,7 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
                 }
 
                 if (bot->isDead() && !bot->HasPlayerFlag(PLAYER_FLAGS_GHOST) &&
-                    !sPlayerbotAIConfig.allowSummonWhenBotIsDead)
+                    !sPlayerbotAIConfig.AllowSummonWhenBotIsDead)
                 {
                     botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(
                         "meeting_stone_cannot_summon_bot_dead",
@@ -218,8 +218,8 @@ bool SummonAction::Teleport(Player* summoner, Player* player, bool preserveAuras
                 }
 
                 bool revive =
-                    sPlayerbotAIConfig.reviveBotWhenSummoned == 2 ||
-                    (sPlayerbotAIConfig.reviveBotWhenSummoned == 1 && !summoner->IsInCombat() && summoner->IsAlive());
+                    sPlayerbotAIConfig.ReviveBotWhenSummoned == 2 ||
+                    (sPlayerbotAIConfig.ReviveBotWhenSummoned == 1 && !summoner->IsInCombat() && summoner->IsAlive());
 
                 if (bot->isDead() && revive)
                 {

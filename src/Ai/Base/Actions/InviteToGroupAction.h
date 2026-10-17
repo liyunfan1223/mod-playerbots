@@ -38,7 +38,7 @@ public:
 class JoinGroupAction : public InviteToGroupAction
 {
 public:
-    JoinGroupAction(PlayerbotAI* ai, std::string name = "join") : InviteToGroupAction(ai, name) {}
+    JoinGroupAction(PlayerbotAI* botAI, std::string name = "join") : InviteToGroupAction(botAI, name) {}
     bool Execute(Event event) override;
 };
 

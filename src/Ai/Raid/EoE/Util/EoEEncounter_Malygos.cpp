@@ -374,7 +374,7 @@ Unit* GetPowerSparkToKill(PlayerbotAI* botAI, Unit* currentTarget)
         return nullptr;
 
     Unit* boss = GetMalygos(bot);
-    bool const ranged = botAI->IsRanged(bot);
+    bool const ranged = PlayerbotAI::IsRanged(bot);
 
     Unit* best = nullptr;
     float bestBossDist = std::numeric_limits<float>::max();
@@ -382,7 +382,7 @@ Unit* GetPowerSparkToKill(PlayerbotAI* botAI, Unit* currentTarget)
     {
         bool inReach;
         if (ranged)
-            inReach = bot->IsWithinCombatRange(spark, sPlayerbotAIConfig.spellDistance);
+            inReach = bot->IsWithinCombatRange(spark, sPlayerbotAIConfig.SpellDistance);
         else
             inReach = bot->IsWithinMeleeRange(spark, currentTarget == spark ? POWER_SPARK_MELEE_STICKY : 0.0f);
 

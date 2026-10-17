@@ -25,12 +25,12 @@ class WotlkDungeonUKActionContext : public NamedObjectContext<Action>
             creators["ingvar smash return"] = &WotlkDungeonUKActionContext::ingvar_smash_return;
         }
     private:
-        static Action* attack_frost_tomb(PlayerbotAI* ai) { return new AttackFrostTombAction(ai); }
-        static Action* attack_dalronn(PlayerbotAI* ai) { return new AttackDalronnAction(ai); }
-        static Action* ingvar_get_behind(PlayerbotAI* ai) { return new SetBehindTargetAction(ai); }
-        // static Action* ingvar_hide_los(PlayerbotAI* ai) { return new TellLosAction(ai); }
-        static Action* ingvar_dodge_smash(PlayerbotAI* ai) { return new IngvarDodgeSmashAction(ai); }
-        static Action* ingvar_smash_return(PlayerbotAI* ai) { return new IngvarSmashReturnAction(ai); }
+        static Action* attack_frost_tomb(PlayerbotAI* botAI) { return new AttackFrostTombAction(botAI); }
+        static Action* attack_dalronn(PlayerbotAI* botAI) { return new AttackDalronnAction(botAI); }
+        static Action* ingvar_get_behind(PlayerbotAI* botAI) { return new SetBehindTargetAction(botAI); }
+        // static Action* ingvar_hide_los(PlayerbotAI* botAI) { return new TellLosAction(botAI); }
+        static Action* ingvar_dodge_smash(PlayerbotAI* botAI) { return new IngvarDodgeSmashAction(botAI); }
+        static Action* ingvar_smash_return(PlayerbotAI* botAI) { return new IngvarSmashReturnAction(botAI); }
 };
 
 #endif

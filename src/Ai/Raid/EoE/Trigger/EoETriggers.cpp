@@ -32,7 +32,7 @@ bool MalygosBubbleTrigger::IsActive()
     if (IsSafelySheltered(bot))
         return false;
 
-    if (!botAI->IsRanged(bot) && !botAI->IsHeal(bot))
+    if (!PlayerbotAI::IsRanged(bot) && !PlayerbotAI::IsHeal(bot))
     {
         // Melee and tanks owe the raid a dead Nexus Lord and then a disk ride first; the disk half
         // only counts for bots MalygosFreeDiskTrigger will actually let board.

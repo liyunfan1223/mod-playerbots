@@ -48,7 +48,7 @@ float SkarvaldAndDalronnMultiplier::GetValue(Action* action)
 float IngvarThePlundererMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "ingvar the plunderer");
-    bool isTank = botAI->IsTank(bot);
+    bool isTank = PlayerbotAI::IsTank(bot);
     if (!boss) { return 1.0f; }
 
     // Prevent movement actions overriding current movement, we're probably dodging a slam

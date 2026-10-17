@@ -19,11 +19,15 @@ public:
     bool CanUpdateAI();
     void SetNextCheckDelay(uint32 const delay);
     void IncreaseNextCheckDelay(uint32 delay);
-    void YieldThread(Player* bot, uint32 delay = sPlayerbotAIConfig.reactDelay);
+    void YieldThread(Player* bot, uint32 delay = sPlayerbotAIConfig.ReactDelay);
     virtual void UpdateAI(uint32 elapsed, bool minimal = false);
     virtual void UpdateAIInternal(uint32 elapsed, bool minimal = false) = 0;
     bool IsActive();
     bool IsBotAI() const;
+
+    void SetActionDuration(uint32 duration);
+    void ResetActionDuration();
+    bool IsActionDurationActive() const { return nextAICheckDelay > 0; }
 
 protected:
     uint32 nextAICheckDelay;

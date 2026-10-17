@@ -7,6 +7,8 @@
 #ifndef PLAYERBOTS_NEWRPGINFO_H
 #define PLAYERBOTS_NEWRPGINFO_H
 
+#include <unordered_set>
+
 #include "Define.h"
 #include "ObjectGuid.h"
 #include "ObjectMgr.h"
@@ -70,6 +72,16 @@ struct NewRpgInfo
     {
         ObjectGuid::LowType capturePointSpawnId{0};
     };
+    // RPG_DO_GATHER
+    struct DoGather
+    {
+        ObjectGuid::LowType nodeSpawnId{0};
+        WorldPosition nodePos{};
+        std::unordered_set<ObjectGuid::LowType> visited;
+        uint32 lastReach{0};
+        uint32 lastPassiveCheck{0};
+        ObjectGuid::LowType lastSwitchedFrom{0};
+    };
     struct Idle
     {
     };
@@ -92,7 +104,8 @@ struct NewRpgInfo
         DoQuest,
         Rest,
         TravelFlight,
-        OutdoorPvP
+        OutdoorPvP,
+        DoGather
     >;
     RpgData data;
 
@@ -106,6 +119,7 @@ struct NewRpgInfo
     void ChangeToDoQuest(uint32 questId, Quest const* quest);
     void ChangeToTravelFlight(uint32 flightMasterEntry, WorldPosition flightMasterPos, std::vector<uint32> path);
     void ChangeToOutdoorPvp(ObjectGuid::LowType capturePointSpawnId = 0);
+    void ChangeToDoGather();
     void ChangeToRest();
     void ChangeToIdle();
     bool CanChangeTo(NewRpgStatus status);

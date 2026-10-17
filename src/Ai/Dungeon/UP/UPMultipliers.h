@@ -12,7 +12,7 @@
 class SkadiMultiplier : public Multiplier
 {
     public:
-        SkadiMultiplier(PlayerbotAI* ai) : Multiplier(ai, "skadi the ruthless") {}
+        SkadiMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "skadi the ruthless") {}
 
     public:
         float GetValue(Action* action) override;
@@ -21,7 +21,7 @@ class SkadiMultiplier : public Multiplier
 class YmironMultiplier : public Multiplier
 {
     public:
-        YmironMultiplier(PlayerbotAI* ai) : Multiplier(ai, "king ymiron") {}
+        YmironMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "king ymiron") {}
 
     public:
         float GetValue(Action* action) override;

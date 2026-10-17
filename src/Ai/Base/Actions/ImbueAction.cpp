@@ -204,7 +204,7 @@ TryEmergencyAction::TryEmergencyAction(PlayerbotAI* botAI) : Action(botAI, "try 
 bool TryEmergencyAction::Execute(Event /*event*/)
 {
     // Do not use consumable if bot can heal self
-    if ((botAI->IsHeal(bot)) && (bot->GetPowerPct(POWER_MANA) > 20))
+    if ((PlayerbotAI::IsHeal(bot)) && (bot->GetPowerPct(POWER_MANA) > 20))
         return false;
 
     // If bot does not have aggro: use bandage instead of potion/stone/crystal

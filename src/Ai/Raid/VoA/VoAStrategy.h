@@ -12,7 +12,7 @@
 class RaidVoAStrategy : public Strategy
 {
 public:
-    RaidVoAStrategy(PlayerbotAI* ai) : Strategy(ai) {}
+    RaidVoAStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
     virtual std::string const getName() override { return "voa"; }
     virtual void InitTriggers(std::vector<TriggerNode*>& triggers) override;
 };

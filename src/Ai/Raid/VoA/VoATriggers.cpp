@@ -13,7 +13,7 @@
 bool EmalonMarkBossTrigger::IsActive()
 {
     // Only tank bot can mark target
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
     {
         return false;
     }
@@ -68,7 +68,7 @@ bool EmalonLightingNovaTrigger::IsActive()
     }
 
     // Tank dont need to move
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         return false;
     }
@@ -83,7 +83,7 @@ bool EmalonLightingNovaTrigger::IsActive()
 bool EmalonOverchargeTrigger::IsActive()
 {
     // Only tank bot can mark target
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
     {
         return false;
     }

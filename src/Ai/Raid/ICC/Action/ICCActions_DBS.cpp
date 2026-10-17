@@ -20,7 +20,7 @@ bool IccDbsTankPositionAction::Execute(Event /*event*/)
     if (!boss)
         return false;
 
-    if (botAI->IsTank(bot))
+    if (PlayerbotAI::IsTank(bot))
     {
         bool const hasRuneOfBlood = botAI->GetAura("Rune of Blood", bot) != nullptr;
 
@@ -46,7 +46,7 @@ bool IccDbsTankPositionAction::Execute(Event /*event*/)
 
                 Unit* victim = unit->GetVictim();
                 Player* victimPlayer = victim ? victim->ToPlayer() : nullptr;
-                if (!victimPlayer || !botAI->IsTank(victimPlayer))
+                if (!victimPlayer || !PlayerbotAI::IsTank(victimPlayer))
                 {
                     IccCastClassTaunt(bot, botAI,unit);
                     break;
@@ -82,7 +82,7 @@ bool IccDbsTankPositionAction::Execute(Event /*event*/)
 
             Unit* victim = unit->GetVictim();
             Player* victimPlayer = victim ? victim->ToPlayer() : nullptr;
-            if (!victimPlayer || !botAI->IsTank(victimPlayer))
+            if (!victimPlayer || !PlayerbotAI::IsTank(victimPlayer))
             {
                 IccCastClassTaunt(bot, botAI,unit);
                 break;
@@ -97,14 +97,14 @@ bool IccDbsTankPositionAction::Execute(Event /*event*/)
         return false;
     }
 
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
     {
         if (CrowdControlBloodBeasts())
             return true;
     }
 
     // Handle ranged and healer positioning
-    if (botAI->IsRanged(bot) || botAI->IsHeal(bot))
+    if (PlayerbotAI::IsRanged(bot) || PlayerbotAI::IsHeal(bot))
     {
         // Handle evasion from blood beasts
         if (EvadeBloodBeasts())
@@ -213,7 +213,7 @@ bool IccDbsTankPositionAction::PositionInRangedFormation()
         if (!member->IsAlive())
             continue;
 
-        if ((botAI->IsRanged(member) || botAI->IsHeal(member)) && !botAI->IsTank(member))
+        if ((PlayerbotAI::IsRanged(member) || PlayerbotAI::IsHeal(member)) && !PlayerbotAI::IsTank(member))
         {
             if (member == bot)
             {
@@ -270,7 +270,7 @@ bool IccDbsTankPositionAction::PositionInRangedFormation()
             Player* member = itr->GetSource();
             if (!member || member == bot || !member->IsAlive())
                 continue;
-            if (!botAI->IsMelee(member) || botAI->IsTank(member))
+            if (!PlayerbotAI::IsMelee(member) || PlayerbotAI::IsTank(member))
                 continue;
 
             float d = bot->GetExactDist2d(member);
@@ -340,7 +340,7 @@ bool IccAddsDbsAction::Execute(Event /*event*/)
         return false;
 
     // This action is only for melee
-    if (!botAI->IsMelee(bot))
+    if (!PlayerbotAI::IsMelee(bot))
         return false;
 
     Unit* priorityTarget = FindPriorityTarget(boss);

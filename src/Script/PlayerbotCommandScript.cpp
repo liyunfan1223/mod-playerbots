@@ -87,8 +87,8 @@ public:
 
         if (!strcmp(args, "toggle"))
         {
-            sPlayerbotAIConfig.perfMonEnabled = !sPlayerbotAIConfig.perfMonEnabled;
-            if (sPlayerbotAIConfig.perfMonEnabled)
+            sPlayerbotAIConfig.PerfMonEnabled = !sPlayerbotAIConfig.PerfMonEnabled;
+            if (sPlayerbotAIConfig.PerfMonEnabled)
                 LOG_INFO("playerbots", "Performance monitor enabled");
             else
                 LOG_INFO("playerbots", "Performance monitor disabled");

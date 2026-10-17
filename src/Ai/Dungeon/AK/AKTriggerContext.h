@@ -20,9 +20,9 @@ class WotlkDungeonOKTriggerContext : public NamedObjectContext<Trigger>
             creators["shadow crash"] = &WotlkDungeonOKTriggerContext::shadow_crash;
         }
     private:
-        static Trigger* nadox_guardian(PlayerbotAI* ai) { return new NadoxGuardianTrigger(ai); }
-        static Trigger* jedoga_volunteer(PlayerbotAI* ai) { return new JedogaVolunteerTrigger(ai); }
-        static Trigger* shadow_crash(PlayerbotAI* ai) { return new ShadowCrashTrigger(ai); }
+        static Trigger* nadox_guardian(PlayerbotAI* botAI) { return new NadoxGuardianTrigger(botAI); }
+        static Trigger* jedoga_volunteer(PlayerbotAI* botAI) { return new JedogaVolunteerTrigger(botAI); }
+        static Trigger* shadow_crash(PlayerbotAI* botAI) { return new ShadowCrashTrigger(botAI); }
 };
 
 #endif

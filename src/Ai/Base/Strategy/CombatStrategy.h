@@ -23,7 +23,7 @@ public:
 class AvoidAoeStrategy : public Strategy
 {
 public:
-    explicit AvoidAoeStrategy(PlayerbotAI* ai);
+    explicit AvoidAoeStrategy(PlayerbotAI* botAI);
     const std::string getName() override { return "avoid aoe"; }
     std::vector<NextAction> getDefaultActions() override;
     void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
@@ -33,7 +33,7 @@ public:
 class TankFaceStrategy : public Strategy
 {
 public:
-    explicit TankFaceStrategy(PlayerbotAI* ai);
+    explicit TankFaceStrategy(PlayerbotAI* botAI);
     const std::string getName() override { return "tank face"; }
     std::vector<NextAction> getDefaultActions() override;
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
@@ -42,7 +42,7 @@ public:
 class CombatFormationStrategy : public Strategy
 {
 public:
-    CombatFormationStrategy(PlayerbotAI* ai) : Strategy(ai) {}
+    CombatFormationStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
     const std::string getName() override { return "formation"; }
     std::vector<NextAction> getDefaultActions() override;
 };

@@ -44,7 +44,7 @@ bool PullRequestAction::Execute(Event event)
     if (!strategy)
         return false;
 
-    if (!botAI->IsTank(bot))
+    if (!PlayerbotAI::IsTank(bot))
         return false;
 
     Unit* target = GetPullTarget(event);
@@ -56,7 +56,7 @@ bool PullRequestAction::Execute(Event event)
         return false;
     }
 
-    float const maxPullDistance = sPlayerbotAIConfig.reactDistance * 3.0f;
+    float const maxPullDistance = sPlayerbotAIConfig.ReactDistance * 3.0f;
     if (target->GetMapId() != bot->GetMapId() || bot->GetDistance(target) > maxPullDistance)
     {
         std::string const text = PlayerbotTextMgr::instance().GetBotTextOrDefault(
@@ -92,7 +92,7 @@ bool PullRequestAction::Execute(Event event)
     strategy->RequestPull(target);
     context->GetValue<Unit*>("current target")->Set(target);
     botAI->ChangeEngine(BOT_STATE_COMBAT);
-    botAI->SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
+    botAI->SetNextCheckDelay(sPlayerbotAIConfig.ReactDelay);
     return true;
 }
 
@@ -292,7 +292,7 @@ bool ReturnToPullPositionAction::isUseful()
 
     PositionInfo pullPosition = AI_VALUE(PositionMap&, "position")["pull"];
     return pullPosition.isSet() && pullPosition.mapId == bot->GetMapId() &&
-           bot->GetDistance(pullPosition.x, pullPosition.y, pullPosition.z) > sPlayerbotAIConfig.followDistance;
+           bot->GetDistance(pullPosition.x, pullPosition.y, pullPosition.z) > sPlayerbotAIConfig.FollowDistance;
 }
 
 bool ReachPullAction::Execute(Event /*event*/)

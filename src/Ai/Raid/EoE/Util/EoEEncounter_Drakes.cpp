@@ -200,7 +200,7 @@ void GetDrakeHealerGuids(PlayerbotAI* botAI, std::vector<ObjectGuid>& out)
     Group* group = bot->GetGroup();
     if (!group)
     {
-        if (botAI->IsHeal(bot))
+        if (PlayerbotAI::IsHeal(bot))
             out.push_back(bot->GetGUID());
         return;
     }
@@ -227,7 +227,7 @@ void GetDrakeHealerGuids(PlayerbotAI* botAI, std::vector<ObjectGuid>& out)
         if (!member)
             continue;
 
-        (botAI->IsHeal(member) ? healers : others).push_back(member->GetGUID());
+        (PlayerbotAI::IsHeal(member) ? healers : others).push_back(member->GetGUID());
     }
 
     // Guid order is identical on every bot, so the flight agrees on the roster without talking.
