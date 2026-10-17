@@ -11,6 +11,16 @@
 #include "Random.h"
 #include "WorldSessionMgr.h"
 
+namespace
+{
+// %item prefixes %item_link, and the map's reverse order replaces the longer key first.
+void ApplyPlaceholders(std::string& text, std::map<std::string, std::string> const& placeholders)
+{
+    for (auto it = placeholders.rbegin(); it != placeholders.rend(); ++it)
+        PlayerbotTextMgr::replaceAll(text, it->first, it->second);
+}
+}
+
 void PlayerbotTextMgr::replaceAll(std::string& str, std::string const& from, std::string const& to)
 {
     if (from.empty())
@@ -99,8 +109,7 @@ std::string PlayerbotTextMgr::GetBotText(std::string name, std::map<std::string,
     if (botText.empty())
         return "";
 
-    for (std::map<std::string, std::string>::iterator i = placeholders.begin(); i != placeholders.end(); ++i)
-        replaceAll(botText, i->first, i->second);
+    ApplyPlaceholders(botText, placeholders);
 
     return botText;
 }
@@ -111,10 +120,7 @@ std::string PlayerbotTextMgr::GetBotTextOrDefault(std::string name, std::string 
     std::string botText = GetBotText(name, placeholders);
     if (botText.empty())
     {
-        for (std::map<std::string, std::string>::iterator i = placeholders.begin(); i != placeholders.end(); ++i)
-        {
-            replaceAll(defaultText, i->first, i->second);
-        }
+        ApplyPlaceholders(defaultText, placeholders);
         return defaultText;
     }
 
@@ -150,8 +156,7 @@ std::string PlayerbotTextMgr::GetBotText(ChatReplyType replyType, std::map<std::
     BotTextEntry textEntry = proper_list[urand(0, proper_list.size() - 1)];
     std::string botText =
         !textEntry.m_text[GetLocalePriority()].empty() ? textEntry.m_text[GetLocalePriority()] : textEntry.m_text[0];
-    for (auto& placeholder : placeholders)
-        replaceAll(botText, placeholder.first, placeholder.second);
+    ApplyPlaceholders(botText, placeholders);
 
     return botText;
 }
