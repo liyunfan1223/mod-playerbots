@@ -366,6 +366,13 @@ public:
         CastSpellAction(botAI, "explosive trap") {}
 };
 
+class CastTrapLauncherExplosiveAction : public CastSpellAction
+{
+public:
+    CastTrapLauncherExplosiveAction(PlayerbotAI* botAI) :
+        CastSpellAction(botAI, "trap launcher: explosive trap") {}
+};
+
 class CastBlackArrowAction : public CastDebuffSpellAction
 {
 public:
