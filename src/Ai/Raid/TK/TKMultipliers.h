@@ -12,7 +12,7 @@
 #include "TKHelpers.h"
 #include <string>
 
-// General
+// Shared
 
 class TempestKeepEncounterMultiplier : public Multiplier
 {
@@ -22,8 +22,8 @@ public:
 
     float GetValue(Action* action) final
     {
-        return EncounterHelpers::IsEncounterInProgress(bot, TkHelpers::TK_MAP_ID)
-            ? GetValueInEncounter(action) : 1.0f;
+        return EncounterHelpers::IsEncounterInProgress(bot, TkHelpers::TK_MAP_ID) ?
+            GetValueInEncounter(action) : 1.0f;
     }
 
 protected:
@@ -100,7 +100,8 @@ class HighAstromancerSolarianDisableMeleeTargetingMultiplier : public TempestKee
 {
 public:
     HighAstromancerSolarianDisableMeleeTargetingMultiplier(PlayerbotAI* botAI)
-        : TempestKeepEncounterMultiplier(botAI, "high astromancer solarian disable melee targeting") {}
+        : TempestKeepEncounterMultiplier(
+            botAI, "high astromancer solarian disable melee targeting") {}
 
 protected:
     float GetValueInEncounter(Action* action) override;
@@ -148,22 +149,24 @@ protected:
     float GetValueInEncounter(Action* action) override;
 };
 
-// class KaelthasSunstriderDisableWarlockTankSoulshatterMultiplier : public TempestKeepEncounterMultiplier
-// {
-// public:
-//     KaelthasSunstriderDisableWarlockTankSoulshatterMultiplier(PlayerbotAI* botAI)
-//         : TempestKeepEncounterMultiplier(
-//             botAI, "kael'thas sunstrider disable warlock tank soulshatter") {}
-//
-// protected:
-//     float GetValueInEncounter(Action* action) override;
-// };
+class KaelthasSunstriderDisableWarlockTankSoulshatterMultiplier
+    : public TempestKeepEncounterMultiplier
+{
+public:
+    KaelthasSunstriderDisableWarlockTankSoulshatterMultiplier(PlayerbotAI* botAI)
+        : TempestKeepEncounterMultiplier(
+            botAI, "kael'thas sunstrider disable warlock tank soulshatter") {}
+
+protected:
+    float GetValueInEncounter(Action* action) override;
+};
 
 class KaelthasSunstriderKeepDistanceFromCapernianMultiplier : public TempestKeepEncounterMultiplier
 {
 public:
     KaelthasSunstriderKeepDistanceFromCapernianMultiplier(PlayerbotAI* botAI)
-        : TempestKeepEncounterMultiplier(botAI, "kael'thas sunstrider keep distance from capernian") {}
+        : TempestKeepEncounterMultiplier(
+            botAI, "kael'thas sunstrider keep distance from capernian") {}
 
 protected:
     float GetValueInEncounter(Action* action) override;
@@ -193,7 +196,8 @@ class KaelthasSunstriderManageAutomaticTargetingMultiplier : public TempestKeepE
 {
 public:
     KaelthasSunstriderManageAutomaticTargetingMultiplier(PlayerbotAI* botAI)
-        : TempestKeepEncounterMultiplier(botAI, "kael'thas sunstrider manage automatic targeting") {}
+        : TempestKeepEncounterMultiplier(
+            botAI, "kael'thas sunstrider manage automatic targeting") {}
 
 protected:
     float GetValueInEncounter(Action* action) override;
@@ -219,17 +223,18 @@ protected:
     float GetValueInEncounter(Action* action) override;
 };
 
-class KaelthasSunstriderDelayCooldownsMultiplier : public TempestKeepEncounterMultiplier
+class KaelthasSunstriderDelayDpsCooldownsMultiplier : public TempestKeepEncounterMultiplier
 {
 public:
-    KaelthasSunstriderDelayCooldownsMultiplier(PlayerbotAI* botAI)
-        : TempestKeepEncounterMultiplier(botAI, "kael'thas sunstrider delay cooldowns") {}
+    KaelthasSunstriderDelayDpsCooldownsMultiplier(PlayerbotAI* botAI)
+        : TempestKeepEncounterMultiplier(botAI, "kael'thas sunstrider delay dps cooldowns") {}
 
 protected:
     float GetValueInEncounter(Action* action) override;
 };
 
-class KaelthasSunstriderStaySpreadDuringGravityLapseMultiplier : public TempestKeepEncounterMultiplier
+class KaelthasSunstriderStaySpreadDuringGravityLapseMultiplier
+    : public TempestKeepEncounterMultiplier
 {
 public:
     KaelthasSunstriderStaySpreadDuringGravityLapseMultiplier(PlayerbotAI* botAI)

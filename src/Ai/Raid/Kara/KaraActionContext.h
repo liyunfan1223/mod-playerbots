@@ -15,7 +15,7 @@ class RaidKarazhanActionContext : public NamedObjectContext<Action>
 public:
     RaidKarazhanActionContext()
     {
-        // General
+        // Shared
         creators["karazhan reset encounter states"] =
             &RaidKarazhanActionContext::karazhan_reset_encounter_states;
 
@@ -145,145 +145,183 @@ public:
     }
 
 private:
-    // General
-    static Action* karazhan_reset_encounter_states(PlayerbotAI* botAI) {
+    // Shared
+    static Action* karazhan_reset_encounter_states(PlayerbotAI* botAI)
+    {
         return new KarazhanResetEncounterStatesAction(botAI);
     }
-    static Action* karazhan_set_tremor_totem(PlayerbotAI* botAI) {
+    static Action* karazhan_set_tremor_totem(PlayerbotAI* botAI)
+    {
         return new KarazhanSetTremorTotemAction(botAI);
     }
 
     // Trash
-    static Action* mana_warp_stun_creature_before_warp_breach(PlayerbotAI* botAI) {
+    static Action* mana_warp_stun_creature_before_warp_breach(PlayerbotAI* botAI)
+    {
         return new ManaWarpStunCreatureBeforeWarpBreachAction(botAI);
     }
 
     // Attumen the Huntsman
-    static Action* attumen_the_huntsman_handle_phase_one(PlayerbotAI* botAI) {
+    static Action* attumen_the_huntsman_handle_phase_one(PlayerbotAI* botAI)
+    {
         return new AttumenTheHuntsmanHandlePhaseOneAction(botAI);
     }
-    static Action* attumen_the_huntsman_handle_phase_two(PlayerbotAI* botAI) {
+    static Action* attumen_the_huntsman_handle_phase_two(PlayerbotAI* botAI)
+    {
         return new AttumenTheHuntsmanHandlePhaseTwoAction(botAI);
     }
-    static Action* attumen_the_huntsman_manage_dps_timer(PlayerbotAI* botAI) {
+    static Action* attumen_the_huntsman_manage_dps_timer(PlayerbotAI* botAI)
+    {
         return new AttumenTheHuntsmanSetDpsTimerAction(botAI);
     }
 
     // Moroes
-    static Action* moroes_mark_target(PlayerbotAI* botAI) {
+    static Action* moroes_mark_target(PlayerbotAI* botAI)
+    {
         return new MoroesMarkTargetAction(botAI);
     }
 
     // Maiden of Virtue
-    static Action* maiden_of_virtue_tank_position_boss(PlayerbotAI* botAI) {
+    static Action* maiden_of_virtue_tank_position_boss(PlayerbotAI* botAI)
+    {
         return new MaidenOfVirtueTankPositionBossAction(botAI);
     }
-    static Action* maiden_of_virtue_position_ranged_between_pillars(PlayerbotAI* botAI) {
+    static Action* maiden_of_virtue_position_ranged_between_pillars(PlayerbotAI* botAI)
+    {
         return new MaidenOfVirtuePositionRangedBetweenPillarsAction(botAI);
     }
-    static Action* maiden_of_virtue_set_grounding_totem(PlayerbotAI* botAI) {
+    static Action* maiden_of_virtue_set_grounding_totem(PlayerbotAI* botAI)
+    {
         return new MaidenOfVirtueSetGroundingTotemAction(botAI);
     }
 
     // The Big Bad Wolf
-    static Action* big_bad_wolf_position_boss(PlayerbotAI* botAI) {
+    static Action* big_bad_wolf_position_boss(PlayerbotAI* botAI)
+    {
         return new BigBadWolfPositionBossAction(botAI);
     }
-    static Action* big_bad_wolf_little_red_riding_hood_run_away(PlayerbotAI* botAI) {
+    static Action* big_bad_wolf_little_red_riding_hood_run_away(PlayerbotAI* botAI)
+    {
         return new BigBadWolfLittleRedRidingHoodRunAwayAction(botAI);
     }
 
     // Romulo and Julianne
-    static Action* romulo_and_julianne_mark_target(PlayerbotAI* botAI) {
+    static Action* romulo_and_julianne_mark_target(PlayerbotAI* botAI)
+    {
         return new RomuloAndJulianneMarkTargetAction(botAI);
     }
 
     // The Wizard of Oz
-    static Action* wizard_of_oz_mark_target(PlayerbotAI* botAI) {
+    static Action* wizard_of_oz_mark_target(PlayerbotAI* botAI)
+    {
         return new WizardOfOzMarkTargetAction(botAI);
     }
-    static Action* wizard_of_oz_scorch_strawman(PlayerbotAI* botAI) {
+    static Action* wizard_of_oz_scorch_strawman(PlayerbotAI* botAI)
+    {
         return new WizardOfOzScorchStrawmanAction(botAI);
     }
 
     // The Curator
-    static Action* the_curator_mark_astral_flare(PlayerbotAI* botAI) {
+    static Action* the_curator_mark_astral_flare(PlayerbotAI* botAI)
+    {
         return new TheCuratorMarkAstralFlareAction(botAI);
     }
-    static Action* the_curator_position_boss(PlayerbotAI* botAI) {
+    static Action* the_curator_position_boss(PlayerbotAI* botAI)
+    {
         return new TheCuratorPositionBossAction(botAI);
     }
-    static Action* the_curator_spread_ranged(PlayerbotAI* botAI) {
+    static Action* the_curator_spread_ranged(PlayerbotAI* botAI)
+    {
         return new TheCuratorSpreadRangedAction(botAI);
     }
 
     // Terestian Illhoof
-    static Action* terestian_illhoof_mark_target(PlayerbotAI* botAI) {
+    static Action* terestian_illhoof_mark_target(PlayerbotAI* botAI)
+    {
         return new TerestianIllhoofMarkTargetAction(botAI);
     }
 
     // Shade of Aran
-    static Action* shade_of_aran_run_away_from_arcane_explosion(PlayerbotAI* botAI) {
+    static Action* shade_of_aran_run_away_from_arcane_explosion(PlayerbotAI* botAI)
+    {
         return new ShadeOfAranRunAwayFromArcaneExplosionAction(botAI);
     }
-    static Action* shade_of_aran_stop_moving_during_flame_wreath(PlayerbotAI* botAI) {
+    static Action* shade_of_aran_stop_moving_during_flame_wreath(PlayerbotAI* botAI)
+    {
         return new ShadeOfAranStopMovingDuringFlameWreathAction(botAI);
     }
-    static Action* shade_of_aran_mark_conjured_elemental(PlayerbotAI* botAI) {
+    static Action* shade_of_aran_mark_conjured_elemental(PlayerbotAI* botAI)
+    {
         return new ShadeOfAranMarkConjuredElementalAction(botAI);
     }
-    static Action* shade_of_aran_ranged_maintain_distance(PlayerbotAI* botAI) {
+    static Action* shade_of_aran_ranged_maintain_distance(PlayerbotAI* botAI)
+    {
         return new ShadeOfAranRangedMaintainDistanceAction(botAI);
     }
 
     // Netherspite
-    static Action* netherspite_block_red_beam(PlayerbotAI* botAI) {
+    static Action* netherspite_block_red_beam(PlayerbotAI* botAI)
+    {
         return new NetherspiteBlockRedBeamAction(botAI);
     }
-    static Action* netherspite_block_blue_beam(PlayerbotAI* botAI) {
+    static Action* netherspite_block_blue_beam(PlayerbotAI* botAI)
+    {
         return new NetherspiteBlockBlueBeamAction(botAI);
     }
-    static Action* netherspite_block_green_beam(PlayerbotAI* botAI) {
+    static Action* netherspite_block_green_beam(PlayerbotAI* botAI)
+    {
         return new NetherspiteBlockGreenBeamAction(botAI);
     }
-    static Action* netherspite_avoid_beam_and_void_zone(PlayerbotAI* botAI) {
+    static Action* netherspite_avoid_beam_and_void_zone(PlayerbotAI* botAI)
+    {
         return new NetherspiteAvoidBeamAndVoidZoneAction(botAI);
     }
-    static Action* netherspite_banish_phase_avoid_void_zone(PlayerbotAI* botAI) {
+    static Action* netherspite_banish_phase_avoid_void_zone(PlayerbotAI* botAI)
+    {
         return new NetherspiteBanishPhaseAvoidVoidZoneAction(botAI);
     }
-    static Action* netherspite_manage_timers_and_trackers(PlayerbotAI* botAI) {
+    static Action* netherspite_manage_timers_and_trackers(PlayerbotAI* botAI)
+    {
         return new NetherspiteManageTimersAndTrackersAction(botAI);
     }
 
     // Prince Malchezaar
-    static Action* prince_malchezaar_enfeebled_bot_avoid_hazard(PlayerbotAI* botAI) {
+    static Action* prince_malchezaar_enfeebled_bot_avoid_hazard(PlayerbotAI* botAI)
+    {
         return new PrinceMalchezaarEnfeebledBotAvoidHazardAction(botAI);
     }
-    static Action* prince_malchezaar_non_tank_avoid_infernal(PlayerbotAI* botAI) {
+    static Action* prince_malchezaar_non_tank_avoid_infernal(PlayerbotAI* botAI)
+    {
         return new PrinceMalchezaarNonTankAvoidInfernalAction(botAI);
     }
-    static Action* prince_malchezaar_tanks_position_boss(PlayerbotAI* botAI) {
+    static Action* prince_malchezaar_tanks_position_boss(PlayerbotAI* botAI)
+    {
         return new PrinceMalchezaarTanksPositionBossAction(botAI);
     }
 
     // Nightbane
-    static Action* nightbane_ground_phase_position_boss(PlayerbotAI* botAI) {
+    static Action* nightbane_ground_phase_position_boss(PlayerbotAI* botAI)
+    {
         return new NightbaneGroundPhaseTanksPositionBossAction(botAI);
     }
-    static Action* nightbane_ground_phase_rotate_ranged_positions(PlayerbotAI* botAI) {
+    static Action* nightbane_ground_phase_rotate_ranged_positions(PlayerbotAI* botAI)
+    {
         return new NightbaneGroundPhaseCoordinateRangedMovementAction(botAI);
     }
-    static Action* nightbane_control_pet_aggression(PlayerbotAI* botAI) {
+    static Action* nightbane_control_pet_aggression(PlayerbotAI* botAI)
+    {
         return new NightbaneControlPetAggressionAction(botAI);
     }
-    static Action* nightbane_flight_phase_stack_and_move(PlayerbotAI* botAI) {
+    static Action* nightbane_flight_phase_stack_and_move(PlayerbotAI* botAI)
+    {
         return new NightbaneFlightPhaseStackAndMoveAction(botAI);
     }
-    static Action* nightbane_teleport_back_to_terrace(PlayerbotAI* botAI) {
+    static Action* nightbane_teleport_back_to_terrace(PlayerbotAI* botAI)
+    {
         return new NightbaneTeleportBackToTerraceAction(botAI);
     }
-    static Action* nightbane_manage_timers_and_trackers(PlayerbotAI* botAI) {
+    static Action* nightbane_manage_timers_and_trackers(PlayerbotAI* botAI)
+    {
         return new NightbaneManageTimersAndTrackersAction(botAI);
     }
 };

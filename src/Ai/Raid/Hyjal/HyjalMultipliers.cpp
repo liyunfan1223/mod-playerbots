@@ -17,7 +17,7 @@ using namespace HyjalHelpers;
 using namespace EncounterHelpers;
 
 // Note: BOT_STATE_NON_COMBAT checks cannot be used by any multiplier that could result in a bot
-// having no valid targets as it will then swap to the non-combat engine, even during a boss fight.
+// having no valid targets, as it will then swap to the non-combat engine, even during a boss fight.
 // This concern implicates any avoidance action that could hold the bot out of attack range.
 
 float HyjalDelayDpsCooldownsMultiplier::GetValue(Action* action)

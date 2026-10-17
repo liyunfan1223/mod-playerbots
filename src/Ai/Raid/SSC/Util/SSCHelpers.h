@@ -12,7 +12,6 @@
 #include "ObjectGuid.h"
 #include "Position.h"
 #include <array>
-#include <initializer_list>
 #include <limits>
 #include <optional>
 #include <type_traits>
@@ -81,8 +80,8 @@ enum class SscSpells : uint32
     SPELL_DRUID_BERSERK          = 50334,
 
     // Hunter
-    SPELL_MISDIRECTION_CAST      = 34477,
-    SPELL_MISDIRECTION           = 35079, // the aura on the hunter
+    SPELL_MISDIRECTION           = 34477,
+    SPELL_MISDIRECTION_AURA      = 35079, // the aura on the hunter
 
     // Paladin
     SPELL_DIVINE_SHIELD          =   642,
@@ -145,14 +144,13 @@ enum class SscItems : uint32
     ITEM_TAINTED_CORE            = 31088,
 };
 
-// General
+// Shared
 
 inline constexpr uint32 SSC_MAP_ID = 548;
 inline constexpr uint32 HAZARD_CACHE_INTERVAL_MS = 200;
 inline constexpr float PATH_STEP_DISTANCE = 3.5f;
 inline constexpr float PATH_BACKWARD_STEP_DISTANCE = 2.25f;
 
-bool ClearSscTargetIcon(Player* bot, uint8 iconId, std::initializer_list<uint32> entries);
 bool MisdirectTargetToTank(PlayerbotAI* botAI, Unit* target, Player* tank);
 bool CastTankTaunt(PlayerbotAI* botAI, Unit* target);
 bool FindHazardEscapeStep(
@@ -200,8 +198,8 @@ inline constexpr float HYDROSS_CLEANSING_FIELD_RADIUS = 28.0f;
 // The incoming phase's tank waits this far short of the field's edge, on its own side.
 inline constexpr float HYDROSS_HANDOFF_SHORT_DISTANCE = 8.0f;
 
-inline Position const HYDROSS_FROST_TANK_POSITION =  { -235.653f, -354.823f, -0.828f };
-inline Position const HYDROSS_NATURE_TANK_POSITION = { -224.721f, -324.755f, -3.682f };
+inline Position const HYDROSS_FROST_TANK_POSITION =    { -235.653f, -354.823f, -0.828f };
+inline Position const HYDROSS_NATURE_TANK_POSITION =   { -224.721f, -324.755f, -3.682f };
 inline Position const HYDROSS_CLEANSING_FIELD_CENTER = { -239.715f, -366.440f, -0.745f };
 
 // The main tank holds Hydross in frost phase, the first assist tank in nature phase. Every other
@@ -277,8 +275,9 @@ inline constexpr uint32 LEOTHERAS_WHIRLWIND_DPS_WAIT_MS = 3 * IN_MILLISECONDS;
 inline constexpr float LEOTHERAS_RANGED_SAFE_DISTANCE = 15.0f;
 inline constexpr float LEOTHERAS_WHIRLWIND_SAFE_DISTANCE = 25.0f;
 inline constexpr float LEOTHERAS_RANGED_SPREAD_DISTANCE = 4.0f;
-// Chaos Blast deals splash damage within 8y of the target.
-inline constexpr float LEOTHERAS_CHAOS_BLAST_SAFE_DISTANCE = 10.0f;
+inline constexpr float LEOTHERAS_CHAOS_BLAST_HAZARD_RADIUS = 8.0f;
+inline constexpr float LEOTHERAS_CHAOS_BLAST_SAFE_DISTANCE =
+    LEOTHERAS_CHAOS_BLAST_HAZARD_RADIUS + 2.0f;
 inline constexpr float LEOTHERAS_SHADOW_SEPARATION_DISTANCE = 20.0f;
 
 inline Position const LEOTHERAS_SPAWN_POSITION = { 376.543f, -438.631f, 29.608f };
@@ -338,8 +337,9 @@ inline constexpr uint32 SPITFIRE_TOTEM_CACHE_INTERVAL_MS = 200;
 
 inline constexpr float CARIBDIS_HEALER_DISTANCE = 32.0f;
 inline constexpr float CARIBDIS_HEALER_MAX_DISTANCE = 35.0f;
-// Tidal Surge's range is 10 yards.
-inline constexpr float CARIBDIS_TIDAL_SURGE_SAFE_DISTANCE = 12.0f;
+inline constexpr float CARIBDIS_TIDAL_SURGE_HAZARD_RADIUS = 10.0f;
+inline constexpr float CARIBDIS_TIDAL_SURGE_SAFE_DISTANCE =
+    CARIBDIS_TIDAL_SURGE_HAZARD_RADIUS + 2.0f;
 // Bots walk to Caribdis until she's in sight and then stop at no closer than this distance away.
 inline constexpr float CARIBDIS_APPROACH_STOP_DISTANCE = 5.0f;
 // A Cyclone spawns on a random player within 45y of Caribdis and picks up all players within 4y.
@@ -417,8 +417,8 @@ bool IsOnVashjDais(float x, float y, float margin, float rockClearance);
 
 // Vashj: Static Charge, Entangle and Shock Blast
 
-// Static Charge's range is 10y from the target's center.
-inline constexpr float VASHJ_STATIC_CHARGE_SAFE_DISTANCE = 11.0f;
+inline constexpr float VASHJ_STATIC_CHARGE_HAZARD_RADIUS = 10.0f;
+inline constexpr float VASHJ_STATIC_CHARGE_SAFE_DISTANCE = VASHJ_STATIC_CHARGE_HAZARD_RADIUS + 1.0f;
 // Vashj's Entangle has a 15y range, so ranged bots stay at least this far back from her.
 inline constexpr float VASHJ_PHASE_3_RANGED_DISTANCE = 15.0f;
 inline constexpr float VASHJ_PHASE_3_RANGED_SPREAD_DISTANCE = 4.0f;
@@ -435,9 +435,8 @@ Player* FindVashjGroundingShaman(Player* bot);
 
 // Vashj: Toxic Spores
 
-// Toxic Spore pools have a range of 5y + the target's combat reach.
-inline constexpr float TOXIC_SPORES_HIT_RADIUS = 6.5f;
-inline constexpr float TOXIC_SPORES_AVOID_RADIUS = 7.5f;
+inline constexpr float TOXIC_SPORES_HAZARD_RADIUS = 6.5f; // 5y + the target's combat reach
+inline constexpr float TOXIC_SPORES_AVOID_RADIUS = TOXIC_SPORES_HAZARD_RADIUS + 1.0f;
 // Vashj's tank has a greater avoidance radius to keep melee dps on the far side of Vashj clear
 // as well. She is ~3.5y from the tank and melee ~3.75y past her (7.25y total + 0.25y slack).
 inline constexpr float TOXIC_SPORES_TANK_AVOID_RADIUS = TOXIC_SPORES_AVOID_RADIUS + 7.5f;

@@ -14,7 +14,7 @@
 using namespace TkHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool TempestKeepNoEncounterInProgressTrigger::IsActive()
 {
@@ -44,7 +44,7 @@ bool CrimsonHandCenturionCastsArcaneFlurryTrigger::IsActive()
 
 // Al'ar <Phoenix God>
 
-bool AlarPullingBossTrigger::IsActiveInEncounter()
+bool AlarHunterShouldMisdirectTrigger::IsActiveInEncounter()
 {
     if (bot->getClass() != CLASS_HUNTER)
         return false;
@@ -66,7 +66,7 @@ bool AlarFliesBetweenPlatformsTrigger::IsActiveInEncounter()
     return locationIndex != POINT_QUILL_OR_DIVE_IDX && locationIndex != POINT_MIDDLE_IDX;
 }
 
-bool AlarEmbersExplodeUponDeathTrigger::IsActiveInEncounter()
+bool AlarEmbersShouldBeTankedTrigger::IsActiveInEncounter()
 {
     return PlayerbotAI::IsTank(bot) && AI_VALUE2(Unit*, "find target", "ember of al'ar");
 }
@@ -203,7 +203,7 @@ bool KaelthasSunstriderChasedByThaladredTrigger::IsActiveInEncounter()
     return phase != PHASE_NONE;
 }
 
-bool KaelthasSunstriderPullingTankableAdvisorsTrigger::IsActiveInEncounter()
+bool KaelthasSunstriderHunterShouldMisdirectAdvisorsTrigger::IsActiveInEncounter()
 {
     if (bot->getClass() != CLASS_HUNTER)
         return false;
@@ -270,7 +270,7 @@ bool KaelthasSunstriderShouldHoldPhase3PositionsTrigger::IsActiveInEncounter()
         IsCapernianTank(bot);
 }
 
-bool KaelthasSunstriderDeterminingAdvisorKillOrderTrigger::IsActiveInEncounter()
+bool KaelthasSunstriderShouldAssignAdvisorDpsPriorityTrigger::IsActiveInEncounter()
 {
     if (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0, true))
         return false;
@@ -320,7 +320,7 @@ bool KaelthasSunstriderLegendaryAxeCastsWhirlwindTrigger::IsActiveInEncounter()
     if (phase < PHASE_WEAPONS || phase > PHASE_ALL_ADVISORS)
         return false;
 
-    return GetLegendaryWeapon(botAI, Id(TkNpcs::NPC_DEVASTATION)) != nullptr;
+    return GetLegendaryWeapon(botAI, Id(TkNpcs::NPC_DEVASTATION));
 }
 
 bool KaelthasSunstriderLegendaryWeaponsAreDeadTrigger::IsActiveInEncounter()

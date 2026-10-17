@@ -289,6 +289,9 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 /*elapsed*/, bool /*minimal*/)
     if (!sPlayerbotAIConfig.RandomBotAutologin || !sPlayerbotAIConfig.Enabled)
         return;
 
+    if (sPlayerbotAIConfig.RandomBotConcentrateInPlayerZone)
+        UpdatePlayerZones();
+
     /*if (sPlayerbotAIConfig.enablePrototypePerformanceDiff)
     {
         LOG_INFO("playerbots", "---------------------------------------");
@@ -1865,38 +1868,21 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
 std::vector<WorldLocation> RandomPlayerbotMgr::GetPlayerZoneTeleportLocations(std::vector<WorldLocation> const& locs,
                                                                               Player* bot)
 {
-    std::set<uint32> playerMaps;
     std::set<std::pair<uint32, uint32>> playerMapZones;
-
-    // players only ever holds real (non random bot) players and is maintained on login/logout, so
-    // this is a pass over the online player list, not a world-wide scan.
-    for (Player* player : players)
     {
-        if (!player || !player->IsInWorld() || player->IsGameMaster())
-            continue;
-
-        Map* map = player->GetMap();
-        if (!map)
-            continue;
-
-        // Instanceable maps (dungeons, raids, battlegrounds, arenas) are never valid targets: a
-        // WorldLocation carries no instance id, so a bot would be sent to another instance of the
-        // same map rather than to the player.
-        if (map->Instanceable())
-            continue;
-
-        // Resolve the player zone the same way as the candidate locations below (unphased terrain),
-        // so a player standing in a phased area still matches its underlying zone.
-        uint32 zoneId = map->GetZoneId(PHASEMASK_NORMAL, player->GetPositionX(), player->GetPositionY(),
-                                       player->GetPositionZ());
-        playerMaps.insert(map->GetId());
-        playerMapZones.insert(std::make_pair(map->GetId(), zoneId));
+        std::lock_guard<std::mutex> lock(_playerZonesLock);
+        playerMapZones = _playerZones;
     }
 
     std::vector<WorldLocation> filtered;
     if (playerMapZones.empty())
         return filtered;
 
+    std::set<uint32> playerMaps;
+    for (auto const& mapZone : playerMapZones)
+        playerMaps.insert(mapZone.first);
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
     for (WorldLocation const& loc : locs)
     {
         if (playerMaps.find(loc.GetMapId()) == playerMaps.end())
@@ -1918,10 +1904,47 @@ std::vector<WorldLocation> RandomPlayerbotMgr::GetPlayerZoneTeleportLocations(st
                 continue;
         }
 
+        if (std::find(sPlayerbotAIConfig.RandomBotMaps.begin(), sPlayerbotAIConfig.RandomBotMaps.end(),
+                      loc.GetMapId()) == sPlayerbotAIConfig.RandomBotMaps.end())
+            continue;
+
+        if (botAI && !botAI->StarterLevelDistanceCheck(bot, loc, true))
+            continue;
+
         filtered.push_back(loc);
     }
 
     return filtered;
+}
+
+// World thread only.
+void RandomPlayerbotMgr::UpdatePlayerZones()
+{
+    std::set<std::pair<uint32, uint32>> playerMapZones;
+
+    for (Player* player : players)
+    {
+        if (!player || !player->IsInWorld() || player->IsGameMaster())
+            continue;
+
+        if (!IsRealPlayer(player) && !IsSelfBot(player))
+            continue;
+
+        Map* map = player->GetMap();
+        if (!map)
+            continue;
+
+        // WorldLocation has no instance id.
+        if (map->Instanceable())
+            continue;
+
+        uint32 zoneId =
+            map->GetZoneId(PHASEMASK_NORMAL, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        playerMapZones.insert(std::make_pair(map->GetId(), zoneId));
+    }
+
+    std::lock_guard<std::mutex> lock(_playerZonesLock);
+    _playerZones = std::move(playerMapZones);
 }
 
 void RandomPlayerbotMgr::RandomTeleportGrindForLevel(Player* bot)
