@@ -6,6 +6,7 @@
 
 #include "BuyAction.h"
 #include "BudgetValues.h"
+#include "DBCStores.h"
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "ItemUsageValue.h"
@@ -94,6 +95,10 @@ bool BuyAction::Execute(Event event)
                 uint32 maxPurchases = 1;  // Default to buying once
                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(tItem->item);
                 if (!proto)
+                    continue;
+
+                // Skip items that are out of stock or that cost currencies (honor/arena/tokens) the bot lacks.
+                if (!CanAfford(tItem, proto, pCreature))
                     continue;
 
                 if (proto->Class == ITEM_CLASS_CONSUMABLE || proto->Class == ITEM_CLASS_PROJECTILE)
@@ -214,6 +219,35 @@ bool BuyAction::Execute(Event event)
     }
 
     return vendored;
+}
+
+bool BuyAction::CanAfford(VendorItem const* tItem, ItemTemplate const* proto, Creature* vendor) const
+{
+    // Limited stock: skip if the vendor has fewer than one purchase remaining.
+    if (tItem->maxcount != 0 && vendor->GetVendorItemCurrentCount(tItem) < proto->BuyCount)
+        return false;
+
+    // Non-gold costs (honor / arena points, token items, personal arena rating).
+    if (tItem->ExtendedCost)
+    {
+        ItemExtendedCostEntry const* iece = sItemExtendedCostStore.LookupEntry(tItem->ExtendedCost);
+        if (!iece)
+            return false;
+
+        if (bot->GetHonorPoints() < iece->reqhonorpoints)
+            return false;
+        if (bot->GetArenaPoints() < iece->reqarenapoints)
+            return false;
+
+        for (uint8 i = 0; i < MAX_ITEM_EXTENDED_COST_REQUIREMENTS; ++i)
+            if (iece->reqitem[i] && !bot->HasItemCount(iece->reqitem[i], iece->reqitemcount[i]))
+                return false;
+
+        if (bot->GetMaxPersonalArenaRatingRequirement(iece->reqarenaslot) < iece->reqpersonalarenarating)
+            return false;
+    }
+
+    return true;
 }
 
 bool BuyAction::BuyItem(VendorItemData const* tItems, ObjectGuid vendorguid, ItemTemplate const* proto)

@@ -24,6 +24,7 @@
 #include "Player.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
 #include "QuestDef.h"
 #include "Random.h"
 #include "SharedDefines.h"
@@ -427,6 +428,28 @@ bool NewRpgWanderNpcAction::Execute(Event /*event*/)
             data.lastReach = getMSTime();
             if (bot->CanInteractWithQuestGiver(object))
                 InteractWithNpcOrGameObjectForQuest(data.npcOrGo);
+
+            if (Creature* creature = object->ToCreature())
+            {
+                uint32 npcFlags = creature->GetCreatureTemplate()->npcflag;
+
+                // Random bots sell junk and top up consumables at every vendor (maintainer
+                // request). Each step reuses the cached maintenance values, so the vendor
+                // logic only runs when the bot has something to sell or repair.
+                if ((npcFlags & UNIT_NPC_FLAG_VENDOR) && AI_VALUE(bool, "can sell"))
+                {
+                    botAI->DoSpecificAction("sell", Event("sell", "vendor"));
+
+                    // Buying sorts the vendor list through the weight calculator; skip it for
+                    // bots without money for cheap consumables.
+                    if (bot->GetMoney() >= 1000)
+                        botAI->DoSpecificAction("buy", Event("buy", "vendor"));
+                }
+
+                if ((npcFlags & UNIT_NPC_FLAG_REPAIR) && AI_VALUE(bool, "can repair"))
+                    botAI->DoSpecificAction("repair", Event("repair"));
+            }
+
             return true;
         }
 
