@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <limits>
 #include <list>
+#include <mutex>
 
 namespace SwpHelpers
 {
@@ -146,10 +147,16 @@ Unit* SelectNearestQualifying(
     return best;
 }
 
-} // end anonymous namespace
+std::mutex muruStateMutex;
+std::unordered_map<uint32, MuruEncounterState> muruStates;
 
-std::unordered_map<uint32, MuruDarknessState> muruDarknessStates;
-std::unordered_map<uint32, std::unordered_map<ObjectGuid, uint8>> muruVoidSentinelTankAssignments;
+MuruDarknessState& GetOrEmplaceDarkness(uint32 instanceId)
+{
+    std::optional<MuruDarknessState>& darkness = MuruState(instanceId).darkness;
+    return darkness ? *darkness : darkness.emplace();
+}
+
+} // end anonymous namespace
 
 bool IsMuruPhaseActive(Unit* muru)
 {
@@ -172,7 +179,7 @@ bool TryGetMuruDarknessActiveState(Player* bot, Unit* muru)
         int32 const elapsedZoneMs = std::max(darkness->GetMaxDuration() - remainingMs, 0);
 
         StampMuruDarknessWindow(
-            muruDarknessStates[instanceId], now,
+            GetOrEmplaceDarkness(instanceId), now,
             MURU_DARKNESS_PRE_EFFECT_MS + static_cast<uint32>(elapsedZoneMs),
             static_cast<uint32>(remainingMs));
     }
@@ -184,20 +191,21 @@ bool TryGetMuruDarknessActiveState(Player* bot, Unit* muru)
             std::min(static_cast<uint32>(duration), MURU_DARKNESS_PRE_EFFECT_MS);
 
         StampMuruDarknessWindow(
-            muruDarknessStates[instanceId], now, MURU_DARKNESS_PRE_EFFECT_MS - remainingPreEffectMs,
+            GetOrEmplaceDarkness(instanceId), now,
+            MURU_DARKNESS_PRE_EFFECT_MS - remainingPreEffectMs,
             remainingPreEffectMs + MURU_DARKNESS_AURA_MS);
     }
 
-    auto const stateItr = muruDarknessStates.find(instanceId);
-    if (stateItr == muruDarknessStates.end())
+    MuruEncounterState* state = FindMuruState(instanceId);
+    if (!state || !state->darkness)
         return false;
 
-    uint32 const expireMs = stateItr->second.expireMs;
+    uint32 const expireMs = state->darkness->expireMs;
     if (expireMs > now)
         return true;
 
     if (expireMs <= now)
-        muruDarknessStates.erase(stateItr);
+        state->darkness.reset();
 
     return false;
 }
@@ -212,21 +220,22 @@ bool TryGetMuruDarknessEarlyState(Player* bot, Unit* muru, uint32 earlyWindowMs)
 
 bool PeekMuruDarknessActiveState(Player* bot)
 {
-    auto const stateItr = muruDarknessStates.find(bot->GetInstanceId());
-    return stateItr != muruDarknessStates.end() && stateItr->second.expireMs > getMSTime();
+    MuruEncounterState const* state = FindMuruState(bot->GetInstanceId());
+    return state && state->darkness && state->darkness->expireMs > getMSTime();
 }
 
 bool PeekMuruDarknessEarlyState(Player* bot, uint32 earlyWindowMs)
 {
-    auto const stateItr = muruDarknessStates.find(bot->GetInstanceId());
-    if (stateItr == muruDarknessStates.end())
+    MuruEncounterState const* state = FindMuruState(bot->GetInstanceId());
+    if (!state || !state->darkness)
         return false;
 
+    MuruDarknessState const& darkness = *state->darkness;
     uint32 const now = getMSTime();
-    if (stateItr->second.expireMs <= now)
+    if (darkness.expireMs <= now)
         return false;
 
-    return stateItr->second.startMs < now && now - stateItr->second.startMs < earlyWindowMs;
+    return darkness.startMs < now && now - darkness.startMs < earlyWindowMs;
 }
 
 MuruEncounterGuids FindMuruEncounterGuids(PlayerbotAI* botAI)
@@ -375,7 +384,7 @@ Position const& GetAssignedVoidSentinelTankPosition(Unit* voidSentinel)
     Position const& northPosition = MURU_VOID_SENTINEL_N_TANK_POSITION;
     Position const& eastPosition = MURU_VOID_SENTINEL_E_TANK_POSITION;
 
-    auto& assignments = muruVoidSentinelTankAssignments[voidSentinel->GetInstanceId()];
+    auto& assignments = MuruState(voidSentinel->GetInstanceId()).voidSentinelTankAssignments;
     auto assignmentItr = assignments.find(sentinelGuid);
     if (assignmentItr == assignments.end())
     {
@@ -567,6 +576,35 @@ bool CommandControlledCreatureToAttack(Unit* controlled, Unit* target)
     }
 
     return true;
+}
+
+// Shared encounter state
+
+MuruEncounterState& MuruState(uint32 instanceId)
+{
+    std::lock_guard lock(muruStateMutex);
+    return muruStates[instanceId];
+}
+
+MuruEncounterState* FindMuruState(uint32 instanceId)
+{
+    std::lock_guard lock(muruStateMutex);
+    auto it = muruStates.find(instanceId);
+    return it != muruStates.end() ? &it->second : nullptr;
+}
+
+bool MuruResetInstance(uint32 instanceId)
+{
+    std::lock_guard lock(muruStateMutex);
+    auto it = muruStates.find(instanceId);
+    if (it == muruStates.end())
+        return false;
+
+    MuruEncounterState const& state = it->second;
+    bool const wasSet = state.darkness || !state.voidSentinelTankAssignments.empty();
+
+    muruStates.erase(it);
+    return wasSet;
 }
 
 }

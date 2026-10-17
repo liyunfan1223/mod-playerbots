@@ -43,16 +43,6 @@ struct KiljaedenDarknessShieldState
     uint32 lastDarknessCastMsLeft = 0;
 };
 
-struct KiljaedenEncounterState
-{
-    std::vector<KiljaedenArmageddon> armageddons;
-    std::unordered_map<ObjectGuid, uint8> rangedAssignments;
-    std::unordered_map<ObjectGuid, uint8> rangedArmageddonAssignments;
-    uint32 dragonOrbAnnouncementMs = 0;
-    uint32 rangedAssignmentRebuildMs = 0;
-    uint32 rangedArmageddonRebuildMs = 0;
-};
-
 inline std::array const KILJAEDEN_DRAGON_ORB_ENTRIES = {
     Id(SwpObjects::GO_DRAGON_ORB_1),
     Id(SwpObjects::GO_DRAGON_ORB_2),
@@ -70,13 +60,11 @@ inline constexpr float KILJAEDEN_PHASE3_HP_THRESHOLD = 85.0f;
 inline constexpr float KILJAEDEN_PHASE4_HP_THRESHOLD = 55.0f;
 inline constexpr float KILJAEDEN_PHASE5_HP_THRESHOLD = 25.0f;
 
-// For the "kiljaeden hands" value.
 inline constexpr uint32 HAND_CACHE_INTERVAL_MS = 200;
-// The presence of Dragon Orbs is cached, but GO_FLAG_IN_USE and GO_FLAG_NOT_SELECTABLE are not.
 inline constexpr uint32 DRAGON_ORB_CACHE_INTERVAL_MS = 200;
 
-inline constexpr float HAND_SEARCH_RADIUS = 75.0f;
-// Hammer of Justice is a single-target spell that counts both CombatReaches so its actual range is
+inline constexpr float HAND_SEARCH_RADIUS = 80.0f;
+// Hammer of Justice is a single-target spell that counts both combat reaches so its actual range is
 // its tooltip range of 10y + 1.5y (player) + 2.5y (Hand) = 14y. Holding a little inside that
 // threshold leaves room for the Hand to shift between the range check and the cast landing.
 inline constexpr float HAND_HOLY_PALADIN_STANDOFF = 12.0f;
@@ -99,14 +87,12 @@ inline constexpr uint8 KILJAEDEN_TOTAL_RANGED_SLOT_COUNT =
     KILJAEDEN_INNER_RANGED_SLOT_COUNT + KILJAEDEN_OUTER_RANGED_SLOT_COUNT;
 // Only up to two ranged bots may share a slot when an Armageddon forces a reshuffle.
 inline constexpr uint8 KILJAEDEN_MAX_BOTS_PER_RANGED_SLOT = 2;
-inline constexpr uint32 ARMAGEDDON_HAZARD_DURATION_MS = 10000;
+inline constexpr uint32 ARMAGEDDON_HAZARD_DURATION_MS = 10 * IN_MILLISECONDS;
 inline constexpr float ARMAGEDDON_SAFE_DISTANCE = 11.0f;
 
 inline constexpr float KILJAEDEN_REFLECTION_SEARCH_RADIUS = 100.0f;
 inline constexpr float DRAGON_ORB_SEARCH_RADIUS = 200.0f;
 inline constexpr float DRAGON_ORB_IN_USE_HOLD_DISTANCE = 15.0f;
-// Grace after using an Orb before a lingering root is considered stale and is cleared.
-inline constexpr uint32 DRAGON_ORB_ANNOUNCEMENT_RESET_MS = 10000;
 // Shield of the Blue (45848) lasts 5s and Darkness of a Thousand Souls (46605) is an 8s channel, so
 // the dragon casts once <4.5s remain.
 inline constexpr int32 SHIELD_OF_THE_BLUE_CAST_WINDOW_MS = 4500;
@@ -125,12 +111,6 @@ inline Position const KILJAEDEN_S_MELEE_POSITION =  { 1689.487f, 632.119f, 27.82
 inline Position const KILJAEDEN_E_MELEE_POSITION =  { 1700.542f, 619.589f, 27.786f };
 inline Position const KILJAEDEN_DARKNESS_POSITION = { 1709.768f, 642.241f, 27.706f };
 
-extern std::unordered_map<uint32, KiljaedenEncounterState> kiljaedenEncounterStates;
-extern std::unordered_map<uint32, std::unordered_map<ObjectGuid, uint32>>
-    kiljaedenHandControlClaims;
-extern std::unordered_set<ObjectGuid> kiljaedenTrackedArmageddonTargets;
-extern std::unordered_map<ObjectGuid::LowType, uint32> kiljaedenDragonOrbUseTimes;
-
 GuidVector FindKiljaedenHandGuids(Player* bot);
 std::vector<Unit*> GetKiljaedenHands(PlayerbotAI* botAI);
 bool IsKiljaedenHandControlClaimed(Unit* hand);
@@ -145,7 +125,6 @@ void EnsureKiljaedenRangedArmageddonAssignments(Player* bot);
 bool IsKiljaedenCastingDarknessOfAThousandSouls(Unit* kiljaeden);
 GuidVector FindKiljaedenDragonOrbGuids(Player* bot);
 Player* GetKiljaedenDragonOrbUser(Player* bot);
-bool ResetKiljaedenDragonOrbUserAnnouncement(uint32 instanceId);
 bool HasUsedKiljaedenDragonOrb(Player* bot);
 bool HasKiljaedenDragonAura(Player* bot);
 Unit* GetKiljaedenControlledDragon(Player* bot);
@@ -154,6 +133,25 @@ Player* FindBestKiljaedenDragonClusterTarget(Player* bot, Unit* dragon, uint32 s
 Player* FindClosestKiljaedenDragonTarget(Player* bot, Unit* dragon, uint32 spellId = 0);
 bool HasStaleRootFlag(Player* bot);
 bool ReleaseStaleRootFlag(Player* bot);
+
+// Shared encounter state
+
+struct KiljaedenEncounterState
+{
+    std::vector<KiljaedenArmageddon> armageddons;
+    std::unordered_map<ObjectGuid, uint8> rangedAssignments;
+    std::unordered_map<ObjectGuid, uint8> rangedArmageddonAssignments;
+    std::unordered_map<ObjectGuid, uint32> handControlClaims;
+    std::unordered_set<ObjectGuid> dragonOrbUsers;
+    std::unordered_set<ObjectGuid> trackedArmageddonTargets;
+    uint32 dragonOrbAnnouncementMs = 0;
+    uint32 rangedAssignmentRebuildMs = 0;
+    uint32 rangedArmageddonRebuildMs = 0;
+};
+
+KiljaedenEncounterState& KiljaedenState(uint32 instanceId);
+KiljaedenEncounterState* FindKiljaedenState(uint32 instanceId);
+bool KiljaedenResetInstance(uint32 instanceId);
 
 }
 

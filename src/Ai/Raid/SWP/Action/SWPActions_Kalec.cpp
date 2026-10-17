@@ -23,11 +23,11 @@ bool KalecgosAnnounceBossHealthAction::Execute(Event /*event*/)
     if (!kalecgos)
         return false;
 
-    auto const stateItr = kalecgosEncounterStates.find(bot->GetInstanceId());
-    if (stateItr == kalecgosEncounterStates.end())
+    KalecgosEncounterState* foundState = FindKalecgosState(bot->GetInstanceId());
+    if (!foundState)
         return false;
 
-    KalecgosEncounterState& state = stateItr->second;
+    KalecgosEncounterState& state = *foundState;
     std::string text;
 
     if (!IsInSpectralRealm(bot))

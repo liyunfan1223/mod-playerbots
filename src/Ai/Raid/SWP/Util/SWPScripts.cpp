@@ -341,7 +341,8 @@ public:
         if (!creature || creature->GetEntry() != Id(SwpNpcs::NPC_ARMAGEDDON_TARGET))
             return;
 
-        if (kiljaedenTrackedArmageddonTargets.count(creature->GetGUID()))
+        KiljaedenEncounterState const* state = FindKiljaedenState(creature->GetInstanceId());
+        if (state && state->trackedArmageddonTargets.contains(creature->GetGUID()))
             return;
 
         bool hasSunwellStrategy = false;
@@ -371,7 +372,8 @@ public:
         if (!hasSunwellStrategy)
             return;
 
-        kiljaedenTrackedArmageddonTargets.insert(creature->GetGUID());
+        KiljaedenState(creature->GetInstanceId()).trackedArmageddonTargets.insert(
+            creature->GetGUID());
 
         AddKiljaedenArmageddon(
             creature->GetInstanceId(), creature->GetPosition(),
@@ -386,7 +388,8 @@ public:
         if (!creature || creature->GetEntry() != Id(SwpNpcs::NPC_ARMAGEDDON_TARGET))
             return;
 
-        kiljaedenTrackedArmageddonTargets.erase(creature->GetGUID());
+        if (KiljaedenEncounterState* state = FindKiljaedenState(creature->GetInstanceId()))
+            state->trackedArmageddonTargets.erase(creature->GetGUID());
     }
 };
 

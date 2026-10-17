@@ -12,7 +12,7 @@
 #include "SWPShared.h"
 #include <string>
 
-// General
+// Shared
 
 class SunwellEncounterMultiplier : public Multiplier
 {

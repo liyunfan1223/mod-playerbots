@@ -12,7 +12,7 @@
 #include "Trigger.h"
 #include <string>
 
-// General
+// Shared
 
 class SunwellEncounterTrigger : public Trigger
 {
@@ -33,8 +33,6 @@ protected:
 class SunwellNoEncounterInProgressTrigger : public Trigger
 {
 public:
-    // Throttled to once per second. This trigger is true for all trash and downtime and, being
-    // for between-encounter clean-up, has no real urgency to it.
     SunwellNoEncounterInProgressTrigger(PlayerbotAI* botAI)
         : Trigger(botAI, "sunwell no encounter in progress", 1000) {}
     bool IsActive() override;
@@ -43,8 +41,6 @@ public:
 class SunwellAuraToRemoveTrigger : public Trigger
 {
 public:
-    // Also throttled, though this can occur in combat (clear Ice Block and Divine Shield). A bit
-    // of a delay here feels more realistic anyway.
     SunwellAuraToRemoveTrigger(PlayerbotAI* botAI)
         : Trigger(botAI, "sunwell aura to remove", 1000) {}
     bool IsActive() override;
@@ -70,8 +66,8 @@ public:
 
 // Shared Bosses
 
-// A Hunter while the named boss is above BOSS_ENGAGED_HEALTH_PCT, so Misdirection goes out on the
-// pull. Used for Kalecgos, Brutallus and the Eredar Twins (on Alythess).
+// For Misdirection before BOSS_ENGAGED_HEALTH_PCT (i.e., shortly after pull). Used for Kalecgos,
+// Brutallus, and the Eredar Twins (on Alythess).
 class SunwellHunterShouldMisdirectTrigger : public SunwellEncounterTrigger
 {
 public:

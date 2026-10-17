@@ -11,7 +11,7 @@
 #include "Position.h"
 #include "SWPShared.h"
 #include <array>
-#include <unordered_map>
+#include <optional>
 #include <vector>
 
 class Player;
@@ -53,14 +53,13 @@ struct EredarTwinsTankAssignment
 // Used to measure if a bot is on the balcony; deliberately a little below the actual balcony Z.
 inline constexpr float EREDAR_TWINS_BALCONY_Z = 50.0f;
 
-// For the "eredar twins blaze" value.
 inline constexpr uint32 EREDAR_TWINS_BLAZE_CACHE_INTERVAL_MS = 200;
 // The Blaze trap GO casts 45246, dealing damage in a 3y radius; extra 1.5y is avoidance buffer.
 inline constexpr float BLAZE_DANGER_RADIUS = 4.5f;
 inline constexpr float BLAZE_SEARCH_RADIUS = 30.0f;
 
 // Grace period for the tanks to build threat before the rest of the raid opens fire.
-inline constexpr uint32 EREDAR_TWINS_DPS_HOLD_MS = 8000;
+inline constexpr uint32 EREDAR_TWINS_DPS_HOLD_MS = 8 * IN_MILLISECONDS;
 // DPS cooldowns are held until Sacrolash is at this percent. Eredar Twins is a threat-sensitive
 // fight due to Sacrolash dropping threat on tanks and Alythess targeting Conflagration based on
 // Sacrolash's threat table.
@@ -79,7 +78,7 @@ inline constexpr uint32 CONFLAGRATION_WINDOW_MS = 5500;
 inline constexpr uint32 BLAZE_TARGET_WINDOW_MS = 2500;
 
 inline constexpr uint8 FLAME_TOUCHED_PROTECT_STACKS = 5;
-inline constexpr int32 FLAME_SEAR_PROTECT_WINDOW_MS = 2000;
+inline constexpr int32 FLAME_SEAR_PROTECT_WINDOW_MS = 2 * IN_MILLISECONDS;
 
 inline Position const ALYTHESS_START_POSITION = { 1819.180f, 625.539f, 33.4038f };
 inline std::array const ALYTHESS_TANK_POSITIONS = {
@@ -100,12 +99,6 @@ inline Position const EREDAR_TWINS_RANGED_CONFLAG_POSITION = { 1801.133f, 584.45
 inline Position const EREDAR_TWINS_P2_MELEE_POSITION =       { 1814.327f, 625.645f, 33.404f };
 inline Position const EREDAR_TWINS_P2_RANGED_POSITION =      { 1805.587f, 625.653f, 33.404f };
 
-extern std::unordered_map<uint32, EredarTwinsIncomingConflagrationState>
-    eredarTwinsIncomingConflagrationStates;
-extern std::unordered_map<uint32, EredarTwinsBlazeTargetState> eredarTwinsBlazeTargetStates;
-extern std::unordered_map<uint32, uint32> eredarTwinsDpsHoldStartMs;
-extern std::unordered_map<uint32, EredarTwinsTankAssignment> eredarTwinsTankAssignments;
-
 Position GetAlythessTankPosition(Unit* alythess, uint8 index);
 Position GetEredarTwinsP2MeleePosition(Unit* alythess);
 Position GetEredarTwinsP2RangedPosition(Unit* alythess);
@@ -124,6 +117,22 @@ void RecordIncomingEredarTwinsConflagrationTarget(Player* target);
 Player* GetEredarTwinsConflagrationTarget(Player* bot);
 void RecordEredarTwinsBlazeTarget(Player* target);
 Player* GetEredarTwinsBlazeTarget(Player* bot);
+
+// Shared encounter state
+
+// The conflagration and Blaze targets are cleared mid-fight when they expire, so each field is
+// optional rather than the whole entry being erased.
+struct EredarTwinsEncounterState
+{
+    std::optional<EredarTwinsIncomingConflagrationState> incomingConflagration;
+    std::optional<EredarTwinsBlazeTargetState> blazeTarget;
+    std::optional<uint32> dpsHoldStartMs;
+    std::optional<EredarTwinsTankAssignment> tankAssignment;
+};
+
+EredarTwinsEncounterState& EredarTwinsState(uint32 instanceId);
+EredarTwinsEncounterState* FindEredarTwinsState(uint32 instanceId);
+bool EredarTwinsResetInstance(uint32 instanceId);
 
 }
 

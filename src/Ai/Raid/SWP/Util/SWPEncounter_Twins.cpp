@@ -14,6 +14,8 @@
 #include "Playerbots.h"
 #include "ThreatManager.h"
 #include <list>
+#include <mutex>
+#include <unordered_map>
 
 using namespace EncounterHelpers;
 
@@ -84,8 +86,8 @@ EredarTwinsTankAssignment const emptyTankAssignment;
 
 EredarTwinsTankAssignment const& GetTankAssignment(Player* bot)
 {
-    auto const itr = eredarTwinsTankAssignments.find(bot->GetInstanceId());
-    return itr != eredarTwinsTankAssignments.end() ? itr->second : emptyTankAssignment;
+    EredarTwinsEncounterState const* state = FindEredarTwinsState(bot->GetInstanceId());
+    return state && state->tankAssignment ? *state->tankAssignment : emptyTankAssignment;
 }
 
 // Hold once the bot has closed to within the ratio of the lowest tank threat on that boss.
@@ -95,16 +97,10 @@ bool HasClosedOnTankThreat(Unit* boss, Player* bot, float tankThreat, float thre
         boss->GetThreatMgr().GetThreat(bot) >= tankThreat * threatHoldRatio;
 }
 
+std::mutex eredarTwinsStateMutex;
+std::unordered_map<uint32, EredarTwinsEncounterState> eredarTwinsStates;
+
 } // end anonymous namespace
-
-std::unordered_map<uint32, EredarTwinsIncomingConflagrationState>
-    eredarTwinsIncomingConflagrationStates;
-
-std::unordered_map<uint32, EredarTwinsBlazeTargetState> eredarTwinsBlazeTargetStates;
-
-std::unordered_map<uint32, uint32> eredarTwinsDpsHoldStartMs;
-
-std::unordered_map<uint32, EredarTwinsTankAssignment> eredarTwinsTankAssignments;
 
 Position GetAlythessTankPosition(Unit* alythess, uint8 index)
 {
@@ -153,7 +149,10 @@ void ResolveEredarTwinsTankAssignment(Player* bot)
     if (!alythessTank)
         return;
 
-    EredarTwinsTankAssignment& assignment = eredarTwinsTankAssignments[bot->GetInstanceId()];
+    std::optional<EredarTwinsTankAssignment>& assignmentField =
+        EredarTwinsState(bot->GetInstanceId()).tankAssignment;
+    EredarTwinsTankAssignment& assignment =
+        assignmentField ? *assignmentField : assignmentField.emplace();
     assignment.alythessTankGuid = alythessTank->GetGUID();
     assignment.source = source;
 }
@@ -336,8 +335,9 @@ void RecordIncomingEredarTwinsConflagrationTarget(Player* target)
         return;
 
     uint32 const now = getMSTime();
-    EredarTwinsIncomingConflagrationState& state =
-        eredarTwinsIncomingConflagrationStates[target->GetInstanceId()];
+    std::optional<EredarTwinsIncomingConflagrationState>& incoming =
+        EredarTwinsState(target->GetInstanceId()).incomingConflagration;
+    EredarTwinsIncomingConflagrationState& state = incoming ? *incoming : incoming.emplace();
 
     if (state.targetGuid != target->GetGUID())
         state.delayMs = now + CONFLAGRATION_DELAY_MS;
@@ -348,17 +348,16 @@ void RecordIncomingEredarTwinsConflagrationTarget(Player* target)
 
 Player* GetEredarTwinsConflagrationTarget(Player* bot)
 {
-    auto const incomingItr = eredarTwinsIncomingConflagrationStates.find(bot->GetInstanceId());
-
-    if (incomingItr == eredarTwinsIncomingConflagrationStates.end())
+    EredarTwinsEncounterState* twinsState = FindEredarTwinsState(bot->GetInstanceId());
+    if (!twinsState || !twinsState->incomingConflagration)
         return nullptr;
 
-    EredarTwinsIncomingConflagrationState const& state = incomingItr->second;
+    EredarTwinsIncomingConflagrationState const& state = *twinsState->incomingConflagration;
     uint32 const now = getMSTime();
 
     if (state.expireMs <= now)
     {
-        eredarTwinsIncomingConflagrationStates.erase(incomingItr);
+        twinsState->incomingConflagration.reset();
         return nullptr;
     }
 
@@ -384,21 +383,23 @@ void RecordEredarTwinsBlazeTarget(Player* target)
     if (!target)
         return;
 
-    EredarTwinsBlazeTargetState& state = eredarTwinsBlazeTargetStates[target->GetInstanceId()];
+    std::optional<EredarTwinsBlazeTargetState>& blaze =
+        EredarTwinsState(target->GetInstanceId()).blazeTarget;
+    EredarTwinsBlazeTargetState& state = blaze ? *blaze : blaze.emplace();
     state.targetGuid = target->GetGUID();
     state.startMs = getMSTime();
 }
 
 Player* GetEredarTwinsBlazeTarget(Player* bot)
 {
-    auto const itr = eredarTwinsBlazeTargetStates.find(bot->GetInstanceId());
-    if (itr == eredarTwinsBlazeTargetStates.end())
+    EredarTwinsEncounterState* twinsState = FindEredarTwinsState(bot->GetInstanceId());
+    if (!twinsState || !twinsState->blazeTarget)
         return nullptr;
 
-    EredarTwinsBlazeTargetState const& state = itr->second;
+    EredarTwinsBlazeTargetState const& state = *twinsState->blazeTarget;
     if (GetMSTimeDiffToNow(state.startMs) >= BLAZE_TARGET_WINDOW_MS)
     {
-        eredarTwinsBlazeTargetStates.erase(itr);
+        twinsState->blazeTarget.reset();
         return nullptr;
     }
 
@@ -414,6 +415,36 @@ Player* GetEredarTwinsBlazeTarget(Player* bot)
     }
 
     return nullptr;
+}
+
+// Shared encounter state
+
+EredarTwinsEncounterState& EredarTwinsState(uint32 instanceId)
+{
+    std::lock_guard lock(eredarTwinsStateMutex);
+    return eredarTwinsStates[instanceId];
+}
+
+EredarTwinsEncounterState* FindEredarTwinsState(uint32 instanceId)
+{
+    std::lock_guard lock(eredarTwinsStateMutex);
+    auto it = eredarTwinsStates.find(instanceId);
+    return it != eredarTwinsStates.end() ? &it->second : nullptr;
+}
+
+bool EredarTwinsResetInstance(uint32 instanceId)
+{
+    std::lock_guard lock(eredarTwinsStateMutex);
+    auto it = eredarTwinsStates.find(instanceId);
+    if (it == eredarTwinsStates.end())
+        return false;
+
+    EredarTwinsEncounterState const& state = it->second;
+    bool const wasSet = state.incomingConflagration || state.blazeTarget ||
+        state.dpsHoldStartMs || state.tankAssignment;
+
+    eredarTwinsStates.erase(it);
+    return wasSet;
 }
 
 }

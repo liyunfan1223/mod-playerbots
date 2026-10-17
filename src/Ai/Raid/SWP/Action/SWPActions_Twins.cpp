@@ -58,7 +58,9 @@ bool EredarTwinsAnnounceAlythessTankAction::Execute(Event /*event*/)
     if (source == AlythessTankSource::Unresolved || !alythessTank)
         return false;
 
-    eredarTwinsTankAssignments[bot->GetInstanceId()].announcementMs = getMSTime();
+    std::optional<EredarTwinsTankAssignment>& assignment =
+        EredarTwinsState(bot->GetInstanceId()).tankAssignment;
+    (assignment ? *assignment : assignment.emplace()).announcementMs = getMSTime();
 
     std::map<std::string, std::string> placeholders = {{"%bot", alythessTank->GetName()}};
     std::string text;
@@ -339,7 +341,7 @@ bool EredarTwinsStackInRoomCenterAction::Execute(Event /*event*/)
 bool EredarTwinsDpsPrioritizeSacrolashAction::Execute(Event /*event*/)
 {
     // Start the 8s clock for tanks to get aggro first.
-    eredarTwinsDpsHoldStartMs.try_emplace(bot->GetInstanceId(), getMSTime());
+    EmplaceIfUnset(EredarTwinsState(bot->GetInstanceId()).dpsHoldStartMs, getMSTime());
 
     Unit* sacrolash = AI_VALUE2(Unit*, "find target", "lady sacrolash");
     Unit* twinTarget =

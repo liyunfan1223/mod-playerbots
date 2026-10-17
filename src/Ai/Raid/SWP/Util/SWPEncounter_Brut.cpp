@@ -9,6 +9,7 @@
 #include "SWPShared.h"
 #include <algorithm>
 #include <cmath>
+#include <mutex>
 #include <vector>
 
 namespace SwpHelpers
@@ -16,10 +17,11 @@ namespace SwpHelpers
 
 // Note: Brutallus's CombatReach is 18.0f
 
-std::unordered_map<uint32, BrutallusEncounterState> brutallusEncounterStates;
-
 namespace
 {
+
+std::mutex brutallusStateMutex;
+std::unordered_map<uint32, BrutallusEncounterState> brutallusStates;
 
 bool IsBurnPadActive(BrutallusEncounterState const& state, ObjectGuid ownerGuid)
 {
@@ -287,7 +289,7 @@ bool TryGetBrutallusAssignedPositionIndex(Player* bot, uint8& positionIndex)
         return false;
 
     bool const isRanged = PlayerbotAI::IsRanged(bot);
-    auto& state = brutallusEncounterStates[bot->GetInstanceId()];
+    auto& state = BrutallusState(bot->GetInstanceId());
 
     if (isRanged)
         EnsureRangedAssignments(group, state);
@@ -337,11 +339,8 @@ bool TryGetBrutallusBurnPadPosition(
         return false;
 
     uint8 padIndex = 0;
-    if (!TryGetBurnPadIndex(
-            brutallusEncounterStates[bot->GetInstanceId()], bot, rangedIndex, padIndex))
-    {
+    if (!TryGetBurnPadIndex(BrutallusState(bot->GetInstanceId()), bot, rangedIndex, padIndex))
         return false;
-    }
 
     constexpr float degreeToRadian = M_PI / 180.0f;
     static constexpr std::array burnPadAngleOffsets = {
@@ -398,16 +397,37 @@ bool TryGetBrutallusLaneTraversalPosition(
 
 bool ReleaseBrutallusBurnPad(Player* bot)
 {
-    auto const instanceItr = brutallusEncounterStates.find(bot->GetInstanceId());
-    if (instanceItr == brutallusEncounterStates.end())
+    BrutallusEncounterState* state = FindBrutallusState(bot->GetInstanceId());
+    if (!state)
         return false;
 
-    return instanceItr->second.rangedBurnPadAssignments.erase(bot->GetGUID()) > 0;
+    return state->rangedBurnPadAssignments.erase(bot->GetGUID()) > 0;
 }
 
 bool HasBrutallusBurn(Player* bot)
 {
     return bot->HasAura(Id(SwpSpells::SPELL_BURN));
+}
+
+// Shared encounter state
+
+BrutallusEncounterState& BrutallusState(uint32 instanceId)
+{
+    std::lock_guard lock(brutallusStateMutex);
+    return brutallusStates[instanceId];
+}
+
+BrutallusEncounterState* FindBrutallusState(uint32 instanceId)
+{
+    std::lock_guard lock(brutallusStateMutex);
+    auto it = brutallusStates.find(instanceId);
+    return it != brutallusStates.end() ? &it->second : nullptr;
+}
+
+bool BrutallusResetInstance(uint32 instanceId)
+{
+    std::lock_guard lock(brutallusStateMutex);
+    return brutallusStates.erase(instanceId) > 0;
 }
 
 }

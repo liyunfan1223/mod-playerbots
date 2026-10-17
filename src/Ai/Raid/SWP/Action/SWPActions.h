@@ -31,8 +31,7 @@ public:
 class SunwellRemoveAuraAction : public Action
 {
 public:
-    SunwellRemoveAuraAction(PlayerbotAI* botAI)
-        : Action(botAI, "sunwell remove aura") {}
+    SunwellRemoveAuraAction(PlayerbotAI* botAI) : Action(botAI, "sunwell remove aura") {}
     bool Execute(Event event) override;
 };
 

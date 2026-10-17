@@ -24,15 +24,17 @@
 #include "SWPEncounter_Muru.h"
 #include "SWPEncounter_Twins.h"
 #include "SWPShared.h"
+#include "ThreatManager.h"
 #include "Timer.h"
 #include "WipeAction.h"
 
 using namespace SwpHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
-// Without this, bots are able to drink after Kil'jaeden's Hands go down.
+// Without this, bots are able to drink after Kil'jaeden's Hands go down. I assume it's due to the
+// issue reported here: https://github.com/azerothcore/azerothcore-wotlk/issues/22122.
 float SunwellNoEncounterDrinkingMultiplier::GetValueInEncounter(Action* action)
 {
     return dynamic_cast<DrinkAction*>(action) || dynamic_cast<EatAction*>(action) ? 0.0f : 1.0f;
@@ -75,14 +77,32 @@ float SunwellControlMisdirectionMultiplier::GetValueInEncounter(Action* action)
     if (!dynamic_cast<CastMisdirectionOnMainTankAction*>(action))
         return 1.0f;
 
-    if (AI_VALUE2(Unit*, "find target", "entropius"))
-        return 1.0f;
+    bool isHeldBoss = false;
+    for (auto const& [guid, ref] : bot->GetThreatMgr().GetThreatenedByMeList())
+    {
+        Unit* unit = ref->GetOwner();
+        if (!unit)
+            continue;
 
-    return AI_VALUE2(Unit*, "find target", "kalecgos") ||
-        AI_VALUE2(Unit*, "find target", "brutallus") ||
-        AI_VALUE2(Unit*, "find target", "grand warlock alythess") ||
-        AI_VALUE2(Unit*, "find target", "m'uru") ||
-        AI_VALUE2(Unit*, "find target", "kil'jaeden") ? 0.0f : 1.0f;
+        switch (unit->GetEntry())
+        {
+            case Id(SwpNpcs::NPC_ENTROPIUS):
+                return 1.0f;
+
+            case Id(SwpNpcs::NPC_KALECGOS_DRAGON):
+            case Id(SwpNpcs::NPC_BRUTALLUS):
+            case Id(SwpNpcs::NPC_GRAND_WARLOCK_ALYTHESS):
+            case Id(SwpNpcs::NPC_MURU):
+            case Id(SwpNpcs::NPC_KILJAEDEN):
+                isHeldBoss = true;
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    return isHeldBoss ? 0.0f : 1.0f;
 }
 
 float SunwellDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
@@ -109,14 +129,72 @@ float SunwellDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
         }
     }
 
+    Unit* hand = nullptr;
+    Unit* kiljaeden = nullptr;
+    Unit* muru = nullptr;
+    Unit* entropius = nullptr;
+    Unit* alythess = nullptr;
+    Unit* sacrolash = nullptr;
+    Unit* felmyst = nullptr;
+    Unit* brutallus = nullptr;
+    Unit* kalecgos = nullptr;
+    for (auto const& [guid, ref] : bot->GetThreatMgr().GetThreatenedByMeList())
+    {
+        Unit* unit = ref->GetOwner();
+        if (!unit)
+            continue;
+
+        switch (unit->GetEntry())
+        {
+            case Id(SwpNpcs::NPC_HAND_OF_THE_DECEIVER):
+                hand = unit;
+                break;
+
+            case Id(SwpNpcs::NPC_KILJAEDEN):
+                kiljaeden = unit;
+                break;
+
+            case Id(SwpNpcs::NPC_MURU):
+                muru = unit;
+                break;
+
+            case Id(SwpNpcs::NPC_ENTROPIUS):
+                entropius = unit;
+                break;
+
+            case Id(SwpNpcs::NPC_GRAND_WARLOCK_ALYTHESS):
+                alythess = unit;
+                break;
+
+            case Id(SwpNpcs::NPC_LADY_SACROLASH):
+                sacrolash = unit;
+                break;
+
+            case Id(SwpNpcs::NPC_FELMYST):
+                felmyst = unit;
+                break;
+
+            case Id(SwpNpcs::NPC_BRUTALLUS):
+                brutallus = unit;
+                break;
+
+            case Id(SwpNpcs::NPC_KALECGOS_DRAGON):
+                kalecgos = unit;
+                break;
+
+            default:
+                break;
+        }
+    }
+
     // Kil'jaeden is summoned only when the last Hand dies.
-    if (AI_VALUE2(Unit*, "find target", "hand of the deceiver"))
+    if (hand)
         return 0.0f;
 
     bool const isBloodlust = bot->getClass() == CLASS_SHAMAN &&
         (dynamic_cast<CastHeroismAction*>(action) || dynamic_cast<CastBloodlustAction*>(action));
 
-    if (Unit* kiljaeden = AI_VALUE2(Unit*, "find target", "kil'jaeden"))
+    if (kiljaeden)
     {
         if (kiljaeden->GetHealthPct() <= KILJAEDEN_PHASE5_HP_THRESHOLD)
             return 1.0f;
@@ -127,9 +205,8 @@ float SunwellDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
         return kiljaeden->GetHealthPct() > KILJAEDEN_PHASE3_HP_THRESHOLD ? 0.0f : 1.0f;
     }
 
-    if (Unit* muru = AI_VALUE2(Unit*, "find target", "m'uru"))
+    if (muru)
     {
-        Unit* entropius = AI_VALUE2(Unit*, "find target", "entropius");
         if (entropius && entropius->GetHealthPct() < BOSS_ENGAGED_HEALTH_PCT)
             return 1.0f;
 
@@ -140,14 +217,13 @@ float SunwellDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
         return muru->GetHealthPct() > MURU_MAX_DPS_HP_PERCENT ? 0.0f : 1.0f;
     }
 
-    if (AI_VALUE2(Unit*, "find target", "grand warlock alythess"))
+    if (alythess)
     {
-        Unit* sacrolash = AI_VALUE2(Unit*, "find target", "lady sacrolash");
         return sacrolash && sacrolash->GetHealthPct() > EREDAR_TWINS_MAX_DPS_HP_PERCENT ?
             0.0f : 1.0f;
     }
 
-    if (Unit* felmyst = AI_VALUE2(Unit*, "find target", "felmyst"))
+    if (felmyst)
     {
         if (felmyst->IsFlying())
             return 0.0f;
@@ -155,10 +231,10 @@ float SunwellDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
         return felmyst->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
     }
 
-    if (Unit* brutallus = AI_VALUE2(Unit*, "find target", "brutallus"))
+    if (brutallus)
         return brutallus->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
 
-    if (AI_VALUE2(Unit*, "find target", "kalecgos")) // Use cooldowns against Sathrovarr only.
+    if (kalecgos) // Use cooldowns against Sathrovarr only.
         return IsInSpectralRealm(bot) ? 1.0f : 0.0f;
 
     return 1.0f;
@@ -190,7 +266,7 @@ float KalecgosWaitToDecurseMultiplier::GetValueInEncounter(Action* action)
     if (!target)
         return 1.0f;
 
-    // Like Illidan's Shadowfiends, the spread from player-to-player is a separate spell
+    // Like with Illidan's Shadowfiends, the spread from player-to-player is a separate spell.
     Aura* curse = target->GetAura(Id(SwpSpells::SPELL_CURSE_OF_BOUNDLESS_AGONY));
     if (!curse)
         curse = target->GetAura(Id(SwpSpells::SPELL_CURSE_OF_BOUNDLESS_AGONY_SEC));
@@ -254,11 +330,11 @@ float KalecgosSuppressAssistTankPullThreatMultiplier::GetValueInEncounter(Action
     if (!PlayerbotAI::IsAssistTank(bot))
         return 1.0f;
 
-    auto const stateItr = kalecgosEncounterStates.find(bot->GetInstanceId());
-    if (stateItr == kalecgosEncounterStates.end() || !stateItr->second.encounterStartMs)
+    KalecgosEncounterState const* state = FindKalecgosState(bot->GetInstanceId());
+    if (!state || !state->encounterStartMs)
         return 1.0f;
 
-    return getMSTimeDiff(stateItr->second.encounterStartMs, getMSTime()) <
+    return getMSTimeDiff(state->encounterStartMs, getMSTime()) <
         KALECGOS_PULL_THREAT_SUPPRESSION_MS ? 0.0f : 1.0f;
 }
 
@@ -394,9 +470,8 @@ float FelmystWaitForLandingDpsMultiplier::GetValueInEncounter(Action* action)
     if (PlayerbotAI::IsMainTank(bot))
         return 1.0f;
 
-    auto const stateItr = felmystEncounterStates.find(felmyst->GetInstanceId());
-    return stateItr != felmystEncounterStates.end() &&
-        stateItr->second.landingDpsWaitStartMs ? 0.0f : 1.0f;
+    FelmystEncounterState const* state = FindFelmystState(felmyst->GetInstanceId());
+    return state && state->landingDpsWaitStartMs ? 0.0f : 1.0f;
 }
 
 float FelmystPrioritizeEncapsulateAvoidanceMultiplier::GetValueInEncounter(Action* action)
@@ -540,11 +615,12 @@ float EredarTwinsHoldDpsAtStartMultiplier::GetValueInEncounter(Action* action)
     if (!AI_VALUE2(Unit*, "find target", "lady sacrolash"))
         return 1.0f;
 
-    auto const it = eredarTwinsDpsHoldStartMs.find(bot->GetInstanceId());
-    if (it == eredarTwinsDpsHoldStartMs.end())
+    EredarTwinsEncounterState const* state = FindEredarTwinsState(bot->GetInstanceId());
+    if (!state || !state->dpsHoldStartMs)
         return 0.0f;
 
-    return getMSTimeDiff(it->second, getMSTime()) < EREDAR_TWINS_DPS_HOLD_MS ? 0.0f : 1.0f;
+    return getMSTimeDiff(*state->dpsHoldStartMs, getMSTime()) <
+        EREDAR_TWINS_DPS_HOLD_MS ? 0.0f : 1.0f;
 }
 
 float EredarTwinsControlThreatMultiplier::GetValueInEncounter(Action* action)

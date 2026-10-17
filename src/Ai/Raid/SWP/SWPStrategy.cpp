@@ -18,7 +18,7 @@ using namespace EncounterHelpers;
 
 void RaidSwpStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    // General
+    // Shared
     triggers.push_back(new TriggerNode("sunwell no encounter in progress",
         { NextAction("sunwell reset encounter states", ACTION_EMERGENCY + 10) }));
 
@@ -196,7 +196,7 @@ void RaidSwpStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
     // Kil'jaeden <The Deceiver>
     triggers.push_back(new TriggerNode("kil'jaeden should coordinate orb use",
-        { NextAction("kil'jaeden announce dragon orb user", ACTION_RAID) }));
+        { NextAction("kil'jaeden announce dragon orb user", ACTION_RAID - 1) }));
 
     triggers.push_back(new TriggerNode("kil'jaeden hands of the deceiver are active",
         { NextAction("kil'jaeden control hands of the deceiver", ACTION_EMERGENCY),
@@ -230,8 +230,8 @@ void RaidSwpStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 
 void RaidSwpStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
-    // General
-    // multipliers.push_back(new SunwellNoEncounterDrinkingMultiplier(botAI));
+    // Shared
+    multipliers.push_back(new SunwellNoEncounterDrinkingMultiplier(botAI));
 
     // Trash
     multipliers.push_back(new VolatileFiendRestrictApproachMultiplier(botAI));

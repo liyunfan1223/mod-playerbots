@@ -10,20 +10,22 @@
 #include "PlayerbotTextMgr.h"
 #include <algorithm>
 #include <map>
+#include <mutex>
 #include <string>
 #include <vector>
 
 namespace SwpHelpers
 {
 
-// Note: Kalecgos's CombatReach is 10.5f, and Sathrovarr's CombatReach is 4.0f
+// Note: Kalecgos's CombatReach is 10.5f, and Sathrovarr's CombatReach is 4.0f (4.5f in PR 28010).
 // Note: Kalecgos remains on player threat lists for the duration of the encounter, even for
 // players in the Spectral Realm and after he turns friendly after Sathrovarr is killed.
 
-std::unordered_map<uint32, KalecgosEncounterState> kalecgosEncounterStates;
-
 namespace
 {
+
+std::mutex kalecgosStateMutex;
+std::unordered_map<uint32, KalecgosEncounterState> kalecgosStates;
 
 void ClearExpiredActiveRift(KalecgosEncounterState& state, uint32 now)
 {
@@ -47,7 +49,7 @@ uint8 GetAssignedGroup(KalecgosEncounterState const& state, ObjectGuid playerGui
 
 KalecgosEncounterState& GetPreparedEncounterState(Player* player)
 {
-    KalecgosEncounterState& state = kalecgosEncounterStates[player->GetInstanceId()];
+    KalecgosEncounterState& state = KalecgosState(player->GetInstanceId());
     if (!state.encounterStartMs)
         state.encounterStartMs = getMSTime();
 
@@ -518,7 +520,7 @@ void EnsureKalecgosRaidAssignments(Player* player)
     if (!group)
         return;
 
-    KalecgosEncounterState& state = kalecgosEncounterStates[player->GetInstanceId()];
+    KalecgosEncounterState& state = KalecgosState(player->GetInstanceId());
     std::vector<Player*> botMembers;
     std::array<ObjectGuid, KALECGOS_TANK_COUNT> const expectedTankAssignmentGuids =
         GetExpectedTankAssignmentGuids(player);
@@ -625,11 +627,11 @@ Player* FindKalecgosDesignatedTank(Player* player)
     if (!group)
         return nullptr;
 
-    auto const stateItr = kalecgosEncounterStates.find(player->GetInstanceId());
-    if (stateItr == kalecgosEncounterStates.end())
+    KalecgosEncounterState* state = FindKalecgosState(player->GetInstanceId());
+    if (!state)
         return nullptr;
 
-    return ResolveKalecgosDesignatedTank(player, group, stateItr->second);
+    return ResolveKalecgosDesignatedTank(player, group, *state);
 }
 
 Player* GetKalecgosDesignatedTank(Player* player)
@@ -763,6 +765,27 @@ void RecordSpectralRealmEnter(Player* player)
                 replacementTank ? replacementTank->GetGUID() : ObjectGuid::Empty;
         }
     }
+}
+
+// Shared encounter state
+
+KalecgosEncounterState& KalecgosState(uint32 instanceId)
+{
+    std::lock_guard lock(kalecgosStateMutex);
+    return kalecgosStates[instanceId];
+}
+
+KalecgosEncounterState* FindKalecgosState(uint32 instanceId)
+{
+    std::lock_guard lock(kalecgosStateMutex);
+    auto it = kalecgosStates.find(instanceId);
+    return it != kalecgosStates.end() ? &it->second : nullptr;
+}
+
+bool KalecgosResetInstance(uint32 instanceId)
+{
+    std::lock_guard lock(kalecgosStateMutex);
+    return kalecgosStates.erase(instanceId) > 0;
 }
 
 }

@@ -84,10 +84,10 @@ bool MisdirectTargetToTank(PlayerbotAI* botAI, Unit* target, Player* tank)
     if (!target || !tank)
         return false;
 
-    if (botAI->CanCastSpell(Id(SwpSpells::SPELL_MISDIRECTION_CAST), tank))
-        return botAI->CastSpell(Id(SwpSpells::SPELL_MISDIRECTION_CAST), tank);
+    if (botAI->CanCastSpell(Id(SwpSpells::SPELL_MISDIRECTION), tank))
+        return botAI->CastSpell(Id(SwpSpells::SPELL_MISDIRECTION), tank);
 
-    if (!botAI->GetBot()->HasAura(Id(SwpSpells::SPELL_MISDIRECTION)))
+    if (!botAI->GetBot()->HasAura(Id(SwpSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", target) && botAI->CastSpell("steady shot", target);

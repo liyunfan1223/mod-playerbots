@@ -514,7 +514,7 @@ bool FelmystManageLandingDpsTimerAction::Execute(Event /*event*/)
         return false;
 
     uint32 const instanceId = felmyst->GetInstanceId();
-    auto& state = felmystEncounterStates[instanceId];
+    auto& state = FelmystState(instanceId);
 
     auto const clearTimers = [&state]
     {

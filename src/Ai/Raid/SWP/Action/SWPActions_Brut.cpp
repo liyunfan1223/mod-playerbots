@@ -219,7 +219,7 @@ bool BrutallusPositionRangedInTwoGroupsAction::Execute(Event /*event*/)
     if (!TryGetBrutallusAssignedPositionIndex(bot, rangedIndex))
         return false;
 
-    auto& burnStates = brutallusEncounterStates[bot->GetInstanceId()].rangedBurnStates;
+    auto& burnStates = BrutallusState(bot->GetInstanceId()).rangedBurnStates;
 
     auto const burnStateItr = burnStates.find(guid);
     BrutallusRangedBurnState burnState = BrutallusRangedBurnState::None;
@@ -357,7 +357,7 @@ bool BrutallusIsolateBurnAction::Execute(Event /*event*/)
     if (!TryGetBrutallusAssignedPositionIndex(bot, rangedIndex))
         return false;
 
-    auto& burnStates = brutallusEncounterStates[bot->GetInstanceId()].rangedBurnStates;
+    auto& burnStates = BrutallusState(bot->GetInstanceId()).rangedBurnStates;
 
     auto const burnStateItr = burnStates.find(guid);
     BrutallusRangedBurnState burnState = BrutallusRangedBurnState::None;

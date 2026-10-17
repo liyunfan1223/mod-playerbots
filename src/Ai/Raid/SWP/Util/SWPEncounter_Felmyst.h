@@ -96,44 +96,25 @@ struct FogSafeThreshold
     bool safeSideIsNorth;  // true = safe side has higher X (north), false = lower X (south)
 };
 
-struct FelmystEncounterState
-{
-    IncomingEncapsulateState incomingEncapsulate;
-    bool encapsulateOccurredThisGroundPhase = false;
-    std::unordered_map<ObjectGuid, uint8> demonicVaporRegionIndices;
-    uint8 demonicVaporUsedRegionMask = 0;
-    uint8 demonicVaporFirstRegionIndex = 0;
-    FogOfCorruptionState fogOfCorruption;
-    FogPassState fogPass;
-    uint32 landingDpsWaitStartMs = 0;
-    uint32 landingTouchdownMs = 0;
-    ObjectGuid flightLeaderGuid = ObjectGuid::Empty;
-};
-
-extern std::unordered_map<uint32, FelmystEncounterState> felmystEncounterStates;
-
-// What the "felmyst demonic vapors" value stores. Only which vapors exist is cached, not where
-// they are.
 struct FelmystDemonicVaporGuids
 {
-    GuidVector heads; // Each chases the player who summoned it
+    GuidVector heads;
     GuidVector trails;
 };
 
-// For the "felmyst demonic vapors" value.
 inline constexpr uint32 DEMONIC_VAPOR_CACHE_INTERVAL_MS = 200;
 inline constexpr float DEMONIC_VAPOR_SEARCH_RADIUS = 100.0f;
-// A head is taken as its summoner's only within this of them, edge to edge.
+// A head is treated as its summoner's only within this distance of them, edge to edge.
 inline constexpr float DEMONIC_VAPOR_SUMMONER_RADIUS = 50.0f;
 
 // How close to the center of a ground stack a bot stops, center to center.
 inline constexpr float FELMYST_RANGED_GROUP_RADIUS = 2.0f;
-// Bots wait 300ms to react to Encapsulate (to make the action look less artificial).
+// Bots wait this long to react to Encapsulate (to make the action look less artificial).
 inline constexpr uint32 ENCAPSULATE_DELAY_MS = 300;
 // How close ranged have to be to a player charmed by Fog to attack.
 inline constexpr float FELMYST_CHARMED_TARGET_RANGE = 30.0f;
 // How long after landing following a flight phase does the raid keeps holding DPS.
-inline constexpr uint32 FELMYST_GROUNDED_DPS_WAIT_MS = 3000;
+inline constexpr uint32 FELMYST_GROUNDED_DPS_WAIT_MS = 3 * IN_MILLISECONDS;
 // How close Felmyst must be to a specified position to be considered there.
 inline constexpr float FELMYST_LOCATION_MATCH_DISTANCE = 2.0f;
 // How far a fog destination must be from any vapor. Vapor has a 3y radius and no real buffer is
@@ -236,7 +217,6 @@ FelmystGroundStack GetClosestFelmystGroundStack(Player* bot, Unit* felmyst, Unit
 float GetFelmystFrontAngle(Player* bot, Unit* felmyst);
 bool TryGetFelmystRangedPosition(Player* bot, Unit* felmyst, Position& position);
 FelmystDemonicVaporGuids FindFelmystDemonicVaporGuids(Player* bot);
-// The head summoned by summoner, from bot's "felmyst demonic vapors" value.
 Creature* GetFelmystDemonicVaporSummonedBy(Player* bot, Player* summoner);
 bool IsFelmystDemonicVaporHeadNearBot(Player* bot);
 std::vector<Creature*> GetDemonicVaporHazards(Player* bot);
@@ -260,6 +240,26 @@ bool DidEncapsulateOccurThisGroundPhase(Player* bot);
 Player* GetFelmystGasNovaDispelTarget(Player* bot);
 Player* GetFelmystCharmedTarget(Player* bot, Unit* felmyst);
 Player* GetFelmystFlightLeader(Player* player);
+
+// Shared encounter state
+
+struct FelmystEncounterState
+{
+    IncomingEncapsulateState incomingEncapsulate;
+    bool encapsulateOccurredThisGroundPhase = false;
+    std::unordered_map<ObjectGuid, uint8> demonicVaporRegionIndices;
+    uint8 demonicVaporUsedRegionMask = 0;
+    uint8 demonicVaporFirstRegionIndex = 0;
+    FogOfCorruptionState fogOfCorruption;
+    FogPassState fogPass;
+    uint32 landingDpsWaitStartMs = 0;
+    uint32 landingTouchdownMs = 0;
+    ObjectGuid flightLeaderGuid = ObjectGuid::Empty;
+};
+
+FelmystEncounterState& FelmystState(uint32 instanceId);
+FelmystEncounterState* FindFelmystState(uint32 instanceId);
+bool FelmystResetInstance(uint32 instanceId);
 
 }
 

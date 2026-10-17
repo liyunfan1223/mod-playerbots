@@ -25,12 +25,12 @@ using namespace EncounterHelpers;
 bool KiljaedenAnnounceDragonOrbUserAction::Execute(Event /*event*/)
 {
     uint32 const instanceId = bot->GetInstanceId();
-    auto const stateItr = kiljaedenEncounterStates.find(instanceId);
+    /* KiljaedenEncounterState const* state = FindKiljaedenState(instanceId);
 
-    if (stateItr != kiljaedenEncounterStates.end() && stateItr->second.dragonOrbAnnouncementMs)
-        return false;
+    if (state && state->dragonOrbAnnouncementMs)
+        return false; */
 
-    kiljaedenEncounterStates[instanceId].dragonOrbAnnouncementMs = getMSTime();
+    KiljaedenState(instanceId).dragonOrbAnnouncementMs = getMSTime();
 
     Player* orbUser = GetKiljaedenDragonOrbUser(bot);
     std::string text;
@@ -322,12 +322,9 @@ bool KiljaedenPositionMeleeAndAvoidArmageddonsAction::TryAdjustMeleeForArmageddo
     Position& position)
 {
     PruneExpiredKiljaedenArmageddons(bot->GetInstanceId());
-    auto armageddonItr = kiljaedenEncounterStates.find(bot->GetInstanceId());
-    if (armageddonItr == kiljaedenEncounterStates.end() ||
-        armageddonItr->second.armageddons.empty())
-    {
+    KiljaedenEncounterState const* state = FindKiljaedenState(bot->GetInstanceId());
+    if (!state || state->armageddons.empty())
         return true;
-    }
 
     Unit* kiljaeden = AI_VALUE2(Unit*, "find target", "kil'jaeden");
     if (!kiljaeden || IsKiljaedenCastingDarknessOfAThousandSouls(kiljaeden) ||
@@ -344,7 +341,7 @@ bool KiljaedenPositionMeleeAndAvoidArmageddonsAction::TryAdjustMeleeForArmageddo
 
     auto const isSafePosition = [&](Position const& pos)
     {
-        for (KiljaedenArmageddon const& armageddon : armageddonItr->second.armageddons)
+        for (KiljaedenArmageddon const& armageddon : state->armageddons)
         {
             if (pos.GetExactDist2d(
                     armageddon.destination.GetPositionX(),
@@ -399,12 +396,12 @@ bool KiljaedenPositionRangedAndAvoidArmageddonsAction::TryGetRangedPosition(Posi
 {
     EnsureKiljaedenRangedAssignments(bot);
 
-    auto const instanceItr = kiljaedenEncounterStates.find(bot->GetInstanceId());
-    if (instanceItr == kiljaedenEncounterStates.end())
+    KiljaedenEncounterState const* state = FindKiljaedenState(bot->GetInstanceId());
+    if (!state)
         return false;
 
-    auto const assignmentItr = instanceItr->second.rangedAssignments.find(bot->GetGUID());
-    if (assignmentItr == instanceItr->second.rangedAssignments.end())
+    auto const assignmentItr = state->rangedAssignments.find(bot->GetGUID());
+    if (assignmentItr == state->rangedAssignments.end())
         return false;
 
     return TryGetKiljaedenRangedSlotPosition(assignmentItr->second, position);
@@ -413,15 +410,12 @@ bool KiljaedenPositionRangedAndAvoidArmageddonsAction::TryGetRangedPosition(Posi
 bool KiljaedenPositionRangedAndAvoidArmageddonsAction::TryAdjustRangedForArmageddon(Position& position)
 {
     EnsureKiljaedenRangedArmageddonAssignments(bot);
-    auto const armageddonAssignmentItr =
-        kiljaedenEncounterStates.find(bot->GetInstanceId());
-
-    if (armageddonAssignmentItr == kiljaedenEncounterStates.end())
+    KiljaedenEncounterState const* state = FindKiljaedenState(bot->GetInstanceId());
+    if (!state)
         return true;
 
-    auto const tempAssignmentItr =
-        armageddonAssignmentItr->second.rangedArmageddonAssignments.find(bot->GetGUID());
-    if (tempAssignmentItr == armageddonAssignmentItr->second.rangedArmageddonAssignments.end())
+    auto const tempAssignmentItr = state->rangedArmageddonAssignments.find(bot->GetGUID());
+    if (tempAssignmentItr == state->rangedArmageddonAssignments.end())
         return true;
 
     return TryGetKiljaedenRangedSlotPosition(tempAssignmentItr->second, position);
@@ -525,7 +519,7 @@ bool KiljaedenUseDragonOrbAction::Execute(Event /*event*/)
     if (closestOrb->IsAtInteractDistance(*bot, closestOrb->GetInteractionDistance()))
     {
         closestOrb->Use(bot);
-        kiljaedenDragonOrbUseTimes[bot->GetGUID().GetCounter()] = getMSTime();
+        KiljaedenState(bot->GetInstanceId()).dragonOrbUsers.insert(bot->GetGUID());
         return true;
     }
 

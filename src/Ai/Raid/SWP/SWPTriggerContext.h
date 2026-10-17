@@ -15,7 +15,7 @@ class RaidSwpTriggerContext : public NamedObjectContext<Trigger>
 public:
     RaidSwpTriggerContext()
     {
-        // General
+        // Shared
         creators["sunwell no encounter in progress"] =
             &RaidSwpTriggerContext::sunwell_no_encounter_in_progress;
 
@@ -219,7 +219,7 @@ public:
     }
 
 private:
-    // General
+    // Shared
     static Trigger* sunwell_no_encounter_in_progress(PlayerbotAI* botAI)
     {
         return new SunwellNoEncounterInProgressTrigger(botAI);

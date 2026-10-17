@@ -19,7 +19,7 @@
 using namespace SwpHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool SunwellNoEncounterInProgressTrigger::IsActive()
 {
@@ -261,9 +261,8 @@ bool FelmystGroundPhaseShouldBeTankedTrigger::IsActiveInEncounter()
 
     if (felmyst->IsFlying())
     {
-        auto const stateItr = felmystEncounterStates.find(bot->GetInstanceId());
-        if (stateItr != felmystEncounterStates.end())
-            stateItr->second.encapsulateOccurredThisGroundPhase = false;
+        if (FelmystEncounterState* state = FindFelmystState(bot->GetInstanceId()))
+            state->encapsulateOccurredThisGroundPhase = false;
 
         return false;
     }
@@ -282,9 +281,8 @@ bool FelmystRangedShouldPositionToDispelAndFleeTrigger::IsActiveInEncounter()
 
     if (felmyst->IsFlying())
     {
-        auto const stateItr = felmystEncounterStates.find(bot->GetInstanceId());
-        if (stateItr != felmystEncounterStates.end())
-            stateItr->second.encapsulateOccurredThisGroundPhase = false;
+        if (FelmystEncounterState* state = FindFelmystState(bot->GetInstanceId()))
+            state->encapsulateOccurredThisGroundPhase = false;
 
         return false;
     }
@@ -314,9 +312,8 @@ bool FelmystMeleeShouldStayTogetherTrigger::IsActiveInEncounter()
 
     if (felmyst->IsFlying())
     {
-        auto const stateItr = felmystEncounterStates.find(bot->GetInstanceId());
-        if (stateItr != felmystEncounterStates.end())
-            stateItr->second.encapsulateOccurredThisGroundPhase = false;
+        if (FelmystEncounterState* state = FindFelmystState(bot->GetInstanceId()))
+            state->encapsulateOccurredThisGroundPhase = false;
 
         return false;
     }
@@ -410,10 +407,7 @@ bool FelmystMeleeCannotReachFlyingBossTrigger::IsActiveInEncounter()
         return false;
 
     Unit* felmyst = AI_VALUE2(Unit*, "find target", "felmyst");
-    if (!felmyst)
-        return false;
-
-    if (AI_VALUE(Unit*, "current target") != felmyst)
+    if (!felmyst || AI_VALUE(Unit*, "current target") != felmyst)
         return false;
 
     return IsFelmystAirPhaseTargetSuppressed(felmyst);
@@ -425,10 +419,7 @@ bool FelmystPlayerIsCharmedByFogTrigger::IsActiveInEncounter()
         return false;
 
     Unit* felmyst = AI_VALUE2(Unit*, "find target", "felmyst");
-    if (!felmyst)
-        return false;
-
-    return GetFelmystCharmedTarget(bot, felmyst);
+    return felmyst && GetFelmystCharmedTarget(bot, felmyst);
 }
 
 bool FelmystShouldHoldDpsWhileLandingTrigger::IsActiveInEncounter()
@@ -454,8 +445,8 @@ bool EredarTwinsShouldAnnounceAlythessTankTrigger::IsActiveInEncounter()
     if (!IsMechanicTrackerBot(bot, SWP_MAP_ID))
         return false;
 
-    auto const itr = eredarTwinsTankAssignments.find(bot->GetInstanceId());
-    if (itr != eredarTwinsTankAssignments.end() && itr->second.announcementMs)
+    EredarTwinsEncounterState const* state = FindEredarTwinsState(bot->GetInstanceId());
+    if (state && state->tankAssignment && state->tankAssignment->announcementMs)
         return false;
 
     return AI_VALUE2(Unit*, "find target", "grand warlock alythess") ||
@@ -660,7 +651,7 @@ bool MuruDarknessIsComingTrigger::IsActiveInEncounter()
 
 bool MuruBerserkerHasFlurryTrigger::IsActiveInEncounter()
 {
-    // No stuns and can't be a Tauren. Too bad.
+    // These classes have no stuns and can't be Tauren.
     if (bot->getClass() == CLASS_MAGE || bot->getClass() == CLASS_PRIEST ||
         bot->getClass() == CLASS_WARLOCK)
     {
@@ -675,7 +666,7 @@ bool MuruBerserkerHasFlurryTrigger::IsActiveInEncounter()
 
 bool MuruFuryMageCastingFelFireballTrigger::IsActiveInEncounter()
 {
-    // Do Druids have no interrupts...?
+    // Druids are seriously the only class with no interrupts?
     if (bot->getClass() == CLASS_DRUID)
         return false;
 
@@ -750,8 +741,11 @@ bool KiljaedenShouldCoordinateOrbUseTrigger::IsActiveInEncounter()
     if (!IsMechanicTrackerBot(bot, SWP_MAP_ID))
         return false;
 
-    auto const stateItr = kiljaedenEncounterStates.find(bot->GetInstanceId());
-    if (stateItr != kiljaedenEncounterStates.end() && stateItr->second.dragonOrbAnnouncementMs)
+    KiljaedenEncounterState const* state = FindKiljaedenState(bot->GetInstanceId());
+    if (state && state->dragonOrbAnnouncementMs)
+        return false;
+
+    if (bot->GetExactDist2d(SUNWELL_CENTER_POSITION) < HAND_SEARCH_RADIUS)
         return false;
 
     return AI_VALUE2(Unit*, "find target", "hand of the deceiver");
@@ -759,6 +753,9 @@ bool KiljaedenShouldCoordinateOrbUseTrigger::IsActiveInEncounter()
 
 bool KiljaedenHandsOfTheDeceiverAreActiveTrigger::IsActiveInEncounter()
 {
+    if (bot->GetExactDist2d(SUNWELL_CENTER_POSITION) < HAND_SEARCH_RADIUS)
+        return false;
+
     return AI_VALUE2(Unit*, "find target", "hand of the deceiver");
 }
 
@@ -850,10 +847,7 @@ bool KiljaedenDragonOrbIsActiveTrigger::IsActiveInEncounter()
     if (!kiljaeden || kiljaeden->GetHealthPct() > KILJAEDEN_PHASE3_HP_THRESHOLD)
         return false;
 
-    if (GetKiljaedenDragonOrbUser(bot) != bot)
-        return false;
-
-    if (HasKiljaedenDragonAura(bot))
+    if (GetKiljaedenDragonOrbUser(bot) != bot || HasKiljaedenDragonAura(bot))
         return false;
 
     bool orbInUse = false;

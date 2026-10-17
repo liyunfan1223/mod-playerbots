@@ -15,7 +15,7 @@ class RaidSwpActionContext : public NamedObjectContext<Action>
 public:
     RaidSwpActionContext()
     {
-        // General
+        // Shared
         creators["sunwell reset encounter states"] =
             &RaidSwpActionContext::sunwell_reset_encounter_states;
 
@@ -229,7 +229,7 @@ public:
     }
 
 private:
-    // General
+    // Shared
     static Action* sunwell_reset_encounter_states(PlayerbotAI* botAI)
     {
         return new SunwellResetEncounterStatesAction(botAI);

@@ -39,9 +39,8 @@ bool SunwellResetEncounterStatesAction::Execute(Event /*event*/)
     }
 
     // Brutallus
-    auto const brutallusItr = brutallusEncounterStates.find(instanceId);
-    if (brutallusItr != brutallusEncounterStates.end())
-        reset |= brutallusItr->second.rangedBurnStates.erase(guid) > 0;
+    if (BrutallusEncounterState* brutallusState = FindBrutallusState(instanceId))
+        reset |= brutallusState->rangedBurnStates.erase(guid) > 0;
 
     reset |= ReleaseBrutallusBurnPad(bot);
 
@@ -69,7 +68,8 @@ bool SunwellResetEncounterStatesAction::Execute(Event /*event*/)
     }
 
     // Kil'jaeden
-    reset |= kiljaedenDragonOrbUseTimes.erase(guid.GetCounter()) > 0;
+    if (KiljaedenEncounterState* kiljaedenState = FindKiljaedenState(instanceId))
+        reset |= kiljaedenState->dragonOrbUsers.erase(guid) > 0;
 
     // A drake lost as Kil'jaeden dies leaves its rider stale-rooted after the encounter, when the
     // in-combat release (KiljaedenReleaseStaleRootAction) can no longer run.
@@ -79,21 +79,15 @@ bool SunwellResetEncounterStatesAction::Execute(Event /*event*/)
     if (!IsMechanicTrackerBot(bot, SWP_MAP_ID))
         return reset;
 
-    if (!AI_VALUE2(bool, "combat", "self target"))
-        reset |= ClearTargetIcon(bot, RtiTargetValue::skullIndex);
+    reset |= ClearStrategyTargetIcon(
+        bot, RtiTargetValue::skullIndex, { Id(SwpNpcs::NPC_HAND_OF_THE_DECEIVER) });
 
-    reset |= kalecgosEncounterStates.erase(instanceId) > 0;
-    reset |= brutallusEncounterStates.erase(instanceId) > 0;
-    reset |= felmystEncounterStates.erase(instanceId) > 0;
-    reset |= eredarTwinsIncomingConflagrationStates.erase(instanceId) > 0;
-    reset |= eredarTwinsBlazeTargetStates.erase(instanceId) > 0;
-    reset |= eredarTwinsDpsHoldStartMs.erase(instanceId) > 0;
-    reset |= eredarTwinsTankAssignments.erase(instanceId) > 0;
-    reset |= muruDarknessStates.erase(instanceId) > 0;
-    reset |= muruVoidSentinelTankAssignments.erase(instanceId) > 0;
-    reset |= kiljaedenEncounterStates.erase(instanceId) > 0;
-    reset |= ResetKiljaedenDragonOrbUserAnnouncement(instanceId);
-    reset |= kiljaedenHandControlClaims.erase(instanceId) > 0;
+    reset |= KalecgosResetInstance(instanceId);
+    reset |= BrutallusResetInstance(instanceId);
+    reset |= FelmystResetInstance(instanceId);
+    reset |= EredarTwinsResetInstance(instanceId);
+    reset |= MuruResetInstance(instanceId);
+    reset |= KiljaedenResetInstance(instanceId);
 
     return reset;
 }
