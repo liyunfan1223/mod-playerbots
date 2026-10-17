@@ -15,6 +15,12 @@
 #include "SpellMgr.h"
 #include "Util.h"
 
+namespace
+{
+// The magic schools resistance is counted for: fire, nature, frost, shadow and arcane
+constexpr uint32 MAGIC_RESISTANCE_SCHOOLS = MAX_SPELL_SCHOOL - SPELL_SCHOOL_FIRE;
+}
+
 StatsCollector::StatsCollector(CollectorType type, int32 cls, int32 lvl) : type_(type), cls_(cls), lvl_(lvl)
 {
     Reset();
@@ -662,7 +668,7 @@ void StatsCollector::CollectMagicResistance(uint32 schoolMask, float val)
             ++schools;
     }
 
-    stats[STATS_TYPE_RESISTANCE] += val * schools / 5;
+    stats[STATS_TYPE_RESISTANCE] += val * schools / MAGIC_RESISTANCE_SCHOOLS;
 }
 
 void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, float multiplier, bool canNextTrigger,

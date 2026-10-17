@@ -33,6 +33,13 @@ constexpr uint32 SPELL_POLEAXE_SPECIALIZATION = 12785;
 constexpr uint32 SPELL_NERVES_OF_COLD_STEEL = 50138;
 constexpr uint32 SPELL_SHADOW_FOCUS = 15835;
 constexpr uint32 SPELL_ARCANE_FOCUS = 12840;
+
+// Threat reduction per percent and magic resistance per point, by role
+constexpr float HEALER_THREAT_REDUCTION_WEIGHT = 2.0f;
+constexpr float HEALER_RESISTANCE_WEIGHT = 1.0f;
+constexpr float CASTER_THREAT_REDUCTION_WEIGHT = 4.0f;
+constexpr float CASTER_RESISTANCE_WEIGHT = 0.5f;
+constexpr float TANK_THREAT_REDUCTION_WEIGHT = -4.0f;
 }
 
 template <size_t Size>
@@ -553,16 +560,16 @@ void StatsWeightCalculator::GenerateAdditionalWeights(Player* player)
     // tanks want more threat (Enchant Gloves - Threat). Melee and hunters weigh neither.
     if (healSpec_)
     {
-        stats_weights_[STATS_TYPE_THREAT_REDUCTION] += 2.0f;
-        stats_weights_[STATS_TYPE_RESISTANCE] += 1.0f;
+        stats_weights_[STATS_TYPE_THREAT_REDUCTION] += HEALER_THREAT_REDUCTION_WEIGHT;
+        stats_weights_[STATS_TYPE_RESISTANCE] += HEALER_RESISTANCE_WEIGHT;
     }
     else if (casterSpec_)
     {
-        stats_weights_[STATS_TYPE_THREAT_REDUCTION] += 4.0f;
-        stats_weights_[STATS_TYPE_RESISTANCE] += 0.5f;
+        stats_weights_[STATS_TYPE_THREAT_REDUCTION] += CASTER_THREAT_REDUCTION_WEIGHT;
+        stats_weights_[STATS_TYPE_RESISTANCE] += CASTER_RESISTANCE_WEIGHT;
     }
     else if (type_ == CollectorType::MELEE_TANK)
-        stats_weights_[STATS_TYPE_THREAT_REDUCTION] -= 4.0f;
+        stats_weights_[STATS_TYPE_THREAT_REDUCTION] += TANK_THREAT_REDUCTION_WEIGHT;
 
     if (pvpSpec_ && !exclude_resilience_)
         stats_weights_[STATS_TYPE_RESILIENCE] += 7.0f;
