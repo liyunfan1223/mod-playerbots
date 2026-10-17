@@ -57,6 +57,7 @@ protected:
 
     /* STUCK / UNUSABLE AREA RECOVERY */
     WorldPosition FindRecoveryAnchor();
+    bool IsStrandedInOpenWater();
     bool RecoverToRpgArea();
 
 protected:
@@ -83,7 +84,6 @@ protected:
     // A same-zone anchor closer than this means the bot is already in a serviced area
     // (city, quest hub) whose level cache has no entries: recovering would only bounce it
     // to a point at its feet.
-    const float recoverySameZoneDistance = 500.0f;
 };
 
 #endif

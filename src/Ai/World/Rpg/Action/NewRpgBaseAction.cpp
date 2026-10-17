@@ -1127,6 +1127,18 @@ WorldPosition NewRpgBaseAction::FindRecoveryAnchor()
     return best;
 }
 
+bool NewRpgBaseAction::IsStrandedInOpenWater()
+{
+    // A diving bot is not stranded; it is pursuing something below the surface. A bot swimming
+    // at the surface with no ground under it was swept out or lost its way.
+    if (!bot->IsInWater() || bot->IsUnderWater())
+        return false;
+
+    float const ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(),
+                                                  bot->GetPositionZ() + bot->GetCollisionHeight(), true, 5.0f);
+    return ground == INVALID_HEIGHT || ground == VMAP_INVALID_HEIGHT_VALUE;
+}
+
 bool NewRpgBaseAction::RecoverToRpgArea()
 {
     // The bot is somewhere RPG progression cannot continue (e.g. swept out into The Great Sea):
@@ -1134,14 +1146,6 @@ bool NewRpgBaseAction::RecoverToRpgArea()
     // the camp status, which brings its own stuck handling.
     WorldPosition anchor = FindRecoveryAnchor();
     if (anchor == WorldPosition())
-        return false;
-
-    // The nearest anchor being in the bot's own zone and nearby means the bot is in a serviced
-    // area (city, quest hub) whose level cache simply has no entries: recovering would only bounce
-    // it to a point at its feet. Cross-zone anchors (The Great Sea -> land) still recover.
-    if (anchor.GetMapId() == bot->GetMapId() && bot->GetExactDist(anchor) < recoverySameZoneDistance &&
-        bot->GetZoneId() == bot->GetMap()->GetZoneId(bot->GetPhaseMask(), anchor.GetPositionX(),
-                                                    anchor.GetPositionY(), anchor.GetPositionZ()))
         return false;
 
     AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(bot->GetZoneId());
@@ -1157,11 +1161,8 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
 {
     // The bot is somewhere RPG progression cannot continue (e.g. swept out into The Great Sea):
     // walk/swim back to the nearest regular anchor instead of idling or resting there.
-    if (SelectRandomGrindPos(bot) == WorldPosition() && SelectRandomCampPos(bot) == WorldPosition())
-    {
-        if (RecoverToRpgArea())
-            return true;
-    }
+    if (sPlayerbotAIConfig.RpgAreaRecovery && IsStrandedInOpenWater() && RecoverToRpgArea())
+        return true;
 
     std::vector<NewRpgStatus> availableStatus;
     uint32 probSum = 0;
