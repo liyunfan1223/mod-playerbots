@@ -222,7 +222,7 @@ private:
     float activityMod = 0.25;
     bool _isBotInitializing = true;
     bool _isBotLogging = true;
-    bool _staticBotCountRolled = false;
+    bool _botCountRolled = false;
     time_t _nextScheduledCountUpdate = 0;
     NewRpgStatistic rpgStasticTotal;
     CachedEvent* FindEvent(uint32 bot, std::string const& event);

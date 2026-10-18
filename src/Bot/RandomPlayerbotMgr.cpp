@@ -305,13 +305,14 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 /*elapsed*/, bool /*minimal*/)
     {
         case 1:
             // Mode 1 (variable): roll a count at server start and re-roll it every RandomBotCountChangeMin/MaxInterval.
-            if (!maxAllowedBotCount || (maxAllowedBotCount < sPlayerbotAIConfig.MinRandomBots ||
-                                        maxAllowedBotCount > sPlayerbotAIConfig.MaxRandomBots))
+            // The start roll is forced, in case there's a stale count from another mode.
+            if (!_botCountRolled || !maxAllowedBotCount)
             {
                 maxAllowedBotCount = urand(sPlayerbotAIConfig.MinRandomBots, sPlayerbotAIConfig.MaxRandomBots);
                 SetEventValue(0, "bot_count", maxAllowedBotCount,
                               urand(sPlayerbotAIConfig.RandomBotCountChangeMinInterval,
                                     sPlayerbotAIConfig.RandomBotCountChangeMaxInterval));
+                _botCountRolled = true;
             }
             break;
         case 2:
@@ -329,11 +330,11 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 /*elapsed*/, bool /*minimal*/)
         }
         default:
             // Mode 0 (static): roll a count once at server start and hold it for the whole run.
-            if (!_staticBotCountRolled)
+            if (!_botCountRolled)
             {
                 maxAllowedBotCount = urand(sPlayerbotAIConfig.MinRandomBots, sPlayerbotAIConfig.MaxRandomBots);
                 SetEventValue(0, "bot_count", maxAllowedBotCount, YEAR);
-                _staticBotCountRolled = true;
+                _botCountRolled = true;
             }
             break;
     }
