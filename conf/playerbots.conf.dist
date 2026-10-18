@@ -1733,7 +1733,8 @@ Playerbots.FastReactInBG = 1
 # PVP FLAG INTERACTION REACTION DELAY
 #
 # Random delay, in milliseconds, between reaching interaction range and using a battleground
-# flag or capture point. This applies to flag pickup/turn-in and capturable battleground objects.
+# flag or capture point. This applies to flag pickup/return and capturable battleground objects.
+# WSG flag carriers enter the capture area and turn in immediately, without this delay.
 # Set both values to 0 to disable the artificial delay. If Max is lower than Min, the values
 # are swapped automatically when the configuration is loaded.
 Playerbots.PvpFlagInteractionDelayMin = 1000

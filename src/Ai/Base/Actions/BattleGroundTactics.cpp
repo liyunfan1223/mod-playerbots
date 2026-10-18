@@ -24,6 +24,7 @@
 #include "Event.h"
 #include "GameObject.h"
 #include "IVMapMgr.h"
+#include "ObjectMgr.h"
 #include "PathGenerator.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
@@ -3826,6 +3827,26 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG)))
             continue;
 
+        if (isWsBaseFlag)
+        {
+            uint32 const triggerId =
+                bot->GetTeamId() == TEAM_HORDE ? BG_WS_TRIGGER_HORDE_FLAG_SPAWN : BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN;
+            AreaTrigger const* captureArea = sObjectMgr->GetAreaTrigger(triggerId);
+            if (!captureArea)
+                continue;
+
+            ResetFlagInteractionDelay();
+
+            // Flag interaction range can extend beyond the server's capture area.
+            if (!bot->IsInAreaTriggerRadius(captureArea))
+                return MoveTo(captureArea->map, captureArea->x, captureArea->y, captureArea->z);
+
+            WorldPacket data(CMSG_AREATRIGGER);
+            data << triggerId;
+            bot->GetSession()->HandleAreaTriggerOpcode(data);
+            return true;
+        }
+
         if (dist < INTERACTION_DISTANCE && ShouldDelayFlagInteraction(go))
             return true;
 
@@ -3869,24 +3890,6 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             {
                 if (dist < INTERACTION_DISTANCE)
                 {
-                    // Handle flag capture at base
-                    if (isWsBaseFlag)
-                    {
-                        if (bot->GetTeamId() == TEAM_HORDE)
-                        {
-                            WorldPacket data(CMSG_AREATRIGGER);
-                            data << uint32(BG_WS_TRIGGER_HORDE_FLAG_SPAWN);
-                            bot->GetSession()->HandleAreaTriggerOpcode(data);
-                        }
-                        else
-                        {
-                            WorldPacket data(CMSG_AREATRIGGER);
-                            data << uint32(BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN);
-                            bot->GetSession()->HandleAreaTriggerOpcode(data);
-                        }
-                        return true;
-                    }
-
                     // Dismount before picking up flag
                     if (bot->IsMounted())
                         bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
