@@ -74,8 +74,7 @@ bool IronAssemblyInterruptTrigger::IsActive()
     if (!brundir)
         return false;
 
-    // Which cast is up and who owes it are one decision, made in the encounter helper so the trigger
-    // and the action cannot end up describing different elections.
+    // Which cast is up and who owes it are one decision, made in the encounter helper.
     return IronAssemblyInterruptDuty(botAI, bot, brundir) != nullptr;
 }
 

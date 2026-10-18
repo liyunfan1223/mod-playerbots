@@ -1303,7 +1303,7 @@ Position const& GetMimironPhase1StackAnchor(PlayerbotAI* botAI, Player* bot)
     MimironFightState& state = MimironFightStateFor(bot);
 
     // Gathering the field costs a scan of every nearby npc, and twenty-five bots ask for this every
-    // tick, so the answer is folded on the same interval the observability pass uses.
+    // tick, so the answer is folded on the encounter's scan interval.
     if (state.stackScanMs &&
         GetMSTimeDiffToNow(state.stackScanMs) < ULDUAR_MIMIRON_SCAN_INTERVAL_MS)
         return ULDUAR_MIMIRON_PHASE1_STACK_SPOTS[state.stackAnchor];
@@ -1564,7 +1564,7 @@ std::vector<ObjectGuid> GetMimironKeptFireBots(PlayerbotAI* botAI, Player* bot)
         return {};
 
     // A grid scan, since "possible targets" is per bot and the kept pair has to be the same for
-    // everyone. Folded on the observability interval, like the stack anchor.
+    // everyone. Folded on the scan interval, like the stack anchor.
     MimironFightState& state = MimironFightStateFor(bot);
     if (!state.fireBotScanMs ||
         GetMSTimeDiffToNow(state.fireBotScanMs) >= ULDUAR_MIMIRON_SCAN_INTERVAL_MS)
@@ -1977,7 +1977,7 @@ float GetMimironWedgeCentreline(PlayerbotAI* botAI, Player* bot)
 }
 
 // Phase 4 Firefighter tank spot: the fixed one until fire gathers, then the ring point with least fire.
-// Raid-wide on the observability interval, since trigger, action and formation guard must agree.
+// Raid-wide on the scan interval, since trigger, action and formation guard must agree.
 Position GetMimironPhase4TankSpot(PlayerbotAI* botAI, Player* bot)
 {
     MimironFightState& state = MimironFightStateFor(bot);

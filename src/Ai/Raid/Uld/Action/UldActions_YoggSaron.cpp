@@ -870,14 +870,10 @@ Unit* YoggSaronSetDpsPriorityAction::ResolveTarget(Unit* currentTarget)
                               target->GetEntry() == NPC_GUARDIAN_OF_YS &&
                               currentTarget->GetEntry() == NPC_GUARDIAN_OF_YS &&
                               YoggSaronLowGuardianTakesOver(target, currentTarget);
-        if (comeBack)
-        {
-        }
-        else if (currentTier < desiredTier || !target || IsYoggSaronFocusedGuardian(currentTarget) ||
-                 target->GetExactDist2d(bot) + targetSwitchDistance >= currentTarget->GetExactDist2d(bot))
-        {
+        if (!comeBack &&
+            (currentTier < desiredTier || !target || IsYoggSaronFocusedGuardian(currentTarget) ||
+             target->GetExactDist2d(bot) + targetSwitchDistance >= currentTarget->GetExactDist2d(bot)))
             target = currentTarget;
-        }
     }
 
     if (target)
@@ -1969,13 +1965,8 @@ bool YoggSaronGuardianControlAction::ControlPhaseOne()
                       false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
 
     if (Unit* guardian = YoggSaronPhase1TauntTarget(botAI))
-    {
-        // Whether the Guardian being fetched is still somewhere its death would pay for the phase,
-        // which is the one thing worth knowing about a taunt here after the fact.
-
         if (Taunt(guardian))
             return true;
-    }
 
     // Nothing to fetch, or the taunt is on cooldown: hold the pile. A taunt that does not go out leaves the bot
     // selected on a stale aim and nothing else replaces it, so the tank never swings.

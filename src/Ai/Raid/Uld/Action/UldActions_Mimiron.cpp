@@ -226,6 +226,8 @@ bool MimironFleeAction::FleeFan(Position const& from, Unit* fallbackFrom, float 
                   false, priority);
 }
 
+// Last resort once every bearing off the MK II is refused, e.g. where straight away points off the mesh.
+// Runs to the bot's slot, screened like any destination, or the room centre when that's inside the circle.
 bool MimironShockBlastAction::FleeShockToAnchor()
 {
     Position anchor;
