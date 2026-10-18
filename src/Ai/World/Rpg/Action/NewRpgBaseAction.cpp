@@ -551,7 +551,9 @@ uint32 NewRpgBaseAction::BestRewardIndex(Quest const* quest)
             {
                 uint32 const itemId = quest->RewardChoiceItemId[i];
                 ItemTemplate const* rewardProto = sObjectMgr->GetItemTemplate(itemId);
-                uint8 const rewardSlot = rewardProto ? botAI->FindEquipSlot(rewardProto, NULL_SLOT, true) : NULL_SLOT;
+                uint8 rewardSlot = NULL_SLOT;
+                if (rewardProto)
+                    rewardSlot = botAI->FindEquipSlot(rewardProto, NULL_SLOT, true);
                 float score = calc.CalculateItem(itemId, 0, rewardSlot);
                 if (score > bestScore)
                 {
