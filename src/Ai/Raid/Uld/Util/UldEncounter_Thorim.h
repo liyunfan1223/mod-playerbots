@@ -361,6 +361,9 @@ struct ThorimEncounterState
     ObjectGuid frostAuraPaladin{};
     uint32 frostAuraScanMs = 0;
 
+    // Latched on the first Sif Blizzard of the pull. She only fights in hard mode.
+    bool sifJoined{};
+
     // Which half of the raid each member belongs to, struck once and then left alone. Recomputing it
     // per tick would let a role predicate flipping mid-fight walk the arena squad into the corridor.
     std::unordered_map<ObjectGuid, uint8> squads{};

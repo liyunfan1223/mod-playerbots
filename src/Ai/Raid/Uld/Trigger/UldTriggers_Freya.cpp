@@ -11,7 +11,6 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "UldEncounter_Freya.h"
-#include "UldHardMode.h"
 #include "UldScripts.h"
 #include "EncounterHelpers.h"
 #include "ScriptedCreature.h"
@@ -112,9 +111,6 @@ bool FreyaMoveToHealingSporeTrigger::IsActive()
 
 bool FreyaBreakIronRootsTrigger::IsActive()
 {
-    if (!IsFreyaHardModeActive(botAI))
-        return false;
-
     // Trapped by either the Ironbranch or the Freya-cast Iron Roots (each leaves its own DoT), and both
     // ids of each: HasAura takes the exact spell, and a 25-man raid only ever applies the 25-man half.
     return bot->HasAura(SPELL_IRON_ROOTS_DAMAGE_10) || bot->HasAura(SPELL_IRON_ROOTS_DAMAGE_25) ||
@@ -123,9 +119,6 @@ bool FreyaBreakIronRootsTrigger::IsActive()
 
 bool FreyaDodgeUnstableSunBeamTrigger::IsActive()
 {
-    if (!IsFreyaHardModeActive(botAI))
-        return false;
-
     // Beam stalkers are non-selectable, so walk the stalker scan: nearby npcs, entry tested before the LOS
     // ray. This runs every tick for every bot in Ulduar until Freya dies.
     for (ObjectGuid const& guid : GetFreyaScan(botAI).Stalkers())
@@ -268,9 +261,6 @@ bool FreyaSummonArmyTrigger::IsActive()
 
 bool FreyaGroundTremorHoldCastTrigger::IsActive()
 {
-    if (!IsFreyaHardModeActive(botAI))
-        return false;
-
     // By entry rather than off the target list: this runs for every bot wherever the gate is open, and
     // on trash and in other fights nothing else needs that list built.
     if (!IsFreyaGroundTremorCasting(GetFreyaBossByEntry(botAI)))

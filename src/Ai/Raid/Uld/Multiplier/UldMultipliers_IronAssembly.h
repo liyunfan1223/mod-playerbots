@@ -15,7 +15,8 @@
 class IronAssemblyHoldDpsCooldownsMultiplier : public Multiplier
 {
 public:
-    IronAssemblyHoldDpsCooldownsMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "iron assembly hold dps cooldowns") {}
+    IronAssemblyHoldDpsCooldownsMultiplier(PlayerbotAI* botAI)
+        : Multiplier(botAI, "iron assembly hold dps cooldowns") {}
     float GetValue(Action* action) override;
 };
 

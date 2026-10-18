@@ -282,9 +282,6 @@ public:
     bool ApplyInstanceStrategies;
     bool UlduarVezaxHardMode;
     bool UlduarIronAssemblyHardMode;
-    bool UlduarFlameLeviathanHardMode;
-    bool UlduarThorimHardMode;
-    bool UlduarFreyaHardMode;
     bool UlduarMimironHardMode;
     bool UlduarXT002HardMode;
     uint32 RandomBotMinLevel, RandomBotMaxLevel;

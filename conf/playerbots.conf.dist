@@ -475,13 +475,15 @@ Playerbots.ApplyInstanceStrategies = 1
 
 # Ulduar hard modes.
 #
-# Hard modes are optional harder versions of an Ulduar encounter that the raid opts into (leave the
-# towers standing, keep the Saronite Vapors alive, press Mimiron's button, ...). They are not the
-# 10/25 heroic setting. Bots do not detect them: each option below is the declaration, and while it
-# is on that boss' hard-mode behaviour is armed for the whole encounter, so set it to match what your
-# raid actually does. It still only fires when the mechanic it reacts to is really there, so an
-# option left on for a boss run in normal mode mostly costs nothing - the exceptions are called out
-# per option.
+# Hard modes are optional harder versions of an Ulduar encounter that the raid opts into (keep the
+# Saronite Vapors alive, kill XT-002's Heart, press Mimiron's button, ...). They are not the 10/25
+# heroic setting. The options below cover the hard modes that change the bots' plan before the hard
+# mode shows itself. Bots do not detect those: each option is the declaration, and while it is on that
+# boss' hard-mode behaviour is armed for the whole encounter, so set it to match what your raid
+# actually does. It still only fires when the mechanic it reacts to is really there, so an option left
+# on for a boss run in normal mode mostly costs nothing - the exceptions are called out per option.
+# Flame Leviathan's towers, Freya's Elders, Thorim's Sif and Yogg-Saron's Keepers need no option: bots
+# react to their mechanics whenever they appear.
 
 # Enable Vezax hard-mode behaviour (fight the Saronite Animus). When on, bots leave the Saronite
 # Vapors alive, hold Heroism/Bloodlust for the Animus, and stop damaging Vezax at 15% health (tanks
@@ -497,15 +499,6 @@ Playerbots.UlduarVezaxHardMode = 0
 # Default: 0 (disabled)
 Playerbots.UlduarIronAssemblyHardMode = 0
 
-# Enable Flame Leviathan hard-mode behaviour (towers left standing). Each surviving tower
-# empowers the boss and spawns a periodic ground hazard: Storm -> Thorim's Hammer strikes,
-# Flame -> Mimiron's Inferno fire trail, Frost -> Hodir's Fury. When on, bots pilot their
-# vehicle out of whichever hazard is nearest; with it off they ignore the hazards and play
-# the fight as normal mode. A tower the raid did destroy costs nothing here, since its hazard
-# never spawns. Life tower (adds) needs no special handling.
-# Default: 0 (disabled)
-Playerbots.UlduarFlameLeviathanHardMode = 0
-
 # Enable XT-002 Deconstructor hard-mode behaviour (kill the exposed Heart). At 75%, 50% and 25% XT
 # submerges and exposes his Heart for 30 seconds; killing it full-heals him and gives him Heartbreak
 # for the rest of the fight, which also makes Searing Light spawn Life Sparks and Gravity Bomb drop
@@ -517,23 +510,6 @@ Playerbots.UlduarFlameLeviathanHardMode = 0
 # tanking the Pummeller happen either way.
 # Default: 0 (disabled)
 Playerbots.UlduarXT002HardMode = 0
-
-# Enable Thorim hard-mode behaviour (arena gauntlet cleared fast enough that Sif joins the
-# fight). Once Sif drops into the arena she casts Frostbolt Volley (raid-wide, healed through),
-# Blizzard (a moving ground AoE) and Frost Nova (point-blank after a teleport). When on, bots
-# move out of Sif's Blizzard and ranged/healers keep their distance so her Frost Nova misses;
-# with it off they ignore Sif and play the fight as normal mode. Frostbolt Volley is unavoidable
-# and left to the healers either way.
-# Default: 0 (disabled)
-Playerbots.UlduarThorimHardMode = 0
-
-# Enable Freya hard-mode behaviour (Elders left alive). Each living Elder permanently empowers Freya
-# for the whole fight: Ironbranch -> Iron Roots (traps a player in a killable root), Brightleaf ->
-# Unstable Sun Beam (a damaging ground zone). When on, a rooted bot kills the root trapping it and
-# bots step out of Unstable Sun Beams; with it off they play the fight as normal mode. Stonebark's
-# Ground Tremor (raid-wide knockback) is unavoidable and left to the healers either way.
-# Default: 0 (disabled)
-Playerbots.UlduarFreyaHardMode = 0
 
 # Enable Mimiron hard-mode behaviour ("Firefighter", the Big Red Button pressed before the pull).
 # Firefighter adds two hazards on top of the normal fight: a persistent, spreading ground fire and

@@ -11,7 +11,6 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "UldEncounter_Thorim.h"
-#include "UldHardMode.h"
 #include "UldScripts.h"
 #include "EncounterHelpers.h"
 #include "RangeTriggers.h"
@@ -312,9 +311,6 @@ bool ThorimTankPickupTrigger::IsActive()
 
 bool ThorimSifBlizzardTrigger::IsActive()
 {
-    if (!IsThorimHardModeActive(botAI))
-        return false;
-
     // No tank dodges in phase 2, by role: the holder check alone drops out for the half second after a human
     // tank's taunt, and the 30 yd flee then tows the boss into the ranged camp.
     Unit* boss = GetThorim(botAI);

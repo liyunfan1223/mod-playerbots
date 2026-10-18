@@ -15,8 +15,8 @@ class Player;
 class PlayerbotAI;
 class Unit;
 
-// Ulduar hard modes are a raid choice, not the 10/25 heroic flag. Each is its boss's config switch alone,
-// and the per-boss triggers still check their own mechanic, so the option must match what the raid does
+// Ulduar hard modes are a raid choice, not the 10/25 heroic flag. Only a hard mode that changes the plan
+// before it shows up gets a config switch; elsewhere the triggers' own hazard checks are the gate
 
 // General Vezax: the raid keeps six Saronite Vapors alive, which spawns the Saronite Animus (33524)
 // and gives Vezax the invulnerable Saronite Barrier until the Animus dies.
@@ -36,18 +36,6 @@ bool IsSteelbreakerEmpowered(PlayerbotAI* botAI, Unit* steelbreaker, Unit* molge
 // The council member the raid should kill next. Hard mode saves Steelbreaker for last; the normal
 // order kills him first. Returns nullptr if none are alive.
 Unit* GetIronAssemblyNextKillTarget(PlayerbotAI* botAI);
-
-// Flame Leviathan: FL_TOWER_ALL when the option is on, else 0. Claiming all four is free, hazards are
-// found by NPC entry so a destroyed tower adds none
-uint32 FlameLeviathanActiveTowerMask(PlayerbotAI* botAI);
-
-// Thorim: hard mode = the arena gauntlet is cleared fast enough that Sif (33196) interrupts her
-// channel and joins the fight instead of despawning.
-bool IsThorimHardModeActive(PlayerbotAI* botAI);
-
-// Freya: an Elder left alive at the pull empowers her for the whole fight, even after it dies. The
-// triggers check the hazard itself (rooted bot, Unstable Sun Beam), which only exists in hard mode
-bool IsFreyaHardModeActive(PlayerbotAI* botAI);
 
 // Mimiron "Firefighter": the Big Red Button pressed before the pull adds the spreading fire and Frost
 // Bomb. GetMimironKeptFireBots picks the P3 Emergency Fire Bots kept alive to put the fire out

@@ -63,7 +63,8 @@ bool HodirAnchored(PlayerbotAI* botAI)
 {
     Player* bot = botAI->GetBot();
     return IsHodirEngaged(botAI) &&
-           (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0, true) || PlayerbotAI::IsRanged(bot));
+           (PlayerbotAI::IsMainTank(bot) || PlayerbotAI::IsAssistTankOfIndex(bot, 0, true) ||
+            PlayerbotAI::IsRanged(bot));
 }
 
 bool HodirResistancePaladin(PlayerbotAI* botAI)

@@ -15,7 +15,6 @@
 #include "SharedDefines.h"
 #include "Trigger.h"
 #include "UldEncounter_FlameLeviathan.h"
-#include "UldHardMode.h"
 #include "UldScripts.h"
 #include "Vehicle.h"
 
@@ -83,10 +82,6 @@ bool FlameLeviathanDriveUrgentTrigger::IsActive()
     if (FlameLeviathanShouldClearBatteringRam(botAI, bot))
         return true;
 
-    uint32 towerMask = FlameLeviathanActiveTowerMask(botAI);
-    if (!towerMask)
-        return false;
-
     Unit* vehicleBase = bot->GetVehicleBase();
-    return GetFlameLeviathanNearestTowerHazard(botAI, vehicleBase, towerMask) != nullptr;
+    return GetFlameLeviathanNearestTowerHazard(botAI, vehicleBase, FL_TOWER_ALL) != nullptr;
 }

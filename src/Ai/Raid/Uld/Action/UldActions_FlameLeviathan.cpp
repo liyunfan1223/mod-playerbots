@@ -28,7 +28,6 @@
 #include "ScriptedCreature.h"
 #include "ServerFacade.h"
 #include "UldEncounter_FlameLeviathan.h"
-#include "UldHardMode.h"
 #include "UldScripts.h"
 #include "Unit.h"
 #include "Vehicle.h"
@@ -492,11 +491,10 @@ bool FlameLeviathanInterruptVentsAction::Execute(Event /*event*/)
 
     // Outranks the urgent drive, so never park a hull that has a blast or hazard to leave. Same test as the
     // drive (strict Hammer circle for the reserve), so both agree on whether a dodge is coming.
-    uint32 const towerMask = FlameLeviathanActiveTowerMask(botAI);
     bool const dodging =
         FlameLeviathanShouldClearBatteringRam(botAI, bot) ||
-        (towerMask && GetFlameLeviathanNearestTowerHazard(botAI, vehicleBase, towerMask, ULDUAR_FL_TOWER_HAZARD_MARGIN,
-                                                          FlameLeviathanIsVentReserve(bot) ? FL_TOWER_STORM : 0));
+        GetFlameLeviathanNearestTowerHazard(botAI, vehicleBase, FL_TOWER_ALL, ULDUAR_FL_TOWER_HAZARD_MARGIN,
+                                            FlameLeviathanIsVentReserve(bot) ? FL_TOWER_STORM : 0);
 
     // A moving hull's spline overrides SetFacingTo, so stop before turning.
     if (!vehicleBase->HasInArc(ULDUAR_FL_ELECTROSHOCK_CONE_HALF_ANGLE * 2.0f, boss))
@@ -574,10 +572,8 @@ bool FlameLeviathanDriveAction::Execute(Event /*event*/)
     // Hammer marks use the strict circle (Inferno keeps the full band) and dodges pick exits it can fire from.
     bool const ventDuty = FlameLeviathanIsVentReserve(bot) && FlameLeviathanVentWindowOpen(bot, boss);
 
-    Unit* hazard = nullptr;
-    if (uint32 towerMask = FlameLeviathanActiveTowerMask(botAI))
-        hazard = GetFlameLeviathanNearestTowerHazard(botAI, vehicleBase_, towerMask, ULDUAR_FL_TOWER_HAZARD_MARGIN,
-                                                     ventDuty ? FL_TOWER_STORM : 0);
+    Unit* hazard = GetFlameLeviathanNearestTowerHazard(botAI, vehicleBase_, FL_TOWER_ALL,
+                                                       ULDUAR_FL_TOWER_HAZARD_MARGIN, ventDuty ? FL_TOWER_STORM : 0);
 
     if (!hazard)
         dodgeGoal_.reset();
@@ -710,8 +706,7 @@ bool FlameLeviathanDriveAction::ClearHazard(Unit* hazard, Unit* keepInReachOf)
     // The Inferno is a trail of ~15 patches, and straight out from the nearest often lands in the next one.
     // Fan off the radial until a point clears all of them.
     std::vector<Unit*> hazards;
-    GetFlameLeviathanTowerHazards(botAI, vehicleBase_, FlameLeviathanActiveTowerMask(botAI),
-                                  ULDUAR_FL_TOWER_HAZARD_CLEAR_SCAN, hazards);
+    GetFlameLeviathanTowerHazards(botAI, vehicleBase_, FL_TOWER_ALL, ULDUAR_FL_TOWER_HAZARD_CLEAR_SCAN, hazards);
 
     // Clear to stop on, with a straight leg there that enters no new reach. Past the kite ring's bounds is a
     // wall: the spline stops short and the hull stays in the fire.
@@ -854,9 +849,8 @@ bool FlameLeviathanDriveAction::HoldStation(Unit* boss)
 
     // A straight leg into the Inferno trail just gets dodged straight back, so go round it.
     Position goal = station;
-    if (FlameLeviathanActiveTowerMask(botAI) & FL_TOWER_FLAMES)
-        if (std::optional<Position> detour = DetourAroundFire(boss, station, true))
-            goal = *detour;
+    if (std::optional<Position> detour = DetourAroundFire(boss, station, true))
+        goal = *detour;
 
     // Face what the cast node will shoot, or the park facing and the cone weapons undo each other. Same bands,
     // tar lead included; the reserve stays on him, since turning back would cost a tick each channel.
@@ -895,10 +889,9 @@ bool FlameLeviathanDriveAction::RushToVents(Unit* boss)
 
     // A FORCED dodge leg cancels the charge and wastes the 40 energy. Same test as the drive's, so it matches
     // the dodge this reserve will actually take.
-    uint32 const towerMask = FlameLeviathanActiveTowerMask(botAI);
     if (FlameLeviathanShouldClearBatteringRam(botAI, bot) ||
-        (towerMask && GetFlameLeviathanNearestTowerHazard(botAI, vehicleBase_, towerMask,
-                                                          ULDUAR_FL_TOWER_HAZARD_MARGIN, FL_TOWER_STORM)))
+        GetFlameLeviathanNearestTowerHazard(botAI, vehicleBase_, FL_TOWER_ALL, ULDUAR_FL_TOWER_HAZARD_MARGIN,
+                                            FL_TOWER_STORM))
         return false;
 
     // Measured from his edge, like the cone. Inside a full charge the dash would carry the hull through
@@ -925,13 +918,10 @@ bool FlameLeviathanDriveAction::RushToVents(Unit* boss)
             return false;
 
     // Nor through the Inferno trail.
-    if (towerMask & FL_TOWER_FLAMES)
-    {
-        std::vector<Unit*> fires;
-        GetFlameLeviathanTowerHazards(botAI, vehicleBase_, FL_TOWER_FLAMES, ULDUAR_FL_TOWER_HAZARD_CLEAR_SCAN, fires);
-        if (!LegClearOfHazards(vehicleBase_, vehicleBase_->GetPosition(), landing, fires, 0.0f))
-            return false;
-    }
+    std::vector<Unit*> fires;
+    GetFlameLeviathanTowerHazards(botAI, vehicleBase_, FL_TOWER_FLAMES, ULDUAR_FL_TOWER_HAZARD_CLEAR_SCAN, fires);
+    if (!LegClearOfHazards(vehicleBase_, vehicleBase_->GetPosition(), landing, fires, 0.0f))
+        return false;
 
     // Stopped first: a moving hull's spline overrides the facing.
     if (!vehicleBase_->HasInArc(ULDUAR_FL_STEAM_RUSH_AIM_ARC, boss))
@@ -1027,7 +1017,7 @@ bool FlameLeviathanDriveAction::Kite(Unit* boss)
                          boss->IsWithinCombatRange(vehicleBase_, ULDUAR_FL_BATTERING_RAM_CAST_RANGE);
 
     Position goal = ring[kiteIdx_];
-    if (!ramming && (FlameLeviathanActiveTowerMask(botAI) & FL_TOWER_FLAMES))
+    if (!ramming)
         if (std::optional<Position> detour = DetourAroundFire(boss, goal, false))
             goal = *detour;
 

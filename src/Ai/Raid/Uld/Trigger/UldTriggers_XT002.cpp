@@ -72,7 +72,8 @@ bool XT002RaidPositionTrigger::IsActive()
 {
     // Melee dps and off-tanks never get a spot, so this is always false for them. Same role calls
     // BuildXT002RingMembers makes, answered before XT's lookup.
-    if (!PlayerbotAI::IsMainTank(bot) && (PlayerbotAI::IsTank(bot) || (!PlayerbotAI::IsRangedDps(bot) && !PlayerbotAI::IsHeal(bot))))
+    if (!PlayerbotAI::IsMainTank(bot) &&
+        (PlayerbotAI::IsTank(bot) || (!PlayerbotAI::IsRangedDps(bot) && !PlayerbotAI::IsHeal(bot))))
         return false;
 
     Unit* xt002 = GetXT002(botAI);

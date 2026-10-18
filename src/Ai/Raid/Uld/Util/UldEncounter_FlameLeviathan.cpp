@@ -18,7 +18,6 @@
 #include "RaidInstanceState.h"
 #include "Timer.h"
 #include "UldEncounterGate.h"
-#include "UldHardMode.h"
 #include "UldScripts.h"
 #include "UldTargets.h"
 #include "Unit.h"
@@ -107,7 +106,7 @@ FlameLeviathanState& FlameLeviathanStateFor(Player* bot) { return flStates.For(b
 // Arms a reticle from the tick it is first seen stunned, for the fuse and the strike's flight.
 void TickHodirsFury(FlameLeviathanState& state, PlayerbotAI* botAI, Player* bot)
 {
-    if (!botAI || !(FlameLeviathanActiveTowerMask(botAI) & FL_TOWER_FROST))
+    if (!botAI)
         return;
 
     // SummonTowerHelpers places two, and they live for the whole pull.

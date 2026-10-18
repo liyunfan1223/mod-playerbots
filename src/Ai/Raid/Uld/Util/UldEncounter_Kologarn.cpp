@@ -176,7 +176,8 @@ Unit* GetKologarnNearestEyebeam(PlayerbotAI* botAI, Player* bot, float radius)
     Unit* best = nullptr;
     float bestDistance = radius;
 
-    for (uint32 entry : {static_cast<uint32>(NPC_KOLOGARN_EYEBEAM_LEFT), static_cast<uint32>(NPC_KOLOGARN_EYEBEAM_RIGHT)})
+    for (uint32 entry :
+         {static_cast<uint32>(NPC_KOLOGARN_EYEBEAM_LEFT), static_cast<uint32>(NPC_KOLOGARN_EYEBEAM_RIGHT)})
     {
         std::list<Creature*> eyes;
         bot->GetCreatureListWithEntryInGrid(eyes, entry, radius);
