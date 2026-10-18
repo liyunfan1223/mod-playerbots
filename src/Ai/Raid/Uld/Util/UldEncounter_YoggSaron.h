@@ -582,7 +582,7 @@ inline constexpr uint32 ULDUAR_YOGG_SARON_LUST_FALLBACK_MS = 30000;
 extern const std::vector<uint32> ULDUAR_YOGG_SARON_ILLUSION_MOBS;
 
 // The ten portal spots, straight from the core's yoggPortalLoc. A table because the brain team must stand on its spot
-// before any portal exists. All ten are on the floor by navprobe, 20.1-23.2 yd from the body.
+// before any portal exists. All ten are on the navmesh, 20.1-23.2 yd from the body.
 extern const Position ULDUAR_YOGG_SARON_PORTAL_SPOTS[ULDUAR_YOGG_SARON_PORTAL_SPOTS_25MAN];
 
 extern const Position ULDUAR_YOGG_SARON_MIDDLE;
@@ -622,7 +622,7 @@ extern const Position ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT;
 extern const Position ULDUAR_YOGG_SARON_PHASE_3_RANGED_SPOT;
 
 // Where ranged stand while a Crusher is too close to their spot, tried in order: the ranged spot turned -15, +15, -30,
-// +30 degrees round Yogg's middle, same 39 yd out. On the floor by navprobe, 21.6-25.2 yd from the melee spot.
+// +30 degrees round Yogg's middle, same 39 yd out. On the navmesh, 21.6-25.2 yd from the melee spot.
 extern const std::vector<Position> ULDUAR_YOGG_SARON_PHASE_3_RANGED_STANDBY_SPOTS;
 
 // Beacon drag spots without Thorim, one per marked Guardian. The heal hits every Guardian within 20 yd of the mark,

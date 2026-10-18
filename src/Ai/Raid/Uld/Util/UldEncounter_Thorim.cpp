@@ -52,7 +52,7 @@ const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_1 = Position(2212.193f
 const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_2 = Position(2212.1353f, -318.20795f, 412.1348f);
 const Position ULDUAR_THORIM_GAUNTLET_RIGHT_SIDE_10_YARDS_3 = Position(2212.1956f, -328.0144f, 412.1348f);
 // 1 and 5 sit in the 18 yd necks (x 2126-2144), 2 to 4 hug the east wall, clear of the traps on the centreline.
-// Z is navprobe's settled height: the walk moves on exact waypoints and never corrects it.
+// Z is the navmesh's settled height: the walk moves on exact waypoints and never corrects it.
 const Position ULDUAR_THORIM_BALCONY_1 = Position(2141.0f, -408.0f, 438.247f);
 const Position ULDUAR_THORIM_BALCONY_2 = Position(2151.0f, -396.0f, 438.247f);
 const Position ULDUAR_THORIM_BALCONY_3 = Position(2152.0f, -365.0f, 438.744f);
@@ -60,7 +60,7 @@ const Position ULDUAR_THORIM_BALCONY_4 = Position(2151.0f, -332.0f, 438.247f);
 const Position ULDUAR_THORIM_BALCONY_5 = Position(2137.5f, -318.0f, 438.222f);
 const Position ULDUAR_THORIM_JUMP_START_POINT = Position(2137.137f, -291.19025f, 438.24753f, 1.7059844f);
 const Position ULDUAR_THORIM_JUMP_END_POINT = Position(2137.8818f, -278.18942f, 419.66653f);
-// Z as navprobe settles each point, for the same reason as the waypoints above.
+// Z as the navmesh settles each point, for the same reason as the waypoints above.
 const Position ULDUAR_THORIM_BALCONY_HOLD1_SPOT = Position(2126.0f, -294.0f, 438.247f);
 const Position ULDUAR_THORIM_BALCONY_HOLD2_SPOT = Position(2138.0f, -296.0f, 438.247f);
 const Position ULDUAR_THORIM_BALCONY_HOLD3_SPOT = Position(2150.0f, -297.0f, 438.247f);
@@ -686,7 +686,7 @@ std::array<Position, 7> const ULDUAR_THORIM_THUNDER_ORB_SPOTS = {
     Position(2092.95f, -263.00f, 433.30f), Position(2104.94f, -233.44f, 433.30f),
     Position(2124.30f, -222.60f, 433.30f)};
 
-// A camp slot's spot while that orb is lit, solved offline and navprobed: 42.5 deg off the cone, 22+ yd
+// A camp slot's spot while that orb is lit, solved offline and checked on the navmesh: 42.5 deg off the cone, 22+ yd
 // off the tank spot, within 32 of the boss, 9+ from every other body (Chain Lightning jumps 8).
 struct ThorimShelterSpot
 {

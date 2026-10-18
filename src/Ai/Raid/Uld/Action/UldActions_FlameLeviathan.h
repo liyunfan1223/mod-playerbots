@@ -51,14 +51,15 @@ protected:
     // The nearest hostile already in combat, him and his turrets aside: what to shoot on the approach.
     Unit* NearestFightingHostile();
 
-    Unit* vehicleBase_ = nullptr;
+private:
+    Unit* _vehicleBase = nullptr;
 
     // Cast times of barrels not yet seen landing, and the last flight timed.
-    std::vector<uint32> barrelsInFlight_;
-    uint32 barrelLeadMs_ = 0;  // ULDUAR_FL_PYRITE_FLIGHT_MS until a landing has been timed
-    ObjectGuid barrelTarget_;
-    uint8 lastPyriteStacks_ = 0;
-    int32 lastPyriteDurationMs_ = 0;
+    std::vector<uint32> _barrelsInFlight;
+    uint32 _barrelLeadMs = 0;  // ULDUAR_FL_PYRITE_FLIGHT_MS until a landing has been timed
+    ObjectGuid _barrelTarget;
+    uint8 _lastPyriteStacks = 0;
+    int32 _lastPyriteDurationMs = 0;
 };
 
 class FlameLeviathanEnterVehicleAction : public MovementAction
@@ -128,17 +129,18 @@ protected:
     Unit* NearestCrate(float radius);
     void ResetKite();
 
-    Unit* vehicleBase_ = nullptr;
+private:
+    Unit* _vehicleBase = nullptr;
 
-    Position issued_;
-    bool hasIssued_ = false;
-    bool parked_ = false;
+    Position _issued;
+    bool _hasIssued = false;
+    bool _parked = false;
 
-    int32 kiteIdx_ = -1;
-    int8 kiteDir_ = 0;  // picked at the start of each kite, then held
+    int32 _kiteIdx = -1;
+    int8 _kiteDir = 0;  // picked at the start of each kite, then held
 
     // Held until it stops being clear or the hull parks on it, and dropped once no hazard owns the tick.
-    std::optional<Position> dodgeGoal_;
+    std::optional<Position> _dodgeGoal;
 };
 
 #endif

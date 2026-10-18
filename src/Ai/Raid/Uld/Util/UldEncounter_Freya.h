@@ -141,7 +141,7 @@ inline constexpr uint32 ULDUAR_FREYA_NATURE_BOMB_LATCH_MS = 7000;
 // that a tank stopped on the way hands the tick back instead of holding Freya still for a whole volley.
 inline constexpr uint32 ULDUAR_FREYA_TANK_BOMB_LATCH_MS = 3000;
 
-// Where the main tank holds Freya, navprobe-checked on the bot filter (--nav 0x09).
+// Where the main tank holds Freya, checked on the navmesh with the bots' path filter.
 extern const Position ULDUAR_FREYA_TANK_ANCHOR;
 
 // How far the tank may take her from the anchor. Every bomb escape aims away from the back line, so without a

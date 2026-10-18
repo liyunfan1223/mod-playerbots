@@ -56,7 +56,7 @@
 
 using namespace EncounterHelpers;
 
-// navprobe map 603: every point below is on mesh at 0.04, settled Z 417.321, out to 44 yd on the hold's
+// Checked on the map 603 navmesh: every point below is on mesh at 0.04, settled Z 417.321, out to 44 yd on the hold's
 // bearing. Angles are from the hold's line to his landing spot.
 const Position ULDUAR_ALGALON_ROOM_CENTER = Position(1632.668f, -302.7656f, 417.3211f);
 const Position ULDUAR_ALGALON_PICKUP_SLOT = Position(1633.781f, -310.688f, 417.321f);

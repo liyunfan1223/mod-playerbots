@@ -125,7 +125,7 @@ inline constexpr float ULDUAR_IRON_ASSEMBLY_SPREAD_RING_RADIUS = 18.0f;
 inline constexpr uint8 ULDUAR_IRON_ASSEMBLY_SPREAD_SLOTS = 16;
 
 // Centred on Steelbreaker's tank spot, so every slot clears Meltdown by 7 yd. Don't go past 23: at 24
-// navprobe drops the 135 degree slot into a hole.
+// the 135 degree slot falls into a hole in the navmesh.
 inline constexpr float ULDUAR_IRON_ASSEMBLY_EMPOWERED_SPREAD_RING_RADIUS = 22.0f;
 
 // Molgeim's last rune outlives him on the stack point, inside this ring, and blocks about 140 degrees
