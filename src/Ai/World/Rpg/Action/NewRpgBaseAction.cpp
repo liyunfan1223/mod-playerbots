@@ -894,7 +894,6 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
         if (!quest)
             continue;
 
-        QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
         if (bot->GetQuestStatus(item.QuestId) == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
         {
             return true;
