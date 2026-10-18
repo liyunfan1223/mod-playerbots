@@ -4,6 +4,12 @@
  * or (at your option) any later version.
  */
 
+/*
+ * PvP portions adapted from VincentVanclef/mod-playerbots, commit d7cc409c2e145bc4fa5b64bfc9539dab4cf11a43.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may
+ * redistribute it and/or modify it under version 3 of the License, or (at your option), any later version.
+ */
+
 #include "CheckMountStateAction.h"
 #include "PlayerbotsDatabase.h"
 #include "AreaDefines.h"
@@ -69,6 +75,22 @@ MountData CollectMountData(Player const* bot)
 
 bool CheckMountStateAction::Execute(Event /*event*/)
 {
+    if (sPlayerbotAIConfig.PvpTacticsImprovements && bot->InBattleground() && !bot->InArena())
+    {
+        master = GetMaster();
+        botInShapeshiftForm = bot->GetShapeshiftForm();
+        masterInShapeshiftForm = master ? master->GetShapeshiftForm() : FORM_NONE;
+    }
+
+    if (HasBattlegroundFlightState())
+    {
+        Dismount();
+        if (botInShapeshiftForm == FORM_FLIGHT || botInShapeshiftForm == FORM_FLIGHT_EPIC)
+            botAI->RemoveShapeshift();
+        ClearStaleFlightFlags();
+        return true;
+    }
+
     // Forced flight dismount:
     // Bots get stale flight movement flags after a forced dismount (e.g: Dalaran) because the post landing dismount cleanup
     // needs MSG_MOVE_FALL_LAND (a client opcode) and client movement packets. The stale flags cause the bot to be stuck with
@@ -156,17 +178,21 @@ bool CheckMountStateAction::Execute(Event /*event*/)
 bool CheckMountStateAction::isUseful()
 {
     // Not useful when:
-    if (botAI->IsInVehicle() || bot->isDead() || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
-        !bot->IsOutdoors() || bot->InArena())
+    if (botAI->IsInVehicle() || bot->isDead() || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) || bot->InArena())
+        return false;
+
+    if (HasBattlegroundFlightState())
+        return true;
+
+    if (!bot->IsOutdoors())
         return false;
 
     master = GetMaster();
 
-    // Get shapeshift states, only applicable when there's a master
-    if (master)
+    if (master || (sPlayerbotAIConfig.PvpTacticsImprovements && bot->InBattleground() && !bot->InArena()))
     {
         botInShapeshiftForm = bot->GetShapeshiftForm();
-        masterInShapeshiftForm = master->GetShapeshiftForm();
+        masterInShapeshiftForm = master ? master->GetShapeshiftForm() : FORM_NONE;
     }
 
     // Not useful when in combat and not currently mounted / travel formed
@@ -316,10 +342,12 @@ bool CheckMountStateAction::TryForms(Player* master, int32 masterMountType, int3
         return true;
     }
 
+    bool const allowFlight = !sPlayerbotAIConfig.PvpTacticsImprovements || !bot->InBattleground() || bot->InArena();
+
     // Check if master is in Flight Form or has a flying mount and bot can flight form
-    if (botAI->CanCastSpell(SPELL_FLIGHT_FORM, bot, true) &&
+    if (allowFlight && botAI->CanCastSpell(SPELL_FLIGHT_FORM, bot, true) &&
         ((masterInShapeshiftForm == FORM_FLIGHT && botInShapeshiftForm != FORM_FLIGHT) ||
-        (masterMountType == 1 && masterSpeed == 149)))
+         (masterMountType == 1 && masterSpeed == 149)))
     {
         botAI->CastSpell(SPELL_FLIGHT_FORM, bot);
 
@@ -329,9 +357,9 @@ bool CheckMountStateAction::TryForms(Player* master, int32 masterMountType, int3
     }
 
     // Check if master is in Swift Flight Form or has an epic flying mount and bot can swift flight form
-    if (botAI->CanCastSpell(SPELL_SWIFT_FLIGHT_FORM, bot, true) &&
+    if (allowFlight && botAI->CanCastSpell(SPELL_SWIFT_FLIGHT_FORM, bot, true) &&
         ((masterInShapeshiftForm == FORM_FLIGHT_EPIC && botInShapeshiftForm != FORM_FLIGHT_EPIC) ||
-        (masterMountType == 1 && masterSpeed >= 279)))
+         (masterMountType == 1 && masterSpeed >= 279)))
     {
         botAI->CastSpell(SPELL_SWIFT_FLIGHT_FORM, bot);
 
@@ -550,6 +578,9 @@ int32 CheckMountStateAction::CalculateMasterMountSpeed(Player* master) const
 
 uint32 CheckMountStateAction::GetMountType(Player* master) const
 {
+    if (sPlayerbotAIConfig.PvpTacticsImprovements && bot->InBattleground() && !bot->InArena())
+        return 0;
+
     bool const noRealMaster = (!master || master == bot);
 
     if (noRealMaster)
@@ -566,4 +597,11 @@ uint32 CheckMountStateAction::GetMountType(Player* master) const
         return 1;
 
     return 0;
+}
+
+bool CheckMountStateAction::HasBattlegroundFlightState() const
+{
+    return sPlayerbotAIConfig.PvpTacticsImprovements && bot->InBattleground() && !bot->InArena() &&
+           (bot->HasIncreaseMountedFlightSpeedAura() || bot->HasFlyAura() || bot->GetShapeshiftForm() == FORM_FLIGHT ||
+            bot->GetShapeshiftForm() == FORM_FLIGHT_EPIC);
 }

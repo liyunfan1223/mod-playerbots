@@ -5,6 +5,7 @@
  */
 
 #include "BattleGroundJoinAction.h"
+
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
@@ -16,6 +17,7 @@
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "RandomPlayerbotFactory.h"
+#include "RandomPlayerbotMgr.h"
 
 bool BGJoinAction::Execute(Event /*event*/)
 {
@@ -301,15 +303,18 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
     uint32 bgHordePlayerCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount;
     uint32 activeBgQueue = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].activeBgQueue;
     uint32 bgInstanceCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgInstanceCount;
+    uint32 const actualCapacity =
+        sRandomPlayerbotMgr.GetBgActiveTeamCapacity(queueTypeId, bracketId, TeamSize * bgInstanceCount);
+    uint32 const teamTarget = TeamSize * activeBgQueue + actualCapacity;
 
     if (teamId == TEAM_ALLIANCE)
     {
-        if ((bgAllianceBotCount + bgAlliancePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
+        if ((bgAllianceBotCount + bgAlliancePlayerCount) < teamTarget)
             return true;
     }
     else
     {
-        if ((bgHordeBotCount + bgHordePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
+        if ((bgHordeBotCount + bgHordePlayerCount) < teamTarget)
             return true;
     }
 
@@ -632,15 +637,18 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
     uint32 bgHordePlayerCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount;
     uint32 activeBgQueue = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].activeBgQueue;
     uint32 bgInstanceCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgInstanceCount;
+    uint32 const actualCapacity =
+        sRandomPlayerbotMgr.GetBgActiveTeamCapacity(queueTypeId, bracketId, TeamSize * bgInstanceCount);
+    uint32 const teamTarget = TeamSize * activeBgQueue + actualCapacity;
 
     if (teamId == TEAM_ALLIANCE)
     {
-        if ((bgAllianceBotCount + bgAlliancePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
+        if ((bgAllianceBotCount + bgAlliancePlayerCount) < teamTarget)
             return true;
     }
     else
     {
-        if ((bgHordeBotCount + bgHordePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
+        if ((bgHordeBotCount + bgHordePlayerCount) < teamTarget)
             return true;
     }
 

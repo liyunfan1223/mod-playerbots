@@ -50,6 +50,14 @@
 #include <set>
 #include <utility>
 
+namespace
+{
+uint32 RandomBgCapacityKey(BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId)
+{
+    return (uint32(queueTypeId) << 8) | uint32(bracketId);
+}
+}  // namespace
+
 struct GuidClassRaceInfo
 {
     ObjectGuid::LowType guid;
@@ -943,6 +951,8 @@ void RandomPlayerbotMgr::CheckBgQueue()
 
     LOG_DEBUG("playerbots", "Checking BG Queue...");
 
+    std::unordered_map<uint32, uint32> randomBgActiveTeamCapacities;
+
     // Initialize Battleground Data (do not clear here)
 
     for (int bracket = BG_BRACKET_ID_FIRST; bracket < MAX_BATTLEGROUND_BRACKETS; ++bracket)
@@ -1038,7 +1048,12 @@ void RandomPlayerbotMgr::CheckBgQueue()
                     instanceIds = &BattlegroundData[queueTypeId][bracketId].bgInstances;
                     if (instanceIds &&
                         std::find(instanceIds->begin(), instanceIds->end(), instanceId) == instanceIds->end())
+                    {
                         instanceIds->push_back(instanceId);
+                        if (queueTypeId == BATTLEGROUND_QUEUE_RB)
+                            randomBgActiveTeamCapacities[RandomBgCapacityKey(queueTypeId, bracketId)] +=
+                                bg->GetMaxPlayersPerTeam();
+                    }
 
                     BattlegroundData[queueTypeId][bracketId].bgInstanceCount = instanceIds->size();
                 }
@@ -1145,7 +1160,12 @@ void RandomPlayerbotMgr::CheckBgQueue()
 
                 if (instanceIds &&
                     std::find(instanceIds->begin(), instanceIds->end(), instanceId) == instanceIds->end())
+                {
                     instanceIds->push_back(instanceId);
+                    if (!isArena && queueTypeId == BATTLEGROUND_QUEUE_RB)
+                        randomBgActiveTeamCapacities[RandomBgCapacityKey(queueTypeId, bracketId)] +=
+                            bg->GetMaxPlayersPerTeam();
+                }
 
                 if (isArena)
                 {
@@ -1219,7 +1239,23 @@ void RandomPlayerbotMgr::CheckBgQueue()
         updateBGInstanceCount(BATTLEGROUND_QUEUE_WS, wsBrackets, randomBotAutoJoinBGWSCount);
     }
 
+    {
+        std::lock_guard<std::mutex> lock(_randomBgCapacityMutex);
+        _randomBgActiveTeamCapacities.swap(randomBgActiveTeamCapacities);
+    }
+
     LogBattlegroundInfo();
+}
+
+uint32 RandomPlayerbotMgr::GetBgActiveTeamCapacity(BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId,
+                                                   uint32 fallback) const
+{
+    if (queueTypeId != BATTLEGROUND_QUEUE_RB || !fallback)
+        return fallback;
+
+    std::lock_guard<std::mutex> lock(_randomBgCapacityMutex);
+    auto const itr = _randomBgActiveTeamCapacities.find(RandomBgCapacityKey(queueTypeId, bracketId));
+    return itr != _randomBgActiveTeamCapacities.end() ? itr->second : fallback;
 }
 
 void RandomPlayerbotMgr::LogBattlegroundInfo()

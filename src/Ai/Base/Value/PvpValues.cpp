@@ -4,6 +4,12 @@
  * or (at your option) any later version.
  */
 
+/*
+ * PvP portions adapted from VincentVanclef/mod-playerbots, commit d7cc409c2e145bc4fa5b64bfc9539dab4cf11a43.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may
+ * redistribute it and/or modify it under version 3 of the License, or (at your option), any later version.
+ */
+
 #include "PvpValues.h"
 #include "BattlegroundEY.h"
 #include "BattlegroundMgr.h"
@@ -26,6 +32,33 @@ BattlegroundTypeId RealBgType(Player* bot)
 Unit* FlagCarrierValue::Calculate()
 {
     Unit* carrier = nullptr;
+
+    if ((sPlayerbotAIConfig.PvpTacticsImprovements || sPlayerbotAIConfig.BgObjectiveBrain) && bot->InBattleground() &&
+        !bot->InArena())
+    {
+        Battleground* bg = bot->GetBattleground();
+        TeamId const team = bot->GetBgTeamId();
+        if (!bg || (team != TEAM_ALLIANCE && team != TEAM_HORDE))
+            return nullptr;
+
+        ObjectGuid carrierGuid;
+        if (RealBgType(bot) == BATTLEGROUND_WS)
+        {
+            TeamId const flagTeam = sameTeam ? bg->GetOtherTeamId(team) : team;
+            carrierGuid = static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(flagTeam);
+        }
+        else if (RealBgType(bot) == BATTLEGROUND_EY)
+            carrierGuid = static_cast<BattlegroundEY*>(bg)->GetFlagPickerGUID();
+
+        Player* player = carrierGuid.IsEmpty() ? nullptr : ObjectAccessor::GetPlayer(*bot, carrierGuid);
+        if (!player || !player->IsAlive() || !player->IsInWorld() || !player->InBattleground() ||
+            !bot->IsInMap(player) || player->GetBgTeamId() == TEAM_NEUTRAL ||
+            player->GetBattlegroundId() != bot->GetBattlegroundId() ||
+            (sameTeam ? player->GetBgTeamId() != team : player->GetBgTeamId() == team))
+            return nullptr;
+
+        return ignoreRange || bot->IsWithinDistInMap(player, sPlayerbotAIConfig.SightDistance) ? player : nullptr;
+    }
 
     if (botAI->GetBot()->InBattleground())
     {

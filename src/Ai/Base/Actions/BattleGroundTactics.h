@@ -9,6 +9,7 @@
 
 #include "BattlegroundAV.h"
 #include "MovementActions.h"
+#include "RTGBattlegroundObjectiveBrain.h"
 
 class ChatHandler;
 class Battleground;
@@ -130,8 +131,20 @@ private:
     bool teamFlagTaken();
     bool protectFC();
     bool useBuff();
+    bool MoveCoordinatedCarrier(Battleground* bg);
+    bool HasGroundObjectivePath(float x, float y, float z);
+    bool RecoverCoordinatedObjective();
     uint32 getPlayersInArea(TeamId teamId, Position point, float range, bool combat = true);
     bool IsLockedInsideKeep();
+
+    RTGBattlegroundObjectiveBrain _objectiveBrain;
+    Position _objectiveProgressPosition;
+    uint32 _objectiveProgressAt = 0;
+    Position _groundPathTarget;
+    Position _groundPathStart;
+    uint32 _groundPathMap = 0;
+    uint32 _groundPathCheckedAt = 0;
+    bool _groundPathValid = false;
 };
 
 class ArenaTactics : public MovementAction

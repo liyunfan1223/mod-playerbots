@@ -6763,6 +6763,11 @@ uint32 PlayerbotAI::GetReactDelay()
 
     if (inBG)
     {
+        // Adapted from VincentVanclef/mod-playerbots; keep faster combat polling opt-in.
+        if (sPlayerbotAIConfig.PvpFastCombatReactions && sPlayerbotAIConfig.FastReactInBG && bot->InBattleground() &&
+            !bot->InArena())
+            return base;
+
         if (bot->IsInCombat() || currentState == BOT_STATE_COMBAT)
         {
             return static_cast<uint32>(base * (sPlayerbotAIConfig.FastReactInBG ? 2.5f : 5.0f));

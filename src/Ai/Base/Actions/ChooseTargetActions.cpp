@@ -4,6 +4,12 @@
  * or (at your option) any later version.
  */
 
+/*
+ * PvP portions adapted from VincentVanclef/mod-playerbots, commit d7cc409c2e145bc4fa5b64bfc9539dab4cf11a43.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may
+ * redistribute it and/or modify it under version 3 of the License, or (at your option), any later version.
+ */
+
 #include "ChooseTargetActions.h"
 #include "ChooseRpgTargetAction.h"
 #include "Event.h"
@@ -15,9 +21,26 @@
 #include "RtiTargetValue.h"
 #include "ServerFacade.h"
 
+namespace
+{
+bool ImprovedFlagObjectives(Player* bot)
+{
+    return bot && bot->InBattleground() && !bot->InArena() &&
+           (sPlayerbotAIConfig.PvpTacticsImprovements || sPlayerbotAIConfig.BgObjectiveBrain);
+}
+
+bool ShouldPreserveFlagObjective(Player* bot)
+{
+    if (ImprovedFlagObjectives(bot))
+        return PlayerHasFlag::IsCarryingFlag(bot);
+
+    return PlayerHasFlag::IsCapturingFlag(bot);
+}
+}  // namespace
+
 bool AttackEnemyPlayerAction::isUseful()
 {
-    if (PlayerHasFlag::IsCapturingFlag(bot))
+    if (ShouldPreserveFlagObjective(bot))
         return false;
 
     return !sPlayerbotAIConfig.IsPvpProhibited(bot->GetZoneId(), bot->GetAreaId());
@@ -26,12 +49,30 @@ bool AttackEnemyPlayerAction::isUseful()
 bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
+    if (ImprovedFlagObjectives(bot))
+    {
+        Player* carrier = target ? target->ToPlayer() : nullptr;
+        if (!carrier || !carrier->IsAlive() || !carrier->IsInWorld() || !bot->IsInMap(carrier) ||
+            !bot->InBattleground() || !carrier->InBattleground() ||
+            bot->GetBattlegroundId() != carrier->GetBattlegroundId() || bot->GetBgTeamId() == carrier->GetBgTeamId() ||
+            !PlayerHasFlag::IsCarryingFlag(carrier) || PlayerHasFlag::IsCarryingFlag(bot))
+            return false;
+
+        return !sPlayerbotAIConfig.IsPvpProhibited(bot->GetZoneId(), bot->GetAreaId()) &&
+               !sPlayerbotAIConfig.IsPvpProhibited(carrier->GetZoneId(), carrier->GetAreaId()) &&
+               ServerFacade::instance().IsDistanceLessOrEqualThan(ServerFacade::instance().GetDistance2d(bot, carrier),
+                                                                  100.0f);
+    }
+
     return target && ServerFacade::instance().IsDistanceLessOrEqualThan(ServerFacade::instance().GetDistance2d(bot, target), 100.0f) &&
            PlayerHasFlag::IsCapturingFlag(bot);
 }
 
 bool AggressiveTargetAction::isUseful()
 {
+    if (ImprovedFlagObjectives(bot) && PlayerHasFlag::IsCarryingFlag(bot))
+        return false;
+
     if (bot->IsInCombat())
         return false;
 
@@ -124,6 +165,9 @@ bool AttackAnythingAction::isUseful()
     if (!bot || !botAI)  // Prevents invalid accesses
         return false;
 
+    if (ImprovedFlagObjectives(bot) && PlayerHasFlag::IsCarryingFlag(bot))
+        return false;
+
     if (!botAI->AllowActivity(GRIND_ACTIVITY))  // Bot cannot be active
         return false;
 
@@ -154,7 +198,7 @@ bool AttackAnythingAction::isPossible() { return GetTarget() && AttackAction::is
 
 bool DpsAssistAction::isUseful()
 {
-    if (PlayerHasFlag::IsCapturingFlag(bot))
+    if (ShouldPreserveFlagObjective(bot))
         return false;
 
     return true;
@@ -199,6 +243,9 @@ bool AttackRtiTargetAction::Execute(Event /*event*/)
 
 bool AttackRtiTargetAction::isUseful()
 {
+    if (ImprovedFlagObjectives(bot) && PlayerHasFlag::IsCarryingFlag(bot))
+        return false;
+
     if (botAI->ContainsStrategy(STRATEGY_TYPE_HEAL))
         return false;
 

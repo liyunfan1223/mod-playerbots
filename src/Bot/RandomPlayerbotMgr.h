@@ -7,14 +7,15 @@
 #ifndef PLAYERBOTS_RANDOMPLAYERBOTMGR_H
 #define PLAYERBOTS_RANDOMPLAYERBOTMGR_H
 
+#include <mutex>
+#include <set>
+#include <unordered_set>
+
 #include "GameTime.h"
 #include "NewRpgInfo.h"
 #include "ObjectGuid.h"
 #include "PlayerbotCommandServer.h"
 #include "PlayerbotMgr.h"
-#include <mutex>
-#include <set>
-#include <unordered_set>
 
 struct BattlegroundInfo
 {
@@ -158,6 +159,8 @@ public:
     void CheckLfgQueue();
     void CheckPlayers();
     void LogBattlegroundInfo();
+    uint32 GetBgActiveTeamCapacity(BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId,
+                                   uint32 fallback) const;
 
     std::map<TeamId, std::map<BattlegroundTypeId, std::vector<uint32>>> getBattleMastersCache()
     {
@@ -255,6 +258,8 @@ private:
     std::unordered_map<uint32, ObjectGuid::LowType> BattleMasterSpawnIds;
     std::unordered_map<uint32, BotEventCache> eventCache;
     std::unordered_set<uint32> currentBots;
+    mutable std::mutex _randomBgCapacityMutex;
+    std::unordered_map<uint32, uint32> _randomBgActiveTeamCapacities;
     uint32 playersLevel;
     // Written on the world thread, read from map threads.
     std::set<std::pair<uint32, uint32>> _playerZones;

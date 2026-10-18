@@ -5,6 +5,11 @@
  */
 
 #include "BattleGroundTactics.h"
+
+#include <algorithm>
+#include <cmath>
+#include <mutex>
+
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "BattleGroundJoinAction.h"
@@ -24,14 +29,16 @@
 #include "Event.h"
 #include "GameObject.h"
 #include "IVMapMgr.h"
+#include "ObjectMgr.h"
 #include "PathGenerator.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "PvpTriggers.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
-#include <algorithm>
-#include <mutex>
+
+// Objective coordination and road discipline adapted from VincentVanclef/mod-playerbots,
+// revision d7cc409c2e145bc4fa5b64bfc9539dab4cf11a43 (michael92394).
 
 // common bg positions
 Position const WS_WAITING_POS_HORDE_1 = {944.981f, 1423.478f, 345.434f, 6.18f};
@@ -1570,6 +1577,41 @@ bool BGTactics::eyJumpDown()
             return true;
         }
     }
+    // The landing is still above the field; finish on the two ground waypoints.
+    if (RTGBattlegroundObjectiveBrain::IsEnabled(bot))
+    {
+        constexpr std::size_t LANDING_POINT_INDEX = 4;
+        constexpr std::size_t GROUND_EXIT_POINT_COUNT = 2;
+        constexpr float LANDING_HEIGHT_TOLERANCE = 3.0f;
+        constexpr float LANDING_CORRIDOR_RADIUS = 120.0f;
+        constexpr float WAYPOINT_TOLERANCE = 4.5f;
+        constexpr float FIELD_HEIGHT = 1186.0f;
+        constexpr float HORDE_FIELD_X = 1932.0f;
+        constexpr float ALLIANCE_FIELD_X = 2408.0f;
+        bool const horde = bot->GetTeamId() == TEAM_HORDE;
+        float const botX = bot->GetPositionX();
+        float const botZ = bot->GetPositionZ();
+        Position const& landing = positons[LANDING_POINT_INDEX];
+        bool const reachedField = botZ <= FIELD_HEIGHT && (horde ? botX >= HORDE_FIELD_X : botX <= ALLIANCE_FIELD_X);
+        if (reachedField || botZ > landing.GetPositionZ() + LANDING_HEIGHT_TOLERANCE ||
+            bot->GetDistance(landing) > LANDING_CORRIDOR_RADIUS)
+            return false;
+
+        BattleBotPath const& exitPath =
+            horde ? vPath_EY_Horde_Spawn_to_Crossroad1Horde : vPath_EY_Alliance_Spawn_to_Crossroad1Alliance;
+        if (exitPath.size() < GROUND_EXIT_POINT_COUNT)
+            return false;
+        for (std::size_t point = exitPath.size() - GROUND_EXIT_POINT_COUNT; point < exitPath.size(); ++point)
+        {
+            BattleBotWaypoint const& step = exitPath[point];
+            bool const behind = horde ? step.x < botX - WAYPOINT_TOLERANCE : step.x > botX + WAYPOINT_TOLERANCE;
+            if (step.z > botZ + LANDING_HEIGHT_TOLERANCE || behind ||
+                bot->GetDistance(step.x, step.y, step.z) <= WAYPOINT_TOLERANCE)
+                continue;
+            if (HasGroundObjectivePath(step.x, step.y, step.z) && MoveTo(bg->GetMapId(), step.x, step.y, step.z))
+                return true;
+        }
+    }
     return false;
 }
 
@@ -1642,6 +1684,14 @@ bool BGTactics::Execute(Event /*event*/)
             return false;
     }
 
+    if (RTGBattlegroundObjectiveBrain::IsEnabled(bot))
+    {
+        if ((getName() == "move to objective" || getName() == "check flag") && MoveCoordinatedCarrier(bg))
+            return true;
+        if (getName() == "move to objective" && RecoverCoordinatedObjective())
+            return true;
+    }
+
     if (getName() == "move to start")
         return moveToStart();
 
@@ -1706,6 +1756,13 @@ bool BGTactics::Execute(Event /*event*/)
         {
             // bot->GetMotionMaster()->MovementExpired();
             return false;
+        }
+
+        if (RTGBattlegroundObjectiveBrain::IsEnabled(bot))
+        {
+            if (moveToObjective(false) || selectObjectiveWp(*vPaths))
+                return true;
+            return moveToObjective(true);
         }
 
         if (!moveToObjective(false))
@@ -1865,6 +1922,132 @@ bool BGTactics::moveToStart(bool force)
     return true;
 }
 
+bool BGTactics::MoveCoordinatedCarrier(Battleground* bg)
+{
+    BattlegroundTypeId const type = bg->GetBgTypeID() == BATTLEGROUND_RB ? bg->GetBgTypeID(true) : bg->GetBgTypeID();
+    TeamId const team = bot->GetBgTeamId();
+    if (team != TEAM_ALLIANCE && team != TEAM_HORDE)
+        return false;
+    uint32 triggerId = 0;
+    AreaTrigger const* area = nullptr;
+    if (type == BATTLEGROUND_WS)
+    {
+        BattlegroundWS* ws = static_cast<BattlegroundWS*>(bg);
+        if (ws->GetFlagPickerGUID(bg->GetOtherTeamId(team)) != bot->GetGUID() ||
+            ws->GetFlagState(team) != BG_WS_FLAG_STATE_ON_BASE)
+            return false;
+        triggerId = team == TEAM_ALLIANCE ? BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN : BG_WS_TRIGGER_HORDE_FLAG_SPAWN;
+        area = sObjectMgr->GetAreaTrigger(triggerId);
+    }
+    else if (type == BATTLEGROUND_EY)
+    {
+        BattlegroundEY* eye = static_cast<BattlegroundEY*>(bg);
+        if (eye->GetFlagPickerGUID() != bot->GetGUID())
+            return false;
+        float nearest = FLT_MAX;
+        for (auto const& [node, objectId, trigger] : EY_AttackObjectives)
+        {
+            if (!eye->GetCapturePointInfo(node).IsUnderControl(team))
+                continue;
+            AreaTrigger const* candidate = sObjectMgr->GetAreaTrigger(trigger);
+            if (!candidate)
+                continue;
+            float const distance = bot->GetExactDist(candidate->x, candidate->y, candidate->z);
+            if (distance < nearest)
+            {
+                nearest = distance;
+                triggerId = trigger;
+                area = candidate;
+            }
+        }
+    }
+    if (!area || bot->GetExactDist(area->x, area->y, area->z) > 35.0f)
+        return false;
+    if (!bot->IsInAreaTriggerRadius(area))
+    {
+        if (!HasGroundObjectivePath(area->x, area->y, area->z))
+            return false;
+        return MoveTo(area->map, area->x, area->y, area->z, false, false, false, false,
+                      MovementPriority::MOVEMENT_FORCED);
+    }
+    WorldPacket packet(CMSG_AREATRIGGER);
+    packet << triggerId;
+    bot->GetSession()->HandleAreaTriggerOpcode(packet);
+    return true;
+}
+
+bool BGTactics::HasGroundObjectivePath(float x, float y, float z)
+{
+    if (!std::isfinite(x) || !std::isfinite(y) || !std::isfinite(z))
+        return false;
+    uint32 const now = getMSTime();
+    if (_groundPathCheckedAt && _groundPathMap == bot->GetMapId() && bot->GetExactDist(_groundPathStart) < 4.0f &&
+        _groundPathTarget.GetExactDist(x, y, z) < 0.5f &&
+        getMSTimeDiff(_groundPathCheckedAt, now) < sPlayerbotAIConfig.BgObjectiveRecheckMs)
+        return _groundPathValid;
+    _groundPathTarget.Relocate(x, y, z);
+    _groundPathStart.Relocate(bot->GetPosition());
+    _groundPathMap = bot->GetMapId();
+    _groundPathCheckedAt = now;
+    PathGenerator path(bot);
+    // NORMAL alone excludes partial routes, missing mmaps, shortcuts and off-mesh endpoints.
+    _groundPathValid = path.CalculatePath(x, y, z, false) && path.GetPathType() == PATHFIND_NORMAL;
+    Movement::PointsArray const& points = path.GetPath();
+    if (points.size() < 2)
+        _groundPathValid = false;
+    if (_groundPathValid)
+    {
+        G3D::Vector3 const& end = points.back();
+        if (Position(x, y, z).GetExactDist(end.x, end.y, end.z) > 3.0f)
+            _groundPathValid = false;
+    }
+    for (std::size_t index = 0; _groundPathValid && index < points.size(); ++index)
+    {
+        if (!std::isfinite(points[index].x) || !std::isfinite(points[index].y) || !std::isfinite(points[index].z))
+        {
+            _groundPathValid = false;
+            break;
+        }
+        if (index == 0)
+            continue;
+        float const dx = points[index].x - points[index - 1].x;
+        float const dy = points[index].y - points[index - 1].y;
+        float const rise = std::fabs(points[index].z - points[index - 1].z);
+        float const horizontal = std::sqrt(dx * dx + dy * dy);
+        if ((horizontal < 0.2f && rise > 2.75f) || (rise > 4.0f && rise > horizontal * 0.9f))
+            _groundPathValid = false;
+    }
+    return _groundPathValid;
+}
+
+bool BGTactics::RecoverCoordinatedObjective()
+{
+    uint32 const now = getMSTime();
+    PositionInfo objective;
+    if (bot->IsInCombat() || !botAI->CanMove() || !_objectiveBrain.Update(botAI, objective) ||
+        _objectiveBrain.ShouldHold(bot) || bot->GetExactDist(objective.x, objective.y, objective.z) < 6.0f)
+    {
+        _objectiveProgressAt = now;
+        _objectiveProgressPosition.Relocate(bot->GetPosition());
+        return false;
+    }
+    if (!_objectiveProgressAt || bot->GetExactDist(_objectiveProgressPosition) > 2.25f)
+    {
+        _objectiveProgressAt = now;
+        _objectiveProgressPosition.Relocate(bot->GetPosition());
+        return false;
+    }
+    if (getMSTimeDiff(_objectiveProgressAt, now) < sPlayerbotAIConfig.BgStuckRecoverMs)
+        return false;
+    _objectiveProgressAt = now;
+    bot->StopMoving();
+    bot->GetMotionMaster()->Clear();
+    AI_VALUE(LastMovement&, "last movement").clear();
+    _objectiveBrain.Reset();
+    _groundPathCheckedAt = 0;
+    return resetObjective();
+}
+
 bool BGTactics::selectObjective(bool reset)
 {
     Battleground* bg = bot->GetBattleground();
@@ -1876,6 +2059,11 @@ bool BGTactics::selectObjective(bool reset)
 
     PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
+    if (_objectiveBrain.Update(botAI, pos))
+    {
+        posMap["bg objective"] = pos;
+        return true;
+    }
     if (pos.isSet() && !reset)
         return false;
 
@@ -3159,6 +3347,13 @@ bool BGTactics::moveToObjective(bool ignoreDist)
         bgType = bg->GetBgTypeID(true);
 
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
+    bool const coordinated = _objectiveBrain.Update(botAI, pos);
+    if (coordinated)
+    {
+        context->GetValue<PositionMap&>("position")->Get()["bg objective"] = pos;
+        if (_objectiveBrain.ShouldHold(bot))
+            return true;
+    }
     if (!pos.isSet())
         return selectObjective();
     else
@@ -3188,6 +3383,13 @@ bool BGTactics::moveToObjective(bool ignoreDist)
         // std::ostringstream out; out << "Moving to objective " << pos.x << ", " << pos.y << ", Distance: " <<
         // ServerFacade::instance().GetDistance2d(bot, pos.x, pos.y); bot->Say(out.str(), LANG_UNIVERSAL);
 
+        if (coordinated)
+        {
+            if (!HasGroundObjectivePath(pos.x, pos.y, pos.z))
+                return false;
+            return MoveTo(pos.mapId, pos.x, pos.y, pos.z);
+        }
+
         // dont increase from 1.5 will cause bugs with horde capping AV towers
         return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z, 1.5f);
     }
@@ -3208,7 +3410,10 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
     if (!pos.isSet())
         return false;
 
-    if (bgType == BATTLEGROUND_WS)
+    bool const coordinated = RTGBattlegroundObjectiveBrain::IsEnabled(bot);
+    auto PathDistance = [coordinated](float distance) { return coordinated ? distance : std::sqrt(distance); };
+
+    if (bgType == BATTLEGROUND_WS && !coordinated)
     {
         if (wsJumpDown())
             return true;
@@ -3262,6 +3467,12 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
     // uint32 chosenPathIndex = -1;
     for (auto const& path : vPaths)
     {
+        if (coordinated && bgType == BATTLEGROUND_WS &&
+            (path == &vPath_WSG_HordeTunnel_to_HordeBaseRoof || path == &vPath_WSG_AllianceTunnel_to_AllianceBaseRoof ||
+             path == &vPath_WSG_AllianceGraveyardLower_to_HordeFlagRoom ||
+             path == &vPath_WSG_HordeGraveyardLower_to_AllianceFlagRoom || path == &vPath_WSG_AllianceGraveyardJump ||
+             path == &vPath_WSG_HordeGraveyardJump))
+            continue;
         // index++;
         // TODO need to remove sqrt from these two and distToBot but it totally throws path scoring out of
         // whack if you do that without changing how its implemented (I'm amazed it works as well as it does
@@ -3271,12 +3482,18 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
         // use that to multiply the total score?
         BattleBotWaypoint& startPoint = ((*path)[0]);
         float const startPointDistToDestination =
-            sqrt(Position(pos.x, pos.y, pos.z, 0.f).GetExactDist(startPoint.x, startPoint.y, startPoint.z));
+            PathDistance(Position(pos.x, pos.y, pos.z, 0.f).GetExactDist(startPoint.x, startPoint.y, startPoint.z));
         BattleBotWaypoint& endPoint = ((*path)[path->size() - 1]);
         float const endPointDistToDestination =
-            sqrt(Position(pos.x, pos.y, pos.z, 0.f).GetExactDist(endPoint.x, endPoint.y, endPoint.z));
+            PathDistance(Position(pos.x, pos.y, pos.z, 0.f).GetExactDist(endPoint.x, endPoint.y, endPoint.z));
 
         bool reverse = startPointDistToDestination < endPointDistToDestination;
+
+        if (coordinated && bgType == BATTLEGROUND_EY &&
+            (path == &vPath_EY_Horde_Spawn_to_Crossroad1Horde ||
+             path == &vPath_EY_Alliance_Spawn_to_Crossroad1Alliance) &&
+            (reverse || bot->GetPositionZ() < 1218.0f))
+            continue;
 
         // dont travel reverse if it's a reverse paths
         if (reverse && std::find(vPaths_NoReverseAllowed.begin(), vPaths_NoReverseAllowed.end(), path) !=
@@ -3288,7 +3505,7 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
         for (uint32 i = 0; i < path->size(); i++)
         {
             BattleBotWaypoint& waypoint = ((*path)[i]);
-            float const distToBot = sqrt(bot->GetDistance(waypoint.x, waypoint.y, waypoint.z));
+            float const distToBot = PathDistance(bot->GetDistance(waypoint.x, waypoint.y, waypoint.z));
             if (closestPointDistToBot > distToBot)
             {
                 closestPointDistToBot = distToBot;
@@ -3316,6 +3533,9 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
 
         if (chosenPathScore > pathScore)
         {
+            BattleBotWaypoint const& join = path->at(closestPointIndex);
+            if (coordinated && !HasGroundObjectivePath(join.x, join.y, join.z))
+                continue;
             chosenPathScore = pathScore;
             chosenPath = path;
             chosenPathPoint = closestPointIndex;
@@ -3345,7 +3565,9 @@ bool BGTactics::resetObjective()
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
 
-    if (bgType == BATTLEGROUND_WS)
+    if (RTGBattlegroundObjectiveBrain::IsEnabled(bot))
+        oddsToChangeRole = 0;
+    else if (bgType == BATTLEGROUND_WS)
         oddsToChangeRole = 2;
     else if (bgType == BATTLEGROUND_EY || bgType == BATTLEGROUND_IC || bgType == BATTLEGROUND_AB)
         oddsToChangeRole = 1;
@@ -3372,8 +3594,10 @@ bool BGTactics::resetObjective()
 
 bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 currentPoint, bool reverse)
 {
-    if (!currentPath)
+    if (!currentPath || currentPath->empty() || currentPoint >= currentPath->size())
         return false;
+
+    bool const coordinated = RTGBattlegroundObjectiveBrain::IsEnabled(bot);
 
     uint32 const lastPointInPath = reverse ? 0 : ((*currentPath).size() - 1);
 
@@ -3381,6 +3605,8 @@ bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 curr
     bool inCombat = bot->GetVehicle() ? (bool)AI_VALUE(Unit*, "enemy player target") : bot->IsInCombat();
     if (currentPoint == lastPointInPath || (inCombat && !PlayerHasFlag::IsCapturingFlag(bot)) || !bot->IsAlive())
     {
+        if (coordinated && _objectiveBrain.ShouldHold(bot))
+            return true;
         // Path is over.
         // std::ostringstream out;
         // out << "Reached path end!";
@@ -3398,6 +3624,15 @@ bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 curr
 
     uint32 nPoint = reverse ? std::max((int)(currPoint - urand(1, 5)), 0)
                             : std::min((uint32)(currPoint + urand(1, 5)), lastPointInPath);
+    if (coordinated)
+    {
+        BattleBotWaypoint const& join = currentPath->at(currentPoint);
+        nPoint = bot->GetDistance(join.x, join.y, join.z) > 4.5f ? currentPoint : currPoint;
+        BattleBotWaypoint const& step = currentPath->at(nPoint);
+        if (!HasGroundObjectivePath(step.x, step.y, step.z))
+            return false;
+        return MoveTo(bot->GetMapId(), step.x, step.y, step.z);
+    }
     BattleBotWaypoint& nextPoint = currentPath->at(nPoint);
 
     // std::ostringstream out;
@@ -3411,6 +3646,9 @@ bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 curr
 
 bool BGTactics::startNewPathBegin(std::vector<BattleBotPath*> const& vPaths)
 {
+    if (RTGBattlegroundObjectiveBrain::IsEnabled(bot))
+        return selectObjectiveWp(vPaths);
+
     Battleground* bg = bot->GetBattleground();
     if (!bg)
         return false;
@@ -3472,6 +3710,9 @@ bool BGTactics::startNewPathBegin(std::vector<BattleBotPath*> const& vPaths)
 
 bool BGTactics::startNewPathFree(std::vector<BattleBotPath*> const& vPaths)
 {
+    if (RTGBattlegroundObjectiveBrain::IsEnabled(bot))
+        return selectObjectiveWp(vPaths);
+
     Battleground* bg = bot->GetBattleground();
     if (!bg)
         return false;
@@ -3546,6 +3787,10 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
     BattlegroundTypeId bgType = bg->GetBgTypeID();
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
+
+    if (bgType == BATTLEGROUND_EY && RTGBattlegroundObjectiveBrain::IsEnabled(bot) &&
+        (bg->GetFlagPickerGUID() == bot->GetGUID() || bot->HasAura(BG_EY_NETHERSTORM_FLAG_SPELL)))
+        return false;
 
     // Initialize vectors for nearby objects and players
     GuidVector closeObjects;
@@ -3758,7 +4003,7 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             continue;
 
         // Special handling for WSG and EY base flags
-        bool isWsBaseFlag = bgType == BATTLEGROUND_WS && go->GetEntry() == vFlagsWS[bot->GetTeamId()];
+        bool isWsBaseFlag = bgType == BATTLEGROUND_WS && go->GetEntry() == vFlagsWS[bot->GetBgTeamId()];
         bool isEyBaseFlag = bgType == BATTLEGROUND_EY && go->GetEntry() == vFlagsEY[0];
 
         // Ensure bots are inside the Eye of the Storm capture circle before casting
@@ -3949,7 +4194,7 @@ bool BGTactics::flagTaken()
     if (!bg)
         return false;
 
-    return !bg->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId())).IsEmpty();
+    return !bg->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetBgTeamId())).IsEmpty();
 }
 
 bool BGTactics::teamFlagTaken()
@@ -3958,7 +4203,7 @@ bool BGTactics::teamFlagTaken()
     if (!bg)
         return false;
 
-    return !bg->GetFlagPickerGUID(bot->GetTeamId()).IsEmpty();
+    return !bg->GetFlagPickerGUID(bot->GetBgTeamId()).IsEmpty();
 }
 
 bool BGTactics::protectFC()
@@ -3966,6 +4211,13 @@ bool BGTactics::protectFC()
     Battleground* bg = bot->GetBattleground();
     if (!bg)
         return false;
+
+    if (RTGBattlegroundObjectiveBrain::IsEnabled(bot))
+    {
+        PositionInfo objective;
+        if (!_objectiveBrain.Update(botAI, objective) || !_objectiveBrain.IsEscort())
+            return false;
+    }
 
     Unit* teamFC = AI_VALUE(Unit*, "team flag carrier");
 
@@ -4065,7 +4317,7 @@ uint32 BGTactics::getPlayersInArea(TeamId teamId, Position point, float range, b
         if (!player)
             continue;
 
-        if (player->IsAlive() && (teamId == TEAM_NEUTRAL || teamId == player->GetTeamId()))
+        if (player->IsAlive() && (teamId == TEAM_NEUTRAL || teamId == player->GetBgTeamId()))
         {
             if (!combat && player->IsInCombat())
                 continue;

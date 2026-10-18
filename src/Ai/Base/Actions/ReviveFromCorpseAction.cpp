@@ -4,6 +4,12 @@
  * or (at your option) any later version.
  */
 
+/*
+ * PvP portions adapted from VincentVanclef/mod-playerbots, commit d7cc409c2e145bc4fa5b64bfc9539dab4cf11a43.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may
+ * redistribute it and/or modify it under version 3 of the License, or (at your option), any later version.
+ */
+
 #include "ReviveFromCorpseAction.h"
 #include "Corpse.h"
 #include "Event.h"
@@ -375,4 +381,7 @@ bool SpiritHealerAction::Execute(Event /*event*/)
     return false;
 }
 
-bool SpiritHealerAction::isUseful() { return bot->HasPlayerFlag(PLAYER_FLAGS_GHOST); }
+bool SpiritHealerAction::isUseful()
+{
+    return (!bot->InBattleground() || bot->InArena()) && bot->HasPlayerFlag(PLAYER_FLAGS_GHOST);
+}

@@ -1730,6 +1730,31 @@ Playerbots.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887
 # Improve reaction speeds in battlegrounds and arenas (may cause lag)
 Playerbots.FastReactInBG = 1
 
+# OPTIONAL PVP TACTICS AND WSG/EOTS OBJECTIVE COORDINATION
+# Adapted from VincentVanclef/mod-playerbots; disabled by default for existing installations.
+# Correct flag-carrier team/target selection and grounded battleground mount behavior.
+Playerbots.PvpTacticsImprovements = 0
+
+# Use ReactDelay as the dynamic combat AI tick delay in non-arena BGs when FastReactInBG is enabled.
+# May increase CPU usage. Does not change spell rotations or interaction/interrupt delays.
+Playerbots.PvpFastCombatReactions = 0
+
+# Stable WSG/EotS roles, carrier escort/interception, tower pressure and safe stuck recovery.
+# The existing battleground objective logic remains the fallback when disabled or unavailable.
+Playerbots.RTG.BG.ObjectiveBrain = 0
+# Enable diagnostic logging for objective assignments.
+Playerbots.RTG.BG.DebugObjectiveBrain = 0
+
+# Minimum interval between nearby-player objective reassessments, in milliseconds (1000-10000).
+Playerbots.RTG.BG.RecheckMs = 2000
+
+# Assignment commitment, in milliseconds (clamped to 5000-120000).
+Playerbots.RTG.BG.WSG.CommitMs = 18000
+Playerbots.RTG.BG.EOTS.CommitMs = 20000
+
+# No-progress interval before retrying a safe objective route, in milliseconds (5000-60000).
+Playerbots.RTG.BG.StuckRecoverMs = 10000
+
 #
 #
 ####################################################################################################

@@ -36,6 +36,7 @@ public:
 
     bool IsActive() override;
     static bool IsCapturingFlag(Player* bot);
+    static bool IsCarryingFlag(Player* bot);
 };
 
 class EnemyFlagCarrierNear : public Trigger

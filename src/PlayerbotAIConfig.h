@@ -112,6 +112,14 @@ public:
     uint32 GlobalCoolDown, ReactDelay, MaxWaitForMove, DisableMoveSplinePath, MaxMovementSearchTime, ExpireActionTime,
         DispelAuraDuration, PassiveDelay, RepeatDelay, ErrorDelay, RpgDelay, SitDelay, ReturnDelay, LootDelay;
     bool DynamicReactDelay;
+    bool PvpTacticsImprovements = false;
+    bool PvpFastCombatReactions = false;
+    bool BgObjectiveBrain = false;
+    bool BgDebugObjectiveBrain = false;
+    uint32 BgObjectiveRecheckMs = 2000;
+    uint32 BgWsgCommitMs = 18000;
+    uint32 BgEotsCommitMs = 20000;
+    uint32 BgStuckRecoverMs = 10000;
     float SightDistance, SpellDistance, ReactDistance, GrindDistance, LootDistance, ShootDistance, FleeDistance,
         TooCloseDistance, MeleeDistance, FollowDistance, WhisperDistance, ContactDistance, AoeRadius, RpgDistance,
         TargetPosRecalcDistance, FarDistance, HealDistance, AggroDistance;

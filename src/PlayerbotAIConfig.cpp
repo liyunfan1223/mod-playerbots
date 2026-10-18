@@ -18,6 +18,7 @@
 #include "Talentspec.h"
 #include "TravelMgr.h"
 #include <cctype>
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
@@ -220,6 +221,18 @@ bool PlayerbotAIConfig::Initialize()
                                            "3973,4085,4086,4087,4088,251"),
         PvpProhibitedAreaIds);
     FastReactInBG = sConfigMgr->GetOption<bool>("Playerbots.FastReactInBG", true);
+    PvpTacticsImprovements = sConfigMgr->GetOption<bool>("Playerbots.PvpTacticsImprovements", false);
+    PvpFastCombatReactions = sConfigMgr->GetOption<bool>("Playerbots.PvpFastCombatReactions", false);
+    BgObjectiveBrain = sConfigMgr->GetOption<bool>("Playerbots.RTG.BG.ObjectiveBrain", false);
+    BgDebugObjectiveBrain = sConfigMgr->GetOption<bool>("Playerbots.RTG.BG.DebugObjectiveBrain", false);
+    BgObjectiveRecheckMs =
+        std::clamp<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RTG.BG.RecheckMs", 2000), 1000, 10000);
+    BgWsgCommitMs =
+        std::clamp<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RTG.BG.WSG.CommitMs", 18000), 5000, 120000);
+    BgEotsCommitMs =
+        std::clamp<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RTG.BG.EOTS.CommitMs", 20000), 5000, 120000);
+    BgStuckRecoverMs =
+        std::clamp<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RTG.BG.StuckRecoverMs", 10000), 5000, 60000);
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("Playerbots.RandomBotQuestIds", "3802,5505,6502,7761,7848,10277,10285,11492,"
                                            "13188,13189,24499,24511,24710,24712"),

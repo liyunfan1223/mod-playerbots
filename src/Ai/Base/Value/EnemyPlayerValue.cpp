@@ -4,11 +4,33 @@
  * or (at your option) any later version.
  */
 
+/*
+ * PvP portions adapted from VincentVanclef/mod-playerbots, commit d7cc409c2e145bc4fa5b64bfc9539dab4cf11a43.
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license, you may
+ * redistribute it and/or modify it under version 3 of the License, or (at your option), any later version.
+ */
+
 #include "EnemyPlayerValue.h"
 #include "CombatManager.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
+
+namespace
+{
+bool ImprovedBgTeams(Player* bot)
+{
+    return bot && bot->InBattleground() && !bot->InArena() &&
+           (sPlayerbotAIConfig.PvpTacticsImprovements || sPlayerbotAIConfig.BgObjectiveBrain);
+}
+
+bool IsEnemyBgPlayer(Player* bot, Player* player)
+{
+    return player && bot->InBattleground() && player->InBattleground() && bot->IsInMap(player) &&
+           bot->GetBattlegroundId() == player->GetBattlegroundId() && bot->GetBgTeamId() != TEAM_NEUTRAL &&
+           player->GetBgTeamId() != TEAM_NEUTRAL && bot->GetBgTeamId() != player->GetBgTeamId();
+}
+}  // namespace
 
 bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
 {
@@ -18,11 +40,14 @@ bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
 
     bool inCannon = botAI->IsInVehicle(false, true);
     Player* enemy = dynamic_cast<Player*>(unit);
-    if (enemy && botAI->IsOpposing(enemy) && enemy->IsPvP() &&
+    bool const isEnemy =
+        ImprovedBgTeams(bot) && bot->InBattleground() ? IsEnemyBgPlayer(bot, enemy) : enemy && botAI->IsOpposing(enemy);
+    if (enemy && isEnemy && enemy->IsPvP() &&
         !sPlayerbotAIConfig.IsPvpProhibited(enemy->GetZoneId(), enemy->GetAreaId()) &&
         !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NON_ATTACKABLE_2) &&
         ((inCannon || !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))) &&
-        /*!enemy->HasStealthAura() && !enemy->HasInvisibilityAura()*/ (bot->InBattleground() ? bot->CanSeeOrDetect(enemy) : enemy->CanSeeOrDetect(bot)) &&
+        /*!enemy->HasStealthAura() && !enemy->HasInvisibilityAura()*/
+        (bot->InBattleground() ? bot->CanSeeOrDetect(enemy) : enemy->CanSeeOrDetect(bot)) &&
         !(enemy->HasSpiritOfRedemptionAura()))
     {
         // If with master, only attack if master is PvP flagged
@@ -57,6 +82,7 @@ Unit* EnemyPlayerValue::Calculate()
     // 1. Check units we are currently in PvP combat with.
     std::vector<Unit*> targets;
     Unit* pVictim = bot->GetVictim();
+    TeamId const bgTeam = ImprovedBgTeams(bot) && bot->InBattleground() ? bot->GetBgTeamId() : bot->GetTeamId();
     for (auto const& [guid, combatRef] : bot->GetCombatManager().GetPvPCombatRefs())
     {
         Unit* pTarget = combatRef->GetOther(bot);
@@ -65,8 +91,10 @@ Unit* EnemyPlayerValue::Calculate()
             !bot->IsWithinDist(pTarget, VISIBILITY_DISTANCE_NORMAL))
             continue;
 
-        if ((bot->GetTeamId() == TEAM_HORDE && pTarget->HasAura(23333)) ||
-            (bot->GetTeamId() == TEAM_ALLIANCE && pTarget->HasAura(23335)))
+        if (ImprovedBgTeams(bot) && bot->InBattleground() && !IsEnemyBgPlayer(bot, pTarget->ToPlayer()))
+            continue;
+
+        if ((bgTeam == TEAM_HORDE && pTarget->HasAura(23333)) || (bgTeam == TEAM_ALLIANCE && pTarget->HasAura(23335)))
             return pTarget;
 
         targets.push_back(pTarget);
@@ -98,12 +126,15 @@ Unit* EnemyPlayerValue::Calculate()
         if (pTarget == pVictim)
             continue;
 
-        if (bot->GetTeamId() == TEAM_HORDE)
+        if (ImprovedBgTeams(bot) && bot->InBattleground() && !IsEnemyBgPlayer(bot, pTarget))
+            continue;
+
+        if (bgTeam == TEAM_HORDE)
         {
             if (pTarget->HasAura(23333))
                 return pTarget;
         }
-        else
+        else if (bgTeam == TEAM_ALLIANCE)
         {
             if (pTarget->HasAura(23335))
                 return pTarget;
@@ -138,8 +169,11 @@ Unit* EnemyPlayerValue::Calculate()
                     continue;
 
                 if (Unit* pAttacker = pMember->getAttackerForHelper())
-                    if (pAttacker->IsPlayer() && bot->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) &&
-                        bot->IsWithinLOSInMap(pAttacker) && pAttacker != pVictim &&
+                    if (pAttacker->IsPlayer() &&
+                        (!ImprovedBgTeams(bot) || !bot->InBattleground() ||
+                         IsEnemyBgPlayer(bot, pAttacker->ToPlayer())) &&
+                        bot->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) && bot->IsWithinLOSInMap(pAttacker) &&
+                        pAttacker != pVictim &&
                         (bot->InBattleground() ? bot->CanSeeOrDetect(pAttacker) : pAttacker->CanSeeOrDetect(bot)))
                         return pAttacker;
             }
