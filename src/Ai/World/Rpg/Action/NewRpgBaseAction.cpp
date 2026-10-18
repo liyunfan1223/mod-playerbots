@@ -1134,6 +1134,23 @@ bool NewRpgBaseAction::IsStrandedInOpenWater()
     if (!bot->IsInWater() || bot->IsUnderWater())
         return false;
 
+    // Serviced areas (capitals, cities, travel hubs) may have deep water; never recover there.
+    if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(bot->GetZoneId()))
+    {
+        if (area->flags & (AREA_FLAG_CAPITAL | AREA_FLAG_CITY | AREA_FLAG_SLAVE_CAPITAL | AREA_FLAG_SLAVE_CAPITAL2))
+            return false;
+    }
+
+    auto nearHub = [this](std::vector<WorldLocation> const& hubs)
+    {
+        for (WorldLocation const& hub : hubs)
+            if (hub.GetMapId() == bot->GetMapId() && bot->GetExactDist(hub) < 200.0f)
+                return true;
+        return false;
+    };
+    if (nearHub(sTravelMgr.GetCityLocations(bot)) || nearHub(sTravelMgr.GetTravelHubs(bot)))
+        return false;
+
     float const ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), bot->GetPositionX(), bot->GetPositionY(),
                                                   bot->GetPositionZ() + bot->GetCollisionHeight(), true, 5.0f);
     return ground == INVALID_HEIGHT || ground == VMAP_INVALID_HEIGHT_VALUE;
@@ -1180,7 +1197,7 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
     // Safety check. No usable status where the bot currently is: recover before resting.
     if (availableStatus.empty() || probSum == 0)
     {
-        if (RecoverToRpgArea())
+        if (sPlayerbotAIConfig.RpgAreaRecovery && RecoverToRpgArea())
             return true;
 
         botAI->rpgInfo.ChangeToRest();
