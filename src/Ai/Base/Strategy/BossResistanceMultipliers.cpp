@@ -29,6 +29,8 @@ float BossNatureAspectHoldMultiplier::GetValue(Action* action)
     if (!competingAspects.count(action->getName()))
         return 1.0f;
 
+    // keep in step with BossNatureResistanceTrigger's gate, or the Wild cast and the Dragonhawk node
+    // trade the aspect slot every tick
     Unit* boss = ai::buff::FindBossByName(botAI, _bossName);
     if (!boss || !boss->IsAlive() || boss->IsFriendlyTo(bot))
         return 1.0f;
