@@ -50,7 +50,8 @@ bool IsZulAmanBoss(uint32 entry)
 {
     return entry == Id(ZaNpcs::NPC_AKILZON) || entry == Id(ZaNpcs::NPC_NALORAKK) ||
         entry == Id(ZaNpcs::NPC_JANALAI) || entry == Id(ZaNpcs::NPC_HALAZZI) ||
-        entry == Id(ZaNpcs::NPC_HEX_LORD_MALACRASS) || entry == Id(ZaNpcs::NPC_ZULJIN);
+        entry == Id(ZaNpcs::NPC_HALAZZI_TROLL) || entry == Id(ZaNpcs::NPC_HEX_LORD_MALACRASS) ||
+        entry == Id(ZaNpcs::NPC_ZULJIN);
 }
 
 Unit* GetZulAmanBoss(Player* bot)
@@ -181,7 +182,7 @@ float ZulAmanDisableTankActionsMultiplier::GetValueInEncounter(Action* action)
     }
 
     // Halazzi: The assist tank picks up the lynx so disable the main tank from taunting it.
-    if (bossEntry == Id(ZaNpcs::NPC_HALAZZI))
+    if (bossEntry == Id(ZaNpcs::NPC_HALAZZI) || bossEntry == Id(ZaNpcs::NPC_HALAZZI_TROLL))
     {
         if (!isTaunt)
             return 0.0f;

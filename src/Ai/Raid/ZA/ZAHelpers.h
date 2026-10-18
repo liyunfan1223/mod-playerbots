@@ -82,6 +82,7 @@ enum class ZaNpcs : uint32
 
     // Halazzi <Lynx Avatar>
     NPC_HALAZZI                     = 23577,
+    NPC_HALAZZI_TROLL               = 24144,
     NPC_SPIRIT_OF_THE_LYNX          = 24143,
     NPC_CORRUPTED_LIGHTNING_TOTEM   = 24224,
 
