@@ -20,6 +20,7 @@
 #include <cctype>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 template <class T>
 void LoadList(std::string const value, T& list)
@@ -244,6 +245,14 @@ bool PlayerbotAIConfig::Initialize()
     RandomBotAutologin = sConfigMgr->GetOption<bool>("Playerbots.RandomBotAutologin", true);
     MinRandomBots = sConfigMgr->GetOption<int32>("Playerbots.MinRandomBots", 500);
     MaxRandomBots = sConfigMgr->GetOption<int32>("Playerbots.MaxRandomBots", 500);
+    // An inverted range aborts the worldserver on the first population tick, since urand asserts on it.
+    if (MinRandomBots > MaxRandomBots)
+    {
+        LOG_ERROR("server.loading",
+                  "Playerbots.MinRandomBots ({}) is higher than Playerbots.MaxRandomBots ({}). Swapping them.",
+                  MinRandomBots, MaxRandomBots);
+        std::swap(MinRandomBots, MaxRandomBots);
+    }
     RandomBotUpdateInterval = sConfigMgr->GetOption<int32>("Playerbots.RandomBotUpdateInterval", 20);
     RandomBotCountChangeMinInterval =
         sConfigMgr->GetOption<int32>("Playerbots.RandomBotCountChangeMinInterval", 30 * MINUTE);
