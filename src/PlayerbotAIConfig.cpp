@@ -681,6 +681,13 @@ bool PlayerbotAIConfig::Initialize()
     RandomBotXPRate = sConfigMgr->GetOption<float>("Playerbots.RandomBotXPRate", 1.0);
     RandomBotAllianceRatio = sConfigMgr->GetOption<int32>("Playerbots.RandomBotAllianceRatio", 50);
     RandomBotHordeRatio = sConfigMgr->GetOption<int32>("Playerbots.RandomBotHordeRatio", 50);
+    if (!RandomBotAllianceRatio && !RandomBotHordeRatio)    // AddRandomBots() divides by 0 if both ratio = 0
+    {
+        LOG_ERROR("server.loading",
+                  "Playerbots.RandomBotAllianceRatio and Playerbots.RandomBotHordeRatio are both 0. Using 50/50.");
+        RandomBotAllianceRatio = 50;
+        RandomBotHordeRatio = 50;
+    }
     DisableDeathKnightLogin = sConfigMgr->GetOption<bool>("Playerbots.DisableDeathKnightLogin", 0);
     LimitTalentsExpansion = sConfigMgr->GetOption<bool>("Playerbots.LimitTalentsExpansion", 0);
     BotActiveAlone = sConfigMgr->GetOption<int32>("Playerbots.BotActiveAlone", 10);
