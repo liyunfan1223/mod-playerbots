@@ -221,9 +221,9 @@ bool PlayerbotAIConfig::Initialize()
                                            "3973,4085,4086,4087,4088,251"),
         PvpProhibitedAreaIds);
     FastReactInBG = sConfigMgr->GetOption<bool>("Playerbots.FastReactInBG", true);
-    PvpFlagInteractionDelayMin = sConfigMgr->GetOption<uint32>("Playerbots.PvpFlagInteractionDelayMin", 1000);
+    PvpFlagInteractionDelayMin = sConfigMgr->GetOption<uint32>("Playerbots.PvpFlagInteractionDelayMin", 300);
     PvpFlagInteractionDelayMax = sConfigMgr->GetOption<uint32>("Playerbots.PvpFlagInteractionDelayMax", 3000);
-    PvpInterruptReactionDelayMin = sConfigMgr->GetOption<uint32>("Playerbots.PvpInterruptReactionDelayMin", 1000);
+    PvpInterruptReactionDelayMin = sConfigMgr->GetOption<uint32>("Playerbots.PvpInterruptReactionDelayMin", 300);
     PvpInterruptReactionDelayMax = sConfigMgr->GetOption<uint32>("Playerbots.PvpInterruptReactionDelayMax", 3000);
 
     if (PvpFlagInteractionDelayMin > PvpFlagInteractionDelayMax)

@@ -1737,7 +1737,7 @@ Playerbots.FastReactInBG = 1
 # WSG flag carriers enter the capture area and turn in immediately, without this delay.
 # Set both values to 0 to disable the artificial delay. If Max is lower than Min, the values
 # are swapped automatically when the configuration is loaded.
-Playerbots.PvpFlagInteractionDelayMin = 1000
+Playerbots.PvpFlagInteractionDelayMin = 300
 Playerbots.PvpFlagInteractionDelayMax = 3000
 
 # PVP INTERRUPT (CC) REACTION DELAY
@@ -1747,7 +1747,7 @@ Playerbots.PvpFlagInteractionDelayMax = 3000
 # affects casts made by players; PvE/NPC interrupts remain immediate. If the cast finishes before
 # the selected delay expires, the bot will not interrupt it. Set both values to 0 to disable the
 # artificial delay. If Max is lower than Min, the values are swapped automatically on load.
-Playerbots.PvpInterruptReactionDelayMin = 1000
+Playerbots.PvpInterruptReactionDelayMin = 300
 Playerbots.PvpInterruptReactionDelayMax = 3000
 
 #
