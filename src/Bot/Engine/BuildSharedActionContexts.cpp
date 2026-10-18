@@ -24,6 +24,7 @@
 #include "SSCActionContext.h"
 #include "TKActionContext.h"
 #include "TbcDungeonActionContext.h"
+#include "UldActionContext.h"
 #include "VoAActionContext.h"
 #include "WorldPacketActionContext.h"
 #include "WotlkDungeonActionContext.h"
@@ -50,6 +51,7 @@ void AiObjectContext::BuildSharedActionContexts(
     actionContexts.Add(new RaidOsActionContext());
     actionContexts.Add(new RaidEoEActionContext());
     actionContexts.Add(new RaidVoAActionContext());
+    actionContexts.Add(new RaidUlduarActionContext());
     actionContexts.Add(new RaidOnyxiaActionContext());
     actionContexts.Add(new RaidIccActionContext());
     actionContexts.Add(new RaidRsActionContext());

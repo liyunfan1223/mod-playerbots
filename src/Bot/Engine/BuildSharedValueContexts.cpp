@@ -14,6 +14,7 @@
 #include "SSCValueContext.h"
 #include "TKValueContext.h"
 #include "UBValueContext.h"
+#include "UldValueContext.h"
 #include "ZAValueContext.h"
 #include "ValueContext.h"
 
@@ -31,4 +32,5 @@ void AiObjectContext::BuildSharedValueContexts(
     valueContexts.Add(new TbcDungeonMgTValueContext());
     valueContexts.Add(new TbcDungeonUnderbogValueContext());
     valueContexts.Add(new WotlkDungeonGDValueContext());
+    valueContexts.Add(new RaidUlduarValueContext());
 }
