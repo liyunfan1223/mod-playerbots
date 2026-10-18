@@ -1051,7 +1051,8 @@ std::vector<Player*> GetYoggSaronBrainTeam(PlayerbotAI* botAI)
     if (!healers.empty())
         team.push_back(healers.front());
     team.insert(team.end(), ranged.begin(), ranged.end());
-    team.insert(team.end(), healers.begin() + (healers.empty() ? 0 : 1), healers.end());
+    if (healers.size() > 1)
+        team.insert(team.end(), healers.begin() + 1, healers.end());
 
     if (team.size() > size)
         team.resize(size);
