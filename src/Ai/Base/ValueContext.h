@@ -94,6 +94,7 @@
 #include "ThreatValues.h"
 #include "TradeValues.h"
 #include "Value.h"
+#include "SotaTacticsValue.h"
 #include "WaitForAttackTimeValue.h"
 
 class PlayerbotAI;
@@ -104,6 +105,7 @@ public:
     ValueContext()
     {
         creators["active spell"] = &ValueContext::active_spell;
+        creators["sota tactics"] = &ValueContext::sota_tactics;
         creators["craft"] = &ValueContext::craft;
         creators["collision"] = &ValueContext::collision;
         creators["skip spells list"] = &ValueContext::skip_spells_list_value;
@@ -333,6 +335,7 @@ public:
     }
 
 private:
+    static UntypedValue* sota_tactics(PlayerbotAI* botAI) { return new SotaTacticsValue(botAI); }
     static UntypedValue* party_member_without_water(PlayerbotAI* botAI)
     {
         return new PartyMemberWithoutWaterValue(botAI);

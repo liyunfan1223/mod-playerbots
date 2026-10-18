@@ -5,7 +5,40 @@
  */
 
 #include "BattlegroundStrategy.h"
+#include "ChooseTargetActions.h"
 #include "Playerbots.h"
+#include "SotaActions.h"
+
+namespace
+{
+class SotaMovementMultiplier : public Multiplier
+{
+public:
+    explicit SotaMovementMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "sota movement") {}
+
+    float GetValue(Action* action) override
+    {
+        SotaTactics tactics = GetSotaTactics(botAI);
+        if (!tactics.enabled || !dynamic_cast<MovementAction*>(action))
+            return 1.0f;
+        if (dynamic_cast<AttackEnemyPlayerAction*>(action) || dynamic_cast<DpsAssistAction*>(action) ||
+            dynamic_cast<TankAssistAction*>(action) || dynamic_cast<DpsAoeAction*>(action) ||
+            dynamic_cast<AttackLeastHpTargetAction*>(action) || dynamic_cast<AggressiveTargetAction*>(action) ||
+            dynamic_cast<AttackAnythingAction*>(action))
+            if (Unit* target = GetSotaDefenseTarget(botAI, tactics))
+                if (action->GetTarget() != target)
+                    return 0.0f;
+        if (tactics.active && bot->IsInCombat() && !bot->GetVehicle() && dynamic_cast<AttackAction*>(action))
+            return 1.0f;
+        if (dynamic_cast<SotaLandingAction*>(action) || dynamic_cast<SotaMoveAction*>(action) ||
+            dynamic_cast<SotaEnterVehicleAction*>(action) || dynamic_cast<SotaDriveVehicleAction*>(action))
+            return 1.0f;
+        if (!tactics.active || tactics.landingRequired || bot->GetVehicle())
+            return 0.0f;
+        return 1.0f;
+    }
+};
+}  // namespace
 
 void BGStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
@@ -83,4 +116,22 @@ void ArenaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(
         new TriggerNode("no possible targets", { NextAction("arena tactics", ACTION_BG)}));
+}
+
+void SotaStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
+{
+    triggers.push_back(new TriggerNode(
+        "often", {NextAction("sota prepare", ACTION_EMERGENCY + 1.0f), NextAction("sota land", ACTION_EMERGENCY)}));
+    triggers.push_back(new TriggerNode(
+        "bg active",
+        {NextAction("sota leave vehicle", ACTION_MOVE + 5.0f), NextAction("sota fire vehicle", ACTION_MOVE + 4.0f),
+         NextAction("sota drive vehicle", ACTION_MOVE + 3.0f), NextAction("sota enter vehicle", ACTION_MOVE + 2.0f),
+         NextAction("sota deploy", ACTION_MOVE + 2.0f), NextAction("sota fall back", ACTION_MOVE + 1.0f),
+         NextAction("sota interact", ACTION_MOVE), NextAction("sota attack demolisher", ACTION_RAID),
+         NextAction("sota move", ACTION_BG)}));
+}
+
+void SotaStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
+{
+    multipliers.push_back(new SotaMovementMultiplier(botAI));
 }

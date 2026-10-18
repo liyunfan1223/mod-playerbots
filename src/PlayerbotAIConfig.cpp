@@ -224,6 +224,7 @@ bool PlayerbotAIConfig::Initialize()
     PvpTacticsImprovements = sConfigMgr->GetOption<bool>("Playerbots.PvpTacticsImprovements", false);
     PvpFastCombatReactions = sConfigMgr->GetOption<bool>("Playerbots.PvpFastCombatReactions", false);
     BgObjectiveBrain = sConfigMgr->GetOption<bool>("Playerbots.RTG.BG.ObjectiveBrain", false);
+    SotaTacticsEnabled = sConfigMgr->GetOption<bool>("Playerbots.BG.Sota.Enabled", false);
     BgDebugObjectiveBrain = sConfigMgr->GetOption<bool>("Playerbots.RTG.BG.DebugObjectiveBrain", false);
     BgObjectiveRecheckMs =
         std::clamp<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RTG.BG.RecheckMs", 2000), 1000, 10000);
@@ -233,6 +234,10 @@ bool PlayerbotAIConfig::Initialize()
         std::clamp<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RTG.BG.EOTS.CommitMs", 20000), 5000, 120000);
     BgStuckRecoverMs =
         std::clamp<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RTG.BG.StuckRecoverMs", 10000), 5000, 60000);
+    PvpFlagInteractionDelayMin = sConfigMgr->GetOption<uint32>("Playerbots.PvpFlagInteractionDelayMin", 300);
+    PvpFlagInteractionDelayMax = sConfigMgr->GetOption<uint32>("Playerbots.PvpFlagInteractionDelayMax", 3000);
+    if (PvpFlagInteractionDelayMin > PvpFlagInteractionDelayMax)
+        std::swap(PvpFlagInteractionDelayMin, PvpFlagInteractionDelayMax);
     LoadList<std::vector<uint32>>(
         sConfigMgr->GetOption<std::string>("Playerbots.RandomBotQuestIds", "3802,5505,6502,7761,7848,10277,10285,11492,"
                                            "13188,13189,24499,24511,24710,24712"),

@@ -483,6 +483,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         if (bgType == BATTLEGROUND_IC)
             engine->addStrategy("isle", false);
 
+        if (bgType == BATTLEGROUND_SA && sPlayerbotAIConfig.SotaTacticsEnabled)
+            engine->addStrategy("sota", false);
+
         if (player->InArena())
         {
             engine->addStrategy("arena", false);
@@ -705,6 +708,9 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 
         if (bgType == BATTLEGROUND_IC)
             nonCombatEngine->addStrategy("isle", false);
+
+        if (bgType == BATTLEGROUND_SA && sPlayerbotAIConfig.SotaTacticsEnabled)
+            nonCombatEngine->addStrategy("sota", false);
 
         if (player->InArena())
         {

@@ -1745,6 +1745,16 @@ Playerbots.RTG.BG.ObjectiveBrain = 0
 # Enable diagnostic logging for objective assignments.
 Playerbots.RTG.BG.DebugObjectiveBrain = 0
 
+# Strand of the Ancients: split ship landing, siege vehicles, graveyards and staged defense.
+# Requires the companion core SotA state-accessor and graveyard-interaction fixes.
+Playerbots.BG.Sota.Enabled = 0
+
+# Artificial reaction delay before starting a SotA graveyard opening cast, in milliseconds.
+# The native eight-second cast remains unchanged. Set both to 0 to disable the artificial delay.
+# Min and Max are swapped on load when Max is lower. Shared with the PvP flag interaction policy.
+Playerbots.PvpFlagInteractionDelayMin = 300
+Playerbots.PvpFlagInteractionDelayMax = 3000
+
 # Minimum interval between nearby-player objective reassessments, in milliseconds (1000-10000).
 Playerbots.RTG.BG.RecheckMs = 2000
 

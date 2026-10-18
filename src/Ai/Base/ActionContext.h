@@ -12,6 +12,7 @@
 #include "AutoMaintenanceOnLevelupAction.h"
 #include "BattleGroundJoinAction.h"
 #include "BattleGroundTactics.h"
+#include "SotaActions.h"
 #include "BotStateActions.h"
 #include "BuyAction.h"
 #include "CancelChannelAction.h"
@@ -216,6 +217,17 @@ public:
 
         // BG Tactics
         creators["bg tactics"] = &ActionContext::bg_tactics;
+        creators["sota land"] = &ActionContext::sota_land;
+        creators["sota prepare"] = &ActionContext::sota_prepare;
+        creators["sota deploy"] = &ActionContext::sota_deploy;
+        creators["sota move"] = &ActionContext::sota_move;
+        creators["sota fall back"] = &ActionContext::sota_fall_back;
+        creators["sota interact"] = &ActionContext::sota_interact;
+        creators["sota enter vehicle"] = &ActionContext::sota_enter_vehicle;
+        creators["sota drive vehicle"] = &ActionContext::sota_drive_vehicle;
+        creators["sota fire vehicle"] = &ActionContext::sota_fire_vehicle;
+        creators["sota leave vehicle"] = &ActionContext::sota_leave_vehicle;
+        creators["sota attack demolisher"] = &ActionContext::sota_attack_demolisher;
         creators["bg move to start"] = &ActionContext::bg_move_to_start;
         creators["bg reset objective force"] = &ActionContext::bg_reset_objective_force;
         creators["bg move to objective"] = &ActionContext::bg_move_to_objective;
@@ -421,6 +433,17 @@ private:
 
     // BG Tactics
     static Action* bg_tactics(PlayerbotAI* botAI) { return new BGTactics(botAI); }
+    static Action* sota_land(PlayerbotAI* botAI) { return new SotaLandingAction(botAI); }
+    static Action* sota_prepare(PlayerbotAI* botAI) { return new SotaPrepareAction(botAI); }
+    static Action* sota_deploy(PlayerbotAI* botAI) { return new SotaDeployAction(botAI); }
+    static Action* sota_move(PlayerbotAI* botAI) { return new SotaMoveAction(botAI); }
+    static Action* sota_fall_back(PlayerbotAI* botAI) { return new SotaFallBackAction(botAI); }
+    static Action* sota_interact(PlayerbotAI* botAI) { return new SotaInteractAction(botAI); }
+    static Action* sota_enter_vehicle(PlayerbotAI* botAI) { return new SotaEnterVehicleAction(botAI); }
+    static Action* sota_drive_vehicle(PlayerbotAI* botAI) { return new SotaDriveVehicleAction(botAI); }
+    static Action* sota_fire_vehicle(PlayerbotAI* botAI) { return new SotaFireVehicleAction(botAI); }
+    static Action* sota_leave_vehicle(PlayerbotAI* botAI) { return new SotaLeaveVehicleAction(botAI); }
+    static Action* sota_attack_demolisher(PlayerbotAI* botAI) { return new SotaAttackDemolisherAction(botAI); }
     static Action* bg_move_to_start(PlayerbotAI* botAI) { return new BGTactics(botAI, "move to start"); }
     static Action* bg_reset_objective_force(PlayerbotAI* botAI) { return new BGTactics(botAI, "reset objective force"); }
     static Action* bg_move_to_objective(PlayerbotAI* botAI) { return new BGTactics(botAI, "move to objective"); }

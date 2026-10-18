@@ -79,6 +79,16 @@ public:
     std::string const getName() override { return "isle"; }
 };
 
+class SotaStrategy : public Strategy
+{
+public:
+    explicit SotaStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+    uint32 GetType() const override { return STRATEGY_TYPE_GENERIC; }
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
+    std::string const getName() override { return "sota"; }
+};
+
 class ArenaStrategy : public Strategy
 {
 public:

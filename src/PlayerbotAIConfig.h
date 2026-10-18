@@ -115,6 +115,7 @@ public:
     bool PvpTacticsImprovements = false;
     bool PvpFastCombatReactions = false;
     bool BgObjectiveBrain = false;
+    bool SotaTacticsEnabled = false;
     bool BgDebugObjectiveBrain = false;
     uint32 BgObjectiveRecheckMs = 2000;
     uint32 BgWsgCommitMs = 18000;
@@ -313,6 +314,8 @@ public:
     bool DeleteRandomBotGuilds;
     std::vector<uint32> PvpProhibitedZoneIds;
     std::vector<uint32> PvpProhibitedAreaIds;
+    uint32 PvpFlagInteractionDelayMin;
+    uint32 PvpFlagInteractionDelayMax;
     bool FastReactInBG;
 
     bool RandomBotsWalkingRPG;

@@ -105,6 +105,7 @@ public:
         creators["behind"] = &StrategyContext::behind;
         creators["bg"] = &StrategyContext::bg;
         creators["battleground"] = &StrategyContext::battleground;
+        creators["sota"] = &StrategyContext::sota;
         creators["warsong"] = &StrategyContext::warsong;
         creators["alterac"] = &StrategyContext::alterac;
         creators["arathi"] = &StrategyContext::arathi;
@@ -181,6 +182,7 @@ private:
     static Strategy* mount(PlayerbotAI* botAI) { return new MountStrategy(botAI); }
     static Strategy* bg(PlayerbotAI* botAI) { return new BGStrategy(botAI); }
     static Strategy* battleground(PlayerbotAI* botAI) { return new BattlegroundStrategy(botAI); }
+    static Strategy* sota(PlayerbotAI* botAI) { return new SotaStrategy(botAI); }
     static Strategy* warsong(PlayerbotAI* botAI) { return new WarsongStrategy(botAI); }
     static Strategy* alterac(PlayerbotAI* botAI) { return new AlteracStrategy(botAI); }
     static Strategy* arathi(PlayerbotAI* botAI) { return new ArathiStrategy(botAI); }
