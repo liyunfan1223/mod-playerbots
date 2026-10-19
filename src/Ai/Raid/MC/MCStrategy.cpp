@@ -81,6 +81,9 @@ void RaidMcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(
         new TriggerNode("mc majordomo shadow resistance",
                         { NextAction("mc majordomo shadow resistance", ACTION_RAID) }));
+    triggers.push_back(
+        new TriggerNode("mc majordomo damage shield",
+                        { NextAction("mc majordomo stop attack", ACTION_RAID + 1) }));
 
     // Ragnaros
     triggers.push_back(
@@ -103,6 +106,7 @@ void RaidMcStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
     multipliers.push_back(new GarrDisableDpsAoeMultiplier(botAI));
     multipliers.push_back(new BaronGeddonAbilityMultiplier(botAI));
     multipliers.push_back(new GolemaggMultiplier(botAI));
+    multipliers.push_back(new MajordomoReflectionMultiplier(botAI));
 }
 
 void RaidMcStrategy::AppendTargetExclusions(GuidSet& exclusions, TargetValueExclusionType type)
@@ -117,6 +121,11 @@ void RaidMcStrategy::AppendTargetExclusions(GuidSet& exclusions, TargetValueExcl
     // through their own target selection.
     AiObjectContext* context = botAI->GetAiObjectContext();
     bool const golemaggAlive = AI_VALUE2(Unit*, "find target", "golemagg the incinerator") != nullptr;
+    // The DPS target search skips the moon (crowd control) mark, so a moon-marked healer does not count.
+    Group const* group = botAI->GetBot()->GetGroup();
+    ObjectGuid const moonGuid = group ? group->GetTargetIcon(4) : ObjectGuid::Empty;
+    bool flamewakerHealerAlive = false;
+    GuidVector flamewakerElites;
     for (ObjectGuid const guid : AI_VALUE(GuidVector, "attackers"))
     {
         Unit* unit = botAI->GetUnit(guid);
@@ -125,5 +134,13 @@ void RaidMcStrategy::AppendTargetExclusions(GuidSet& exclusions, TargetValueExcl
 
         if ((golemaggAlive && unit->GetEntry() == NPC_CORE_RAGER) || unit->GetEntry() == NPC_MAJORDOMO_EXECUTUS)
             exclusions.insert(guid);
+        else if (unit->GetEntry() == NPC_FLAMEWAKER_HEALER && unit->IsAlive() && guid != moonGuid)
+            flamewakerHealerAlive = true;
+        else if (unit->GetEntry() == NPC_FLAMEWAKER_ELITE)
+            flamewakerElites.push_back(guid);
     }
+
+    // Majordomo's healers first: they heal the elites and each other.
+    if (type == TargetValueExclusionType::DpsTarget && flamewakerHealerAlive)
+        exclusions.insert(flamewakerElites.begin(), flamewakerElites.end());
 }

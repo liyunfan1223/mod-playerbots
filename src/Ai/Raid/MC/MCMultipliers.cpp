@@ -142,3 +142,62 @@ float GolemaggMultiplier::GetValue(Action* action)
     }
     return 1.0f;
 }
+
+float MajordomoReflectionMultiplier::GetValue(Action* action)
+{
+    // Majordomo shields his adds for 10 s: Magic Reflection sends spells back at the caster, Damage Shield
+    // burns every melee hit. Bots hold those attacks on their target until it fades; tanks keep the adds.
+    if (PlayerbotAI::IsTank(bot))
+        return 1.0f;
+
+    bool const isAttack = dynamic_cast<AttackAction*>(action) != nullptr;
+    auto* spellAction = dynamic_cast<CastSpellAction*>(action);
+    if (!isAttack && !spellAction)
+        return 1.0f;
+
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!IsMajordomoAdd(target))
+        return 1.0f;
+
+    bool const reflects = target->HasAura(SPELL_MAGIC_REFLECTION);
+    bool const shielded = target->HasAura(SPELL_DAMAGE_SHIELD);
+    if (!reflects && !shielded)
+        return 1.0f;
+
+    // Only melee swings hit the shield; ranged auto-attacks do not.
+    if (isAttack)
+        return shielded && PlayerbotAI::IsMelee(bot) ? 0.0f : 1.0f;
+
+    if (spellAction->GetTargetName() != "current target")
+        return 1.0f;
+
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(AI_VALUE2(uint32, "spell id", spellAction->getSpell()));
+    if (!spellInfo)
+        return 1.0f;
+
+    // The core's own tests: Spell::m_canReflect, and Unit::DealDamage for Damage Shield procs.
+    auto const canReflect = [](SpellInfo const* info)
+    {
+        return info && info->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !info->HasAttribute(SPELL_ATTR0_IS_ABILITY) &&
+               !info->HasAttribute(SPELL_ATTR1_NO_REFLECTION) && !info->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) &&
+               !info->IsPassive() && (!info->IsPositive() || info->HasEffect(SPELL_EFFECT_DISPEL));
+    };
+    if (reflects)
+    {
+        if (canReflect(spellInfo))
+            return 0.0f;
+
+        // A channel like Arcane Missiles is not reflected itself, but the spells it triggers are.
+        for (SpellEffectInfo const& effect : spellInfo->GetEffects())
+        {
+            if (effect.TriggerSpell && canReflect(sSpellMgr->GetSpellInfo(effect.TriggerSpell)))
+                return 0.0f;
+        }
+    }
+
+    if (shielded && spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE &&
+        !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_HOLY))
+        return 0.0f;
+
+    return 1.0f;
+}

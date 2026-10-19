@@ -103,4 +103,13 @@ public:
     bool Execute(Event event) override;
 };
 
+class McMajordomoStopAttackAction : public Action
+{
+public:
+    McMajordomoStopAttackAction(PlayerbotAI* botAI, std::string const name = "mc majordomo stop attack")
+        : Action(botAI, name) {};
+    bool isUseful() override;
+    bool Execute(Event event) override;
+};
+
 #endif

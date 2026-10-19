@@ -341,3 +341,12 @@ bool McCoreHoundMarkAction::Execute(Event /*event*/)
     bot->GetGroup()->SetTargetIcon(RtiTargetValue::skullIndex, bot->GetGUID(), target->GetGUID());
     return true;
 }
+
+bool McMajordomoStopAttackAction::isUseful() { return bot->GetVictim() != nullptr; }
+
+bool McMajordomoStopAttackAction::Execute(Event /*event*/)
+{
+    // Auto-attack keeps swinging into the Damage Shield; the multiplier keeps the bot from re-engaging.
+    bot->AttackStop();
+    return true;
+}
