@@ -108,6 +108,7 @@ public:
     bool DisabledWithoutRealPlayer;
     bool EnableICCBuffs;
     bool AllowAccountBots, AllowGuildBots, AllowTrustedAccountBots;
+    std::set<uint32> SharedBotGuilds;
     bool RandomBotGuildNearby, RandomBotInvitePlayer, InviteChat;
     uint32 GlobalCoolDown, ReactDelay, MaxWaitForMove, DisableMoveSplinePath, MaxMovementSearchTime, ExpireActionTime,
         DispelAuraDuration, PassiveDelay, RepeatDelay, ErrorDelay, RpgDelay, SitDelay, ReturnDelay, LootDelay;

@@ -85,6 +85,36 @@ public:
     uint32 GetMasterAccountId() const { return masterAccountId; }
 };
 
+// A random bot in a guild listed in Playerbots.SharedBotGuilds may be added by any real player of its faction
+static bool IsSharedGuildBot(ObjectGuid botGuid, uint32 botAccountId, Player* master, uint32 masterAccountId)
+{
+    if (sPlayerbotAIConfig.SharedBotGuilds.empty() || !master ||
+        !sPlayerbotAIConfig.IsInRandomAccountList(botAccountId) ||
+        sPlayerbotAIConfig.IsInRandomAccountList(masterAccountId))
+        return false;
+
+    CharacterCacheEntry const* entry = sCharacterCache->GetCharacterCacheByGuid(botGuid);
+    if (!entry || Player::TeamIdForRace(entry->Race) != master->GetTeamId(true))
+        return false;
+
+    // The bot obeys whoever adds it, so a rank that can invite, remove, promote or demote is not shared.
+    // These rights include the GR_RIGHT_EMPTY bit, and the core grants all of them to a rank without it.
+    uint32 const managementRights =
+        (GR_RIGHT_INVITE | GR_RIGHT_REMOVE | GR_RIGHT_PROMOTE | GR_RIGHT_DEMOTE) & ~uint32(GR_RIGHT_EMPTY);
+    for (uint32 guildId : sPlayerbotAIConfig.SharedBotGuilds)
+    {
+        Guild* guild = sGuildMgr->GetGuildById(guildId);
+        Guild::Member const* member = guild ? guild->GetMember(botGuid) : nullptr;
+        if (member)
+        {
+            uint32 rights = guild->GetRankRights(member->GetRankId());
+            return (rights & GR_RIGHT_EMPTY) && !(rights & managementRights);
+        }
+    }
+
+    return false;
+}
+
 void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId)
 {
     if (botLoading.find(playerGuid) != botLoading.end())
@@ -108,12 +138,13 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
     bool sameGuild = sPlayerbotAIConfig.AllowGuildBots && guild && guild->GetMember(playerGuid);
     bool addClassBot = sRandomPlayerbotMgr.IsAddclassBot(playerGuid.GetCounter());
     bool linkedAccount = sPlayerbotAIConfig.AllowTrustedAccountBots && IsAccountLinked(accountId, masterAccountId);
+    bool sharedGuild = IsSharedGuildBot(playerGuid, accountId, masterPlayer, masterAccountId);
 
     bool allowed = true;
     std::ostringstream out;
     std::string botName;
     sCharacterCache->GetCharacterNameByGuid(playerGuid, botName);
-    if (!isRndbot && !sameAccount && !sameGuild && !addClassBot && !linkedAccount)
+    if (!isRndbot && !sameAccount && !sameGuild && !addClassBot && !linkedAccount && !sharedGuild)
     {
         allowed = false;
         out << "Failure: You are not allowed to control bot " << botName.c_str();
