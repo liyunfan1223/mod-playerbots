@@ -69,4 +69,28 @@ namespace BlackwingLairHelpers
             entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_BLUE_WHELP) ||
             entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_BRONZE_WHELP);
     }
+
+    bool IsCorruptedTotem(Unit const* unit)
+    {
+        if (!unit)
+            return false;
+
+        uint32 const entry = unit->GetEntry();
+        return entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_FIRE_NOVA_TOTEM) ||
+            entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_STONESKIN_TOTEM) ||
+            entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_HEALING_TOTEM) ||
+            entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_WINDFURY_TOTEM);
+    }
+
+    Unit* FindCorruptedTotem(PlayerbotAI* botAI)
+    {
+        GuidVector targets = botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets")->Get();
+        for (ObjectGuid const guid : targets)
+        {
+            Unit* unit = botAI->GetUnit(guid);
+            if (unit && unit->IsAlive() && IsCorruptedTotem(unit))
+                return unit;
+        }
+        return nullptr;
+    }
 }

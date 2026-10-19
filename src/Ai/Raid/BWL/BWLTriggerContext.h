@@ -38,6 +38,7 @@ public:
 
         creators["bwl nefarian positioning"] = &RaidBwlTriggerContext::bwl_nefarian_positioning;
         creators["bwl nefarian wild magic"] = &RaidBwlTriggerContext::bwl_nefarian_wild_magic;
+        creators["bwl nefarian corrupted totem"] = &RaidBwlTriggerContext::bwl_nefarian_corrupted_totem;
 
         creators["bwl death talon wyrmguard tank"] = &RaidBwlTriggerContext::bwl_death_talon_wyrmguard_tank;
         creators["bwl death talon wyrmguard ranged"] = &RaidBwlTriggerContext::bwl_death_talon_wyrmguard_ranged;
@@ -60,6 +61,7 @@ private:
     static Trigger* bwl_affliction_bronze(PlayerbotAI* botAI) { return new BwlAfflictionBronzeTrigger(botAI); }
     static Trigger* bwl_nefarian_wild_magic(PlayerbotAI* botAI) { return new BwlNefarianWildMagicTrigger(botAI); }
     static Trigger* bwl_nefarian_positioning(PlayerbotAI* botAI) { return new BwlNefarianPositioningTrigger(botAI); }
+    static Trigger* bwl_nefarian_corrupted_totem(PlayerbotAI* botAI) { return new BwlNefarianCorruptedTotemTrigger(botAI); }
     static Trigger* bwl_death_talon_wyrmguard_tank(PlayerbotAI* botAI) { return new BwlDeathTalonWyrmguardTankTrigger(botAI); }
     static Trigger* bwl_death_talon_wyrmguard_ranged(PlayerbotAI* botAI) { return new BwlDeathTalonWyrmguardRangedTrigger(botAI); }
 };

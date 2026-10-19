@@ -28,7 +28,13 @@ namespace BlackwingLairHelpers
         SPELL_HOURGLASS_SAND = 23645,
 
         // Nefarian
-        SPELL_WILD_MAGIC = 23410
+        SPELL_WILD_MAGIC = 23410,
+        SPELL_CORRUPTED_HEALING = 23401,
+
+        // Priest talent
+        SPELL_EMPOWERED_RENEW_R1 = 63534,
+        SPELL_EMPOWERED_RENEW_R2 = 63542,
+        SPELL_EMPOWERED_RENEW_R3 = 63543
     };
 
     enum class BlackwingLairGameObjects : uint32
@@ -48,6 +54,12 @@ namespace BlackwingLairHelpers
         NPC_CORRUPTED_BLUE_WHELP = 14024,
         NPC_CORRUPTED_BRONZE_WHELP = 14025,
 
+        // Nefarian
+        NPC_CORRUPTED_FIRE_NOVA_TOTEM = 14662,
+        NPC_CORRUPTED_STONESKIN_TOTEM = 14663,
+        NPC_CORRUPTED_HEALING_TOTEM = 14664,
+        NPC_CORRUPTED_WINDFURY_TOTEM = 14666,
+
         // Trash
         NPC_DEATH_TALON_WYRMGUARD = 12460
     };
@@ -59,6 +71,8 @@ namespace BlackwingLairHelpers
     bool IsRazorgoreOffTank(Player* bot);
     bool IsNonBABotNearPosition(Player const* bot, Position const& position, float distance);
     bool IsCorruptedWhelp(Unit const* unit);
+    bool IsCorruptedTotem(Unit const* unit);
+    Unit* FindCorruptedTotem(PlayerbotAI* botAI);
 }
 
 #endif

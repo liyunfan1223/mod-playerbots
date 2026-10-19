@@ -91,6 +91,14 @@ public:
     bool IsActive() override;
 };
 
+class BwlNefarianCorruptedTotemTrigger : public Trigger
+{
+public:
+    // Scans nearby units, so it only checks every 2 seconds.
+    BwlNefarianCorruptedTotemTrigger(PlayerbotAI* botAI) : Trigger(botAI, "bwl nefarian corrupted totem", 2) {}
+    bool IsActive() override;
+};
+
 // Trash
 
 class BwlDeathTalonWyrmguardTankTrigger : public Trigger

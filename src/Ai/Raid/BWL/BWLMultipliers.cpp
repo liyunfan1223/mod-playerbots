@@ -8,6 +8,7 @@
 #include "BWLActions.h"
 #include "BWLHelpers.h"
 #include "ChooseTargetActions.h"
+#include "GenericSpellActions.h"
 #include "HunterActions.h"
 #include "Playerbots.h"
 #include "ReachTargetActions.h"
@@ -86,4 +87,41 @@ float VaelastraszBurningAdrenalineMultiplier::GetValue(Action* action)
     }
 
     return 1.0f;
+}
+
+float NefarianCorruptedHealingMultiplier::GetValue(Action* action)
+{
+    // Priest call: a holy heal that is not a heal-over-time puts a damage-over-time effect on its target instead.
+    if (!bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_CORRUPTED_HEALING)))
+        return 1.0f;
+
+    auto* spellAction = dynamic_cast<CastSpellAction*>(action);
+    if (!spellAction)
+        return 1.0f;
+
+    static std::unordered_set<std::string> const directHeals = {
+        "lesser heal", "heal", "greater heal", "flash heal", "binding heal", "penance", "prayer of healing",
+        "circle of healing", "prayer of mending", "desperate prayer", "divine hymn", "holy nova"};
+    std::string const spell = spellAction->getSpell();
+    if (directHeals.count(spell))
+        return 0.0f;
+
+    // Empowered Renew adds an instant direct heal to Renew.
+    if (spell == "renew" && (bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_EMPOWERED_RENEW_R1)) ||
+                             bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_EMPOWERED_RENEW_R2)) ||
+                             bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_EMPOWERED_RENEW_R3))))
+        return 0.0f;
+
+    return 1.0f;
+}
+
+float NefarianCorruptedTotemMultiplier::GetValue(Action* action)
+{
+    // Keeps ranged DPS on a corrupted totem until it dies instead of switching back to the dps or RTI target.
+    if ((!dynamic_cast<DpsAssistAction*>(action) && !dynamic_cast<AttackRtiTargetAction*>(action)) ||
+        !PlayerbotAI::IsRangedDps(bot))
+        return 1.0f;
+
+    Unit* target = AI_VALUE(Unit*, "current target");
+    return target && target->IsAlive() && IsCorruptedTotem(target) ? 0.0f : 1.0f;
 }
