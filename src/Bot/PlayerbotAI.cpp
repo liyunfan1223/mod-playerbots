@@ -1730,7 +1730,7 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         "tbc-seth", "tbc-ub", "tempestkeep", "ulduar", "voa", "wotlk-an", "wotlk-cos", "wotlk-dtk",
         "wotlk-eoe", "wotlk-fos", "wotlk-gd", "wotlk-hol", "wotlk-hos", "wotlk-nex", "wotlk-occ",
         "wotlk-ok", "wotlk-os", "wotlk-pos", "wotlk-toc", "wotlk-uk", "wotlk-up", "wotlk-vh",
-        "zulaman"
+        "zulaman", "zulgurub"
     };
 
     for (std::string const& strat : allInstanceStrategies)
@@ -1744,6 +1744,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
     {
         case 249:
             strategyName = "onyxia";  // Onyxia's Lair
+            break;
+        case 309:
+            strategyName = "zulgurub";  // Zul'Gurub
             break;
         case 409:
             strategyName = "moltencore";  // Molten Core
