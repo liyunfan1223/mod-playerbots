@@ -4153,18 +4153,19 @@ bool IccLichKingAddsAction::HandleVileSpiritMechanics()
 
     if (!PlayerbotAI::IsTank(bot) && !bossCastingHarvest)
     {
-        // Flee to MT if a spirit is targeting this bot OR is within FLEE_RANGE.
-        // Either condition is enough — proximity catches spirits that haven't
-        // committed a target yet, targeting catches faraway chasers.
+        // Victim assignment happens before a spirit reaches the raid. Only a
+        // nearby, low-altitude spirit should interrupt normal positioning.
         static constexpr float FLEE_RANGE = 15.0f;
+        static constexpr float MAX_HEIGHT_DIFF = 8.0f;
 
         Unit* chaser = nullptr;
         for (Unit* spirit : spirits)
         {
-            bool const isTargetingBot = spirit->GetVictim() &&
-                                        spirit->GetVictim()->GetGUID() == bot->GetGUID();
-            bool const isClose = bot->GetDistance2d(spirit) < FLEE_RANGE;
-            if (isTargetingBot || isClose)
+            if (!spirit->IsAlive() || spirit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) ||
+                std::abs(spirit->GetPositionZ() - bot->GetPositionZ()) > MAX_HEIGHT_DIFF)
+                continue;
+
+            if (bot->GetDistance2d(spirit) < FLEE_RANGE)
             {
                 chaser = spirit;
                 break;
