@@ -12,6 +12,7 @@
 #include "Common.h"
 #include "DBCEnums.h"
 #include "SharedDefines.h"
+#include <atomic>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -86,8 +87,8 @@ private:
     static inline std::map<ArenaType, std::vector<uint32>> _botArenaTeamRegistry;
     static inline std::map<ArenaType, uint32> _configTargets;
     // Whether the name table has a column for the default DBC locale
-    static inline bool _guildNamesLocalized = false;
-    static inline bool _arenaTeamNamesLocalized = false;
+    static inline std::atomic<bool> _guildNamesLocalized{false};
+    static inline std::atomic<bool> _arenaTeamNamesLocalized{false};
 };
 
 #endif
