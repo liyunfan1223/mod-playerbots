@@ -1730,6 +1730,26 @@ Playerbots.PvpProhibitedAreaIds = "976,35,392,2268,4161,4010,4317,4312,3649,3887
 # Improve reaction speeds in battlegrounds and arenas (may cause lag)
 Playerbots.FastReactInBG = 1
 
+# PVP FLAG INTERACTION REACTION DELAY
+#
+# Random delay, in milliseconds, between reaching interaction range and using a battleground
+# flag or capture point. This applies to flag pickup/return and capturable battleground objects.
+# WSG flag carriers enter the capture area and turn in immediately, without this delay.
+# Set both values to 0 to disable the artificial delay. If Max is lower than Min, the values
+# are swapped automatically when the configuration is loaded.
+Playerbots.PvpFlagInteractionDelayMin = 300
+Playerbots.PvpFlagInteractionDelayMax = 3000
+
+# PVP INTERRUPT (CC) REACTION DELAY
+#
+# Random delay, in milliseconds, after an enemy player begins an interruptible cast before a bot
+# may react with an interrupt such as Wind Shear, Kick, Pummel, or Counterspell. This setting only
+# affects casts made by players; PvE/NPC interrupts remain immediate. If the cast finishes before
+# the selected delay expires, the bot will not interrupt it. Set both values to 0 to disable the
+# artificial delay. If Max is lower than Min, the values are swapped automatically on load.
+Playerbots.PvpInterruptReactionDelayMin = 300
+Playerbots.PvpInterruptReactionDelayMax = 3000
+
 #
 #
 ####################################################################################################

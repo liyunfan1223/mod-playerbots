@@ -795,6 +795,7 @@ class InterruptEnemyHealerTrigger : public SpellTrigger
 public:
     InterruptEnemyHealerTrigger(PlayerbotAI* botAI, std::string const spell) : SpellTrigger(botAI, spell) {}
 
+    bool IsActive() override;
     Value<Unit*>* GetTargetValue() override;
     std::string const getName() override { return spell + " on enemy healer"; }
 };

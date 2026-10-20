@@ -9,9 +9,11 @@
 
 #include "BattlegroundAV.h"
 #include "MovementActions.h"
+#include "ObjectGuid.h"
 
 class ChatHandler;
 class Battleground;
+class GameObject;
 class PlayerbotAI;
 struct Position;
 
@@ -130,8 +132,15 @@ private:
     bool teamFlagTaken();
     bool protectFC();
     bool useBuff();
+    bool ShouldDelayFlagInteraction(GameObject* flag);
+    void ResetFlagInteractionDelay();
     uint32 getPlayersInArea(TeamId teamId, Position point, float range, bool combat = true);
     bool IsLockedInsideKeep();
+
+    ObjectGuid _flagInteractionTarget;
+    uint32 _flagInteractionStartedAt = 0;
+    uint32 _flagInteractionDelay = 0;
+    bool _flagInteractionReady = false;
 };
 
 class ArenaTactics : public MovementAction

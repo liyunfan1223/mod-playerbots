@@ -24,11 +24,13 @@
 #include "Event.h"
 #include "GameObject.h"
 #include "IVMapMgr.h"
+#include "ObjectMgr.h"
 #include "PathGenerator.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "PvpTriggers.h"
 #include "ServerFacade.h"
+#include "Timer.h"
 #include "Vehicle.h"
 #include <algorithm>
 #include <mutex>
@@ -3335,6 +3337,8 @@ bool BGTactics::selectObjectiveWp(std::vector<BattleBotPath*> const& vPaths)
 
 bool BGTactics::resetObjective()
 {
+    ResetFlagInteractionDelay();
+
     Battleground* bg = bot->GetBattleground();
     if (!bg)
         return false;
@@ -3368,6 +3372,44 @@ bool BGTactics::resetObjective()
     posMap["bg objective"] = pos;
 
     return selectObjective(true);
+}
+
+void BGTactics::ResetFlagInteractionDelay()
+{
+    _flagInteractionTarget.Clear();
+    _flagInteractionStartedAt = 0;
+    _flagInteractionDelay = 0;
+    _flagInteractionReady = false;
+}
+
+bool BGTactics::ShouldDelayFlagInteraction(GameObject* flag)
+{
+    uint32 const minDelay = sPlayerbotAIConfig.PvpFlagInteractionDelayMin;
+    uint32 const maxDelay = sPlayerbotAIConfig.PvpFlagInteractionDelayMax;
+    if (!flag || (!minDelay && !maxDelay))
+    {
+        ResetFlagInteractionDelay();
+        return false;
+    }
+
+    if (_flagInteractionTarget != flag->GetGUID())
+    {
+        _flagInteractionTarget = flag->GetGUID();
+        _flagInteractionStartedAt = getMSTime();
+        _flagInteractionDelay = urand(minDelay, maxDelay);
+        _flagInteractionReady = !_flagInteractionDelay;
+    }
+
+    if (!_flagInteractionReady && getMSTimeDiff(_flagInteractionStartedAt, getMSTime()) >= _flagInteractionDelay)
+        _flagInteractionReady = true;
+
+    if (_flagInteractionReady)
+        return false;
+
+    if (bot->isMoving())
+        bot->StopMoving();
+
+    return true;
 }
 
 bool BGTactics::moveToObjectiveWp(BattleBotPath* const& currentPath, uint32 currentPoint, bool reverse)
@@ -3546,6 +3588,13 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
     BattlegroundTypeId bgType = bg->GetBgTypeID();
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
+
+    if (!_flagInteractionTarget.IsEmpty())
+    {
+        GameObject* reactionFlag = botAI->GetGameObject(_flagInteractionTarget);
+        if (!reactionFlag || !reactionFlag->isSpawned() || bot->GetDistance(reactionFlag) >= INTERACTION_DISTANCE)
+            ResetFlagInteractionDelay();
+    }
 
     // Initialize vectors for nearby objects and players
     GuidVector closeObjects;
@@ -3795,6 +3844,29 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             !(bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG)))
             continue;
 
+        if (isWsBaseFlag)
+        {
+            uint32 const triggerId =
+                bot->GetTeamId() == TEAM_HORDE ? BG_WS_TRIGGER_HORDE_FLAG_SPAWN : BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN;
+            AreaTrigger const* captureArea = sObjectMgr->GetAreaTrigger(triggerId);
+            if (!captureArea)
+                continue;
+
+            ResetFlagInteractionDelay();
+
+            // Flag interaction range can extend beyond the server's capture area.
+            if (!bot->IsInAreaTriggerRadius(captureArea))
+                return MoveTo(captureArea->map, captureArea->x, captureArea->y, captureArea->z);
+
+            WorldPacket data(CMSG_AREATRIGGER);
+            data << triggerId;
+            bot->GetSession()->HandleAreaTriggerOpcode(data);
+            return true;
+        }
+
+        if (dist < INTERACTION_DISTANCE && ShouldDelayFlagInteraction(go))
+            return true;
+
         // Handle capture mechanics based on BG type
         switch (bgType)
         {
@@ -3835,24 +3907,6 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             {
                 if (dist < INTERACTION_DISTANCE)
                 {
-                    // Handle flag capture at base
-                    if (isWsBaseFlag)
-                    {
-                        if (bot->GetTeamId() == TEAM_HORDE)
-                        {
-                            WorldPacket data(CMSG_AREATRIGGER);
-                            data << uint32(BG_WS_TRIGGER_HORDE_FLAG_SPAWN);
-                            bot->GetSession()->HandleAreaTriggerOpcode(data);
-                        }
-                        else
-                        {
-                            WorldPacket data(CMSG_AREATRIGGER);
-                            data << uint32(BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN);
-                            bot->GetSession()->HandleAreaTriggerOpcode(data);
-                        }
-                        return true;
-                    }
-
                     // Dismount before picking up flag
                     if (bot->IsMounted())
                         bot->RemoveAurasByType(SPELL_AURA_MOUNTED);

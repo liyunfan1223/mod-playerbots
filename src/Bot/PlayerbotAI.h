@@ -24,6 +24,7 @@
 #include "SpellAuras.h"
 #include "Util.h"
 #include "WorldPacket.h"
+#include <array>
 #include <stack>
 
 class Action;
@@ -527,6 +528,7 @@ public:
     virtual bool HasAnyAuraOf(Unit* player, ...);
 
     virtual bool IsInterruptableSpellCasting(Unit* player, std::string const spell);
+    bool IsPvpInterruptReactionReady(Unit* target);
     virtual bool HasAuraToDispel(Unit* player, uint32 dispelType);
     bool CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell = true, Item* itemTarget = nullptr,
                       Item* castItem = nullptr);
@@ -629,6 +631,20 @@ public:
     void AddTimedEvent(std::function<void()> callback, uint32 delayMs);
 
 private:
+    struct PvpInterruptReactionState
+    {
+        ObjectGuid target;
+        uint32 spellId = 0;
+        uint8 castCount = 0;
+        int32 castTimeRemaining = 0;
+        uint32 startedAt = 0;
+        uint32 delay = 0;
+        uint32 lastSeenAt = 0;
+    };
+
+    static constexpr size_t PVP_INTERRUPT_REACTION_SLOTS = 2;
+    std::array<PvpInterruptReactionState, PVP_INTERRUPT_REACTION_SLOTS> _pvpInterruptReactions{};
+
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,
                                    bool mixed = false);
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);

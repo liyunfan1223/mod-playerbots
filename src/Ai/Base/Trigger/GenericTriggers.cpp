@@ -367,7 +367,9 @@ bool ItemCountTrigger::IsActive() { return AI_VALUE2(uint32, "item count", item)
 
 bool InterruptSpellTrigger::IsActive()
 {
-    return SpellTrigger::IsActive() && botAI->IsInterruptableSpellCasting(GetTarget(), getName());
+    Unit* target = GetTarget();
+    return target && botAI->IsInterruptableSpellCasting(target, getName()) &&
+           botAI->IsPvpInterruptReactionReady(target);
 }
 
 bool DeflectSpellTrigger::IsActive()
@@ -600,6 +602,12 @@ bool TargetChangedTrigger::IsActive()
 Value<Unit*>* InterruptEnemyHealerTrigger::GetTargetValue()
 {
     return context->GetValue<Unit*>("enemy healer target", spell);
+}
+
+bool InterruptEnemyHealerTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    return target && botAI->IsInterruptableSpellCasting(target, spell) && botAI->IsPvpInterruptReactionReady(target);
 }
 
 bool RandomBotUpdateTrigger::IsActive()
