@@ -4390,9 +4390,47 @@ void PlayerbotAI::WaitForSpellCast(Spell* spell)
 
 void PlayerbotAI::RemoveAura(std::string const name)
 {
-    uint32 spellid = aiObjectContext->GetValue<uint32>("spell id", name)->Get();
-    if (spellid && bot->HasAura(spellid))
-        bot->RemoveAurasDueToSpell(spellid);
+    if (name.empty())
+        return;
+
+    std::stringstream auraList(name);
+    std::string auraName;
+    while (std::getline(auraList, auraName, ','))
+    {
+        trim(auraName);
+        if (auraName.empty())
+            continue;
+
+        PlayerbotChatHandler handler(bot);
+        uint32 spellid = handler.extractSpellId(auraName);
+
+        if (!spellid)
+        {
+            std::wstring requestedName;
+            if (!Utf8toWStr(auraName, requestedName))
+                continue;
+
+            wstrToLower(requestedName);
+
+            for (Unit::AuraApplicationMap::const_iterator itr = bot->GetAppliedAuras().begin();
+                 itr != bot->GetAppliedAuras().end(); ++itr)
+            {
+                AuraApplication const* application = itr->second;
+                if (!application || !application->GetBase() || !application->GetBase()->GetSpellInfo())
+                    continue;
+
+                SpellInfo const* spellInfo = application->GetBase()->GetSpellInfo();
+                if (Utf8FitTo(spellInfo->SpellName[LOCALE_enUS], requestedName))
+                {
+                    spellid = spellInfo->Id;
+                    break;
+                }
+            }
+        }
+
+        if (spellid)
+            bot->RemoveAurasDueToSpell(spellid);
+    }
 }
 
 void PlayerbotAI::RequestSpellInterrupt()
