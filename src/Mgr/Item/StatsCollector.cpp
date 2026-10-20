@@ -15,6 +15,12 @@
 #include "SpellMgr.h"
 #include "Util.h"
 
+namespace
+{
+// The magic schools resistance is counted for: fire, nature, frost, shadow and arcane
+constexpr uint32 MAGIC_RESISTANCE_SCHOOLS = MAX_SPELL_SCHOOL - SPELL_SCHOOL_FIRE;
+}
+
 StatsCollector::StatsCollector(CollectorType type, int32 cls, int32 lvl) : type_(type), cls_(cls), lvl_(lvl)
 {
     Reset();
@@ -240,7 +246,7 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
                         std::min(1.0f, (float)spellInfo->GetDuration() / (spellInfo->GetDuration() + spellCooldown.count()));
 
                 multiplier *= coverage;
-                HandleApplyAura(effectInfo, multiplier, canNextTrigger, triggerCooldown);
+                HandleApplyAura(effectInfo, multiplier, canNextTrigger, triggerCooldown, spellCooldown.count() <= 0);
                 break;
             }
             case SPELL_EFFECT_HEAL:
@@ -331,15 +337,15 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
             }
             case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
             {
-                // spellid holds the school; school 0 is armor (e.g. Enchant Cloak - Superior Defense)
-                if (enchant_spell_id != SPELL_SCHOOL_NORMAL)
-                    break;
-
                 // for item random suffix
                 if (!enchant_amount)
                     enchant_amount = default_enchant_amount;
 
-                stats[STATS_TYPE_ARMOR] += enchant_amount;
+                // spellid holds the school; school 0 is armor (e.g. Enchant Cloak - Superior Defense)
+                if (enchant_spell_id == SPELL_SCHOOL_NORMAL)
+                    stats[STATS_TYPE_ARMOR] += enchant_amount;
+                else if (enchant_spell_id < MAX_SPELL_SCHOOL)
+                    CollectMagicResistance(1 << enchant_spell_id, enchant_amount);
                 break;
             }
             default:
@@ -651,8 +657,22 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
     }
 }
 
+void StatsCollector::CollectMagicResistance(uint32 schoolMask, float val)
+{
+    // Counted as resistance to all five magic schools, so +15 Fire Resistance is worth +3. Holy resistance is left
+    // out: almost nothing deals holy damage to players.
+    uint32 schools = 0;
+    for (uint32 school = SPELL_SCHOOL_FIRE; school < MAX_SPELL_SCHOOL; ++school)
+    {
+        if (schoolMask & (1 << school))
+            ++schools;
+    }
+
+    stats[STATS_TYPE_RESISTANCE] += val * schools / MAGIC_RESISTANCE_SCHOOLS;
+}
+
 void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, float multiplier, bool canNextTrigger,
-                                     Milliseconds triggerCooldown)
+                                     Milliseconds triggerCooldown, bool permanent)
 {
     if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
         return;
@@ -731,6 +751,16 @@ void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, float mu
             int32 statType = effectInfo.MiscValue;
             if (statType & SPELL_SCHOOL_MASK_NORMAL)  // physical
                 stats[STATS_TYPE_ARMOR] += val * multiplier;
+            // Threat and magic resistance are weighted for lasting effects, not for a burst on a cooldown
+            if (permanent)
+                CollectMagicResistance(statType, val * multiplier);
+            break;
+        }
+        case SPELL_AURA_MOD_THREAT:
+        {
+            // Percent change of the threat caused; only all-school auras, which is every one on items and enchants
+            if (permanent && (effectInfo.MiscValue & SPELL_SCHOOL_MASK_ALL) == SPELL_SCHOOL_MASK_ALL)
+                stats[STATS_TYPE_THREAT_REDUCTION] -= val * multiplier;
             break;
         }
         case SPELL_AURA_MOD_RATING:
