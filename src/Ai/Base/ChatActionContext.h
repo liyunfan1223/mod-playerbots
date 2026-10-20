@@ -43,6 +43,7 @@
 #include "MailAction.h"
 #include "NamedObjectContext.h"
 #include "NewRpgAction.h"
+#include "NewRpgDoQuest.h"
 #include "OpenItemAction.h"
 #include "PassLeadershipToMasterAction.h"
 #include "PetsAction.h"

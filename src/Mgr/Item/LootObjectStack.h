@@ -56,6 +56,8 @@ public:
     uint32 reqSkillValue;
     uint32 reqItem;
 
+    static bool IsNeededForQuest(Player* bot, uint32 itemId);
+
 private:
     void AddLockRequirement(LootLockRequirement const& requirement);
 
@@ -63,7 +65,6 @@ private:
     uint8 _lockRequirementCount = 0;
     uint32 _lockType = 0;
     bool _hasUnsupportedLockRequirement = false;
-    static bool IsNeededForQuest(Player* bot, uint32 itemId);
 };
 
 class LootTarget

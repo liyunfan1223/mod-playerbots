@@ -17,6 +17,7 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSpellRepository.h"
 #include "Playerbots.h"
+#include "QuestValues.h"
 #include "ServerFacade.h"
 #include "UseItemAction.h"
 
@@ -524,7 +525,11 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
         if (!quest)
             continue;
 
-        for (uint8 i = 0; i < 4; i++)
+        // ItemDrops and use-reagents: needed for the quest, but named by no RequiredItemId.
+        if (IsQuestExtraItemWanted(botAI->GetBot(), quest, itemid))
+            return true;
+
+        for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
         {
             if (quest->RequiredItemId[i] == itemid)
             {

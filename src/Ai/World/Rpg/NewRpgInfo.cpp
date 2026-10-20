@@ -181,6 +181,11 @@ std::string NewRpgInfo::ToString()
             out << "\npoiPos: " << arg.pos.GetMapId() << " " << arg.pos.GetPositionX() << " "
                 << arg.pos.GetPositionY() << " " << arg.pos.GetPositionZ();
             out << "\nlastReachPOI: " << (arg.lastReachPOI ? GetMSTimeDiffToNow(arg.lastReachPOI) : 0);
+            out << " spawnSince: " << (arg.spawnSince ? GetMSTimeDiffToNow(arg.spawnSince) : 0);
+            out << "\nspawnGuid: " << (arg.poiFallback ? "poi fallback" : std::to_string(arg.spawnGuid))
+                << " triedSpawns: " << arg.triedSpawns.size();
+            out << "\ntarget: " << (arg.targetGuid ? arg.targetGuid.ToString() : "none");
+            out << "\nvisited: " << arg.visited.size();
         }
         else if constexpr (std::is_same_v<T, TravelFlight>)
         {

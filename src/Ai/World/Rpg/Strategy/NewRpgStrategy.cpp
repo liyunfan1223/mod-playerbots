@@ -54,6 +54,9 @@ void NewRpgStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         new TriggerNode(
             "do quest status",
             {
+                // Grind is off while questing; keep its rest-between-pulls priorities.
+                NextAction("drink", 4.2f),
+                NextAction("food", 4.1f),
                 NextAction("new rpg do quest", 3.0f)
             }
         )

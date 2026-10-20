@@ -22,6 +22,7 @@ struct POIInfo
 {
     G3D::Vector2 pos;
     int32 objectiveIdx;
+    float z{0.0f};
 };
 
 /// A base (composition) class for all new rpg actions

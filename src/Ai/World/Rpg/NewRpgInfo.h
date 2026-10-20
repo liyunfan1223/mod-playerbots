@@ -53,6 +53,24 @@ struct NewRpgInfo
         int32 objectiveIdx{0};
         WorldPosition pos{};
         uint32 lastReachPOI{0};
+        uint32 spawnSince{0};
+        ObjectGuid targetGuid{};
+        WorldPosition targetPos{};
+        uint32 lastScan{0};
+        uint32 targetSince{0};
+        // Combat pauses this engine; a large gap since the last engage restarts targetSince
+        // instead of writing off a still-valid target.
+        uint32 lastEngage{0};
+        std::unordered_map<ObjectGuid, uint32> visited;
+        uint32 lootHoldSince{0};
+        // GuidPosition raw value; 0 = none picked.
+        uint64 spawnGuid{0};
+        std::unordered_set<uint64> triedSpawns;
+        // Shared by every item-use path, so no use is re-issued while a cast is in flight.
+        uint32 lastItemUse{0};
+        ObjectGuid lastSummonAnchor{};
+        // Set when no objective has a spawn point; grind stays on to do the killing at the POI.
+        bool poiFallback{false};
     };
     // RPG_TRAVEL_FLIGHT
     struct TravelFlight
@@ -87,6 +105,8 @@ struct NewRpgInfo
     };
 
     uint32 startT{0};  // start timestamp of the current status
+
+    bool grindSuppressed{false};
 
     // MOVE_FAR
     float nearestMoveFarDis{FLT_MAX};

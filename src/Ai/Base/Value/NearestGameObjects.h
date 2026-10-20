@@ -16,11 +16,15 @@ class PlayerbotAI;
 class AnyGameObjectInObjectRangeCheck
 {
 public:
-    AnyGameObjectInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range) {}
+    AnyGameObjectInObjectRangeCheck(WorldObject const* obj, float range, bool scriptActivated = false)
+        : i_obj(obj), i_range(range), i_scriptActivated(scriptActivated)
+    {
+    }
     WorldObject const& GetFocusObject() const { return *i_obj; }
     bool operator()(GameObject* u)
     {
-        if (u && i_obj->IsWithinDistInMap(u, i_range) && u->isSpawned() && u->GetGOInfo())
+        if (u && i_obj->IsWithinDistInMap(u, i_range) && u->GetGOInfo() &&
+            (u->isSpawned() || (i_scriptActivated && !u->isSpawnedByDefault() && !u->GetRespawnTime())))
             return true;
 
         return false;
@@ -29,6 +33,7 @@ public:
 private:
     WorldObject const* i_obj;
     float i_range;
+    bool i_scriptActivated;
 };
 
 class NearestGameObjects : public ObjectGuidListCalculatedValue

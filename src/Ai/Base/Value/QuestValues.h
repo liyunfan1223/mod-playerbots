@@ -7,6 +7,9 @@
 #ifndef PLAYERBOTS_QUESTVALUES_H
 #define PLAYERBOTS_QUESTVALUES_H
 
+#include <unordered_set>
+#include <vector>
+
 #include "NamedObjectContext.h"
 #include "TravelMgr.h"
 #include "Value.h"
@@ -92,6 +95,45 @@ public:
 
     questGiverMap Calculate() override;
 };
+
+// Built once at startup and read-only afterwards, so map threads can share it.
+void BuildQuestObjectiveSpawns();
+
+// objectiveFlag is 1 << idx; item objectives sit at idx QUEST_OBJECTIVES_COUNT + i.
+std::vector<int32> const& GetQuestObjectiveEntries(uint32 questId, uint32 objectiveFlag);
+
+std::vector<GuidPosition> const& GetEntrySpawns(int32 entry, uint32 mapId);
+
+std::vector<int32> const& GetQuestEnderEntries(uint32 questId);
+
+std::unordered_set<uint32> const& GetQuestTransformSources(uint32 questId);
+
+struct QuestSummonAnchor
+{
+    uint32 focusId{0};
+    uint32 creature{0};
+    bool killAnchor{false};
+    // When false the objective is an ordinary spawned mob, so its presence must not block a re-use.
+    bool summonsObjective{false};
+};
+
+QuestSummonAnchor GetQuestSummonAnchor(uint32 questId, uint32 objectiveIdx);
+
+std::vector<uint32> const& GetQuestKillSources(uint32 questId, uint32 objectiveIdx);
+
+struct QuestCraftReagent
+{
+    uint32 item{0};
+    uint32 count{0};
+};
+
+std::vector<QuestCraftReagent> const& GetQuestCraftReagents(uint32 questId, uint32 itemObjectiveIdx);
+
+uint32 GetQuestCraftItem(uint32 questId, uint32 itemObjectiveIdx);
+
+std::vector<QuestCraftReagent> const& GetQuestItemReagents(uint32 questId);
+
+bool IsQuestExtraItemWanted(Player* bot, Quest const* quest, uint32 itemId);
 
 // All questgivers that have a quest for the bot.
 class ActiveQuestGiversValue : public CalculatedValue<std::vector<GuidPosition>>

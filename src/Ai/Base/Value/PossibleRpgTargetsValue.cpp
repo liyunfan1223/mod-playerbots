@@ -179,7 +179,7 @@ const std::vector<GameobjectTypes> PossibleNewRpgGameObjectsValue::allowedGOFlag
 GuidVector PossibleNewRpgGameObjectsValue::Calculate()
 {
     std::list<GameObject*> targets;
-    AnyGameObjectInObjectRangeCheck u_check(bot, range);
+    AnyGameObjectInObjectRangeCheck u_check(bot, range, true);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
     Cell::VisitObjects(bot, searcher, range);
 

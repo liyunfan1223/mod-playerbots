@@ -36,14 +36,6 @@ private:
     void WhisperStatusChange(Player* owner, std::string const& statusName);
 };
 
-class StartRpgDoQuestAction : public Action
-{
-public:
-    StartRpgDoQuestAction(PlayerbotAI* botAI) : Action(botAI, "start rpg do quest") {}
-
-    bool Execute(Event event) override;
-};
-
 class NewRpgStatusUpdateAction : public NewRpgBaseAction
 {
 public:
@@ -98,19 +90,6 @@ public:
     bool Execute(Event event) override;
 
     const uint32 npcStayTime = 8 * IN_MILLISECONDS;
-};
-
-class NewRpgDoQuestAction : public NewRpgBaseAction
-{
-public:
-    NewRpgDoQuestAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "new rpg do quest") {}
-    bool Execute(Event event) override;
-
-protected:
-    bool DoIncompleteQuest(NewRpgInfo::DoQuest& data);
-    bool DoCompletedQuest(NewRpgInfo::DoQuest& data);
-
-    const uint32 poiStayTime = 5 * MINUTE * IN_MILLISECONDS;
 };
 
 class NewRpgTravelFlightAction : public NewRpgBaseAction
