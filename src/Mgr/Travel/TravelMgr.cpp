@@ -12,6 +12,9 @@
 #include "Creature.h"
 #include "Log.h"
 #include "Map.h"
+#include "World.h"
+#include "DBCStores.h"
+#include "GridTerrainData.h"
 #include "MapCollisionData.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
@@ -4644,6 +4647,100 @@ void TravelMgr::PrepareZone2LevelBracket()
         zone2LevelBracket[zoneId] = {bracketPair.first, bracketPair.second};
 }
 
+namespace
+{
+// Zone lookup for PrepareDestinationCache without creating grids: Map::GetAreaId
+// creates the grid, which loads its terrain, vmap and mmap tile for good, so
+// caching every creature on a continent kept the whole continent's navmesh in
+// memory. Same formula as Map::GetAreaId; terrain is read from the .map file
+// and dropped afterwards, only the (small) vmap tiles stay in the static tree.
+class DestinationAreaLookup
+{
+public:
+    explicit DestinationAreaLookup(Map* map) : _map(map) {}
+
+    uint32 GetAreaId(float x, float y, float z)
+    {
+        GridCoord const gridCoord = Acore::ComputeGridCoord(x, y);
+        GridTerrainData const* terrain = Terrain(gridCoord);
+
+        bool hasVmapArea = false;
+        int32 adtId = 0, rootId = 0, groupId = 0;
+        VMAP::AreaAndLiquidData vdata;
+        VMAP::AreaAndLiquidData ddata;
+        bool const hasStatic = _map->GetMapCollisionData().GetStaticTree().GetAreaAndLiquidData(x, y, z, {}, vdata) &&
+                               vdata.areaInfo.has_value();
+        bool const hasDynamic =
+            _map->GetMapCollisionData().GetDynamicTree().GetAreaAndLiquidData(x, y, z, PHASEMASK_NORMAL, {}, ddata) &&
+            ddata.areaInfo.has_value();
+        if (hasStatic || hasDynamic)
+        {
+            VMAP::AreaAndLiquidData const& used =
+                hasStatic && !(hasDynamic && ddata.floorZ > vdata.floorZ) ? vdata : ddata;
+            adtId = used.areaInfo->adtId;
+            rootId = used.areaInfo->rootId;
+            groupId = used.areaInfo->groupId;
+            hasVmapArea = true;
+            if (terrain)
+            {
+                float const mapHeight = terrain->getHeight(x, y);
+                if (z + 2.0f > mapHeight && mapHeight > used.floorZ)
+                    hasVmapArea = false;
+            }
+        }
+
+        uint32 gridAreaId = 0;
+        float gridMapHeight = INVALID_HEIGHT;
+        if (terrain)
+        {
+            gridAreaId = terrain->getArea(x, y);
+            gridMapHeight = terrain->getHeight(x, y);
+        }
+
+        uint16 areaId = 0;
+        if (hasVmapArea && G3D::fuzzyGe(z, z - GROUND_HEIGHT_TOLERANCE) &&
+            (G3D::fuzzyLt(z, gridMapHeight - GROUND_HEIGHT_TOLERANCE) || z > gridMapHeight))
+        {
+            if (WMOAreaTableEntry const* wmoEntry = GetWMOAreaTableEntryByTripple(rootId, adtId, groupId))
+                areaId = wmoEntry->areaId;
+            if (!areaId)
+                areaId = gridAreaId;
+        }
+        else
+            areaId = gridAreaId;
+
+        if (!areaId)
+            areaId = _map->GetEntry()->linked_zone;
+
+        return areaId;
+    }
+
+private:
+    GridTerrainData const* Terrain(GridCoord const& gridCoord)
+    {
+        if (!MapGridManager::IsValidGridCoordinates(gridCoord.x_coord, gridCoord.y_coord))
+            return nullptr;
+
+        uint32 const key = gridCoord.GetId();
+        auto it = _terrain.find(key);
+        if (it != _terrain.end())
+            return it->second.get();
+
+        _map->GetMapCollisionData().LoadVMapTile(gridCoord.x_coord, gridCoord.y_coord);
+
+        std::string const mapFileName = Acore::StringFormat("{}maps/{:03}{:02}{:02}.map", sWorld->GetDataPath(),
+                                                            _map->GetId(), gridCoord.x_coord, gridCoord.y_coord);
+        std::unique_ptr<GridTerrainData> terrain = std::make_unique<GridTerrainData>();
+        if (terrain->Load(mapFileName) != TerrainMapDataReadResult::Success)
+            terrain.reset();
+        return _terrain.emplace(key, std::move(terrain)).first->second.get();
+    }
+
+    Map* _map;
+    std::unordered_map<uint32, std::unique_ptr<GridTerrainData>> _terrain;
+};
+}
+
 void TravelMgr::PrepareDestinationCache()
 {
     uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
@@ -4655,6 +4752,7 @@ void TravelMgr::PrepareDestinationCache()
     // Temporary map to group creatures by entry and area
     std::map<std::tuple<uint16, int32, int32, int32>, std::vector<CreatureData>> tempLocsCache;
     std::map<uint32, std::map<uint32, std::vector<WorldLocation>>> tempCreatureCache;
+    std::unordered_map<uint16, DestinationAreaLookup> areaLookups;
     for (auto const& [guid, creatureData] : sObjectMgr->GetAllCreatureData())
     {
         CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creatureData.id);
@@ -4676,7 +4774,8 @@ void TravelMgr::PrepareDestinationCache()
         if (!map)
             continue;
 
-        AreaTableEntry const* area = sAreaTableStore.LookupEntry(map->GetAreaId(PHASEMASK_NORMAL, x, y, z));
+        AreaTableEntry const* area =
+            sAreaTableStore.LookupEntry(areaLookups.try_emplace(mapId, map).first->second.GetAreaId(x, y, z));
         if (!area)
             continue;
 
