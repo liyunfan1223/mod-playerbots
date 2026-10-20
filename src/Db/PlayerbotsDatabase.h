@@ -168,7 +168,7 @@ protected:
         return new PlayerbotsDatabaseConnection(connInfo);
     }
 
-    MySQLConnection* CreateConnection(ProducerConsumerQueue<SQLOperation*>* queue,
+    MySQLConnection* CreateAsyncConnection(ProducerConsumerQueue<SQLOperation*>* queue,
         MySQLConnectionInfo& connInfo) override
     {
         return new PlayerbotsDatabaseConnection(queue, connInfo);
