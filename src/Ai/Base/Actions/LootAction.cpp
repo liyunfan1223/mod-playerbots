@@ -6,6 +6,8 @@
 
 #include "LootAction.h"
 
+#include <algorithm>
+
 #include "BroadcastHelper.h"
 #include "ChatHelper.h"
 #include "Event.h"
@@ -354,6 +356,36 @@ proto->Name1.c_str(), 1, bidPrice, buyoutPrice);
 }
 */
 
+// Only what the receiver can still take: an item left for nobody keeps the corpse lootable.
+static bool IsQuestLoot(ItemTemplate const* proto, Player* receiver)
+{
+    // Every group member gets its own copy of a multi-drop item.
+    if (proto->HasFlag(ITEM_FLAG_MULTI_DROP))
+        return false;
+
+    if (receiver->HasQuestForItem(proto->ItemId))
+        return true;
+
+    if (!proto->StartQuest)
+        return false;
+
+    // Same conditions as LootItem::AllowedForPlayer.
+    uint32 prevQuestId = 0;
+    if (Quest const* startQuest = sObjectMgr->GetQuestTemplate(proto->StartQuest))
+        prevQuestId = startQuest->GetPrevQuestId();
+
+    return receiver->GetQuestStatus(proto->StartQuest) == QUEST_STATUS_NONE &&
+           !receiver->GetQuestRewardStatus(proto->StartQuest) &&
+           !(proto->MaxCount && receiver->HasItemCount(proto->ItemId, proto->MaxCount, true)) &&
+           (!prevQuestId || receiver->GetQuestRewardStatus(prevQuestId));
+}
+
+static bool IsQuestLoot(ItemTemplate const* proto, std::vector<Player*> const& receivers)
+{
+    return std::any_of(receivers.begin(), receivers.end(),
+                       [proto](Player* receiver) { return IsQuestLoot(proto, receiver); });
+}
+
 bool StoreLootAction::Execute(Event event)
 {
     WorldPacket p(event.getPacket());  // (8+1+4+1+1+4+4+4+4+4+1)
@@ -398,6 +430,8 @@ bool StoreLootAction::Execute(Event event)
     if (!currentLoot)
         bot->SetLootGUID(guid);
 
+    std::vector<Player*> const questLootReceivers = LootObject::GetQuestLootReceivers(bot);
+
     if (gold > 0)
     {
         WorldPacket* packet = new WorldPacket(CMSG_LOOT_MONEY, 0);
@@ -428,6 +462,10 @@ bool StoreLootAction::Execute(Event event)
 
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
         if (!proto)
+            continue;
+
+        // Opening spells deliver gameobject loot as LOOT_SKINNING, which skips IsLootAllowed above.
+        if (loot_type == LOOT_SKINNING && IsQuestLoot(proto, questLootReceivers))
             continue;
 
         if (!IsRealPlayer(botAI->GetMaster()) && AI_VALUE(uint8, "bag space") > 80)
@@ -507,6 +545,11 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI* botAI)
     std::set<uint32>& lootItems = AI_VALUE(std::set<uint32>&, "always loot list");
     if (lootItems.find(itemid) != lootItems.end())
         return true;
+
+    // Loot from an item in the bot's own bags can't go to anyone else.
+    if (!AI_VALUE(LootObject, "loot target").guid.IsItem() &&
+        IsQuestLoot(proto, LootObject::GetQuestLootReceivers(botAI->GetBot())))
+        return false;
 
     uint32 max = proto->MaxCount;
     if (max > 0 && botAI->GetBot()->HasItemCount(itemid, max, true))

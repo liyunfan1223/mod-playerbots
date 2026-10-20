@@ -6,6 +6,8 @@
 
 #include "LootObjectStack.h"
 
+#include <algorithm>
+
 #include "LootMgr.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
@@ -85,6 +87,14 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     GameObject* go = botAI->GetGameObject(lootGUID);
     if (go && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
     {
+        // Releasing a consumable chest despawns it even with the quest item still inside.
+        std::vector<Player*> const questLootReceivers = GetQuestLootReceivers(bot);
+        bool const leavesQuestLoot = !questLootReceivers.empty();
+        if (leavesQuestLoot &&
+            (go->ActivateToQuest(bot) || std::any_of(questLootReceivers.begin(), questLootReceivers.end(),
+                                                     [go](Player* receiver) { return go->ActivateToQuest(receiver); })))
+            return;
+
         bool onlyHasQuestItems = true;
         bool hasAnyQuestItems = false;
         bool neededQuestItem = false;
@@ -101,7 +111,16 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
 
             hasAnyQuestItems = true;
 
-            if (IsNeededForQuest(bot, itemId))
+            bool const botNeedsItem = IsNeededForQuest(bot, itemId);
+
+            // gameobject_questitem entries are not in the loot template ActivateToQuest checks.
+            if (leavesQuestLoot &&
+                (botNeedsItem ||
+                 std::any_of(questLootReceivers.begin(), questLootReceivers.end(),
+                             [itemId](Player* receiver) { return IsNeededForQuest(receiver, itemId); })))
+                return;
+
+            if (botNeedsItem)
             {
                 // A gathering node can also drop a needed quest item (e.g.
                 // Root Sample off Barrens herbs); gathering yields both, so
@@ -255,6 +274,27 @@ bool LootObject::IsNeededForQuest(Player* bot, uint32 itemId)
     }
 
     return false;
+}
+
+// A synced bot completes a quest when its master hands it in, so it leaves quest loot to the real players.
+std::vector<Player*> LootObject::GetQuestLootReceivers(Player* bot)
+{
+    if (!sPlayerbotAIConfig.SyncQuestWithPlayer)
+        return {};
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+        return {};
+
+    Player* master = botAI->GetMaster();
+    if (!IsRealPlayer(master) || !bot->IsInSameRaidWith(master))
+        return {};
+
+    // The core shares quest loot only with members in reward distance.
+    std::vector<Player*> receivers = botAI->GetRealPlayersInGroup();
+    std::erase_if(receivers,
+                  [bot, master](Player* player) { return player != master && !player->IsAtGroupRewardDistance(bot); });
+    return receivers;
 }
 
 WorldObject* LootObject::GetWorldObject(Player* bot)
