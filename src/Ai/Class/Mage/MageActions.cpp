@@ -12,6 +12,67 @@
 #include "UseItemAction.h"
 #include <cmath>
 
+namespace
+{
+bool IsKnownConjuredWaterItem(Item const* item, std::vector<Item*> const& waterItems)
+{
+    if (!item)
+        return false;
+
+    for (Item* knownWater : waterItems)
+    {
+        if (knownWater == item)
+            return true;
+    }
+
+    return false;
+}
+
+bool PlaceConjuredWaterInTrade(PlayerbotAI* botAI, std::vector<Item*> const& waterItems)
+{
+    Player* bot = botAI->GetBot();
+    TradeData* tradeData = bot->GetTradeData();
+    if (!tradeData)
+        return false;
+
+    // Already trading conjured water.
+    for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
+    {
+        Item* traded = tradeData->GetItem(TradeSlots(i));
+        if (IsKnownConjuredWaterItem(traded, waterItems))
+            return true;
+    }
+
+    int8 freeSlot = -1;
+    for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
+    {
+        if (!tradeData->GetItem(TradeSlots(i)))
+        {
+            freeSlot = i;
+            break;
+        }
+    }
+
+    if (freeSlot < 0)
+        return false;
+
+    for (Item* item : waterItems)
+    {
+        if (!item || item->IsInTrade() || !item->CanBeTraded())
+            continue;
+
+        WorldPacket packet(CMSG_SET_TRADE_ITEM, 3);
+        packet << (uint8)freeSlot;
+        packet << (uint8)item->GetBagSlot();
+        packet << (uint8)item->GetSlot();
+        bot->GetSession()->HandleSetTradeItemOpcode(packet);
+        return true;
+    }
+
+    return false;
+}
+}
+
 std::vector<NextAction> CastMoltenArmorAction::getAlternatives()
 {
     if (!botAI->HasSpell("molten armor"))
@@ -156,4 +217,134 @@ bool CastBlinkBackAction::Execute(Event event)
 
     bot->SetOrientation(bot->GetAngle(target) + M_PI);
     return CastSpellAction::Execute(event);
+}
+
+Unit* MageGiveWaterAction::GetTarget()
+{
+    Group* group = bot->GetGroup();
+    if (!group)
+        return nullptr;
+
+    if (Player* trader = bot->GetTrader())
+    {
+        if (trader->IsAlive() && trader->GetMap() == bot->GetMap())
+            return trader;
+    }
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (!member || member == bot || !member->IsAlive() || member->GetMap() != bot->GetMap())
+            continue;
+
+        uint8 cls = member->getClass();
+        if (cls != CLASS_DRUID && cls != CLASS_HUNTER && cls != CLASS_PALADIN && cls != CLASS_PRIEST &&
+            cls != CLASS_SHAMAN && cls != CLASS_WARLOCK)
+        {
+            continue;
+        }
+
+        if (member->GetTrader() && member->GetTrader() != bot)
+            continue;
+
+        PlayerbotAI* memberAi = GET_PLAYERBOT_AI(member);
+        if (!memberAi)
+            continue;
+
+        if (!memberAi->HasStrategy("food", memberAi->GetState()))
+            continue;
+
+        if (memberAi->GetAiObjectContext()->GetValue<uint32>("item count", "conjured water")->Get())
+            continue;
+
+        return member;
+    }
+
+    return nullptr;
+}
+
+bool MageGiveWaterAction::isUseful()
+{
+    Unit* target = GetTarget();
+    Player* receiver = target ? target->ToPlayer() : nullptr;
+    if (!receiver && bot->GetTrader())
+        receiver = bot->GetTrader()->ToPlayer();
+
+    if (!receiver)
+        return false;
+
+    if (bot->GetTrader() && bot->GetTrader() != receiver)
+        return false;
+
+    if (!botAI->HasSpell("conjure water"))
+        return false;
+
+    if (botAI->HasSpell("ritual of refreshment"))
+        return false;
+
+    return true;
+}
+
+bool MageGiveWaterAction::Execute(Event /*event*/)
+{
+    Unit* target = GetTarget();
+    Player* receiver = target ? target->ToPlayer() : nullptr;
+    if (!receiver && bot->GetTrader())
+        receiver = bot->GetTrader()->ToPlayer();
+
+    if (!receiver)
+        return false;
+
+    if (!receiver->IsAlive() || receiver->GetMap() != bot->GetMap())
+        return false;
+
+    if (bot->GetDistance(receiver) > sPlayerbotAIConfig.spellDistance * 2)
+        return false;
+
+    if (!bot->IsWithinLOS(receiver->GetPositionX(), receiver->GetPositionY(), receiver->GetPositionZ()))
+        return false;
+
+    PlayerbotAI* receiverAi = GET_PLAYERBOT_AI(receiver);
+    if (!receiverAi)
+        return false;
+
+    if (receiverAi->GetAiObjectContext()->GetValue<uint32>("item count", "conjured water")->Get())
+        return false;
+
+    // if someone needs water and mage has none, conjure first and do not open trade yet.
+    std::vector<Item*> waterItems =
+        botAI->GetAiObjectContext()->GetValue<std::vector<Item*>>("inventory items", "conjured water")->Get();
+    if (waterItems.empty())
+    {
+        botAI->DoSpecificAction("conjure water", Event(), true);
+        return true;
+    }
+
+    if (bot->GetTrader())
+    {
+
+        if (bot->GetTrader() != receiver)
+            return false;
+
+        if (!bot->GetTradeData() || !receiver->GetTradeData())
+            return false;
+
+        if (!PlaceConjuredWaterInTrade(botAI, waterItems))
+            return false;
+
+        WorldPacket p;
+        uint32 status = 0;
+        p << status;
+        bot->GetSession()->HandleAcceptTradeOpcode(p);
+
+        return true;
+    }
+
+    if (receiver->GetTrader() && receiver->GetTrader() != bot)
+        return false;
+
+    WorldPacket packet(CMSG_INITIATE_TRADE);
+    packet << receiver->GetGUID();
+    bot->GetSession()->HandleInitiateTradeOpcode(packet);
+    return true;
 }

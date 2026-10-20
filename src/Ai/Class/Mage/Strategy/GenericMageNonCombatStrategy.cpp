@@ -35,6 +35,8 @@ void GenericMageNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trigg
 {
     NonCombatStrategy::InitTriggers(triggers);
 
+    triggers.push_back(new TriggerNode("conjure water", { NextAction("conjure water", 23.0f) }));
+    triggers.push_back(new TriggerNode("give water", { NextAction("give water", 22.0f) }));
     triggers.push_back(new TriggerNode("arcane intellect", { NextAction("arcane intellect", 21.0f) }));
     triggers.push_back(new TriggerNode("no focus magic", { NextAction("focus magic on party", 19.0f) }));
     triggers.push_back(new TriggerNode("often", { NextAction("apply oil", 1.0f) }));

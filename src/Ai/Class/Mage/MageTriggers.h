@@ -16,6 +16,20 @@
 
 // Buff and Out of Combat Triggers
 
+class ConjureWaterTrigger : public Trigger
+{
+public:
+    ConjureWaterTrigger(PlayerbotAI* botAI) : Trigger(botAI, "conjure water") {}
+    bool IsActive() override;
+};
+
+class MageGiveWaterTrigger : public GiveWaterTrigger
+{
+public:
+    MageGiveWaterTrigger(PlayerbotAI* botAI) : GiveWaterTrigger(botAI) {}
+    bool IsActive() override;
+};
+
 class ArcaneIntellectOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:

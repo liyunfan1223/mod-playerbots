@@ -125,6 +125,8 @@ public:
         creators["no firestarter strategy"] = &MageTriggerFactoryInternal::no_firestarter_strategy;
         creators["enemy is close and no firestarter strategy"] = &MageTriggerFactoryInternal::enemy_is_close_and_no_firestarter_strategy;
         creators["enemy too close for spell and no firestarter strategy"] = &MageTriggerFactoryInternal::enemy_too_close_for_spell_and_no_firestarter_strategy;
+        creators["conjure water"] = &MageTriggerFactoryInternal::conjure_water;
+        creators["give water"] = &MageTriggerFactoryInternal::give_water;
     }
 
 private:
@@ -174,6 +176,8 @@ private:
     static Trigger* no_firestarter_strategy(PlayerbotAI* botAI) { return new NoFirestarterStrategyTrigger(botAI); }
     static Trigger* enemy_is_close_and_no_firestarter_strategy(PlayerbotAI* botAI) { return new EnemyIsCloseAndNoFirestarterStrategyTrigger(botAI); }
     static Trigger* enemy_too_close_for_spell_and_no_firestarter_strategy(PlayerbotAI* botAI) { return new EnemyTooCloseForSpellAndNoFirestarterStrategyTrigger(botAI); }
+    static Trigger* conjure_water(PlayerbotAI* botAI) { return new ConjureWaterTrigger(botAI); }
+    static Trigger* give_water(PlayerbotAI* botAI) { return new MageGiveWaterTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
@@ -232,6 +236,7 @@ public:
         creators["mirror image"] = &MageAiObjectContextInternal::mirror_image;
         creators["focus magic on party"] = &MageAiObjectContextInternal::focus_magic_on_party;
         creators["blink back"] = &MageAiObjectContextInternal::blink_back;
+        creators["give water"] = &MageAiObjectContextInternal::give_water;
         creators["use mana sapphire"] = &MageAiObjectContextInternal::use_mana_sapphire;
         creators["use mana emerald"] = &MageAiObjectContextInternal::use_mana_emerald;
         creators["use mana ruby"] = &MageAiObjectContextInternal::use_mana_ruby;
@@ -293,6 +298,7 @@ private:
     static Action* mirror_image(PlayerbotAI* botAI) { return new CastMirrorImageAction(botAI); }
     static Action* focus_magic_on_party(PlayerbotAI* botAI) { return new CastFocusMagicOnPartyAction(botAI); }
     static Action* blink_back(PlayerbotAI* botAI) { return new CastBlinkBackAction(botAI); }
+    static Action* give_water(PlayerbotAI* botAI) { return new MageGiveWaterAction(botAI); }
     static Action* use_mana_sapphire(PlayerbotAI* botAI) { return new UseManaSapphireAction(botAI); }
     static Action* use_mana_emerald(PlayerbotAI* botAI) { return new UseManaEmeraldAction(botAI); }
     static Action* use_mana_ruby(PlayerbotAI* botAI) { return new UseManaRubyAction(botAI); }

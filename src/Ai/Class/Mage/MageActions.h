@@ -7,6 +7,7 @@
 #ifndef PLAYERBOTS_MAGEACTIONS_H
 #define PLAYERBOTS_MAGEACTIONS_H
 
+#include "GiveItemAction.h"
 #include "GenericSpellActions.h"
 #include "SharedDefines.h"
 #include "UseItemAction.h"
@@ -174,6 +175,16 @@ class CastConjureWaterAction : public CastBuffSpellAction
 {
 public:
     CastConjureWaterAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "conjure water") {}
+};
+
+class MageGiveWaterAction : public GiveWaterAction
+{
+public:
+    MageGiveWaterAction(PlayerbotAI* botAI) : GiveWaterAction(botAI) {}
+
+    Unit* GetTarget() override;
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 class UseManaSapphireAction : public UseItemAction
