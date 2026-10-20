@@ -82,7 +82,7 @@ bool UseItemAction::UseGameObject(ObjectGuid guid)
             return fail("gameobject_cannot_loot_error",
                         "Cannot loot this object: check quest, skill, tools, key, and object state");
 
-        bool inRange = bot->GetDistance(go) <= INTERACTION_DISTANCE - 2.0f;
+        bool inRange = go->IsAtInteractDistance(bot);
         if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT) && bot->GetDistance(go) > CONTACT_DISTANCE)
             return fail("gameobject_stay_out_of_range_error", "Game object is out of reach while staying");
 

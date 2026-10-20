@@ -59,6 +59,7 @@
 #include "NearestCorpsesValue.h"
 #include "NearestFriendlyPlayersValue.h"
 #include "NearestGameObjects.h"
+#include "NearestLootValue.h"
 #include "NearestNonBotPlayersValue.h"
 #include "NearestNpcsValue.h"
 #include "NewPlayerNearbyValue.h"
@@ -175,6 +176,7 @@ public:
         creators["loot target"] = &ValueContext::loot_target;
         creators["available loot"] = &ValueContext::available_loot;
         creators["has available loot"] = &ValueContext::has_available_loot;
+        creators["nearest loot"] = &ValueContext::nearest_loot;
         creators["always loot list"] = &ValueContext::always_loot_list;
         creators["loot strategy"] = &ValueContext::loot_strategy;
         creators["last movement"] = &ValueContext::last_movement;
@@ -392,6 +394,7 @@ private:
     static UntypedValue* available_loot(PlayerbotAI* botAI) { return new AvailableLootValue(botAI); }
     static UntypedValue* loot_target(PlayerbotAI* botAI) { return new LootTargetValue(botAI); }
     static UntypedValue* has_available_loot(PlayerbotAI* botAI) { return new HasAvailableLootValue(botAI); }
+    static UntypedValue* nearest_loot(PlayerbotAI* botAI) { return new NearestLootValue(botAI); }
     static UntypedValue* always_loot_list(PlayerbotAI* botAI) { return new AlwaysLootListValue(botAI); }
     static UntypedValue* loot_strategy(PlayerbotAI* botAI) { return new LootStrategyValue(botAI); }
 

@@ -283,6 +283,24 @@ void LootObject::AddLockRequirement(LootLockRequirement const& requirement)
         _lockRequirements[_lockRequirementCount++] = requirement;
 }
 
+bool LootObject::IsAtInteractDistance(Player* bot)
+{
+    if (IsEmpty() || !bot)
+        return false;
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+        return false;
+
+    if (Creature* creature = botAI->GetCreature(guid))
+        return bot->IsWithinDistInMap(creature, INTERACTION_DISTANCE);
+
+    if (GameObject* go = botAI->GetGameObject(guid))
+        return go->IsAtInteractDistance(bot);
+
+    return false;
+}
+
 bool LootObject::IsLootPossible(Player* bot)
 {
     if (IsEmpty() || !bot)
@@ -296,7 +314,23 @@ bool LootObject::IsLootPossible(Player* bot)
     if (!botAI)
         return false;
 
-    if (abs(worldObj->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE - 2.0f)
+    // Vertical gate: on land loot far above/below is unreachable, but in water the bot can swim
+    // straight to it; the map query also covers a stale cached liquid state after a teleport.
+    auto const inWater = [bot](WorldObject const* obj)
+    {
+        if (obj->GetGUID() == bot->GetGUID() && (bot->IsInWater() || bot->IsUnderWater()))
+            return true;
+
+        uint32 const phase = bot->GetPhaseMask();
+        float const collisionHeight = bot->GetCollisionHeight();
+        float const x = obj->GetPositionX();
+        float const y = obj->GetPositionY();
+        float const z = obj->GetPositionZ();
+        return bot->GetMap()->IsInWater(phase, x, y, z, collisionHeight) ||
+               bot->GetMap()->IsUnderWater(phase, x, y, z, collisionHeight);
+    };
+    if (!inWater(bot) && !inWater(worldObj) &&
+        abs(worldObj->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE - 2.0f)
         return false;
 
     Creature* creature = botAI->GetCreature(guid);
@@ -390,10 +424,19 @@ bool LootObjectStack::Add(ObjectGuid guid)
         availableLoot.clear();
     }
 
-    if (!availableLoot.insert(guid).second)
+    LootTargetList::iterator itr = availableLoot.find(guid);
+    if (itr != availableLoot.end())
+    {
+        // Refresh instead of dropping the re-add, or the entry expires 30s after the first add
+        // while the corpse is still there.
+        LootTarget target = *itr;
+        target.asOfTime = time(nullptr);
+        availableLoot.erase(itr);
+        availableLoot.insert(target);
         return false;
+    }
 
-    return true;
+    return availableLoot.insert(LootTarget(guid)).second;
 }
 
 void LootObjectStack::Remove(ObjectGuid guid)

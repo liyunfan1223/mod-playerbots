@@ -14,6 +14,11 @@ bool LootAvailableTrigger::IsActive()
     if (!AI_VALUE(bool, "has available loot"))
         return false;
 
+    LootObject nearest = AI_VALUE(LootObject, "nearest loot");
+    if (nearest.IsEmpty())
+        return false;
+
+    LootObject lootTarget = AI_VALUE(LootObject, "loot target");
     bool distanceCheck = false;
     if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
     {
@@ -22,16 +27,29 @@ bool LootAvailableTrigger::IsActive()
     }
     else
     {
-        distanceCheck = ServerFacade::instance().IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"),
-                                                                 INTERACTION_DISTANCE - 2.0f);
+        distanceCheck = lootTarget.IsAtInteractDistance(bot);
     }
 
     // Loot target in range, or no hostile targets to deal with first.
     if (distanceCheck || AI_VALUE(GuidVector, "all targets").empty())
         return true;
 
-    LootObject lootTarget = AI_VALUE(LootObject, "loot target");
-    return !lootTarget.IsEmpty() && !lootTarget.IsLootPossible(bot);
+    if (lootTarget.IsEmpty() || !lootTarget.IsLootPossible(bot))
+        return true;
+
+    // Re-run the loot action when the nearest entry is clearly closer than the target, instead
+    // of chasing the old target past fresh corpses. The margin stops two equidistant corpses on
+    // either side of an obstacle from swapping places on every tick.
+    if (nearest.guid == lootTarget.guid)
+        return false;
+
+    WorldObject* nearestObject = nearest.GetWorldObject(bot);
+    WorldObject* currentObject = lootTarget.GetWorldObject(bot);
+    if (!nearestObject || !currentObject)
+        return true;
+
+    constexpr float lootSwitchMargin = 3.0f;
+    return bot->GetDistance(nearestObject) + lootSwitchMargin < bot->GetDistance(currentObject);
 }
 
 bool FarFromCurrentLootTrigger::IsActive()
@@ -40,7 +58,7 @@ bool FarFromCurrentLootTrigger::IsActive()
     if (!loot.IsLootPossible(bot))
         return false;
 
-    return AI_VALUE2(float, "distance", "loot target") >= INTERACTION_DISTANCE - 2.0f;
+    return !loot.IsAtInteractDistance(bot);
 }
 
 bool CanLootTrigger::IsActive() { return AI_VALUE(bool, "can loot"); }
