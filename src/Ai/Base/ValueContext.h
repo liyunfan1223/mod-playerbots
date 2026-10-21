@@ -26,6 +26,7 @@
 #include "DistanceValue.h"
 #include "DpsTargetValue.h"
 #include "DuelTargetValue.h"
+#include "DungeonCorpseRunValue.h"
 #include "EnemyHealerTargetValue.h"
 #include "EnemyPlayerValue.h"
 #include "EstimatedLifetimeValue.h"
@@ -103,6 +104,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
 public:
     ValueContext()
     {
+        creators["dungeon corpse run"] = &ValueContext::DungeonCorpseRun;
         creators["active spell"] = &ValueContext::active_spell;
         creators["craft"] = &ValueContext::craft;
         creators["collision"] = &ValueContext::collision;
@@ -333,6 +335,7 @@ public:
     }
 
 private:
+    static UntypedValue* DungeonCorpseRun(PlayerbotAI* botAI) { return new DungeonCorpseRunValue(botAI); }
     static UntypedValue* party_member_without_water(PlayerbotAI* botAI)
     {
         return new PartyMemberWithoutWaterValue(botAI);

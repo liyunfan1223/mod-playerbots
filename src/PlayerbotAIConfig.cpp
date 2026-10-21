@@ -5,6 +5,13 @@
  */
 
 #include "PlayerbotAIConfig.h"
+
+#include <algorithm>
+#include <cctype>
+#include <cmath>
+#include <iostream>
+#include <sstream>
+
 #include "BisListMgr.h"
 #include "Config.h"
 #include "NewRpgInfo.h"
@@ -17,9 +24,6 @@
 #include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 #include "TravelMgr.h"
-#include <cctype>
-#include <iostream>
-#include <sstream>
 
 template <class T>
 void LoadList(std::string const value, T& list)
@@ -123,6 +127,38 @@ bool PlayerbotAIConfig::Initialize()
     GrindDistance = sConfigMgr->GetOption<float>("Playerbots.GrindDistance", 75.0f);
     ReactDistance = sConfigMgr->GetOption<float>("Playerbots.ReactDistance", 150.0f);
 
+    DungeonCorpseRunEnabled = sConfigMgr->GetOption<bool>("Playerbots.DungeonCorpseRun.Enable", true);
+    constexpr uint32 minDungeonCorpseRunTeleportDelay = 1;
+    constexpr uint32 maxDungeonCorpseRunTeleportDelay = 600;
+    DungeonCorpseRunTeleportDelay = sConfigMgr->GetOption<uint32>("Playerbots.DungeonCorpseRun.TeleportDelay", 60);
+    if (DungeonCorpseRunTeleportDelay < minDungeonCorpseRunTeleportDelay ||
+        DungeonCorpseRunTeleportDelay > maxDungeonCorpseRunTeleportDelay)
+    {
+        LOG_WARN("playerbots", "Playerbots.DungeonCorpseRun.TeleportDelay {} is outside {}..{} seconds; clamping it.",
+                 DungeonCorpseRunTeleportDelay, minDungeonCorpseRunTeleportDelay, maxDungeonCorpseRunTeleportDelay);
+        DungeonCorpseRunTeleportDelay = std::clamp(DungeonCorpseRunTeleportDelay, minDungeonCorpseRunTeleportDelay,
+                                                   maxDungeonCorpseRunTeleportDelay);
+    }
+    constexpr float defaultDungeonCorpseRunTeleportDistance = 100.0f;
+    constexpr float minDungeonCorpseRunTeleportDistance = 1.0f;
+    constexpr float maxDungeonCorpseRunTeleportDistance = 500.0f;
+    DungeonCorpseRunTeleportDistance = sConfigMgr->GetOption<float>("Playerbots.DungeonCorpseRun.TeleportDistance",
+                                                                    defaultDungeonCorpseRunTeleportDistance);
+    if (!std::isfinite(DungeonCorpseRunTeleportDistance))
+    {
+        LOG_WARN("playerbots", "Playerbots.DungeonCorpseRun.TeleportDistance must be finite; using {} yards.",
+                 defaultDungeonCorpseRunTeleportDistance);
+        DungeonCorpseRunTeleportDistance = defaultDungeonCorpseRunTeleportDistance;
+    }
+    else if (DungeonCorpseRunTeleportDistance < minDungeonCorpseRunTeleportDistance ||
+             DungeonCorpseRunTeleportDistance > maxDungeonCorpseRunTeleportDistance)
+    {
+        LOG_WARN("playerbots", "Playerbots.DungeonCorpseRun.TeleportDistance {} is outside {}..{} yards; clamping it.",
+                 DungeonCorpseRunTeleportDistance, minDungeonCorpseRunTeleportDistance,
+                 maxDungeonCorpseRunTeleportDistance);
+        DungeonCorpseRunTeleportDistance = std::clamp(
+            DungeonCorpseRunTeleportDistance, minDungeonCorpseRunTeleportDistance, maxDungeonCorpseRunTeleportDistance);
+    }
     CriticalHealth = sConfigMgr->GetOption<int32>("Playerbots.CriticalHealth", 25);
     LowHealth = sConfigMgr->GetOption<int32>("Playerbots.LowHealth", 45);
     MediumHealth = sConfigMgr->GetOption<int32>("Playerbots.MediumHealth", 65);

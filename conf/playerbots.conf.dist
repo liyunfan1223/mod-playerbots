@@ -19,6 +19,7 @@
 #        LOOTING
 #        TIMERS
 #        DISTANCES
+#        RESURRECTION AND CORPSE RUNS
 #        THRESHOLDS
 #        QUESTS
 #        COMBAT
@@ -420,6 +421,29 @@ Playerbots.AoeRadius = 10
 Playerbots.RpgDistance = 200
 Playerbots.GrindDistance = 75.0
 Playerbots.ReactDistance = 150.0
+
+#
+#
+####################################################################################################
+
+####################################################################################################
+# RESURRECTION AND CORPSE RUNS
+#
+
+# If no living group member can offer a learned resurrection, let a dead bot release spirit.
+# Return the ghost to its original dungeon entrance; normal core instance-entry handling revives it.
+# Requires its real group player in that same instance; raids, BGs and arenas are excluded.
+# Pending resurrection and usable self-resurrection take precedence. The instance is never reset.
+# Default: 1 (enabled)
+Playerbots.DungeonCorpseRun.Enable = 1
+
+# Seconds to wait after normal resurrection at the dungeon entrance before catching up to the group.
+# Catch-up requires a living real group player in the same instance and no combat. Clamped to 1..600.
+Playerbots.DungeonCorpseRun.TeleportDelay = 60
+
+# Minimum distance in yards from that real group player before the delayed catch-up teleport is needed.
+# Finite values are clamped to 1..500; non-finite values use the default of 100 yards.
+Playerbots.DungeonCorpseRun.TeleportDistance = 100.0
 
 #
 #

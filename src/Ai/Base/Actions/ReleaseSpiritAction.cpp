@@ -5,7 +5,9 @@
  */
 
 #include "ReleaseSpiritAction.h"
+
 #include "Corpse.h"
+#include "DungeonCorpseRunAction.h"
 #include "Event.h"
 #include "GameGraveyard.h"
 #include "Log.h"
@@ -87,6 +89,9 @@ void ReleaseSpiritAction::LogRelease(std::string const& releaseMsg) const
 // AutoReleaseSpiritAction implementation
 bool AutoReleaseSpiritAction::Execute(Event /*event*/)
 {
+    if (DungeonCorpseRun::IsEligible(botAI) && !DungeonCorpseRun::PrepareRelease(botAI))
+        return false;
+
     IncrementDeathCount();
     bot->DurabilityRepairAll(false, 1.0f, false);
     LogRelease("auto released");
@@ -170,6 +175,9 @@ bool AutoReleaseSpiritAction::HandleBattlegroundSpiritHealer()
 
 bool AutoReleaseSpiritAction::ShouldAutoRelease() const
 {
+    if (DungeonCorpseRun::IsEligible(botAI))
+        return DungeonCorpseRun::ShouldRelease(botAI);
+
     if (!bot->GetGroup())
         return true;
 
@@ -233,10 +241,7 @@ bool RepopAction::Execute(Event /*event*/)
     return true;
 }
 
-bool RepopAction::isUseful()
-{
-    return !bot->InBattleground();
-}
+bool RepopAction::isUseful() { return !bot->InBattleground() && !DungeonCorpseRun::IsPending(botAI); }
 
 int64 RepopAction::CalculateDeadTime() const
 {

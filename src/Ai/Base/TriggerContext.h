@@ -9,6 +9,7 @@
 
 #include "BotStateTriggers.h"
 #include "CureTriggers.h"
+#include "DungeonCorpseRunTrigger.h"
 #include "FishingTriggers.h"
 #include "GenericTriggers.h"
 #include "GuildTriggers.h"
@@ -34,6 +35,8 @@ class TriggerContext : public NamedObjectContext<Trigger>
 public:
     TriggerContext()
     {
+        creators["dungeon corpse run"] = &TriggerContext::DungeonCorpseRun;
+        creators["dungeon corpse run catch up"] = &TriggerContext::DungeonCorpseRunCatchUp;
         creators["return"] = &TriggerContext::_return;
         creators["sit"] = &TriggerContext::sit;
         creators["return to stay position"] = &TriggerContext::return_to_stay_position;
@@ -252,6 +255,8 @@ public:
     }
 
 private:
+    static Trigger* DungeonCorpseRun(PlayerbotAI* botAI) { return new DungeonCorpseRunTrigger(botAI); }
+    static Trigger* DungeonCorpseRunCatchUp(PlayerbotAI* botAI) { return new DungeonCorpseRunCatchUpTrigger(botAI); }
     static Trigger* give_food(PlayerbotAI* botAI) { return new GiveFoodTrigger(botAI); }
     static Trigger* give_water(PlayerbotAI* botAI) { return new GiveWaterTrigger(botAI); }
     static Trigger* no_rti(PlayerbotAI* botAI) { return new NoRtiTrigger(botAI); }

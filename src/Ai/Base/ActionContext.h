@@ -26,6 +26,7 @@
 #include "DelayAction.h"
 #include "DestroyItemAction.h"
 #include "DropQuestAction.h"
+#include "DungeonCorpseRunAction.h"
 #include "EmoteAction.h"
 #include "FishingAction.h"
 #include "FollowActions.h"
@@ -78,6 +79,8 @@ class ActionContext : public NamedObjectContext<Action>
 public:
     ActionContext()
     {
+        creators["dungeon corpse run"] = &ActionContext::DungeonCorpseRun;
+        creators["dungeon corpse run catch up"] = &ActionContext::DungeonCorpseRunCatchUp;
         creators["mark rti"] = &ActionContext::mark_rti;
         creators["set return position"] = &ActionContext::set_return_position;
         creators["rpg"] = &ActionContext::rpg;
@@ -282,6 +285,8 @@ public:
     }
 
 private:
+    static Action* DungeonCorpseRun(PlayerbotAI* botAI) { return new DungeonCorpseRunAction(botAI); }
+    static Action* DungeonCorpseRunCatchUp(PlayerbotAI* botAI) { return new DungeonCorpseRunCatchUpAction(botAI); }
     static Action* give_water(PlayerbotAI* botAI) { return new GiveWaterAction(botAI); }
     static Action* give_food(PlayerbotAI* botAI) { return new GiveFoodAction(botAI); }
     static Action* ra(PlayerbotAI* botAI) { return new RemoveAuraAction(botAI); }

@@ -5,7 +5,9 @@
  */
 
 #include "ReviveFromCorpseAction.h"
+
 #include "Corpse.h"
+#include "DungeonCorpseRunAction.h"
 #include "Event.h"
 #include "FleeManager.h"
 #include "GameGraveyard.h"
@@ -81,7 +83,7 @@ bool ReviveFromCorpseAction::Execute(Event event)
 
 bool FindCorpseAction::Execute(Event /*event*/)
 {
-    if (bot->InBattleground())
+    if (bot->InBattleground() || DungeonCorpseRun::IsPending(botAI))
         return false;
 
     Player* groupLeader = botAI->GetGroupLeader();
@@ -204,7 +206,7 @@ bool FindCorpseAction::Execute(Event /*event*/)
 
 bool FindCorpseAction::isUseful()
 {
-    if (bot->InBattleground())
+    if (bot->InBattleground() || DungeonCorpseRun::IsPending(botAI))
         return false;
 
     return bot->GetCorpse();
