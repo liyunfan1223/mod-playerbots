@@ -113,6 +113,11 @@ constexpr uint32_t Weight(Motivation motivation, Activity activity, uint32_t bas
     return static_cast<uint32_t>(std::clamp<uint64_t>(weighted, 1, 1000000));
 }
 
+// Expansion of a bot's session for the era, read from the era's bot level cap (60 vanilla,
+// 70 TBC, 80 Wrath). Sessions used to be created as Wrath regardless of era, so vanilla bots
+// walked into Outland and the Blood Elf/Draenei zones (28 online there on 2026-10-21).
+constexpr uint8_t EraExpansion(uint32_t botMaxLevel) { return botMaxLevel <= 60 ? 0 : botMaxLevel <= 70 ? 1 : 2; }
+
 // Levelling pace by personality, as a percentage of the bot XP rate: power levellers race
 // ahead, explorers and crafters take their time. Applied only to bots not grouped with a
 // real player (a player's party levels together at the normal rate).

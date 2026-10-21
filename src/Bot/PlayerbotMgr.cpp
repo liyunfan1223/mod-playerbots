@@ -19,6 +19,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectGuid.h"
 #include "ObjectMgr.h"
+#include "LivingWorldPolicy.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "PlayerbotGuildMgr.h"
@@ -155,8 +156,12 @@ void PlayerbotHolder::AddPlayerBot(ObjectGuid playerGuid, uint32 masterAccountId
         return;
     }
 
+    // With the living world on, bot sessions follow the era so bots cannot enter later expansions' maps.
+    uint8 const expansion = sPlayerbotAIConfig.LivingWorldEnabled
+                                ? LivingWorld::EraExpansion(sPlayerbotAIConfig.RandomBotMaxLevel)
+                                : uint8(EXPANSION_WRATH_OF_THE_LICH_KING);
     WorldSession* botSession =
-        new WorldSession(accountId, "", 0x0, nullptr, SEC_PLAYER, EXPANSION_WRATH_OF_THE_LICH_KING, time_t(0),
+        new WorldSession(accountId, "", 0x0, nullptr, SEC_PLAYER, expansion, time_t(0),
                          sWorld->GetDefaultDbcLocale(), 0, false, false, 0);
 
     botLoading.emplace(playerGuid, PendingBotLogin{masterAccountId, botSession, false});
