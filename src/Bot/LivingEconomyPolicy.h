@@ -22,6 +22,28 @@ inline constexpr float MarketReach = 40.0f;
 inline constexpr float MaxMarketTrip = 3000.0f;
 constexpr bool WorthMarketTrip(float distance) { return distance > MarketReach && distance <= MaxMarketTrip; }
 
+// Auction flipping: a trader with nothing of its own to sell may buy one clearly underpriced
+// listing (at most 75% of the median of at least 3 other listings, above vendor price) and
+// resell it at cost +15% or just under the going rate, whichever is higher.
+inline constexpr uint32_t FlipMinListings = 3;
+inline constexpr uint32_t FlipBuyPercent = 75;
+inline constexpr uint32_t FlipCooldownSeconds = 600;
+// A trader with nothing to sell travels to the auction house to hunt bargains only when it could
+// spend at least 1 gold on one under the purchase budget rule (a purse of 5 gold or more).
+inline constexpr uint32_t FlipTripBudget = 10000;
+constexpr bool IsFlipBargain(uint32_t unitPrice, uint32_t median, uint32_t vendorPrice, uint32_t otherListings)
+{
+    return otherListings >= FlipMinListings && median && unitPrice > vendorPrice &&
+           uint64_t(unitPrice) * 100 <= uint64_t(median) * FlipBuyPercent;
+}
+constexpr uint32_t FlipResalePrice(uint32_t paidUnit, uint32_t median)
+{
+    uint64_t const markup = uint64_t(paidUnit) * 115 / 100 + 1;
+    uint64_t const going = uint64_t(median) * 97 / 100;
+    uint64_t const price = markup > going ? markup : going;
+    return price > MoneyLimit ? 0 : static_cast<uint32_t>(price);
+}
+
 inline uint32_t Surplus(uint32_t owned, uint32_t reserve, uint32_t stack)
 {
     return owned > reserve ? std::min(owned - reserve, stack) : 0;

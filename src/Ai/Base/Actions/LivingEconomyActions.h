@@ -47,6 +47,7 @@ struct LivingEconomyPlan
     uint32 recipe = 0;
     LivingSupplyKind supplyKind = LivingSupplyKind::Reagent;
     uint32 category = 0;
+    bool flip = false;  // auction job: look for an underpriced listing to buy and resell
 };
 
 class LivingEconomyValue : public CalculatedValue<LivingEconomyPlan>

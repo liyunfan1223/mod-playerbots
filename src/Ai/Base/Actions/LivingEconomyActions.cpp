@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include <map>
+#include <mutex>
 #include <unordered_map>
 
 #include "AuctionHouseMgr.h"
@@ -93,6 +94,41 @@ bool IsTrader(Player* player)
     return LivingWorldMgr::instance().GetProfile(player).motivation == LivingWorld::Motivation::Trader;
 }
 
+// What traders paid for flipped goods (so the resale covers it) and when they last looked for a
+// bargain. Bot threads read it while planning; world-thread operations update it.
+struct FlipLedger
+{
+    std::mutex lock;
+    std::unordered_map<uint32, std::unordered_map<uint32, uint32>> paid;  // bot -> item -> unit price paid
+    std::unordered_map<uint32, time_t> lastScan;                            // bot -> last bargain scan
+};
+
+FlipLedger& Flips()
+{
+    static FlipLedger ledger;
+    return ledger;
+}
+
+uint32 FlipPaid(Player* player, uint32 entry)
+{
+    FlipLedger& ledger = Flips();
+    std::lock_guard<std::mutex> guard(ledger.lock);
+    auto const bot = ledger.paid.find(player->GetGUID().GetCounter());
+    if (bot == ledger.paid.end())
+        return 0;
+    auto const item = bot->second.find(entry);
+    return item == bot->second.end() ? 0 : item->second;
+}
+
+bool FlipScanDue(Player* player)
+{
+    FlipLedger& ledger = Flips();
+    std::lock_guard<std::mutex> guard(ledger.lock);
+    auto const it = ledger.lastScan.find(player->GetGUID().GetCounter());
+    return it == ledger.lastScan.end() ||
+           GameTime::GetGameTime().count() - it->second >= LivingWorld::FlipCooldownSeconds;
+}
+
 bool IsLivingMail(Mail const* mail)
 {
     return mail && (mail->messageType == MAIL_AUCTION ||
@@ -115,15 +151,16 @@ uint32 SaleCount(PlayerbotAI* ai, Item* item, Stock const& stock)
         (proto->Class == ITEM_CLASS_WEAPON &&
          (proto->SubClass == ITEM_SUBCLASS_WEAPON_MISC || proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE)))
         return 0;
+    // Goods bought to flip are for resale whatever the bot itself would use them for.
+    bool const flipped = FlipPaid(ai->GetBot(), item->GetEntry()) != 0;
     auto* context = ai->GetAiObjectContext();
     // The qualifier includes the random property, so an upgrade isn't mistaken for a spare.
     std::string const qualifier =
         std::to_string(item->GetEntry()) + "," + std::to_string(item->GetItemRandomPropertyId());
-    ItemUsage const usage = context->GetValue<ItemUsage>("item usage", qualifier)->Get();
-    if (usage != ITEM_USAGE_AH)
+    if (!flipped && context->GetValue<ItemUsage>("item usage", qualifier)->Get() != ITEM_USAGE_AH)
         return 0;
     auto const it = stock.reserve.find(item->GetEntry());
-    uint32 const reserve = it == stock.reserve.end() ? 0 : it->second;
+    uint32 const reserve = flipped || it == stock.reserve.end() ? 0 : it->second;
     return LivingWorld::Surplus(ai->GetBot()->GetItemCount(item->GetEntry(), false), reserve, item->GetCount());
 }
 
@@ -357,6 +394,36 @@ uint32 PeerPrice(Market const& market, uint32 entry, ObjectGuid owner)
     return *middle;
 }
 
+// Going rate for judging a flip: the median of every other listing of the item, including the same
+// seller's. Comparing only with other sellers found no bargains, because nearly every listing belongs
+// to the single AH bot (2026-10-21). The flipper's own listings and the judged listing are left out.
+uint32 FlipMedian(Market const& market, uint32 entry, ObjectGuid flipper, uint32 unit, uint32& count)
+{
+    count = 0;
+    auto const it = market.prices.find(entry);
+    if (it == market.prices.end())
+        return 0;
+    std::vector<uint32> prices;
+    bool judgedSkipped = false;
+    for (auto const& [seller, price] : it->second)
+    {
+        if (seller == flipper || !price)
+            continue;
+        if (!judgedSkipped && price == unit)
+        {
+            judgedSkipped = true;
+            continue;
+        }
+        prices.push_back(price);
+    }
+    count = static_cast<uint32>(prices.size());
+    if (prices.empty())
+        return 0;
+    auto middle = prices.begin() + prices.size() / 2;
+    std::nth_element(prices.begin(), middle, prices.end());
+    return *middle;
+}
+
 class LivingAuctionOperation : public PlayerbotOperation
 {
 public:
@@ -388,9 +455,14 @@ public:
                                          deposit, player->GetLevel()))
             return false;
         auto const cost = stock.costs.find(product);
+        uint32 const paid = FlipPaid(player, product);
         uint32 const price =
-            LivingWorld::AuctionUnitPrice(item->GetTemplate()->SellPrice, cost == stock.costs.end() ? 0 : cost->second,
-                                          PeerPrice(market, product, _bot), count);
+            paid ? LivingWorld::FlipResalePrice(paid, PeerPrice(market, product, _bot))
+                 : LivingWorld::AuctionUnitPrice(item->GetTemplate()->SellPrice,
+                                                 cost == stock.costs.end() ? 0 : cost->second,
+                                                 PeerPrice(market, product, _bot), count);
+        if (price && uint64(price) * count > LivingWorld::MoneyLimit)
+            return false;
         if (!price)
             return false;
         uint32 const previous = player->GetItemCount(product, false);
@@ -403,13 +475,103 @@ public:
         ++market.owners[_bot];
         ++market.listings[{_bot, product}];
         market.prices[product].emplace_back(_bot, price);
-        LOG_DEBUG("playerbots", "Living trader {} listed {} x {} at {} copper", _bot.ToString(), count, product, price);
+        if (paid && !player->GetItemCount(product, true))
+        {
+            FlipLedger& ledger = Flips();
+            std::lock_guard<std::mutex> guard(ledger.lock);
+            ledger.paid[_bot.GetCounter()].erase(product);
+        }
+        LOG_DEBUG("playerbots", "Living trader {} listed {} x {} at {} copper{}", _bot.ToString(), count, product, price,
+                  paid ? " (flip)" : "");
         return true;
     }
 
 private:
     ObjectGuid _bot;
     LivingEconomyPlan _plan;
+};
+
+// Buys one clearly underpriced listing to resell. Runs on the world thread like the sale.
+class LivingFlipOperation : public PlayerbotOperation
+{
+public:
+    LivingFlipOperation(ObjectGuid bot, ObjectGuid auctioneer) : _bot(bot), _auctioneer(auctioneer) {}
+    ObjectGuid GetBotGuid() const override { return _bot; }
+    std::string GetName() const override { return "Living auction flip"; }
+    bool Execute() override
+    {
+        Player* player = ObjectAccessor::FindPlayer(_bot);
+        PlayerbotAI* ai = player ? GET_PLAYERBOT_AI(player) : nullptr;
+        if (!ai || !LivingProfessions::CanWork(ai) || !IsTrader(player))
+            return false;
+        Creature* npc = player->GetNPCIfCanInteractWith(_auctioneer, UNIT_NPC_FLAG_AUCTIONEER);
+        auto* house = npc ? sAuctionMgr->GetAuctionsMap(npc->GetFaction()) : nullptr;
+        if (!house)
+            return false;
+        time_t const now = GameTime::GetGameTime().count();
+        {
+            FlipLedger& ledger = Flips();
+            std::lock_guard<std::mutex> guard(ledger.lock);
+            ledger.lastScan[_bot.GetCounter()] = now;
+        }
+
+        Market& market = ReadMarket(house);
+        uint32 bestId = 0, bestBuyout = 0, bestEntry = 0, bestUnit = 0;
+        uint64 bestRatio = 0;
+        for (auto const& [id, auction] : house->GetAuctions())
+        {
+            if (!auction || auction->owner == _bot || auction->bidder == _bot || !auction->buyout ||
+                !auction->itemCount || auction->expire_time <= now)
+                continue;
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(auction->item_template);
+            if (!proto)
+                continue;
+            uint32 const unit = auction->buyout / auction->itemCount;
+            uint32 others = 0;
+            uint32 const median = FlipMedian(market, auction->item_template, _bot, unit, others);
+            if (!LivingWorld::IsFlipBargain(unit, median, proto->SellPrice, others) ||
+                !LivingWorld::CanAffordTraining(player->GetMoney(), auction->buyout, player->GetLevel()))
+                continue;
+            uint64 const ratio = uint64(unit) * 1000 / median;
+            if (!bestId || ratio < bestRatio)
+            {
+                bestId = id;
+                bestBuyout = auction->buyout;
+                bestEntry = auction->item_template;
+                bestUnit = unit;
+                bestRatio = ratio;
+            }
+        }
+        if (!bestId)
+        {
+            LOG_INFO("playerbots", "Living trader {} found no flip bargain among {} listings", player->GetName(),
+                     house->GetAuctions().size());
+            return false;
+        }
+
+        uint32 const before = player->GetMoney();
+        WorldPacket packet(CMSG_AUCTION_PLACE_BID);
+        packet << _auctioneer << bestId << bestBuyout;
+        player->GetSession()->HandleAuctionPlaceBid(packet);
+        if (player->GetMoney() >= before)
+        {
+            LOG_INFO("playerbots", "Living trader {} could not buy out auction {} ({} copper)", player->GetName(),
+                     bestId, bestBuyout);
+            return false;
+        }
+        {
+            FlipLedger& ledger = Flips();
+            std::lock_guard<std::mutex> guard(ledger.lock);
+            ledger.paid[_bot.GetCounter()][bestEntry] = bestUnit;
+        }
+        LOG_INFO("playerbots", "Living trader {} bought auction {} (item {} at {} copper each, {}% of the going rate) to flip",
+                 player->GetName(), bestId, bestEntry, bestUnit, bestRatio / 10);
+        return true;
+    }
+
+private:
+    ObjectGuid _bot;
+    ObjectGuid _auctioneer;
 };
 
 class LivingMailOperation : public PlayerbotOperation
@@ -513,7 +675,14 @@ LivingEconomyPlan LivingEconomyValue::Calculate()
                 best = score;
             }
         }
-    return result.item.IsEmpty() ? LivingEconomyPlan{} : result;
+    if (result.item.IsEmpty())
+    {
+        // Nothing of its own to sell: a trader at the auction house looks for a bargain instead.
+        if (!FlipScanDue(bot))
+            return {};
+        result.flip = true;
+    }
+    return result;
 }
 
 LivingMarketTrip LivingMarketTripValue::Calculate()
@@ -529,8 +698,12 @@ LivingMarketTrip LivingMarketTripValue::Calculate()
             hasGoods = true;
             break;
         }
+    // With nothing to sell, a trader with spare gold still goes when a bargain scan is due: flips only
+    // happen at the auction house, so without this trip none happened in 6 hours (2026-10-21).
+    bool const bargainHunt = !hasGoods && FlipScanDue(bot) &&
+                             LivingWorld::CanAffordTraining(bot->GetMoney(), LivingWorld::FlipTripBudget, bot->GetLevel());
     TravelMgr::NpcLocation auctioneer;
-    if (!hasGoods || !sTravelMgr.SelectAuctioneerByMap(bot, auctioneer))
+    if ((!hasGoods && !bargainHunt) || !sTravelMgr.SelectAuctioneerByMap(bot, auctioneer))
         return trip;
     trip.go = LivingWorld::WorthMarketTrip(bot->GetExactDist(auctioneer.loc));
     trip.destination = auctioneer.loc;
@@ -561,6 +734,9 @@ bool LivingEconomyAction::Execute(Event /*event*/)
         return false;
     }
     value->Set({});
+    if (_job == LivingEconomyJob::Auction && plan.flip)
+        return PlayerbotWorldThreadProcessor::instance().QueueOperation(
+            std::make_unique<LivingFlipOperation>(bot->GetGUID(), plan.target));
     if (_job == LivingEconomyJob::Auction)
         return PlayerbotWorldThreadProcessor::instance().QueueOperation(
             std::make_unique<LivingAuctionOperation>(bot->GetGUID(), plan));
