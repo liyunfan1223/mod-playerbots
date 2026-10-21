@@ -153,7 +153,7 @@ void PlayerbotGuildMgr::LoadGuildNames()
 
     QueryResult result = CharacterDatabase.Query(
         "SELECT {} FROM playerbots_guild_names",
-        RandomPlayerbotFactory::GetLocalizedNameSelector("name"));
+        RandomPlayerbotFactory::GetGuildNameSelector("name"));
 
     if (!result)
     {
