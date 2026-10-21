@@ -18,6 +18,14 @@ class IckAndKrickMultiplier : public Multiplier
         float GetValue(Action* action) override;
 };
 
+class PoSHazardMultiplier : public Multiplier
+{
+public:
+    PoSHazardMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "pos hazards") {}
+
+    float GetValue(Action* action) override;
+};
+
 class GarfrostMultiplier : public Multiplier
 {
 public:

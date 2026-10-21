@@ -15,6 +15,7 @@ public:
     WotlkDungeonPoSStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
     std::string const getName() override { return "wotlk-pos"; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitReactionTriggers(std::vector<TriggerNode*>& triggers) override;
     void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
 };
 
