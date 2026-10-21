@@ -7,6 +7,7 @@
 #include "LivingWorldMgr.h"
 
 #include "Log.h"
+#include "Random.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerbotsDatabase.h"
@@ -184,4 +185,20 @@ uint32 LivingWorldMgr::GetSessionTime(uint32 guid, uint32 baseline)
     if (found == _profiles.end())
         return baseline;
     return static_cast<uint32>(uint64(baseline) * LivingWorld::SessionPercent(found->second.motivation) / 100);
+}
+
+void LivingWorldMgr::RollCityStart(Player* player)
+{
+    if (!IsEnabled(player) || player->GetLevel() < LivingWorld::CityStartMinLevel)
+        return;
+    if (urand(1, 100) > LivingWorld::CityStartPercent(GetProfile(player).motivation))
+        return;
+    std::lock_guard<std::mutex> lock(_mutex);
+    _cityStarts.insert(player->GetGUID().GetCounter());
+}
+
+bool LivingWorldMgr::TakeCityStart(Player* player)
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+    return _cityStarts.erase(player->GetGUID().GetCounter()) > 0;
 }

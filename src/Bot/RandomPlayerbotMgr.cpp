@@ -1535,6 +1535,20 @@ bool RandomPlayerbotMgr::ProcessBot(Player* bot)
     if (bot->InBattlegroundQueue())
         return false;
 
+    // This session starts in town, as if the bot had logged out at its capital's bank last time.
+    if (LivingWorldMgr::instance().TakeCityStart(bot))
+    {
+        std::vector<WorldLocation> locs = sTravelMgr.GetCityLocations(bot);
+        uint32 const zoneBefore = bot->GetZoneId();
+        if (!locs.empty())
+            RandomTeleport(bot, locs, true);
+        LOG_INFO("playerbots", "Living bot {} starts its session in town: {} city locations, zone {} -> {}{}",
+                 bot->GetName(), locs.size(), zoneBefore, bot->GetZoneId(),
+                 bot->IsBeingTeleported() ? " (teleporting)" : "");
+        if (!locs.empty())
+            return true;
+    }
+
     // leave group if leader is rndbot
     Group* group = bot->GetGroup();
     if (group && !group->isLFGGroup() && IsRandomBot(group->GetLeader()))
@@ -2686,6 +2700,10 @@ void RandomPlayerbotMgr::OnPlayerLogout(Player* player)
 
 void RandomPlayerbotMgr::OnBotLoginInternal(Player* const bot)
 {
+    // Ordinary session logins only: after a restart the whole population resumes where it was.
+    if (GameTime::GetUptime().count() > 15 * MINUTE)
+        LivingWorldMgr::instance().RollCityStart(bot);
+
     if (_isBotLogging)
     {
         LOG_INFO("playerbots", "{}/{} Bot {} logged in", playerBots.size(),

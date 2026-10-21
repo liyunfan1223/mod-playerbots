@@ -9,6 +9,7 @@
 
 #include <mutex>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "LivingWorldPolicy.h"
 #include "PlayerbotAIConfig.h"
@@ -30,11 +31,16 @@ public:
     void LimitExperience(Player* player, uint32& amount);
     // In-world time for a bot about to log in; bots without a saved profile keep the baseline.
     uint32 GetSessionTime(uint32 guid, uint32 baseline);
+    // At a session's login, decides whether the bot starts it in its capital; the bot manager
+    // takes the decision on its next visit and performs the trip.
+    void RollCityStart(Player* player);
+    bool TakeCityStart(Player* player);
 
 private:
     void Save(uint32 guid, LivingWorld::Profile const& profile);
     std::mutex _mutex;
     std::unordered_map<uint32, LivingWorld::Profile> _profiles;
+    std::unordered_set<uint32> _cityStarts;
 };
 
 #endif

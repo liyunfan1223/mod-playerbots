@@ -143,6 +143,24 @@ constexpr uint32_t SessionPercent(Motivation motivation)
     }
 }
 
+// Chance that a new play session starts in the faction's capital (players log in where they
+// logged out: at the bank, auction house or trainers). Traders and crafters mostly do; power
+// levellers rarely. Below level 10 bots stay in their starting zones.
+inline constexpr uint32_t CityStartMinLevel = 10;
+constexpr uint32_t CityStartPercent(Motivation motivation)
+{
+    switch (motivation)
+    {
+        case Motivation::Trader: return 60;
+        case Motivation::Profession: return 50;
+        case Motivation::Explorer: return 35;
+        case Motivation::Pvp: return 30;
+        case Motivation::Gear: return 25;
+        case Motivation::Leveller: return 10;
+        default: return 0;
+    }
+}
+
 constexpr uint32_t BattlegroundRole(Temperament temperament, uint32_t roll)
 {
     roll %= 10;
