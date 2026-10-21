@@ -128,6 +128,21 @@ constexpr uint32_t XpPacePercent(Motivation motivation)
     }
 }
 
+// Play-session length by personality, as a percentage of the configured in-world time: power
+// levellers and gear farmers put in long sessions, explorers drop in briefly. Weighted by the
+// motivation mix the average stays near 100%, so the online population is unchanged.
+constexpr uint32_t SessionPercent(Motivation motivation)
+{
+    switch (motivation)
+    {
+        case Motivation::Leveller: return 150;
+        case Motivation::Gear: return 120;
+        case Motivation::Pvp: return 110;
+        case Motivation::Explorer: return 60;
+        default: return 100;
+    }
+}
+
 constexpr uint32_t BattlegroundRole(Temperament temperament, uint32_t roll)
 {
     roll %= 10;

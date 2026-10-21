@@ -174,3 +174,14 @@ void LivingWorldMgr::LimitExperience(Player* player, uint32& amount)
     allowed = allowed > current ? allowed - current : 0;
     amount = static_cast<uint32>(std::min<uint64>(amount, allowed));
 }
+
+uint32 LivingWorldMgr::GetSessionTime(uint32 guid, uint32 baseline)
+{
+    if (!sPlayerbotAIConfig.LivingWorldEnabled)
+        return baseline;
+    std::lock_guard<std::mutex> lock(_mutex);
+    auto const found = _profiles.find(guid);
+    if (found == _profiles.end())
+        return baseline;
+    return static_cast<uint32>(uint64(baseline) * LivingWorld::SessionPercent(found->second.motivation) / 100);
+}

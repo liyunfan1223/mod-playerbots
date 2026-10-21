@@ -28,6 +28,8 @@ public:
     uint32 GetBattlegroundRole(Player* player, uint32 roll);
     uint32 GetLevelCap(Player* player);
     void LimitExperience(Player* player, uint32& amount);
+    // In-world time for a bot about to log in; bots without a saved profile keep the baseline.
+    uint32 GetSessionTime(uint32 guid, uint32 baseline);
 
 private:
     void Save(uint32 guid, LivingWorld::Profile const& profile);

@@ -769,8 +769,9 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             }
 
             uint32 add_time = sPlayerbotAIConfig.EnablePeriodicOnlineOffline
-                                ? urand(sPlayerbotAIConfig.MinRandomBotInWorldTime,
-                                        sPlayerbotAIConfig.MaxRandomBotInWorldTime)
+                                ? LivingWorldMgr::instance().GetSessionTime(
+                                      charInfo.guid, urand(sPlayerbotAIConfig.MinRandomBotInWorldTime,
+                                                           sPlayerbotAIConfig.MaxRandomBotInWorldTime))
                                 : sPlayerbotAIConfig.PermanentlyInWorldTime;
 
             SetEventValue(charInfo.guid, "add", 1, add_time);
