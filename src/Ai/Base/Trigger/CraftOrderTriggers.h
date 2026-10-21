@@ -28,4 +28,12 @@ public:
     bool IsActive() override;
 };
 
+class MailToCollectTrigger : public Trigger
+{
+public:
+    MailToCollectTrigger(PlayerbotAI* botAI) : Trigger(botAI, "mail to collect", 2) {}
+
+    bool IsActive() override;
+};
+
 #endif

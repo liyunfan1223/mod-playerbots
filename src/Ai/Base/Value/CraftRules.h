@@ -16,6 +16,8 @@
 namespace CraftRules
 {
 constexpr uint32 MAX_ORDER_COUNT = 100;
+// Mail with items comes back to its sender when it expires, after 30 days at most; one more day to collect it.
+constexpr uint32 MAIL_WATCH_SECONDS = 31 * 24 * 60 * 60;
 
 struct Reagent
 {
@@ -42,6 +44,7 @@ struct OrderState
     uint32 ownProducts = 0;     // the bot's own stock of the product when the order was placed
     uint32 lastProgress = 0;    // getMSTime() of the last step forward; not saved
     bool castPending = false;   // the order action started the current cast; not saved
+    uint32 mailWatchUntil = 0;  // game time until which refund payments and returns can reach the mailbox
     Reagents reagents;
 
     bool IsEmpty() const { return itemId == 0; }
@@ -62,7 +65,13 @@ struct OrderState
     // Counts the customer's take; never more than was made.
     void OnDelivered(uint32 itemCount);
 
-    void Clear() { *this = OrderState(); }
+    // A refund was mailed: its payment, or the mail itself, can come back until it expires.
+    void WatchMail(uint32 now);
+    bool IsWatchingMail(uint32 now) const { return now < mailWatchUntil; }
+    // No order and no mail to look for, so nothing to save.
+    bool IsIdle(uint32 now) const { return IsEmpty() && !IsWatchingMail(now); }
+    // Ends the order but keeps looking for the mail of earlier refunds.
+    void Clear();
 };
 
 // The order count after the item link ("craft [link] 3"): 1 when absent or not a number, at most MAX_ORDER_COUNT.

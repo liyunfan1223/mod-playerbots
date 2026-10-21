@@ -9,6 +9,7 @@
 #include "CraftOrder.h"
 #include "CraftValue.h"
 #include "Event.h"
+#include "MailAction.h"
 #include "Playerbots.h"
 
 bool CraftOrderAction::isPossible()
@@ -43,5 +44,20 @@ bool RefundCraftOrderAction::Execute(Event /*event*/)
 {
     CraftOrder::Refund(botAI);
     CraftOrder::TellStatus(botAI);
+    return true;
+}
+
+bool CollectMailPaymentsAction::isUseful() { return CraftOrder::HasCollectableMail(botAI); }
+
+bool CollectMailPaymentsAction::Execute(Event /*event*/)
+{
+    GameObject* mailbox = botAI->GetGameObject(MailProcessor::FindMailbox(botAI));
+    if (!mailbox)
+        return false;
+
+    if (!bot->IsWithinDistInMap(mailbox, INTERACTION_DISTANCE))
+        return MoveNear(mailbox);
+
+    CraftOrder::CollectMail(botAI, mailbox->GetGUID());
     return true;
 }

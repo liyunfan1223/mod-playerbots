@@ -6,7 +6,9 @@
 
 #include "CraftOrderTriggers.h"
 
+#include "CraftOrder.h"
 #include "CraftValue.h"
+#include "MailAction.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
@@ -26,4 +28,10 @@ bool CraftOrderStaleTrigger::IsActive()
         return true;
 
     return getMSTimeDiff(data.lastProgress, getMSTime()) >= sPlayerbotAIConfig.CraftOrderTimeout * IN_MILLISECONDS;
+}
+
+// Bots that mailed a refund in the last month collect what comes back as they pass a mailbox, never out in the world.
+bool MailToCollectTrigger::IsActive()
+{
+    return CraftOrder::HasCollectableMail(botAI) && !MailProcessor::FindMailbox(botAI).IsEmpty();
 }

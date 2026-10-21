@@ -192,6 +192,8 @@ bool SetCraftAction::PlaceOrder(std::string const& param)
                       (sPlayerbotAIConfig.EnableRandomBotTrading == 2 && CraftOrder::GetFee(bot, order, count))))
         return refuse("trade_disabled", "Trading is disabled");
 
+    // Mail from earlier refunds can still come back during the new order.
+    order.mailWatchUntil = data.mailWatchUntil;
     data = std::move(order);
     CraftOrder::Touch(data);
     CraftOrder::Save(botAI);

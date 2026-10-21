@@ -7,7 +7,7 @@
 #ifndef PLAYERBOTS_CRAFTORDERACTIONS_H
 #define PLAYERBOTS_CRAFTORDERACTIONS_H
 
-#include "Action.h"
+#include "MovementActions.h"
 
 class PlayerbotAI;
 
@@ -26,6 +26,15 @@ public:
     RefundCraftOrderAction(PlayerbotAI* botAI) : Action(botAI, "refund craft order") {}
 
     bool Execute(Event event) override;
+};
+
+class CollectMailPaymentsAction : public MovementAction
+{
+public:
+    CollectMailPaymentsAction(PlayerbotAI* botAI) : MovementAction(botAI, "collect mail payments") {}
+
+    bool Execute(Event event) override;
+    bool isUseful() override;
 };
 
 #endif

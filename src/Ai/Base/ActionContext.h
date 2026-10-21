@@ -198,6 +198,7 @@ public:
         creators["craft random item"] = &ActionContext::craft_random_item;
         creators["craft order"] = &ActionContext::craft_order;
         creators["refund craft order"] = &ActionContext::refund_craft_order;
+        creators["collect mail payments"] = &ActionContext::collect_mail_payments;
         creators["smart destroy item"] = &ActionContext::smart_destroy_item;
         creators["disenchant random item"] = &ActionContext::disenchant_random_item;
         creators["enchant random item"] = &ActionContext::enchant_random_item;
@@ -406,6 +407,7 @@ private:
     static Action* craft_random_item(PlayerbotAI* botAI) { return new CraftRandomItemAction(botAI); }
     static Action* craft_order(PlayerbotAI* botAI) { return new CraftOrderAction(botAI); }
     static Action* refund_craft_order(PlayerbotAI* botAI) { return new RefundCraftOrderAction(botAI); }
+    static Action* collect_mail_payments(PlayerbotAI* botAI) { return new CollectMailPaymentsAction(botAI); }
     static Action* smart_destroy_item(PlayerbotAI* botAI) { return new SmartDestroyItemAction(botAI); }
     static Action* disenchant_random_item(PlayerbotAI* botAI) { return new DisEnchantRandomItemAction(botAI); }
     static Action* enchant_random_item(PlayerbotAI* botAI) { return new EnchantRandomItemAction(botAI); }

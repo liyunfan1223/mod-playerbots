@@ -62,6 +62,15 @@ uint32 OrderState::OwedProducts(uint32 held) const
 
 void OrderState::OnDelivered(uint32 itemCount) { delivered = std::min(made, delivered + itemCount); }
 
+void OrderState::WatchMail(uint32 now) { mailWatchUntil = std::max(mailWatchUntil, now + MAIL_WATCH_SECONDS); }
+
+void OrderState::Clear()
+{
+    uint32 const watchUntil = mailWatchUntil;
+    *this = OrderState();
+    mailWatchUntil = watchUntil;
+}
+
 uint32 ParseOrderCount(std::string const& param)
 {
     size_t const lastSpace = param.rfind(' ');

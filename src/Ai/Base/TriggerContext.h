@@ -45,6 +45,7 @@ public:
         creators["random"] = &TriggerContext::Random;
         creators["craft order ready"] = &TriggerContext::craft_order_ready;
         creators["craft order stale"] = &TriggerContext::craft_order_stale;
+        creators["mail to collect"] = &TriggerContext::mail_to_collect;
         creators["seldom"] = &TriggerContext::seldom;
         creators["often"] = &TriggerContext::often;
         creators["very often"] = &TriggerContext::very_often;
@@ -348,6 +349,7 @@ private:
     static Trigger* Random(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "random", 20); }
     static Trigger* craft_order_ready(PlayerbotAI* botAI) { return new CraftOrderReadyTrigger(botAI); }
     static Trigger* craft_order_stale(PlayerbotAI* botAI) { return new CraftOrderStaleTrigger(botAI); }
+    static Trigger* mail_to_collect(PlayerbotAI* botAI) { return new MailToCollectTrigger(botAI); }
     static Trigger* seldom(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "seldom", 300); }
     static Trigger* often(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "often", 5); }
     static Trigger* very_often(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "often", 3); }

@@ -9,6 +9,8 @@
 #include "Bag.h"
 #include "ChatHelper.h"
 #include "CraftValue.h"
+#include "GameTime.h"
+#include "MailAction.h"
 #include "Mail.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotTextMgr.h"
@@ -99,6 +101,8 @@ static Item* SplitStack(Player* bot, Item* item, uint32 count)
     Item* part = bot->GetItemByPos(pos);
     return part && part->GetEntry() == item->GetEntry() ? part : nullptr;
 }
+
+static uint32 Now() { return uint32(GameTime::GetGameTime().count()); }
 
 static void DeleteSaved(uint32 botGuid)
 {
@@ -421,6 +425,7 @@ void CraftOrder::Refund(PlayerbotAI* botAI)
 
         MailItems(bot, data.owner, mailReceiver, reagents, 0, trans);
         MailItems(bot, data.owner, mailReceiver, products, fee, trans);
+        data.WatchMail(Now());
 
         if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(data.itemId))
         {
@@ -443,7 +448,7 @@ void CraftOrder::Save(PlayerbotAI* botAI)
     CraftData const& data = botAI->GetCraftOrder();
     uint32 const botGuid = botAI->GetBot()->GetGUID().GetCounter();
 
-    if (data.IsEmpty())
+    if (data.IsIdle(Now()))
     {
         DeleteSaved(botGuid);
         return;
@@ -460,6 +465,7 @@ void CraftOrder::Save(PlayerbotAI* botAI)
     stmt->SetData(7, data.delivered);
     stmt->SetData(8, data.ownProducts);
     stmt->SetData(9, CraftRules::FormatReagents(data.reagents));
+    stmt->SetData(10, data.mailWatchUntil);
     PlayerbotsDatabase.Execute(stmt);
 }
 
@@ -470,6 +476,7 @@ void CraftOrder::LoadAll()
     if (!result)
         return;
 
+    uint32 const now = Now();
     std::lock_guard<std::mutex> lock(savedOrdersLock);
     do
     {
@@ -486,6 +493,14 @@ void CraftOrder::LoadAll()
         data.ownProducts = fields[8].Get<uint32>();
         if (!CraftRules::ParseReagents(fields[9].Get<std::string>(), data.reagents))
             LOG_ERROR("playerbots", "Crafting order of bot {} has malformed reagents", botGuid);
+        data.mailWatchUntil = fields[10].Get<uint32>();
+
+        // A refund's mail window that closed while the server was down.
+        if (data.IsIdle(now))
+        {
+            DeleteSaved(botGuid);
+            continue;
+        }
 
         savedOrders[botGuid] = std::move(data);
     } while (result->NextRow());
@@ -502,4 +517,76 @@ void CraftOrder::Load(PlayerbotAI* botAI)
     data = std::move(itr->second);
     savedOrders.erase(itr);
     Touch(data);
+}
+
+// A payment for a refund, which keeps the subject of the mail it paid for, or a refund the customer sent back, that has
+// been delivered.
+static bool IsCollectable(Mail const* mail, uint32 now, std::string const& subject)
+{
+    if (mail->state == MAIL_STATE_DELETED || mail->deliver_time > time_t(now))
+        return false;
+
+    bool const payment = mail->IsCODPayment() && mail->money;
+    return (payment || mail->IsReturnedMail()) && mail->subject == subject;
+}
+
+bool CraftOrder::HasCollectableMail(PlayerbotAI* botAI)
+{
+    Player* bot = botAI->GetBot();
+    uint32 const now = Now();
+    if (!botAI->GetCraftOrder().IsWatchingMail(now) || !bot->GetMailSize())
+        return false;
+
+    std::string const subject = RefundSubject();
+    uint32 const freeSlots = FreeBagSlots(bot);
+    for (Mail* mail : bot->GetMails())
+    {
+        if (IsCollectable(mail, now, subject) && mail->items.size() <= freeSlots)
+            return true;
+    }
+
+    return false;
+}
+
+void CraftOrder::CollectMail(PlayerbotAI* botAI, ObjectGuid mailbox)
+{
+    Player* bot = botAI->GetBot();
+    uint32 const now = Now();
+    std::string const subject = RefundSubject();
+    std::vector<Mail*> mails;
+    for (Mail* mail : bot->GetMails())
+    {
+        if (IsCollectable(mail, now, subject))
+            mails.push_back(mail);
+    }
+
+    uint32 freeSlots = FreeBagSlots(bot);
+    for (Mail* mail : mails)
+    {
+        if (mail->items.size() > freeSlots)
+            continue;
+
+        freeSlots -= mail->items.size();
+        if (mail->money)
+        {
+            WorldPacket packet;
+            packet << mailbox << mail->messageID;
+            bot->GetSession()->HandleMailTakeMoney(packet);
+        }
+
+        std::vector<uint32> itemGuids;
+        for (MailItemInfo const& info : mail->items)
+            itemGuids.push_back(info.item_guid);
+
+        for (uint32 itemGuid : itemGuids)
+        {
+            WorldPacket packet;
+            packet << mailbox << mail->messageID << itemGuid;
+            bot->GetSession()->HandleMailTakeItem(packet);
+        }
+
+        // Deleting a mail destroys what is still in it, so only an emptied one goes.
+        if (!mail->money && mail->items.empty())
+            MailProcessor::RemoveMail(bot, mail->messageID, mailbox);
+    }
 }
