@@ -544,6 +544,7 @@ public:
 
         PlayerbotSpellRepository::Instance().Initialize();
         CheckMountStateAction::LoadPreferredMounts();
+        CraftOrder::LoadAll();
 
         LOG_INFO("server.loading", "Loading gather node index...");
         GatherNodeMgr::instance().Load();

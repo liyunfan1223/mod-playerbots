@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <charconv>
+#include <sstream>
 
 namespace CraftRules
 {
@@ -124,6 +125,44 @@ uint32 CraftsThatFit(std::vector<StackNeed> const& needs, uint32 requested, uint
         --crafts;
 
     return crafts;
+}
+
+std::string FormatReagents(Reagents const& reagents)
+{
+    std::ostringstream out;
+    for (auto const& [item, reagent] : reagents)
+        out << item << ":" << reagent.perCraft << ":" << reagent.obtained << ":" << reagent.own << " ";
+
+    return out.str();
+}
+
+bool ParseReagents(std::string const& text, Reagents& reagents)
+{
+    reagents.clear();
+    std::istringstream in(text);
+    std::string entry;
+    while (in >> entry)
+    {
+        uint32 values[4] = {};
+        char const* pos = entry.data();
+        char const* const end = entry.data() + entry.size();
+        for (uint32 i = 0; i < 4; ++i)
+        {
+            auto const [next, ec] = std::from_chars(pos, end, values[i]);
+            bool const separated = i < 3 ? next != end && *next == ':' : next == end;
+            if (ec != std::errc() || !separated)
+            {
+                reagents.clear();
+                return false;
+            }
+
+            pos = next + 1;
+        }
+
+        reagents[values[0]] = {values[1], values[2], values[3]};
+    }
+
+    return true;
 }
 
 std::string EncodeRecipeBits(std::vector<bool> const& known)

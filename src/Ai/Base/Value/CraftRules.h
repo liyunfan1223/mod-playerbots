@@ -40,8 +40,8 @@ struct OrderState
     uint32 made = 0;            // items those crafts created
     uint32 delivered = 0;       // items the customer has taken in trades
     uint32 ownProducts = 0;     // the bot's own stock of the product when the order was placed
-    uint32 lastProgress = 0;    // getMSTime() of the last step forward
-    bool castPending = false;   // the order action started the current cast
+    uint32 lastProgress = 0;    // getMSTime() of the last step forward; not saved
+    bool castPending = false;   // the order action started the current cast; not saved
     Reagents reagents;
 
     bool IsEmpty() const { return itemId == 0; }
@@ -85,6 +85,11 @@ uint32 SlotsNeeded(std::vector<StackNeed> const& needs, uint32 crafts);
 
 // The most crafts, up to requested, whose worst case fits in freeSlots; 0 when not even one does.
 uint32 CraftsThatFit(std::vector<StackNeed> const& needs, uint32 requested, uint32 freeSlots);
+
+// "item:perCraft:obtained:own " per reagent, as saved in playerbots_craft_orders.reagents.
+std::string FormatReagents(Reagents const& reagents);
+// False on any malformed entry, leaving reagents empty.
+bool ParseReagents(std::string const& text, Reagents& reagents);
 
 // The recipe field of a |Htrade: link: one bit per skill line entry, six per character, least significant bit first,
 // in standard base64 without padding.

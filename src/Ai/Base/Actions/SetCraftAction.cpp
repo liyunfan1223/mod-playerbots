@@ -194,6 +194,7 @@ bool SetCraftAction::PlaceOrder(std::string const& param)
 
     data = std::move(order);
     CraftOrder::Touch(data);
+    CraftOrder::Save(botAI);
 
     CraftOrder::TellStatus(botAI);
 

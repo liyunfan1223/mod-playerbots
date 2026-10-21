@@ -13,9 +13,15 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
+#include "PlayerbotsDatabase.h"
 
 #include <algorithm>
+#include <mutex>
 #include <sstream>
+
+// Orders saved before a crash, read at startup and handed to each bot as it logs in.
+static std::map<uint32, CraftData> savedOrders;
+static std::mutex savedOrdersLock;
 
 static bool IsGeneralBag(Bag const* bag) { return bag && bag->GetTemplate()->SubClass == ITEM_SUBCLASS_CONTAINER; }
 
@@ -92,6 +98,13 @@ static Item* SplitStack(Player* bot, Item* item, uint32 count)
     bot->SplitItem(item->GetPos(), pos, count);
     Item* part = bot->GetItemByPos(pos);
     return part && part->GetEntry() == item->GetEntry() ? part : nullptr;
+}
+
+static void DeleteSaved(uint32 botGuid)
+{
+    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_DEL_CRAFT_ORDER);
+    stmt->SetData(0, botGuid);
+    PlayerbotsDatabase.Execute(stmt);
 }
 
 static std::string RefundSubject()
@@ -257,6 +270,7 @@ void CraftOrder::OnItemCreated(PlayerbotAI* botAI, Item* item, uint32 itemCount)
     data.castPending = false;
     data.OnCrafted(itemCount);
     Touch(data);
+    Save(botAI);
 
     if (data.IsCrafted())
     {
@@ -375,6 +389,7 @@ void CraftOrder::OnTradeCompleted(PlayerbotAI* botAI, Player* trader, std::map<u
         return;
     }
 
+    Save(botAI);
     if (reagentsReceived)
         TellStatus(botAI);
 }
@@ -420,4 +435,71 @@ void CraftOrder::Refund(PlayerbotAI* botAI)
     CharacterDatabase.CommitTransaction(trans);
 
     data.Reset();
+    Save(botAI);
+}
+
+void CraftOrder::Save(PlayerbotAI* botAI)
+{
+    CraftData const& data = botAI->GetCraftOrder();
+    uint32 const botGuid = botAI->GetBot()->GetGUID().GetCounter();
+
+    if (data.IsEmpty())
+    {
+        DeleteSaved(botGuid);
+        return;
+    }
+
+    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_REP_CRAFT_ORDER);
+    stmt->SetData(0, botGuid);
+    stmt->SetData(1, data.owner.GetCounter());
+    stmt->SetData(2, data.itemId);
+    stmt->SetData(3, data.spellId);
+    stmt->SetData(4, data.count);
+    stmt->SetData(5, data.crafted);
+    stmt->SetData(6, data.made);
+    stmt->SetData(7, data.delivered);
+    stmt->SetData(8, data.ownProducts);
+    stmt->SetData(9, CraftRules::FormatReagents(data.reagents));
+    PlayerbotsDatabase.Execute(stmt);
+}
+
+void CraftOrder::LoadAll()
+{
+    PlayerbotsDatabasePreparedStatement* stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_CRAFT_ORDERS);
+    PreparedQueryResult result = PlayerbotsDatabase.Query(stmt);
+    if (!result)
+        return;
+
+    std::lock_guard<std::mutex> lock(savedOrdersLock);
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 const botGuid = fields[0].Get<uint32>();
+        CraftData data;
+        data.owner = ObjectGuid::Create<HighGuid::Player>(fields[1].Get<uint32>());
+        data.itemId = fields[2].Get<uint32>();
+        data.spellId = fields[3].Get<uint32>();
+        data.count = fields[4].Get<uint32>();
+        data.crafted = fields[5].Get<uint32>();
+        data.made = fields[6].Get<uint32>();
+        data.delivered = fields[7].Get<uint32>();
+        data.ownProducts = fields[8].Get<uint32>();
+        if (!CraftRules::ParseReagents(fields[9].Get<std::string>(), data.reagents))
+            LOG_ERROR("playerbots", "Crafting order of bot {} has malformed reagents", botGuid);
+
+        savedOrders[botGuid] = std::move(data);
+    } while (result->NextRow());
+}
+
+void CraftOrder::Load(PlayerbotAI* botAI)
+{
+    std::lock_guard<std::mutex> lock(savedOrdersLock);
+    auto const itr = savedOrders.find(botAI->GetBot()->GetGUID().GetCounter());
+    if (itr == savedOrders.end())
+        return;
+
+    CraftData& data = botAI->GetCraftOrder();
+    data = std::move(itr->second);
+    savedOrders.erase(itr);
+    Touch(data);
 }

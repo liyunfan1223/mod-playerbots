@@ -48,6 +48,10 @@ public:
     // Mails back what is left of the customer's reagents and anything crafted they have not collected, then clears
     // the order.
     static void Refund(PlayerbotAI* botAI);
+    static void Save(PlayerbotAI* botAI);
+    // Reads every saved order once at startup; Load hands a bot its order when it logs in.
+    static void LoadAll();
+    static void Load(PlayerbotAI* botAI);
 };
 
 #endif

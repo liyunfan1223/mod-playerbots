@@ -125,6 +125,10 @@ void PlayerbotsDatabaseConnection::DoPrepareStatements()
     PrepareStatement(PLAYERBOTS_DEL_RANDOM_BOTS_BY_EVENT, "DELETE FROM playerbots_random_bots WHERE event = ?", CONNECTION_SYNCH);
 
     PrepareStatement(PLAYERBOTS_SEL_TEXT_CHANCE, "SELECT name, probability FROM ai_playerbot_texts_chance", CONNECTION_SYNCH);
+
+    PrepareStatement(PLAYERBOTS_SEL_CRAFT_ORDERS, "SELECT `bot`, `owner`, `item`, `spell`, `count`, `crafted`, `made`, `delivered`, `own_products`, `reagents` FROM `playerbots_craft_orders`", CONNECTION_SYNCH);
+    PrepareStatement(PLAYERBOTS_REP_CRAFT_ORDER, "REPLACE INTO `playerbots_craft_orders` (`bot`, `owner`, `item`, `spell`, `count`, `crafted`, `made`, `delivered`, `own_products`, `reagents`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(PLAYERBOTS_DEL_CRAFT_ORDER, "DELETE FROM `playerbots_craft_orders` WHERE `bot` = ?", CONNECTION_ASYNC);
 }
 PlayerbotsDatabaseConnection::PlayerbotsDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
 {
