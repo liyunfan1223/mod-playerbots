@@ -36,4 +36,15 @@ private:
     CraftData data;
 };
 
+// Refund mail has waited Playerbots.CraftMailTripDelay in the mailbox: an idle bot goes to the nearest mailbox for it.
+class CraftMailOverdueValue : public BoolCalculatedValue
+{
+public:
+    CraftMailOverdueValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "craft mail overdue", 60 * IN_MILLISECONDS)
+    {
+    }
+
+    bool Calculate() override;
+};
+
 #endif

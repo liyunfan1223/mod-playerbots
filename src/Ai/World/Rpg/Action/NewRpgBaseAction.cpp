@@ -1073,6 +1073,61 @@ WorldPosition NewRpgBaseAction::SelectRandomCampPos(Player* bot)
     return dest;
 }
 
+// A town's team is set on its own area, or else on its zone.
+static bool IsFriendlyArea(Player* bot, WorldLocation const& loc)
+{
+    AreaTableEntry const* area = sAreaTableStore.LookupEntry(
+        bot->GetMap()->GetAreaId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ()));
+    if (!area)
+        return false;
+
+    uint32 team = area->team;
+    if (!team && area->zone)
+    {
+        if (AreaTableEntry const* zone = sAreaTableStore.LookupEntry(area->zone))
+            team = zone->team;
+    }
+
+    if (area->IsSanctuary() || team == AREATEAM_ANY)
+        return true;
+
+    return team == (bot->GetTeamId() == TEAM_ALLIANCE ? AREATEAM_ALLY : AREATEAM_HORDE);
+}
+
+// The nearest mailbox in a friendly or sanctuary area, within the range a camp is chosen from.
+WorldPosition NewRpgBaseAction::SelectMailboxPos(Player* bot)
+{
+    static std::vector<WorldLocation> const mailboxes = []()
+    {
+        std::vector<WorldLocation> locs;
+        for (auto const& [spawnId, data] : sObjectMgr->GetAllGOData())
+        {
+            GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(data.id);
+            if (goInfo && goInfo->type == GAMEOBJECT_TYPE_MAILBOX)
+                locs.emplace_back(data.mapid, data.posX, data.posY, data.posZ, data.orientation);
+        }
+
+        return locs;
+    }();
+
+    WorldPosition dest{};
+    float nearest = bot->GetLevel() <= 5 ? 500.0f : 2500.0f;
+    for (WorldLocation const& mailbox : mailboxes)
+    {
+        if (mailbox.GetMapId() != bot->GetMapId())
+            continue;
+
+        float const dist = bot->GetExactDist(mailbox);
+        if (dist >= nearest || !IsFriendlyArea(bot, mailbox))
+            continue;
+
+        nearest = dist;
+        dest = mailbox;
+    }
+
+    return dest;
+}
+
 bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, WorldPosition& flightMasterPos, std::vector<uint32>& path)
 {
     TravelMgr::FlightMasterInfo const* info = sTravelMgr.GetNearestFlightMasterInfo(bot);

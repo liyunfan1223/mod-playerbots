@@ -5,6 +5,7 @@
  */
 
 #include "NewRpgAction.h"
+#include "AiObjectContext.h"
 #include "AreaDefines.h"
 #include "BroadcastHelper.h"
 #include "ChatHelper.h"
@@ -251,8 +252,21 @@ bool NewRpgStatusUpdateAction::Execute(Event /*event*/)
     switch (status)
     {
         case RPG_IDLE:
+        {
+            // Crafting order refund mail has waited long enough: go to town by way of the nearest mailbox.
+            if (context->GetValue<bool>("craft mail overdue")->Get())
+            {
+                WorldPosition const pos = SelectMailboxPos(bot);
+                if (pos != WorldPosition())
+                {
+                    info.ChangeToGoCamp(pos);
+                    return true;
+                }
+            }
+
             return RandomChangeStatus({RPG_GO_CAMP, RPG_GO_GRIND, RPG_WANDER_RANDOM, RPG_WANDER_NPC, RPG_DO_QUEST,
                                        RPG_TRAVEL_FLIGHT, RPG_REST, RPG_OUTDOOR_PVP, RPG_DO_GATHER});
+        }
 
         case RPG_GO_GRIND:
         {

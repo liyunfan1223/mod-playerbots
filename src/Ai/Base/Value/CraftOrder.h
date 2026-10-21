@@ -53,8 +53,9 @@ public:
     // Reads every saved order once at startup; Load hands a bot its order when it logs in.
     static void LoadAll();
     static void Load(PlayerbotAI* botAI);
-    // A payment for one of the bot's refunds, or a refund sent back that fits in its bags, is in its mailbox.
-    static bool HasCollectableMail(PlayerbotAI* botAI);
+    // A payment for one of the bot's refunds, or a refund sent back that fits in its bags, has waited in its mailbox at
+    // least waited seconds.
+    static bool HasCollectableMail(PlayerbotAI* botAI, uint32 waited = 0);
     // Takes the payments and returned refunds out of the mailbox the bot stands at.
     static void CollectMail(PlayerbotAI* botAI, ObjectGuid mailbox);
 };

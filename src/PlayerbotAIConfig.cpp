@@ -705,6 +705,7 @@ bool PlayerbotAIConfig::Initialize()
     EnablePeriodicOnlineOffline = sConfigMgr->GetOption<bool>("Playerbots.EnablePeriodicOnlineOffline", false);
     EnableRandomBotTrading = sConfigMgr->GetOption<int32>("Playerbots.EnableRandomBotTrading", 1);
     CraftOrderTimeout = sConfigMgr->GetOption<uint32>("Playerbots.CraftOrderTimeout", 300);
+    CraftMailTripDelay = sConfigMgr->GetOption<uint32>("Playerbots.CraftMailTripDelay", 259200);
     PeriodicOnlineOfflineRatio = sConfigMgr->GetOption<float>("Playerbots.PeriodicOnlineOfflineRatio", 2.0);
     GearScoreCheck = sConfigMgr->GetOption<bool>("Playerbots.GearScoreCheck", false);
     RandomBotPreQuests = sConfigMgr->GetOption<bool>("Playerbots.PreQuests", false);

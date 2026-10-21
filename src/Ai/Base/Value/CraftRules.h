@@ -74,6 +74,12 @@ struct OrderState
     void Clear();
 };
 
+// Mail delivered at deliveredAt has been in the mailbox for at least waited seconds; 0 for any delivered mail.
+inline bool HasWaited(uint32 deliveredAt, uint32 now, uint32 waited)
+{
+    return now >= deliveredAt && now - deliveredAt >= waited;
+}
+
 // The order count after the item link ("craft [link] 3"): 1 when absent or not a number, at most MAX_ORDER_COUNT.
 uint32 ParseOrderCount(std::string const& param);
 

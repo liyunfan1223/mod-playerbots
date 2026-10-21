@@ -794,6 +794,12 @@ Playerbots.EnableRandomBotTrading = 1
 # Default: 300
 Playerbots.CraftOrderTimeout = 300
 
+# Seconds a payment for, or a return of, a crafting order refund may wait in a bot's mailbox before an idle random
+# bot (new rpg strategy) heads to the nearest friendly mailbox for it. Bots otherwise collect it whenever they pass a
+# mailbox. 0 disables the trip
+# Default: 259200 (3 days)
+Playerbots.CraftMailTripDelay = 259200
+
 # Configure message prefixes which will be excluded in analysis in trade action to open trade window
 Playerbots.TradeActionExcludedPrefixes = "RPLL_H_,DBMv4,{звезда} Questie,{rt1} Questie"
 

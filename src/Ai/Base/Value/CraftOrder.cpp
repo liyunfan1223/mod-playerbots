@@ -520,17 +520,17 @@ void CraftOrder::Load(PlayerbotAI* botAI)
 }
 
 // A payment for a refund, which keeps the subject of the mail it paid for, or a refund the customer sent back, that has
-// been delivered.
-static bool IsCollectable(Mail const* mail, uint32 now, std::string const& subject)
+// been in the mailbox for at least waited seconds.
+static bool IsCollectable(Mail const* mail, uint32 now, std::string const& subject, uint32 waited = 0)
 {
-    if (mail->state == MAIL_STATE_DELETED || mail->deliver_time > time_t(now))
+    if (mail->state == MAIL_STATE_DELETED || !CraftRules::HasWaited(uint32(mail->deliver_time), now, waited))
         return false;
 
     bool const payment = mail->IsCODPayment() && mail->money;
     return (payment || mail->IsReturnedMail()) && mail->subject == subject;
 }
 
-bool CraftOrder::HasCollectableMail(PlayerbotAI* botAI)
+bool CraftOrder::HasCollectableMail(PlayerbotAI* botAI, uint32 waited)
 {
     Player* bot = botAI->GetBot();
     uint32 const now = Now();
@@ -541,11 +541,17 @@ bool CraftOrder::HasCollectableMail(PlayerbotAI* botAI)
     uint32 const freeSlots = FreeBagSlots(bot);
     for (Mail* mail : bot->GetMails())
     {
-        if (IsCollectable(mail, now, subject) && mail->items.size() <= freeSlots)
+        if (IsCollectable(mail, now, subject, waited) && mail->items.size() <= freeSlots)
             return true;
     }
 
     return false;
+}
+
+bool CraftMailOverdueValue::Calculate()
+{
+    uint32 const delay = sPlayerbotAIConfig.CraftMailTripDelay;
+    return delay && CraftOrder::HasCollectableMail(botAI, delay);
 }
 
 void CraftOrder::CollectMail(PlayerbotAI* botAI, ObjectGuid mailbox)
