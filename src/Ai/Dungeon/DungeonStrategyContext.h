@@ -15,6 +15,7 @@
 #include "FoSStrategy.h"
 #include "GDStrategy.h"
 #include "HoLStrategy.h"
+#include "HoRStrategy.h"
 #include "HoSStrategy.h"
 #include "MechStrategy.h"
 #include "MgTStrategy.h"
@@ -62,6 +63,7 @@ public:
         creators["wotlk-toc"] = &DungeonStrategyContext::wotlk_toc;     // Trial of the Champion
         creators["wotlk-pos"] = &DungeonStrategyContext::wotlk_pos;     // Pit of Saron
         creators["wotlk-fos"] = &DungeonStrategyContext::wotlk_fos;     // The Forge of Souls
+        creators["wotlk-hor"] = &DungeonStrategyContext::wotlk_hor;     // Halls of Reflection
     }
 
 private:
@@ -85,6 +87,7 @@ private:
     static Strategy* wotlk_cos(PlayerbotAI* botAI) { return new WotlkDungeonCoSStrategy(botAI); }
     static Strategy* wotlk_fos(PlayerbotAI* botAI) { return new WotlkDungeonFoSStrategy(botAI); }
     static Strategy* wotlk_pos(PlayerbotAI* botAI) { return new WotlkDungeonPoSStrategy(botAI); }
+    static Strategy* wotlk_hor(PlayerbotAI* botAI) { return new WotlkDungeonHoRStrategy(botAI); }
     static Strategy* wotlk_toc(PlayerbotAI* botAI) { return new WotlkDungeonToCStrategy(botAI); }
 };
 

@@ -1716,7 +1716,7 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         "aq20", "blacktemple", "bwl", "gruulslair", "hyjal", "icc", "karazhan", "magtheridon",
         "moltencore", "naxx", "onyxia", "rs", "ssc", "tbc-ac", "tbc-mech", "tbc-mgt", "tbc-ramp",
         "tbc-seth", "tbc-ub", "tempestkeep", "ulduar", "voa", "wotlk-an", "wotlk-cos", "wotlk-dtk",
-        "wotlk-eoe", "wotlk-fos", "wotlk-gd", "wotlk-hol", "wotlk-hos", "wotlk-nex", "wotlk-occ",
+        "wotlk-eoe", "wotlk-fos", "wotlk-gd", "wotlk-hol", "wotlk-hor", "wotlk-hos", "wotlk-nex", "wotlk-occ",
         "wotlk-ok", "wotlk-os", "wotlk-pos", "wotlk-toc", "wotlk-uk", "wotlk-up", "wotlk-vh",
         "zulaman"
     };
@@ -1725,6 +1725,7 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
     {
         engines[BOT_STATE_COMBAT]->removeStrategy(strat);
         engines[BOT_STATE_NON_COMBAT]->removeStrategy(strat);
+        engines[BOT_STATE_REACTION]->removeStrategy(strat);
     }
 
     std::string strategyName;
@@ -1847,6 +1848,9 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
         case 658:
             strategyName = "wotlk-pos";  // Pit of Saron
             break;
+        case 668:
+            strategyName = "wotlk-hor";  // Halls of Reflection
+            break;
         case 724:
             strategyName = "rs";  // Ruby Sanctum
             break;
@@ -1859,6 +1863,8 @@ void PlayerbotAI::ApplyInstanceStrategies(uint32 mapId, bool tellMaster)
 
     engines[BOT_STATE_COMBAT]->addStrategy(strategyName);
     engines[BOT_STATE_NON_COMBAT]->addStrategy(strategyName);
+    // Only reaction triggers run there: the ones that must stop a cast already in progress
+    engines[BOT_STATE_REACTION]->addStrategy(strategyName);
 
     if (tellMaster && !strategyName.empty())
     {
