@@ -14,22 +14,17 @@
 #include "Playerbots.h"
 #include "PoSTriggers.h"
 
-const Position ICKANDKRICK_TANK_POSITION = Position(816.8508f, 102.331505f, 509.1586f);
-// Between the two forges: the group fights here so boulders (and cover) land mid-room, and waits here during the leaps
-const Position GARFROST_ROOM_MIDDLE = Position(682.0f, -212.0f, 527.2f);
-// boss_ick evades when its target is more than 80 yd from here
-const Position ICKANDKRICK_ROOM_CENTER = Position(836.65f, 115.08f, 510.0f);
-
 class IckAndKrickAction : public AttackAction
 {
 public:
     IckAndKrickAction(PlayerbotAI* botAI) : AttackAction(botAI, "ick and krick") {}
     bool Execute(Event event) override;
 
+private:
     bool TankPosition(Unit* boss);
-    bool Pursuit(bool pursuit, Unit* boss);
-    bool PoisonNova(bool poisonNova, Unit* boss);
-    bool ExplosiveBarrage(bool explosiveBarrage, Unit* boss);
+    bool Pursuit(Unit* boss);
+    bool PoisonNova(Unit* boss);
+    bool ExplosiveBarrage(Unit* boss);
 };
 
 class TyrannusAction : public AttackAction
@@ -38,7 +33,8 @@ public:
     TyrannusAction(PlayerbotAI* botAI) : AttackAction(botAI, "tyrannus") {}
     bool Execute(Event event) override;
 
-    bool RangedSpread(bool rangedSpread);
+private:
+    bool RangedSpread();
 };
 
 class GarfrostTakeCoverAction : public MovementAction
@@ -93,5 +89,4 @@ public:
     bool ShouldReactionInterruptCast() const override { return true; }
 };
 
-bool IsBrandDamagingTotemSpell(std::string const& spell);
 #endif

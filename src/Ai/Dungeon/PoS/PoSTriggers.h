@@ -7,11 +7,13 @@
 #ifndef PLAYERBOTS_POSTRIGGERS_H
 #define PLAYERBOTS_POSTRIGGERS_H
 
+#include <vector>
+
 #include "DungeonStrategyUtils.h"
 #include "GenericTriggers.h"
 #include "PlayerbotAIConfig.h"
+#include "PoSPolicy.h"
 #include "Trigger.h"
-#include <unordered_map>
 
 enum PitOfSaronIDs
 {
@@ -48,36 +50,11 @@ enum PitOfSaronIDs
     GO_SARONITE_ROCK                    = 196485,
 };
 
-// Melee DPS duck behind a boulder at this many Permafrost stacks; ticks every 2 s, gone 3 s after the last one
-constexpr uint32 GARFROST_MELEE_HIDE_STACKS = 8;
-// Throw Saronite lands with a 6 yd impact
-constexpr float GARFROST_SARONITE_AVOID_RADIUS = 7.5f;
-
-uint32 PermafrostStacks(Unit* unit);
-bool IsGarfrostForging(Unit* boss);
-bool IsShieldedFromGarfrost(Unit* boss, Unit* unit);
-bool GarfrostWantsCover(Player* bot, Unit* boss);
-bool GetSaroniteLanding(Unit* boss, Position& landing);
-bool BrandedHealerMayHeal(Player* bot, Unit* boss);
-
-// Persistent ground effects (Toxic Waste pools, Icy Blast patches): centre and radius
-struct PoSGroundHazard
-{
-    float x, y, radius;
-};
-
-std::vector<PoSGroundHazard> FindPoSGroundHazards(WorldObject* searcher);
-bool InPoSGroundHazard(std::vector<PoSGroundHazard> const& hazards, float x, float y, float margin);
+// Toxic Waste pools and Icy Blast patches within reach of the searcher
+std::vector<PitOfSaron::Hazard> FindPoSGroundHazards(WorldObject* searcher);
+// Tyrannus, else Ick: the bosses whose fights leave ground hazards
 Unit* FindPoSBoss(PlayerbotAI* botAI);
 bool IsPoisonNovaCasting(Unit* boss);
-
-// Poison Nova reaches 15 yd; bots clear it to this distance
-constexpr float POISON_NOVA_SAFE_DISTANCE = 18.0f;
-
-// Pets Overlord's Brand made passive, with the stance to give back once it fades
-void TyrannusRememberSuspendedPet(Player* bot, Creature* pet);
-bool TyrannusHasSuspendedPets(Player* bot);
-std::unordered_map<ObjectGuid, ReactStates> TyrannusTakeSuspendedPets(Player* bot);
 
 class IckAndKrickTrigger : public Trigger
 {

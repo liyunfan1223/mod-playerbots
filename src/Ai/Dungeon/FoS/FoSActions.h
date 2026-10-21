@@ -14,8 +14,6 @@
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 
-const Position BRONJAHM_TANK_POSITION = Position(5297.920f, 2506.698f, 686.068f);
-
 class MoveFromBronjahmAction : public MovementAction
 {
 public:
@@ -40,13 +38,6 @@ public:
     bool isUseful() override;
 };
 
-// The sweep reaches 52 degrees either side of the boss's facing and turns up to 90 degrees from where it
-// started, so a bot within 35 degrees of straight behind stays clear for the whole wail
-constexpr float WAILING_SOULS_SAFE_ARC = 70.0f * float(M_PI) / 180.0f;
-
-bool IsInterruptSpell(std::string const& spell);
-bool IsDamagingTotemSpell(std::string const& spell);
-
 class DevourerWailingSoulsAction : public MovementAction
 {
 public:
@@ -59,6 +50,11 @@ class DevourerWellOfSoulsAction : public MovementAction
 public:
     DevourerWellOfSoulsAction(PlayerbotAI* botAI) : MovementAction(botAI, "devourer well of souls") {}
     bool Execute(Event event) override;
+
+private:
+    bool StepOut(Unit* boss, Unit* well);
+    // The tank pulls him off a well he stands in, so melee can reach him without stepping in
+    bool DragBossClear(Unit* boss);
 };
 
 class DevourerStopDamageAction : public Action

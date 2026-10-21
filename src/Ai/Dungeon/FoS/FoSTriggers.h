@@ -11,7 +11,6 @@
 #include "GenericTriggers.h"
 #include "PlayerbotAIConfig.h"
 #include "Trigger.h"
-#include <unordered_map>
 
 enum ForgeOfSoulsBronjahmIDs
 {
@@ -34,19 +33,6 @@ enum ForgeOfSoulsBronjahmIDs
     SPELL_WAILING_SOULS_SWEEP_2 = 68876,
 };
 
-// Well of Souls damage (68863) reaches 4 yards; the rest is margin for the bot's size and the well's drift
-constexpr float WELL_OF_SOULS_AVOID_RADIUS = 6.0f;
-
-bool IsWailingSoulsActive(Unit* boss);
-bool IsPhantomBlastCasting(Unit* boss);
-bool IsMirroredSoulActive(Player* bot, Unit* boss);
-Unit* FindWellOfSouls(WorldObject* searcher, float x, float y, float radius);
-bool IsCastingAt(Unit* caster, Unit* target);
-
-// Pets Mirrored Soul made passive, with the stance to give back once it fades
-void DevourerRememberSuspendedPet(Player* bot, Creature* pet);
-bool DevourerHasSuspendedPets(Player* bot);
-std::unordered_map<ObjectGuid, ReactStates> DevourerTakeSuspendedPets(Player* bot);
 class MoveFromBronjahmTrigger : public Trigger
 {
 public:

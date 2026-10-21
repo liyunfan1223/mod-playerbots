@@ -39,5 +39,6 @@ void WotlkDungeonPoSStrategy::InitMultipliers(std::vector<Multiplier*>& multipli
 {
     multipliers.push_back(new IckAndKrickMultiplier(botAI));
     multipliers.push_back(new PoSHazardMultiplier(botAI));
+    multipliers.push_back(new TyrannusBrandMultiplier(botAI));
     multipliers.push_back(new GarfrostMultiplier(botAI));
 }

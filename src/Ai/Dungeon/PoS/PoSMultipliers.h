@@ -26,6 +26,14 @@ public:
     float GetValue(Action* action) override;
 };
 
+class TyrannusBrandMultiplier : public Multiplier
+{
+public:
+    TyrannusBrandMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "tyrannus brand") {}
+
+    float GetValue(Action* action) override;
+};
+
 class GarfrostMultiplier : public Multiplier
 {
 public:
