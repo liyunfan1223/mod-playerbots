@@ -46,7 +46,7 @@ void RaidSwpStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         { NextAction("kalecgos enter spectral rift", ACTION_EMERGENCY + 1) }));
 
     triggers.push_back(new TriggerNode("kalecgos ranged should spread",
-        { NextAction("kalecgos disperse ranged", ACTION_RAID) }));
+        { NextAction("kalecgos spread ranged", ACTION_RAID) }));
 
     triggers.push_back(new TriggerNode("kalecgos too many arcane buffet stacks",
         { NextAction("kalecgos remove arcane buffet", ACTION_RAID + 2) }));

@@ -42,8 +42,8 @@ public:
         creators["kalecgos enter spectral rift"] =
             &RaidSwpActionContext::kalecgos_enter_spectral_rift;
 
-        creators["kalecgos disperse ranged"] =
-            &RaidSwpActionContext::kalecgos_disperse_ranged;
+        creators["kalecgos spread ranged"] =
+            &RaidSwpActionContext::kalecgos_spread_ranged;
 
         creators["kalecgos remove arcane buffet"] =
             &RaidSwpActionContext::kalecgos_remove_arcane_buffet;
@@ -267,9 +267,9 @@ private:
     {
         return new KalecgosEnterSpectralRiftAction(botAI);
     }
-    static Action* kalecgos_disperse_ranged(PlayerbotAI* botAI)
+    static Action* kalecgos_spread_ranged(PlayerbotAI* botAI)
     {
-        return new KalecgosDisperseRangedAction(botAI);
+        return new KalecgosSpreadRangedAction(botAI);
     }
     static Action* kalecgos_remove_arcane_buffet(PlayerbotAI* botAI)
     {

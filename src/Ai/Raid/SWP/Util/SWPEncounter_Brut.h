@@ -84,7 +84,7 @@ inline Position const BRUTALLUS_MAIN_TANK_POSITION = { 1483.528f, 595.346f, 23.5
 
 float GetBrutallusMainTankAngle(Unit* brutallus, Player* mainTank);
 float GetBrutallusAssistTankAngle(Unit* brutallus, Player* assistTank, float mainTankAngle);
-Position GetBrutallusPositionAtAngle(Player* bot, Unit* brutallus, float angle, float radius);
+Position GetBrutallusPositionAtAngle(Player* bot, Unit const &brutallus, float angle, float radius);
 bool TryGetBrutallusAssignedPositionIndex(Player* bot, uint8& positionIndex);
 bool TryGetBrutallusRangedPosition(
     Player* bot, Unit* brutallus, Player* mainTank, Player* assistTank,

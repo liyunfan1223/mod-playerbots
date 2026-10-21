@@ -85,7 +85,7 @@ bool BrutallusTanksPositionAndSwapAction::Execute(Event event)
             mainTankAngle + BRUTALLUS_ASSIST_TANK_ANGLE_OFFSET);
 
         Position const position = GetBrutallusPositionAtAngle(
-            bot, brutallus, assistTankAngle, BRUTALLUS_TANK_POSITION_RADIUS);
+            bot, *brutallus, assistTankAngle, BRUTALLUS_TANK_POSITION_RADIUS);
 
         constexpr float arrivalDist = 2.0f;
         constexpr MovementPriority priority = MovementPriority::MOVEMENT_COMBAT;
@@ -201,7 +201,7 @@ bool BrutallusPositionMeleeAtRearCenterAction::TryGetBrutallusMeleePosition(
         localMeleeIndex, maxMeleeSlots, BRUTALLUS_SHARED_SAFE_MELEE_ARC_WIDTH);
 
     float const angle = Position::NormalizeOrientation(baseAngle + angleOffset);
-    position = GetBrutallusPositionAtAngle(bot, brutallus, angle, meleeRadius);
+    position = GetBrutallusPositionAtAngle(bot, *brutallus, angle, meleeRadius);
     return true;
 }
 
@@ -247,7 +247,7 @@ bool BrutallusPositionRangedInTwoGroupsAction::Execute(Event /*event*/)
             bot->GetPositionX() - brutallus->GetPositionX()));
 
         Position const position = GetBrutallusPositionAtAngle(
-            bot, brutallus, currentAngle, BRUTALLUS_OUTER_LANE_RADIUS);
+            bot, *brutallus, currentAngle, BRUTALLUS_OUTER_LANE_RADIUS);
 
         if (bot->GetExactDist2d(position) <= 1.0f)
         {

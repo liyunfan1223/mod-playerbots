@@ -143,7 +143,7 @@ bool KalecgosEnterSpectralRiftAction::ShouldTankEnter()
     return true;
 }
 
-bool KalecgosDisperseRangedAction::Execute(Event /*event*/)
+bool KalecgosSpreadRangedAction::Execute(Event /*event*/)
 {
     if (!_initialRangedPositionReached)
     {

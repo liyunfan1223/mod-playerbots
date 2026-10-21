@@ -31,8 +31,8 @@ bool SunwellResetEncounterStatesAction::Execute(Event /*event*/)
     bool reset = false;
 
     // Kalecgos
-    Action* kalecAction = context->GetAction("kalecgos disperse ranged");
-    if (kalecAction && static_cast<KalecgosDisperseRangedAction*>(kalecAction)
+    Action* kalecAction = context->GetAction("kalecgos spread ranged");
+    if (kalecAction && static_cast<KalecgosSpreadRangedAction*>(kalecAction)
             ->ResetInitialRangedPositionReached())
     {
         reset = true;

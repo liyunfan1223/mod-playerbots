@@ -104,11 +104,11 @@ private:
     bool ShouldTankEnter();
 };
 
-class KalecgosDisperseRangedAction : public MovementAction
+class KalecgosSpreadRangedAction : public MovementAction
 {
 public:
-    KalecgosDisperseRangedAction(PlayerbotAI* botAI)
-        : MovementAction(botAI, "kalecgos disperse ranged") {}
+    KalecgosSpreadRangedAction(PlayerbotAI* botAI)
+        : MovementAction(botAI, "kalecgos spread ranged") {}
     bool Execute(Event event) override;
     bool ResetInitialRangedPositionReached()
     {
