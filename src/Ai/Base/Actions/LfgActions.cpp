@@ -8,6 +8,7 @@
 #include "AiFactory.h"
 #include "ItemVisitors.h"
 #include "LFGMgr.h"
+#include "LivingGearActions.h"
 #include "Opcodes.h"
 #include "Playerbots.h"
 #include "RandomPlayerbotMgr.h"
@@ -152,6 +153,9 @@ bool LfgJoinAction::JoinLFG()
 
     if (!selected.size())
         return false;
+
+    // Gear hunters queue for the dungeons whose bosses drop their upgrades
+    LivingGear::FilterDungeons(botAI, list);
 
     if (list.empty())
         return false;

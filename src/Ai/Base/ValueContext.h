@@ -53,6 +53,7 @@
 #include "LineTargetValue.h"
 #include "LivingEconomyActions.h"
 #include "LivingFieldActions.h"
+#include "LivingGearActions.h"
 #include "LivingProcessingActions.h"
 #include "LivingProfessionActions.h"
 #include "LogLevelValue.h"
@@ -112,6 +113,7 @@ public:
         creators["living processing"] = &ValueContext::living_processing;
         creators["living field plan"] = &ValueContext::living_field_plan;
         creators["living field state"] = &ValueContext::living_field_state;
+        creators["living gear hunt"] = &ValueContext::living_gear_hunt;
         creators["living supplies"] = &ValueContext::living_supplies;
         creators["living auction"] = &ValueContext::living_auction;
         creators["living mail"] = &ValueContext::living_mail;
@@ -350,6 +352,7 @@ private:
     static UntypedValue* living_processing(PlayerbotAI* botAI) { return new LivingProcessingValue(botAI); }
     static UntypedValue* living_field_plan(PlayerbotAI* botAI) { return new LivingFieldPlanValue(botAI); }
     static UntypedValue* living_field_state(PlayerbotAI* botAI) { return new LivingFieldStateValue(botAI); }
+    static UntypedValue* living_gear_hunt(PlayerbotAI* botAI) { return new LivingGearHuntValue(botAI); }
     static UntypedValue* living_supplies(PlayerbotAI* botAI)
     {
         return new LivingEconomyValue(botAI, "living supplies", LivingEconomyJob::Supplies);

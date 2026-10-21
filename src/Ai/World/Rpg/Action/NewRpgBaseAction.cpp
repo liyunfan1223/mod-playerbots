@@ -15,6 +15,8 @@
 #include "GossipDef.h"
 #include "GridTerrainData.h"
 #include "IVMapMgr.h"
+#include "LivingGearActions.h"
+#include "LivingGearPolicy.h"
 #include "LivingWorldMgr.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
@@ -976,6 +978,11 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
 
 WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
 {
+    // Gear hunters usually grind where their wanted drops live.
+    WorldPosition hunt{};
+    if (urand(1, 100) <= LivingWorld::GearHuntChance && LivingGear::SelectHuntPos(bot, hunt))
+        return hunt;
+
     std::vector<WorldLocation> const& locs = sTravelMgr.GetLocsPerLevelCache(bot->GetLevel());
     float hiRange = 500.0f;
     float loRange = 2500.0f;

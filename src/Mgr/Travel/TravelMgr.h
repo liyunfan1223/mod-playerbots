@@ -883,6 +883,14 @@ public:
     bool SelectAuctioneerByMap(Player* bot, NpcLocation& outAuctioneer);
     std::vector<WorldLocation> const& GetLocsPerLevelCache(uint8 level) { return locsPerLevelCache[level]; }
 
+    // Living-world gear hunting (built once in PrepareDestinationCache, read-only afterwards):
+    // open-world creature types that drop era-eligible gear, their grind clusters and drops.
+    std::vector<uint32> const& GetGearHuntEntries(uint8 level) const;
+    std::vector<WorldLocation> const* GetGearHuntLocs(uint32 entry) const;
+    std::vector<uint32> const* GetGearDrops(uint32 entry) const;
+    // Era-eligible gear dropped by a dungeon's bosses (normal difficulty), by map id.
+    std::vector<uint32> const* GetDungeonGearDrops(uint32 mapId) const;
+
     template <class D, class W, class URBG>
     void weighted_shuffle(D first, D last, W first_weight, W last_weight, URBG&& g)
     {
@@ -976,6 +984,7 @@ private:
     // Navigation initialization
     void PrepareZone2LevelBracket();
     void PrepareDestinationCache();
+    void PrepareDungeonGearCache();
 
     // Internal types
     struct LevelBracket
@@ -999,6 +1008,10 @@ private:
     std::map<uint8, std::vector<BankerLocation>> bankerLocsPerLevelCache;
     std::unordered_map<uint32, WorldLocation> bankerEntryToLocation;
     std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
+    std::map<uint8, std::vector<uint32>> gearHuntEntriesPerLevel;
+    std::unordered_map<uint32, std::vector<WorldLocation>> gearHuntLocs;
+    std::unordered_map<uint32, std::vector<uint32>> gearDrops;
+    std::unordered_map<uint32, std::vector<uint32>> dungeonGearDrops;
     std::unordered_map<uint32, std::vector<WorldLocation>> creatureSpawnsByTemplate;
     std::map<uint32, LevelBracket> zone2LevelBracket;
 };

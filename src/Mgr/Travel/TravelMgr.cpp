@@ -10,7 +10,9 @@
 #include "ChatHelper.h"
 #include "Corpse.h"
 #include "Creature.h"
+#include "LivingGearPolicy.h"
 #include "Log.h"
+#include "LootMgr.h"
 #include "Map.h"
 #include "MapCollisionData.h"
 #include "MapMgr.h"
@@ -25,6 +27,7 @@
 #include "VMapMgr2.h"
 #include <iomanip>
 #include <numeric>
+#include <set>
 
 // Navigation data
 
@@ -4364,6 +4367,7 @@ void TravelMgr::Init()
     {
         PrepareZone2LevelBracket();
         PrepareDestinationCache();
+        PrepareDungeonGearCache();
     }
     sTravelNodeMap.InitTaxiGraph();
     LOG_INFO("playerbots", "Playerbots Taxi graph and destination cache built.");
@@ -4499,6 +4503,59 @@ const std::vector<WorldLocation> TravelMgr::GetTravelHubs(Player* bot)
                                                  ? allianceHubsPerLevelCache[bot->GetLevel()]
                                                  : hordeHubsPerLevelCache[bot->GetLevel()];
     return locs;
+}
+
+std::vector<uint32> const& TravelMgr::GetGearHuntEntries(uint8 level) const
+{
+    static std::vector<uint32> const none;
+    auto const it = gearHuntEntriesPerLevel.find(level);
+    return it == gearHuntEntriesPerLevel.end() ? none : it->second;
+}
+
+std::vector<WorldLocation> const* TravelMgr::GetGearHuntLocs(uint32 entry) const
+{
+    auto const it = gearHuntLocs.find(entry);
+    return it == gearHuntLocs.end() ? nullptr : &it->second;
+}
+
+std::vector<uint32> const* TravelMgr::GetGearDrops(uint32 entry) const
+{
+    auto const it = gearDrops.find(entry);
+    return it == gearDrops.end() ? nullptr : &it->second;
+}
+
+std::vector<uint32> const* TravelMgr::GetDungeonGearDrops(uint32 mapId) const
+{
+    auto const it = dungeonGearDrops.find(mapId);
+    return it == dungeonGearDrops.end() ? nullptr : &it->second;
+}
+
+void TravelMgr::PrepareDungeonGearCache()
+{
+    std::unordered_map<uint32, std::set<uint32>> drops;
+    std::set<uint32> seenBosses;
+    for (auto const& [guid, creatureData] : sObjectMgr->GetAllCreatureData())
+    {
+        MapEntry const* map = sMapStore.LookupEntry(creatureData.mapid);
+        if (!map || !map->IsDungeon() || !seenBosses.insert(creatureData.id).second)
+            continue;
+        CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creatureData.id);
+        if (!creatureTemplate || !creatureTemplate->lootid ||
+            !(creatureTemplate->HasFlagsExtra(CREATURE_FLAG_EXTRA_DUNGEON_BOSS) || creatureTemplate->rank == CREATURE_ELITE_WORLDBOSS))
+            continue;
+
+        std::set<uint32> loot;
+        if (LootTemplate const* lootTemplate = LootTemplates_Creature.GetLootFor(creatureTemplate->lootid))
+            lootTemplate->CollectNonQuestItems(loot);
+        for (uint32 itemId : loot)
+            if (ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId))
+                if (LivingWorld::IsGearDrop(item->Class, item->Quality, item->ItemLevel,
+                                            sPlayerbotAIConfig.RandomGearScoreLimit))
+                    drops[creatureData.mapid].insert(itemId);
+    }
+    for (auto& [mapId, items] : drops)
+        dungeonGearDrops[mapId].assign(items.begin(), items.end());
+    LOG_INFO("playerbots", "Gear hunting: {} dungeons and raids have era-eligible boss loot", dungeonGearDrops.size());
 }
 
 std::vector<WorldLocation> TravelMgr::GetCityLocations(Player* bot)
@@ -4819,6 +4876,14 @@ void TravelMgr::PrepareDestinationCache()
     {
         if (creatureDataList.size() >= 2)
         {
+            WorldLocation const clusterLoc(std::get<0>(gridTuple), static_cast<float>(std::get<1>(gridTuple)) * 50.0f,
+                                           static_cast<float>(std::get<2>(gridTuple)) * 50.0f,
+                                           static_cast<float>(std::get<3>(gridTuple)) * 50.0f);
+            std::set<uint32> clusterEntries;
+            for (CreatureData const& data : creatureDataList)
+                if (clusterEntries.insert(data.id).second)
+                    gearHuntLocs[data.id].push_back(clusterLoc);
+
             CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creatureDataList[0].id);
             uint32 level = (creatureTemplate->minlevel + creatureTemplate->maxlevel + 1) / 2;
             for (int32 l = (int32)level - (int32)sPlayerbotAIConfig.RandomBotTeleLowerLevel;
@@ -4834,6 +4899,51 @@ void TravelMgr::PrepareDestinationCache()
             }
         }
     }
+    // Gear hunting index: creature types whose loot contains era-eligible gear. Only signature
+    // drops count; shared world-drop pools (referenced by most mobs) make no place special.
+    std::unordered_map<uint32, std::vector<uint32>> allDrops;
+    std::unordered_map<uint32, uint32> dropSources;
+    for (auto const& [entry, locs] : gearHuntLocs)
+    {
+        CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(entry);
+        std::set<uint32> loot;
+        if (creatureTemplate && creatureTemplate->lootid)
+            if (LootTemplate const* lootTemplate = LootTemplates_Creature.GetLootFor(creatureTemplate->lootid))
+                lootTemplate->CollectNonQuestItems(loot);
+        for (uint32 itemId : loot)
+            if (ItemTemplate const* item = sObjectMgr->GetItemTemplate(itemId))
+                if (LivingWorld::IsGearDrop(item->Class, item->Quality, item->ItemLevel,
+                                            sPlayerbotAIConfig.RandomGearScoreLimit))
+                {
+                    allDrops[entry].push_back(itemId);
+                    ++dropSources[itemId];
+                }
+    }
+
+    uint32 gearHuntEntries = 0;
+    for (auto it = gearHuntLocs.begin(); it != gearHuntLocs.end();)
+    {
+        CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(it->first);
+        std::vector<uint32> drops;
+        for (uint32 itemId : allDrops[it->first])
+            if (LivingWorld::IsSignatureDrop(dropSources[itemId]))
+                drops.push_back(itemId);
+
+        if (drops.empty() || !creatureTemplate)
+        {
+            it = gearHuntLocs.erase(it);
+            continue;
+        }
+        uint32 const level = (creatureTemplate->minlevel + creatureTemplate->maxlevel + 1) / 2;
+        for (uint32 l = 1; l <= maxLevel; ++l)
+            if (LivingWorld::HuntableLevel(level, l))
+                gearHuntEntriesPerLevel[uint8(l)].push_back(it->first);
+        gearDrops[it->first] = std::move(drops);
+        ++gearHuntEntries;
+        ++it;
+    }
+    LOG_INFO("playerbots", "Gear hunting: {} open-world creature types drop era-eligible gear", gearHuntEntries);
+
     for (auto const& [entry, areaMap] : tempCreatureCache)
     {
         for (auto const& [area, locList] : areaMap)
