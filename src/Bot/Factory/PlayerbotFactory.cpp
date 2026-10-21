@@ -5,7 +5,11 @@
  */
 
 #include "PlayerbotFactory.h"
-#include "PlayerbotsDatabase.h"
+
+#include <array>
+#include <unordered_set>
+#include <utility>
+
 #include "AccountMgr.h"
 #include "AiFactory.h"
 #include "AiObjectContext.h"
@@ -19,6 +23,9 @@
 #include "ItemPackets.h"
 #include "ItemTemplate.h"
 #include "ItemVisitors.h"
+#include "LivingProfessionActions.h"
+#include "LivingProfessionPolicy.h"
+#include "LivingWorldMgr.h"
 #include "Log.h"
 #include "LootMgr.h"
 #include "ObjectMgr.h"
@@ -31,21 +38,16 @@
 #include "PlayerbotRepository.h"
 #include "PlayerbotSpellRepository.h"
 #include "Playerbots.h"
+#include "PlayerbotsDatabase.h"
 #include "QuestDef.h"
 #include "RandomItemMgr.h"
 #include "RandomPlayerbotFactory.h"
 #include "ReputationMgr.h"
 #include "SharedDefines.h"
-#include "StatsWeightCalculator.h"
 #include "SpellMgr.h"
+#include "StatsWeightCalculator.h"
 #include "Trainer.h"
 #include "World.h"
-#include <array>
-#include <unordered_set>
-#include <utility>
-
-#include <array>
-#include <utility>
 
 namespace
 {
@@ -825,6 +827,12 @@ void PlayerbotFactory::Prepare()
 
 void PlayerbotFactory::Randomize(bool incremental)
 {
+    if (LivingWorldMgr::instance().Preserve(bot))
+        return;
+
+    if (LivingWorldMgr::instance().IsEnabled(bot))
+        level = std::min<uint32>(level, LivingWorldMgr::instance().GetLevelCap(bot));
+
     // if (sPlayerbotAIConfig.DisableRandomLevels)
     //     return;
 
@@ -1083,12 +1091,16 @@ void PlayerbotFactory::Randomize(bool incremental)
     bot->SetPower(POWER_MANA, bot->GetMaxPower(POWER_MANA));
     bot->SaveToDB(false, false);
     LOG_DEBUG("playerbots", "Initialization Done.");
+    LivingWorldMgr::instance().MarkInitialized(bot);
     if (pmo)
         pmo->finish();
 }
 
 void PlayerbotFactory::Refresh()
 {
+    if (LivingWorldMgr::instance().IsEnabled(bot))
+        return;
+
     // Prepare();
     // if (!sPlayerbotAIConfig.EquipAndSpecPersistence ||
     //     bot->GetLevel() < sPlayerbotAIConfig.EquipAndSpecPersistenceLevel)
@@ -3024,9 +3036,14 @@ void PlayerbotFactory::InitTradeSkills()
     }
 
     std::vector<uint16> primarySkills;
-    auto addPrimarySkill = [&primarySkills, maxPrimaryTradeSkills](uint16 skillId)
+    // Living-world bots only take professions their era has (no jewelcrafting or inscription in vanilla).
+    bool const eraLimited = LivingWorldMgr::instance().IsEnabled(bot);
+    auto addPrimarySkill = [&primarySkills, maxPrimaryTradeSkills, eraLimited](uint16 skillId)
     {
         if (!skillId || !IsPrimaryTradeSkill(skillId) || primarySkills.size() >= maxPrimaryTradeSkills)
+            return;
+
+        if (eraLimited && !LivingWorld::FindProfession(skillId, sPlayerbotAIConfig.RandomBotMaxLevel))
             return;
 
         if (std::find(primarySkills.begin(), primarySkills.end(), skillId) == primarySkills.end())
@@ -3530,6 +3547,8 @@ void PlayerbotFactory::InitAvailableSpells()
     for (uint32 trainerId : trainerIdCache[bot->getClass()])
     {
         Trainer::Trainer* trainer = sObjectMgr->GetTrainer(trainerId);
+        if (LivingWorldMgr::instance().Preserve(bot) && trainer->GetTrainerType() == Trainer::Type::Tradeskill)
+            continue;
 
         for (auto& spell : trainer->GetSpells())
         {
@@ -3543,6 +3562,12 @@ void PlayerbotFactory::InitAvailableSpells()
                 continue;
 
             if (!trainer->CanTeachSpell(bot, trainerSpell))
+                continue;
+
+            // A fresh living-world bot's starting professions stop at the era's rank and recipes
+            // (no Master rank or Outland recipes during vanilla).
+            if (trainer->GetTrainerType() == Trainer::Type::Tradeskill && LivingWorldMgr::instance().IsEnabled(bot) &&
+                !LivingProfessions::WithinEra(*trainerSpell))
                 continue;
 
             if (trainerSpell->IsCastable())

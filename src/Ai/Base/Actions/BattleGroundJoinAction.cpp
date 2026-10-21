@@ -5,14 +5,39 @@
  */
 
 #include "BattleGroundJoinAction.h"
+
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "Event.h"
+#include "GameTime.h"
 #include "GroupMgr.h"
+#include "LivingWorldMgr.h"
+#include "LivingWorldPolicy.h"
+#include "RandomPlayerbotMgr.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
+
+namespace
+{
+// Living-world bots fill a match with real players in it according to a gear-score spread
+// around those players (see LivingWorld::GearMatchChance).
+bool GearFitsQueue(Player* bot, BattlegroundQueueTypeId queueTypeId, BattlegroundBracketId bracketId)
+{
+    if (!LivingWorldMgr::instance().IsEnabled(bot))
+        return true;
+    BattlegroundInfo const& data = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId];
+    if (!data.playerGearScoreCount)
+        return true;  // bots-only match: nothing to match against
+    uint32 const playerGearScore = static_cast<uint32>(data.playerGearScoreSum / data.playerGearScoreCount);
+    uint32 const chance = LivingWorld::GearMatchChance(PlayerbotAI::GetMixedGearScore(bot, false, false),
+                                                       playerGearScore,
+                                                       LivingWorldMgr::instance().GetProfile(bot).temperament);
+    return LivingWorld::GearMatchRoll(bot->GetGUID().GetCounter(), queueTypeId,
+                                      GameTime::GetGameTime().count(), chance);
+}
+}  // namespace
 
 bool BGJoinAction::Execute(Event /*event*/)
 {
@@ -280,7 +305,7 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
 
         if ((skirmishArenaBotCount + skirmishArenaPlayerCount) < maxRequiredSkirmishBots)
         {
-            return true;
+            return GearFitsQueue(bot, queueTypeId, bracketId);
         }
 
         return false;
@@ -297,12 +322,12 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
     if (teamId == TEAM_ALLIANCE)
     {
         if ((bgAllianceBotCount + bgAlliancePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
-            return true;
+            return GearFitsQueue(bot, queueTypeId, bracketId);
     }
     else
     {
         if ((bgHordeBotCount + bgHordePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
-            return true;
+            return GearFitsQueue(bot, queueTypeId, bracketId);
     }
 
     return false;
@@ -611,7 +636,7 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
 
         if ((skirmishArenaBotCount + skirmishArenaPlayerCount) < maxRequiredSkirmishBots)
         {
-            return true;
+            return GearFitsQueue(bot, queueTypeId, bracketId);
         }
 
         return false;
@@ -628,12 +653,12 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
     if (teamId == TEAM_ALLIANCE)
     {
         if ((bgAllianceBotCount + bgAlliancePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
-            return true;
+            return GearFitsQueue(bot, queueTypeId, bracketId);
     }
     else
     {
         if ((bgHordeBotCount + bgHordePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
-            return true;
+            return GearFitsQueue(bot, queueTypeId, bracketId);
     }
 
     return false;
@@ -914,7 +939,8 @@ bool BGStatusAction::Execute(Event event)
                         // properly, set bg for "bg strategy check" to fix that
                         botAI->ChangeStrategy("+bg", BOT_STATE_NON_COMBAT);
                     }
-                    context->GetValue<uint32>("bg role")->Set(urand(0, 9));
+                    context->GetValue<uint32>("bg role")->Set(
+                        LivingWorldMgr::instance().GetBattlegroundRole(bot, urand(0, 9)));
                     PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
                     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
                     pos.Reset();
@@ -1036,7 +1062,7 @@ bool BGStatusAction::Execute(Event event)
             // set bg for "bg strategy check" to fix that
             botAI->ChangeStrategy("+bg", BOT_STATE_NON_COMBAT);
         }
-        context->GetValue<uint32>("bg role")->Set(urand(0, 9));
+        context->GetValue<uint32>("bg role")->Set(LivingWorldMgr::instance().GetBattlegroundRole(bot, urand(0, 9)));
         PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();
         PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
         PositionInfo pos2 = context->GetValue<PositionMap&>("position")->Get()["bg siege"];

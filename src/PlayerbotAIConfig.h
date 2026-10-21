@@ -105,6 +105,7 @@ public:
     bool IsInPvpProhibitedArea(uint32 id);
 
     bool Enabled;
+    bool LivingWorldEnabled = false;
     bool DisabledWithoutRealPlayer;
     bool EnableICCBuffs;
     bool AllowAccountBots, AllowGuildBots, AllowTrustedAccountBots;

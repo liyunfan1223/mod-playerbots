@@ -5,13 +5,18 @@
  */
 
 #include "CheckMailAction.h"
+
 #include "Event.h"
 #include "GuildTaskMgr.h"
+#include "LivingWorldMgr.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
 
 bool CheckMailAction::Execute(Event /*event*/)
 {
+    if (LivingWorldMgr::instance().IsEnabled(bot))
+        return false;
+
     WorldPacket p;
     bot->GetSession()->HandleQueryNextMailTime(p);
 
@@ -59,6 +64,9 @@ bool CheckMailAction::Execute(Event /*event*/)
 
 bool CheckMailAction::isUseful()
 {
+    if (LivingWorldMgr::instance().IsEnabled(bot))
+        return false;
+
     if (botAI->GetMaster() || !bot->GetMailSize() || bot->InBattleground())
         return false;
 

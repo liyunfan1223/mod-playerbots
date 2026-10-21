@@ -51,6 +51,10 @@
 #include "LeastHpTargetValue.h"
 #include "LfgValues.h"
 #include "LineTargetValue.h"
+#include "LivingEconomyActions.h"
+#include "LivingFieldActions.h"
+#include "LivingProcessingActions.h"
+#include "LivingProfessionActions.h"
 #include "LogLevelValue.h"
 #include "LootStrategyValue.h"
 #include "LootValues.h"
@@ -103,6 +107,14 @@ class ValueContext : public NamedObjectContext<UntypedValue>
 public:
     ValueContext()
     {
+        creators["living training"] = &ValueContext::living_training;
+        creators["living craft"] = &ValueContext::living_craft;
+        creators["living processing"] = &ValueContext::living_processing;
+        creators["living field plan"] = &ValueContext::living_field_plan;
+        creators["living field state"] = &ValueContext::living_field_state;
+        creators["living supplies"] = &ValueContext::living_supplies;
+        creators["living auction"] = &ValueContext::living_auction;
+        creators["living mail"] = &ValueContext::living_mail;
         creators["active spell"] = &ValueContext::active_spell;
         creators["craft"] = &ValueContext::craft;
         creators["collision"] = &ValueContext::collision;
@@ -333,6 +345,23 @@ public:
     }
 
 private:
+    static UntypedValue* living_training(PlayerbotAI* botAI) { return new LivingTrainingValue(botAI); }
+    static UntypedValue* living_craft(PlayerbotAI* botAI) { return new LivingCraftValue(botAI); }
+    static UntypedValue* living_processing(PlayerbotAI* botAI) { return new LivingProcessingValue(botAI); }
+    static UntypedValue* living_field_plan(PlayerbotAI* botAI) { return new LivingFieldPlanValue(botAI); }
+    static UntypedValue* living_field_state(PlayerbotAI* botAI) { return new LivingFieldStateValue(botAI); }
+    static UntypedValue* living_supplies(PlayerbotAI* botAI)
+    {
+        return new LivingEconomyValue(botAI, "living supplies", LivingEconomyJob::Supplies);
+    }
+    static UntypedValue* living_auction(PlayerbotAI* botAI)
+    {
+        return new LivingEconomyValue(botAI, "living auction", LivingEconomyJob::Auction);
+    }
+    static UntypedValue* living_mail(PlayerbotAI* botAI)
+    {
+        return new LivingEconomyValue(botAI, "living mail", LivingEconomyJob::Mail);
+    }
     static UntypedValue* party_member_without_water(PlayerbotAI* botAI)
     {
         return new PartyMemberWithoutWaterValue(botAI);

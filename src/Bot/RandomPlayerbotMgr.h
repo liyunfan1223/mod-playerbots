@@ -43,6 +43,10 @@ struct BattlegroundInfo
     // Players (Battleground)
     uint32 bgHordePlayerCount = 0;
     uint32 bgAlliancePlayerCount = 0;
+
+    // Real players queued or playing in this bracket: summed gear score, for living-world matching
+    uint64 playerGearScoreSum = 0;
+    uint32 playerGearScoreCount = 0;
 };
 
 class ChatHandler;

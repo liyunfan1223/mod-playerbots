@@ -5,14 +5,17 @@
  */
 
 #include "NewRpgBaseAction.h"
+
 #include "BroadcastHelper.h"
 #include "ChatHelper.h"
 #include "Creature.h"
+#include "G3D/Vector2.h"
 #include "GameObject.h"
 #include "GatherNodeMgr.h"
 #include "GossipDef.h"
 #include "GridTerrainData.h"
 #include "IVMapMgr.h"
+#include "LivingWorldMgr.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
@@ -36,7 +39,6 @@
 #include "StatsWeightCalculator.h"
 #include "Timer.h"
 #include "TravelMgr.h"
-#include "G3D/Vector2.h"
 
 bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
 {
@@ -1103,7 +1105,8 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
         if (CheckRpgStatusAvailable(status))
         {
             availableStatus.push_back(status);
-            probSum += sPlayerbotAIConfig.RpgStatusProbWeight[status];
+            probSum += LivingWorldMgr::instance().GetActivityWeight(bot, status,
+                                                                    sPlayerbotAIConfig.RpgStatusProbWeight[status]);
         }
     }
     // Safety check. Default to "rest" if all RPG weights = 0
@@ -1118,7 +1121,8 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
     NewRpgStatus chosenStatus = RPG_STATUS_END;
     for (NewRpgStatus status : availableStatus)
     {
-        accumulate += sPlayerbotAIConfig.RpgStatusProbWeight[status];
+        accumulate +=
+            LivingWorldMgr::instance().GetActivityWeight(bot, status, sPlayerbotAIConfig.RpgStatusProbWeight[status]);
         if (accumulate >= rand)
         {
             chosenStatus = status;

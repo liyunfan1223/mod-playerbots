@@ -25,6 +25,7 @@ struct GatherNodeSpawn
     WorldPosition pos{};
     uint32 skillId{0};  // SKILL_HERBALISM or SKILL_MINING
     uint32 reqSkillValue{0};
+    uint32 lootId{0};
 };
 
 /// Index of gatherable gameobject spawns (herbs/veins) on continent maps,
@@ -64,10 +65,10 @@ public:
     GatherNodeSpawn const* GetNearestLiveNode(Player* bot, std::unordered_set<ObjectGuid::LowType> const& visited,
                                               float radius);
 
+    std::vector<GatherNodeSpawn> const* GetZoneNodes(uint32 mapId, uint32 zoneId) const;
+
 private:
     bool IsUsable(PlayerbotAI* botAI, Player* bot, GatherNodeSpawn const& node);
-
-    std::vector<GatherNodeSpawn> const* GetZoneNodes(uint32 mapId, uint32 zoneId) const;
 
     // Bucketed per zone so the zone-scoped queries (HasUsableNodes,
     // GetNextNode) touch only the bot's zone instead of the whole continent.

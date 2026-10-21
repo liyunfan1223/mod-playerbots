@@ -68,6 +68,7 @@ public:
     void InitSkills();
 
     static uint32 tradeSkills[];
+    static uint16 GetTrainerSpellTradeSkill(Trainer::Spell const* trainerSpell);
     static float CalculateEnchantScore(uint32 enchant_id, Player* bot);
     uint32 InitTalentsTree(bool incremental = false, bool use_template = true, bool reset = false);
     static void InitTalentsBySpecNo(Player* bot, int specNo, bool reset);
@@ -167,7 +168,6 @@ private:
     bool CanEquipUnseenItem(uint8 slot, uint16& dest, uint32 item);
     static bool IsPrimaryTradeSkill(uint16 skillId);
     static bool IsSecondaryTradeSkill(uint16 skillId);
-    static uint16 GetTrainerSpellTradeSkill(Trainer::Spell const* trainerSpell);
     static bool IsGatheringTradeSkill(uint16 skillId);
     static bool IsCraftingTradeSkill(uint16 skillId);
     static uint32 GetProfessionStarterSpell(uint16 skillId);

@@ -5,9 +5,11 @@
  */
 
 #include "CastCustomSpellAction.h"
+
 #include "ChatHelper.h"
 #include "Event.h"
 #include "ItemUsageValue.h"
+#include "LivingWorldMgr.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -339,6 +341,9 @@ bool CastRandomSpellAction::castSpell(uint32 spellId, WorldObject* wo)
 
 bool DisEnchantRandomItemAction::Execute(Event /*event*/)
 {
+    if (LivingWorldMgr::instance().IsEnabled(bot))
+        return false;
+
     std::vector<Item*> items =
         AI_VALUE2(std::vector<Item*>, "inventory items", "usage " + std::to_string(ITEM_USAGE_DISENCHANT));
     std::reverse(items.begin(), items.end());
@@ -360,7 +365,7 @@ bool DisEnchantRandomItemAction::Execute(Event /*event*/)
 
 bool DisEnchantRandomItemAction::isUseful()
 {
-    return botAI->HasSkill(SKILL_ENCHANTING) && !bot->IsInCombat() &&
+    return !LivingWorldMgr::instance().IsEnabled(bot) && botAI->HasSkill(SKILL_ENCHANTING) && !bot->IsInCombat() &&
            AI_VALUE2(uint32, "item count", "usage " + std::to_string(ITEM_USAGE_DISENCHANT)) > 0;
 }
 

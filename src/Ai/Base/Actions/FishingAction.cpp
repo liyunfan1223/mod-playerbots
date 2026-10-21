@@ -5,12 +5,14 @@
  */
 
 #include "FishingAction.h"
+
 #include "Event.h"
 #include "FishValues.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ItemPackets.h"
 #include "LastMovementValue.h"
+#include "LivingWorldMgr.h"
 #include "Map.h"
 #include "MovementActions.h"
 #include "Object.h"
@@ -127,7 +129,7 @@ WorldPosition FindLandRadialFromPosition (PlayerbotAI* botAI, WorldPosition targ
     const int numDirections = angles;
     std::vector<WorldPosition> boundaryPoints;
     Player* master = botAI->GetMaster();
-    if (!master)
+    if (!master && !LivingWorldMgr::instance().IsEnabled(bot))
         return WorldPosition();
 
     Map* map = bot->GetMap();
@@ -150,7 +152,16 @@ WorldPosition FindLandRadialFromPosition (PlayerbotAI* botAI, WorldPosition targ
             if (groundZ == INVALID_HEIGHT)
                 continue;
 
-            if (map->isInLineOfSight(checkX, checkY, groundZ, targetX, targetY, targetZ, phaseMask, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) && master->GetDistance(checkX, checkY, groundZ) > fishingSearchWindow - SEARCH_LAND_BUFFER)
+            if (!master &&
+                (!map->isInLineOfSight(checkX, checkY, groundZ + bot->GetCollisionHeight(), targetX, targetY, targetZ,
+                                      phaseMask, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) ||
+                 bot->GetDistance(checkX, checkY, groundZ) > fishingSearchWindow))
+                continue;
+
+            if (master &&
+                map->isInLineOfSight(checkX, checkY, groundZ, targetX, targetY, targetZ, phaseMask,
+                                     LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) &&
+                master->GetDistance(checkX, checkY, groundZ) > fishingSearchWindow - SEARCH_LAND_BUFFER)
                 continue;
 
             boundaryPoints.emplace_back(WorldPosition(bot->GetMapId(), checkX, checkY, groundZ));
@@ -229,6 +240,10 @@ WorldPosition FindFishingHole(PlayerbotAI* botAI)
     {
         GameObject* go = botAI->GetGameObject(guid);
         if (!go)
+            continue;
+        if (LivingWorldMgr::instance().IsEnabled(player) &&
+            (!go->isSpawned() || !go->InSamePhase(player) ||
+             player->GetDistance2d(go) > sPlayerbotAIConfig.FishingDistance + MAX_DISTANCE_TO_WATER))
             continue;
         if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
         {
@@ -383,7 +398,7 @@ bool EquipFishingPoleAction::isUseful()
         }
     }
 
-    if (sRandomPlayerbotMgr.IsRandomBot(bot))
+    if (sRandomPlayerbotMgr.IsRandomBot(bot) && !LivingWorldMgr::instance().IsEnabled(bot))
     {
         bot->StoreNewItemInBestSlots(FISHING_POLE, 1);  // Try to get a fishing pole
         return true;

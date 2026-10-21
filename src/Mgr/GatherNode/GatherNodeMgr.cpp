@@ -109,6 +109,7 @@ void GatherNodeMgr::Load()
         node.pos = WorldPosition(goData.mapid, goData.posX, goData.posY, goData.posZ);
         node.skillId = skillId;
         node.reqSkillValue = reqSkillValue;
+        node.lootId = goInfo->GetLootId();
         auto zoneItr = dbZoneIds.find(spawnId);
         uint32 zoneId = zoneItr != dbZoneIds.end()
                             ? zoneItr->second

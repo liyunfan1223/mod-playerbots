@@ -15,6 +15,15 @@ void PlayerbotsDatabaseConnection::DoPrepareStatements()
     if (!m_reconnecting)
         m_stmts.resize(MAX_PLAYERBOTS_STATEMENTS);
 
+    PrepareStatement(PLAYERBOTS_SEL_LIVING_PROFILES,
+                     "SELECT guid, motivation, temperament, level_cap, initialized FROM playerbots_living_profiles",
+                     CONNECTION_SYNCH);
+    PrepareStatement(
+        PLAYERBOTS_UPSERT_LIVING_PROFILE,
+        "INSERT INTO playerbots_living_profiles (guid, motivation, temperament, level_cap, initialized) "
+        "VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE initialized = GREATEST(initialized, VALUES(initialized))",
+        CONNECTION_ASYNC);
+
     PrepareStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER, "SELECT DISTINCT name FROM playerbots_custom_strategy WHERE owner = ?", CONNECTION_SYNCH);
     PrepareStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME, "SELECT idx, action_line FROM playerbots_custom_strategy WHERE owner = ? AND name = ? ORDER BY idx", CONNECTION_SYNCH);
     PrepareStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME_AND_IDX, "SELECT action_line FROM playerbots_custom_strategy WHERE owner = ? AND name = ? AND idx = ?", CONNECTION_SYNCH);

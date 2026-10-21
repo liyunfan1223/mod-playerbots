@@ -5,7 +5,16 @@
  */
 
 #include "RandomPlayerbotMgr.h"
-#include "PlayerbotsDatabase.h"
+
+#include <algorithm>
+#include <boost/thread/thread.hpp>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+#include <random>
+#include <set>
+#include <utility>
+
 #include "AiFactory.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
@@ -20,6 +29,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "LFGMgr.h"
+#include "LivingWorldMgr.h"
 #include "MapMgr.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
@@ -31,6 +41,7 @@
 #include "PlayerbotFactory.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
+#include "PlayerbotsDatabase.h"
 #include "Position.h"
 #include "RaceMgr.h"
 #include "Random.h"
@@ -41,14 +52,6 @@
 #include "Unit.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
-#include <algorithm>
-#include <boost/thread/thread.hpp>
-#include <cstdlib>
-#include <ctime>
-#include <iomanip>
-#include <random>
-#include <set>
-#include <utility>
 
 struct GuidClassRaceInfo
 {
@@ -996,6 +999,9 @@ void RandomPlayerbotMgr::CheckBgQueue()
             BattlegroundBracketId bracketId = pvpDiff->GetBracketId();
             BattlegroundData[queueTypeId][bracketId].minLevel = pvpDiff->minLevel;
             BattlegroundData[queueTypeId][bracketId].maxLevel = pvpDiff->maxLevel;
+            BattlegroundData[queueTypeId][bracketId].playerGearScoreSum +=
+                PlayerbotAI::GetMixedGearScore(player, false, false);
+            BattlegroundData[queueTypeId][bracketId].playerGearScoreCount++;
 
             // Arena logic
             bool isRated = false;
@@ -1498,9 +1504,6 @@ bool RandomPlayerbotMgr::ProcessBot(Player* bot)
     if (bot->InBattleground())
         return false;
 
-    if (bot->InBattlegroundQueue())
-        return false;
-
      uint32 botId = bot->GetGUID().GetCounter();
 
     // if death revive
@@ -1525,6 +1528,11 @@ bool RandomPlayerbotMgr::ProcessBot(Player* bot)
 
         return false;
     }
+
+    // Checked after revival: a bot that died while queued used to stay a corpse until its match began
+    // (on 2026-10-20 ~15% of online bots were dead, many for over two hours).
+    if (bot->InBattlegroundQueue())
+        return false;
 
     // leave group if leader is rndbot
     Group* group = bot->GetGroup();
@@ -1977,6 +1985,9 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot)
 
 void RandomPlayerbotMgr::Randomize(Player* bot)
 {
+    if (LivingWorldMgr::instance().Preserve(bot))
+        return;
+
     if (bot->InBattleground())
         return;
 
@@ -2195,12 +2206,18 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
     if (!botAI)
         return;
 
+    // Revival comes before the living-world exit. With the exit first, the manager never revived living
+    // bots: they lay dead until their own AI ran back (on 2026-10-21 ~17% of online bots were dead,
+    // some for over five hours).
     if (bot->isDead())
     {
         bot->ResurrectPlayer(1.0f);
         bot->SpawnCorpseBones();
         botAI->ResetStrategies(false);
     }
+
+    if (LivingWorldMgr::instance().IsEnabled(bot))
+        return;
 
     // if (sPlayerbotAIConfig.DisableRandomLevels)
     //     return;

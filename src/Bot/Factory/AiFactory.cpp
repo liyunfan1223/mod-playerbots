@@ -283,6 +283,9 @@ std::string AiFactory::GetPlayerSpecName(Player* player)
 
 void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const facade, Engine* engine)
 {
+    if (sPlayerbotAIConfig.LivingWorldEnabled && sRandomPlayerbotMgr.IsRandomBot(player))
+        engine->addStrategy("living fieldwork", false);
+
     uint8 tab = GetPlayerSpecTab(player);
 
     if (!player->InBattleground())
@@ -593,6 +596,11 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 
     if ((sRandomPlayerbotMgr.IsRandomBot(player)) && !player->InBattleground())
     {
+        if (sPlayerbotAIConfig.LivingWorldEnabled)
+        {
+            nonCombatEngine->addStrategy("living professions", false);
+            nonCombatEngine->addStrategy("living fieldwork", false);
+        }
         Player* master = facade->GetMaster();
 
         // let 25% of free bots start duels.

@@ -5,11 +5,14 @@
  */
 
 #include "SellAction.h"
+
 #include "ChatHelper.h"
 #include "Event.h"
 #include "ItemPackets.h"
 #include "ItemUsageValue.h"
 #include "ItemVisitors.h"
+#include "LivingFieldActions.h"
+#include "LivingWorldMgr.h"
 #include "Playerbots.h"
 
 class SellItemsVisitor : public IterateItemsVisitor
@@ -83,6 +86,10 @@ public:
         ItemUsage usage = context->GetValue<ItemUsage>("item usage", item->GetEntry())->Get();
         if (usage != ITEM_USAGE_VENDOR && usage != ITEM_USAGE_AH)
             return true;
+        Player* player = item->GetOwner();
+        if (usage == ITEM_USAGE_AH && LivingWorldMgr::instance().IsEnabled(player) &&
+            LivingWorldMgr::instance().GetProfile(player).motivation == LivingWorld::Motivation::Trader)
+            return true;
 
         return SellItemsVisitor::Visit(item);
     }
@@ -149,7 +156,11 @@ void SellAction::Sell(FindItemVisitor* visitor)
 
 void SellAction::Sell(Item* item)
 {
+    if (!item || LivingProfessions::FieldReservedItem(botAI, item->GetGUID()))
+        return;
+
     std::ostringstream out;
+    ItemTemplate const* soldTemplate = item->GetTemplate();
 
     GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();
 
@@ -171,12 +182,12 @@ void SellAction::Sell(Item* item)
         nicePacket.Read();
         bot->GetSession()->HandleSellItemOpcode(nicePacket);
 
-        if (botAI->HasCheat(BotCheatMask::gold))
+        if (botAI->HasCheat(BotCheatMask::gold) && !LivingWorldMgr::instance().IsEnabled(bot))
         {
             bot->SetMoney(botMoney);
         }
 
-        out << "Selling " << chat->FormatItem(item->GetTemplate());
+        out << "Selling " << chat->FormatItem(soldTemplate);
         botAI->TellMaster(out);
 
         bot->PlayDistanceSound(120);

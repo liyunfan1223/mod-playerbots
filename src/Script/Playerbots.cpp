@@ -5,26 +5,29 @@
  */
 
 #include "Playerbots.h"
+
+#include <mysqld_error.h>
+
+#include "AllMapScript.h"
 #include "BattleGroundTactics.h"
 #include "BattlefieldScript.h"
+#include "BuiltInConfig.h"
 #include "Channel.h"
 #include "CheckMountStateAction.h"
 #include "Config.h"
-#include "BuiltInConfig.h"
 #include "DBUpdater.h"
 #include "DatabaseEnv.h"
-#include "PlayerbotsDatabase.h"
-#include <mysqld_error.h>
-#include "AllMapScript.h"
 #include "GatherNodeMgr.h"
 #include "GlobalScript.h"
 #include "GuildTaskMgr.h"
+#include "LivingWorldMgr.h"
 #include "PlayerScript.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotCommandScript.h"
 #include "PlayerbotGuildMgr.h"
 #include "PlayerbotSpellRepository.h"
 #include "PlayerbotWorldThreadProcessor.h"
+#include "PlayerbotsDatabase.h"
 #include "RandomPlayerbotMgr.h"
 #include "ScriptMgr.h"
 #include "ServerScript.h"
@@ -127,21 +130,16 @@ public:
 class PlayerbotsPlayerScript : public PlayerScript
 {
 public:
-    PlayerbotsPlayerScript() : PlayerScript("PlayerbotsPlayerScript", {
-        PLAYERHOOK_ON_LOGIN,
-        PLAYERHOOK_ON_BEFORE_LOGOUT,
-        PLAYERHOOK_ON_AFTER_UPDATE,
-        PLAYERHOOK_ON_CREATURE_KILL_CREDIT,
-        PLAYERHOOK_ON_BEFORE_PETITION_SIGN,
-        PLAYERHOOK_ON_BEFORE_CRITERIA_PROGRESS,
-        PLAYERHOOK_ON_BEFORE_ACHI_COMPLETE,
-        PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT,
-        PLAYERHOOK_CAN_PLAYER_USE_GROUP_CHAT,
-        PLAYERHOOK_CAN_PLAYER_USE_GUILD_CHAT,
-        PLAYERHOOK_CAN_PLAYER_USE_CHANNEL_CHAT,
-        PLAYERHOOK_ON_GIVE_EXP,
-        PLAYERHOOK_ON_BEFORE_TELEPORT
-    }) {}
+    PlayerbotsPlayerScript()
+        : PlayerScript("PlayerbotsPlayerScript",
+                       {PLAYERHOOK_ON_LOGIN, PLAYERHOOK_ON_BEFORE_LOGOUT, PLAYERHOOK_ON_AFTER_UPDATE,
+                        PLAYERHOOK_ON_CREATURE_KILL_CREDIT, PLAYERHOOK_ON_BEFORE_PETITION_SIGN,
+                        PLAYERHOOK_ON_BEFORE_CRITERIA_PROGRESS, PLAYERHOOK_ON_BEFORE_ACHI_COMPLETE,
+                        PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT, PLAYERHOOK_CAN_PLAYER_USE_GROUP_CHAT,
+                        PLAYERHOOK_CAN_PLAYER_USE_GUILD_CHAT, PLAYERHOOK_CAN_PLAYER_USE_CHANNEL_CHAT,
+                        PLAYERHOOK_ON_GIVE_EXP, PLAYERHOOK_ON_CAN_GIVE_LEVEL, PLAYERHOOK_ON_BEFORE_TELEPORT})
+    {
+    }
 
     void OnPlayerLogin(Player* player) override
     {
@@ -360,10 +358,23 @@ public:
         return true;
     }
 
+    bool OnPlayerCanGiveLevel(Player* player, uint8 level) override
+    {
+        return !LivingWorldMgr::instance().IsEnabled(player) || level <= LivingWorldMgr::instance().GetLevelCap(player);
+    }
+
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
+        LivingWorldMgr::instance().LimitExperience(player, amount);
+
+        // Living-world bots level at their personality's pace on top of the bot XP rate.
+        float const pace = player && LivingWorldMgr::instance().IsEnabled(player)
+                               ? LivingWorld::XpPacePercent(LivingWorldMgr::instance().GetProfile(player).motivation) / 100.0f
+                               : 1.0f;
+        float const rate = sPlayerbotAIConfig.RandomBotXPRate * pace;
+
         // early return
-        if (sPlayerbotAIConfig.RandomBotXPRate == 1.0 || !player)
+        if (rate == 1.0f || !player)
             return;
 
         // no XP multiplier, when player is no bot.
@@ -384,8 +395,9 @@ public:
             }
         }
 
-        // otherwise apply bot XP multiplier.
-        amount = static_cast<uint32>(std::round(static_cast<float>(amount) * sPlayerbotAIConfig.RandomBotXPRate));
+        // otherwise apply bot XP multiplier (with the living-world pace).
+        amount = static_cast<uint32>(std::round(static_cast<float>(amount) * rate));
+        LivingWorldMgr::instance().LimitExperience(player, amount);
     }
 };
 
@@ -529,6 +541,7 @@ public:
         LOG_INFO("server.loading", "Load Playerbots Config...");
 
         sPlayerbotAIConfig.Initialize();
+        LivingWorldMgr::instance().Load();
 
         LOG_INFO("server.loading", ">> Loaded playerbots config in {} ms", GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");

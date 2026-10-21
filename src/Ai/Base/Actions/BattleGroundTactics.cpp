@@ -5,6 +5,9 @@
  */
 
 #include "BattleGroundTactics.h"
+
+#include <algorithm>
+
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "BattleGroundJoinAction.h"
@@ -24,13 +27,13 @@
 #include "Event.h"
 #include "GameObject.h"
 #include "IVMapMgr.h"
+#include "LivingWorldMgr.h"
 #include "PathGenerator.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "PvpTriggers.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
-#include <algorithm>
 
 // common bg positions
 Position const WS_WAITING_POS_HORDE_1 = {944.981f, 1423.478f, 345.434f, 6.18f};
@@ -3342,7 +3345,7 @@ bool BGTactics::resetObjective()
 
     // Change role if allowed by odds and not carrying flag
     if (urand(0, 99) < oddsToChangeRole && !isCarryingFlag)
-        context->GetValue<uint32>("bg role")->Set(urand(0, 9));
+        context->GetValue<uint32>("bg role")->Set(LivingWorldMgr::instance().GetBattlegroundRole(bot, urand(0, 9)));
 
     // Reset objective position
     PositionMap& posMap = context->GetValue<PositionMap&>("position")->Get();

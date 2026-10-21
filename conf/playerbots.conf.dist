@@ -2,6 +2,15 @@
 # PLAYERBOTS CONFIGURATION FILE                  #
 ##################################################
 
+# Persistent motivations and activity/battleground preferences for random bots.
+# Preserves established inventory, professions and money during routine maintenance.
+# New bots receive one starting loadout; normal XP respects era and saved twink caps.
+# Includes paid local profession training/supplies, crafting, processing, trader sales and auction/recovery mail.
+# Trader cohort is 15%; listings are capped at 20 per house and 2 per item.
+# Other upstream conveniences remain; this is not a fully earned economy.
+# Requires the living_profiles DB update.
+Playerbots.LivingWorld.Enabled = 0
+
 # Overview
 # "Randombot": randomly generated bots that log in separately from players and populate the world. Randombots may automatically grind, quest, level up, and upgrade equipment and can be invited to groups and given commands.
 # "AddClass bot": bots from the AddClassAccountPoolSize accounts. They are used for quickly adding a leveled and geared bot of any class to your party. They are recommended for a quick formation of a party.

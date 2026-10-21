@@ -5,7 +5,9 @@
  */
 
 #include "AutoMaintenanceOnLevelupAction.h"
+
 #include "BroadcastHelper.h"
+#include "LivingWorldMgr.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "RandomPlayerbotMgr.h"
@@ -78,7 +80,8 @@ void AutoMaintenanceOnLevelupAction::LearnSpells(std::ostringstream* out)
 void AutoMaintenanceOnLevelupAction::LearnTrainerSpells(std::ostringstream* /*out*/)
 {
     PlayerbotFactory factory(bot, bot->GetLevel());
-    factory.InitSkills();
+    if (!LivingWorldMgr::instance().IsEnabled(bot))
+        factory.InitSkills();
     factory.InitClassSpells();
     factory.InitAvailableSpells();
     factory.InitPet();
@@ -160,6 +163,9 @@ std::string const AutoMaintenanceOnLevelupAction::FormatSpell(SpellInfo const* s
 
 void AutoMaintenanceOnLevelupAction::AutoUpgradeEquip()
 {
+    if (LivingWorldMgr::instance().IsEnabled(bot))
+        return;
+
     if (!sRandomPlayerbotMgr.IsRandomBot(bot))
         return;
 

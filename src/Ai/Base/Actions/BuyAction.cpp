@@ -5,11 +5,13 @@
  */
 
 #include "BuyAction.h"
+
 #include "BudgetValues.h"
 #include "Event.h"
 #include "ItemCountValue.h"
 #include "ItemUsageValue.h"
 #include "ItemVisitors.h"
+#include "LivingWorldMgr.h"
 #include "Playerbots.h"
 #include "StatsWeightCalculator.h"
 
@@ -230,12 +232,13 @@ bool BuyAction::BuyItem(VendorItemData const* tItems, ObjectGuid vendorguid, Ite
             continue;
 
         uint32 botMoney = bot->GetMoney();
-        if (botAI->HasCheat(BotCheatMask::gold))
+        bool const grantGold = botAI->HasCheat(BotCheatMask::gold) && !LivingWorldMgr::instance().IsEnabled(bot);
+        if (grantGold)
             bot->SetMoney(10000000);
 
         bot->BuyItemFromVendorSlot(vendorguid, slot, itemId, 1, NULL_BAG, NULL_SLOT);
 
-        if (botAI->HasCheat(BotCheatMask::gold))
+        if (grantGold)
             bot->SetMoney(botMoney);
 
         uint32 newCount = bot->GetItemCount(itemId, false);

@@ -38,6 +38,10 @@
 #include "ImbueAction.h"
 #include "InviteToGroupAction.h"
 #include "LeaveGroupAction.h"
+#include "LivingEconomyActions.h"
+#include "LivingFieldActions.h"
+#include "LivingProcessingActions.h"
+#include "LivingProfessionActions.h"
 #include "LootAction.h"
 #include "LootRollAction.h"
 #include "MoveToRpgTargetAction.h"
@@ -78,6 +82,14 @@ class ActionContext : public NamedObjectContext<Action>
 public:
     ActionContext()
     {
+        creators["living train"] = &ActionContext::living_train;
+        creators["living craft"] = &ActionContext::living_craft;
+        creators["living processing"] = &ActionContext::living_processing;
+        creators["living fieldwork"] = &ActionContext::living_fieldwork;
+        creators["living restore weapons"] = &ActionContext::living_restore_weapons;
+        creators["living supplies"] = &ActionContext::living_supplies;
+        creators["living auction"] = &ActionContext::living_auction;
+        creators["living mail"] = &ActionContext::living_mail;
         creators["mark rti"] = &ActionContext::mark_rti;
         creators["set return position"] = &ActionContext::set_return_position;
         creators["rpg"] = &ActionContext::rpg;
@@ -282,6 +294,23 @@ public:
     }
 
 private:
+    static Action* living_train(PlayerbotAI* botAI) { return new LivingTrainAction(botAI); }
+    static Action* living_craft(PlayerbotAI* botAI) { return new LivingCraftAction(botAI); }
+    static Action* living_processing(PlayerbotAI* botAI) { return new LivingProcessingAction(botAI); }
+    static Action* living_fieldwork(PlayerbotAI* botAI) { return new LivingFieldAction(botAI); }
+    static Action* living_restore_weapons(PlayerbotAI* botAI) { return new LivingRestoreWeaponsAction(botAI); }
+    static Action* living_supplies(PlayerbotAI* botAI)
+    {
+        return new LivingEconomyAction(botAI, "living supplies", LivingEconomyJob::Supplies);
+    }
+    static Action* living_auction(PlayerbotAI* botAI)
+    {
+        return new LivingEconomyAction(botAI, "living auction", LivingEconomyJob::Auction);
+    }
+    static Action* living_mail(PlayerbotAI* botAI)
+    {
+        return new LivingEconomyAction(botAI, "living mail", LivingEconomyJob::Mail);
+    }
     static Action* give_water(PlayerbotAI* botAI) { return new GiveWaterAction(botAI); }
     static Action* give_food(PlayerbotAI* botAI) { return new GiveFoodAction(botAI); }
     static Action* ra(PlayerbotAI* botAI) { return new RemoveAuraAction(botAI); }

@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS `playerbots_living_profiles` (
+    `guid` INT UNSIGNED NOT NULL,
+    `motivation` TINYINT UNSIGNED NOT NULL,
+    `temperament` TINYINT UNSIGNED NOT NULL,
+    `level_cap` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    `initialized` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    `profile_version` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -12,6 +12,7 @@
 #include "GuildMgr.h"
 #include "GuildTaskMgr.h"
 #include "ItemUsageValue.h"
+#include "LivingProcessingActions.h"
 #include "LootObjectStack.h"
 #include "LootStrategyValue.h"
 #include "PlayerbotAIConfig.h"
@@ -394,6 +395,7 @@ bool StoreLootAction::Execute(Event event)
         return false;
 
     availableLoot->LootOpened(guid);
+    bool const processingLoot = LivingProfessions::IsProcessingLoot(bot, guid);
 
     if (!currentLoot)
         bot->SetLootGUID(guid);
@@ -423,14 +425,15 @@ bool StoreLootAction::Execute(Event event)
         if (lootslot_type != LOOT_SLOT_TYPE_ALLOW_LOOT && lootslot_type != LOOT_SLOT_TYPE_OWNER)
             continue;
 
-        if (loot_type != LOOT_SKINNING && !IsLootAllowed(itemid, botAI))
+        if (!processingLoot && loot_type != LOOT_SKINNING && !IsLootAllowed(itemid, botAI))
             continue;
 
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
         if (!proto)
             continue;
 
-        if (!IsRealPlayer(botAI->GetMaster()) && AI_VALUE(uint8, "bag space") > 80)
+        // Processing inputs are consumed on release. Take every output; core mail recovers overflow.
+        if (!processingLoot && !IsRealPlayer(botAI->GetMaster()) && AI_VALUE(uint8, "bag space") > 80)
         {
             uint32 maxStack = proto->GetMaxStackSize();
             if (maxStack == 1)

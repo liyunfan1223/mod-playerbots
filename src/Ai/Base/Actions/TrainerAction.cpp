@@ -5,10 +5,12 @@
  */
 
 #include "TrainerAction.h"
+
 #include "AiFactory.h"
 #include "BisListMgr.h"
 #include "BudgetValues.h"
 #include "Event.h"
+#include "LivingWorldMgr.h"
 #include "PlayerbotFactory.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
@@ -106,6 +108,10 @@ void TrainerAction::Iterate(Creature* creature, bool learnSpells, uint32 spellId
 
     Trainer::Trainer* trainer = sObjectMgr->GetTrainer(creature->GetEntry());
     if (!trainer)
+        return;
+
+    // Autonomous profession work owns its budget and era checks.
+    if (LivingWorldMgr::instance().IsEnabled(bot) && trainer->GetTrainerType() == Trainer::Type::Tradeskill)
         return;
 
     float reputationDiscount = bot->GetReputationPriceDiscount(creature);
