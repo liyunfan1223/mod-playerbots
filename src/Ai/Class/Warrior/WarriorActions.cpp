@@ -7,6 +7,7 @@
 #include "WarriorActions.h"
 #include "AiFactory.h"
 #include "Playerbots.h"
+#include "SpellAuraEffects.h"
 
 namespace
 {
@@ -16,6 +17,48 @@ constexpr uint32 SPELL_ICE_BLOCK = 45438;
 constexpr uint32 SPELL_BLESSING_OF_PROTECTION = 41450;
 constexpr uint32 SPELL_VIGILANCE = 50720;
 constexpr uint32 SPELL_SHATTERING_THROW = 64382;
+}
+
+// Used for trigger and isUseful: true if the bot's Battle Shout is stronger than any Blessing of Might on it.
+bool CastBattleShoutAction::CanApply(PlayerbotAI* botAI)
+{
+    Player* bot = botAI->GetBot();
+    uint32 spellId = botAI->GetAiObjectContext()->GetValue<uint32>("spell id", "battle shout")->Get();
+    if (!spellId)
+        return false;
+
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    if (!spellInfo)
+        return false;
+
+    for (uint8 eff = 0; eff < MAX_SPELL_EFFECTS; ++eff)
+    {
+        if (!spellInfo->Effects[eff].ApplyAuraName)
+            continue;
+
+        int32 const amount = spellInfo->Effects[eff].CalcValue(bot);
+        AuraType const auraType = AuraType(spellInfo->Effects[eff].ApplyAuraName);
+        for (AuraEffect const* existing : bot->GetAuraEffectsByType(auraType))
+        {
+            SpellInfo const* existingInfo = existing->GetSpellInfo();
+            if (existing->GetCasterGUID() == bot->GetGUID() && existingInfo->IsRankOf(spellInfo))
+                continue;
+
+            SpellGroupStackRule const rule = sSpellMgr->CheckSpellGroupStackRules(spellInfo, existingInfo);
+            if (rule != SPELL_GROUP_STACK_RULE_EXCLUSIVE_HIGHEST)
+                continue;
+
+            if (std::abs(amount) <= std::abs(existing->GetAmount()))
+                return false;
+        }
+    }
+
+    return true;
+}
+
+bool CastBattleShoutAction::isUseful()
+{
+    return CastBuffSpellAction::isUseful() && CanApply(botAI);
 }
 
 bool CastBerserkerRageAction::isPossible()

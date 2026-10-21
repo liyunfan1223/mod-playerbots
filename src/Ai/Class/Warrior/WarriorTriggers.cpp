@@ -6,6 +6,7 @@
 
 #include "WarriorTriggers.h"
 #include "Playerbots.h"
+#include "WarriorActions.h"
 
 namespace
 {
@@ -14,7 +15,6 @@ constexpr uint32 SPELL_SHATTERING_THROW = 64382;
 constexpr uint32 SPELL_DIVINE_SHIELD = 642;
 constexpr uint32 SPELL_ICE_BLOCK = 45438;
 constexpr uint32 SPELL_BLESSING_OF_PROTECTION = 41450;
-constexpr uint32 SPELL_COMMANDING_PRESENCE_RANKS[] = { 12318, 12857, 12858, 12860, 12861 };
 }
 
 bool BloodrageBuffTrigger::IsActive()
@@ -74,67 +74,5 @@ bool ShatteringThrowTrigger::IsActive()
 
 bool BattleShoutTrigger::IsActive()
 {
-    if (!BuffTrigger::IsActive())
-        return false;
-
-    uint32 battleShoutSpellId = AI_VALUE2(uint32, "spell id", "battle shout");
-    if (!battleShoutSpellId)
-        return false;
-
-    SpellInfo const* bsInfo = sSpellMgr->GetSpellInfo(battleShoutSpellId);
-    if (!bsInfo)
-        return false;
-
-    int32 bsApValue = 0;
-    for (uint8 eff = 0; eff < MAX_SPELL_EFFECTS; ++eff)
-    {
-        if (bsInfo->Effects[eff].ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
-        {
-            bsApValue = bsInfo->Effects[eff].BasePoints + 1;
-            break;
-        }
-    }
-    if (!bsApValue)
-        return false;
-
-    static const float commandingPresenceBonus[]   = {
-        0.05f, 0.10f, 0.15f, 0.20f, 0.25f };
-
-    float cpBonus = 0.0f;
-    for (int rank = 4; rank >= 0; --rank)
-    {
-        if (bot->HasAura(SPELL_COMMANDING_PRESENCE_RANKS[rank]))
-        {
-            cpBonus = commandingPresenceBonus[rank];
-            break;
-        }
-    }
-    int32 effectiveBsAp = int32(bsApValue * (1.0f + cpBonus));
-
-    static char const* blessingNames[] = {
-        "blessing of might", "greater blessing of might", nullptr
-    };
-    for (int i = 0; blessingNames[i] != nullptr; ++i)
-    {
-        Aura* bom = botAI->GetAura(blessingNames[i], bot);
-        if (!bom)
-            continue;
-
-        SpellInfo const* bomInfo = bom->GetSpellInfo();
-        if (!bomInfo)
-            continue;
-
-        for (uint8 eff = 0; eff < MAX_SPELL_EFFECTS; ++eff)
-        {
-            if (bomInfo->Effects[eff].ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
-            {
-                int32 bomApValue = bomInfo->Effects[eff].BasePoints + 1;
-                if (bomApValue >= effectiveBsAp)
-                    return false;
-                break;
-            }
-        }
-    }
-
-    return true;
+    return BuffTrigger::IsActive() && CastBattleShoutAction::CanApply(botAI);
 }

@@ -203,7 +203,6 @@ public:
         creators["challenging shout"] = &WarriorAiObjectContextInternal::challenging_shout;
         creators["shield wall"] = &WarriorAiObjectContextInternal::shield_wall;
         creators["battle shout"] = &WarriorAiObjectContextInternal::battle_shout;
-        creators["battle shout taunt"] = &WarriorAiObjectContextInternal::battle_shout_taunt;
         creators["thunder clap"] = &WarriorAiObjectContextInternal::thunder_clap;
         creators["taunt"] = &WarriorAiObjectContextInternal::taunt;
         creators["revenge"] = &WarriorAiObjectContextInternal::revenge;
@@ -283,7 +282,6 @@ private:
     static Action* challenging_shout(PlayerbotAI* botAI) { return new CastChallengingShoutAction(botAI); }
     static Action* shield_wall(PlayerbotAI* botAI) { return new CastShieldWallAction(botAI); }
     static Action* battle_shout(PlayerbotAI* botAI) { return new CastBattleShoutAction(botAI); }
-    static Action* battle_shout_taunt(PlayerbotAI* botAI) { return new CastBattleShoutTauntAction(botAI); }
     static Action* thunder_clap(PlayerbotAI* botAI) { return new CastThunderClapAction(botAI); }
     static Action* shield_bash_on_enemy_healer(PlayerbotAI* botAI)
     {
