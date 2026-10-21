@@ -15,7 +15,7 @@ INSERT INTO `ai_playerbot_texts`
  `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`,
  `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`)
 VALUES (
-1928,
+1947,
 'pvp_loadout_announce',
 'Going in as %spec, average item level %ilvl, geared for rating %rating',
 0, 0,
