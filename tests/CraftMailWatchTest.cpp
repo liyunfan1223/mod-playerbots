@@ -76,3 +76,25 @@ TEST(CraftMailWatch, AnOpenOrderIsNeverIdle)
     EXPECT_FALSE(Order().IsIdle(NOW));
     EXPECT_FALSE(Order().IsIdle(NOW + MAIL_WATCH_SECONDS));
 }
+
+namespace
+{
+constexpr uint32 THREE_DAYS = 3 * 24 * 60 * 60;
+}
+
+TEST(CraftMailWait, CountsFromDelivery)
+{
+    EXPECT_FALSE(HasWaited(NOW, NOW, THREE_DAYS));
+    EXPECT_FALSE(HasWaited(NOW, NOW + THREE_DAYS - 1, THREE_DAYS));
+    EXPECT_TRUE(HasWaited(NOW, NOW + THREE_DAYS, THREE_DAYS));
+    EXPECT_TRUE(HasWaited(NOW, NOW + 10 * THREE_DAYS, THREE_DAYS));
+}
+
+TEST(CraftMailWait, NoWaitMeansAnyDeliveredMail) { EXPECT_TRUE(HasWaited(NOW, NOW, 0)); }
+
+TEST(CraftMailWait, MailNotYetDeliveredHasNotWaited)
+{
+    // Mail sent with a delivery delay is not in the mailbox yet.
+    EXPECT_FALSE(HasWaited(NOW + 60, NOW, 0));
+    EXPECT_FALSE(HasWaited(NOW + 60, NOW, THREE_DAYS));
+}
