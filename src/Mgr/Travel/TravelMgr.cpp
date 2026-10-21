@@ -4505,6 +4505,27 @@ const std::vector<WorldLocation> TravelMgr::GetTravelHubs(Player* bot)
     return locs;
 }
 
+bool TravelMgr::SelectAuctioneerByMap(Player* bot, NpcLocation& outAuctioneer)
+{
+    bool const alliance = bot->GetTeamId() == TEAM_ALLIANCE;
+    float best = 0.0f;
+    bool found = false;
+    for (Auctioneer const& auctioneer : auctioneers)
+    {
+        if (auctioneer.npc.loc.GetMapId() != bot->GetMapId() ||
+            !(alliance ? auctioneer.forAlliance : auctioneer.forHorde))
+            continue;
+        float const distance = bot->GetExactDist(auctioneer.npc.loc);
+        if (!found || distance < best)
+        {
+            outAuctioneer = auctioneer.npc;
+            best = distance;
+            found = true;
+        }
+    }
+    return found;
+}
+
 std::vector<uint32> const& TravelMgr::GetGearHuntEntries(uint8 level) const
 {
     static std::vector<uint32> const none;
@@ -4835,6 +4856,17 @@ void TravelMgr::PrepareDestinationCache()
                     innkeepersCount++;
                 }
             }
+        }
+        // === AUCTIONEERS === (living-world traders walk to these to sell surplus)
+        else if (creatureTemplate->npcflag & UNIT_NPC_FLAG_AUCTIONEER)
+        {
+            FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(creatureTemplate->faction);
+            if (factionEntry)
+                auctioneers.push_back({{WorldLocation(mapId, x + cos(orient) * 3.0f, y + sin(orient) * 3.0f, z + 0.5f,
+                                                      orient + M_PI),
+                                        templateEntry},
+                                       !(factionEntry->hostileMask & 2),
+                                       !(factionEntry->hostileMask & 4)});
         }
         // === BANKERS ===
         else if (creatureTemplate->npcflag & UNIT_NPC_FLAG_BANKER &&

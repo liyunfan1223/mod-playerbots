@@ -16,6 +16,12 @@ inline constexpr uint32_t MaxLivingItemAuctions = 2;
 inline constexpr uint32_t MoneyLimit = 2147483647;
 inline constexpr uint32_t PostmasterEntry = 34337;
 
+// Traders travel to sell only when the auctioneer is out of reach (selling starts within 40
+// yards) but on the same continent and not absurdly far (MoveFarTo handles long walks).
+inline constexpr float MarketReach = 40.0f;
+inline constexpr float MaxMarketTrip = 3000.0f;
+constexpr bool WorthMarketTrip(float distance) { return distance > MarketReach && distance <= MaxMarketTrip; }
+
 inline uint32_t Surplus(uint32_t owned, uint32_t reserve, uint32_t stack)
 {
     return owned > reserve ? std::min(owned - reserve, stack) : 0;

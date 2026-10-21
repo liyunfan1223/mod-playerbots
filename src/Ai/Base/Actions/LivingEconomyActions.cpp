@@ -21,6 +21,7 @@
 #include "Mail.h"
 #include "PlayerbotWorldThreadProcessor.h"
 #include "Playerbots.h"
+#include "TravelMgr.h"
 
 namespace LivingProfessions
 {
@@ -513,6 +514,27 @@ LivingEconomyPlan LivingEconomyValue::Calculate()
             }
         }
     return result.item.IsEmpty() ? LivingEconomyPlan{} : result;
+}
+
+LivingMarketTrip LivingMarketTripValue::Calculate()
+{
+    LivingMarketTrip trip;
+    if (!LivingProfessions::CanWork(botAI) || !IsTrader(bot))
+        return trip;
+    Stock const stock = ProfessionStock(bot);
+    bool hasGoods = false;
+    for (Item* item : BagItems(bot))
+        if (SaleCount(botAI, item, stock))
+        {
+            hasGoods = true;
+            break;
+        }
+    TravelMgr::NpcLocation auctioneer;
+    if (!hasGoods || !sTravelMgr.SelectAuctioneerByMap(bot, auctioneer))
+        return trip;
+    trip.go = LivingWorld::WorthMarketTrip(bot->GetExactDist(auctioneer.loc));
+    trip.destination = auctioneer.loc;
+    return trip;
 }
 
 bool LivingEconomyAction::isUseful() { return LivingProfessions::CanWork(botAI); }

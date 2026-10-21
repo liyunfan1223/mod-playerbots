@@ -5,12 +5,15 @@
  */
 
 #include "NewRpgAction.h"
+#include "AiObjectContext.h"
 #include "AreaDefines.h"
 #include "BroadcastHelper.h"
 #include "ChatHelper.h"
 #include "DBCStores.h"
 #include "GossipDef.h"
 #include "IVMapMgr.h"
+#include "LivingEconomyActions.h"
+#include "LivingEconomyPolicy.h"
 #include "MotionMaster.h"
 #include "MoveSpline.h"
 #include "NewRpgInfo.h"
@@ -398,6 +401,12 @@ bool NewRpgWanderRandomAction::Execute(Event /*event*/)
 bool NewRpgWanderNpcAction::Execute(Event /*event*/)
 {
     if (SearchQuestGiverAndAcceptOrReward())
+        return true;
+
+    // A trader with goods to sell visits the auction house rather than a random NPC.
+    LivingMarketTrip const trip =
+        botAI->GetAiObjectContext()->GetValue<LivingMarketTrip>("living market trip")->Get();
+    if (trip.go && bot->GetExactDist(trip.destination) > LivingWorld::MarketReach && MoveFarTo(trip.destination))
         return true;
 
     NewRpgInfo& info = botAI->rpgInfo;

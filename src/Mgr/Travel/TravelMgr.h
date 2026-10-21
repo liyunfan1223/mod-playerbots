@@ -1008,6 +1008,13 @@ private:
     std::map<uint8, std::vector<BankerLocation>> bankerLocsPerLevelCache;
     std::unordered_map<uint32, WorldLocation> bankerEntryToLocation;
     std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
+    struct Auctioneer
+    {
+        NpcLocation npc;
+        bool forAlliance;
+        bool forHorde;
+    };
+    std::vector<Auctioneer> auctioneers;
     std::map<uint8, std::vector<uint32>> gearHuntEntriesPerLevel;
     std::unordered_map<uint32, std::vector<WorldLocation>> gearHuntLocs;
     std::unordered_map<uint32, std::vector<uint32>> gearDrops;

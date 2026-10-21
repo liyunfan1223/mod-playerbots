@@ -62,6 +62,21 @@ private:
     LivingEconomyJob _job;
 };
 
+// A trader holding surplus to sell heads for the nearest friendly auctioneer on its map when it
+// goes visiting NPCs; once within reach, the "living auction" job lists the goods.
+struct LivingMarketTrip
+{
+    bool go = false;
+    WorldLocation destination;
+};
+
+class LivingMarketTripValue : public CalculatedValue<LivingMarketTrip>
+{
+public:
+    LivingMarketTripValue(PlayerbotAI* botAI) : CalculatedValue(botAI, "living market trip", 60000) {}
+    LivingMarketTrip Calculate() override;
+};
+
 class LivingEconomyAction : public MovementAction
 {
 public:
