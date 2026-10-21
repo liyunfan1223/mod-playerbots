@@ -6,6 +6,8 @@
 
 #include "PlayerbotSecurity.h"
 #include "LFGMgr.h"
+#include "LivingBondMgr.h"
+#include "LivingWorldMgr.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
@@ -78,6 +80,23 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             return PLAYERBOT_SECURITY_TALK;
         }
 
+        // Living-world bonds: rivals are refused; friends are trusted like guildmates below.
+        bool trusted = false;
+        if (LivingWorldMgr::instance().IsEnabled(bot))
+        {
+            LivingWorld::Attitude const attitude =
+                LivingBondMgr::instance().AttitudeOf(bot->GetGUID().GetCounter(), from->GetGUID().GetCounter());
+            if (attitude == LivingWorld::Attitude::Rival)
+            {
+                if (reason)
+                    *reason = PLAYERBOT_DENY_RIVAL;
+
+                return PLAYERBOT_SECURITY_TALK;
+            }
+            trusted = LivingWorld::TrustsLikeGuildmate(attitude);
+        }
+        bool const guildmate = bot->GetGuildId() && bot->GetGuildId() == from->GetGuildId();
+
         if (sPlayerbotAIConfig.GroupInvitationPermission <= 0)
         {
             if (reason)
@@ -91,7 +110,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             int32 levelDiff = int32(bot->GetLevel()) - int32(from->GetLevel());
             if (levelDiff > 5)
             {
-                if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
+                if (!guildmate && !trusted)
                 {
                     if (reason)
                         *reason = PLAYERBOT_DENY_LOW_LEVEL;
@@ -104,7 +123,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         int32 botGS = static_cast<int32>(botAI->GetEquipGearScore(bot));
         int32 fromGS = static_cast<int32>(botAI->GetEquipGearScore(from));
 
-        if (sPlayerbotAIConfig.GearScoreCheck && botGS && bot->GetLevel() > 15 && botGS > fromGS)
+        if (sPlayerbotAIConfig.GearScoreCheck && !trusted && botGS && bot->GetLevel() > 15 && botGS > fromGS)
         {
             uint32 diffPct = uint32(100 * (botGS - fromGS) / botGS);
             uint32 reqPct = uint32(12 * sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) / from->GetLevel());
@@ -120,7 +139,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
 
         if (bot->InBattlegroundQueue())
         {
-            if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
+            if (!guildmate && !trusted)
             {
                 if (reason)
                     *reason = PLAYERBOT_DENY_BG;
@@ -264,6 +283,24 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
                     break;
                 case PLAYERBOT_DENY_LFG:
                     out << "I am in a queue for dungeon. Will do it later";
+                    break;
+                case PLAYERBOT_DENY_RIVAL:
+                    switch (LivingWorld::MainGrudge(
+                        LivingBondMgr::instance().Get(bot->GetGUID().GetCounter(), from->GetGUID().GetCounter())))
+                    {
+                        case LivingWorld::Grudge::Ninja:
+                            out << "Not after you ninja'd that loot. No.";
+                            break;
+                        case LivingWorld::Grudge::Kills:
+                            out << "You've killed me one too many times. No.";
+                            break;
+                        case LivingWorld::Grudge::Slights:
+                            out << "After last time? No thanks.";
+                            break;
+                        default:
+                            out << "I'd rather not.";
+                            break;
+                    }
                     break;
                 default:
                     out << "I can't do that";

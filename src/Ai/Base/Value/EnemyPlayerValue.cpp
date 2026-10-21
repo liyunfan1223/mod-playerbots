@@ -6,6 +6,8 @@
 
 #include "EnemyPlayerValue.h"
 #include "CombatManager.h"
+#include "LivingBondMgr.h"
+#include "LivingWorldMgr.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
@@ -54,6 +56,15 @@ Unit* EnemyPlayerValue::Calculate()
             controllingVehicle = true;
     }
 
+    // Living-world grudges: rivals (e.g. players who ganked this bot) are fought first.
+    bool const grudges = LivingWorldMgr::instance().IsEnabled(bot);
+    auto const isRival = [&](Unit const* unit)
+    {
+        return grudges && unit->IsPlayer() &&
+               LivingBondMgr::instance().AttitudeOf(bot->GetGUID().GetCounter(), unit->GetGUID().GetCounter()) ==
+                   LivingWorld::Attitude::Rival;
+    };
+
     // 1. Check units we are currently in PvP combat with.
     std::vector<Unit*> targets;
     Unit* pVictim = bot->GetVictim();
@@ -76,7 +87,12 @@ Unit* EnemyPlayerValue::Calculate()
     {
         std::sort(targets.begin(), targets.end(),
                   [&](Unit const* pUnit1, Unit const* pUnit2)
-                  { return bot->GetDistance(pUnit1) < bot->GetDistance(pUnit2); });
+                  {
+                      bool const rival1 = isRival(pUnit1);
+                      if (rival1 != isRival(pUnit2))
+                          return rival1;
+                      return bot->GetDistance(pUnit1) < bot->GetDistance(pUnit2);
+                  });
 
         return *targets.begin();
     }
@@ -85,6 +101,15 @@ Unit* EnemyPlayerValue::Calculate()
 
     GuidVector players = AI_VALUE(GuidVector, "nearest enemy players");
     float const maxAggroDistance = GetMaxAttackDistance();
+    // A rival in reach is chosen before nearer strangers, from the full aggro distance whatever its health.
+    if (grudges && !controllingVehicle && !passenger)
+        for (auto const& gTarget : players)
+        {
+            Player* rival = dynamic_cast<Player*>(botAI->GetUnit(gTarget));
+            if (rival && rival != pVictim && isRival(rival) && bot->IsWithinDist(rival, maxAggroDistance) &&
+                bot->IsWithinLOSInMap(rival) && fabs(bot->GetPositionZ() - rival->GetPositionZ()) < 30.0f)
+                return rival;
+        }
     for (auto const& gTarget : players)
     {
         Unit* pUnit = botAI->GetUnit(gTarget);

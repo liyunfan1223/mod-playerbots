@@ -23,6 +23,14 @@ void PlayerbotsDatabaseConnection::DoPrepareStatements()
         "INSERT INTO playerbots_living_profiles (guid, motivation, temperament, level_cap, initialized) "
         "VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE initialized = GREATEST(initialized, VALUES(initialized))",
         CONNECTION_ASYNC);
+    PrepareStatement(PLAYERBOTS_SEL_LIVING_BONDS,
+                     "SELECT bot, other, score, quests, bosses, battlegrounds, minutes, helps, duels, kills, ninjas, "
+                     "slights, last_seen FROM playerbots_living_bonds",
+                     CONNECTION_SYNCH);
+    PrepareStatement(PLAYERBOTS_UPSERT_LIVING_BOND,
+                     "REPLACE INTO playerbots_living_bonds (bot, other, score, quests, bosses, battlegrounds, minutes, "
+                     "helps, duels, kills, ninjas, slights, last_seen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                     CONNECTION_ASYNC);
 
     PrepareStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER, "SELECT DISTINCT name FROM playerbots_custom_strategy WHERE owner = ?", CONNECTION_SYNCH);
     PrepareStatement(PLAYERBOTS_SEL_CUSTOM_STRATEGY_BY_OWNER_AND_NAME, "SELECT idx, action_line FROM playerbots_custom_strategy WHERE owner = ? AND name = ? ORDER BY idx", CONNECTION_SYNCH);

@@ -36,7 +36,8 @@ enum DenyReason
     PLAYERBOT_DENY_NOT_LEADER,
     PLAYERBOT_DENY_IS_LEADER,
     PLAYERBOT_DENY_BG,
-    PLAYERBOT_DENY_LFG
+    PLAYERBOT_DENY_LFG,
+    PLAYERBOT_DENY_RIVAL  // living-world bond: the bot holds a grudge against the asker
 };
 
 class PlayerbotSecurity

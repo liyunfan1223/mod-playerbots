@@ -20,6 +20,7 @@
 #include "GatherNodeMgr.h"
 #include "GlobalScript.h"
 #include "GuildTaskMgr.h"
+#include "LivingBondMgr.h"
 #include "LivingWorldMgr.h"
 #include "PlayerScript.h"
 #include "PlayerbotAIConfig.h"
@@ -542,6 +543,7 @@ public:
 
         sPlayerbotAIConfig.Initialize();
         LivingWorldMgr::instance().Load();
+        LivingBondMgr::instance().Load();
 
         LOG_INFO("server.loading", ">> Loaded playerbots config in {} ms", GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
@@ -629,6 +631,7 @@ void AddSC_HyjalBotScripts();
 void AddSC_IcecrownBotScripts();
 void AddSC_RubySanctumBotScripts();
 void AddSC_randombot_level_mgr();
+void AddLivingBondScripts();
 
 void AddPlayerbotsScripts()
 {
@@ -653,4 +656,5 @@ void AddPlayerbotsScripts()
     AddSC_IcecrownBotScripts();
     AddSC_RubySanctumBotScripts();
     AddSC_randombot_level_mgr();
+    AddLivingBondScripts();
 }
