@@ -95,6 +95,7 @@
 #include "TradeValues.h"
 #include "Value.h"
 #include "WaitForAttackTimeValue.h"
+#include "WorldResurrectTargetValue.h"
 
 class PlayerbotAI;
 
@@ -103,6 +104,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
 public:
     ValueContext()
     {
+        creators["world resurrect target"] = &ValueContext::WorldResurrectTarget;
         creators["active spell"] = &ValueContext::active_spell;
         creators["craft"] = &ValueContext::craft;
         creators["collision"] = &ValueContext::collision;
@@ -333,6 +335,7 @@ public:
     }
 
 private:
+    static UntypedValue* WorldResurrectTarget(PlayerbotAI* botAI) { return new WorldResurrectTargetValue(botAI); }
     static UntypedValue* party_member_without_water(PlayerbotAI* botAI)
     {
         return new PartyMemberWithoutWaterValue(botAI);

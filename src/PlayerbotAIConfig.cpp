@@ -5,6 +5,13 @@
  */
 
 #include "PlayerbotAIConfig.h"
+
+#include <algorithm>
+#include <cctype>
+#include <cmath>
+#include <iostream>
+#include <sstream>
+
 #include "BisListMgr.h"
 #include "Config.h"
 #include "NewRpgInfo.h"
@@ -17,9 +24,6 @@
 #include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 #include "TravelMgr.h"
-#include <cctype>
-#include <iostream>
-#include <sstream>
 
 template <class T>
 void LoadList(std::string const value, T& list)
@@ -122,6 +126,26 @@ bool PlayerbotAIConfig::Initialize()
     RpgDistance = sConfigMgr->GetOption<float>("Playerbots.RpgDistance", 200.0f);
     GrindDistance = sConfigMgr->GetOption<float>("Playerbots.GrindDistance", 75.0f);
     ReactDistance = sConfigMgr->GetOption<float>("Playerbots.ReactDistance", 150.0f);
+
+    WorldResurrectEnabled = sConfigMgr->GetOption<bool>("Playerbots.WorldResurrect.Enable", true);
+    constexpr float defaultWorldResurrectDistance = 30.0f;
+    constexpr float minWorldResurrectDistance = 1.0f;
+    constexpr float maxWorldResurrectDistance = 60.0f;
+    WorldResurrectDistance =
+        sConfigMgr->GetOption<float>("Playerbots.WorldResurrect.Distance", defaultWorldResurrectDistance);
+    if (!std::isfinite(WorldResurrectDistance))
+    {
+        LOG_WARN("playerbots", "Playerbots.WorldResurrect.Distance must be finite; using {} yards.",
+                 defaultWorldResurrectDistance);
+        WorldResurrectDistance = defaultWorldResurrectDistance;
+    }
+    else if (WorldResurrectDistance < minWorldResurrectDistance || WorldResurrectDistance > maxWorldResurrectDistance)
+    {
+        LOG_WARN("playerbots", "Playerbots.WorldResurrect.Distance {} is outside {}..{} yards; clamping it.",
+                 WorldResurrectDistance, minWorldResurrectDistance, maxWorldResurrectDistance);
+        WorldResurrectDistance =
+            std::clamp(WorldResurrectDistance, minWorldResurrectDistance, maxWorldResurrectDistance);
+    }
 
     CriticalHealth = sConfigMgr->GetOption<int32>("Playerbots.CriticalHealth", 25);
     LowHealth = sConfigMgr->GetOption<int32>("Playerbots.LowHealth", 45);

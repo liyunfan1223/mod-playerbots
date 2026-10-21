@@ -69,6 +69,7 @@
 #include "VehicleActions.h"
 #include "WaitForAttackAction.h"
 #include "WorldBuffAction.h"
+#include "WorldResurrectAction.h"
 #include "XpGainAction.h"
 
 class PlayerbotAI;
@@ -95,6 +96,8 @@ public:
         creators["reach melee"] = &ActionContext::ReachMelee;
         creators["reach party member to heal"] = &ActionContext::reach_party_member_to_heal;
         creators["reach party member to resurrect"] = &ActionContext::reach_party_member_to_resurrect;
+        creators["world resurrect"] = &ActionContext::WorldResurrect;
+        creators["reach world resurrect target"] = &ActionContext::ReachWorldResurrectTarget;
         creators["flee"] = &ActionContext::flee;
         creators["flee with pet"] = &ActionContext::flee_with_pet;
         creators["avoid aoe"] = &ActionContext::avoid_aoe;
@@ -282,6 +285,8 @@ public:
     }
 
 private:
+    static Action* WorldResurrect(PlayerbotAI* botAI) { return new WorldResurrectAction(botAI); }
+    static Action* ReachWorldResurrectTarget(PlayerbotAI* botAI) { return new ReachWorldResurrectTargetAction(botAI); }
     static Action* give_water(PlayerbotAI* botAI) { return new GiveWaterAction(botAI); }
     static Action* give_food(PlayerbotAI* botAI) { return new GiveFoodAction(botAI); }
     static Action* ra(PlayerbotAI* botAI) { return new RemoveAuraAction(botAI); }
