@@ -11,6 +11,7 @@
 #include "CharacterPackets.h"
 #include "ChatHelper.h"
 #include "CheckMountStateAction.h"
+#include "CraftValue.h"
 #include "Common.h"
 #include "CreatureData.h"
 #include "DBCStores.h"
@@ -5561,7 +5562,8 @@ Item* PlayerbotAI::FindItemInInventory(std::function<bool(ItemTemplate const*)> 
         if (Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
         {
             ItemTemplate const* pItemProto = pItem->GetTemplate();
-            if (pItemProto && bot->CanUseItem(pItemProto) == EQUIP_ERR_OK && checkItem(pItemProto))
+            if (pItemProto && bot->CanUseItem(pItemProto) == EQUIP_ERR_OK && checkItem(pItemProto) &&
+                !IsReservedItem(pItemProto->ItemId))
                 return pItem;
         }
     }
@@ -5576,7 +5578,8 @@ Item* PlayerbotAI::FindItemInInventory(std::function<bool(ItemTemplate const*)> 
                 if (Item* const pItem = bot->GetItemByPos(bag, slot))
                 {
                     ItemTemplate const* pItemProto = pItem->GetTemplate();
-                    if (pItemProto && bot->CanUseItem(pItemProto) == EQUIP_ERR_OK && checkItem(pItemProto))
+                    if (pItemProto && bot->CanUseItem(pItemProto) == EQUIP_ERR_OK && checkItem(pItemProto) &&
+                        !IsReservedItem(pItemProto->ItemId))
                         return pItem;
                 }
             }
@@ -5592,6 +5595,16 @@ Item* PlayerbotAI::FindPoison() const
     return FindItemInInventory([](ItemTemplate const* pItemProto) -> bool
                                { return pItemProto->Class == ITEM_CLASS_CONSUMABLE && pItemProto->SubClass == 6; });
 }
+
+CraftData& PlayerbotAI::GetCraftOrder() const
+{
+    if (!_craftOrder)
+        _craftOrder = &aiObjectContext->GetValue<CraftData&>("craft")->Get();
+
+    return *_craftOrder;
+}
+
+bool PlayerbotAI::IsReservedItem(uint32 itemId) const { return GetCraftOrder().IsReserved(itemId); }
 
 // Find Ammo
 Item* PlayerbotAI::FindAmmo() const

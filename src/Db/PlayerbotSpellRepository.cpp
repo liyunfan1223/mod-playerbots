@@ -70,11 +70,22 @@ void PlayerbotSpellRepository::Initialize()
             _ridingSkillByMount.try_emplace(itr->second, rank);
     }
 
+    std::unordered_map<uint32, std::vector<SkillLineAbilityEntry const*>> abilitiesBySkill;
     for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
     {
-        if (SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j))
-            skillSpells[skillLine->Spell] = skillLine;
+        SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
+        if (!skillLine)
+            continue;
+
+        skillSpells[skillLine->Spell] = skillLine;
+
+        // Only professions have a profession link.
+        SkillLineEntry const* skill = sSkillLineStore.LookupEntry(skillLine->SkillLine);
+        if (skill && (skill->categoryId == SKILL_CATEGORY_PROFESSION || skill->categoryId == SKILL_CATEGORY_SECONDARY))
+            abilitiesBySkill[skillLine->SkillLine].push_back(skillLine);
     }
+
+    InitTradeSkillLinks(abilitiesBySkill);
 
     for (uint32 spellId = 0; spellId < sSpellMgr->GetSpellInfoStoreSize(); ++spellId)
     {
@@ -107,6 +118,57 @@ void PlayerbotSpellRepository::Initialize()
 
     LOG_DEBUG("playerbots", "ListSpellsAction: initialized caches (skillSpells={}, vendorItems={}).",
               skillSpells.size(), vendorItems.size());
+}
+
+// The client numbers a profession's link bits over all of its SkillLineAbility rows, sorted by
+// MinSkillLineRank and then by row ID; the link carries no list, so this order must match the client's DBC.
+void PlayerbotSpellRepository::InitTradeSkillLinks(
+    std::unordered_map<uint32, std::vector<SkillLineAbilityEntry const*>>& abilitiesBySkill)
+{
+    for (auto& [skillId, abilities] : abilitiesBySkill)
+    {
+        std::sort(abilities.begin(), abilities.end(),
+                  [](SkillLineAbilityEntry const* lhs, SkillLineAbilityEntry const* rhs)
+                  {
+                      if (lhs->MinSkillLineRank != rhs->MinSkillLineRank)
+                          return lhs->MinSkillLineRank < rhs->MinSkillLineRank;
+                      return lhs->ID < rhs->ID;
+                  });
+
+        TradeSkillLinkData data{0, {}};
+        data.entries.reserve(abilities.size());
+        for (SkillLineAbilityEntry const* ability : abilities)
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(ability->Spell);
+            if (!data.tradeSpellId && spellInfo && spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_TRADE_SKILL)
+                data.tradeSpellId = ability->Spell;
+
+            bool bindOnPickup = false;
+            if (spellInfo)
+            {
+                for (SpellEffectInfo const& effect : spellInfo->GetEffects())
+                {
+                    if (effect.Effect != SPELL_EFFECT_CREATE_ITEM || !effect.ItemType)
+                        continue;
+
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(effect.ItemType);
+                    if (proto && proto->Bonding == BIND_WHEN_PICKED_UP)
+                        bindOnPickup = true;
+                }
+            }
+
+            data.entries.push_back({ability->Spell, bindOnPickup});
+        }
+
+        if (data.tradeSpellId)
+            _tradeSkillLinks.emplace(skillId, std::move(data));
+    }
+}
+
+TradeSkillLinkData const* PlayerbotSpellRepository::GetTradeSkillLinkData(uint32 skillId) const
+{
+    auto const itr = _tradeSkillLinks.find(skillId);
+    return itr != _tradeSkillLinks.end() ? &itr->second : nullptr;
 }
 
 SkillLineAbilityEntry const* PlayerbotSpellRepository::GetSkillLine(uint32 spellId) const

@@ -329,14 +329,19 @@ ObjectGuid MailProcessor::FindMailbox(PlayerbotAI* botAI)
 {
     GuidVector gos = *botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest game objects");
     ObjectGuid mailbox;
+    float nearest = 0.0f;
     for (ObjectGuid const guid : gos)
     {
-        if (GameObject* go = botAI->GetGameObject(guid))
-            if (go->GetGoType() == GAMEOBJECT_TYPE_MAILBOX)
-            {
-                mailbox = go->GetGUID();
-                break;
-            }
+        GameObject* go = botAI->GetGameObject(guid);
+        if (!go || go->GetGoType() != GAMEOBJECT_TYPE_MAILBOX)
+            continue;
+
+        float const dist = botAI->GetBot()->GetDistance(go);
+        if (!mailbox || dist < nearest)
+        {
+            mailbox = go->GetGUID();
+            nearest = dist;
+        }
     }
 
     return mailbox;

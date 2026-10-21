@@ -5,6 +5,7 @@
  */
 
 #include "TradeStatusAction.h"
+#include "CraftOrder.h"
 #include "CraftValue.h"
 #include "Event.h"
 #include "GuildTaskMgr.h"
@@ -15,7 +16,6 @@
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
 #include "RandomPlayerbotMgr.h"
-#include "SetCraftAction.h"
 
 bool TradeStatusAction::Execute(Event event)
 {
@@ -99,27 +99,9 @@ bool TradeStatusAction::Execute(Event event)
             }
 
             for (std::map<uint32, uint32>::iterator i = givenItemIds.begin(); i != givenItemIds.end(); ++i)
-            {
-                uint32 itemId = i->first;
-                uint32 count = i->second;
+                GuildTaskMgr::instance().CheckItemTask(i->first, i->second, trader, bot);
 
-                CraftData& craftData = AI_VALUE(CraftData&, "craft");
-                if (!craftData.IsEmpty() && craftData.IsRequired(itemId))
-                    craftData.AddObtained(itemId, count);
-
-                GuildTaskMgr::instance().CheckItemTask(itemId, count, trader, bot);
-            }
-
-            for (std::map<uint32, uint32>::iterator i = takenItemIds.begin(); i != takenItemIds.end(); ++i)
-            {
-                uint32 itemId = i->first;
-                uint32 count = i->second;
-
-                CraftData& craftData = AI_VALUE(CraftData&, "craft");
-                if (!craftData.IsEmpty() && craftData.itemId == itemId)
-                    craftData.Crafted(count);
-            }
-
+            CraftOrder::OnTradeCompleted(botAI, trader, givenItemIds, takenItemIds);
             return true;
         }
     }
@@ -142,6 +124,9 @@ void TradeStatusAction::BeginTrade()
 
     WorldPacket p;
     bot->GetSession()->HandleBeginTradeOpcode(p);
+
+    if (CraftOrder::OfferCraftedItems(botAI, trader))
+        return;
 
     ListItemsVisitor visitor;
     IterateItems(&visitor);
@@ -228,6 +213,9 @@ bool TradeStatusAction::CheckTrade()
         return true;
     }
 
+    if (!CraftOrder::CheckTrade(botAI, trader))
+        return false;
+
     int32 botItemsMoney = CalculateCost(bot, true);
     int32 botMoney = bot->GetTradeData()->GetMoney() + botItemsMoney;
     int32 playerItemsMoney = CalculateCost(trader, false);
@@ -248,10 +236,13 @@ bool TradeStatusAction::CheckTrade()
                      LANG_UNIVERSAL, trader);
         return false;
     }
+    // CraftOrder::CheckTrade let through only the crafted items the customer is owed; their price is the craft fee.
+    CraftData const& craftData = botAI->GetCraftOrder();
     for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
     {
         Item* item = bot->GetTradeData()->GetItem((TradeSlots)slot);
-        if (item && !item->GetTemplate()->SellPrice && !item->GetTemplate()->IsConjuredConsumable())
+        bool const isCraftedOrder = item && craftData.IsReserved(item->GetEntry());
+        if (item && !isCraftedOrder && !item->GetTemplate()->SellPrice && !item->GetTemplate()->IsConjuredConsumable())
         {
             std::ostringstream out;
             botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
@@ -355,6 +346,10 @@ int32 TradeStatusAction::CalculateCost(Player* player, bool sell)
     if (!data)
         return 0;
 
+    CraftData const& craftData = botAI->GetCraftOrder();
+    bool const isCustomer = trader && craftData.IsCustomer(trader->GetGUID());
+    bool craftedItems = false;
+
     uint32 sum = 0;
     for (uint32 slot = 0; slot < TRADE_SLOT_TRADED_COUNT; ++slot)
     {
@@ -369,15 +364,15 @@ int32 TradeStatusAction::CalculateCost(Player* player, bool sell)
         if (proto->Quality < ITEM_QUALITY_NORMAL)
             return 0;
 
-        CraftData& craftData = AI_VALUE(CraftData&, "craft");
-        if (!craftData.IsEmpty())
+        if (isCustomer)
         {
+            // The customer's reagents are theirs; the bot only charges its fee, once, for the crafted items.
             if (player == trader && !sell && craftData.IsRequired(proto->ItemId))
                 continue;
 
-            if (player == bot && sell && craftData.itemId == proto->ItemId && craftData.IsFulfilled())
+            if (player == bot && sell && craftData.IsCrafted() && craftData.itemId == proto->ItemId)
             {
-                sum += item->GetCount() * SetCraftAction::GetCraftFee(craftData);
+                craftedItems = true;
                 continue;
             }
         }
@@ -389,6 +384,10 @@ int32 TradeStatusAction::CalculateCost(Player* player, bool sell)
             sum += item->GetCount() * proto->BuyPrice * sRandomPlayerbotMgr.GetBuyMultiplier(bot);
 
     }
+
+    // The craft fee covers every crafted item in the trade, so it is added once.
+    if (craftedItems && !craftData.FeePaid())
+        sum += CraftOrder::GetFee(bot, craftData, craftData.crafted);
 
     return sum;
 }

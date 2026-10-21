@@ -93,16 +93,14 @@ std::string const WhoAction::QuerySkill(std::string const text)
     if (!skill || !botAI->HasSkill((SkillType)skill))
         return "";
 
-    std::string const skillName = chat->FormatSkill(skill);
-    uint32 spellId = AI_VALUE2(uint32, "spell id", skillName);
+    // Gathering skills have no recipe window to link, so they are named instead.
+    std::string link = ChatHelper::FormatProfessionLink(bot, skill);
+    if (link.empty())
+        link = chat->FormatSkill(skill);
+
     uint16 value = bot->GetSkillValue(skill);
     uint16 maxSkill = bot->GetMaxSkillValue(skill);
-    ObjectGuid guid = bot->GetGUID();
-
-    std::string const data = "0";
-    out << "|cFFFFFF00|Htrade:" << spellId << ":" << value << ":" << maxSkill << ":" << std::hex << std::uppercase
-        << guid.GetRawValue() << std::nouppercase << std::dec << ":" << data << "|h[" << skillName << "]|h|r"
-        << " |h|cff00ff00" << value << "|h|cffffffff/"
+    out << link << " |h|cff00ff00" << value << "|h|cffffffff/"
         << "|h|cff00ff00" << maxSkill << "|h|cffffffff ";
 
     return out.str();

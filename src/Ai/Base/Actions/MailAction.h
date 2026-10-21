@@ -21,10 +21,9 @@ public:
     virtual bool Process(uint32 index, Mail* mail, PlayerbotAI* botAI) = 0;
     virtual bool After([[maybe_unused]] PlayerbotAI* botAI) { return true; }
 
+    // The nearest mailbox in sight.
     static ObjectGuid FindMailbox(PlayerbotAI* botAI);
-
-protected:
-    void RemoveMail(Player* bot, uint32 id, ObjectGuid mailbox);
+    static void RemoveMail(Player* bot, uint32 id, ObjectGuid mailbox);
 };
 
 class MailAction : public InventoryAction

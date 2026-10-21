@@ -10,6 +10,9 @@ void NonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("random", { NextAction("clean quest log", 1.0f) }));
     triggers.push_back(new TriggerNode("timer", { NextAction("check mount state", 1.0f) }));
+    triggers.push_back(new TriggerNode("craft order ready", { NextAction("craft order", ACTION_NORMAL) }));
+    triggers.push_back(new TriggerNode("craft order stale", { NextAction("refund craft order", ACTION_NORMAL) }));
+    triggers.push_back(new TriggerNode("mail to collect", { NextAction("collect mail payments", ACTION_NORMAL) }));
 }
 
 void CollisionStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

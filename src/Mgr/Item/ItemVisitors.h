@@ -14,6 +14,7 @@
 
 class AiObjectContext;
 class Player;
+class PlayerbotAI;
 
 char* strstri(char const* str1, char const* str2);
 
@@ -59,12 +60,13 @@ private:
 class FindUsableItemVisitor : public FindItemVisitor
 {
 public:
-    FindUsableItemVisitor(Player* bot) : FindItemVisitor(), bot(bot) {}
+    FindUsableItemVisitor(Player* bot);
 
     bool Visit(Item* item) override;
 
 private:
     Player* bot;
+    PlayerbotAI* botAI;
 };
 
 class HasRelicBySubclassVisitor : public IterateItemsVisitor

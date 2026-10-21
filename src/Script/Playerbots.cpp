@@ -9,6 +9,7 @@
 #include "BattlefieldScript.h"
 #include "Channel.h"
 #include "CheckMountStateAction.h"
+#include "CraftOrder.h"
 #include "Config.h"
 #include "BuiltInConfig.h"
 #include "DBUpdater.h"
@@ -140,7 +141,8 @@ public:
         PLAYERHOOK_CAN_PLAYER_USE_GUILD_CHAT,
         PLAYERHOOK_CAN_PLAYER_USE_CHANNEL_CHAT,
         PLAYERHOOK_ON_GIVE_EXP,
-        PLAYERHOOK_ON_BEFORE_TELEPORT
+        PLAYERHOOK_ON_BEFORE_TELEPORT,
+        PLAYERHOOK_ON_CREATE_ITEM
     }) {}
 
     void OnPlayerLogin(Player* player) override
@@ -182,6 +184,13 @@ public:
         }
 
         sRandomPlayerbotMgr.OnPlayerLogout(player);
+    }
+
+    // Spell-created items only: a crafting order counts a craft once its item exists, not when the cast starts.
+    void OnPlayerCreateItem(Player* player, Item* item, uint32 itemCount) override
+    {
+        if (PlayerbotAI* botAI = PlayerbotsMgr::instance().GetPlayerbotAI(player))
+            CraftOrder::OnItemCreated(botAI, item, itemCount);
     }
 
     void OnPlayerCreatureKillCredit(Player* player, Creature* killed) override
@@ -535,6 +544,7 @@ public:
 
         PlayerbotSpellRepository::Instance().Initialize();
         CheckMountStateAction::LoadPreferredMounts();
+        CraftOrder::LoadAll();
 
         LOG_INFO("server.loading", "Loading gather node index...");
         GatherNodeMgr::instance().Load();

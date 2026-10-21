@@ -12,6 +12,7 @@
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "Containers.h"
+#include "CraftOrder.h"
 #include "DatabaseEnv.h"
 #include "Define.h"
 #include "Group.h"
@@ -409,6 +410,9 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
         if (!sRandomPlayerbotMgr.IsRandomBot(bot) && bot->isTaxiCheater())
             bot->SetTaxiCheater(false);
 
+        // Return a crafting order's items now rather than leave them in the bags of a bot that may not return.
+        CraftOrder::Refund(botAI);
+
         bot->SaveToDB(false, false);
 
         WorldSession* botWorldSessionPtr = bot->GetSession();
@@ -572,6 +576,7 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
         botAI->ResetStrategies(!sRandomPlayerbotMgr.IsRandomBot(bot));
     }
     PlayerbotRepository::instance().Load(botAI);
+    CraftOrder::Load(botAI);
 
     if (master && !master->HasUnitState(UNIT_STATE_IN_FLIGHT))
     {

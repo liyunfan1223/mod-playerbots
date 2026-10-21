@@ -31,6 +31,10 @@ ItemUsage ItemUsageValue::Calculate()
     if (!proto)
         return ITEM_USAGE_NONE;
 
+    // A crafting order's reagents and products belong to the customer: never sell, use or destroy them.
+    if (botAI->IsReservedItem(itemId))
+        return ITEM_USAGE_KEEP;
+
     if (IsRealPlayer(botAI->GetMaster()))
     {
         if (IsItemUsefulForSkill(proto) || IsItemNeededForSkill(proto))
