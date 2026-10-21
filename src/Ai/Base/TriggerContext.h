@@ -8,6 +8,7 @@
 #define PLAYERBOTS_TRIGGERCONTEXT_H
 
 #include "BotStateTriggers.h"
+#include "CraftOrderTriggers.h"
 #include "CureTriggers.h"
 #include "FishingTriggers.h"
 #include "GenericTriggers.h"
@@ -42,6 +43,8 @@ public:
         creators["timer"] = &TriggerContext::Timer;
         creators["timer bg"] = &TriggerContext::TimerBG;
         creators["random"] = &TriggerContext::Random;
+        creators["craft order ready"] = &TriggerContext::craft_order_ready;
+        creators["craft order stale"] = &TriggerContext::craft_order_stale;
         creators["seldom"] = &TriggerContext::seldom;
         creators["often"] = &TriggerContext::often;
         creators["very often"] = &TriggerContext::very_often;
@@ -343,6 +346,8 @@ private:
     static Trigger* not_dps_aoe_target_active(PlayerbotAI* botAI) { return new NotDpsAoeTargetActiveTrigger(botAI); }
     static Trigger* enemy_player_near(PlayerbotAI* botAI) { return new EnemyPlayerNear(botAI); }
     static Trigger* Random(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "random", 20); }
+    static Trigger* craft_order_ready(PlayerbotAI* botAI) { return new CraftOrderReadyTrigger(botAI); }
+    static Trigger* craft_order_stale(PlayerbotAI* botAI) { return new CraftOrderStaleTrigger(botAI); }
     static Trigger* seldom(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "seldom", 300); }
     static Trigger* often(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "often", 5); }
     static Trigger* very_often(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "often", 3); }

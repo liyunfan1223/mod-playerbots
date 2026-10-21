@@ -7,52 +7,24 @@
 #ifndef PLAYERBOTS_CRAFTVALUE_H
 #define PLAYERBOTS_CRAFTVALUE_H
 
+#include "CraftRules.h"
+#include "ObjectGuid.h"
 #include "Value.h"
-#include <map>
 
 class PlayerbotAI;
 
-class CraftData
+// A crafting order from the bot's master. The customer supplies every reagent.
+class CraftData : public CraftRules::OrderState
 {
 public:
-    CraftData() : itemId(0) {}
+    ObjectGuid owner;
 
-    uint32 itemId;
-    std::map<uint32, uint32> required, obtained;
-
-    bool IsEmpty() { return itemId == 0; }
-    void Reset() { itemId = 0; }
-    bool IsRequired(uint32 item) { return required.find(item) != required.end(); }
-    bool IsFulfilled()
+    void Reset()
     {
-        for (std::map<uint32, uint32>::iterator i = required.begin(); i != required.end(); ++i)
-        {
-            uint32 item = i->first;
-            if (obtained[item] < i->second)
-                return false;
-        }
-
-        return true;
+        Clear();
+        owner.Clear();
     }
-    void AddObtained(uint32 itemId, uint32 count)
-    {
-        if (IsRequired(itemId))
-        {
-            obtained[itemId] += count;
-        }
-    }
-
-    void Crafted(uint32 count)
-    {
-        for (std::map<uint32, uint32>::iterator i = required.begin(); i != required.end(); ++i)
-        {
-            uint32 item = i->first;
-            if (obtained[item] >= required[item] * count)
-            {
-                obtained[item] -= required[item] * count;
-            }
-        }
-    }
+    bool IsCustomer(ObjectGuid guid) const { return !IsEmpty() && guid == owner; }
 };
 
 class CraftValue : public ManualSetValue<CraftData&>

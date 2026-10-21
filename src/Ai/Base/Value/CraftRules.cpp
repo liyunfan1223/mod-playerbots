@@ -6,8 +6,126 @@
 
 #include "CraftRules.h"
 
+#include <algorithm>
+#include <charconv>
+
 namespace CraftRules
 {
+bool OrderState::HasReagentsForNextCraft() const
+{
+    if (IsEmpty() || IsCrafted())
+        return false;
+
+    for (auto const& [item, reagent] : reagents)
+    {
+        if (reagent.obtained < reagent.perCraft)
+            return false;
+    }
+
+    return true;
+}
+
+bool OrderState::AddObtained(uint32 item, uint32 itemCount)
+{
+    auto const itr = reagents.find(item);
+    if (itr == reagents.end())
+        return false;
+
+    itr->second.obtained += itemCount;
+    return true;
+}
+
+void OrderState::OnCrafted(uint32 itemCount)
+{
+    for (auto& [item, reagent] : reagents)
+        reagent.obtained -= std::min(reagent.obtained, reagent.perCraft);
+
+    ++crafted;
+    made += itemCount;
+}
+
+void OrderState::LimitObtained(uint32 item, uint32 held)
+{
+    auto const itr = reagents.find(item);
+    if (itr != reagents.end())
+        itr->second.obtained = std::min(itr->second.obtained, HeldAbove(held, itr->second.own));
+}
+
+uint32 OrderState::OwedProducts(uint32 held) const
+{
+    if (IsEmpty() || made <= delivered)
+        return 0;
+
+    return std::min(made - delivered, HeldAbove(held, ownProducts));
+}
+
+void OrderState::OnDelivered(uint32 itemCount) { delivered = std::min(made, delivered + itemCount); }
+
+uint32 ParseOrderCount(std::string const& param)
+{
+    size_t const lastSpace = param.rfind(' ');
+    if (lastSpace == std::string::npos)
+        return 1;
+
+    char const* first = param.data() + lastSpace + 1;
+    char const* last = param.data() + param.size();
+    if (first == last || !std::all_of(first, last, [](char c) { return c >= '0' && c <= '9'; }))
+        return 1;
+
+    uint32 count = 0;
+    if (std::from_chars(first, last, count).ec != std::errc())
+        return MAX_ORDER_COUNT;  // all digits, so only too large
+
+    return std::clamp<uint32>(count, 1, MAX_ORDER_COUNT);
+}
+
+uint32 CraftFee(uint32 itemLevel, uint32 requiredLevel, uint32 crafts)
+{
+    uint32 const level = std::max(itemLevel, requiredLevel);
+    return crafts * (level * level / 40);
+}
+
+std::vector<uint32> SplitFee(uint32 fee, std::vector<uint32> const& mailItemCounts)
+{
+    uint64 total = 0;
+    for (uint32 itemCount : mailItemCounts)
+        total += itemCount;
+
+    std::vector<uint32> cods;
+    uint32 feeLeft = fee;
+    for (size_t i = 0; i < mailItemCounts.size(); ++i)
+    {
+        uint32 const cod = i + 1 == mailItemCounts.size() || !total
+                               ? feeLeft
+                               : std::min(feeLeft, uint32(uint64(fee) * mailItemCounts[i] / total));
+        feeLeft -= cod;
+        cods.push_back(cod);
+    }
+
+    return cods;
+}
+
+uint32 SlotsNeeded(std::vector<StackNeed> const& needs, uint32 crafts)
+{
+    uint32 slots = 0;
+    for (StackNeed const& need : needs)
+    {
+        uint32 const stack = std::max<uint32>(need.maxStack, 1);
+        slots += (need.perCraft * crafts + stack - 1) / stack;
+    }
+
+    return slots;
+}
+
+uint32 CraftsThatFit(std::vector<StackNeed> const& needs, uint32 requested, uint32 freeSlots)
+{
+    uint32 crafts = requested;
+    while (crafts && SlotsNeeded(needs, crafts) > freeSlots)
+        --crafts;
+
+    return crafts;
+}
+
 std::string EncodeRecipeBits(std::vector<bool> const& known)
 {
     static constexpr char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
