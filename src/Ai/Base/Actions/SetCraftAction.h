@@ -10,6 +10,7 @@
 #include "Action.h"
 #include "CraftValue.h"
 
+class Player;
 class PlayerbotAI;
 
 struct SkillLineAbilityEntry;
@@ -25,6 +26,7 @@ public:
 
 private:
     void TellCraft();
+    void TellProfessions(Player* requester);
 
     static std::map<uint32, SkillLineAbilityEntry const*> skillSpells;
 };

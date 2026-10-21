@@ -11,15 +11,40 @@
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
 
+#include <array>
+
+// Mining is here for its Smelting window.
+static constexpr std::array<uint32, 11> CRAFTING_SKILLS = {
+    SKILL_ALCHEMY,     SKILL_BLACKSMITHING, SKILL_COOKING,        SKILL_ENCHANTING, SKILL_ENGINEERING, SKILL_FIRST_AID,
+    SKILL_INSCRIPTION, SKILL_JEWELCRAFTING, SKILL_LEATHERWORKING, SKILL_MINING,     SKILL_TAILORING};
+
 std::map<uint32, SkillLineAbilityEntry const*> SetCraftAction::skillSpells;
+
+// Tells the bot's master through the usual channel, anyone else by whisper.
+static void Tell(PlayerbotAI* botAI, Player* player, std::string const& text)
+{
+    if (player == botAI->GetMaster())
+        botAI->TellMaster(text);
+    else
+        botAI->GetBot()->Whisper(text, LANG_UNIVERSAL, player);
+}
 
 bool SetCraftAction::Execute(Event event)
 {
     Player* master = GetMaster();
-    if (!master)
+    Player* requester = event.getOwner() ? event.getOwner() : master;
+    if (!requester)
         return false;
 
     std::string const link = event.getParam();
+    if (link.empty())
+    {
+        TellProfessions(requester);
+        return true;
+    }
+
+    if (!master)
+        return false;
 
     CraftData& data = AI_VALUE(CraftData&, "craft");
     if (link == "reset")
@@ -40,7 +65,7 @@ bool SetCraftAction::Execute(Event event)
     if (itemIds.empty())
     {
         botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-            "craft_usage", "Usage: 'craft [itemId]' or 'craft reset'", {}));
+            "craft_usage", "Usage: 'craft', 'craft [item link]', 'craft ?' or 'craft reset'", {}));
         return false;
     }
 
@@ -106,6 +131,29 @@ bool SetCraftAction::Execute(Event event)
 
     TellCraft();
     return true;
+}
+
+void SetCraftAction::TellProfessions(Player* requester)
+{
+    bool any = false;
+    for (uint32 skill : CRAFTING_SKILLS)
+    {
+        std::string const link = ChatHelper::FormatProfessionLink(bot, skill);
+        if (link.empty())
+            continue;
+
+        std::ostringstream out;
+        out << link << " " << bot->GetSkillValue(skill) << "/" << bot->GetMaxSkillValue(skill);
+        Tell(botAI, requester, out.str());
+        any = true;
+    }
+
+    if (!any)
+    {
+        Tell(botAI, requester,
+             PlayerbotTextMgr::instance().GetBotTextOrDefault("craft_no_professions",
+                                                              "I don't know any crafting professions", {}));
+    }
 }
 
 void SetCraftAction::TellCraft()

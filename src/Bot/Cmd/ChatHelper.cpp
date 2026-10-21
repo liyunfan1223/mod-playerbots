@@ -7,9 +7,11 @@
 #include "ChatHelper.h"
 #include "AiFactory.h"
 #include "Common.h"
+#include "CraftRules.h"
 #include "DBCStores.h"
 #include "ItemTemplate.h"
 #include "ObjectMgr.h"
+#include "PlayerbotSpellRepository.h"
 #include "Playerbots.h"
 #include "SpellInfo.h"
 #include "World.h"
@@ -429,6 +431,43 @@ std::string const ChatHelper::FormatSpell(SpellInfo const* spellInfo)
         spellInfo->SpellName[sWorld->GetDefaultDbcLocale()] : spellInfo->SpellName[LOCALE_enUS];
     out << "|cffffffff|Hspell:" << spellInfo->Id << "|h[" << spellName << "]|h|r";
     return out.str();
+}
+
+static std::string FormatTradeSkillLink(SpellInfo const* tradeSpell, uint16 skillValue, uint16 maxSkillValue,
+                                        ObjectGuid owner, std::string const& recipes)
+{
+    std::string spellName = tradeSpell->SpellName[sWorld->GetDefaultDbcLocale()]
+                                ? tradeSpell->SpellName[sWorld->GetDefaultDbcLocale()]
+                                : tradeSpell->SpellName[LOCALE_enUS];
+
+    std::ostringstream out;
+    out << "|cffffd000|Htrade:" << tradeSpell->Id << ":" << skillValue << ":" << maxSkillValue << ":" << std::hex
+        << std::uppercase << owner.GetRawValue() << std::nouppercase << std::dec << ":" << recipes << "|h[" << spellName
+        << "]|h|r";
+    return out.str();
+}
+
+// Bind-on-pickup recipes are shown as unknown: the player could not be given what they make.
+std::string const ChatHelper::FormatProfessionLink(Player* player, uint32 skill)
+{
+    if (!player->HasSkill(skill))
+        return "";
+
+    TradeSkillLinkData const* linkData = PlayerbotSpellRepository::Instance().GetTradeSkillLinkData(skill);
+    if (!linkData)
+        return "";
+
+    SpellInfo const* tradeSpell = sSpellMgr->GetSpellInfo(linkData->tradeSpellId);
+    if (!tradeSpell)
+        return "";
+
+    std::vector<bool> known;
+    known.reserve(linkData->entries.size());
+    for (TradeSkillLinkEntry const& entry : linkData->entries)
+        known.push_back(!entry.bindOnPickup && player->HasSpell(entry.spellId));
+
+    return FormatTradeSkillLink(tradeSpell, player->GetSkillValue(skill), player->GetMaxSkillValue(skill),
+                                player->GetGUID(), CraftRules::EncodeRecipeBits(known));
 }
 
 std::string const ChatHelper::FormatItem(ItemTemplate const* proto, uint32 count, uint32 total)
