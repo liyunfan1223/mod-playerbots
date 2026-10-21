@@ -11,6 +11,7 @@
 #include "GenericTriggers.h"
 #include "PlayerbotAIConfig.h"
 #include "Trigger.h"
+#include <unordered_map>
 
 enum ForgeOfSoulsBronjahmIDs
 {
@@ -23,9 +24,29 @@ enum ForgeOfSoulsBronjahmIDs
     SPELL_SOULSTORM             = 68872,
 
     // Devourer of Souls
+    NPC_WELL_OF_SOULS           = 36536,
+
+    SPELL_PHANTOM_BLAST         = 68982,
+    SPELL_PHANTOM_BLAST_H       = 70322,
+    SPELL_MIRRORED_SOUL         = 69051,
     SPELL_WAILING_SOULS         = 68899,
+    SPELL_WAILING_SOULS_SWEEP   = 68875,
+    SPELL_WAILING_SOULS_SWEEP_2 = 68876,
 };
 
+// Well of Souls damage (68863) reaches 4 yards; the rest is margin for the bot's size and the well's drift
+constexpr float WELL_OF_SOULS_AVOID_RADIUS = 6.0f;
+
+bool IsWailingSoulsActive(Unit* boss);
+bool IsPhantomBlastCasting(Unit* boss);
+bool IsMirroredSoulActive(Player* bot, Unit* boss);
+Unit* FindWellOfSouls(WorldObject* searcher, float x, float y, float radius);
+bool IsCastingAt(Unit* caster, Unit* target);
+
+// Pets Mirrored Soul made passive, with the stance to give back once it fades
+void DevourerRememberSuspendedPet(Player* bot, Creature* pet);
+bool DevourerHasSuspendedPets(Player* bot);
+std::unordered_map<ObjectGuid, ReactStates> DevourerTakeSuspendedPets(Player* bot);
 class MoveFromBronjahmTrigger : public Trigger
 {
 public:
@@ -49,10 +70,45 @@ public:
     bool IsActive() override;
 };
 
-class DevourerOfSoulsTrigger : public Trigger
+class DevourerWailingSoulsTrigger : public Trigger
 {
 public:
-    DevourerOfSoulsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "devourer of souls") {}
+    DevourerWailingSoulsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "devourer wailing souls") {}
+    bool IsActive() override;
+};
+
+class DevourerWellOfSoulsTrigger : public Trigger
+{
+public:
+    DevourerWellOfSoulsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "devourer well of souls") {}
+    bool IsActive() override;
+};
+
+class DevourerMirroredSoulTrigger : public Trigger
+{
+public:
+    DevourerMirroredSoulTrigger(PlayerbotAI* botAI) : Trigger(botAI, "devourer mirrored soul") {}
+    bool IsActive() override;
+};
+
+class DevourerMirroredSoulFadedTrigger : public Trigger
+{
+public:
+    DevourerMirroredSoulFadedTrigger(PlayerbotAI* botAI) : Trigger(botAI, "devourer mirrored soul faded") {}
+    bool IsActive() override;
+};
+
+class DevourerPhantomBlastTrigger : public Trigger
+{
+public:
+    DevourerPhantomBlastTrigger(PlayerbotAI* botAI) : Trigger(botAI, "devourer phantom blast") {}
+    bool IsActive() override;
+};
+
+class DevourerStopCastTrigger : public Trigger
+{
+public:
+    DevourerStopCastTrigger(PlayerbotAI* botAI) : Trigger(botAI, "devourer stop cast") {}
     bool IsActive() override;
 };
 

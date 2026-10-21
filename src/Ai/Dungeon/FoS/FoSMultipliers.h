@@ -26,4 +26,12 @@ public:
     float GetValue(Action* action) override;
 };
 
+class DevourerOfSoulsMultiplier : public Multiplier
+{
+public:
+    DevourerOfSoulsMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "devourer of souls") {}
+
+    float GetValue(Action* action) override;
+};
+
 #endif

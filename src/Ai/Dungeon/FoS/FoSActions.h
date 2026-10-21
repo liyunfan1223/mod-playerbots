@@ -10,6 +10,7 @@
 #include "Action.h"
 #include "AttackAction.h"
 #include "FoSTriggers.h"
+#include "MovementActions.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
 
@@ -39,19 +40,56 @@ public:
     bool isUseful() override;
 };
 
-class DevourerOfSoulsAction : public AttackAction
+// The sweep reaches 52 degrees either side of the boss's facing and turns up to 90 degrees from where it
+// started, so a bot within 35 degrees of straight behind stays clear for the whole wail
+constexpr float WAILING_SOULS_SAFE_ARC = 70.0f * float(M_PI) / 180.0f;
+
+bool IsInterruptSpell(std::string const& spell);
+bool IsDamagingTotemSpell(std::string const& spell);
+
+class DevourerWailingSoulsAction : public MovementAction
 {
 public:
-    DevourerOfSoulsAction(PlayerbotAI* botAI, float distance = 10.0f, float delta_angle = M_PI / 8)
-        : AttackAction(botAI, "devourer of souls")
-    {
-        this->distance = distance;
-        this->delta_angle = delta_angle;
-    }
-    virtual bool Execute(Event event);
+    DevourerWailingSoulsAction(PlayerbotAI* botAI) : MovementAction(botAI, "devourer wailing souls") {}
+    bool Execute(Event event) override;
+};
 
-protected:
-    float distance, delta_angle;
+class DevourerWellOfSoulsAction : public MovementAction
+{
+public:
+    DevourerWellOfSoulsAction(PlayerbotAI* botAI) : MovementAction(botAI, "devourer well of souls") {}
+    bool Execute(Event event) override;
+};
+
+class DevourerStopDamageAction : public Action
+{
+public:
+    DevourerStopDamageAction(PlayerbotAI* botAI) : Action(botAI, "devourer stop damage") {}
+    bool Execute(Event event) override;
+    bool isUseful() override;
+};
+
+class DevourerRestorePetsAction : public Action
+{
+public:
+    DevourerRestorePetsAction(PlayerbotAI* botAI) : Action(botAI, "devourer restore pets") {}
+    bool Execute(Event event) override;
+};
+
+class DevourerInterruptPhantomBlastAction : public Action
+{
+public:
+    DevourerInterruptPhantomBlastAction(PlayerbotAI* botAI) : Action(botAI, "devourer interrupt phantom blast") {}
+    bool Execute(Event event) override;
+};
+
+// A reaction: the engine interrupts the cast in progress before running it
+class DevourerStopCastAction : public Action
+{
+public:
+    DevourerStopCastAction(PlayerbotAI* botAI) : Action(botAI, "devourer stop cast") {}
+    bool Execute(Event /*event*/) override { return true; }
+    bool ShouldReactionInterruptCast() const override { return true; }
 };
 
 #endif
