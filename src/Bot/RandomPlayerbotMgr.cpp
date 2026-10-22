@@ -19,10 +19,10 @@
 #include "FleeManager.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "JsonUtils.h"
 #include "LFGMgr.h"
 #include "MapMgr.h"
 #include "NewRpgInfo.h"
-#include "JsonUtils.h"
 #include "NewRpgStrategy.h"
 #include "ObjectGuid.h"
 #include "PerfMonitor.h"
@@ -3038,7 +3038,6 @@ void RandomPlayerbotMgr::PrintStats()
                  rpgStatusCount[RPG_DO_QUEST], rpgStatusCount[RPG_TRAVEL_FLIGHT], rpgStatusCount[RPG_OUTDOOR_PVP]);
 
         PrintQuestTotals(rpgStasticTotal);
-
     }
 
     LOG_INFO("playerbots", "Bots engine:", dead);
