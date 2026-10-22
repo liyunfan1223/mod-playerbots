@@ -246,8 +246,7 @@ bool EnemyFlagCarrierNear::IsActive()
     Unit* carrier = AI_VALUE(Unit*, "enemy flag carrier");
 
     Battleground* bg = bot->GetBattleground();
-    bool isWarsong = bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS;
-    if (isWarsong && sPlayerbotAIConfig.EnableWsgTactics)
+    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
         return CanRespondToWsgCarrier(botAI, carrier);
 
     if (!carrier || !ServerFacade::instance().IsDistanceLessOrEqualThan(

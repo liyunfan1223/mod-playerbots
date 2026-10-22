@@ -352,10 +352,6 @@ Unit* FlagCarrierValue::Calculate()
             TeamId flagTeam = sameTeam ? battleground->GetOtherTeamId(bot->GetTeamId()) : bot->GetTeamId();
             ObjectGuid guid = warsong->GetFlagPickerGUID(flagTeam);
             carrier = guid.IsEmpty() ? nullptr : ObjectAccessor::GetPlayer(bot->GetMap(), guid);
-            if (!sPlayerbotAIConfig.EnableWsgTactics)
-                return carrier && (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig.SightDistance))
-                           ? carrier
-                           : nullptr;
             return IsValidWsgCarrier(bot, carrier, sameTeam) &&
                            (ignoreRange || bot->IsWithinDistInMap(carrier, sPlayerbotAIConfig.SightDistance))
                        ? carrier

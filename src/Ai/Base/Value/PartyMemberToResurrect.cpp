@@ -45,7 +45,7 @@ private:
 Unit* PartyMemberToResurrect::Calculate()
 {
     Battleground* bg = bot->GetBattleground();
-    if (sPlayerbotAIConfig.EnableWsgTactics && bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
+    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
         return nullptr;
 
     FindDeadPlayer finder(this);

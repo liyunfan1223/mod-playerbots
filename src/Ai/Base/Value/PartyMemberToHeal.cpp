@@ -34,7 +34,7 @@ Unit* PartyMemberToHeal::Calculate()
 
     Group* group = bot->GetGroup();
     Battleground* bg = bot->GetBattleground();
-    bool isWarsong = sPlayerbotAIConfig.EnableWsgTactics && bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS;
+    bool isWarsong = bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS;
     ObjectGuid carrierGuid;
     if (isWarsong && bg->GetStatus() == STATUS_IN_PROGRESS && PlayerbotAI::IsHeal(bot))
         carrierGuid = static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId()));

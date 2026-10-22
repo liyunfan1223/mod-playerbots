@@ -1590,7 +1590,7 @@ void PlayerbotAI::DoNextAction(bool min)
 
         // The dead engine has no battleground strategy, so its "dead" trigger cannot reset this route.
         if (Battleground* bg = bot->GetBattleground())
-            if (sPlayerbotAIConfig.EnableWsgTactics && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
+            if (bg->GetBgTypeID(true) == BATTLEGROUND_WS)
                 aiObjectContext->GetValue<WsgRouteState>("wsg route")->Reset();
 
         ChangeEngine(BOT_STATE_DEAD);

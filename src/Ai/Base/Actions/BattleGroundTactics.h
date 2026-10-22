@@ -160,8 +160,6 @@ private:
     static std::string const HandleConsoleCommandPrivate(WorldSession* session, char const* args);
     bool moveToStart(bool force = false);
     bool selectObjective(bool reset = false);
-    bool selectLegacyWsgObjective();
-    bool LegacyWsgJumpDown();
 
 protected:
     bool moveToObjective(bool ignoreDist);

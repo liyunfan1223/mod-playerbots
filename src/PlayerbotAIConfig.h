@@ -252,7 +252,6 @@ public:
     uint32 GuildRepliesRate;
 
     bool RandomBotJoinBG;
-    bool EnableWsgTactics;
     bool RandomBotAutoJoinBG;
 
     std::string RandomBotAutoJoinICBrackets;

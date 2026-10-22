@@ -1639,13 +1639,6 @@ Playerbots.AutoTeleportForLevel = 1
 # Enable battlegrounds/arenas for randombots
 Playerbots.RandomBotJoinBG = 1
 
-# Enable WSG carrier escorts, returner objectives, and objective routing.
-# While enabled, WSG healers do not resurrect; the spirit healer handles resurrection.
-# Disabled by default; off keeps legacy WSG objectives, routing, and carrier support.
-# Restart the server after changing this; strategy triggers are chosen when bot AI is created.
-# Default: 0 (disabled)
-Playerbots.EnableWsgTactics = 0
-
 # Allow players to command random bots on their own team in the same battleground or arena.
 # Every such player gets the command access of a master without becoming the bot's master,
 # so the bot keeps playing the battleground.
