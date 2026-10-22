@@ -15,6 +15,8 @@
 #include "GridNotifiersImpl.h"
 #include "Map.h"
 #include "Playerbots.h"
+#include "Spell.h"
+#include "SpellInfo.h"
 #include "WorldSession.h"
 
 namespace
@@ -107,6 +109,55 @@ bool IsEligibleTarget(Player* bot, Player* target)
            !target->InArena() && bot->IsWithinDistInMap(target, sPlayerbotAIConfig.WorldResurrectDistance) &&
            bot->IsWithinLOSInMap(target) && !IsClaimedByOther(bot->GetGUID(), target->GetGUID());
 }
+
+bool IsEligibleBot(PlayerbotAI* botAI)
+{
+    if (!sPlayerbotAIConfig.WorldResurrectEnabled || !botAI)
+        return false;
+
+    Player* bot = botAI->GetBot();
+    if (!bot || !*WorldResurrect::GetSpellName(bot) || !bot->IsInWorld() || bot->IsDuringRemoveFromWorld() ||
+        !bot->GetSession() || bot->GetSession()->PlayerLogout() || bot->GetSession()->IsLoggingOut() ||
+        !bot->IsAlive() || bot->IsInCombat() || botAI->GetState() != BOT_STATE_NON_COMBAT || botAI->GetMaster() ||
+        bot->GetGroup() || bot->GetGroupInvite() || !sRandomPlayerbotMgr.IsRandomBot(bot) || !bot->GetMap() ||
+        bot->GetMap()->Instanceable() || bot->InBattleground() || bot->InArena() || bot->InBattlegroundQueue() ||
+        bot->IsBeingTeleported() || bot->IsInFlight() || bot->IsFlying() || bot->Unit::IsFalling() ||
+        bot->GetTransport() || bot->GetVehicle() || bot->GetTradeData() || bot->duel || bot->IsMounted() ||
+        !bot->IsStandState() || !botAI->CanMove())
+    {
+        return false;
+    }
+
+    // A queued LFG proposal belongs to the normal LFG workflow; no global LFG manager lookup is needed.
+    return !botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Get() &&
+           botAI->HasSpell(WorldResurrect::GetSpellName(bot));
+}
+
+bool IsCastingClaimedResurrection(PlayerbotAI* botAI, ObjectGuid targetGuid)
+{
+    if (!targetGuid)
+        return false;
+
+    Spell* spell = botAI->GetBot()->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+    if (!spell || spell->getState() != SPELL_STATE_PREPARING || !spell->GetSpellInfo() ||
+        spell->m_targets.GetUnitTargetGUID() != targetGuid)
+        return false;
+
+    uint32 spellId =
+        botAI->GetAiObjectContext()->GetValue<uint32>("spell id", WorldResurrect::GetSpellName(botAI->GetBot()))->Get();
+    return spell->GetSpellInfo()->Id == spellId;
+}
+
+void ReleaseBotClaim(PlayerbotAI* botAI)
+{
+    if (!botAI || !botAI->HasWorldResurrectClaim())
+        return;
+
+    if (Player* bot = botAI->GetBot())
+        WorldResurrect::ReleaseClaim(bot->GetGUID());
+
+    botAI->SetWorldResurrectClaim(false);
+}
 }  // namespace
 
 char const* WorldResurrect::GetSpellName(Player const* player)
@@ -131,27 +182,47 @@ char const* WorldResurrect::GetSpellName(Player const* player)
 
 bool WorldResurrect::CanHelp(PlayerbotAI* botAI)
 {
-    if (!sPlayerbotAIConfig.WorldResurrectEnabled || !botAI)
-        return false;
-
-    Player* bot = botAI->GetBot();
-    if (!bot || !*GetSpellName(bot) || !bot->IsInWorld() || bot->IsDuringRemoveFromWorld() || !bot->GetSession() ||
-        bot->GetSession()->PlayerLogout() || !bot->IsAlive() || bot->IsInCombat() ||
-        botAI->GetState() != BOT_STATE_NON_COMBAT || botAI->GetMaster() || bot->GetGroup() || bot->GetGroupInvite() ||
-        !sRandomPlayerbotMgr.IsRandomBot(bot) || !bot->GetMap() || bot->GetMap()->Instanceable() ||
-        bot->InBattleground() || bot->InArena() || bot->InBattlegroundQueue() || bot->IsBeingTeleported() ||
-        bot->IsInFlight() || bot->IsFlying() || bot->IsFalling() || bot->GetTransport() || bot->GetVehicle() ||
-        bot->GetTradeData() || bot->duel || bot->IsMounted() || !bot->IsStandState() ||
-        bot->IsNonMeleeSpellCast(false) || !botAI->CanMove())
+    if (!IsEligibleBot(botAI))
     {
+        ReleaseBotClaim(botAI);
         return false;
     }
 
-    // A queued LFG proposal belongs to the normal LFG workflow; no global LFG manager lookup is needed.
-    if (botAI->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Get() || !botAI->HasSpell(GetSpellName(bot)))
+    if (botAI->GetBot()->IsNonMeleeSpellCast(false))
+    {
+        if (botAI->HasWorldResurrectClaim() &&
+            !IsCastingClaimedResurrection(botAI, GetClaimedTarget(botAI->GetBot()->GetGUID())))
+            ReleaseBotClaim(botAI);
+
         return false;
+    }
 
     return true;
+}
+
+void WorldResurrect::UpdateClaim(PlayerbotAI* botAI)
+{
+    if (!botAI || !botAI->HasWorldResurrectClaim())
+        return;
+
+    if (!IsEligibleBot(botAI))
+    {
+        ReleaseBotClaim(botAI);
+        return;
+    }
+
+    Player* bot = botAI->GetBot();
+    ObjectGuid targetGuid = GetClaimedTarget(bot->GetGUID());
+    if (!targetGuid)
+    {
+        botAI->SetWorldResurrectClaim(false);
+        return;
+    }
+
+    // An active resurrection must keep its claim while the normal casting gate is false.
+    if ((bot->IsNonMeleeSpellCast(false) && !IsCastingClaimedResurrection(botAI, targetGuid)) ||
+        !IsEligibleTarget(bot, botAI->GetPlayer(targetGuid)))
+        ReleaseBotClaim(botAI);
 }
 
 Player* WorldResurrect::GetTarget(PlayerbotAI* botAI)
@@ -165,7 +236,7 @@ Player* WorldResurrect::GetTarget(PlayerbotAI* botAI)
         return target;
 
     if (guid == GetClaimedTarget(botAI->GetBot()->GetGUID()))
-        ReleaseClaim(botAI->GetBot()->GetGUID());
+        ReleaseBotClaim(botAI);
 
     return nullptr;
 }
@@ -179,13 +250,20 @@ bool WorldResurrect::TryClaim(PlayerbotAI* botAI, ObjectGuid targetGuid)
     std::lock_guard<std::mutex> lock(claimMutex);
     CleanupExpiredClaims();
     if (!ExpireClaim(targetGuid))
-        return targetClaims.find(targetGuid)->second.BotGuid == botGuid;
+    {
+        bool claimed = targetClaims.find(targetGuid)->second.BotGuid == botGuid;
+        if (claimed)
+            botAI->SetWorldResurrectClaim(true);
+
+        return claimed;
+    }
 
     if (auto existing = botClaims.find(botGuid); existing != botClaims.end())
         RemoveClaim(existing->second);
 
     targetClaims[targetGuid] = {botGuid, getMSTime()};
     botClaims[botGuid] = targetGuid;
+    botAI->SetWorldResurrectClaim(true);
     return true;
 }
 
@@ -206,7 +284,7 @@ ObjectGuid WorldResurrectTargetValue::Calculate()
         if (IsEligibleTarget(bot, botAI->GetPlayer(claimedGuid)))
             return claimedGuid;
 
-        WorldResurrect::ReleaseClaim(bot->GetGUID());
+        ReleaseBotClaim(botAI);
     }
 
     std::list<Player*> players;

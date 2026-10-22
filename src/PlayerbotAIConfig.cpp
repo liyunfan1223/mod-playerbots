@@ -127,7 +127,7 @@ bool PlayerbotAIConfig::Initialize()
     GrindDistance = sConfigMgr->GetOption<float>("Playerbots.GrindDistance", 75.0f);
     ReactDistance = sConfigMgr->GetOption<float>("Playerbots.ReactDistance", 150.0f);
 
-    WorldResurrectEnabled = sConfigMgr->GetOption<bool>("Playerbots.WorldResurrect.Enable", true);
+    WorldResurrectEnabled = sConfigMgr->GetOption<bool>("Playerbots.WorldResurrect.Enable", false);
     constexpr float defaultWorldResurrectDistance = 30.0f;
     constexpr float minWorldResurrectDistance = 1.0f;
     constexpr float maxWorldResurrectDistance = 60.0f;

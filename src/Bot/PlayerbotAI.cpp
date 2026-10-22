@@ -55,6 +55,7 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include "WorldResurrectTargetValue.h"
 #include <cmath>
 #include <mutex>
 #include <sstream>
@@ -234,6 +235,9 @@ PlayerbotAI::PlayerbotAI(Player* bot)
 
 PlayerbotAI::~PlayerbotAI()
 {
+    if (_hasWorldResurrectClaim && bot)
+        WorldResurrect::ReleaseClaim(bot->GetGUID());
+
     for (uint8 i = 0; i < BOT_STATE_MAX; i++)
     {
         if (engines[i])
@@ -249,6 +253,9 @@ PlayerbotAI::~PlayerbotAI()
 
 void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 {
+    if (_hasWorldResurrectClaim)
+        WorldResurrect::UpdateClaim(this);
+
     // Handle the AI check delay
     if (nextAICheckDelay > elapsed)
         nextAICheckDelay -= elapsed;

@@ -406,6 +406,8 @@ public:
     void UpdateAI(uint32 elapsed, bool minimal = false) override;
     void UpdateAIInternal(uint32 elapsed, bool minimal = false) override;
     bool UpdateAIReaction(uint32 elapsed, bool minimal, bool canControlSelf);
+    bool HasWorldResurrectClaim() const { return _hasWorldResurrectClaim; }
+    void SetWorldResurrectClaim(bool hasClaim) { _hasWorldResurrectClaim = hasClaim; }
     Engine* GetCurrentEngine() const { return currentEngine; }
     void SetActionDuration(Action const* action);
     using PlayerbotAIBase::SetActionDuration;
@@ -629,6 +631,7 @@ public:
     void AddTimedEvent(std::function<void()> callback, uint32 delayMs);
 
 private:
+    bool _hasWorldResurrectClaim = false;
     static void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore,
                                    bool mixed = false);
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);

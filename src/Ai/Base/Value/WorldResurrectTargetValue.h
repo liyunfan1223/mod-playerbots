@@ -16,6 +16,7 @@ namespace WorldResurrect
 {
 char const* GetSpellName(Player const* player);
 bool CanHelp(PlayerbotAI* botAI);
+void UpdateClaim(PlayerbotAI* botAI);
 Player* GetTarget(PlayerbotAI* botAI);
 bool TryClaim(PlayerbotAI* botAI, ObjectGuid targetGuid);
 void ReleaseClaim(ObjectGuid botGuid);
