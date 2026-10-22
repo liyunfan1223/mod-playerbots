@@ -57,8 +57,7 @@ public:
         return PlayerbotMgr::HandlePlayerbotMgrCommand(handler, args);
     }
 
-    // Resolves a typed target to an online bot; reports the failure itself so the command layer
-    // does not append its generic help text.
+    // Sends its own error so the core does not append its generic help text.
     static PlayerbotAI* GetOnlineBotAI(ChatHandler* handler, PlayerIdentifier const& target)
     {
         Player* player = target.GetConnectedPlayer();
@@ -68,8 +67,8 @@ public:
         return botAI;
     }
 
-    // Run a bot chat/AI command inside the bot's context. Usable from the console and SOAP, where
-    // there is no session: the bot is then the sender, which PlayerbotSecurity::CheckLevelFor accepts.
+    // From the console or SOAP there is no player object to send the command, so the bot sends it to itself.
+    // The bot's security check always lets a bot command itself.
     static bool HandleExecCommand(ChatHandler* handler, PlayerIdentifier target, Tail command)
     {
         PlayerbotAI* botAI = GetOnlineBotAI(handler, target);
@@ -89,8 +88,6 @@ public:
         return true;
     }
 
-    // Synchronous, read-only bot state query (state, position, tpos, movement, target, hp,
-    // strategy, action, values, travel, budget); the remote command server makes the same call.
     static bool HandleInspectCommand(ChatHandler* handler, PlayerIdentifier target, Tail command)
     {
         PlayerbotAI* botAI = GetOnlineBotAI(handler, target);
