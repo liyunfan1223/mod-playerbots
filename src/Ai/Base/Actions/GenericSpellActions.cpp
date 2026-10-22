@@ -5,7 +5,6 @@
  */
 
 #include "GenericSpellActions.h"
-#include "Battleground.h"
 #include "Chat.h"
 #include "Event.h"
 #include "GenericBuffUtils.h"

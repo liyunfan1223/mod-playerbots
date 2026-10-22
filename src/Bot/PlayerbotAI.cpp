@@ -6,7 +6,6 @@
 
 #include "PlayerbotAI.h"
 #include "AiFactory.h"
-#include "WsgRouteState.h"
 #include "BudgetValues.h"
 #include "ChannelMgr.h"
 #include "CharacterPackets.h"
@@ -56,6 +55,7 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include "WsgRouteState.h"
 #include <cmath>
 #include <mutex>
 #include <sstream>

@@ -2425,166 +2425,161 @@ bool BGTactics::selectObjective(bool reset)
             Position target;
             TeamId team = bot->GetTeamId();
 
+            BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
+            TeamId enemyTeam = bg->GetOtherTeamId(team);
+            uint8 ownFlagState = warsong->GetFlagState(team);
+            uint8 enemyFlagState = warsong->GetFlagState(enemyTeam);
+            bool carryingEnemyFlag = warsong->GetFlagPickerGUID(enemyTeam) == bot->GetGUID();
+            WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
+            uint32 role = assignment.Valid ? assignment.Role : context->GetValue<uint32>("bg role")->Get();
+            uint8 defendersCount = assignment.Valid ? assignment.Defenders : GetWsgDefenderCount(bg, team);
+            constexpr uint32 fallbackEscortRoles = 2;
+            uint32 escortRoles = assignment.Valid ? assignment.Escorts : fallbackEscortRoles;
+            bool escortRole =
+                assignment.Valid ? assignment.Escort : role >= defendersCount && role < defendersCount + escortRoles;
+            bool baseDefender = assignment.Valid ? assignment.BaseDefender : role == 0 && defendersCount > 0;
+            bool returnerRole = assignment.Valid ? assignment.Returner : role < defendersCount;
+
+            auto ResolveCarrier = [&](TeamId flagTeam) -> Player*
             {
-                BattlegroundWS* warsong = static_cast<BattlegroundWS*>(bg);
-                TeamId enemyTeam = bg->GetOtherTeamId(team);
-                uint8 ownFlagState = warsong->GetFlagState(team);
-                uint8 enemyFlagState = warsong->GetFlagState(enemyTeam);
-                bool carryingEnemyFlag = warsong->GetFlagPickerGUID(enemyTeam) == bot->GetGUID();
-                WsgTeamAssignment assignment = context->GetValue<WsgTeamAssignment>("wsg team assignment")->Get();
-                uint32 role = assignment.Valid ? assignment.Role : context->GetValue<uint32>("bg role")->Get();
-                uint8 defendersCount = assignment.Valid ? assignment.Defenders : GetWsgDefenderCount(bg, team);
-                constexpr uint32 fallbackEscortRoles = 2;
-                uint32 escortRoles = assignment.Valid ? assignment.Escorts : fallbackEscortRoles;
-                bool escortRole = assignment.Valid ? assignment.Escort
-                                                   : role >= defendersCount && role < defendersCount + escortRoles;
-                bool baseDefender = assignment.Valid ? assignment.BaseDefender : role == 0 && defendersCount > 0;
-                bool returnerRole = assignment.Valid ? assignment.Returner : role < defendersCount;
+                ObjectGuid guid = warsong->GetFlagPickerGUID(flagTeam);
+                Player* carrier = guid.IsEmpty() ? nullptr : ObjectAccessor::GetPlayer(bg->GetBgMap(), guid);
+                return carrier && carrier->IsInWorld() && carrier->IsAlive() && carrier->GetMap() == bot->GetMap()
+                           ? carrier
+                           : nullptr;
+            };
 
-                auto ResolveCarrier = [&](TeamId flagTeam) -> Player*
+            Player* friendlyCarrier =
+                enemyFlagState == BG_WS_FLAG_STATE_ON_PLAYER ? ResolveCarrier(enemyTeam) : nullptr;
+            Player* enemyCarrier = ownFlagState == BG_WS_FLAG_STATE_ON_PLAYER ? ResolveCarrier(team) : nullptr;
+            auto PatrolMidfield = [&]()
+            {
+                // Screen the enemy half rather than retreating the whole offense
+                // behind the carrier. Keep a patrol leg until reached.
+                PositionInfo& patrol = posMap["wsg midfield patrol"];
+                constexpr float patrolArrivalRadius = 12.0f;
+                if (!patrol.isSet() || patrol.mapId != bot->GetMapId() ||
+                    bot->GetDistance(patrol.x, patrol.y, patrol.z) < patrolArrivalRadius)
                 {
-                    ObjectGuid guid = warsong->GetFlagPickerGUID(flagTeam);
-                    Player* carrier = guid.IsEmpty() ? nullptr : ObjectAccessor::GetPlayer(bg->GetBgMap(), guid);
-                    return carrier && carrier->IsInWorld() && carrier->IsAlive() && carrier->GetMap() == bot->GetMap()
-                               ? carrier
-                               : nullptr;
-                };
-
-                Player* friendlyCarrier =
-                    enemyFlagState == BG_WS_FLAG_STATE_ON_PLAYER ? ResolveCarrier(enemyTeam) : nullptr;
-                Player* enemyCarrier = ownFlagState == BG_WS_FLAG_STATE_ON_PLAYER ? ResolveCarrier(team) : nullptr;
-                auto PatrolMidfield = [&]()
-                {
-                    // Screen the enemy half rather than retreating the whole offense
-                    // behind the carrier. Keep a patrol leg until reached.
-                    PositionInfo& patrol = posMap["wsg midfield patrol"];
-                    constexpr float patrolArrivalRadius = 12.0f;
-                    if (!patrol.isSet() || patrol.mapId != bot->GetMapId() ||
-                        bot->GetDistance(patrol.x, patrol.y, patrol.z) < patrolArrivalRadius)
-                    {
-                        constexpr float forwardOffset = 35.0f;
-                        constexpr float laneSpacing = 45.0f;
-                        constexpr float patrolSpread = 25.0f;
-                        constexpr uint32 laneCount = 3;
-                        float direction = team == TEAM_ALLIANCE ? -1.0f : 1.0f;
-                        bool defenderRole = assignment.Valid ? assignment.Defender : role < defendersCount;
-                        if (defenderRole && !escortRole && !returnerRole)
-                            direction = -direction;
-                        float lane = static_cast<float>(role % laneCount) - 1.0f;
-                        Position center(WS_ROAM_POS.GetPositionX() + direction * forwardOffset,
-                                        WS_ROAM_POS.GetPositionY() + lane * laneSpacing, WS_ROAM_POS.GetPositionZ());
-                        Position point = bot->GetRandomPoint(center, patrolSpread);
-                        if (point.IsPositionValid())
-                            patrol.Set(point.GetPositionX(), point.GetPositionY(), point.GetPositionZ(),
-                                       bot->GetMapId());
-                    }
-                    if (patrol.isSet())
-                        target.Relocate(patrol.x, patrol.y, patrol.z);
-                    else
-                        target.Relocate(WS_ROAM_POS);
-                };
-                bool enemyObserved = enemyCarrier && bot->CanSeeOrDetect(enemyCarrier);
-                bool pursueEnemyCarrier = returnerRole;
-
-                if (carryingEnemyFlag)
-                {
-                    // A carrier can score only when its own flag is home.
-                    GameObject* ownBaseFlag =
-                        bg->GetBGObject(team == TEAM_ALLIANCE ? BG_WS_OBJECT_A_FLAG : BG_WS_OBJECT_H_FLAG);
-                    if (ownFlagState == BG_WS_FLAG_STATE_ON_BASE && ownBaseFlag && ownBaseFlag->isSpawned() &&
-                        ownBaseFlag->GetGoState() == GO_STATE_READY)
-                        target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_POS_ALLIANCE : WS_FLAG_POS_HORDE);
-                    else
-                        target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_HIDE_ALLIANCE[0] : WS_FLAG_HIDE_HORDE[0]);
+                    constexpr float forwardOffset = 35.0f;
+                    constexpr float laneSpacing = 45.0f;
+                    constexpr float patrolSpread = 25.0f;
+                    constexpr uint32 laneCount = 3;
+                    float direction = team == TEAM_ALLIANCE ? -1.0f : 1.0f;
+                    bool defenderRole = assignment.Valid ? assignment.Defender : role < defendersCount;
+                    if (defenderRole && !escortRole && !returnerRole)
+                        direction = -direction;
+                    float lane = static_cast<float>(role % laneCount) - 1.0f;
+                    Position center(WS_ROAM_POS.GetPositionX() + direction * forwardOffset,
+                                    WS_ROAM_POS.GetPositionY() + lane * laneSpacing, WS_ROAM_POS.GetPositionZ());
+                    Position point = bot->GetRandomPoint(center, patrolSpread);
+                    if (point.IsPositionValid())
+                        patrol.Set(point.GetPositionX(), point.GetPositionY(), point.GetPositionZ(), bot->GetMapId());
                 }
-                else if (ownFlagState == BG_WS_FLAG_STATE_ON_GROUND &&
-                         (assignment.Valid ? assignment.Defender : role < defendersCount) && !escortRole &&
-                         !assignment.CommittedAttack)
-                {
-                    GameObject* droppedFlag = bg->GetBgMap()->GetGameObject(warsong->GetDroppedFlagGUID(team));
-                    if (droppedFlag && droppedFlag->isSpawned() && bot->CanSeeOrDetect(droppedFlag))
-                        target.Relocate(droppedFlag->GetPosition());
-                    else
-                        target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_POS_ALLIANCE : WS_FLAG_POS_HORDE);
-                }
-                else if (enemyObserved && pursueEnemyCarrier)
-                    target.Relocate(enemyCarrier->GetPosition());
-                else if (ownFlagState == BG_WS_FLAG_STATE_ON_PLAYER && returnerRole && enemyCarrier)
-                {
-                    // BG map positions expose carrier X/Y even without local detection.
-                    // Route to the marker, but require normal detection before attacking.
-                    float x = enemyCarrier->GetPositionX();
-                    float y = enemyCarrier->GetPositionY();
-                    Position const& enemyBase = team == TEAM_ALLIANCE ? WS_FLAG_POS_HORDE : WS_FLAG_POS_ALLIANCE;
-                    constexpr float flagRoomMarkerRadius = 80.0f;
-                    float sampleZ = bot->GetPositionZ();
-                    if (enemyBase.GetExactDist2d(x, y) < flagRoomMarkerRadius)
-                        sampleZ = enemyBase.GetPositionZ();
-                    // Use known terrain/flag-room height, not the hidden EFC's Z.
-                    float groundZ = bot->GetMap()->GetHeight(x, y, sampleZ);
-                    if (groundZ != VMAP_INVALID_HEIGHT_VALUE)
-                        target.Relocate(x, y, groundZ);
-                    else if (enemyFlagState == BG_WS_FLAG_STATE_ON_PLAYER)
-                        target.Relocate(enemyBase);
-                    else
-                        PatrolMidfield();
-                }
-                else if (enemyFlagState == BG_WS_FLAG_STATE_ON_GROUND && !baseDefender &&
-                         !(assignment.Valid ? assignment.Defender : role < defendersCount))
-                {
-                    GameObject* droppedFlag = bg->GetBgMap()->GetGameObject(warsong->GetDroppedFlagGUID(enemyTeam));
-                    if (droppedFlag && droppedFlag->isSpawned() && bot->CanSeeOrDetect(droppedFlag))
-                        target.Relocate(droppedFlag->GetPosition());
-                    else
-                        PatrolMidfield();
-                }
-                else if (friendlyCarrier && friendlyCarrier != bot && escortRole)
-                    target.Relocate(friendlyCarrier->GetPosition());
-                else if (baseDefender && !assignment.CommittedAttack)
-                    target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_POS_ALLIANCE : WS_FLAG_POS_HORDE);
-                else if ((assignment.Valid ? assignment.Defender : role < defendersCount) &&
-                         !assignment.CommittedAttack)
-                {
-                    Position const& home = team == TEAM_ALLIANCE ? WS_FLAG_POS_ALLIANCE : WS_FLAG_POS_HORDE;
-                    PositionInfo& defense = posMap["wsg home defense"];
-                    constexpr float defenseSpread = 15.0f;
-                    constexpr float defenseAreaRadius = 25.0f;
-                    if (!defense.isSet() || defense.mapId != bot->GetMapId() ||
-                        home.GetExactDist(defense.x, defense.y, defense.z) > defenseAreaRadius)
-                    {
-                        Position point = bot->GetRandomPoint(home, defenseSpread);
-                        if (point.IsPositionValid())
-                            defense.Set(point.GetPositionX(), point.GetPositionY(), point.GetPositionZ(),
-                                        bot->GetMapId());
-                    }
-                    if (defense.isSet())
-                        target.Relocate(defense.x, defense.y, defense.z);
-                    else
-                        target.Relocate(home);
-                }
-                else if (enemyFlagState == BG_WS_FLAG_STATE_ON_BASE)
-                {
-                    GameObject* baseFlag =
-                        bg->GetBGObject(enemyTeam == TEAM_ALLIANCE ? BG_WS_OBJECT_A_FLAG : BG_WS_OBJECT_H_FLAG);
-                    if (baseFlag && baseFlag->isSpawned() && baseFlag->GetGoState() == GO_STATE_READY)
-                        target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_POS_HORDE : WS_FLAG_POS_ALLIANCE);
-                    else
-                        PatrolMidfield();
-                }
+                if (patrol.isSet())
+                    target.Relocate(patrol.x, patrol.y, patrol.z);
                 else
-                {
-                    // Unassigned attackers screen midfield, not the carrier's retreat.
-                    // This does not reveal a hidden carrier or dropped flag's position.
-                    PatrolMidfield();
-                }
+                    target.Relocate(WS_ROAM_POS);
+            };
+            bool enemyObserved = enemyCarrier && bot->CanSeeOrDetect(enemyCarrier);
+            bool pursueEnemyCarrier = returnerRole;
 
-                if (!target.IsPositionValid())
-                    return false;
-
-                pos.Set(target.GetPositionX(), target.GetPositionY(), target.GetPositionZ(), bot->GetMapId());
-                posMap["bg objective"] = pos;
-                return true;
+            if (carryingEnemyFlag)
+            {
+                // A carrier can score only when its own flag is home.
+                GameObject* ownBaseFlag =
+                    bg->GetBGObject(team == TEAM_ALLIANCE ? BG_WS_OBJECT_A_FLAG : BG_WS_OBJECT_H_FLAG);
+                if (ownFlagState == BG_WS_FLAG_STATE_ON_BASE && ownBaseFlag && ownBaseFlag->isSpawned() &&
+                    ownBaseFlag->GetGoState() == GO_STATE_READY)
+                    target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_POS_ALLIANCE : WS_FLAG_POS_HORDE);
+                else
+                    target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_HIDE_ALLIANCE[0] : WS_FLAG_HIDE_HORDE[0]);
             }
+            else if (ownFlagState == BG_WS_FLAG_STATE_ON_GROUND &&
+                     (assignment.Valid ? assignment.Defender : role < defendersCount) && !escortRole &&
+                     !assignment.CommittedAttack)
+            {
+                GameObject* droppedFlag = bg->GetBgMap()->GetGameObject(warsong->GetDroppedFlagGUID(team));
+                if (droppedFlag && droppedFlag->isSpawned() && bot->CanSeeOrDetect(droppedFlag))
+                    target.Relocate(droppedFlag->GetPosition());
+                else
+                    target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_POS_ALLIANCE : WS_FLAG_POS_HORDE);
+            }
+            else if (enemyObserved && pursueEnemyCarrier)
+                target.Relocate(enemyCarrier->GetPosition());
+            else if (ownFlagState == BG_WS_FLAG_STATE_ON_PLAYER && returnerRole && enemyCarrier)
+            {
+                // BG map positions expose carrier X/Y even without local detection.
+                // Route to the marker, but require normal detection before attacking.
+                float x = enemyCarrier->GetPositionX();
+                float y = enemyCarrier->GetPositionY();
+                Position const& enemyBase = team == TEAM_ALLIANCE ? WS_FLAG_POS_HORDE : WS_FLAG_POS_ALLIANCE;
+                constexpr float flagRoomMarkerRadius = 80.0f;
+                float sampleZ = bot->GetPositionZ();
+                if (enemyBase.GetExactDist2d(x, y) < flagRoomMarkerRadius)
+                    sampleZ = enemyBase.GetPositionZ();
+                // Use known terrain/flag-room height, not the hidden EFC's Z.
+                float groundZ = bot->GetMap()->GetHeight(x, y, sampleZ);
+                if (groundZ != VMAP_INVALID_HEIGHT_VALUE)
+                    target.Relocate(x, y, groundZ);
+                else if (enemyFlagState == BG_WS_FLAG_STATE_ON_PLAYER)
+                    target.Relocate(enemyBase);
+                else
+                    PatrolMidfield();
+            }
+            else if (enemyFlagState == BG_WS_FLAG_STATE_ON_GROUND && !baseDefender &&
+                     !(assignment.Valid ? assignment.Defender : role < defendersCount))
+            {
+                GameObject* droppedFlag = bg->GetBgMap()->GetGameObject(warsong->GetDroppedFlagGUID(enemyTeam));
+                if (droppedFlag && droppedFlag->isSpawned() && bot->CanSeeOrDetect(droppedFlag))
+                    target.Relocate(droppedFlag->GetPosition());
+                else
+                    PatrolMidfield();
+            }
+            else if (friendlyCarrier && friendlyCarrier != bot && escortRole)
+                target.Relocate(friendlyCarrier->GetPosition());
+            else if (baseDefender && !assignment.CommittedAttack)
+                target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_POS_ALLIANCE : WS_FLAG_POS_HORDE);
+            else if ((assignment.Valid ? assignment.Defender : role < defendersCount) && !assignment.CommittedAttack)
+            {
+                Position const& home = team == TEAM_ALLIANCE ? WS_FLAG_POS_ALLIANCE : WS_FLAG_POS_HORDE;
+                PositionInfo& defense = posMap["wsg home defense"];
+                constexpr float defenseSpread = 15.0f;
+                constexpr float defenseAreaRadius = 25.0f;
+                if (!defense.isSet() || defense.mapId != bot->GetMapId() ||
+                    home.GetExactDist(defense.x, defense.y, defense.z) > defenseAreaRadius)
+                {
+                    Position point = bot->GetRandomPoint(home, defenseSpread);
+                    if (point.IsPositionValid())
+                        defense.Set(point.GetPositionX(), point.GetPositionY(), point.GetPositionZ(), bot->GetMapId());
+                }
+                if (defense.isSet())
+                    target.Relocate(defense.x, defense.y, defense.z);
+                else
+                    target.Relocate(home);
+            }
+            else if (enemyFlagState == BG_WS_FLAG_STATE_ON_BASE)
+            {
+                GameObject* baseFlag =
+                    bg->GetBGObject(enemyTeam == TEAM_ALLIANCE ? BG_WS_OBJECT_A_FLAG : BG_WS_OBJECT_H_FLAG);
+                if (baseFlag && baseFlag->isSpawned() && baseFlag->GetGoState() == GO_STATE_READY)
+                    target.Relocate(team == TEAM_ALLIANCE ? WS_FLAG_POS_HORDE : WS_FLAG_POS_ALLIANCE);
+                else
+                    PatrolMidfield();
+            }
+            else
+            {
+                // Unassigned attackers screen midfield, not the carrier's retreat.
+                // This does not reveal a hidden carrier or dropped flag's position.
+                PatrolMidfield();
+            }
+
+            if (!target.IsPositionValid())
+                return false;
+
+            pos.Set(target.GetPositionX(), target.GetPositionY(), target.GetPositionZ(), bot->GetMapId());
+            posMap["bg objective"] = pos;
+            return true;
         }
         case BATTLEGROUND_AB:
         {
