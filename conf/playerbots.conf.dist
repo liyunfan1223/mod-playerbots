@@ -1336,11 +1336,6 @@ Playerbots.RandomBotGroupNearby = 0
 # Default: 1 (enabled)
 Playerbots.AutoDoQuests = 1
 
-# Use quest-starting items from the bags to start their quest automatically (e.g. "A Mangled
-# Journal"). Off by default; the action only runs for bots without a real-player master.
-# Default: 0 (disabled)
-Playerbots.UseStartQuestItems = 0
-
 # Quest items to keep in bots' inventories (do not automatically destroy)
 Playerbots.RandomBotQuestItems = "5175,5176,5177,5178,6948,11000,12382,13704,16309"
 
