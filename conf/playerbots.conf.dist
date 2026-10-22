@@ -409,10 +409,6 @@ Playerbots.SpellDistance = 28.5
 Playerbots.ShootDistance = 5.0
 Playerbots.HealDistance = 38.5
 Playerbots.LootDistance = 15.0
-
-# Defer a loot target the bot has not moved closer to for 5 seconds, so an unreachable target
-# (ledge, across water, bad path) cannot block the bot. Disable to keep trying every tick instead.
-Playerbots.LootWatchdog = 1
 Playerbots.FleeDistance = 5.0
 Playerbots.AggroDistance = 22
 Playerbots.TooCloseDistance = 5.0
