@@ -17,16 +17,16 @@ INSERT INTO `ai_playerbot_texts`
 VALUES (
 2014,
 'calc_item_breakdown',
-'Breakdown: %breakdown (weighted sum %sum, multipliers x%mult)',
+'Breakdown: weighted sum %sum, multipliers x%mult',
 0, 0,
-'분석: %breakdown (가중 합계 %sum, 배수 x%mult)',
-'Détail : %breakdown (somme pondérée %sum, multiplicateurs x%mult)',
-'Aufschlüsselung: %breakdown (gewichtete Summe %sum, Multiplikatoren x%mult)',
-'明细：%breakdown（加权总和 %sum，倍率 x%mult）',
-'明細：%breakdown（加權總和 %sum，倍率 x%mult）',
-'Desglose: %breakdown (suma ponderada %sum, multiplicadores x%mult)',
-'Desglose: %breakdown (suma ponderada %sum, multiplicadores x%mult)',
-'Разбивка: %breakdown (взвешенная сумма %sum, множители x%mult)'
+'분석: 가중 합계 %sum, 배수 x%mult',
+'Détail : somme pondérée %sum, multiplicateurs x%mult',
+'Aufschlüsselung: gewichtete Summe %sum, Multiplikatoren x%mult',
+'明细：加权总和 %sum，倍率 x%mult',
+'明細：加權總和 %sum，倍率 x%mult',
+'Desglose: suma ponderada %sum, multiplicadores x%mult',
+'Desglose: suma ponderada %sum, multiplicadores x%mult',
+'Разбивка: взвешенная сумма %sum, множители x%mult'
 );
 
 INSERT INTO ai_playerbot_texts_chance (name, probability)

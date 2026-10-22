@@ -13,6 +13,7 @@
 #include "StatsWeightCalculator.h"
 #include "World.h"
 #include <charconv>
+#include <iomanip>
 #include <iterator>
 #include <sstream>
 
@@ -179,6 +180,7 @@ bool TellCalculateItemAction::Execute(Event event)
 
     // Per-stat breakdown (value * weight = contribution) so score tuning is verifiable.
     // Keep in sync with enum StatsType in StatsCollector.h.
+    // clang-format off
     static char const* statNames[] = {
         "agility",   "strength",   "intellect",     "spirit",          "stamina",
         "hit",       "crit",       "haste",         "armor",           "defense",
@@ -187,12 +189,14 @@ bool TellCalculateItemAction::Execute(Event event)
         "attack_power", "armor_penetration", "expertise", "melee_dps", "ranged_dps",
         "bonus"
     };
+    // clang-format on
     static_assert(std::size(statNames) == STATS_TYPE_MAX, "statNames must stay in sync with StatsType");
 
     StatsCollector const* collector = calculator.GetCollector();
     float const* weights = calculator.GetStatWeights();
     float sum = 0.0f;
-    std::ostringstream breakdown;
+    std::vector<std::string> lines;
+    std::string line;
     for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
     {
         if (collector->stats[i] == 0.0f)
@@ -200,20 +204,41 @@ bool TellCalculateItemAction::Execute(Event event)
 
         float const contribution = collector->stats[i] * weights[i];
         sum += contribution;
-        if (!breakdown.str().empty())
-            breakdown << ", ";
-        breakdown << statNames[i] << " " << collector->stats[i] << " * " << weights[i] << " = " << contribution;
+
+        std::ostringstream term;
+        term << std::fixed << std::setprecision(2) << statNames[i] << " " << collector->stats[i] << " * " << weights[i]
+             << " = " << contribution;
+
+        // Split into several whispers so no line exceeds the client limit.
+        if (!line.empty() && line.size() + 2 + term.str().size() > PlayerbotAI::MAX_CHAT_MESSAGE_BYTES)
+        {
+            lines.push_back(line);
+            line.clear();
+        }
+
+        if (!line.empty())
+            line += ", ";
+        line += term.str();
     }
 
-    if (!breakdown.str().empty())
-    {
-        std::map<std::string, std::string> placeholders;
-        placeholders["%breakdown"] = breakdown.str();
-        placeholders["%sum"] = std::to_string(sum);
-        placeholders["%mult"] = std::to_string(sum != 0.0f ? score / sum : 0.0f);
-        botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
-            "calc_item_breakdown", "Breakdown: %breakdown (weighted sum %sum, multipliers x%mult)", placeholders));
-    }
+    if (line.empty())
+        return true;
+
+    lines.push_back(line);
+
+    std::ostringstream sumText;
+    std::ostringstream multText;
+    sumText << std::fixed << std::setprecision(2) << sum;
+    multText << std::fixed << std::setprecision(2) << (sum != 0.0f ? score / sum : 0.0f);
+
+    std::map<std::string, std::string> placeholders;
+    placeholders["%sum"] = sumText.str();
+    placeholders["%mult"] = multText.str();
+    botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+        "calc_item_breakdown", "Breakdown: weighted sum %sum, multipliers x%mult", placeholders));
+
+    for (std::string const& chunk : lines)
+        botAI->TellMasterNoFacing(chunk);
 
     return true;
 }
