@@ -6748,6 +6748,7 @@ void PlayerbotAI::RecordQuestCompleted(uint32 questId)
 
 void PlayerbotAI::RecordQuestRewarded(uint32 questId)
 {
+    RecordQuestCompleted(questId);
     countedQuestCompletions.erase(questId);
     ++rpgStatistic.questRewarded;
     if (sPlayerbotAIConfig.CollectDetailedQuestStats)
