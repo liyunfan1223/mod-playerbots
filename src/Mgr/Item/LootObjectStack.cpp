@@ -94,8 +94,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid lootGUID)
     GameObject* go = botAI->GetGameObject(lootGUID);
     if (go && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
     {
-        // The client refuses to interact with hostile game objects; check live so forced
-        // reputations are honored.
+        // The client refuses to use hostile game objects.
         if (go->IsHostileTo(bot))
             return;
 
@@ -316,8 +315,7 @@ bool LootObject::IsLootPossible(Player* bot)
     Creature* creature = botAI->GetCreature(guid);
     if (creature && creature->getDeathState() == DeathState::Corpse)
     {
-        // Gathering is independent of loot rights in the core: a corpse only needs to be fully
-        // looted and the bot to have the matching skill. Only normal corpse loot is gated here.
+        // Gathering does not need loot rights.
         if (!bot->isAllowedToLoot(creature) && !IsGatheringSkill(skillId))
             return false;
     }

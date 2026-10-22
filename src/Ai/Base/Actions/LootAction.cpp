@@ -431,9 +431,7 @@ bool StoreLootAction::Execute(Event event)
         if (!proto)
             continue;
 
-        // Nearly full bags must not make the bot refuse quest or otherwise useful items; only
-        // vendor/auction junk is restricted to topping up existing stacks. An item is skipped
-        // only when the bag genuinely cannot hold it.
+        // Skip loot that isn't useful when bags are nearly full.
         if (!IsRealPlayer(botAI->GetMaster()) && AI_VALUE(uint8, "bag space") > 80)
         {
             ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemid);
@@ -499,8 +497,7 @@ bool StoreLootAction::Execute(Event event)
         BroadcastHelper::BroadcastLootingItem(botAI, bot, proto);
     }
 
-    // A window with nothing storable would make the server fail every autostore request; defer
-    // the object instead of reopening it in a loop.
+    // Nothing storable: defer instead of reopening the window in a loop.
     if (autostored == 0 && guid.IsGameObject())
         availableLoot->DeferLoot(guid);
     else
