@@ -121,6 +121,7 @@ inline constexpr float FELMYST_LOCATION_MATCH_DISTANCE = 2.0f;
 // needed since this distance is for a non-moving bot, but the visual looks much wider than 3y
 // so a bit of leeway allows for some more realism as players would not stand so close.
 inline constexpr float FOG_DESTINATION_VAPOR_CLEARANCE = 8.0f;
+inline constexpr uint8 TOTAL_FOG_LANES = 3;
 
 inline Position const FOG_LEFT_SIDE =  { 1469.064f, 729.585f, 59.824f, 4.677f };
 inline Position const FOG_RIGHT_SIDE = { 1458.556f, 502.200f, 59.900f, 1.606f };
@@ -213,7 +214,7 @@ inline std::array const DEMONIC_VAPOR_LANE_REFERENCES = {
 Position const& GetFelmystMainTankGroundPosition(Player* bot);
 bool TryGetFelmystGroundStackPosition(
     Player* bot, Unit* felmyst, FelmystGroundStack stack, Position& position);
-FelmystGroundStack GetClosestFelmystGroundStack(Player* bot, Unit* felmyst, Unit* unit);
+FelmystGroundStack GetClosestFelmystGroundStack(Player* bot, Unit* felmyst, Player* reference);
 float GetFelmystFrontAngle(Player* bot, Unit* felmyst);
 bool TryGetFelmystRangedPosition(Player* bot, Unit* felmyst, Position& position);
 FelmystDemonicVaporGuids FindFelmystDemonicVaporGuids(Player* bot);
@@ -239,7 +240,7 @@ bool ShouldMoveAwayFromFelmystEncapsulateTarget(
 bool DidEncapsulateOccurThisGroundPhase(Player* bot);
 Player* GetFelmystGasNovaDispelTarget(Player* bot);
 Player* GetFelmystCharmedTarget(Player* bot, Unit* felmyst);
-Player* GetFelmystFlightLeader(Player* player);
+Player* GetFelmystFlightLeader(Player* bot);
 
 // Shared encounter state
 

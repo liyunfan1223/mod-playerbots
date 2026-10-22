@@ -329,7 +329,7 @@ uint8 SelectPreferredDemonicVaporSide(Player* bot, FogLane lane, uint8 allowedSi
         DEMONIC_VAPOR_LEFT_SIDE : DEMONIC_VAPOR_RIGHT_SIDE;
 }
 
-std::array<FogLane, 3> GetDemonicVaporLanePriority(FogLane lane)
+std::array<FogLane, TOTAL_FOG_LANES> GetDemonicVaporLanePriority(FogLane lane)
 {
     switch (lane)
     {
@@ -782,9 +782,9 @@ bool TryGetFelmystGroundStackPosition(
     return true;
 }
 
-FelmystGroundStack GetClosestFelmystGroundStack(Player* bot, Unit* felmyst, Unit* unit)
+FelmystGroundStack GetClosestFelmystGroundStack(Player* bot, Unit* felmyst, Player* reference)
 {
-    if (!unit || !felmyst)
+    if (!felmyst || !reference)
         return FelmystGroundStack::None;
 
     FelmystGroundStack bestStack = FelmystGroundStack::None;
@@ -797,7 +797,7 @@ FelmystGroundStack GetClosestFelmystGroundStack(Player* bot, Unit* felmyst, Unit
         if (!TryGetGroundStackCenter(bot, felmyst, stack, stackX, stackY))
             continue;
 
-        float const stackDistance = unit->GetExactDist2d(stackX, stackY);
+        float const stackDistance = reference->GetExactDist2d(stackX, stackY);
         if (stackDistance < bestDistance)
         {
             bestDistance = stackDistance;
@@ -865,9 +865,6 @@ bool TryGetFelmystRangedPosition(Player* bot, Unit* felmyst, Position& position)
 
 Creature* GetFelmystDemonicVaporSummonedBy(Player* bot, Player* summoner)
 {
-    if (!summoner)
-        return nullptr;
-
     for (ObjectGuid const& guid : GetCachedDemonicVapors(bot).heads)
     {
         Creature* head = GetLivingCreature(bot, guid);
@@ -944,7 +941,7 @@ FogPassState const* AdvanceFelmystFogPassTracker(Unit* felmyst)
             tracker.lastCompletedLane = tracker.armedSweepLane;
             tracker.armedSweepLane = FogLane::None;
 
-            constexpr uint32 thirdPassWindowMs = 10000;
+            constexpr uint32 thirdPassWindowMs = 10 * IN_MILLISECONDS;
             if (tracker.completedPassCount >= 3)
                 tracker.thirdPassWindowExpireMs = getMSTime() + thirdPassWindowMs;
         }
@@ -1150,7 +1147,7 @@ bool TryGetFelmystFogOfCorruptionStageState(Unit* felmyst, FogOfCorruptionState&
 
     if (currentLane != FogLane::None)
     {
-        constexpr uint32 fogWindupGraceMs = 7000;
+        constexpr uint32 fogWindupGraceMs = 7 * IN_MILLISECONDS;
         tracker.lane = currentLane;
         tracker.phase = FogPhase::Windup;
         tracker.expireMs = now + fogWindupGraceMs;
@@ -1279,11 +1276,8 @@ Player* GetFelmystEncapsulateTarget(Player* bot)
 bool ShouldMoveAwayFromFelmystEncapsulateTarget(
     Player* bot, Unit* felmyst, Player* encapsulateTarget)
 {
-    if (!felmyst || !encapsulateTarget || encapsulateTarget == bot ||
-        felmyst->GetVictim() == bot)
-    {
+    if (!felmyst || !encapsulateTarget || encapsulateTarget == bot || felmyst->GetVictim() == bot)
         return false;
-    }
 
     FelmystGroundStack const botStack = GetClosestFelmystGroundStack(bot, felmyst, bot);
     return botStack != FelmystGroundStack::None &&
@@ -1361,18 +1355,18 @@ Player* GetFelmystCharmedTarget(Player* bot, Unit* felmyst)
 
 // Bots will follow this player during the vapor phase. Return the first eligible assistant, and
 // if no eligible assistant is found, return the first eligible bot.
-Player* GetFelmystFlightLeader(Player* player)
+Player* GetFelmystFlightLeader(Player* bot)
 {
-    Group* group = player->GetGroup();
+    Group* group = bot->GetGroup();
     if (!group)
         return nullptr;
 
-    FelmystEncounterState& state = FelmystState(player->GetInstanceId());
+    FelmystEncounterState& state = FelmystState(bot->GetInstanceId());
 
-    auto const isEligible = [player](Player* member) -> bool
+    auto const isEligible = [bot](Player* member) -> bool
     {
         return member && member->IsAlive() && member->GetMapId() == SWP_MAP_ID &&
-            !GetFelmystDemonicVaporSummonedBy(player, member);
+            !GetFelmystDemonicVaporSummonedBy(bot, member);
     };
 
     // Keep the then-current flight leader if still eligible to maintain consistency. Notably, if
