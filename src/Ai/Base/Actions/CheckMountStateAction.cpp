@@ -127,9 +127,8 @@ bool CheckMountStateAction::Execute(Event /*event*/)
 
     // Hold mounting only while the loot actions are working on something; the cleanup and form
     // handling above still run. Capped in time so unreachable loot cannot keep the bot unmounted.
-    bool const lootActive = sPlayerbotAIConfig.PrioritiseLooting &&
-                            (AI_VALUE(LootObjectStack*, "available loot")->IsLootPending() ||
-                             AI_VALUE(bool, "can loot") || !AI_VALUE(LootObject, "loot target").IsEmpty());
+    bool const lootActive = AI_VALUE(LootObjectStack*, "available loot")->IsLootPending() ||
+                            AI_VALUE(bool, "can loot") || !AI_VALUE(LootObject, "loot target").IsEmpty();
     if (lootActive)
     {
         if (!lootHoldSince)

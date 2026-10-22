@@ -409,11 +409,6 @@ Playerbots.SpellDistance = 28.5
 Playerbots.ShootDistance = 5.0
 Playerbots.HealDistance = 38.5
 Playerbots.LootDistance = 15.0
-
-# Finish looting before mounting or grinding: while loot is available or openable the bot does not
-# mount or start a new grind target. It still defends itself when attacked.
-# Default: 0 (opt-in)
-Playerbots.PrioritiseLooting = 0
 Playerbots.FleeDistance = 5.0
 Playerbots.AggroDistance = 22
 Playerbots.TooCloseDistance = 5.0
