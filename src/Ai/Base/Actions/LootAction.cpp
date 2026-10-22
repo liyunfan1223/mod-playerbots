@@ -44,8 +44,26 @@ bool LootAction::Execute(Event /*event*/)
 
 bool LootAction::isUseful()
 {
-    return sPlayerbotAIConfig.FreeMethodLoot || !bot->GetGroup() || bot->GetGroup()->GetLootMethod() != FREE_FOR_ALL ||
-           IsSelfBot(bot);
+    if (!sPlayerbotAIConfig.FreeMethodLoot && bot->GetGroup() && bot->GetGroup()->GetLootMethod() == FREE_FOR_ALL &&
+        !IsSelfBot(bot))
+        return false;
+
+    LootObject lootTarget = AI_VALUE(LootObject, "loot target");
+    LootObject nearest = AI_VALUE(LootObject, "nearest loot");
+    if (lootTarget.IsEmpty() || nearest.IsEmpty() || nearest.guid == lootTarget.guid ||
+        !AI_VALUE(LootObjectStack*, "available loot")->CanAttemptLoot(lootTarget.guid) ||
+        !lootTarget.IsLootPossible(bot))
+        return true;
+
+    WorldObject* nearestObject = nearest.GetWorldObject(bot);
+    WorldObject* currentObject = lootTarget.GetWorldObject(bot);
+    if (!nearestObject || !currentObject)
+        return true;
+
+    // Leave a valid target only for a clearly closer one, so two equidistant corpses on either side
+    // of an obstacle do not swap places on every tick.
+    constexpr float lootSwitchMargin = 3.0f;
+    return bot->GetDistance(nearestObject) + lootSwitchMargin < bot->GetDistance(currentObject);
 }
 
 enum ProfessionSpells

@@ -14,10 +14,6 @@ bool LootAvailableTrigger::IsActive()
     if (!AI_VALUE(bool, "has available loot"))
         return false;
 
-    LootObject nearest = AI_VALUE(LootObject, "nearest loot");
-    if (nearest.IsEmpty())
-        return false;
-
     LootObject lootTarget = AI_VALUE(LootObject, "loot target");
     bool distanceCheck = false;
     if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
@@ -37,19 +33,8 @@ bool LootAvailableTrigger::IsActive()
     if (lootTarget.IsEmpty() || !lootTarget.IsLootPossible(bot))
         return true;
 
-    // Re-run the loot action when the nearest entry is clearly closer than the target, instead
-    // of chasing the old target past fresh corpses. The margin stops two equidistant corpses on
-    // either side of an obstacle from swapping places on every tick.
-    if (nearest.guid == lootTarget.guid)
-        return false;
-
-    WorldObject* nearestObject = nearest.GetWorldObject(bot);
-    WorldObject* currentObject = lootTarget.GetWorldObject(bot);
-    if (!nearestObject || !currentObject)
-        return true;
-
-    constexpr float lootSwitchMargin = 3.0f;
-    return bot->GetDistance(nearestObject) + lootSwitchMargin < bot->GetDistance(currentObject);
+    // A different nearest entry may be worth switching to; LootAction::isUseful applies the margin.
+    return AI_VALUE(LootObject, "nearest loot").guid != lootTarget.guid;
 }
 
 bool FarFromCurrentLootTrigger::IsActive()
