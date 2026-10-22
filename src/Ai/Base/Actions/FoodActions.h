@@ -4,8 +4,8 @@
  * or (at your option) any later version.
  */
 
-#ifndef PLAYERBOTS_NONCOMBATACTIONS_H
-#define PLAYERBOTS_NONCOMBATACTIONS_H
+#ifndef PLAYERBOTS_FOODACTIONS_H
+#define PLAYERBOTS_FOODACTIONS_H
 
 #include "UseItemAction.h"
 
@@ -24,7 +24,8 @@ public:
 class EatAction : public UseItemAction
 {
 public:
-    EatAction(PlayerbotAI* botAI) : UseItemAction(botAI, "food") {}
+    // "food" is the inventory category; the action and chat command are named "eat".
+    EatAction(PlayerbotAI* botAI) : UseItemAction(botAI, "eat", false, "food") {}
 
     bool Execute(Event event) override;
     bool isUseful() override;

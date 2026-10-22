@@ -7,14 +7,6 @@
 #include "GrindingStrategy.h"
 #include "Playerbots.h"
 
-std::vector<NextAction> GrindingStrategy::getDefaultActions()
-{
-    return {
-        NextAction("drink", 4.2f),
-        NextAction("food", 4.1f),
-    };
-}
-
 void GrindingStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // reduce lower than loot
