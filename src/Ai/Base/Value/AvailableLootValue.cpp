@@ -22,6 +22,18 @@ LootTargetValue::LootTargetValue(PlayerbotAI* botAI, std::string const name)
 {
 }
 
+bool CanLootValue::Get()
+{
+    ObjectGuid const guid = AI_VALUE(LootObject, "loot target").guid;
+    if (guid != _lootGuid)
+    {
+        _lootGuid = guid;
+        Reset();
+    }
+
+    return BoolCalculatedValue::Get();
+}
+
 bool CanLootValue::Calculate()
 {
     LootObject loot = AI_VALUE(LootObject, "loot target");

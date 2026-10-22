@@ -25,8 +25,9 @@ bool LootAvailableTrigger::IsActive()
     bool const inRange = botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT)
                              ? ServerFacade::instance().IsDistanceLessOrEqualThan(
                                    AI_VALUE2(float, "distance", "loot target"), CONTACT_DISTANCE)
-                             : lootTarget.IsAtInteractDistance(bot);
-    if (inRange || !lootTarget.IsLootPossible(bot))
+                             : AI_VALUE(bool, "can loot");
+    if (inRange || !AI_VALUE(LootObjectStack*, "available loot")->CanAttemptLoot(lootTarget.guid) ||
+        !lootTarget.IsLootPossible(bot))
         return true;
 
     // No hostile targets to deal with first. Last because "all targets" is an uncached grid search.
@@ -36,7 +37,8 @@ bool LootAvailableTrigger::IsActive()
 bool FarFromCurrentLootTrigger::IsActive()
 {
     LootObject loot = AI_VALUE(LootObject, "loot target");
-    if (loot.IsEmpty() || loot.IsAtInteractDistance(bot))
+    if (loot.IsEmpty() || AI_VALUE(bool, "can loot") ||
+        !AI_VALUE(LootObjectStack*, "available loot")->CanAttemptLoot(loot.guid))
         return false;
 
     return loot.IsLootPossible(bot);
