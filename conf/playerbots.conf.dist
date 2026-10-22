@@ -19,6 +19,7 @@
 #        LOOTING
 #        TIMERS
 #        DISTANCES
+#        RESURRECTION AND CORPSE RUNS
 #        THRESHOLDS
 #        QUESTS
 #        COMBAT
@@ -420,6 +421,24 @@ Playerbots.AoeRadius = 10
 Playerbots.RpgDistance = 200
 Playerbots.GrindDistance = 75.0
 Playerbots.ReactDistance = 150.0
+
+#
+#
+####################################################################################################
+
+####################################################################################################
+# RESURRECTION AND CORPSE RUNS
+#
+
+# Free random bots may cast a learned, normal resurrection spell on nearby same-faction real players
+# in the open world, before they release spirit. Normal spell range, mana and casting rules apply.
+# No instant or combat resurrection; ordinary ground travel can pause briefly to help.
+# Default: 0 (disabled)
+Playerbots.WorldResurrect.Enable = 0
+
+# Maximum search distance in yards. This does not extend the resurrection spell's normal range.
+# Finite values are clamped to 1..60; non-finite values use the default of 30 yards.
+Playerbots.WorldResurrect.Distance = 30.0
 
 #
 #

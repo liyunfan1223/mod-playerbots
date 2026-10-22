@@ -26,7 +26,7 @@
 #include "StuckTriggers.h"
 #include "TravelTriggers.h"
 #include "WaitForAttackTriggers.h"
-
+#include "WorldResurrectTrigger.h"
 class PlayerbotAI;
 
 class TriggerContext : public NamedObjectContext<Trigger>
@@ -34,6 +34,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
 public:
     TriggerContext()
     {
+        creators["world resurrect available"] = &TriggerContext::WorldResurrectAvailable;
         creators["return"] = &TriggerContext::_return;
         creators["sit"] = &TriggerContext::sit;
         creators["return to stay position"] = &TriggerContext::return_to_stay_position;
@@ -252,6 +253,7 @@ public:
     }
 
 private:
+    static Trigger* WorldResurrectAvailable(PlayerbotAI* botAI) { return new WorldResurrectTrigger(botAI); }
     static Trigger* give_food(PlayerbotAI* botAI) { return new GiveFoodTrigger(botAI); }
     static Trigger* give_water(PlayerbotAI* botAI) { return new GiveWaterTrigger(botAI); }
     static Trigger* no_rti(PlayerbotAI* botAI) { return new NoRtiTrigger(botAI); }
