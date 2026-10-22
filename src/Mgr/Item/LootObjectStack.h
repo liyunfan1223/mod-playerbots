@@ -105,7 +105,6 @@ public:
     bool Add(ObjectGuid guid);
     void Remove(ObjectGuid guid);
     void Clear();
-    bool CanLoot(float maxDistance);
     LootObject GetLoot(float maxDistance = 0);
 
     bool IsLootPending();

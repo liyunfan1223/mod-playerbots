@@ -15,35 +15,31 @@ bool LootAvailableTrigger::IsActive()
         return false;
 
     LootObject lootTarget = AI_VALUE(LootObject, "loot target");
-    bool distanceCheck = false;
-    if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
-    {
-        distanceCheck =
-            ServerFacade::instance().IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"), CONTACT_DISTANCE);
-    }
-    else
-    {
-        distanceCheck = lootTarget.IsAtInteractDistance(bot);
-    }
-
-    // Loot target in range, or no hostile targets to deal with first.
-    if (distanceCheck || AI_VALUE(GuidVector, "all targets").empty())
-        return true;
-
-    if (lootTarget.IsEmpty() || !lootTarget.IsLootPossible(bot))
+    if (lootTarget.IsEmpty())
         return true;
 
     // A different nearest entry may be worth switching to; LootAction::isUseful applies the margin.
-    return AI_VALUE(LootObject, "nearest loot").guid != lootTarget.guid;
+    if (AI_VALUE(LootObject, "nearest loot").guid != lootTarget.guid)
+        return true;
+
+    bool const inRange = botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT)
+                             ? ServerFacade::instance().IsDistanceLessOrEqualThan(
+                                   AI_VALUE2(float, "distance", "loot target"), CONTACT_DISTANCE)
+                             : lootTarget.IsAtInteractDistance(bot);
+    if (inRange || !lootTarget.IsLootPossible(bot))
+        return true;
+
+    // No hostile targets to deal with first. Last because "all targets" is an uncached grid search.
+    return AI_VALUE(GuidVector, "all targets").empty();
 }
 
 bool FarFromCurrentLootTrigger::IsActive()
 {
     LootObject loot = AI_VALUE(LootObject, "loot target");
-    if (!loot.IsLootPossible(bot))
+    if (loot.IsEmpty() || loot.IsAtInteractDistance(bot))
         return false;
 
-    return !loot.IsAtInteractDistance(bot);
+    return loot.IsLootPossible(bot);
 }
 
 bool CanLootTrigger::IsActive() { return AI_VALUE(bool, "can loot"); }

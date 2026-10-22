@@ -514,17 +514,7 @@ bool LootObjectStack::CanAttemptLoot(ObjectGuid guid) const
     return itr == availableLoot.end() || itr->IsReady();
 }
 
-bool LootObjectStack::CanLoot(float maxDistance)
-{
-    LootObject nearest = GetNearest(maxDistance);
-    return !nearest.IsEmpty();
-}
-
-LootObject LootObjectStack::GetLoot(float maxDistance)
-{
-    LootObject nearest = GetNearest(maxDistance);
-    return nearest.IsEmpty() ? LootObject() : nearest;
-}
+LootObject LootObjectStack::GetLoot(float maxDistance) { return GetNearest(maxDistance); }
 
 LootObject LootObjectStack::GetNearest(float maxDistance)
 {

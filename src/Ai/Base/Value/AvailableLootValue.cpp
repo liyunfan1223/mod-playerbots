@@ -26,6 +26,6 @@ bool CanLootValue::Calculate()
 {
     LootObject loot = AI_VALUE(LootObject, "loot target");
     LootObjectStack* availableLoot = AI_VALUE(LootObjectStack*, "available loot");
-    return !loot.IsEmpty() && availableLoot->CanAttemptLoot(loot.guid) && loot.IsLootPossible(bot) &&
-           loot.IsAtInteractDistance(bot);
+    return !loot.IsEmpty() && availableLoot->CanAttemptLoot(loot.guid) && loot.IsAtInteractDistance(bot) &&
+           loot.IsLootPossible(bot);
 }
