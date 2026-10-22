@@ -12,6 +12,7 @@
 #include "Position.h"
 #include <type_traits>
 
+class Creature;
 class Player;
 class PlayerbotAI;
 class Unit;
@@ -74,23 +75,48 @@ enum class SwpSpells : uint32
     SPELL_DARKNESS_OF_A_THOUSAND_SOULS = 46605,
     SPELL_SHADOW_SPIKE                 = 46680,
 
+    // Death Knight
+    SPELL_STRANGULATE                  = 47476,
+    SPELL_MIND_FREEZE                  = 47528,
+
     // Hunter
     SPELL_MISDIRECTION                 = 34477,
     SPELL_MISDIRECTION_AURA            = 35079, // the aura on the hunter
+    SPELL_SILENCING_SHOT               = 34490,
 
     // Mage
+    SPELL_COUNTERSPELL                 = 2139,
     SPELL_SPELLSTEAL                   = 30449,
+    SPELL_DEEP_FREEZE                  = 44572,
 
     // Priest
     SPELL_DISPEL_MAGIC_RANK_1          = 527,
     SPELL_SHADOWFORM                   = 15473,
+    SPELL_SILENCE                      = 15487,
     SPELL_MASS_DISPEL                  = 32375,
+
+    // Rogue
+    SPELL_KICK                         = 1766,
 
     // Shaman
     SPELL_PURGE_RANK_1                 = 370,
+    SPELL_WIND_SHEAR                   = 57994,
 
     // Warlock
     SPELL_METAMORPHOSIS                = 47241,
+
+    // Warlock (Felhunter)
+    SPELL_SPELL_LOCK_1                 = 19244,
+    SPELL_SPELL_LOCK_2                 = 19647,
+
+    // Warrior
+    SPELL_SHIELD_BASH                  = 72,
+    SPELL_BERSERKER_STANCE             = 2458,
+    SPELL_PUMMEL                       = 6552,
+    SPELL_CONCUSSION_BLOW              = 12809,
+
+    // Tauren
+    SPELL_WAR_STOMP                    = 20549,
 };
 
 enum class SwpNpcs : uint32
@@ -194,6 +220,9 @@ uint32 GetManualCastCooldown(uint32 spellId);
 uint32 GetManualCastGlobalCooldown(uint32 spellId);
 // Misdirection on the tank, then Steady Shot on the target while it is up, to spend it.
 bool MisdirectTargetToTank(PlayerbotAI* botAI, Unit* target, Player* tank);
+// The Spell Lock rank a living Felhunter can cast at the target now. This is needed because
+// PlayerbotAI::CanCastSpell passes any spell the pet knows without checking range or cooldown.
+uint32 GetReadySpellLock(Creature* pet, Unit* target);
 // One step along the bot's path to a point, stopping short of it by stopDistance. The step
 // follows the path corner-by-corner, rather than aiming at the far end of it, so a bot can move
 // around an obstacle between it and the point.

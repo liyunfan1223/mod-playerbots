@@ -117,15 +117,12 @@ FogLane GetFogLaneFromLocation(FogLocation location)
         case FogLocation::LeftTop:
         case FogLocation::RightTop:
             return FogLane::Top;
-
         case FogLocation::LeftMiddle:
         case FogLocation::RightMiddle:
             return FogLane::Middle;
-
         case FogLocation::LeftBottom:
         case FogLocation::RightBottom:
             return FogLane::Bottom;
-
         default:
             return FogLane::None;
     }

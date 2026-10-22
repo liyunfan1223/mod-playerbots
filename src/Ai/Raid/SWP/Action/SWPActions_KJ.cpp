@@ -132,12 +132,12 @@ bool KiljaedenControlHandsOfTheDeceiverAction::Execute(Event /*event*/)
 
 bool KiljaedenControlHandsOfTheDeceiverAction::CastStunOnHand(Unit* hand)
 {
-    auto const castSpell = [&](char const* spell)
+    auto const castSpell = [&](auto const& spell)
     {
         return botAI->CanCastSpell(spell, hand) && botAI->CastSpell(spell, hand);
     };
 
-    auto const castSelfAoe = [&](char const* spell, float radius)
+    auto const castSelfAoe = [&](auto const& spell, float radius)
     {
         return bot->GetExactDist(hand) < radius && castSpell(spell);
     };
@@ -151,7 +151,7 @@ bool KiljaedenControlHandsOfTheDeceiverAction::CastStunOnHand(Unit* hand)
                  bot->GetComboPoints() >= 4 && castSpell("maim"));
         }
         case CLASS_MAGE:
-            return castSpell("deep freeze");
+            return castSpell(Id(SwpSpells::SPELL_DEEP_FREEZE));
         case CLASS_PALADIN:
             return castSpell("hammer of justice");
         case CLASS_ROGUE:
@@ -160,20 +160,20 @@ bool KiljaedenControlHandsOfTheDeceiverAction::CastStunOnHand(Unit* hand)
             return castSpell("shadowfury");
         case CLASS_WARRIOR:
         {
-            return castSpell("concussion blow") ||
+            return castSpell(Id(SwpSpells::SPELL_CONCUSSION_BLOW)) ||
                 castSelfAoe("shockwave", SHOCKWAVE_RADIUS);
         }
         default:
         {
             return bot->getRace() == RACE_TAUREN &&
-                castSelfAoe("war stomp", SELF_AOE_RACIAL_RADIUS);
+                castSelfAoe(Id(SwpSpells::SPELL_WAR_STOMP), SELF_AOE_RACIAL_RADIUS);
         }
     }
 }
 
 bool KiljaedenControlHandsOfTheDeceiverAction::CastSilenceOnHand(Unit* hand)
 {
-    auto const castSpell = [&](char const* spell)
+    auto const castSpell = [&](auto const& spell)
     {
         return botAI->CanCastSpell(spell, hand) && botAI->CastSpell(spell, hand);
     };
@@ -181,11 +181,11 @@ bool KiljaedenControlHandsOfTheDeceiverAction::CastSilenceOnHand(Unit* hand)
     switch (bot->getClass())
     {
         case CLASS_HUNTER:
-            return castSpell("silencing shot");
+            return castSpell(Id(SwpSpells::SPELL_SILENCING_SHOT));
         case CLASS_PRIEST:
-            return castSpell("silence");
+            return castSpell(Id(SwpSpells::SPELL_SILENCE));
         case CLASS_DEATH_KNIGHT:
-            return castSpell("strangulate");
+            return castSpell(Id(SwpSpells::SPELL_STRANGULATE));
         default:
         {
             return bot->getRace() == RACE_BLOODELF &&

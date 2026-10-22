@@ -496,6 +496,9 @@ public:
     MuruInterruptFelFireballAction(PlayerbotAI* botAI)
         : Action(botAI, "m'uru interrupt fel fireball") {}
     bool Execute(Event event) override;
+
+private:
+    bool CastWarriorInterrupt(Unit* furyMage);
 };
 
 class MuruCastSpellStealOnSpellFuryAction : public Action

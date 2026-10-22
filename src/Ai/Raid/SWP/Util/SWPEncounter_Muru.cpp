@@ -61,13 +61,10 @@ float GetBerserkerStunReach(Player* bot)
         case CLASS_ROGUE:
         case CLASS_WARRIOR:
             return MELEE_ABILITY_REACH;
-
         case CLASS_PALADIN:
             return HAMMER_OF_JUSTICE_REACH;
-
         case CLASS_WARLOCK:
             return RANGED_ABILITY_REACH;
-
         default:
             return bot->getRace() == RACE_TAUREN ? SELF_AOE_RACIAL_RADIUS : 0.0f;
     }
@@ -80,20 +77,15 @@ float GetFuryMageInterruptReach(Player* bot)
         case CLASS_ROGUE:
         case CLASS_WARRIOR:
             return MELEE_ABILITY_REACH;
-
         case CLASS_SHAMAN:
             return WIND_SHEAR_REACH;
-
         case CLASS_DEATH_KNIGHT:
         case CLASS_MAGE:
-        case CLASS_PALADIN:
         case CLASS_PRIEST:
         case CLASS_WARLOCK:
             return RANGED_ABILITY_REACH;
-
         case CLASS_HUNTER:
             return SILENCING_SHOT_REACH;
-
         default:
             return 0.0f;
     }
@@ -255,27 +247,21 @@ MuruEncounterGuids FindMuruEncounterGuids(PlayerbotAI* botAI)
             case Id(SwpNpcs::NPC_MURU):
                 guids.muru = guid;
                 break;
-
             case Id(SwpNpcs::NPC_ENTROPIUS):
                 guids.entropius = guid;
                 break;
-
             case Id(SwpNpcs::NPC_VOID_SENTINEL):
                 guids.voidSentinels.push_back(guid);
                 break;
-
             case Id(SwpNpcs::NPC_VOID_SPAWN):
                 guids.voidSpawns.push_back(guid);
                 break;
-
             case Id(SwpNpcs::NPC_SHADOWSWORD_FURY_MAGE):
                 guids.furyMages.push_back(guid);
                 break;
-
             case Id(SwpNpcs::NPC_SHADOWSWORD_BERSERKER):
                 guids.berserkers.push_back(guid);
                 break;
-
             default:
                 break;
         }

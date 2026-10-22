@@ -6,7 +6,9 @@
 
 #include "SWPShared.h"
 #include "PathGenerator.h"
+#include "PetDefines.h"
 #include "Playerbots.h"
+#include <array>
 
 namespace SwpHelpers
 {
@@ -91,6 +93,28 @@ bool MisdirectTargetToTank(PlayerbotAI* botAI, Unit* target, Player* tank)
         return false;
 
     return botAI->CanCastSpell("steady shot", target) && botAI->CastSpell("steady shot", target);
+}
+
+uint32 GetReadySpellLock(Creature* pet, Unit* target)
+{
+    if (!pet || !target || !pet->IsAlive() || pet->GetEntry() != NPC_FELHUNTER)
+        return 0;
+
+    if (!pet->IsWithinCombatRange(target, RANGED_ABILITY_REACH) || !pet->IsWithinLOSInMap(target))
+        return 0;
+
+    static constexpr std::array spellLockRanks = {
+        Id(SwpSpells::SPELL_SPELL_LOCK_2),
+        Id(SwpSpells::SPELL_SPELL_LOCK_1),
+    };
+
+    for (uint32 spellLock : spellLockRanks)
+    {
+        if (pet->HasSpell(spellLock))
+            return pet->HasSpellCooldown(spellLock) ? 0 : spellLock;
+    }
+
+    return 0;
 }
 
 bool GetPathStepTowardPoint(

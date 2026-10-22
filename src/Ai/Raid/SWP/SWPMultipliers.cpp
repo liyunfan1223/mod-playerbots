@@ -88,7 +88,6 @@ float SunwellControlMisdirectionMultiplier::GetValueInEncounter(Action* action)
         {
             case Id(SwpNpcs::NPC_ENTROPIUS):
                 return 1.0f;
-
             case Id(SwpNpcs::NPC_KALECGOS_DRAGON):
             case Id(SwpNpcs::NPC_BRUTALLUS):
             case Id(SwpNpcs::NPC_GRAND_WARLOCK_ALYTHESS):
@@ -96,7 +95,6 @@ float SunwellControlMisdirectionMultiplier::GetValueInEncounter(Action* action)
             case Id(SwpNpcs::NPC_KILJAEDEN):
                 isHeldBoss = true;
                 break;
-
             default:
                 break;
         }
@@ -149,39 +147,30 @@ float SunwellDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
             case Id(SwpNpcs::NPC_HAND_OF_THE_DECEIVER):
                 hand = unit;
                 break;
-
             case Id(SwpNpcs::NPC_KILJAEDEN):
                 kiljaeden = unit;
                 break;
-
             case Id(SwpNpcs::NPC_MURU):
                 muru = unit;
                 break;
-
             case Id(SwpNpcs::NPC_ENTROPIUS):
                 entropius = unit;
                 break;
-
             case Id(SwpNpcs::NPC_GRAND_WARLOCK_ALYTHESS):
                 alythess = unit;
                 break;
-
             case Id(SwpNpcs::NPC_LADY_SACROLASH):
                 sacrolash = unit;
                 break;
-
             case Id(SwpNpcs::NPC_FELMYST):
                 felmyst = unit;
                 break;
-
             case Id(SwpNpcs::NPC_BRUTALLUS):
                 brutallus = unit;
                 break;
-
             case Id(SwpNpcs::NPC_KALECGOS_DRAGON):
                 kalecgos = unit;
                 break;
-
             default:
                 break;
         }

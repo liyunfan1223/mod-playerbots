@@ -550,7 +550,7 @@ bool MuruCastStunOnBerserkerAction::Execute(Event /*event*/)
     if (!berserker)
         return false;
 
-    auto const castStun = [&](char const* spell)
+    auto const castStun = [&](auto const& spell)
     {
         return botAI->CanCastSpell(spell, berserker) && botAI->CastSpell(spell, berserker);
     };
@@ -566,9 +566,9 @@ bool MuruCastStunOnBerserkerAction::Execute(Event /*event*/)
         case CLASS_WARLOCK:
             return castStun("shadowfury");
         case CLASS_WARRIOR:
-            return castStun("concussion blow") || castStun("shockwave");
+            return castStun(Id(SwpSpells::SPELL_CONCUSSION_BLOW)) || castStun("shockwave");
         default:
-            return bot->getRace() == RACE_TAUREN && castStun("war stomp");
+            return bot->getRace() == RACE_TAUREN && castStun(Id(SwpSpells::SPELL_WAR_STOMP));
     }
 }
 
@@ -578,7 +578,7 @@ bool MuruInterruptFelFireballAction::Execute(Event /*event*/)
     if (!furyMage)
         return false;
 
-    auto const castInterrupt = [&](char const* spell)
+    auto const castInterrupt = [&](auto const& spell)
     {
         return botAI->CanCastSpell(spell, furyMage) && botAI->CastSpell(spell, furyMage);
     };
@@ -586,26 +586,63 @@ bool MuruInterruptFelFireballAction::Execute(Event /*event*/)
     switch (bot->getClass())
     {
         case CLASS_DEATH_KNIGHT:
-            return castInterrupt("mind freeze") || castInterrupt("strangulate");
+        {
+            return (bot->IsWithinMeleeRange(furyMage) &&
+                    castInterrupt(Id(SwpSpells::SPELL_MIND_FREEZE))) ||
+                castInterrupt(Id(SwpSpells::SPELL_STRANGULATE));
+        }
         case CLASS_HUNTER:
-            return castInterrupt("silencing shot");
+            return castInterrupt(Id(SwpSpells::SPELL_SILENCING_SHOT));
         case CLASS_MAGE:
-            return castInterrupt("counterspell");
-        case CLASS_PALADIN:
-            return castInterrupt("avenger's shield");
+            return castInterrupt(Id(SwpSpells::SPELL_COUNTERSPELL));
         case CLASS_PRIEST:
-            return castInterrupt("silence");
+            return castInterrupt(Id(SwpSpells::SPELL_SILENCE));
         case CLASS_ROGUE:
-            return castInterrupt("kick");
+            return castInterrupt(Id(SwpSpells::SPELL_KICK));
         case CLASS_SHAMAN:
-            return castInterrupt("wind shear");
+            return castInterrupt(Id(SwpSpells::SPELL_WIND_SHEAR));
         case CLASS_WARLOCK:
-            return castInterrupt("spell lock");
+        {
+            Pet* pet = bot->GetPet();
+            uint32 const spellLock = GetReadySpellLock(pet, furyMage);
+            return spellLock && pet->CastSpell(furyMage, spellLock, false) == SPELL_CAST_OK;
+        }
         case CLASS_WARRIOR:
-            return castInterrupt("pummel") || castInterrupt("shield bash");
+            return CastWarriorInterrupt(furyMage);
         default:
             return false;
     }
+}
+
+// Pummel requires Berserker Stance. This function makes Arms Warriors stance change, which keeps
+// 10 rage from Stance Mastery, Pummel's cost, allowing Pummel to be cast on the next tick.
+bool MuruInterruptFelFireballAction::CastWarriorInterrupt(Unit* furyMage)
+{
+    if (bot->GetShapeshiftForm() == FORM_BERSERKERSTANCE)
+    {
+        return botAI->CanCastSpell(Id(SwpSpells::SPELL_PUMMEL), furyMage) &&
+            botAI->CastSpell(Id(SwpSpells::SPELL_PUMMEL), furyMage);
+    }
+
+    if (botAI->CanCastSpell(Id(SwpSpells::SPELL_SHIELD_BASH), furyMage) &&
+        botAI->CastSpell(Id(SwpSpells::SPELL_SHIELD_BASH), furyMage))
+    {
+        return true;
+    }
+
+    if (PlayerbotAI::IsTank(bot))
+        return false;
+
+    constexpr uint32 pummelRageCost = 100; // 10 rage
+    uint32 const pummel = Id(SwpSpells::SPELL_PUMMEL);
+    if (!bot->HasSpell(pummel) || bot->HasSpellCooldown(pummel) ||
+        bot->GetPower(POWER_RAGE) < pummelRageCost)
+    {
+        return false;
+    }
+
+    return botAI->CanCastSpell(Id(SwpSpells::SPELL_BERSERKER_STANCE), bot) &&
+        botAI->CastSpell(Id(SwpSpells::SPELL_BERSERKER_STANCE), bot);
 }
 
 bool MuruCastSpellStealOnSpellFuryAction::Execute(Event /*event*/)

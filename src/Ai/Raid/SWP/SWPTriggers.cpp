@@ -666,8 +666,9 @@ bool MuruBerserkerHasFlurryTrigger::IsActiveInEncounter()
 
 bool MuruFuryMageCastingFelFireballTrigger::IsActiveInEncounter()
 {
-    // Druids are seriously the only class with no interrupts?
-    if (bot->getClass() == CLASS_DRUID)
+    // Only tank Druids have interrupts, which we don't want to waste here. Paladins have no
+    // interrupt other than Hammer of Justice, which should be saved as a stun for Berserkers.
+    if (bot->getClass() == CLASS_DRUID || bot->getClass() == CLASS_PALADIN)
         return false;
 
     if (!AI_VALUE2(Unit*, "find target", "m'uru"))
