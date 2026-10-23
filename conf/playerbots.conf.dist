@@ -1428,6 +1428,12 @@ Playerbots.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,23
 # Default: 1 (enabled)
 Playerbots.EnableNewRpgStrategy = 1
 
+# Track per-quest accept/complete/reward/drop/abandon counts and drop/abandon reasons, reported by
+# ".playerbots rndbot queststats" and dumped to LogsDir/playerbots_quest_stats.json by
+# ".playerbots rndbot questdump". Adds per-bot maps that are cleared on every stats aggregation.
+# Default: 0 (disabled)
+Playerbots.CollectDetailedQuestStats = 0
+
 # Control probability weights for RPG status of bots. Takes effect only when the status meets its premise.​
 # Sum of weights need not be 100. Set to 0 to disable the status.
 #

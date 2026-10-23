@@ -6740,6 +6740,48 @@ std::set<uint32> PlayerbotAI::GetCurrentIncompleteQuestIds()
     return result;
 }
 
+void PlayerbotAI::RecordQuestAccepted(uint32 questId)
+{
+    ++rpgStatistic.questAccepted;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].accepted;
+}
+
+void PlayerbotAI::RecordQuestCompleted(uint32 questId)
+{
+    // Each completion counts once per bot and quest, until the quest is rewarded or dropped.
+    if (!countedQuestCompletions.insert(questId).second)
+        return;
+
+    ++rpgStatistic.questCompleted;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].completed;
+}
+
+void PlayerbotAI::RecordQuestRewarded(uint32 questId)
+{
+    RecordQuestCompleted(questId);
+    countedQuestCompletions.erase(questId);
+    ++rpgStatistic.questRewarded;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].rewarded;
+}
+
+void PlayerbotAI::RecordQuestDropped(uint32 questId, QuestDropReason reason)
+{
+    countedQuestCompletions.erase(questId);
+    ++rpgStatistic.questDropped;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].dropped[static_cast<size_t>(reason)];
+}
+
+void PlayerbotAI::RecordQuestAbandoned(uint32 questId, QuestAbandonReason reason)
+{
+    ++rpgStatistic.questAbandoned;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].abandoned[static_cast<size_t>(reason)];
+}
+
 uint32 PlayerbotAI::GetReactDelay()
 {
     uint32 base = sPlayerbotAIConfig.ReactDelay;  // Default 100(ms)

@@ -153,6 +153,10 @@ public:
     PlayerBotMap GetAllBots() { return playerBots; };
     void InitArenaTeams();
     void PrintStats();
+    void PrintQuestTotals(NewRpgStatistic const& stats);
+    NewRpgStatistic CollectQuestStats();
+    void PrintQuestStats();
+    void ExportQuestStatsToJson();
     double GetBuyMultiplier(Player* bot);
     double GetSellMultiplier(Player* bot);
     void AddTradeDiscount(Player* bot, Player* master, int32 value);
