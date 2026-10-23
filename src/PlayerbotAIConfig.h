@@ -396,6 +396,7 @@ public:
     bool AutoLearnTrainerSpells;
     bool AutoDoQuests;
     bool EnableNewRpgStrategy;
+    float RpgTargetSearchDistance;
     bool CollectDetailedQuestStats;
     std::unordered_map<NewRpgStatus, uint32> RpgStatusProbWeight;
     bool SyncLevelWithPlayers;
