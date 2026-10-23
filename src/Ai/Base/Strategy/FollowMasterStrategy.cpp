@@ -13,6 +13,8 @@ std::vector<NextAction> FollowMasterStrategy::getDefaultActions()
     };
 }
 
-void FollowMasterStrategy::InitTriggers(std::vector<TriggerNode*>& /*triggers*/)
+void FollowMasterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
+    // Outranks the new rpg / grind movement actions so a leashed bot is pulled back.
+    triggers.push_back(new TriggerNode("leash too far", { NextAction("follow", ACTION_NORMAL + 5.0f) }));
 }

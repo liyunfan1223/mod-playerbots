@@ -6,13 +6,17 @@
 
 #include "PossibleRpgTargetsValue.h"
 #include "CellImpl.h"
+#include "DBCStores.h"
+#include "Formations.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "LootObjectStack.h"
 #include "NearestGameObjects.h"
 #include "ObjectGuid.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
+#include <algorithm>
 #include <unordered_set>
 
 const std::vector<uint32> PossibleRpgTargetsValue::allowedNpcFlags = {
@@ -167,6 +171,14 @@ bool PossibleNewRpgTargetsValue::AcceptUnit(Unit* unit)
     if (unit->IsHostileTo(bot) || unit->IsPlayer())
         return false;
 
+    // Don't pick a target the leash would pull the bot straight back from.
+    if (IsLeashFormation(botAI))
+    {
+        Player* master = botAI->GetMaster();
+        if (master && ServerFacade::instance().GetDistance2d(master, unit) > sPlayerbotAIConfig.LeashDistance)
+            return false;
+    }
+
     if (unit->HasNpcFlag(UNIT_NPC_FLAG_SPIRITHEALER))
         return false;
 
@@ -192,6 +204,8 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
     Cell::VisitObjects(bot, searcher, range);
 
+    Player* const master = IsLeashFormation(botAI) ? botAI->GetMaster() : nullptr;
+
     std::vector<std::pair<ObjectGuid, float>> guidDistancePairs;
     for (GameObject* go : targets)
     {
@@ -210,6 +224,9 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
         if (!ignoreLos && !bot->IsWithinLOSInMap(go))
             continue;
 
+        if (master && ServerFacade::instance().GetDistance2d(master, go) > sPlayerbotAIConfig.LeashDistance)
+            continue;
+
         guidDistancePairs.push_back({go->GetGUID(), bot->GetExactDist(go)});
     }
     GuidVector results;
@@ -222,5 +239,87 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
     for (auto const& pair : guidDistancePairs) {
         results.push_back(pair.first);
     }
+    return results;
+}
+
+// Same key/skill gate the client applies before it lets a player use a locked object.
+// Lock cases are alternatives, so any one the bot meets is enough.
+static bool CanOpenQuestObjectLock(Player* bot, GameObject* go)
+{
+    LockEntry const* lock = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
+    if (!lock)
+        return true;
+
+    bool hasRequirement = false;
+    for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
+    {
+        switch (lock->Type[i])
+        {
+            case LOCK_KEY_ITEM:
+                if (!lock->Index[i])
+                    break;
+                hasRequirement = true;
+                if (bot->HasItemCount(lock->Index[i], 1))
+                    return true;
+                break;
+            case LOCK_KEY_SKILL:
+            {
+                SkillType skill = SkillByLockType(LockType(lock->Index[i]));
+                if (skill == SKILL_NONE)
+                    return true;
+                hasRequirement = true;
+                if (bot->HasSkill(skill) && bot->GetSkillValue(skill) >= lock->Skill[i])
+                    return true;
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return !hasRequirement;
+}
+
+GuidVector PossibleQuestGrabTargetsValue::Calculate()
+{
+    std::list<GameObject*> targets;
+    AnyGameObjectInObjectRangeCheck u_check(bot, _range);
+    Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
+    Cell::VisitObjects(bot, searcher, _range);
+
+    std::vector<std::pair<ObjectGuid, float>> guidDistancePairs;
+    for (GameObject* go : targets)
+    {
+        if (!go->isSpawned() || !go->IsInWorld())
+            continue;
+
+        // Quest giver objects are handled by "quest grab giver", which checks the quest is
+        // worth taking. Using them here only opens the offer window and loops forever.
+        if (go->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
+            continue;
+
+        // No LOS check: the server only range-checks object use, and LOS rejects objects
+        // pushed into walls that players can click fine.
+        if (!go->ActivateToQuest(bot))
+            continue;
+
+        bool const canOpen = go->GetGoType() == GAMEOBJECT_TYPE_CHEST
+                                 ? LootObject(bot, go->GetGUID()).IsLootPossible(bot)
+                                 : CanOpenQuestObjectLock(bot, go);
+        if (!canOpen)
+        {
+            LOG_DEBUG("playerbots", "[Quest Grab] {} skipping {} (entry {}): locked", bot->GetName(),
+                      go->GetGOInfo()->name, go->GetEntry());
+            continue;
+        }
+
+        guidDistancePairs.push_back({go->GetGUID(), bot->GetExactDist(go)});
+    }
+
+    std::ranges::sort(guidDistancePairs, {}, &std::pair<ObjectGuid, float>::second);
+
+    GuidVector results;
+    for (auto const& [guid, distance] : guidDistancePairs)
+        results.push_back(guid);
+
     return results;
 }

@@ -9,6 +9,7 @@
 #include "Event.h"
 #include "Formations.h"
 #include "PathGenerator.h"
+#include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "ServerFacade.h"
@@ -65,6 +66,27 @@ bool GoAction::Execute(Event event)
             target->setForced(false);
             return true;
         }
+    }
+
+    // One-shot "quest grab", for players who don't want the strategy running all the time.
+    if (param == "quest" || param == "grab")
+    {
+        for (char const* action : { "quest grab giver", "quest grab use item", "quest grab create item",
+                                    "quest grab object" })
+        {
+            if (!botAI->DoSpecificAction(action, Event(), true))
+                continue;
+
+            // Without the strategy nothing retries once the bot arrives, so ask to be told again.
+            if (bot->isMoving())
+                botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+                    "go_quest_moving", "On my way, whisper 'go quest' again once I'm there", {}));
+            return true;
+        }
+
+        botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+            "go_quest_nothing_error", "Nothing quest-related to grab right now", {}));
+        return false;
     }
 
     GuidVector gos = ChatHelper::parseGameobjects(param);
@@ -222,6 +244,8 @@ bool GoAction::Execute(Event event)
         return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z + 0.5f, sPlayerbotAIConfig.FollowDistance);
     }
 
-    botAI->TellMaster("Whisper 'go x,y', 'go [game object]', 'go unit' or 'go position' and I will go there");
+    botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+        "go_help", "Whisper 'go x,y', 'go [game object]', 'go unit', 'go position' or 'go quest' and I will go there",
+        {}));
     return false;
 }

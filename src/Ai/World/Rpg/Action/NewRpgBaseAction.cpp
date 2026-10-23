@@ -8,6 +8,7 @@
 #include "BroadcastHelper.h"
 #include "ChatHelper.h"
 #include "Creature.h"
+#include "Formations.h"
 #include "GameObject.h"
 #include "GatherNodeMgr.h"
 #include "GossipDef.h"
@@ -38,6 +39,7 @@
 #include "Timer.h"
 #include "TravelMgr.h"
 #include "G3D/Vector2.h"
+#include <algorithm>
 
 bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
 {
@@ -712,10 +714,12 @@ bool NewRpgBaseAction::OrganizeQuestLog()
     return true;
 }
 
-bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
+bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward(float distanceLimit, bool organizeQuestLog)
 {
-    OrganizeQuestLog();
-    if (ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract(true, 80.0f))
+    if (organizeQuestLog)
+        OrganizeQuestLog();
+
+    if (ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract(true, distanceLimit))
     {
         WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npcOrGo);
         if (!object)
@@ -837,21 +841,66 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
     return false;
 }
 
-static std::vector<float> GenerateRandomWeights(int n)
+// The master a leashed bot must stay near, or nullptr when the bot is not leashed.
+static Player* GetLeashMaster(Player* bot)
 {
-    std::vector<float> weights(n);
-    float sum = 0.0;
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    return botAI && IsLeashFormation(botAI) ? botAI->GetMaster() : nullptr;
+}
 
-    for (int i = 0; i < n; ++i)
+// Keeps new rpg from choosing a destination the leash would pull the bot straight back from.
+static bool WithinLeashRange(Player* leashMaster, float x, float y)
+{
+    return !leashMaster || leashMaster->GetDistance2d(x, y) <= sPlayerbotAIConfig.LeashDistance;
+}
+
+// Picks one real POI point (within leash range) instead of a random blend of all of them: a blend
+// re-rolls on every call, so it can pass the status check and then land out of range, and the
+// average of real points can be inside a wall or off a ledge.
+static bool PickLeashLegalPoint(Player* bot, std::vector<QuestPOIPoint> const& points, float& outX, float& outY)
+{
+    Player* const leashMaster = GetLeashMaster(bot);
+    std::vector<QuestPOIPoint const*> candidates;
+    candidates.reserve(points.size());
+    for (QuestPOIPoint const& point : points)
     {
-        weights[i] = rand_norm();
-        sum += weights[i];
+        if (WithinLeashRange(leashMaster, point.x, point.y))
+            candidates.push_back(&point);
     }
-    for (int i = 0; i < n; ++i)
-    {
-        weights[i] /= sum;
-    }
-    return weights;
+    if (candidates.empty())
+        return false;
+
+    QuestPOIPoint const& chosen = *candidates[urand(0, static_cast<uint32>(candidates.size()) - 1)];
+    outX = chosen.x;
+    outY = chosen.y;
+    return true;
+}
+
+// GetHeight only searches down from the z it is given. Starting at the bot's z finds the right
+// floor on multi-level terrain; MAX_HEIGHT is the fallback for ground above the bot.
+float NewRpgBaseAction::GetGroundZ(float x, float y)
+{
+    float groundZ = bot->GetMap()->GetHeight(x, y, bot->GetPositionZ());
+    if (groundZ <= INVALID_HEIGHT)
+        groundZ = bot->GetMap()->GetHeight(x, y, MAX_HEIGHT);
+
+    return std::max(groundZ, bot->GetMap()->GetWaterLevel(x, y));
+}
+
+// A reachable point of this POI in the bot's zone, within 1500 yd and the leash.
+bool NewRpgBaseAction::GetQuestPoiPos(QuestPOI const& qPoi, float& x, float& y)
+{
+    if (qPoi.points.empty() || !PickLeashLegalPoint(bot, qPoi.points, x, y))
+        return false;
+
+    if (bot->GetDistance2d(x, y) >= 1500.0f)
+        return false;
+
+    float const z = GetGroundZ(x, y);
+    if (z == INVALID_HEIGHT || z == VMAP_INVALID_HEIGHT_VALUE)
+        return false;
+
+    return bot->GetZoneId() == bot->GetMap()->GetZoneId(bot->GetPhaseMask(), x, y, z);
 }
 
 bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete)
@@ -879,30 +928,9 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
             if (qPoi.ObjectiveIndex != -1)
                 continue;
 
-            if (qPoi.points.size() == 0)
-                continue;
-
             float dx = 0, dy = 0;
-            std::vector<float> weights = GenerateRandomWeights(qPoi.points.size());
-            for (size_t i = 0; i < qPoi.points.size(); i++)
-            {
-                QuestPOIPoint const& point = qPoi.points[i];
-                dx += point.x * weights[i];
-                dy += point.y * weights[i];
-            }
-
-            if (bot->GetDistance2d(dx, dy) >= 1500.0f)
-                continue;
-
-            float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
-
-            if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
-                continue;
-
-            if (bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
-                continue;
-
-            poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
+            if (GetQuestPoiPos(qPoi, dx, dy))
+                poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
         }
 
         if (poiInfo.empty())
@@ -952,29 +980,10 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
         }
         if (!inComplete)
             continue;
-        if (qPoi.points.size() == 0)
-            continue;
+
         float dx = 0, dy = 0;
-        std::vector<float> weights = GenerateRandomWeights(qPoi.points.size());
-        for (size_t i = 0; i < qPoi.points.size(); i++)
-        {
-            QuestPOIPoint const& point = qPoi.points[i];
-            dx += point.x * weights[i];
-            dy += point.y * weights[i];
-        }
-
-        if (bot->GetDistance2d(dx, dy) >= 1500.0f)
-            continue;
-
-        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, MAX_HEIGHT), bot->GetMap()->GetWaterLevel(dx, dy));
-
-        if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
-            continue;
-
-        if (bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
-            continue;
-
-        poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
+        if (GetQuestPoiPos(qPoi, dx, dy))
+            poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
     }
 
     if (poiInfo.size() == 0)
@@ -988,6 +997,7 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
 
 WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
 {
+    Player* const leashMaster = GetLeashMaster(bot);
     std::vector<WorldLocation> const& locs = sTravelMgr.GetLocsPerLevelCache(bot->GetLevel());
     float hiRange = 500.0f;
     float loRange = 2500.0f;
@@ -1011,6 +1021,9 @@ WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
             continue;
 
         if (bot->GetExactDist(loc) > 2500.0f)
+            continue;
+
+        if (!WithinLeashRange(leashMaster, loc.GetPositionX(), loc.GetPositionY()))
             continue;
 
         if (!inCity && bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(),
@@ -1046,6 +1059,7 @@ WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
 
 WorldPosition NewRpgBaseAction::SelectRandomCampPos(Player* bot)
 {
+    Player* const leashMaster = GetLeashMaster(bot);
     const std::vector<WorldLocation> locs = sTravelMgr.GetTravelHubs(bot);
 
     bool inCity = false;
@@ -1067,6 +1081,9 @@ WorldPosition NewRpgBaseAction::SelectRandomCampPos(Player* bot)
             continue;
 
         if (bot->GetExactDist(loc) < 50.0f)
+            continue;
+
+        if (!WithinLeashRange(leashMaster, loc.GetPositionX(), loc.GetPositionY()))
             continue;
 
         if (!inCity && bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(),
@@ -1107,11 +1124,13 @@ bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, Wor
 
 bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateStatus)
 {
+    // A leashed bot does in-range quests first, and otherwise stays with the leader.
+    bool const leashed = IsLeashFormation(botAI);
     std::vector<NewRpgStatus> availableStatus;
     uint32 probSum = 0;
     for (NewRpgStatus status : candidateStatus)
     {
-        if (sPlayerbotAIConfig.RpgStatusProbWeight[status] == 0)
+        if (sPlayerbotAIConfig.RpgStatusProbWeight[status] == 0 || (leashed && status != RPG_DO_QUEST))
             continue;
 
         if (CheckRpgStatusAvailable(status))
@@ -1120,23 +1139,41 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
             probSum += sPlayerbotAIConfig.RpgStatusProbWeight[status];
         }
     }
-    // Safety check. Default to "rest" if all RPG weights = 0
-    if (availableStatus.empty() || probSum == 0)
+    bool const preferQuest = leashed &&
+        std::ranges::find(availableStatus, RPG_DO_QUEST) != availableStatus.end();
+
+    NewRpgStatus chosenStatus = RPG_STATUS_END;
+    if (preferQuest)
     {
-        botAI->rpgInfo.ChangeToRest();
-        bot->SetStandState(UNIT_STAND_STATE_SIT);
+        chosenStatus = RPG_DO_QUEST;
+    }
+    else if (leashed)
+    {
+        // "new rpg status update" outranks plain "follow", so follow from here.
+        if (Player* master = botAI->GetMaster())
+            Follow(master);
+        botAI->rpgInfo.ChangeToIdle();
         return true;
     }
-    uint32 rand = urand(1, probSum);
-    uint32 accumulate = 0;
-    NewRpgStatus chosenStatus = RPG_STATUS_END;
-    for (NewRpgStatus status : availableStatus)
+    else
     {
-        accumulate += sPlayerbotAIConfig.RpgStatusProbWeight[status];
-        if (accumulate >= rand)
+        // Safety check. Default to "rest" if all RPG weights = 0
+        if (availableStatus.empty() || probSum == 0)
         {
-            chosenStatus = status;
-            break;
+            botAI->rpgInfo.ChangeToRest();
+            bot->SetStandState(UNIT_STAND_STATE_SIT);
+            return true;
+        }
+        uint32 rand = urand(1, probSum);
+        uint32 accumulate = 0;
+        for (NewRpgStatus status : availableStatus)
+        {
+            accumulate += sPlayerbotAIConfig.RpgStatusProbWeight[status];
+            if (accumulate >= rand)
+            {
+                chosenStatus = status;
+                break;
+            }
         }
     }
 
@@ -1193,6 +1230,8 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
                 Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
                 if (quest)
                 {
+                    LOG_DEBUG("playerbots", "[New RPG] {} chose to do quest {} ({} candidate(s), leashed: {})",
+                              bot->GetName(), questId, availableQuests.size(), leashed);
                     botAI->rpgInfo.ChangeToDoQuest(questId, quest);
                     return true;
                 }

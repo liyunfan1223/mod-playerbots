@@ -5,6 +5,7 @@
  */
 
 #include "RangeTriggers.h"
+#include "Formations.h"
 #include "MoveSplineInit.h"
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
@@ -209,6 +210,8 @@ bool FarFromMasterTrigger::IsActive()
 {
     return ServerFacade::instance().IsDistanceGreaterThan(AI_VALUE2(float, "distance", "group leader"), distance);
 }
+
+bool LeashTooFarTrigger::IsActive() { return IsLeashFormation(botAI) && FarFromMasterTrigger::IsActive(); }
 
 bool TooCloseToCreatureTrigger::TooCloseToCreature(uint32 creatureId, float range, bool alive)
 {

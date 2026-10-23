@@ -116,6 +116,18 @@ private:
     float distance;
 };
 
+// Active past Playerbots.LeashDistance from the leader while the "leash" formation is set.
+class LeashTooFarTrigger : public FarFromMasterTrigger
+{
+public:
+    explicit LeashTooFarTrigger(PlayerbotAI* botAI)
+        : FarFromMasterTrigger(botAI, "leash too far", sPlayerbotAIConfig.LeashDistance, 10)
+    {
+    }
+
+    bool IsActive() override;
+};
+
 class OutOfReactRangeTrigger : public FarFromMasterTrigger
 {
 public:

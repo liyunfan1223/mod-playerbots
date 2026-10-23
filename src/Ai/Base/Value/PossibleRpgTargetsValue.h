@@ -56,4 +56,21 @@ private:
     bool ignoreLos;
 };
 
+// Quest objects near the bot that "quest grab object" can use: the ones ActivateToQuest makes
+// sparkle for the bot, and whose lock it can open. Range is from the bot, not the leader.
+class PossibleQuestGrabTargetsValue : public ObjectGuidListCalculatedValue
+{
+public:
+    explicit PossibleQuestGrabTargetsValue(PlayerbotAI* botAI, float range = 0.0f)
+        : ObjectGuidListCalculatedValue(botAI, "possible quest grab targets"),
+          _range(range ? range : sPlayerbotAIConfig.QuestGrabDistance)
+    {
+    }
+
+    GuidVector Calculate() override;
+
+private:
+    float _range;
+};
+
 #endif

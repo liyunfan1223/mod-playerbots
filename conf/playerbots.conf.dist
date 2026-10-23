@@ -421,6 +421,22 @@ Playerbots.RpgDistance = 200
 Playerbots.GrindDistance = 75.0
 Playerbots.ReactDistance = 150.0
 
+# Playerbots.LeashDistance
+#     Description: How far (yards) a bot in the "leash" formation may wander
+#                  from the group leader before it follows again. Pair it with
+#                  "new rpg", "grind" or "quest grab" to let the bot act on its
+#                  own nearby. Enable with: formation leash
+#     Default:     30.0
+Playerbots.LeashDistance = 30.0
+
+# Playerbots.QuestGrabDistance
+#     Description: How far (yards), from the bot's own position (not the group
+#                  leader), the "quest grab" strategy will go to accept/turn in
+#                  a quest or use a quest item or object.
+#                  Enable with: nc +quest grab
+#     Default:     30.0
+Playerbots.QuestGrabDistance = 30.0
+
 #
 #
 ####################################################################################################

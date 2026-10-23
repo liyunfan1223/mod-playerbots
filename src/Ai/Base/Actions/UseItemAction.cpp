@@ -149,6 +149,11 @@ bool UseItemAction::UseItemAuto(Item* item) { return UseItem(item, ObjectGuid::E
 
 bool UseItemAction::UseItemOnGameObject(Item* item, ObjectGuid go) { return UseItem(item, go, nullptr); }
 
+bool UseItemAction::UseItemOnUnit(Item* item, Unit* unitTarget)
+{
+    return UseItem(item, ObjectGuid::Empty, nullptr, unitTarget);
+}
+
 bool UseItemAction::UseItemOnItem(Item* item, Item* itemTarget) { return UseItem(item, ObjectGuid::Empty, itemTarget); }
 
 bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Unit* unitTarget)
@@ -270,7 +275,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
     }
 
     Player* master = GetMaster();
-    if (!targetSelected && item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && master &&
+    if (!targetSelected && !unitTarget && item->GetTemplate()->Class != ITEM_CLASS_CONSUMABLE && master &&
         IsRealPlayer(botAI->GetMaster()) && !selfOnly)
     {
         if (ObjectGuid masterSelection = master->GetTarget())

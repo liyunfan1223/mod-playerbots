@@ -39,6 +39,7 @@
 #include "NonCombatStrategy.h"
 #include "PassiveStrategy.h"
 #include "PullStrategy.h"
+#include "QuestGrabStrategy.h"
 #include "QuestStrategies.h"
 #include "RTSCStrategy.h"
 #include "RacialsStrategy.h"
@@ -90,6 +91,7 @@ public:
         creators["custom"] = &StrategyContext::custom;
         creators["reveal"] = &StrategyContext::reveal;
         creators["collision"] = &StrategyContext::collision;
+        creators["quest grab"] = &StrategyContext::quest_grab;
         creators["rpg"] = &StrategyContext::rpg;
         creators["new rpg"] = &StrategyContext::new_rpg;
         creators["travel"] = &StrategyContext::travel;
@@ -169,6 +171,7 @@ private:
     static Strategy* custom(PlayerbotAI* botAI) { return new CustomStrategy(botAI); }
     static Strategy* reveal(PlayerbotAI* botAI) { return new RevealStrategy(botAI); }
     static Strategy* collision(PlayerbotAI* botAI) { return new CollisionStrategy(botAI); }
+    static Strategy* quest_grab(PlayerbotAI* botAI) { return new QuestGrabStrategy(botAI); }
     static Strategy* rpg(PlayerbotAI* botAI) { return new RpgStrategy(botAI); }
     static Strategy* new_rpg(PlayerbotAI* botAI) { return new NewRpgStrategy(botAI); }
     static Strategy* travel(PlayerbotAI* botAI) { return new TravelStrategy(botAI); }
