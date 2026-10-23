@@ -351,7 +351,13 @@ public:
 
     bool OnPlayerBeforeAchievementComplete(Player* player, AchievementEntry const* achievement) override
     {
-        if ((sRandomPlayerbotMgr.IsRandomBot(player) || sRandomPlayerbotMgr.IsAddclassBot(player)) &&
+        // Every bot session, not only the random and addclass pools: IsRandomBot()
+        // needs the character's account to be in the random account list and the
+        // GUID to be in the live pool, so bots a module logs in on its own
+        // accounts pass this guard and take the realm firsts from real players.
+        // A selfbot is unaffected -- it plays on the human's own session, which is
+        // not flagged as a bot session.
+        if (player->GetSession() && player->GetSession()->IsBot() &&
             (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL)))
         {
             return false;
