@@ -15,6 +15,14 @@ bool FindUsableItemVisitor::Visit(Item* item)
     return true;
 }
 
+bool FindStartQuestItemVisitor::Visit(Item* item)
+{
+    if (!item->GetTemplate()->StartQuest)
+        return true;
+
+    return FindUsableItemVisitor::Visit(item);
+}
+
 bool FindPotionVisitor::Accept(ItemTemplate const* proto)
 {
     if (proto->Class == ITEM_CLASS_CONSUMABLE &&

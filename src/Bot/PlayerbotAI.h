@@ -25,6 +25,7 @@
 #include "Util.h"
 #include "WorldPacket.h"
 #include <stack>
+#include <unordered_set>
 
 class Action;
 class AiObjectContext;
@@ -479,6 +480,7 @@ public:
     static std::string GetLocalizedAreaName(AreaTableEntry const* entry);
     static std::string GetLocalizedCreatureName(uint32 entry);
     static std::string GetLocalizedGameObjectName(uint32 entry);
+    static constexpr size_t MAX_CHAT_MESSAGE_BYTES = 255;
     bool TellMaster(std::ostringstream& stream, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMaster(std::string const text, PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
     bool TellMasterNoFacing(std::ostringstream& stream,
@@ -621,6 +623,12 @@ public:
     static SpellFamilyNames Class2SpellFamilyName(uint8 cls);
     NewRpgInfo rpgInfo;
     NewRpgStatistic rpgStatistic;
+    std::unordered_set<uint32> countedQuestCompletions;
+    void RecordQuestAccepted(uint32 questId);
+    void RecordQuestCompleted(uint32 questId);
+    void RecordQuestRewarded(uint32 questId);
+    void RecordQuestDropped(uint32 questId, QuestDropReason reason);
+    void RecordQuestAbandoned(uint32 questId, QuestAbandonReason reason);
     std::unordered_set<uint32> lowPriorityQuest;
     time_t bgReleaseAttemptTime = 0;
     ForceRebuffState forceRebuff;

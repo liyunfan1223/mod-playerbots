@@ -124,7 +124,7 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
     return weight_;
 }
 
-float StatsWeightCalculator::CalculateEnchant(uint32 enchantId)
+float StatsWeightCalculator::CalculateEnchant(uint32 enchantId, uint32 weaponDelay, bool isRanged)
 {
     SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
 
@@ -133,7 +133,7 @@ float StatsWeightCalculator::CalculateEnchant(uint32 enchantId)
 
     Reset();
 
-    collector_->CollectEnchantStats(enchant);
+    collector_->CollectEnchantStats(enchant, 0, weaponDelay, isRanged);
 
     if (enable_overflow_penalty_)
         ApplyOverflowPenalty(player_);
