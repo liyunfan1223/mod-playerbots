@@ -1847,15 +1847,45 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     if (bot->InBattleground())
         return;
 
-    if (bot->GetLevel() >= 10 && urand(0, 100) < sPlayerbotAIConfig.ProbTeleToBankers * 100)
+    // One weighted roll across the three destination classes, so each config value is an exact
+    // share of the roll (they are peers, not nested gates):
+    //   quest giver   : ProbTeleToQuestGivers
+    //   city/banker   : ProbTeleToBankers (level >= 10 only)
+    //   innkeeper/hub : the remainder (1 - quest giver - banker); absorbs any branch that had
+    //                   no destination (no valid giver, below level 10, empty city cache)
+    uint32 roll = urand(0, 99);
+
+    if (roll < sPlayerbotAIConfig.ProbTeleToQuestGivers * 100)
+    {
+        std::vector<WorldLocation> qlocs = sTravelMgr.GetValidQuestGiverLocations(bot);
+
+        // Concentrated servers keep bots near players: only givers in a player zone count, and
+        // otherwise the roll falls through to the hub path.
+        if (!qlocs.empty() && sPlayerbotAIConfig.RandomBotConcentrateInPlayerZone)
+        {
+            std::vector<WorldLocation> playerZoneLocs = GetPlayerZoneTeleportLocations(qlocs, bot);
+            qlocs = std::move(playerZoneLocs);
+        }
+
+        if (!qlocs.empty())
+        {
+            LOG_DEBUG("playerbots", "Random teleporting bot {} to a quest giver ({} candidates)",
+                      bot->GetName().c_str(), qlocs.size());
+            RandomTeleport(bot, qlocs, /*hearth=*/false);
+            return;
+        }
+    }
+    else if (bot->GetLevel() >= 10
+             && roll < (sPlayerbotAIConfig.ProbTeleToQuestGivers + sPlayerbotAIConfig.ProbTeleToBankers) * 100)
     {
         std::vector<WorldLocation> locs = sTravelMgr.GetCityLocations(bot);
         if (!locs.empty())
         {
-            RandomTeleport(bot, locs, true);
+            RandomTeleport(bot, locs, /*hearth=*/true);
             return;
         }
     }
+
     std::vector<WorldLocation> locs = sTravelMgr.GetTeleportLocations(bot);
 
     if (sPlayerbotAIConfig.RandomBotConcentrateInPlayerZone && !locs.empty())
