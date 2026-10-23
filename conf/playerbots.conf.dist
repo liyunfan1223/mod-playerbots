@@ -1607,9 +1607,24 @@ Playerbots.ZoneBracket.4197 = 79,80
 # Defaults: 0 = Eastern Kingdoms, 1 = Kalimdor, 530 = Outland, 571 = Northrend
 Playerbots.RandomBotMaps = 0,1,530,571
 
+# When an idle bot picks a random destination it makes ONE weighted roll across three classes,
+# so each value is an exact share of the roll (peers, not nested gates):
+#     quest giver   : ProbTeleToQuestGivers
+#     city/banker   : ProbTeleToBankers (level >= 10 only; falls through below level 10)
+#     innkeeper/hub : 1 - ProbTeleToQuestGivers - ProbTeleToBankers (the remainder)
+# A branch that cannot produce a destination (no currently-valid quest giver, below level 10, or
+# an empty city cache) falls through to the innkeeper/hub path, which absorbs the unused share.
+
 # Probability bots teleport to banker (city)
 # Default: 0.25
 Playerbots.ProbTeleToBankers = 0.25
+
+# Probability an idle random bot's random move targets a quest giver it can accept a quest from
+# right now (level/faction valid, no unmet prereq, not in progress, quest-log + item room).
+# Falls through to the innkeeper/hub path when no valid giver exists. With
+# RandomBotConcentrateInPlayerZone, only givers in a player zone are used.
+# Default: 0 (off; set above 0 to enable quest-giver teleports)
+Playerbots.ProbTeleToQuestGivers = 0
 
 # Control probability weights for bots teleporting to Capital city bankers
 # Sum of weights need not be 100. Set to 0 to disable teleporting to the city.

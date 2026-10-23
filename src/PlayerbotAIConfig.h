@@ -138,6 +138,7 @@ public:
     bool BotAutologin;
     std::string RandomBotMapsAsString;
     float ProbTeleToBankers;
+    float ProbTeleToQuestGivers;
     bool EnableWeightTeleToCityBankers;
     int WeightTeleToStormwind;
     int WeightTeleToIronforge;

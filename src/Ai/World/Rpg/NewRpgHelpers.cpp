@@ -5,6 +5,7 @@
  */
 
 #include "NewRpgHelpers.h"
+#include "QuestLevelRules.h"
 #include "Creature.h"
 #include "GameObject.h"
 #include "GossipDef.h"
@@ -152,7 +153,7 @@ bool IsQuestWorthDoing(Player* bot, Quest const* quest)
 
 bool IsQuestCapableDoing(Player* bot, Quest const* quest)
 {
-    bool highLevelQuest = bot->GetLevel() + 3 < bot->GetQuestLevel(quest);
+    bool highLevelQuest = bot->GetLevel() + QUEST_MAX_LEVELS_ABOVE_BOT < bot->GetQuestLevel(quest);
     if (highLevelQuest)
         return false;
 
