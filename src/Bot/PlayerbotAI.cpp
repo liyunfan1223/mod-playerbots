@@ -286,8 +286,14 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     bool isCasting = bot->IsNonMeleeSpellCast(true);
     if (bot->IsInCombat())
     {
-        if (!inCombat && !isCasting)
-            ResetActionDuration();
+        if (!inCombat)
+        {
+            // "attackers" is cached for 1 s; refresh it so the assist actions see the new attacker
+            // this tick.
+            aiObjectContext->GetValue<GuidVector>("attackers")->Reset();
+            if (!isCasting)
+                ResetActionDuration();
+        }
 
         inCombat = true;
     }
