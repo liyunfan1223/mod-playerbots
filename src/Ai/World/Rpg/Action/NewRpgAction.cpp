@@ -147,7 +147,7 @@ bool TellRpgStatusAction::Execute(Event event)
         uint32 flightMasterEntry = 0;
         WorldPosition flightMasterPos;
         std::vector<uint32> path;
-        if (!SelectRandomFlightTaxiNode(flightMasterEntry, flightMasterPos, path))
+        if (!SelectRandomFlightTaxiNode(flightMasterEntry, flightMasterPos, path, true))
         {
             std::string msg = PlayerbotTextMgr::instance().GetBotTextOrDefault(
                 "rpg_no_flight_path_error", "No flight path available.", {});

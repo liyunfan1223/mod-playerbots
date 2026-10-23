@@ -36,7 +36,10 @@
 #include "StatsWeightCalculator.h"
 #include "Timer.h"
 #include "TravelMgr.h"
+#include "DBCStores.h"
 #include "G3D/Vector2.h"
+#include <cmath>
+#include <utility>
 
 bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
 {
@@ -1081,18 +1084,111 @@ WorldPosition NewRpgBaseAction::SelectRandomCampPos(Player* bot)
     return dest;
 }
 
-bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, WorldPosition& flightMasterPos, std::vector<uint32>& path)
+bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, WorldPosition& flightMasterPos,
+                                                  std::vector<uint32>& path, bool questAware)
 {
     TravelMgr::FlightMasterInfo const* info = sTravelMgr.GetNearestFlightMasterInfo(bot);
     if (!info)
         return false;
 
-    std::vector<std::vector<uint32>> availablePaths = sTravelMgr.GetOptimalFlightDestinations(bot);
+    bool const scoreDestinations = questAware && sPlayerbotAIConfig.QuestAwareTaxi;
+    std::vector<std::vector<uint32>> availablePaths = sTravelMgr.GetOptimalFlightDestinations(bot, scoreDestinations);
     if (availablePaths.empty())
         return false;
 
     flightMasterEntry = info->templateEntry;
     flightMasterPos = info->pos;
+
+    if (scoreDestinations)
+    {
+        // Collect the active quest POI centres once (x/y only; no height or zone lookups).
+        std::vector<std::pair<float, float>> questPoints;
+        for (uint16 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+        {
+            uint32 questId = bot->GetQuestSlotQuestId(slot);
+            if (!questId)
+                continue;
+
+            QuestPOIVector const* pois = sObjectMgr->GetQuestPOIVector(questId);
+            if (!pois)
+                continue;
+
+            bool const complete = bot->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE;
+            for (QuestPOI const& poi : *pois)
+            {
+                if (poi.MapId != bot->GetMapId() || poi.points.empty())
+                    continue;
+
+                // Completed quests are scored by their turn-in POI (same filter as the picker).
+                if (complete && poi.ObjectiveIndex != -1)
+                    continue;
+
+                float cx = 0.0f, cy = 0.0f;
+                for (QuestPOIPoint const& point : poi.points)
+                {
+                    cx += point.x;
+                    cy += point.y;
+                }
+                questPoints.emplace_back(cx / float(poi.points.size()), cy / float(poi.points.size()));
+            }
+        }
+
+        if (!questPoints.empty())
+        {
+            std::vector<std::pair<float, size_t>> scored;
+            for (size_t i = 0; i < availablePaths.size(); ++i)
+            {
+                TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(availablePaths[i].back());
+                if (!node || node->map_id != bot->GetMapId())
+                    continue;
+
+                float dist = std::numeric_limits<float>::max();
+                for (auto const& [x, y] : questPoints)
+                {
+                    float const dx = node->x - x;
+                    float const dy = node->y - y;
+                    float const d = std::sqrt(dx * dx + dy * dy);
+                    if (d < dist)
+                        dist = d;
+                }
+
+                if (dist < std::numeric_limits<float>::max())
+                    scored.emplace_back(dist, i);
+            }
+
+            if (!scored.empty())
+            {
+                std::sort(scored.begin(), scored.end());
+                static constexpr uint32 TOP_WEIGHTS[3] = {3, 2, 1};
+                size_t const top = std::min<size_t>(3, scored.size());
+                uint32 total = 0;
+                for (size_t i = 0; i < top; ++i)
+                    total += TOP_WEIGHTS[i];
+
+                uint32 roll = urand(1, total);
+                uint32 acc = 0;
+                size_t pick = 0;
+                for (size_t i = 0; i < top; ++i)
+                {
+                    acc += TOP_WEIGHTS[i];
+                    if (roll <= acc)
+                    {
+                        pick = i;
+                        break;
+                    }
+                }
+
+                path = availablePaths[scored[pick].second];
+                LOG_DEBUG("playerbots",
+                          "[New RPG] Bot {} select quest-aware flight taxi node from:{} (node {}) to:{} "
+                          "({:.0f} yd to nearest quest point, {} candidates)",
+                          bot->GetName(), flightMasterEntry, path[0], path[path.size() - 1], scored[pick].first,
+                          availablePaths.size());
+                return true;
+            }
+        }
+    }
+
     path = availablePaths[urand(0, availablePaths.size() - 1)];
     LOG_DEBUG("playerbots", "[New RPG] Bot {} select random flight taxi node from:{} (node {}) to:{} ({} available)",
               bot->GetName(), flightMasterEntry, path[0], path[path.size() - 1], availablePaths.size());
@@ -1198,7 +1294,7 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
             uint32 flightMasterEntry = 0;
             WorldPosition flightMasterPos;
             std::vector<uint32> path;
-            if (SelectRandomFlightTaxiNode(flightMasterEntry, flightMasterPos, path))
+            if (SelectRandomFlightTaxiNode(flightMasterEntry, flightMasterPos, path, true))
             {
                 botAI->rpgInfo.ChangeToTravelFlight(flightMasterEntry, flightMasterPos, path);
                 return true;
