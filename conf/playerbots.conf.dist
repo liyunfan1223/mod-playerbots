@@ -1366,6 +1366,10 @@ Playerbots.AutoLearnTrainerSpells = 1
 # Default: 1 (enabled)
 Playerbots.AutoPickTalents = 1
 
+# Player-controlled bots (altbots and selfbots) automatically spend free talent points on levelup.
+# Default: 0 (disabled)
+Playerbots.AutoPickTalentsForPlayerControlledBots = 0
+
 # Spells every randombot will learn automatically and every altbot will learn with maintenance
 # Default: 54197 (Cold Weather Flying)
 Playerbots.RandomBotSpellIds = "54197"
@@ -1423,6 +1427,16 @@ Playerbots.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,23
 # This option will override Playerbots.AutoDoQuests, RandomBotTeleLowerLevel, and RandomBotTeleHigherLevel
 # Default: 1 (enabled)
 Playerbots.EnableNewRpgStrategy = 1
+
+# Radius (yards) of the new RPG strategy's NPC and gameobject scans. Cost grows with the square of the radius. 
+# Default: 150.0
+Playerbots.RpgTargetSearchDistance = 150.0
+
+# Track per-quest accept/complete/reward/drop/abandon counts and drop/abandon reasons, reported by
+# ".playerbots rndbot queststats" and dumped to LogsDir/playerbots_quest_stats.json by
+# ".playerbots rndbot questdump". Adds per-bot maps that are cleared on every stats aggregation.
+# Default: 0 (disabled)
+Playerbots.CollectDetailedQuestStats = 0
 
 # Control probability weights for RPG status of bots. Takes effect only when the status meets its premise.​
 # Sum of weights need not be 100. Set to 0 to disable the status.
@@ -1639,7 +1653,7 @@ Playerbots.AutoTeleportForLevel = 1
 # Enable battlegrounds/arenas for randombots
 Playerbots.RandomBotJoinBG = 1
 
-# Allow players to command random bots on their own team in the same battleground or arena.
+# Allow players to command random bots with no player master on their own team in the same battleground or arena.
 # Every such player gets the command access of a master without becoming the bot's master,
 # so the bot keeps playing the battleground.
 # Default: 0 (disabled)

@@ -8,7 +8,6 @@
 
 #include "LootObjectStack.h"
 #include "Playerbots.h"
-#include "ServerFacade.h"
 
 AvailableLootValue::AvailableLootValue(PlayerbotAI* botAI, std::string const name)
     : ManualSetValue<LootObjectStack*>(botAI, nullptr, name)
@@ -23,11 +22,22 @@ LootTargetValue::LootTargetValue(PlayerbotAI* botAI, std::string const name)
 {
 }
 
+bool CanLootValue::Get()
+{
+    ObjectGuid const guid = AI_VALUE(LootObject, "loot target").guid;
+    if (guid != _lootGuid)
+    {
+        _lootGuid = guid;
+        Reset();
+    }
+
+    return BoolCalculatedValue::Get();
+}
+
 bool CanLootValue::Calculate()
 {
     LootObject loot = AI_VALUE(LootObject, "loot target");
     LootObjectStack* availableLoot = AI_VALUE(LootObjectStack*, "available loot");
-    return !loot.IsEmpty() && availableLoot->CanAttemptLoot(loot.guid) && loot.IsLootPossible(bot) &&
-           ServerFacade::instance().IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"),
-                                                              INTERACTION_DISTANCE - 2);
+    return !loot.IsEmpty() && availableLoot->CanAttemptLoot(loot.guid) && loot.IsAtInteractDistance(bot) &&
+           loot.IsLootPossible(bot);
 }

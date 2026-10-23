@@ -5,7 +5,7 @@
  */
 
 #include "UseItemAction.h"
-
+#include "AcceptQuestAction.h"
 #include "ChatHelper.h"
 #include "Event.h"
 #include "ItemPackets.h"
@@ -82,7 +82,7 @@ bool UseItemAction::UseGameObject(ObjectGuid guid)
             return fail("gameobject_cannot_loot_error",
                         "Cannot loot this object: check quest, skill, tools, key, and object state");
 
-        bool inRange = bot->GetDistance(go) <= INTERACTION_DISTANCE - 2.0f;
+        bool inRange = go->IsAtInteractDistance(bot);
         if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT) && bot->GetDistance(go) > CONTACT_DISTANCE)
             return fail("gameobject_stay_out_of_range_error", "Game object is out of reach while staying");
 
@@ -294,18 +294,14 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
         targetSelected = true;
     }
 
-    if (uint32 questid = item->GetTemplate()->StartQuest)
+    if (uint32 questId = item->GetTemplate()->StartQuest)
     {
-        if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(questid))
+        if (Quest const* qInfo = sObjectMgr->GetQuestTemplate(questId))
         {
-            WorldPacket packet(CMSG_QUESTGIVER_ACCEPT_QUEST, 8 + 4 + 4);
-            packet << item_guid;
-            packet << questid;
-            packet << uint32(0);
-            bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(packet);
-
-            botAI->TellMasterNoFacing("Got quest " + chat->FormatQuest(qInfo));
-            return true;
+            // The master-driven "use <item>" path accepts what the player could; the automatic
+            // path filters with QuestAction::CanAcceptQuest before calling UseItem.
+            AcceptQuestAction acceptQuestAction(botAI);
+            return acceptQuestAction.AcceptQuest(qInfo, item_guid);
         }
     }
 
@@ -593,47 +589,36 @@ bool UseRandomRecipe::isUseful()
 
 bool UseRandomRecipe::isPossible() { return AI_VALUE2(uint32, "item count", "recipe") > 0; }
 
-bool UseRandomQuestItem::Execute(Event /*event*/)
+bool UseStartQuestItem::Execute(Event /*event*/)
 {
-    Unit* unitTarget = nullptr;
-    ObjectGuid goTarget;
-
-    std::vector<Item*> questItems = AI_VALUE2(std::vector<Item*>, "inventory items", "quest");
-    if (questItems.empty())
-        return false;
-
-    Item* item = nullptr;
-    for (uint8 i = 0; i < 5; i++)
+    for (Item* questItem : AI_VALUE2(std::vector<Item*>, "inventory items", "start quest"))
     {
-        auto itr = questItems.begin();
-        std::advance(itr, urand(0, questItems.size() - 1));
-        Item* questItem = *itr;
+        Quest const* qInfo = sObjectMgr->GetQuestTemplate(questItem->GetTemplate()->StartQuest);
+        if (!QuestAction::CanAcceptQuest(bot, qInfo))
+            continue;
 
-        ItemTemplate const* proto = questItem->GetTemplate();
-        if (proto->StartQuest)
+        // UseItem can fail before the start-quest accept (e.g. a transient cast state), so keep
+        // looking at the other eligible items instead of stopping at the first one.
+        if (UseItem(questItem, ObjectGuid::Empty, nullptr, nullptr))
         {
-            Quest const* qInfo = sObjectMgr->GetQuestTemplate(proto->StartQuest);
-            if (bot->CanTakeQuest(qInfo, false))
-            {
-                item = questItem;
-                break;
-            }
+            botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
+            return true;
         }
     }
 
-    if (!item)
-        return false;
-
-    bool used = UseItem(item, goTarget, nullptr, unitTarget);
-    if (used)
-        botAI->SetNextCheckDelay(sPlayerbotAIConfig.GlobalCoolDown);
-
-    return used;
+    return false;
 }
 
-bool UseRandomQuestItem::isUseful()
+bool UseStartQuestItem::isUseful()
 {
     return !IsRealPlayer(botAI->GetMaster()) && !bot->InBattleground() && !bot->HasUnitState(UNIT_STATE_IN_FLIGHT);
 }
 
-bool UseRandomQuestItem::isPossible() { return AI_VALUE2(uint32, "item count", "quest") > 0; }
+bool UseStartQuestItem::isPossible()
+{
+    for (Item* questItem : AI_VALUE2(std::vector<Item*>, "inventory items", "start quest"))
+        if (QuestAction::CanAcceptQuest(bot, sObjectMgr->GetQuestTemplate(questItem->GetTemplate()->StartQuest)))
+            return true;
+
+    return false;
+}
