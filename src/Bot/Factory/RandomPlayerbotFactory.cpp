@@ -9,9 +9,11 @@
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
 #include "CharacterCache.h"
+#include "DBCStores.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "DatabaseEnv.h"
+#include "LocaleColumns.h"
 #include "Log.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotAIConfig.h"
@@ -27,11 +29,41 @@
 #include "Timer.h"
 #include "World.h"
 
-std::string RandomPlayerbotFactory::GetLocalizedNameSelector(std::string const& column)
+void RandomPlayerbotFactory::LoadLocalizedNameColumns()
 {
-    LocaleConstant locale = sWorld->GetDefaultDbcLocale();
-    if (locale == LOCALE_enUS || locale >= TOTAL_LOCALES)
+    LocaleConstant const locale = sWorld->GetDefaultDbcLocale();
+    auto hasDefaultLocaleColumn = [locale](std::string const& table)
+    {
+        for (LocaleColumn const& localeColumn : GetLocaleColumns(CharacterDatabase, table,
+                 [](LocaleConstant columnLocale) { return std::string("name_") + localeNames[columnLocale]; }))
+        {
+            if (localeColumn.Locale == locale)
+                return true;
+        }
+
+        return false;
+    };
+
+    _guildNamesLocalized = hasDefaultLocaleColumn("playerbots_guild_names");
+    _arenaTeamNamesLocalized = hasDefaultLocaleColumn("playerbots_arena_team_names");
+}
+
+std::string RandomPlayerbotFactory::GetGuildNameSelector(std::string const& column)
+{
+    return GetLocalizedNameSelector(_guildNamesLocalized, column);
+}
+
+std::string RandomPlayerbotFactory::GetArenaTeamNameSelector(std::string const& column)
+{
+    return GetLocalizedNameSelector(_arenaTeamNamesLocalized, column);
+}
+
+std::string RandomPlayerbotFactory::GetLocalizedNameSelector(bool localized, std::string const& column)
+{
+    if (!localized)
         return column;
+
+    LocaleConstant const locale = sWorld->GetDefaultDbcLocale();
 
     // Fall back to the enUS column when the localized one is NULL or empty
     return Acore::StringFormat("COALESCE(NULLIF({}_{}, ''), {})", column, localeNames[locale], column);
@@ -799,7 +831,7 @@ std::string const RandomPlayerbotFactory::CreateRandomGuildName()
     uint32 maxId = fields[0].Get<uint32>();
 
     uint32 id = urand(0, maxId);
-    std::string nameExpr = GetLocalizedNameSelector("n.name");
+    std::string nameExpr = GetGuildNameSelector("n.name");
     result = CharacterDatabase.Query(
         "SELECT {} FROM playerbots_guild_names n "
         "LEFT OUTER JOIN guild e ON e.name = {} "
@@ -856,7 +888,7 @@ void RandomPlayerbotFactory::LoadArenaTeamData()
     _availableArenaTeamNames.clear();
 
     // Join on the localized name so already-taken localized names are filtered out
-    std::string nameExpr = GetLocalizedNameSelector("n.name");
+    std::string nameExpr = GetArenaTeamNameSelector("n.name");
     QueryResult result = CharacterDatabase.Query(
         "SELECT {} FROM playerbots_arena_team_names n "
         "LEFT OUTER JOIN arena_team e ON e.name = {} "
@@ -905,6 +937,13 @@ bool RandomPlayerbotFactory::IsEligibleForBotArenaTeam(Player* bot)
     return true;
 }
 
+bool RandomPlayerbotFactory::SameArenaBracket(uint8 level, uint8 otherLevel)
+{
+    PvPDifficultyEntry const* a = GetBattlegroundBracketByLevel(559, level);  // arena brackets (Nagrand Arena)
+    PvPDifficultyEntry const* b = GetBattlegroundBracketByLevel(559, otherLevel);
+    return a && b && a->GetBracketId() == b->GetBracketId();
+}
+
 void RandomPlayerbotFactory::AssignBotToArenaTeam(Player* bot)
 {
     if (!IsEligibleForBotArenaTeam(bot))
@@ -945,7 +984,7 @@ void RandomPlayerbotFactory::AssignBotToArenaTeamInternal(Player* bot)
 
     std::vector<ArenaTeam*> candidates;
     for (ArenaType type : order)
-        CollectJoinableBotArenaTeams(type, botTeam, candidates);
+        CollectJoinableBotArenaTeams(type, botTeam, bot->GetLevel(), candidates);
 
     for (size_t i = candidates.size(); i > 0; --i)
     {
@@ -1027,7 +1066,8 @@ uint32 RandomPlayerbotFactory::GetBotArenaTeamCount(ArenaType type)
     return it != _botArenaTeamRegistry.end() ? static_cast<uint32>(it->second.size()) : 0;
 }
 
-void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, std::vector<ArenaTeam*>& out)
+void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId faction, uint8 level,
+                                                          std::vector<ArenaTeam*>& out)
 {
     auto it = _botArenaTeamRegistry.find(type);
     if (it == _botArenaTeamRegistry.end())
@@ -1041,7 +1081,7 @@ void RandomPlayerbotFactory::CollectJoinableBotArenaTeams(ArenaType type, TeamId
             continue;
 
         CharacterCacheEntry const* entry = sCharacterCache->GetCharacterCacheByGuid(team->GetCaptain());
-        if (entry && Player::TeamIdForRace(entry->Race) == faction)
+        if (entry && Player::TeamIdForRace(entry->Race) == faction && SameArenaBracket(entry->Level, level))
             out.push_back(team);
     }
 }

@@ -8,6 +8,7 @@
 #include "Event.h"
 #include "Playerbots.h"
 #include "RtiTargetValue.h"
+#include "Strategy.h"
 
 bool RtiAction::Execute(Event event)
 {
@@ -66,8 +67,12 @@ bool MarkRtiAction::Execute(Event /*event*/)
 
     Unit* target = nullptr;
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
+    GuidSet const exclusions = GatherStrategyTargetExclusions(botAI, TargetValueExclusionType::DpsTarget);
     for (ObjectGuid const guid : attackers)
     {
+        if (exclusions.find(guid) != exclusions.end())
+            continue;
+
         Unit* unit = botAI->GetUnit(guid);
         if (!unit)
             continue;

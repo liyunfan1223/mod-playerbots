@@ -17,7 +17,7 @@
 using namespace GruulHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool GruulsLairResetEncounterStatesAction::Execute(Event /*event*/)
 {
@@ -30,10 +30,16 @@ bool GruulsLairResetEncounterStatesAction::Execute(Event /*event*/)
         reset = true;
     }
 
-    if (IsMechanicTrackerBot(bot, GRUUL_MAP_ID) && !AI_VALUE2(bool, "combat", "self target"))
+    if (IsMechanicTrackerBot(bot, GRUUL_MAP_ID))
     {
-        reset |= ClearTargetIcon(bot, RtiTargetValue::skullIndex);
-        reset |= ClearTargetIcon(bot, RtiTargetValue::crossIndex);
+        reset |= ClearStrategyTargetIcon(bot, RtiTargetValue::skullIndex, {
+            Id(GruulNpcs::NPC_BLINDEYE_THE_SEER),
+            Id(GruulNpcs::NPC_OLM_THE_SUMMONER),
+            Id(GruulNpcs::NPC_KIGGLER_THE_CRAZED),
+            Id(GruulNpcs::NPC_HIGH_KING_MAULGAR),
+        });
+        reset |= ClearStrategyTargetIcon(
+            bot, RtiTargetValue::crossIndex, { Id(GruulNpcs::NPC_KROSH_FIREHAND) });
     }
 
     return reset;
@@ -325,10 +331,10 @@ bool HighKingMaulgarMisdirectOgresToTanksAction::Execute(Event /*event*/)
     if (!ogre || !tank || !tank->IsAlive())
         return false;
 
-    if (botAI->CanCastSpell("misdirection", tank))
-        return botAI->CastSpell("misdirection", tank);
+    if (botAI->CanCastSpell(Id(GruulSpells::SPELL_MISDIRECTION), tank))
+        return botAI->CastSpell(Id(GruulSpells::SPELL_MISDIRECTION), tank);
 
-    if (!bot->HasAura(Id(GruulSpells::SPELL_MISDIRECTION)))
+    if (!bot->HasAura(Id(GruulSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", ogre) && botAI->CastSpell("steady shot", ogre);

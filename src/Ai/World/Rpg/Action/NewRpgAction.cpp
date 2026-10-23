@@ -164,6 +164,19 @@ bool TellRpgStatusAction::Execute(Event event)
         WhisperStatusChange(owner, "OUTDOOR_PVP");
         return true;
     }
+    else if (status == RPG_DO_GATHER)
+    {
+        if (!botAI->HasSkill(SKILL_HERBALISM) && !botAI->HasSkill(SKILL_MINING))
+        {
+            std::string msg = PlayerbotTextMgr::instance().GetBotTextOrDefault(
+                "rpg_gather_no_profession_error", "I have neither Herbalism nor Mining, so I can't gather.", {});
+            bot->Whisper(msg, LANG_UNIVERSAL, owner);
+            return false;
+        }
+        info.ChangeToDoGather();
+        WhisperStatusChange(owner, "DO_GATHER");
+        return true;
+    }
     else if (status == RPG_DO_QUEST)
     {
         if (!questId)
@@ -206,7 +219,7 @@ bool TellRpgStatusAction::Execute(Event event)
     std::string msg = PlayerbotTextMgr::instance().GetBotTextOrDefault(
         "rpg_unknown_status_error",
         "Unknown rpg status. Options: idle, rest, wander random, wander npc, "
-        "go grind, go camp, do quest [<id>], travel flight, outdoor pvp.", {});
+        "go grind, go camp, do quest [<id>], travel flight, outdoor pvp, do gather.", {});
     bot->Whisper(msg, LANG_UNIVERSAL, owner);
     return false;
 }
@@ -239,7 +252,7 @@ bool NewRpgStatusUpdateAction::Execute(Event /*event*/)
     {
         case RPG_IDLE:
             return RandomChangeStatus({RPG_GO_CAMP, RPG_GO_GRIND, RPG_WANDER_RANDOM, RPG_WANDER_NPC, RPG_DO_QUEST,
-                                       RPG_TRAVEL_FLIGHT, RPG_REST, RPG_OUTDOOR_PVP});
+                                       RPG_TRAVEL_FLIGHT, RPG_REST, RPG_OUTDOOR_PVP, RPG_DO_GATHER});
 
         case RPG_GO_GRIND:
         {
@@ -320,6 +333,16 @@ bool NewRpgStatusUpdateAction::Execute(Event /*event*/)
         case RPG_OUTDOOR_PVP:
         {
             if (info.HasStatusPersisted(statusOutDoorPvPDuration))
+            {
+                info.ChangeToIdle();
+                return true;
+            }
+            break;
+        }
+        case RPG_DO_GATHER:
+        {
+            // DO_GATHER -> IDLE
+            if (info.HasStatusPersisted(statusDoGatherDuration))
             {
                 info.ChangeToIdle();
                 return true;
@@ -552,7 +575,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest(NewRpgInfo::DoQuest& data)
             // may not be able to complete this quest, marked as abandoned
             /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
             botAI->lowPriorityQuest.insert(questId);
-            botAI->rpgStatistic.questAbandoned++;
+            botAI->RecordQuestAbandoned(questId, QuestAbandonReason::NoProgress);
             LOG_DEBUG("playerbots", "[New RPG] {} marked as abandoned quest {}", bot->GetName(), questId);
             botAI->rpgInfo.ChangeToIdle();
             return true;
@@ -580,7 +603,7 @@ bool NewRpgDoQuestAction::DoCompletedQuest(NewRpgInfo::DoQuest& data)
     {
         // if quest is completed, back to poi with -1 idx to reward
         BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, quest);
-        botAI->rpgStatistic.questCompleted++;
+        botAI->RecordQuestCompleted(questId);
         std::vector<POIInfo> poiInfo;
         if (!GetQuestPOIPosAndObjectiveIdx(questId, poiInfo, true))
         {
@@ -627,7 +650,7 @@ bool NewRpgDoQuestAction::DoCompletedQuest(NewRpgInfo::DoQuest& data)
         // e.g. Can not reward quest to gameobjects
         /// @TODO: It may be better to make lowPriorityQuest a global set shared by all bots (or saved in db)
         botAI->lowPriorityQuest.insert(questId);
-        botAI->rpgStatistic.questAbandoned++;
+        botAI->RecordQuestAbandoned(questId, QuestAbandonReason::CannotTurnIn);
         LOG_DEBUG("playerbots", "[New RPG] {} marked as abandoned quest {}", bot->GetName(), questId);
         botAI->rpgInfo.ChangeToIdle();
         return true;

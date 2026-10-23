@@ -192,6 +192,9 @@ public:
         creators["team has flag"] = &TriggerContext::team_has_flag;
         creators["enemy team has flag"] = &TriggerContext::enemy_team_has_flag;
         creators["enemy flagcarrier near"] = &TriggerContext::enemy_flagcarrier_near;
+        creators["wsg flag state changed"] = &TriggerContext::wsg_flag_state_changed;
+        creators["wsg support threat"] = &TriggerContext::wsg_support_threat;
+        creators["wsg escort separated"] = &TriggerContext::wsg_escort_separated;
         creators["in Battleground"] = &TriggerContext::player_is_in_BATTLEGROUND;
         creators["in Battleground without flag"] = &TriggerContext::player_is_in_BATTLEGROUND_no_flag;
         creators["wants in bg"] = &TriggerContext::player_wants_in_bg;
@@ -243,6 +246,7 @@ public:
         creators["do quest status"] = &TriggerContext::do_quest_status;
         creators["travel flight status"] = &TriggerContext::travel_flight_status;
         creators["outdoor pvp status"] = &TriggerContext::outdoor_pvp_status;
+        creators["do gather status"] = &TriggerContext::do_gather_status;
         creators["can self resurrect"] = &TriggerContext::can_self_resurrect;
         creators["can fish"] = &TriggerContext::can_fish;
         creators["can use fishing bobber"] = &TriggerContext::can_use_fishing_bobber;
@@ -341,6 +345,8 @@ private:
     static Trigger* not_dps_target_active(PlayerbotAI* botAI) { return new NotDpsTargetActiveTrigger(botAI); }
     static Trigger* not_dps_aoe_target_active(PlayerbotAI* botAI) { return new NotDpsAoeTargetActiveTrigger(botAI); }
     static Trigger* enemy_player_near(PlayerbotAI* botAI) { return new EnemyPlayerNear(botAI); }
+    static Trigger* wsg_support_threat(PlayerbotAI* botAI) { return new WsgSupportThreat(botAI); }
+    static Trigger* wsg_escort_separated(PlayerbotAI* botAI) { return new WsgEscortSeparated(botAI); }
     static Trigger* Random(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "random", 20); }
     static Trigger* seldom(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "seldom", 300); }
     static Trigger* often(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "often", 5); }
@@ -411,6 +417,7 @@ private:
     static Trigger* team_has_flag(PlayerbotAI* botAI) { return new TeamHasFlag(botAI); }
     static Trigger* enemy_team_has_flag(PlayerbotAI* botAI) { return new EnemyTeamHasFlag(botAI); }
     static Trigger* enemy_flagcarrier_near(PlayerbotAI* botAI) { return new EnemyFlagCarrierNear(botAI); }
+    static Trigger* wsg_flag_state_changed(PlayerbotAI* botAI) { return new WsgFlagStateChanged(botAI); }
     static Trigger* player_is_in_BATTLEGROUND(PlayerbotAI* botAI) { return new PlayerIsInBattleground(botAI); }
     static Trigger* player_is_in_BATTLEGROUND_no_flag(PlayerbotAI* botAI) { return new PlayerIsInBattlegroundWithoutFlag(botAI); }
     static Trigger* mounted(PlayerbotAI* botAI) { return new IsMountedTrigger(botAI); }
@@ -455,6 +462,7 @@ private:
     static Trigger* do_quest_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_DO_QUEST); }
     static Trigger* travel_flight_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_TRAVEL_FLIGHT); }
     static Trigger* outdoor_pvp_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_OUTDOOR_PVP); }
+    static Trigger* do_gather_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_DO_GATHER); }
     static Trigger* can_self_resurrect(PlayerbotAI* botAI) { return new SelfResurrectTrigger(botAI); }
     static Trigger* can_fish(PlayerbotAI* botAI) { return new CanFishTrigger(botAI); }
     static Trigger* can_use_fishing_bobber(PlayerbotAI* botAI) { return new CanUseFishingBobberTrigger(botAI); }

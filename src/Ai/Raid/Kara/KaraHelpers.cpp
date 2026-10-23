@@ -13,7 +13,7 @@
 namespace KaraHelpers
 {
 
-// General
+// Shared
 
 bool IsSafePosition(float x, float y, std::vector<Unit*> const& hazards, float hazardRadius)
 {

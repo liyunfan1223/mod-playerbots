@@ -15,7 +15,7 @@ class RaidKarazhanTriggerContext : public NamedObjectContext<Trigger>
 public:
     RaidKarazhanTriggerContext()
     {
-        // General
+        // Shared
         creators["karazhan bot is not in combat"] =
             &RaidKarazhanTriggerContext::karazhan_bot_is_not_in_combat;
 
@@ -145,144 +145,182 @@ public:
     }
 
 private:
-    // General
-    static Trigger* karazhan_bot_is_not_in_combat(PlayerbotAI* botAI) {
+    // Shared
+    static Trigger* karazhan_bot_is_not_in_combat(PlayerbotAI* botAI)
+    {
         return new KarazhanBotIsNotInCombatTrigger(botAI);
     }
-    static Trigger* karazhan_enemies_cast_fear(PlayerbotAI* botAI) {
+    static Trigger* karazhan_enemies_cast_fear(PlayerbotAI* botAI)
+    {
         return new KarazhanEnemiesCastFearTrigger(botAI);
     }
 
     // Trash
-    static Trigger* mana_warp_is_about_to_explode(PlayerbotAI* botAI) {
+    static Trigger* mana_warp_is_about_to_explode(PlayerbotAI* botAI)
+    {
         return new ManaWarpIsAboutToExplodeTrigger(botAI);
     }
 
     // Attumen the Huntsman
-    static Trigger* attumen_the_huntsman_phase_one_active(PlayerbotAI* botAI) {
+    static Trigger* attumen_the_huntsman_phase_one_active(PlayerbotAI* botAI)
+    {
         return new AttumenTheHuntsmanPhaseOneActiveTrigger(botAI);
     }
-    static Trigger* attumen_the_huntsman_phase_two_active(PlayerbotAI* botAI) {
+    static Trigger* attumen_the_huntsman_phase_two_active(PlayerbotAI* botAI)
+    {
         return new AttumenTheHuntsmanPhaseTwoActiveTrigger(botAI);
     }
-    static Trigger* attumen_the_huntsman_phase_transition(PlayerbotAI* botAI) {
+    static Trigger* attumen_the_huntsman_phase_transition(PlayerbotAI* botAI)
+    {
         return new AttumenTheHuntsmanPhaseTransitionTrigger(botAI);
     }
 
     // Moroes
-    static Trigger* moroes_should_prioritize_adds(PlayerbotAI* botAI) {
+    static Trigger* moroes_should_prioritize_adds(PlayerbotAI* botAI)
+    {
         return new MoroesShouldPrioritizeAddsTrigger(botAI);
     }
 
     // Maiden of Virtue
-    static Trigger* maiden_of_virtue_boss_engaged_by_tanks(PlayerbotAI* botAI) {
+    static Trigger* maiden_of_virtue_boss_engaged_by_tanks(PlayerbotAI* botAI)
+    {
         return new MaidenOfVirtueBossEngagedByTanksTrigger(botAI);
     }
-    static Trigger* maiden_of_virtue_holy_wrath_deals_chain_damage(PlayerbotAI* botAI) {
+    static Trigger* maiden_of_virtue_holy_wrath_deals_chain_damage(PlayerbotAI* botAI)
+    {
         return new MaidenOfVirtueHolyWrathDealsChainDamageTrigger(botAI);
     }
-    static Trigger* maiden_of_virtue_grounding_totem_consumes_holy_fire(PlayerbotAI* botAI) {
+    static Trigger* maiden_of_virtue_grounding_totem_consumes_holy_fire(PlayerbotAI* botAI)
+    {
         return new MaidenOfVirtueGroundingTotemConsumesHolyFireTrigger(botAI);
     }
 
     // The Big Bad Wolf
-    static Trigger* big_bad_wolf_boss_engaged_by_tank(PlayerbotAI* botAI) {
+    static Trigger* big_bad_wolf_boss_engaged_by_tank(PlayerbotAI* botAI)
+    {
         return new BigBadWolfBossEngagedByTankTrigger(botAI);
     }
-    static Trigger* big_bad_wolf_boss_is_chasing_little_red_riding_hood(PlayerbotAI* botAI) {
+    static Trigger* big_bad_wolf_boss_is_chasing_little_red_riding_hood(PlayerbotAI* botAI)
+    {
         return new BigBadWolfBossIsChasingLittleRedRidingHoodTrigger(botAI);
     }
     // Romulo and Julianne
-    static Trigger* romulo_and_julianne_both_bosses_revived(PlayerbotAI* botAI) {
+    static Trigger* romulo_and_julianne_both_bosses_revived(PlayerbotAI* botAI)
+    {
         return new RomuloAndJulianneBothBossesRevivedTrigger(botAI);
     }
 
     // The Wizard of Oz
-    static Trigger* wizard_of_oz_need_target_priority(PlayerbotAI* botAI) {
+    static Trigger* wizard_of_oz_need_target_priority(PlayerbotAI* botAI)
+    {
         return new WizardOfOzNeedTargetPriorityTrigger(botAI);
     }
-    static Trigger* wizard_of_oz_strawman_is_vulnerable_to_fire(PlayerbotAI* botAI) {
+    static Trigger* wizard_of_oz_strawman_is_vulnerable_to_fire(PlayerbotAI* botAI)
+    {
         return new WizardOfOzStrawmanIsVulnerableToFireTrigger(botAI);
     }
 
     // The Curator
-    static Trigger* the_curator_astral_flare_spawned(PlayerbotAI* botAI) {
+    static Trigger* the_curator_astral_flare_spawned(PlayerbotAI* botAI)
+    {
         return new TheCuratorAstralFlareSpawnedTrigger(botAI);
     }
-    static Trigger* the_curator_boss_engaged_by_tanks(PlayerbotAI* botAI) {
+    static Trigger* the_curator_boss_engaged_by_tanks(PlayerbotAI* botAI)
+    {
         return new TheCuratorBossEngagedByTanksTrigger(botAI);
     }
-    static Trigger* the_curator_boss_engaged_by_ranged(PlayerbotAI* botAI) {
+    static Trigger* the_curator_boss_engaged_by_ranged(PlayerbotAI* botAI)
+    {
         return new TheCuratorBossEngagedByRangedTrigger(botAI);
     }
 
     // Terestian Illhoof
-    static Trigger* terestian_illhoof_need_target_priority(PlayerbotAI* botAI) {
+    static Trigger* terestian_illhoof_need_target_priority(PlayerbotAI* botAI)
+    {
         return new TerestianIllhoofShouldPrioritizeChainsTrigger(botAI);
     }
 
     // Shade of Aran
-    static Trigger* shade_of_aran_arcane_explosion_is_casting(PlayerbotAI* botAI) {
+    static Trigger* shade_of_aran_arcane_explosion_is_casting(PlayerbotAI* botAI)
+    {
         return new ShadeOfAranArcaneExplosionIsCastingTrigger(botAI);
     }
-    static Trigger* shade_of_aran_flame_wreath_is_active(PlayerbotAI* botAI) {
+    static Trigger* shade_of_aran_flame_wreath_is_active(PlayerbotAI* botAI)
+    {
         return new ShadeOfAranFlameWreathIsActiveTrigger(botAI);
     }
-    static Trigger* shade_of_aran_conjured_elementals_summoned(PlayerbotAI* botAI) {
+    static Trigger* shade_of_aran_conjured_elementals_summoned(PlayerbotAI* botAI)
+    {
         return new ShadeOfAranConjuredElementalsSummonedTrigger(botAI);
     }
-    static Trigger* shade_of_aran_boss_casts_counterspell_nearby(PlayerbotAI* botAI) {
+    static Trigger* shade_of_aran_boss_casts_counterspell_nearby(PlayerbotAI* botAI)
+    {
         return new ShadeOfAranBossCastsCounterspellNearbyTrigger(botAI);
     }
 
     // Netherspite
-    static Trigger* netherspite_red_beam_is_active(PlayerbotAI* botAI) {
+    static Trigger* netherspite_red_beam_is_active(PlayerbotAI* botAI)
+    {
         return new NetherspiteRedBeamIsActiveTrigger(botAI);
     }
-    static Trigger* netherspite_blue_beam_is_active(PlayerbotAI* botAI) {
+    static Trigger* netherspite_blue_beam_is_active(PlayerbotAI* botAI)
+    {
         return new NetherspiteBlueBeamIsActiveTrigger(botAI);
     }
-    static Trigger* netherspite_green_beam_is_active(PlayerbotAI* botAI) {
+    static Trigger* netherspite_green_beam_is_active(PlayerbotAI* botAI)
+    {
         return new NetherspiteGreenBeamIsActiveTrigger(botAI);
     }
-    static Trigger* netherspite_bot_is_not_beam_blocker(PlayerbotAI* botAI) {
+    static Trigger* netherspite_bot_is_not_beam_blocker(PlayerbotAI* botAI)
+    {
         return new NetherspiteBotIsNotBeamBlockerTrigger(botAI);
     }
-    static Trigger* netherspite_boss_is_banished(PlayerbotAI* botAI) {
+    static Trigger* netherspite_boss_is_banished(PlayerbotAI* botAI)
+    {
         return new NetherspiteBossIsBanishedTrigger(botAI);
     }
-    static Trigger* netherspite_need_to_manage_timers_and_trackers(PlayerbotAI* botAI) {
+    static Trigger* netherspite_need_to_manage_timers_and_trackers(PlayerbotAI* botAI)
+    {
         return new NetherspiteShouldManageTimersAndTrackersTrigger(botAI);
     }
 
     // Prince Malchezaar
-    static Trigger* prince_malchezaar_bot_is_enfeebled(PlayerbotAI* botAI) {
+    static Trigger* prince_malchezaar_bot_is_enfeebled(PlayerbotAI* botAI)
+    {
         return new PrinceMalchezaarBotIsEnfeebledTrigger(botAI);
     }
-    static Trigger* prince_malchezaar_engaged_by_non_tanks(PlayerbotAI* botAI) {
+    static Trigger* prince_malchezaar_engaged_by_non_tanks(PlayerbotAI* botAI)
+    {
         return new PrinceMalchezaarEngagedByNonTanksTrigger(botAI);
     }
-    static Trigger* prince_malchezaar_boss_engaged_by_tanks(PlayerbotAI* botAI) {
+    static Trigger* prince_malchezaar_boss_engaged_by_tanks(PlayerbotAI* botAI)
+    {
         return new PrinceMalchezaarBossEngagedByTanksTrigger(botAI);
     }
 
     // Nightbane
-    static Trigger* nightbane_boss_engaged_by_tanks(PlayerbotAI* botAI) {
+    static Trigger* nightbane_boss_engaged_by_tanks(PlayerbotAI* botAI)
+    {
         return new NightbaneBossEngagedByTanksTrigger(botAI);
     }
-    static Trigger* nightbane_ranged_bots_are_in_charred_earth(PlayerbotAI* botAI) {
+    static Trigger* nightbane_ranged_bots_are_in_charred_earth(PlayerbotAI* botAI)
+    {
         return new NightbaneGroundPhaseEngagedByRangedTrigger(botAI);
     }
-    static Trigger* nightbane_pets_ignore_collision_to_chase_flying_boss(PlayerbotAI* botAI) {
+    static Trigger* nightbane_pets_ignore_collision_to_chase_flying_boss(PlayerbotAI* botAI)
+    {
         return new NightbanePetsIgnoreCollisionToChaseFlyingBossTrigger(botAI);
     }
-    static Trigger* nightbane_boss_is_flying(PlayerbotAI* botAI) {
+    static Trigger* nightbane_boss_is_flying(PlayerbotAI* botAI)
+    {
         return new NightbaneBossIsFlyingTrigger(botAI);
     }
-    static Trigger* nightbane_bot_went_out_of_bounds(PlayerbotAI* botAI) {
+    static Trigger* nightbane_bot_went_out_of_bounds(PlayerbotAI* botAI)
+    {
         return new NightbaneBotWentOutOfBoundsTrigger(botAI);
     }
-    static Trigger* nightbane_need_to_manage_timers_and_trackers(PlayerbotAI* botAI) {
+    static Trigger* nightbane_need_to_manage_timers_and_trackers(PlayerbotAI* botAI)
+    {
         return new NightbaneShouldManageTimersAndTrackersTrigger(botAI);
     }
 };

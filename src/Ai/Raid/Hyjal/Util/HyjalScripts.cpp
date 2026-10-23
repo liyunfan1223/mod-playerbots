@@ -78,7 +78,7 @@ public:
 
     void OnSpellPrepare(Spell* spell, Unit* caster, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id != Id(HyjalSpells::SPELL_AIR_BURST))
+        if (!caster || spellInfo->Id != Id(HyjalSpells::SPELL_AIR_BURST))
             return;
 
         Player* target = GetTargetedPlayer(spell);

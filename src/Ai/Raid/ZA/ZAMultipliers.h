@@ -20,15 +20,15 @@ public:
 
     float GetValue(Action* action) final
     {
-        return EncounterHelpers::IsEncounterInProgress(bot, ZaHelpers::ZA_MAP_ID)
-            ? GetValueInEncounter(action) : 1.0f;
+        return EncounterHelpers::IsEncounterInProgress(bot, ZaHelpers::ZA_MAP_ID) ?
+            GetValueInEncounter(action) : 1.0f;
     }
 
 protected:
     virtual float GetValueInEncounter(Action* action) = 0;
 };
 
-// General
+// Shared
 
 class ZulAmanDelayDpsCooldownsMultiplier : public ZulAmanEncounterMultiplier
 {
@@ -93,6 +93,7 @@ protected:
 };
 
 // Nalorakk <Bear Avatar>
+// N/A
 
 // Jan'alai <Dragonhawk Avatar>
 
@@ -162,11 +163,11 @@ protected:
 
 // Zul'jin
 
-class ZuljinStopAttackingDuringPhaseChangeMultiplier : public ZulAmanEncounterMultiplier
+class ZuljinNoAttackingDuringPhaseChangeMultiplier : public ZulAmanEncounterMultiplier
 {
 public:
-    ZuljinStopAttackingDuringPhaseChangeMultiplier(PlayerbotAI* botAI)
-        : ZulAmanEncounterMultiplier(botAI, "zul'jin stop attacking during phase change") {}
+    ZuljinNoAttackingDuringPhaseChangeMultiplier(PlayerbotAI* botAI)
+        : ZulAmanEncounterMultiplier(botAI, "zul'jin no attacking during phase change") {}
 
 protected:
     float GetValueInEncounter(Action* action) override;

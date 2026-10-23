@@ -13,6 +13,7 @@
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotFactory.h"
 #include "Playerbots.h"
+#include "QuestAction.h"
 #include "RandomItemMgr.h"
 #include "ServerFacade.h"
 #include "StatsWeightCalculator.h"
@@ -95,6 +96,11 @@ ItemUsage ItemUsageValue::Calculate()
 
     if (bot->GetGuildId() && GuildTaskMgr::instance().IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
+
+    // Starters the bot can take stay in the bags and are used from there; the core deletes the
+    // starting item on accept unless the quest also requires it, so they are never equipped.
+    if (IsStartQuestItemUsefulFor(bot, proto))
+        return ITEM_USAGE_QUEST;
 
     ItemUsage equip = QueryItemUsageForEquip(proto, randomPropertyId);
     if (equip != ITEM_USAGE_NONE)
@@ -542,6 +548,16 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemTemplate const* pr
     }
 
     return false; // Item is not useful for any active quests
+}
+
+bool ItemUsageValue::IsStartQuestItemUsefulFor(Player* player, ItemTemplate const* proto)
+{
+    if (!proto->StartQuest)
+        return false;
+
+    Quest const* quest = sObjectMgr->GetQuestTemplate(proto->StartQuest);
+    return quest && player->GetQuestStatus(proto->StartQuest) == QUEST_STATUS_NONE &&
+        QuestAction::CanAcceptQuest(player, quest);
 }
 
 bool ItemUsageValue::IsItemNeededForSkill(ItemTemplate const* proto)

@@ -91,7 +91,7 @@ enum class KaraNpcs : uint32
     NPC_NETHERSPITE_INFERNAL      = 17646,
 };
 
-// General
+// Shared
 inline constexpr uint32 KARA_MAP_ID = 532;
 bool IsSafePosition (float x, float y, std::vector<Unit*> const& hazards, float hazardRadius);
 

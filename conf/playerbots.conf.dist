@@ -755,6 +755,13 @@ Playerbots.PreQuests = 0
 # Default: 1 (enabled)
 Playerbots.RandomBotJoinLfg = 1
 
+# Allow randombots to join the Dungeon Finder for dungeons and raids of an expansion they have outleveled
+# If disabled, randombots above level 60 do not queue for classic entries and randombots above level 70
+# do not queue for TBC entries, even where the entry's level range allows it (Stratholme is 55-65)
+# Seasonal bosses are exempt
+# Default: 1 (enabled)
+Playerbots.RandomBotJoinLfgOutleveledExpansion = 1
+
 # Enable/Disable periodic online - offline of randombots to mimic the real-world scenario where not all players are online simultaneously
 # When enabled, randombots are randomly selected to go online or offline periodically from a larger set
 # Default: 0 (disabled, the set of online bots remains fixed)
@@ -1359,6 +1366,10 @@ Playerbots.AutoLearnTrainerSpells = 1
 # Default: 1 (enabled)
 Playerbots.AutoPickTalents = 1
 
+# Player-controlled bots (altbots and selfbots) automatically spend free talent points on levelup.
+# Default: 0 (disabled)
+Playerbots.AutoPickTalentsForPlayerControlledBots = 0
+
 # Spells every randombot will learn automatically and every altbot will learn with maintenance
 # Default: 54197 (Cold Weather Flying)
 Playerbots.RandomBotSpellIds = "54197"
@@ -1417,6 +1428,12 @@ Playerbots.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,23
 # Default: 1 (enabled)
 Playerbots.EnableNewRpgStrategy = 1
 
+# Track per-quest accept/complete/reward/drop/abandon counts and drop/abandon reasons, reported by
+# ".playerbots rndbot queststats" and dumped to LogsDir/playerbots_quest_stats.json by
+# ".playerbots rndbot questdump". Adds per-bot maps that are cleared on every stats aggregation.
+# Default: 0 (disabled)
+Playerbots.CollectDetailedQuestStats = 0
+
 # Control probability weights for RPG status of bots. Takes effect only when the status meets its premise.​
 # Sum of weights need not be 100. Set to 0 to disable the status.
 #
@@ -1428,6 +1445,7 @@ Playerbots.EnableNewRpgStrategy = 1
 # TravelFlight  (Default: 15  Go to the nearest flightmaster and fly to a level-appropriate area)
 # Rest          (Default: 5   Take a break for a while and do nothing)
 # OutdoorPvp    (Default: 10  Participate in outdoor PvP capture points if already in an outdoor PvP zone)
+# DoGather      (Default: 15  Roam the current zone harvesting herb/ore nodes; requires Herbalism or Mining)
 Playerbots.RpgStatusProbWeight.WanderRandom = 15
 Playerbots.RpgStatusProbWeight.WanderNpc = 20
 Playerbots.RpgStatusProbWeight.GoGrind = 15
@@ -1436,6 +1454,7 @@ Playerbots.RpgStatusProbWeight.DoQuest = 60
 Playerbots.RpgStatusProbWeight.TravelFlight = 15
 Playerbots.RpgStatusProbWeight.Rest = 5
 Playerbots.RpgStatusProbWeight.OutdoorPvp = 10
+Playerbots.RpgStatusProbWeight.DoGather = 15
 
 # Bots' minimum and maximum level when teleporting in and out of a zone, according to the new RPG strategy
 # Format: Playerbots.ZoneBracket.zoneID = minLevel,maxLevel
@@ -1644,6 +1663,12 @@ Playerbots.AutoTeleportForLevel = 1
 
 # Enable battlegrounds/arenas for randombots
 Playerbots.RandomBotJoinBG = 1
+
+# Allow players to command random bots with no player master on their own team in the same battleground or arena.
+# Every such player gets the command access of a master without becoming the bot's master,
+# so the bot keeps playing the battleground.
+# Default: 0 (disabled)
+Playerbots.AllowBattlegroundCommands = 0
 
 # Enable auto-joining of battlegrounds - have bots start battlegrounds and arenas on their own
 Playerbots.RandomBotAutoJoinBG = 0
