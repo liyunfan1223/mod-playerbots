@@ -98,6 +98,7 @@ bool SellAction::Execute(Event event)
     {
         SellQualityItemsVisitor visitor(this, ITEM_QUALITY_POOR, false);
         IterateItems(&visitor);
+        botAI->ConsolidateItems();  // re-stack what the partial sells fragmented
         return true;
     }
 
@@ -105,6 +106,7 @@ bool SellAction::Execute(Event event)
     {
         SellVendorItemsVisitor visitor(this, context);
         IterateItems(&visitor);
+        botAI->ConsolidateItems();  // re-stack what the partial sells fragmented
         return true;
     }
 
@@ -123,6 +125,7 @@ bool SellAction::Execute(Event event)
     {
         SellQualityItemsVisitor visitor(this, maxQuality, allClasses);
         IterateItems(&visitor);
+        botAI->ConsolidateItems();  // re-stack what the partial sells fragmented
         return true;
     }
 
