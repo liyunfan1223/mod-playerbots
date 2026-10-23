@@ -15,7 +15,7 @@
 class QuestGrabGiverAction : public NewRpgBaseAction
 {
 public:
-    QuestGrabGiverAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab giver") {}
+    explicit QuestGrabGiverAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab giver") {}
     bool Execute(Event event) override;
 };
 
@@ -23,7 +23,7 @@ public:
 class QuestGrabUseItemAction : public NewRpgBaseAction
 {
 public:
-    QuestGrabUseItemAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab use item") {}
+    explicit QuestGrabUseItemAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab use item") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -33,7 +33,7 @@ public:
 class QuestGrabCreateItemAction : public NewRpgBaseAction
 {
 public:
-    QuestGrabCreateItemAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab create item") {}
+    explicit QuestGrabCreateItemAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab create item") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
@@ -42,7 +42,7 @@ public:
 class QuestGrabObjectAction : public NewRpgBaseAction
 {
 public:
-    QuestGrabObjectAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab object") {}
+    explicit QuestGrabObjectAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab object") {}
     bool Execute(Event event) override;
 };
 

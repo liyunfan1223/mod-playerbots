@@ -20,7 +20,7 @@
 #include "SpellMgr.h"
 #include "UseItemAction.h"
 
-#include <algorithm>
+#include <vector>
 
 namespace
 {
@@ -30,10 +30,64 @@ namespace
             botAI->GetAiObjectContext()->GetValue<std::vector<Item*>>("inventory items", "quest")->Get();
 
         // Quest starter items are handled by the "use random quest item" maintenance action.
-        items.erase(std::remove_if(items.begin(), items.end(),
-                                   [](Item* item) { return item->GetTemplate()->StartQuest; }),
-                    items.end());
+        std::erase_if(items, [](Item* item) { return item->GetTemplate()->StartQuest; });
         return items;
+    }
+
+    // Creature (> 0) or gameobject (< 0) entries that incomplete quest objectives still need.
+    std::vector<int32> GetNeededNpcOrGoEntries(Player* bot)
+    {
+        std::vector<int32> entries;
+        for (auto const& [questId, status] : bot->getQuestStatusMap())
+        {
+            Quest const* quest =
+                status.Status == QUEST_STATUS_INCOMPLETE ? sObjectMgr->GetQuestTemplate(questId) : nullptr;
+            if (!quest)
+                continue;
+
+            for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
+            {
+                if (quest->RequiredNpcOrGo[i] && status.CreatureOrGOCount[i] < quest->RequiredNpcOrGoCount[i])
+                    entries.push_back(quest->RequiredNpcOrGo[i]);
+            }
+        }
+        return entries;
+    }
+
+    bool IsItemNeededForQuest(Player* bot, uint32 itemId)
+    {
+        for (auto const& [questId, status] : bot->getQuestStatusMap())
+        {
+            Quest const* quest =
+                status.Status == QUEST_STATUS_INCOMPLETE ? sObjectMgr->GetQuestTemplate(questId) : nullptr;
+            if (!quest)
+                continue;
+
+            for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+            {
+                if (quest->RequiredItemId[i] == itemId && status.ItemCount[i] < quest->RequiredItemCount[i])
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    // Whether one of the item's spells creates an item a quest still needs.
+    bool CreatesNeededQuestItem(Player* bot, ItemTemplate const* proto)
+    {
+        for (auto const& itemSpell : proto->Spells)
+        {
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itemSpell.SpellId);
+            if (!spellInfo)
+                continue;
+
+            for (SpellEffectInfo const& effect : spellInfo->Effects)
+            {
+                if (effect.Effect == SPELL_EFFECT_CREATE_ITEM && IsItemNeededForQuest(bot, effect.ItemType))
+                    return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -48,56 +102,41 @@ bool QuestGrabUseItemAction::isUseful() { return !GetQuestUseItems(botAI).empty(
 
 bool QuestGrabUseItemAction::Execute(Event /*event*/)
 {
-    // Quest data names the target but not the item that credits it, so try each quest item and
-    // let the server's own spell target checks decide. Every pair already in reach is tried
-    // before walking anywhere, so a rejected pair can't pull the bot away from a working one.
-    WorldObject* moveTarget = nullptr;
-    for (Item* item : GetQuestUseItems(botAI))
+    float const range = sPlayerbotAIConfig.QuestGrabDistance;
+    std::vector<WorldObject*> targets;
+    for (int32 entry : GetNeededNpcOrGoEntries(bot))
     {
-        for (auto const& [questId, status] : bot->getQuestStatusMap())
+        WorldObject* target = entry < 0 ? static_cast<WorldObject*>(bot->FindNearestGameObject(-entry, range, true))
+                                        : bot->FindNearestCreature(entry, range);
+        if (target)
+            targets.push_back(target);
+    }
+
+    // Quest data names the target but not the item that credits it, so try each quest item and
+    // let the server's own spell target checks decide. Targets in reach are tried before walking
+    // anywhere, so a rejected pair can't pull the bot away from one that works.
+    WorldObject* moveTarget = nullptr;
+    for (WorldObject* target : targets)
+    {
+        if (!IsWithinInteractionDist(target))
         {
-            if (status.Status != QUEST_STATUS_INCOMPLETE)
-                continue;
+            if (!moveTarget || bot->GetExactDist(target) < bot->GetExactDist(moveTarget))
+                moveTarget = target;
+            continue;
+        }
 
-            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-            if (!quest)
-                continue;
+        for (Item* item : GetQuestUseItems(botAI))
+        {
+            UseItemAction useItemAction(botAI);
+            Creature* creature = target->ToCreature();
+            bool const used = creature ? useItemAction.UseItemOnUnit(item, creature)
+                                       : useItemAction.UseItemOnGameObject(item, target->GetGUID());
 
-            for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
-            {
-                int32 reqEntry = quest->RequiredNpcOrGo[i];
-                if (!reqEntry || status.CreatureOrGOCount[i] >= quest->RequiredNpcOrGoCount[i])
-                    continue;
+            LOG_DEBUG("playerbots", "[Quest Grab] {} {} using {} on {}", bot->GetName(),
+                      used ? "succeeded" : "failed", item->GetTemplate()->Name1, target->GetName());
 
-                float const range = sPlayerbotAIConfig.QuestGrabDistance;
-                GameObject* go = nullptr;
-                Creature* creature = nullptr;
-                if (reqEntry < 0)
-                    go = bot->FindNearestGameObject(uint32(-reqEntry), range, true);
-                else
-                    creature = bot->FindNearestCreature(uint32(reqEntry), range);
-
-                WorldObject* target = go ? static_cast<WorldObject*>(go) : creature;
-                if (!target)
-                    continue;
-
-                if (!IsWithinInteractionDist(target))
-                {
-                    if (!moveTarget || bot->GetExactDist(target) < bot->GetExactDist(moveTarget))
-                        moveTarget = target;
-                    continue;
-                }
-
-                UseItemAction useItemAction(botAI);
-                bool const used = go ? useItemAction.UseItemOnGameObject(item, go->GetGUID())
-                                     : useItemAction.UseItemOnUnit(item, creature);
-
-                LOG_DEBUG("playerbots", "[Quest Grab] {} {} using {} on {} for quest {} objective {}", bot->GetName(),
-                          used ? "succeeded" : "failed", item->GetTemplate()->Name1, reqEntry, questId, i);
-
-                if (used)
-                    return true;
-            }
+            if (used)
+                return true;
         }
     }
 
@@ -110,48 +149,19 @@ bool QuestGrabCreateItemAction::Execute(Event /*event*/)
 {
     for (Item* item : GetQuestUseItems(botAI))
     {
-        ItemTemplate const* proto = item->GetTemplate();
-        for (uint8 spellIdx = 0; spellIdx < MAX_ITEM_PROTO_SPELLS; ++spellIdx)
-        {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[spellIdx].SpellId);
-            if (!spellInfo)
-                continue;
+        if (!CreatesNeededQuestItem(bot, item->GetTemplate()))
+            continue;
 
-            for (uint8 effectIdx = 0; effectIdx < MAX_SPELL_EFFECTS; ++effectIdx)
-            {
-                if (spellInfo->Effects[effectIdx].Effect != SPELL_EFFECT_CREATE_ITEM)
-                    continue;
+        // No target to aim at: the spell's own range/spell focus check decides, a bot in the
+        // wrong place just gets a failed cast.
+        UseItemAction useItemAction(botAI);
+        bool const used = useItemAction.UseItemAuto(item);
 
-                uint32 const createdItemId = spellInfo->Effects[effectIdx].ItemType;
-                for (auto const& [questId, status] : bot->getQuestStatusMap())
-                {
-                    if (status.Status != QUEST_STATUS_INCOMPLETE)
-                        continue;
+        LOG_DEBUG("playerbots", "[Quest Grab] {} {} using {}", bot->GetName(), used ? "succeeded" : "failed",
+                  item->GetTemplate()->Name1);
 
-                    Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-                    if (!quest)
-                        continue;
-
-                    for (uint8 j = 0; j < QUEST_ITEM_OBJECTIVES_COUNT; ++j)
-                    {
-                        if (quest->RequiredItemId[j] != createdItemId ||
-                            status.ItemCount[j] >= quest->RequiredItemCount[j])
-                            continue;
-
-                        // No target to aim at: the spell's own range/spell focus check decides,
-                        // a bot in the wrong place just gets a failed cast.
-                        UseItemAction useItemAction(botAI);
-                        bool const used = useItemAction.UseItemAuto(item);
-
-                        LOG_DEBUG("playerbots", "[Quest Grab] {} {} using {} (creates {}) for quest {}",
-                                  bot->GetName(), used ? "succeeded" : "failed", proto->Name1, createdItemId, questId);
-
-                        if (used)
-                            return true;
-                    }
-                }
-            }
-        }
+        if (used)
+            return true;
     }
     return false;
 }

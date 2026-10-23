@@ -16,7 +16,7 @@ class PlayerbotAI;
 class QuestGrabStrategy : public Strategy
 {
 public:
-    QuestGrabStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
+    explicit QuestGrabStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
 
     uint32 GetType() const override { return STRATEGY_TYPE_NONCOMBAT; }
     std::string const getName() override { return "quest grab"; }

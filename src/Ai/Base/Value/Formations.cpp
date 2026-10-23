@@ -135,7 +135,7 @@ public:
 class LeashFormation : public NearFormation
 {
 public:
-    LeashFormation(PlayerbotAI* botAI) : NearFormation(botAI, "leash") {}
+    explicit LeashFormation(PlayerbotAI* botAI) : NearFormation(botAI, "leash") {}
 
     float GetMaxDistance() override { return sPlayerbotAIConfig.LeashDistance; }
 };

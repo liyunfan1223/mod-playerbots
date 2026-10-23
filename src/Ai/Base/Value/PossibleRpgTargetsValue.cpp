@@ -16,6 +16,7 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "SharedDefines.h"
+#include <algorithm>
 #include <unordered_set>
 
 const std::vector<uint32> PossibleRpgTargetsValue::allowedNpcFlags = {
@@ -314,12 +315,11 @@ GuidVector PossibleQuestGrabTargetsValue::Calculate()
         guidDistancePairs.push_back({go->GetGUID(), bot->GetExactDist(go)});
     }
 
-    std::sort(guidDistancePairs.begin(), guidDistancePairs.end(),
-              [](auto const& a, auto const& b) { return a.second < b.second; });
+    std::ranges::sort(guidDistancePairs, {}, &std::pair<ObjectGuid, float>::second);
 
     GuidVector results;
-    for (auto const& pair : guidDistancePairs)
-        results.push_back(pair.first);
+    for (auto const& [guid, distance] : guidDistancePairs)
+        results.push_back(guid);
 
     return results;
 }

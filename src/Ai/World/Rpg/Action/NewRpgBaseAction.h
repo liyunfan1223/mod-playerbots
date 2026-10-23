@@ -18,6 +18,8 @@
 #include "QuestDef.h"
 #include "TravelMgr.h"
 
+struct QuestPOI;
+
 struct POIInfo
 {
     G3D::Vector2 pos;
@@ -57,6 +59,7 @@ protected:
 
 protected:
     float GetGroundZ(float x, float y);
+    bool GetQuestPoiPos(QuestPOI const& qPoi, float& x, float& y);
     bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete = false);
     static WorldPosition SelectRandomGrindPos(Player* bot);
     static WorldPosition SelectRandomCampPos(Player* bot);

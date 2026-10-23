@@ -120,7 +120,7 @@ private:
 class LeashTooFarTrigger : public FarFromMasterTrigger
 {
 public:
-    LeashTooFarTrigger(PlayerbotAI* botAI)
+    explicit LeashTooFarTrigger(PlayerbotAI* botAI)
         : FarFromMasterTrigger(botAI, "leash too far", sPlayerbotAIConfig.LeashDistance, 10)
     {
     }

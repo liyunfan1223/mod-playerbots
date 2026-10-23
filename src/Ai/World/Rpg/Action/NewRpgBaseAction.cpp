@@ -887,6 +887,22 @@ float NewRpgBaseAction::GetGroundZ(float x, float y)
     return std::max(groundZ, bot->GetMap()->GetWaterLevel(x, y));
 }
 
+// A reachable point of this POI in the bot's zone, within 1500 yd and the leash.
+bool NewRpgBaseAction::GetQuestPoiPos(QuestPOI const& qPoi, float& x, float& y)
+{
+    if (qPoi.points.empty() || !PickLeashLegalPoint(bot, qPoi.points, x, y))
+        return false;
+
+    if (bot->GetDistance2d(x, y) >= 1500.0f)
+        return false;
+
+    float const z = GetGroundZ(x, y);
+    if (z == INVALID_HEIGHT || z == VMAP_INVALID_HEIGHT_VALUE)
+        return false;
+
+    return bot->GetZoneId() == bot->GetMap()->GetZoneId(bot->GetPhaseMask(), x, y, z);
+}
+
 bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete)
 {
     Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
@@ -912,25 +928,9 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
             if (qPoi.ObjectiveIndex != -1)
                 continue;
 
-            if (qPoi.points.size() == 0)
-                continue;
-
             float dx = 0, dy = 0;
-            if (!PickLeashLegalPoint(bot, qPoi.points, dx, dy))
-                continue;
-
-            if (bot->GetDistance2d(dx, dy) >= 1500.0f)
-                continue;
-
-            float dz = GetGroundZ(dx, dy);
-
-            if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
-                continue;
-
-            if (bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
-                continue;
-
-            poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
+            if (GetQuestPoiPos(qPoi, dx, dy))
+                poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
         }
 
         if (poiInfo.empty())
@@ -980,24 +980,10 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
         }
         if (!inComplete)
             continue;
-        if (qPoi.points.size() == 0)
-            continue;
+
         float dx = 0, dy = 0;
-        if (!PickLeashLegalPoint(bot, qPoi.points, dx, dy))
-            continue;
-
-        if (bot->GetDistance2d(dx, dy) >= 1500.0f)
-            continue;
-
-        float dz = GetGroundZ(dx, dy);
-
-        if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
-            continue;
-
-        if (bot->GetZoneId() != bot->GetMap()->GetZoneId(bot->GetPhaseMask(), dx, dy, dz))
-            continue;
-
-        poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
+        if (GetQuestPoiPos(qPoi, dx, dy))
+            poiInfo.push_back({{dx, dy}, qPoi.ObjectiveIndex});
     }
 
     if (poiInfo.size() == 0)
@@ -1154,7 +1140,7 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
         }
     }
     bool const preferQuest = leashed &&
-        std::find(availableStatus.begin(), availableStatus.end(), RPG_DO_QUEST) != availableStatus.end();
+        std::ranges::find(availableStatus, RPG_DO_QUEST) != availableStatus.end();
 
     NewRpgStatus chosenStatus = RPG_STATUS_END;
     if (preferQuest)

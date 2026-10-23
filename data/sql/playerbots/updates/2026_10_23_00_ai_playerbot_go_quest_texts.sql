@@ -2,25 +2,19 @@
 -- Playerbots - Add "go quest" texts
 -- Localized for all WotLK locales (koKR, frFR, deDE, zhCN,
 -- zhTW, esES, esMX, ruRU)
+-- go_help keeps the command keywords in English, they are
+-- the tokens GoAction parses.
 -- #########################################################
 
-DELETE FROM ai_playerbot_texts WHERE name IN (
-    'go_quest_nothing_error',
-    'go_quest_moving',
-    'go_help'
-);
-DELETE FROM ai_playerbot_texts_chance WHERE name IN (
-    'go_quest_nothing_error',
-    'go_quest_moving',
-    'go_help'
-);
+DELETE FROM ai_playerbot_texts_chance WHERE name IN ('go_quest_nothing_error', 'go_quest_moving', 'go_help');
+DELETE FROM ai_playerbot_texts WHERE id IN (1930, 1931, 1932);
 
--- go_quest_nothing_error
 INSERT INTO `ai_playerbot_texts`
     (`id`, `name`, `text`, `say_type`, `reply_type`,
      `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`,
      `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`)
-VALUES (
+VALUES
+(
     1930,
     'go_quest_nothing_error',
     'Nothing quest-related to grab right now',
@@ -32,16 +26,8 @@ VALUES (
     '現在附近沒有可以處理的任務目標',
     'Ahora mismo no hay nada de misiones que recoger',
     'Ahora mismo no hay nada de misiones que recoger',
-    'Сейчас рядом нет ничего нужного для заданий');
-
-INSERT INTO ai_playerbot_texts_chance (name, probability) VALUES ('go_quest_nothing_error', 100);
-
--- go_quest_moving
-INSERT INTO `ai_playerbot_texts`
-    (`id`, `name`, `text`, `say_type`, `reply_type`,
-     `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`,
-     `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`)
-VALUES (
+    'Сейчас рядом нет ничего нужного для заданий'),
+(
     1932,
     'go_quest_moving',
     'On my way, whisper ''go quest'' again once I''m there',
@@ -53,17 +39,8 @@ VALUES (
     '正在過去，到了之後請再密語 ''go quest''',
     'Voy para allá, vuelve a susurrar ''go quest'' cuando llegue',
     'Voy para allá, vuelve a susurrar ''go quest'' cuando llegue',
-    'Иду, шепни ''go quest'' ещё раз, когда я буду на месте');
-
-INSERT INTO ai_playerbot_texts_chance (name, probability) VALUES ('go_quest_moving', 100);
-
--- go_help: command keywords stay in English because they are the actual
--- command tokens parsed by GoAction
-INSERT INTO `ai_playerbot_texts`
-    (`id`, `name`, `text`, `say_type`, `reply_type`,
-     `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`,
-     `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`)
-VALUES (
+    'Иду, шепни ''go quest'' ещё раз, когда я буду на месте'),
+(
     1931,
     'go_help',
     'Whisper ''go x,y'', ''go [game object]'', ''go unit'', ''go position'' or ''go quest'' and I will go there',
@@ -77,4 +54,5 @@ VALUES (
     'Susurra ''go x,y'', ''go [game object]'', ''go unit'', ''go position'' o ''go quest'' e iré allí',
     'Шепни ''go x,y'', ''go [game object]'', ''go unit'', ''go position'' или ''go quest'', и я пойду туда');
 
-INSERT INTO ai_playerbot_texts_chance (name, probability) VALUES ('go_help', 100);
+INSERT INTO ai_playerbot_texts_chance (name, probability)
+SELECT name, 100 FROM ai_playerbot_texts WHERE id IN (1930, 1931, 1932);
