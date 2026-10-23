@@ -102,7 +102,7 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
     if (randomPropertyIds != 0)
         CalculateRandomProperty(randomPropertyIds, itemId);
 
-    bool const checkSetBonus = enable_item_set_bonus_ && sPlayerbotAIConfig.ItemSetSpellScoring;
+    bool const checkSetBonus = enable_item_set_bonus_;
     std::array<float, STATS_TYPE_MAX> setBonusStats{};
     std::array<float, STATS_TYPE_MAX> setBonusBaseline{};
 
@@ -142,7 +142,7 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
     }
     bool const setBonusValued = setBonusValue > 0.0001f;
 
-    if (enable_item_set_bonus_ && (!sPlayerbotAIConfig.ItemSetSpellScoring || !setBonusValued))
+    if (enable_item_set_bonus_ && !setBonusValued)
         CalculateItemSetMod(player_, proto);
 
     CalculateSocketBonus(player_, proto);
