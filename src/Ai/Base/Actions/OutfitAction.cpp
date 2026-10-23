@@ -60,7 +60,7 @@ bool OutfitAction::Execute(Event event)
                 "Equipping outfit %name",
                 {{"%name", name}}));
 
-            EquipItems(outfit);
+            EquipItems(outfit, true);
             return true;
         }
         else if (command == "replace")

@@ -1973,6 +1973,10 @@ public:
 private:
     bool CanKeep(uint32 id)
     {
+        ItemTemplate const* proto = sObjectMgr->GetItemTemplate(id);
+        if (proto && proto->Quality == ITEM_QUALITY_HEIRLOOM)
+            return true;
+
         if (keep.find(id) != keep.end())
             return false;
 
@@ -2444,7 +2448,9 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
 
         if (second_chance && oldItem)
         {
-            bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+            ItemTemplate const* oldProto = oldItem->GetTemplate();
+            if (!oldProto || oldProto->Quality != ITEM_QUALITY_HEIRLOOM)
+                bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
         }
 
         oldItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
@@ -2452,6 +2458,9 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
         // PvP specs: force TRINKET1 to the best available CC-break trinket.
         if (slot == EQUIPMENT_SLOT_TRINKET1 && pvpTrinket1 != 0)
         {
+            if (oldItem && RandomItemMgr::IsLevelingHeirloom(oldItem->GetTemplate(), bot))
+                continue;
+
             if (oldItem)
             {
                 uint8 bagIndex = oldItem->GetBagSlot();
@@ -2631,10 +2640,21 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             continue;
         }
 
-        if (incremental && oldItem)
+        if (oldItem)
         {
             float old_score = calculator.CalculateItem(oldItem->GetEntry(), oldItem->GetItemRandomPropertyId(), slot);
-            if (bestScoreForSlot < 1.2f * old_score)
+            ItemTemplate const* oldProto = oldItem->GetTemplate();
+            ItemTemplate const* newProto = sObjectMgr->GetItemTemplate(bestItemForSlot);
+
+            bool const oldIsLevelingHeirloom = RandomItemMgr::IsLevelingHeirloom(oldProto, bot);
+            bool const newIsLevelingHeirloom = RandomItemMgr::IsLevelingHeirloom(newProto, bot);
+
+            if (oldIsLevelingHeirloom)
+            {
+                if (!newIsLevelingHeirloom || bestScoreForSlot <= old_score)
+                    continue;
+            }
+            else if (!newIsLevelingHeirloom && incremental && bestScoreForSlot < 1.2f * old_score)
                 continue;
         }
         if (oldItem)
@@ -2702,7 +2722,8 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             bool isTrinketSlot = (slot == EQUIPMENT_SLOT_TRINKET1 || slot == EQUIPMENT_SLOT_TRINKET2);
             calculator.SetExcludeResilience(isTrinketSlot);
 
-            if (bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            Item* currentItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            if (currentItem && currentItem->GetTemplate()->Quality != ITEM_QUALITY_HEIRLOOM)
                 bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
 
             std::vector<std::pair<uint32, int32>>& ids = items[slot];
@@ -2748,6 +2769,34 @@ void PlayerbotFactory::InitEquipment(bool incremental, bool second_chance)
             uint16 dest;
             if (!CanEquipUnseenItem(slot, dest, bestItemForSlot))
                 continue;
+
+            Item* equippedItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+            ItemTemplate const* newProto = sObjectMgr->GetItemTemplate(bestItemForSlot);
+            if (equippedItem)
+            {
+                ItemTemplate const* oldProto = equippedItem->GetTemplate();
+                if (!oldProto || !newProto)
+                    continue;
+
+                float oldScore =
+                    calculator.CalculateItem(equippedItem->GetEntry(), equippedItem->GetItemRandomPropertyId(), slot);
+
+                if (RandomItemMgr::IsLevelingHeirloom(oldProto, bot))
+                {
+                    if (!RandomItemMgr::IsLevelingHeirloom(newProto, bot) || bestScoreForSlot <= oldScore)
+                        continue;
+                }
+
+                uint8 dstBag = NULL_BAG;
+                WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
+                packet << equippedItem->GetBagSlot() << equippedItem->GetSlot() << dstBag;
+                WorldPackets::Item::AutoStoreBagItem nicePacket(std::move(packet));
+                nicePacket.Read();
+                bot->GetSession()->HandleAutoStoreBagItemOpcode(nicePacket);
+
+                if (bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                    continue;
+            }
 
             if (Item* equipped = bot->EquipNewItem(dest, bestItemForSlot, true))
             {
@@ -4072,8 +4121,26 @@ void PlayerbotFactory::DestroyEquippedGear(Player* bot)
     {
         if (slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
             continue;
-        if (bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-            bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+        Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (!item)
+            continue;
+
+        ItemTemplate const* proto = item->GetTemplate();
+        if (proto && proto->Quality == ITEM_QUALITY_HEIRLOOM)
+        {
+            if (RandomItemMgr::IsLevelingHeirloom(proto, bot))
+                continue;
+
+            uint8 dstBag = NULL_BAG;
+            WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
+            packet << item->GetBagSlot() << item->GetSlot() << dstBag;
+            WorldPackets::Item::AutoStoreBagItem nicePacket(std::move(packet));
+            nicePacket.Read();
+            bot->GetSession()->HandleAutoStoreBagItemOpcode(nicePacket);
+            continue;
+        }
+
+        bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
     }
 }
 

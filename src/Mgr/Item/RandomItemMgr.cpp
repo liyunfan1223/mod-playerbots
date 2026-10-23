@@ -9,6 +9,7 @@
 #include "DBCStores.h"
 #include "ItemTemplate.h"
 #include "Playerbots.h"
+#include "World.h"
 
 std::unordered_set<uint32> RandomItemMgr::itemCache;
 
@@ -1363,6 +1364,30 @@ std::vector<uint32> RandomItemMgr::GetQuestIdsForItem(uint32 itemId) const
     }
 
     return questIds;
+}
+
+bool RandomItemMgr::IsLevelingHeirloom(ItemTemplate const* proto, Player const* player)
+{
+    if (!proto || !player || proto->Quality != ITEM_QUALITY_HEIRLOOM ||
+        player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+        return false;
+
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        uint32 spellId = proto->Spells[i].SpellId;
+        if (!spellId)
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (!spellInfo)
+            continue;
+
+        if (spellInfo->HasAura(SPELL_AURA_MOD_XP_PCT) ||
+            spellInfo->HasAura(SPELL_AURA_MOD_XP_QUEST_PCT))
+            return true;
+    }
+
+    return false;
 }
 
 bool RandomItemMgr::IsInternalItem(ItemTemplate const* proto)

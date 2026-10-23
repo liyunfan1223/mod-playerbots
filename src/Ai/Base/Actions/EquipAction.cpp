@@ -11,6 +11,7 @@
 #include "ItemUsageValue.h"
 #include "ItemVisitors.h"
 #include "Playerbots.h"
+#include "RandomItemMgr.h"
 #include "StatsWeightCalculator.h"
 #include <utility>
 
@@ -18,16 +19,16 @@ bool EquipAction::Execute(Event event)
 {
     std::string const text = event.getParam();
     ItemIds ids = chat->parseItems(text);
-    EquipItems(ids);
+    EquipItems(ids, true);
     return true;
 }
 
-void EquipAction::EquipItems(ItemIds ids)
+void EquipAction::EquipItems(ItemIds ids, bool notifyOnHeirloomProtection)
 {
     for (ItemIds::iterator i = ids.begin(); i != ids.end(); i++)
     {
         FindItemByIdVisitor visitor(*i);
-        EquipItem(&visitor);
+        EquipItem(&visitor, notifyOnHeirloomProtection);
     }
 }
 
@@ -54,21 +55,56 @@ uint8 EquipAction::GetSmallestBagSlot()
     return curBag;
 }
 
-void EquipAction::EquipItem(FindItemVisitor* visitor)
+void EquipAction::EquipItem(FindItemVisitor* visitor, bool notifyOnHeirloomProtection)
 {
     IterateItems(visitor);
     std::vector<Item*> items = visitor->GetResult();
     if (!items.empty())
-        EquipItem(*items.begin());
+        EquipItem(*items.begin(), notifyOnHeirloomProtection);
 }
 
-void EquipAction::EquipItem(Item* item)
+void EquipAction::EquipItem(Item* item, bool notifyOnHeirloomProtection)
 {
     uint8 bagIndex = item->GetBagSlot();
     uint8 slot = item->GetSlot();
     ItemTemplate const* itemProto = item->GetTemplate();
     uint32 itemId = itemProto->ItemId;
     uint8 invType = itemProto->InventoryType;
+
+    auto reportProtectedHeirloom = [&]()
+    {
+        if (!notifyOnHeirloomProtection)
+            return;
+
+        std::ostringstream out;
+        out << "Cannot equip upgrade: " << chat->FormatItem(itemProto)
+            << ". Experience bonus heirloom equipment is protected.";
+        botAI->TellMaster(out);
+    };
+
+    auto canReplaceEquipped = [&](Item* equippedItem) -> bool
+    {
+        if (!equippedItem)
+            return true;
+
+        ItemTemplate const* equippedProto = equippedItem->GetTemplate();
+        if (!RandomItemMgr::IsLevelingHeirloom(equippedProto, bot))
+            return true;
+
+        if (!RandomItemMgr::IsLevelingHeirloom(itemProto, bot))
+        {
+            reportProtectedHeirloom();
+            return false;
+        }
+
+        StatsWeightCalculator calc(bot);
+        calc.SetItemSetBonus(false);
+        calc.SetOverflowPenalty(false);
+        float candidateScore = calc.CalculateItem(itemId, item->GetItemRandomPropertyId());
+        float equippedScore =
+            calc.CalculateItem(equippedProto->ItemId, equippedItem->GetItemRandomPropertyId());
+        return candidateScore > equippedScore;
+    };
 
     // Handle ammunition separately
     if (invType == INVTYPE_AMMO)
@@ -103,6 +139,10 @@ void EquipAction::EquipItem(Item* item)
         // Handle them early here to avoid issues.
         if (invType == INVTYPE_RANGED || invType == INVTYPE_THROWN || invType == INVTYPE_RANGEDRIGHT)
         {
+            Item* equipped = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+            if (!canReplaceEquipped(equipped))
+                return;
+
             WorldPacket packet(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
             ObjectGuid itemguid = item->GetGUID();
             packet << itemguid << uint8(EQUIPMENT_SLOT_RANGED);
@@ -123,6 +163,27 @@ void EquipAction::EquipItem(Item* item)
         bool isWeapon = (itemProto->Class == ITEM_CLASS_WEAPON);
         bool canTitanGrip = bot->CanTitanGrip();
         bool canDualWield = bot->CanDualWield();
+
+        auto isBetterForSlot = [&](ItemTemplate const* candidateProto, float candidateScore,
+                                   Item* equippedItem, float equippedScore) -> bool
+        {
+            if (!equippedItem)
+                return true;
+
+            ItemTemplate const* equippedProto = equippedItem->GetTemplate();
+            if (!candidateProto || !equippedProto)
+                return false;
+
+            bool const candidateIsLevelingHeirloom =
+                RandomItemMgr::IsLevelingHeirloom(candidateProto, bot);
+            bool const equippedIsLevelingHeirloom =
+                RandomItemMgr::IsLevelingHeirloom(equippedProto, bot);
+
+            if (candidateIsLevelingHeirloom != equippedIsLevelingHeirloom)
+                return candidateIsLevelingHeirloom;
+
+            return candidateScore > equippedScore;
+        };
 
         bool isTwoHander = (invType == INVTYPE_2HWEAPON);
         bool isValidTGWeapon = false;
@@ -193,7 +254,7 @@ void EquipAction::EquipItem(Item* item)
 
             // Priority 1: Replace main hand if the new weapon is strictly better
             // and if conditions allow (e.g. no conflicting 2H logic)
-            bool betterThanMH = (newItemScore > mainHandScore);
+            bool betterThanMH = isBetterForSlot(itemProto, newItemScore, mainHandItem, mainHandScore);
             // If a one-handed weapon is better, we can still use it instead of a two-handed weapon
             bool mhConditionOK = (invType != INVTYPE_2HWEAPON ||
                       (isTwoHander && !canTitanGrip) ||
@@ -212,7 +273,8 @@ void EquipAction::EquipItem(Item* item)
                 }
 
                 // Try moving old main hand weapon to offhand if beneficial
-                if (mainHandItem && mainHandCanGoOff && (!offHandItem || mainHandScore > offHandScore))
+                if (mainHandItem && mainHandCanGoOff &&
+                    isBetterForSlot(mainHandItem->GetTemplate(), mainHandScore, offHandItem, offHandScore))
                 {
                     ItemTemplate const* oldMHProto = mainHandItem->GetTemplate();
 
@@ -235,7 +297,7 @@ void EquipAction::EquipItem(Item* item)
             }
 
             // Priority 2: If not better than main hand, check if better than offhand
-            else if (canGoOff && newItemScore > offHandScore)
+            else if (canGoOff && isBetterForSlot(itemProto, newItemScore, offHandItem, offHandScore))
             {
                 // Equip in offhand
                 WorldPacket eqPacket(CMSG_AUTOEQUIP_ITEM_SLOT, 2);
@@ -289,19 +351,41 @@ void EquipAction::EquipItem(Item* item)
                     float secondItemScore = calc.CalculateItem(equippedItems[1]->GetTemplate()->ItemId, secondRandomProp);
 
                     // Determine which slot (if any) should be replaced
-                    bool betterThanFirst = newItemScore > firstItemScore;
-                    bool betterThanSecond = newItemScore > secondItemScore;
+                    bool betterThanFirst = isBetterForSlot(itemProto, newItemScore, equippedItems[0], firstItemScore);
+                    bool betterThanSecond = isBetterForSlot(itemProto, newItemScore, equippedItems[1], secondItemScore);
 
-                    // Early return if new item is not better than either equipped item
+                    // Explain a manual ring equip blocked by XP heirloom protection.
+                    // Do not warn if a normal ring is simply not an upgrade.
                     if (!betterThanFirst && !betterThanSecond)
+                    {
+                        if (!RandomItemMgr::IsLevelingHeirloom(itemProto, bot))
+                        {
+                            bool const firstProtected =
+                                RandomItemMgr::IsLevelingHeirloom(equippedItems[0]->GetTemplate(), bot);
+                            bool const secondProtected =
+                                RandomItemMgr::IsLevelingHeirloom(equippedItems[1]->GetTemplate(), bot);
+
+                            if ((firstProtected && (secondProtected || newItemScore > firstItemScore)) ||
+                                (secondProtected && newItemScore > secondItemScore))
+                                reportProtectedHeirloom();
+                        }
                         return;
+                    }
 
                     if (betterThanFirst && betterThanSecond)
                     {
-                        // New item is better than both - replace the worse of the two equipped items
-                        if (firstItemScore > secondItemScore)
-                            dstSlot++; // Replace second slot (worse)
-                        // else: keep dstSlot as-is (replace first slot)
+                        bool firstIsLevelingHeirloom =
+                            RandomItemMgr::IsLevelingHeirloom(equippedItems[0]->GetTemplate(), bot);
+                        bool secondIsLevelingHeirloom =
+                            RandomItemMgr::IsLevelingHeirloom(equippedItems[1]->GetTemplate(), bot);
+
+                        if (firstIsLevelingHeirloom != secondIsLevelingHeirloom)
+                        {
+                            if (firstIsLevelingHeirloom)
+                                dstSlot++;
+                        }
+                        else if (firstItemScore > secondItemScore)
+                            dstSlot++; // Replace second slot (worse score)
                     }
                     else if (betterThanSecond)
                         dstSlot++; // Only better than second slot - replace it
@@ -313,6 +397,10 @@ void EquipAction::EquipItem(Item* item)
                 }
             }
         }
+
+        // The destination may have changed since the candidate was selected.
+        if (!canReplaceEquipped(bot->GetItemByPos(INVENTORY_SLOT_BAG_0, dstSlot)))
+            return;
 
         // Equip the item in the chosen slot
         {

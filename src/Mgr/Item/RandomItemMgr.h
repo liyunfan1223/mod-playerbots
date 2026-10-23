@@ -208,6 +208,7 @@ public:
     [[nodiscard]] uint32 GetQuestIdForItem(uint32 itemId) const;
     [[nodiscard]] std::vector<uint32> GetQuestIdsForItem(uint32 itemId) const;
 
+    [[nodiscard]] static bool IsLevelingHeirloom(ItemTemplate const* proto, Player const* player);
     [[nodiscard]] static bool IsInternalItem(ItemTemplate const* proto);
     [[nodiscard]] static bool IsValidItem(ItemTemplate const* proto);
     [[nodiscard]] static bool IsUsedBySkill(ItemTemplate const* proto, uint32 skillId);

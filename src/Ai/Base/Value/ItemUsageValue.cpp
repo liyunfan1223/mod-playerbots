@@ -108,6 +108,9 @@ ItemUsage ItemUsageValue::Calculate()
     if (equip != ITEM_USAGE_NONE)
         return equip;
 
+    if (proto->Quality == ITEM_QUALITY_HEIRLOOM)
+        return ITEM_USAGE_KEEP;
+
     // Get item instance to check if it's soulbound
     Item* item = bot->GetItemByEntry(proto->ItemId);
     bool isSoulbound = item && item->IsSoulBound();
@@ -301,14 +304,21 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
 
     float itemScore = calculator.CalculateItem(itemProto->ItemId, randomPropertyId);
 
-    if (itemScore)
-        shouldEquip = true;
+    bool canEquipForBuild = true;
+    bool const isLevelingHeirloom = RandomItemMgr::IsLevelingHeirloom(itemProto, bot);
 
     if (itemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr.CanEquipWeapon(itemProto, bot->getClass()))
-        shouldEquip = false;
-    if (itemProto->Class == ITEM_CLASS_ARMOR &&
+        canEquipForBuild = false;
+
+    // The random-gear armor heuristic can reject valid scaling heirlooms.
+    if (itemProto->Class == ITEM_CLASS_ARMOR && !isLevelingHeirloom &&
         !sRandomItemMgr.CanEquipArmor(itemProto, bot->getClass(), bot->GetLevel()))
-        shouldEquip = false;
+        canEquipForBuild = false;
+
+    shouldEquip = canEquipForBuild && itemScore != 0.0f;
+
+    if (isLevelingHeirloom && canEquipForBuild)
+        shouldEquip = true;
 
     uint8 possibleSlots = 1;
     uint8 dstSlot = botAI->FindEquipSlot(itemProto, NULL_SLOT, true);
@@ -372,11 +382,27 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
 
         ItemTemplate const* oldItemProto = oldItem->GetTemplate();
         float oldScore = calculator.CalculateItem(oldItemProto->ItemId, oldItem->GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID));
-        if (oldItem)
+
+        bool const oldIsHeirloom = oldItemProto->Quality == ITEM_QUALITY_HEIRLOOM;
+        bool const newIsHeirloom = itemProto->Quality == ITEM_QUALITY_HEIRLOOM;
+
+        if (RandomItemMgr::IsLevelingHeirloom(oldItemProto, bot))
         {
-            // uint32 oldStatWeight = sRandomItemMgr.GetLiveStatWeight(bot, oldItemProto->ItemId);
-            if (itemScore || oldScore)
-                shouldEquipInSlot = itemScore > oldScore * sPlayerbotAIConfig.EquipUpgradeThreshold;
+            // Continue so ring/trinket candidates can still be checked against slot two.
+            if (!newIsHeirloom)
+                continue;
+
+            shouldEquipInSlot = shouldEquip && itemScore > oldScore;
+            if (!shouldEquipInSlot)
+                continue;
+        }
+        else if (isLevelingHeirloom)
+        {
+            shouldEquipInSlot = shouldEquip;
+        }
+        else if (itemScore || oldScore)
+        {
+            shouldEquipInSlot = itemScore > oldScore * sPlayerbotAIConfig.EquipUpgradeThreshold;
         }
 
         // Bigger quiver
@@ -393,6 +419,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
             existingShouldEquip = false;
 
         if (oldItemProto->Class == ITEM_CLASS_ARMOR &&
+            !RandomItemMgr::IsLevelingHeirloom(oldItemProto, bot) &&
             !sRandomItemMgr.CanEquipArmor(oldItemProto, bot->getClass(), bot->GetLevel()))
             existingShouldEquip = false;
 
@@ -401,7 +428,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto, 
 
         // Compare items based on item level, quality or itemId.
         bool isBetter = false;
-        if (itemScore > oldScore)
+        if (isLevelingHeirloom && !oldIsHeirloom)
+            isBetter = true;
+        else if (itemScore > oldScore)
             isBetter = true;
         // else if (newItemPower == oldScore && itemProto->Quality > oldItemProto->Quality)
         //     isBetter = true;

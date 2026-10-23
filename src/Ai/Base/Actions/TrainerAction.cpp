@@ -9,9 +9,11 @@
 #include "BisListMgr.h"
 #include "BudgetValues.h"
 #include "Event.h"
+#include "ItemPackets.h"
 #include "PlayerbotFactory.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
+#include "RandomItemMgr.h"
 #include "ReputationMgr.h"
 #include "Trainer.h"
 
@@ -436,6 +438,8 @@ bool BisGearAction::Execute(Event event)
         ItemTemplate const* tmpl = item->GetTemplate();
         if (!tmpl)
             return;
+        if (tmpl->Quality == ITEM_QUALITY_HEIRLOOM)
+            return;
         if (tmpl->Class == ITEM_CLASS_WEAPON || tmpl->Class == ITEM_CLASS_ARMOR)
             bot->DestroyItem(bag, slot, true);
     };
@@ -447,6 +451,35 @@ bool BisGearAction::Execute(Event event)
             for (uint32 slot = 0; slot < container->GetBagSize(); ++slot)
                 destroyIfEquippable(bag, slot);
     }
+
+    auto clearEquippedForBis = [&](uint8 equippedSlot) -> bool
+    {
+        Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, equippedSlot);
+        if (!item)
+            return true;
+
+        ItemTemplate const* tmpl = item->GetTemplate();
+        if (!tmpl)
+            return false;
+
+        if (tmpl->Quality == ITEM_QUALITY_HEIRLOOM)
+        {
+            if (RandomItemMgr::IsLevelingHeirloom(tmpl, bot))
+                return false;
+
+            uint8 dstBag = NULL_BAG;
+            WorldPacket packet(CMSG_AUTOSTORE_BAG_ITEM, 3);
+            packet << item->GetBagSlot() << item->GetSlot() << dstBag;
+            WorldPackets::Item::AutoStoreBagItem nicePacket(std::move(packet));
+            nicePacket.Read();
+            bot->GetSession()->HandleAutoStoreBagItemOpcode(nicePacket);
+
+            return bot->GetItemByPos(INVENTORY_SLOT_BAG_0, equippedSlot) == nullptr;
+        }
+
+        bot->DestroyItem(INVENTORY_SLOT_BAG_0, equippedSlot, true);
+        return bot->GetItemByPos(INVENTORY_SLOT_BAG_0, equippedSlot) == nullptr;
+    };
 
     // 2. Run full autogear on the empty bot so every slot gets a best-available pick.
     //    Uncovered slots will keep the autogear pick; BiS overwrites the rest below.
@@ -463,7 +496,7 @@ bool BisGearAction::Execute(Event event)
     {
         if (Item* item = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
             if (bisEntries.count(item->GetEntry()))
-                bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+                clearEquippedForBis(slot);
     }
 
     // 3. Apply BiS: only touch slots where the bot can actually equip the BiS item.
@@ -494,8 +527,8 @@ bool BisGearAction::Execute(Event event)
             continue;
 
         uint8 slot = kv.first;
-        if (bot->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-            bot->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
+        if (!clearEquippedForBis(slot))
+            continue;
 
         uint16 dest = 0;
         InventoryResult eqResult = bot->CanEquipNewItem(slot, dest, kv.second, false);
@@ -512,9 +545,8 @@ bool BisGearAction::Execute(Event event)
 
             if (pairedSlot != 0xFF)
             {
-                if (bot->GetItemByPos(INVENTORY_SLOT_BAG_0, pairedSlot))
-                    bot->DestroyItem(INVENTORY_SLOT_BAG_0, pairedSlot, true);
-                eqResult = bot->CanEquipNewItem(slot, dest, kv.second, false);
+                if (clearEquippedForBis(pairedSlot))
+                    eqResult = bot->CanEquipNewItem(slot, dest, kv.second, false);
             }
         }
 
