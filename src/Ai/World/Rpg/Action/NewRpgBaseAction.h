@@ -24,9 +24,6 @@ struct POIInfo
     int32 objectiveIdx;
 };
 
-// Quest giver interaction radius: the new RPG giver search and the grind suppression around givers.
-constexpr float QUEST_GIVER_SEARCH_DISTANCE = 80.0f;
-
 /// A base (composition) class for all new rpg actions
 /// All functions that may be shared by multiple actions should be declared here
 /// And we should make all actions composable instead of inheritable
@@ -34,10 +31,6 @@ class NewRpgBaseAction : public MovementAction
 {
 public:
     NewRpgBaseAction(PlayerbotAI* botAI, std::string name) : MovementAction(botAI, name) {}
-
-    // Standalone so values and multipliers can reuse the same interaction search the actions use.
-    static ObjectGuid FindNpcOrGameObjectToInteract(PlayerbotAI* botAI, Player* bot, bool questgiverOnly = false,
-                                                    float distanceLimit = 0.0f);
 
 protected:
     /* MOVEMENT RELATED */
@@ -47,13 +40,9 @@ protected:
     bool ForceToWait(uint32 duration, MovementPriority priority = MovementPriority::MOVEMENT_NORMAL);
 
     /* QUEST RELATED CHECK */
-    static bool HasQuestToAcceptOrReward(Player* bot, WorldObject* object);
     bool InteractWithNpcOrGameObjectForQuest(ObjectGuid guid);
-    static bool CanInteractWithQuestGiver(Player* bot, Object* questGiver);
     bool IsWithinInteractionDist(Object* object);
     uint32 BestRewardIndex(Quest const* quest);
-    static bool IsQuestWorthDoing(Player* bot, Quest const* quest);
-    static bool IsQuestCapableDoing(Player* bot, Quest const* quest);
 
     /* QUEST RELATED ACTION */
     bool SearchQuestGiverAndAcceptOrReward();
@@ -80,6 +69,12 @@ protected:
     // the teleport fires, but long enough that a genuine long
     // walk that is slowly making progress never triggers it.
     const uint32 stuckTime = 90 * IN_MILLISECONDS;
+
+    /* FOR QUEST GIVER */
+    // Time on one giver, walking and interacting, after which it is skipped until the next IDLE.
+    const uint32 questGiverGiveUpTime = 60 * IN_MILLISECONDS;
+    // A longer pause (combat, eating) starts the timer over.
+    const uint32 questGiverRetryGap = 5 * IN_MILLISECONDS;
 };
 
 #endif

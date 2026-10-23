@@ -4,18 +4,18 @@
  * or (at your option) any later version.
  */
 
-#ifndef PLAYERBOTS_QUESTGIVERTOINTERACTVALUE_H
-#define PLAYERBOTS_QUESTGIVERTOINTERACTVALUE_H
+#ifndef PLAYERBOTS_NEWRPGQUESTGIVERVALUE_H
+#define PLAYERBOTS_NEWRPGQUESTGIVERVALUE_H
 
 #include "Value.h"
 
 class PlayerbotAI;
 
-class QuestGiverToInteractValue : public ObjectGuidCalculatedValue
+class NewRpgQuestGiverValue : public ObjectGuidCalculatedValue
 {
 public:
     // The search walks the nearby NPC/GO caches and builds quest menus, so cache it.
-    QuestGiverToInteractValue(PlayerbotAI* botAI) : ObjectGuidCalculatedValue(botAI, "quest giver to interact", 500) {}
+    NewRpgQuestGiverValue(PlayerbotAI* botAI) : ObjectGuidCalculatedValue(botAI, "new rpg quest giver", 500) {}
 
     ObjectGuid Calculate() override;
 };

@@ -5,12 +5,11 @@
  */
 
 #include "NewRpgMultipliers.h"
-#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 
 float NewRpgQuestGiverMultiplier::GetValue(Action* action)
 {
-    if (!sPlayerbotAIConfig.PrioritiseQuestGivers || !action || action->getName() != "attack anything")
+    if (!action || action->getName() != "attack anything")
         return 1.0f;
 
     switch (botAI->rpgInfo.GetStatus())
@@ -25,5 +24,9 @@ float NewRpgQuestGiverMultiplier::GetValue(Action* action)
             return 1.0f;  // this status's action never visits a giver
     }
 
-    return AI_VALUE(ObjectGuid, "quest giver to interact").IsEmpty() ? 1.0f : 0.0f;
+    // The giver visit runs first in the status action (3.0), below "attack anything" (4.0). Raising the status
+    // actions would also put their movement above grinding, and a multiplier above 1 cannot reorder the queue:
+    // the engine orders by base relevance and applies multipliers after the pop. So grinding is dropped for the
+    // tick instead. SearchQuestGiverAndAcceptOrReward gives up on a giver after a minute, which empties the value.
+    return AI_VALUE(ObjectGuid, "new rpg quest giver").IsEmpty() ? 1.0f : 0.0f;
 }

@@ -13,6 +13,7 @@
 #include "GossipDef.h"
 #include "GridTerrainData.h"
 #include "IVMapMgr.h"
+#include "NewRpgHelpers.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
@@ -37,7 +38,6 @@
 #include "Timer.h"
 #include "TravelMgr.h"
 #include "G3D/Vector2.h"
-#include <algorithm>
 
 bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
 {
@@ -329,7 +329,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
 
         QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
         if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
-            IsQuestWorthDoing(bot, quest) && IsQuestCapableDoing(bot, quest))
+            NewRpgHelpers::IsQuestWorthDoing(bot, quest) && NewRpgHelpers::IsQuestCapableDoing(bot, quest))
         {
             AcceptQuest(quest, guid);
             if (botAI->GetMaster())
@@ -355,84 +355,6 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
         }
     }
     return true;
-}
-
-bool NewRpgBaseAction::CanInteractWithQuestGiver(Player* bot, Object* questGiver)
-{
-    // This is a variant of Player::CanInteractWithQuestGiver
-    // that removes the distance check and keeps all other checks
-    switch (questGiver->GetTypeId())
-    {
-        case TYPEID_UNIT: // Player::GetNPCIfCanInteractWith
-        {
-            ObjectGuid guid = questGiver->GetGUID();
-
-            // unit checks
-            if (!guid)
-                return false;
-
-            if (!bot->IsInWorld() || bot->IsDuringRemoveFromWorld())
-                return false;
-
-            if (bot->IsInFlight())
-                return false;
-
-            // exist (we need look pets also for some interaction (quest/etc)
-            Creature* creature = ObjectAccessor::GetCreatureOrPetOrVehicle(*bot, guid);
-            if (!creature)
-                return false;
-
-            // Deathstate checks
-            if (!bot->IsAlive() &&
-                !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_VISIBLE_TO_GHOSTS))
-                return false;
-
-            // alive or spirit healer
-            if (!creature->IsAlive() &&
-                !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_INTERACT_WHILE_DEAD))
-                return false;
-
-            // appropriate npc type
-            if (!creature->HasNpcFlag(UNIT_NPC_FLAG_QUESTGIVER))
-                return false;
-
-            // not allow interaction under control, but allow with own pets
-            if (creature->GetCharmerGUID())
-                return false;
-
-            // xinef: perform better check
-            if (creature->GetReactionTo(bot) <= REP_UNFRIENDLY)
-                return false;
-
-            return true;
-        }
-        case TYPEID_GAMEOBJECT: // Player::GetGameObjectIfCanInteractWith
-        {
-            ObjectGuid guid = questGiver->GetGUID();
-
-            if (GameObject* go = bot->GetMap()->GetGameObject(guid))
-            {
-                if (go->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
-                {
-                    // Players cannot interact with gameobjects that use the "Point" icon
-                    if (go->GetGOInfo()->IconName == "Point")
-                        return false;
-
-                    return true;
-                }
-            }
-
-            return false;
-        }
-        // unused for now
-        // case TYPEID_PLAYER:
-        //     return bot->IsAlive() && questGiver->ToPlayer()->IsAlive();
-        // case TYPEID_ITEM:
-        //     return bot->IsAlive();
-        default:
-            break;
-    }
-    return false;
 }
 
 bool NewRpgBaseAction::IsWithinInteractionDist(Object* questGiver)
@@ -562,40 +484,6 @@ uint32 NewRpgBaseAction::BestRewardIndex(Quest const* quest)
     }
 }
 
-bool NewRpgBaseAction::IsQuestWorthDoing(Player* bot, Quest const* quest)
-{
-    bool isLowLevelQuest =
-        bot->GetLevel() > (bot->GetQuestLevel(quest) + sWorld->getIntConfig(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF));
-
-    if (isLowLevelQuest)
-        return false;
-
-    if (quest->IsRepeatable())
-        return false;
-
-    if (quest->IsSeasonal())
-        return false;
-
-    return true;
-}
-
-bool NewRpgBaseAction::IsQuestCapableDoing(Player* bot, Quest const* quest)
-{
-    bool highLevelQuest = bot->GetLevel() + 3 < bot->GetQuestLevel(quest);
-    if (highLevelQuest)
-        return false;
-
-    // Elite quest and dungeon quest etc
-    if (quest->GetType() != 0)
-        return false;
-
-    // now we only capable of doing solo quests
-    if (quest->GetSuggestedPlayers() >= 2)
-        return false;
-
-    return true;
-}
-
 bool NewRpgBaseAction::OrganizeQuestLog()
 {
     int32 freeSlotNum = 0;
@@ -620,7 +508,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             continue;
 
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        if (!IsQuestWorthDoing(bot, quest) || !IsQuestCapableDoing(bot, quest) ||
+        if (!NewRpgHelpers::IsQuestWorthDoing(bot, quest) || !NewRpgHelpers::IsQuestCapableDoing(bot, quest) ||
             bot->GetQuestStatus(questId) == QUEST_STATUS_FAILED)
         {
             LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), questId);
@@ -702,128 +590,38 @@ bool NewRpgBaseAction::OrganizeQuestLog()
 bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
 {
     OrganizeQuestLog();
-    if (ObjectGuid npcOrGo = AI_VALUE(ObjectGuid, "quest giver to interact"))
-    {
-        WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npcOrGo);
-        if (!object)
-            return false;
-
-        if (bot->CanInteractWithQuestGiver(object))
-        {
-            InteractWithNpcOrGameObjectForQuest(npcOrGo);
-            ForceToWait(5000);
-            return true;
-        }
-        return MoveWorldObjectTo(npcOrGo);
-    }
-    return false;
-}
-
-ObjectGuid NewRpgBaseAction::FindNpcOrGameObjectToInteract(PlayerbotAI* botAI, Player* bot, bool questgiverOnly,
-                                                           float distanceLimit)
-{
-    GuidVector possibleTargets = botAI->GetAiObjectContext()->GetValue<GuidVector>("possible new rpg targets")->Get();
-    GuidVector possibleGameObjects =
-        botAI->GetAiObjectContext()->GetValue<GuidVector>("possible new rpg game objects")->Get();
-
-    if (possibleTargets.empty() && possibleGameObjects.empty())
-        return ObjectGuid();
-
-    WorldObject* nearestObject = nullptr;
-    for (ObjectGuid& guid : possibleTargets)
-    {
-        WorldObject* object = ObjectAccessor::GetWorldObject(*bot, guid);
-
-        if (!object || !object->IsInWorld())
-            continue;
-
-        if (distanceLimit && bot->GetDistance(object) > distanceLimit)
-            continue;
-
-        if (CanInteractWithQuestGiver(bot, object) && HasQuestToAcceptOrReward(bot, object))
-        {
-            if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
-                nearestObject = object;
-            break;
-        }
-    }
-
-    for (ObjectGuid& guid : possibleGameObjects)
-    {
-        WorldObject* object = ObjectAccessor::GetWorldObject(*bot, guid);
-
-        if (!object || !object->IsInWorld())
-            continue;
-
-        if (distanceLimit && bot->GetDistance(object) > distanceLimit)
-            continue;
-
-        if (CanInteractWithQuestGiver(bot, object) && HasQuestToAcceptOrReward(bot, object))
-        {
-            if (!nearestObject || bot->GetExactDist(nearestObject) > bot->GetExactDist(object))
-                nearestObject = object;
-            break;
-        }
-    }
-
-    if (nearestObject)
-        return nearestObject->GetGUID();
-
-    // No questgiver to accept or reward
-    if (questgiverOnly)
-        return ObjectGuid();
-
-    if (possibleTargets.empty())
-        return ObjectGuid();
-
-    int idx = urand(0, possibleTargets.size() - 1);
-    ObjectGuid guid = possibleTargets[idx];
-    WorldObject* object = ObjectAccessor::GetCreatureOrPetOrVehicle(*bot, guid);
-    if (!object)
-        object = ObjectAccessor::GetGameObject(*bot, guid);
-
-    if (object && object->IsInWorld())
-    {
-        return object->GetGUID();
-    }
-    return ObjectGuid();
-}
-
-bool NewRpgBaseAction::HasQuestToAcceptOrReward(Player* bot, WorldObject* object)
-{
-    ObjectGuid guid = object->GetGUID();
-    bot->PrepareQuestMenu(guid);
-    QuestMenu const& menu = bot->PlayerTalkClass->GetQuestMenu();
-    if (menu.Empty())
+    ObjectGuid npcOrGo = AI_VALUE(ObjectGuid, "new rpg quest giver");
+    if (!npcOrGo)
         return false;
 
-    for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
-    {
-        QuestMenuItem const& item = menu.GetItem(idx);
-        Quest const* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
-        if (!quest)
-            continue;
-        QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
-        if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
-        {
-            return true;
-        }
-    }
-    for (uint8 idx = 0; idx < menu.GetMenuItemCount(); idx++)
-    {
-        QuestMenuItem const& item = menu.GetItem(idx);
-        Quest const* quest = sObjectMgr->GetQuestTemplate(item.QuestId);
-        if (!quest)
-            continue;
+    WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npcOrGo);
+    if (!object)
+        return false;
 
-        QuestStatus const& status = bot->GetQuestStatus(item.QuestId);
-        if (status == QUEST_STATUS_NONE && bot->CanTakeQuest(quest, false) && bot->CanAddQuest(quest, false) &&
-            IsQuestWorthDoing(bot, quest) && IsQuestCapableDoing(bot, quest))
-        {
-            return true;
-        }
+    NewRpgInfo& info = botAI->rpgInfo;
+    if (info.questGiver != npcOrGo || GetMSTimeDiffToNow(info.questGiverLastTry) > questGiverRetryGap)
+    {
+        info.questGiver = npcOrGo;
+        info.questGiverSince = getMSTime();
     }
-    return false;
+    info.questGiverLastTry = getMSTime();
+
+    // Unreachable, or an offer the interaction never clears: let the status action and grinding resume.
+    if (GetMSTimeDiffToNow(info.questGiverSince) > questGiverGiveUpTime)
+    {
+        LOG_DEBUG("playerbots", "[New RPG] {} gives up on quest giver {}", bot->GetName(), npcOrGo.ToString());
+        info.ignoredQuestGivers.insert(npcOrGo);
+        info.questGiver.Clear();
+        return false;
+    }
+
+    if (bot->CanInteractWithQuestGiver(object))
+    {
+        InteractWithNpcOrGameObjectForQuest(npcOrGo);
+        ForceToWait(5000);
+        return true;
+    }
+    return MoveWorldObjectTo(npcOrGo);
 }
 
 static std::vector<float> GenerateRandomWeights(int n)

@@ -9,7 +9,7 @@
 
 #include "Multiplier.h"
 
-// Suppresses grind targets while a giver the current RPG status would visit is nearby.
+// Drops "attack anything" while a giver the current RPG status would visit is nearby, so the status action runs.
 class NewRpgQuestGiverMultiplier : public Multiplier
 {
 public:

@@ -13,6 +13,7 @@
 #include "IVMapMgr.h"
 #include "MotionMaster.h"
 #include "MoveSpline.h"
+#include "NewRpgHelpers.h"
 #include "NewRpgInfo.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
@@ -24,6 +25,7 @@
 #include "Player.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotTextMgr.h"
+#include "Playerbots.h"
 #include "QuestDef.h"
 #include "Random.h"
 #include "SharedDefines.h"
@@ -407,8 +409,19 @@ bool NewRpgWanderNpcAction::Execute(Event /*event*/)
     auto& data = *dataPtr;
     if (!data.npcOrGo)
     {
-        // No npc can be found, switch to IDLE
-        ObjectGuid npcOrGo = FindNpcOrGameObjectToInteract(botAI, bot);
+        // Prefer a giver with something to accept or reward, else any nearby npc; none -> IDLE
+        ObjectGuid npcOrGo = NewRpgHelpers::FindQuestGiver(botAI);
+        if (npcOrGo.IsEmpty())
+        {
+            GuidVector possibleTargets = AI_VALUE(GuidVector, "possible new rpg targets");
+            if (!possibleTargets.empty())
+            {
+                uint32 idx = urand(0, possibleTargets.size() - 1);
+                WorldObject* object = ObjectAccessor::GetWorldObject(*bot, possibleTargets[idx]);
+                if (object && object->IsInWorld())
+                    npcOrGo = object->GetGUID();
+            }
+        }
         if (npcOrGo.IsEmpty())
         {
             info.ChangeToIdle();

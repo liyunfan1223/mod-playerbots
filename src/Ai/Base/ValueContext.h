@@ -62,6 +62,7 @@
 #include "NearestNonBotPlayersValue.h"
 #include "NearestNpcsValue.h"
 #include "NewPlayerNearbyValue.h"
+#include "NewRpgQuestGiverValue.h"
 #include "OutfitListValue.h"
 #include "PartyMemberSnaredTargetValue.h"
 #include "PartyMemberToDispel.h"
@@ -75,7 +76,6 @@
 #include "PossibleRpgTargetsValue.h"
 #include "PossibleTargetsValue.h"
 #include "PvpValues.h"
-#include "QuestGiverToInteractValue.h"
 #include "QuestValues.h"
 #include "RTSCValues.h"
 #include "RandomBotUpdateValue.h"
@@ -128,6 +128,7 @@ public:
         creators["possible rpg targets"] = &ValueContext::possible_rpg_targets;
         creators["possible new rpg targets"] = &ValueContext::possible_new_rpg_targets;
         creators["possible new rpg game objects"] = &ValueContext::possible_new_rpg_game_objects;
+        creators["new rpg quest giver"] = &ValueContext::new_rpg_quest_giver;
         creators["nearest corpses"] = &ValueContext::nearest_corpses;
         creators["log level"] = &ValueContext::log_level;
         creators["party member without aura"] = &ValueContext::party_member_without_aura;
@@ -176,7 +177,6 @@ public:
         creators["loot target"] = &ValueContext::loot_target;
         creators["available loot"] = &ValueContext::available_loot;
         creators["has available loot"] = &ValueContext::has_available_loot;
-        creators["quest giver to interact"] = &ValueContext::quest_giver_to_interact;
         creators["always loot list"] = &ValueContext::always_loot_list;
         creators["loot strategy"] = &ValueContext::loot_strategy;
         creators["last movement"] = &ValueContext::last_movement;
@@ -394,7 +394,6 @@ private:
     static UntypedValue* available_loot(PlayerbotAI* botAI) { return new AvailableLootValue(botAI); }
     static UntypedValue* loot_target(PlayerbotAI* botAI) { return new LootTargetValue(botAI); }
     static UntypedValue* has_available_loot(PlayerbotAI* botAI) { return new HasAvailableLootValue(botAI); }
-    static UntypedValue* quest_giver_to_interact(PlayerbotAI* botAI) { return new QuestGiverToInteractValue(botAI); }
     static UntypedValue* always_loot_list(PlayerbotAI* botAI) { return new AlwaysLootListValue(botAI); }
     static UntypedValue* loot_strategy(PlayerbotAI* botAI) { return new LootStrategyValue(botAI); }
 
@@ -436,6 +435,7 @@ private:
     static UntypedValue* possible_rpg_targets(PlayerbotAI* botAI) { return new PossibleRpgTargetsValue(botAI); }
     static UntypedValue* possible_new_rpg_targets(PlayerbotAI* botAI) { return new PossibleNewRpgTargetsValue(botAI); }
     static UntypedValue* possible_new_rpg_game_objects(PlayerbotAI* botAI) { return new PossibleNewRpgGameObjectsValue(botAI); }
+    static UntypedValue* new_rpg_quest_giver(PlayerbotAI* botAI) { return new NewRpgQuestGiverValue(botAI); }
     static UntypedValue* possible_targets(PlayerbotAI* botAI) { return new PossibleTargetsValue(botAI); }
     static UntypedValue* possible_triggers(PlayerbotAI* botAI) { return new PossibleTriggersValue(botAI); }
     static UntypedValue* possible_targets_no_los(PlayerbotAI* botAI)
