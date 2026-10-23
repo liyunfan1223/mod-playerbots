@@ -63,14 +63,14 @@ class PossibleQuestGrabTargetsValue : public ObjectGuidListCalculatedValue
 public:
     PossibleQuestGrabTargetsValue(PlayerbotAI* botAI, float range = 0.0f)
         : ObjectGuidListCalculatedValue(botAI, "possible quest grab targets"),
-          range(range ? range : sPlayerbotAIConfig.QuestGrabDistance)
+          _range(range ? range : sPlayerbotAIConfig.QuestGrabDistance)
     {
     }
 
     GuidVector Calculate() override;
 
 private:
-    float range;
+    float _range;
 };
 
 #endif

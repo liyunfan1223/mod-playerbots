@@ -6,10 +6,12 @@
 
 DELETE FROM ai_playerbot_texts WHERE name IN (
     'go_quest_nothing_error',
+    'go_quest_moving',
     'go_help'
 );
 DELETE FROM ai_playerbot_texts_chance WHERE name IN (
     'go_quest_nothing_error',
+    'go_quest_moving',
     'go_help'
 );
 
@@ -33,6 +35,27 @@ VALUES (
     'Сейчас рядом нет ничего нужного для заданий');
 
 INSERT INTO ai_playerbot_texts_chance (name, probability) VALUES ('go_quest_nothing_error', 100);
+
+-- go_quest_moving
+INSERT INTO `ai_playerbot_texts`
+    (`id`, `name`, `text`, `say_type`, `reply_type`,
+     `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`,
+     `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`)
+VALUES (
+    1932,
+    'go_quest_moving',
+    'On my way, whisper ''go quest'' again once I''m there',
+    0, 0,
+    '가는 중입니다. 도착하면 ''go quest''를 다시 귓속말해 주세요',
+    'J''y vais, chuchotez à nouveau ''go quest'' quand j''y serai',
+    'Bin unterwegs, flüstere noch einmal ''go quest'', wenn ich da bin',
+    '正在过去，到了之后请再密语 ''go quest''',
+    '正在過去，到了之後請再密語 ''go quest''',
+    'Voy para allá, vuelve a susurrar ''go quest'' cuando llegue',
+    'Voy para allá, vuelve a susurrar ''go quest'' cuando llegue',
+    'Иду, шепни ''go quest'' ещё раз, когда я буду на месте');
+
+INSERT INTO ai_playerbot_texts_chance (name, probability) VALUES ('go_quest_moving', 100);
 
 -- go_help: command keywords stay in English because they are the actual
 -- command tokens parsed by GoAction

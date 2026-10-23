@@ -841,18 +841,17 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
     return false;
 }
 
-// Keeps new rpg from choosing a destination the leash would pull the bot straight back from.
-static bool WithinLeashRange(Player* bot, float x, float y)
+// The master a leashed bot must stay near, or nullptr when the bot is not leashed.
+static Player* GetLeashMaster(Player* bot)
 {
     PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
-    if (!botAI || !IsLeashFormation(botAI))
-        return true;
+    return botAI && IsLeashFormation(botAI) ? botAI->GetMaster() : nullptr;
+}
 
-    Player* master = botAI->GetMaster();
-    if (!master)
-        return true;
-
-    return master->GetDistance2d(x, y) <= sPlayerbotAIConfig.LeashDistance;
+// Keeps new rpg from choosing a destination the leash would pull the bot straight back from.
+static bool WithinLeashRange(Player* leashMaster, float x, float y)
+{
+    return !leashMaster || leashMaster->GetDistance2d(x, y) <= sPlayerbotAIConfig.LeashDistance;
 }
 
 // Picks one real POI point (within leash range) instead of a random blend of all of them: a blend
@@ -860,11 +859,12 @@ static bool WithinLeashRange(Player* bot, float x, float y)
 // average of real points can be inside a wall or off a ledge.
 static bool PickLeashLegalPoint(Player* bot, std::vector<QuestPOIPoint> const& points, float& outX, float& outY)
 {
+    Player* const leashMaster = GetLeashMaster(bot);
     std::vector<QuestPOIPoint const*> candidates;
     candidates.reserve(points.size());
     for (QuestPOIPoint const& point : points)
     {
-        if (WithinLeashRange(bot, point.x, point.y))
+        if (WithinLeashRange(leashMaster, point.x, point.y))
             candidates.push_back(&point);
     }
     if (candidates.empty())
@@ -1011,6 +1011,7 @@ bool NewRpgBaseAction::GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector
 
 WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
 {
+    Player* const leashMaster = GetLeashMaster(bot);
     std::vector<WorldLocation> const& locs = sTravelMgr.GetLocsPerLevelCache(bot->GetLevel());
     float hiRange = 500.0f;
     float loRange = 2500.0f;
@@ -1036,7 +1037,7 @@ WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
         if (bot->GetExactDist(loc) > 2500.0f)
             continue;
 
-        if (!WithinLeashRange(bot, loc.GetPositionX(), loc.GetPositionY()))
+        if (!WithinLeashRange(leashMaster, loc.GetPositionX(), loc.GetPositionY()))
             continue;
 
         if (!inCity && bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(),
@@ -1072,6 +1073,7 @@ WorldPosition NewRpgBaseAction::SelectRandomGrindPos(Player* bot)
 
 WorldPosition NewRpgBaseAction::SelectRandomCampPos(Player* bot)
 {
+    Player* const leashMaster = GetLeashMaster(bot);
     const std::vector<WorldLocation> locs = sTravelMgr.GetTravelHubs(bot);
 
     bool inCity = false;
@@ -1095,7 +1097,7 @@ WorldPosition NewRpgBaseAction::SelectRandomCampPos(Player* bot)
         if (bot->GetExactDist(loc) < 50.0f)
             continue;
 
-        if (!WithinLeashRange(bot, loc.GetPositionX(), loc.GetPositionY()))
+        if (!WithinLeashRange(leashMaster, loc.GetPositionX(), loc.GetPositionY()))
             continue;
 
         if (!inCity && bot->GetMap()->GetZoneId(bot->GetPhaseMask(), loc.GetPositionX(), loc.GetPositionY(),
@@ -1136,11 +1138,13 @@ bool NewRpgBaseAction::SelectRandomFlightTaxiNode(uint32& flightMasterEntry, Wor
 
 bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateStatus)
 {
+    // A leashed bot does in-range quests first, and otherwise stays with the leader.
+    bool const leashed = IsLeashFormation(botAI);
     std::vector<NewRpgStatus> availableStatus;
     uint32 probSum = 0;
     for (NewRpgStatus status : candidateStatus)
     {
-        if (sPlayerbotAIConfig.RpgStatusProbWeight[status] == 0)
+        if (sPlayerbotAIConfig.RpgStatusProbWeight[status] == 0 || (leashed && status != RPG_DO_QUEST))
             continue;
 
         if (CheckRpgStatusAvailable(status))
@@ -1149,8 +1153,6 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
             probSum += sPlayerbotAIConfig.RpgStatusProbWeight[status];
         }
     }
-    // A leashed bot does in-range quests first, and otherwise stays with the leader.
-    bool const leashed = IsLeashFormation(botAI);
     bool const preferQuest = leashed &&
         std::find(availableStatus.begin(), availableStatus.end(), RPG_DO_QUEST) != availableStatus.end();
 

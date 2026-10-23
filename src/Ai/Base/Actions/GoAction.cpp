@@ -74,8 +74,14 @@ bool GoAction::Execute(Event event)
         for (char const* action : { "quest grab giver", "quest grab use item", "quest grab create item",
                                     "quest grab object" })
         {
-            if (botAI->DoSpecificAction(action, Event(), true))
-                return true;
+            if (!botAI->DoSpecificAction(action, Event(), true))
+                continue;
+
+            // Without the strategy nothing retries once the bot arrives, so ask to be told again.
+            if (bot->isMoving())
+                botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+                    "go_quest_moving", "On my way, whisper 'go quest' again once I'm there", {}));
+            return true;
         }
 
         botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(

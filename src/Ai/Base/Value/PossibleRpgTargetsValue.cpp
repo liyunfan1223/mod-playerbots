@@ -281,9 +281,9 @@ static bool CanOpenQuestObjectLock(Player* bot, GameObject* go)
 GuidVector PossibleQuestGrabTargetsValue::Calculate()
 {
     std::list<GameObject*> targets;
-    AnyGameObjectInObjectRangeCheck u_check(bot, range);
+    AnyGameObjectInObjectRangeCheck u_check(bot, _range);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
-    Cell::VisitObjects(bot, searcher, range);
+    Cell::VisitObjects(bot, searcher, _range);
 
     std::vector<std::pair<ObjectGuid, float>> guidDistancePairs;
     for (GameObject* go : targets)

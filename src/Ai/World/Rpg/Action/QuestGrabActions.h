@@ -9,9 +9,7 @@
 
 #include "NewRpgBaseAction.h"
 
-// Actions of the "quest grab" strategy. Each one only reacts to something already within
-// Playerbots.QuestGrabDistance of the bot, so they share NewRpgBaseAction's quest helpers
-// without running the new rpg status machine.
+// "quest grab" actions: they only react to things within Playerbots.QuestGrabDistance of the bot.
 
 // Accept or turn in quests at a nearby quest giver.
 class QuestGrabGiverAction : public NewRpgBaseAction

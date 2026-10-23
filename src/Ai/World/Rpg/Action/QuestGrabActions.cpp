@@ -48,9 +48,12 @@ bool QuestGrabUseItemAction::isUseful() { return !GetQuestUseItems(botAI).empty(
 
 bool QuestGrabUseItemAction::Execute(Event /*event*/)
 {
+    // Quest data names the target but not the item that credits it, so try each quest item and
+    // let the server's own spell target checks decide. Every pair already in reach is tried
+    // before walking anywhere, so a rejected pair can't pull the bot away from a working one.
+    WorldObject* moveTarget = nullptr;
     for (Item* item : GetQuestUseItems(botAI))
     {
-        ItemTemplate const* proto = item->GetTemplate();
         for (auto const& [questId, status] : bot->getQuestStatusMap())
         {
             if (status.Status != QUEST_STATUS_INCOMPLETE)
@@ -66,8 +69,6 @@ bool QuestGrabUseItemAction::Execute(Event /*event*/)
                 if (!reqEntry || status.CreatureOrGOCount[i] >= quest->RequiredNpcOrGoCount[i])
                     continue;
 
-                // Quest data names the target but not the item that credits it, so try each
-                // quest item and let the server's own spell target checks decide.
                 float const range = sPlayerbotAIConfig.QuestGrabDistance;
                 GameObject* go = nullptr;
                 Creature* creature = nullptr;
@@ -81,21 +82,26 @@ bool QuestGrabUseItemAction::Execute(Event /*event*/)
                     continue;
 
                 if (!IsWithinInteractionDist(target))
-                    return MoveWorldObjectTo(target->GetGUID());
+                {
+                    if (!moveTarget || bot->GetExactDist(target) < bot->GetExactDist(moveTarget))
+                        moveTarget = target;
+                    continue;
+                }
 
                 UseItemAction useItemAction(botAI);
                 bool const used = go ? useItemAction.UseItemOnGameObject(item, go->GetGUID())
                                      : useItemAction.UseItemOnUnit(item, creature);
 
                 LOG_DEBUG("playerbots", "[Quest Grab] {} {} using {} on {} for quest {} objective {}", bot->GetName(),
-                          used ? "succeeded" : "failed", proto->Name1, reqEntry, questId, i);
+                          used ? "succeeded" : "failed", item->GetTemplate()->Name1, reqEntry, questId, i);
 
                 if (used)
                     return true;
             }
         }
     }
-    return false;
+
+    return moveTarget && MoveWorldObjectTo(moveTarget->GetGUID());
 }
 
 bool QuestGrabCreateItemAction::isUseful() { return !GetQuestUseItems(botAI).empty(); }
