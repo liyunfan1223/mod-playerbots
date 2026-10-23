@@ -5954,7 +5954,7 @@ uint32 PlayerbotAI::GetInventoryItemsCountWithId(uint32 itemId)
 
 void PlayerbotAI::ConsolidateItems()
 {
-    if (!bot)
+    if (!bot || !bot->IsAlive())
         return;
 
     // Only entries with two or more stacks in the bags can be consolidated.
@@ -5973,8 +5973,9 @@ void PlayerbotAI::ConsolidateItems()
             continue;
 
         // Merge into the fullest partial stack through the core's drag-to-stack path, one move
-        // per pass; each pass re-collects because a move can empty the source or fill the target.
-        for (uint8 pass = 0; pass < 128; ++pass)
+        // per pass. Each successful move removes one partial stack (a target fills or a source
+        // empties), so the initial stack count bounds the passes.
+        for (uint32 pass = 0; pass < stackCount; ++pass)
         {
             std::vector<Item*> stacks;
             for (Item* item : GetInventoryItems())
@@ -6001,8 +6002,24 @@ void PlayerbotAI::ConsolidateItems()
             if (!source)
                 break;
 
+            std::vector<uint32> before;
+            before.reserve(stacks.size());
+            for (Item* item : stacks)
+                before.push_back(item->GetCount());
+            std::sort(before.begin(), before.end());
+
             // The core merges as much as fits and leaves any remainder in the source slot.
             bot->SwapItem(source->GetPos(), target->GetPos());
+
+            // SwapItem can refuse (dead, busy) or move without merging; stop instead of retrying
+            // the same pair for the rest of the pass budget.
+            std::vector<uint32> after;
+            for (Item* item : GetInventoryItems())
+                if (item && item->GetEntry() == entry && item->GetCount() > 0)
+                    after.push_back(item->GetCount());
+            std::sort(after.begin(), after.end());
+            if (after == before)
+                break;
         }
     }
 }
