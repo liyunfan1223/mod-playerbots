@@ -1366,6 +1366,10 @@ Playerbots.AutoLearnTrainerSpells = 1
 # Default: 1 (enabled)
 Playerbots.AutoPickTalents = 1
 
+# Player-controlled bots (altbots and selfbots) automatically spend free talent points on levelup.
+# Default: 0 (disabled)
+Playerbots.AutoPickTalentsForPlayerControlledBots = 0
+
 # Spells every randombot will learn automatically and every altbot will learn with maintenance
 # Default: 54197 (Cold Weather Flying)
 Playerbots.RandomBotSpellIds = "54197"
