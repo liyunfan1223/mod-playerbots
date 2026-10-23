@@ -55,6 +55,7 @@
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
+#include "WsgRouteState.h"
 #include <cmath>
 #include <mutex>
 #include <sstream>
@@ -285,8 +286,14 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     bool isCasting = bot->IsNonMeleeSpellCast(true);
     if (bot->IsInCombat())
     {
-        if (!inCombat && !isCasting)
-            ResetActionDuration();
+        if (!inCombat)
+        {
+            // "attackers" is cached for 1 s; refresh it so the assist actions see the new attacker
+            // this tick.
+            aiObjectContext->GetValue<GuidVector>("attackers")->Reset();
+            if (!isCasting)
+                ResetActionDuration();
+        }
 
         inCombat = true;
     }
@@ -1586,6 +1593,11 @@ void PlayerbotAI::DoNextAction(bool min)
         aiObjectContext->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid::Empty);
         aiObjectContext->GetValue<ObjectGuid>("pull strategy target")->Set(ObjectGuid::Empty);
         aiObjectContext->GetValue<LootObject>("loot target")->Set(LootObject());
+
+        // The dead engine has no battleground strategy, so its "dead" trigger cannot reset this route.
+        if (Battleground* bg = bot->GetBattleground())
+            if (bg->GetBgTypeID(true) == BATTLEGROUND_WS)
+                aiObjectContext->GetValue<WsgRouteState>("wsg route")->Reset();
 
         ChangeEngine(BOT_STATE_DEAD);
         return;
@@ -6729,6 +6741,48 @@ std::set<uint32> PlayerbotAI::GetCurrentIncompleteQuestIds()
     }
 
     return result;
+}
+
+void PlayerbotAI::RecordQuestAccepted(uint32 questId)
+{
+    ++rpgStatistic.questAccepted;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].accepted;
+}
+
+void PlayerbotAI::RecordQuestCompleted(uint32 questId)
+{
+    // Each completion counts once per bot and quest, until the quest is rewarded or dropped.
+    if (!countedQuestCompletions.insert(questId).second)
+        return;
+
+    ++rpgStatistic.questCompleted;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].completed;
+}
+
+void PlayerbotAI::RecordQuestRewarded(uint32 questId)
+{
+    RecordQuestCompleted(questId);
+    countedQuestCompletions.erase(questId);
+    ++rpgStatistic.questRewarded;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].rewarded;
+}
+
+void PlayerbotAI::RecordQuestDropped(uint32 questId, QuestDropReason reason)
+{
+    countedQuestCompletions.erase(questId);
+    ++rpgStatistic.questDropped;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].dropped[static_cast<size_t>(reason)];
+}
+
+void PlayerbotAI::RecordQuestAbandoned(uint32 questId, QuestAbandonReason reason)
+{
+    ++rpgStatistic.questAbandoned;
+    if (sPlayerbotAIConfig.CollectDetailedQuestStats)
+        ++rpgStatistic.byQuest[questId].abandoned[static_cast<size_t>(reason)];
 }
 
 uint32 PlayerbotAI::GetReactDelay()

@@ -7,11 +7,15 @@
 #include "InvalidTargetValue.h"
 #include "AttackersValue.h"
 #include "Playerbots.h"
+#include "PvpValues.h"
 #include "Unit.h"
 
 bool InvalidTargetValue::Calculate()
 {
     Unit* target = AI_VALUE(Unit*, qualifier);
+    if (IsUnavailableCombatTarget(bot, target))
+        return true;
+
     Unit* enemy = AI_VALUE(Unit*, "enemy player target");
     if (target && enemy && target == enemy && target->IsAlive())
         return false;

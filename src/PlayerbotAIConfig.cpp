@@ -20,6 +20,7 @@
 #include <cctype>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 template <class T>
 void LoadList(std::string const value, T& list)
@@ -244,6 +245,14 @@ bool PlayerbotAIConfig::Initialize()
     RandomBotAutologin = sConfigMgr->GetOption<bool>("Playerbots.RandomBotAutologin", true);
     MinRandomBots = sConfigMgr->GetOption<int32>("Playerbots.MinRandomBots", 500);
     MaxRandomBots = sConfigMgr->GetOption<int32>("Playerbots.MaxRandomBots", 500);
+    // An inverted range aborts the worldserver on the first population tick, since urand asserts on it.
+    if (MinRandomBots > MaxRandomBots)
+    {
+        LOG_ERROR("server.loading",
+                  "Playerbots.MinRandomBots ({}) is higher than Playerbots.MaxRandomBots ({}). Swapping them.",
+                  MinRandomBots, MaxRandomBots);
+        std::swap(MinRandomBots, MaxRandomBots);
+    }
     RandomBotUpdateInterval = sConfigMgr->GetOption<int32>("Playerbots.RandomBotUpdateInterval", 20);
     RandomBotCountChangeMinInterval =
         sConfigMgr->GetOption<int32>("Playerbots.RandomBotCountChangeMinInterval", 30 * MINUTE);
@@ -681,6 +690,13 @@ bool PlayerbotAIConfig::Initialize()
     RandomBotXPRate = sConfigMgr->GetOption<float>("Playerbots.RandomBotXPRate", 1.0);
     RandomBotAllianceRatio = sConfigMgr->GetOption<int32>("Playerbots.RandomBotAllianceRatio", 50);
     RandomBotHordeRatio = sConfigMgr->GetOption<int32>("Playerbots.RandomBotHordeRatio", 50);
+    if (!RandomBotAllianceRatio && !RandomBotHordeRatio)    // AddRandomBots() divides by 0 if both ratio = 0
+    {
+        LOG_ERROR("server.loading",
+                  "Playerbots.RandomBotAllianceRatio and Playerbots.RandomBotHordeRatio are both 0. Using 50/50.");
+        RandomBotAllianceRatio = 50;
+        RandomBotHordeRatio = 50;
+    }
     DisableDeathKnightLogin = sConfigMgr->GetOption<bool>("Playerbots.DisableDeathKnightLogin", 0);
     LimitTalentsExpansion = sConfigMgr->GetOption<bool>("Playerbots.LimitTalentsExpansion", 0);
     BotActiveAlone = sConfigMgr->GetOption<int32>("Playerbots.BotActiveAlone", 10);
@@ -723,6 +739,7 @@ bool PlayerbotAIConfig::Initialize()
     DropObsoleteQuests = sConfigMgr->GetOption<bool>("Playerbots.DropObsoleteQuests", true);
     AllowLearnTrainerSpells = sConfigMgr->GetOption<bool>("Playerbots.AllowLearnTrainerSpells", true);
     AutoPickTalents = sConfigMgr->GetOption<bool>("Playerbots.AutoPickTalents", true);
+    AutoPickTalentsForPlayerControlledBots = sConfigMgr->GetOption<bool>("Playerbots.AutoPickTalentsForPlayerControlledBots", false);
     AutoUpgradeEquip = sConfigMgr->GetOption<bool>("Playerbots.AutoUpgradeEquip", true);
     HunterWolfPet = sConfigMgr->GetOption<int32>("Playerbots.HunterWolfPet", 0);
     DefaultPetStance = sConfigMgr->GetOption<int32>("Playerbots.DefaultPetStance", 1);
@@ -732,6 +749,7 @@ bool PlayerbotAIConfig::Initialize()
     AutoTeleportForLevel = sConfigMgr->GetOption<bool>("Playerbots.AutoTeleportForLevel", false);
     AutoDoQuests = sConfigMgr->GetOption<bool>("Playerbots.AutoDoQuests", true);
     EnableNewRpgStrategy = sConfigMgr->GetOption<bool>("Playerbots.EnableNewRpgStrategy", true);
+    CollectDetailedQuestStats = sConfigMgr->GetOption<bool>("Playerbots.CollectDetailedQuestStats", false);
 
     RpgStatusProbWeight[RPG_WANDER_RANDOM] = sConfigMgr->GetOption<int32>("Playerbots.RpgStatusProbWeight.WanderRandom", 15);
     RpgStatusProbWeight[RPG_WANDER_NPC] = sConfigMgr->GetOption<int32>("Playerbots.RpgStatusProbWeight.WanderNpc", 20);
