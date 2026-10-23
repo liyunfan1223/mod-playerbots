@@ -15,7 +15,7 @@ INSERT INTO `ai_playerbot_texts`
  `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`,
  `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8`)
 VALUES (
-2014,
+1929,
 'calc_item_breakdown',
 'Breakdown: weighted sum %sum, multipliers x%mult',
 0, 0,
