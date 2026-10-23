@@ -431,22 +431,20 @@ bool NewRpgWanderNpcAction::Execute(Event /*event*/)
 
             if (Creature* creature = object->ToCreature())
             {
-                uint32 npcFlags = creature->GetCreatureTemplate()->npcflag;
-
                 constexpr uint32 MIN_VENDOR_BALANCE = 1000;  // 10 silver
 
-                if ((npcFlags & UNIT_NPC_FLAG_VENDOR) && AI_VALUE(bool, "can sell"))
+                if (creature->HasNpcFlag(UNIT_NPC_FLAG_VENDOR) && AI_VALUE(bool, "can sell"))
                 {
-                    botAI->DoSpecificAction("sell", Event("sell", "vendor"));
+                    botAI->DoSpecificAction("sell", Event("sell", "vendor"), true);
 
                     // Buying sorts the vendor list through the weight calculator; skip it for
                     // bots without money for cheap consumables.
                     if (bot->GetMoney() >= MIN_VENDOR_BALANCE)
-                        botAI->DoSpecificAction("buy", Event("buy", "vendor"));
+                        botAI->DoSpecificAction("buy", Event("buy", "vendor"), true);
                 }
 
-                if ((npcFlags & UNIT_NPC_FLAG_REPAIR) && AI_VALUE(bool, "can repair"))
-                    botAI->DoSpecificAction("repair", Event("repair"));
+                if (creature->HasNpcFlag(UNIT_NPC_FLAG_REPAIR) && AI_VALUE(bool, "can repair"))
+                    botAI->DoSpecificAction("repair", Event("repair"), true);
             }
 
             return true;

@@ -4,9 +4,10 @@
  * or (at your option) any later version.
  */
 
+#include "SellAction.h"
+
 #include <algorithm>
 
-#include "SellAction.h"
 #include "ChatHelper.h"
 #include "Event.h"
 #include "ItemPackets.h"
@@ -204,7 +205,6 @@ void SellAction::Sell(Item* item, bool force)
         uint32 excessCount = totalCount - keepRequirement;
         if (item->GetCount() > excessCount)
             countToSell = excessCount;
-
     }
 
     GuidVector vendors = botAI->GetAiObjectContext()->GetValue<GuidVector>("nearest npcs")->Get();

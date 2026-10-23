@@ -67,25 +67,24 @@ bool BuyAction::Execute(Event event)
             calculator.SetItemSetBonus(false);
             calculator.SetOverflowPenalty(false);
 
+            // Score each item once; the comparator must be a strict weak ordering, and the old
+            // "if either score is 0, compare item level" branch was not.
+            std::unordered_map<uint32, std::pair<float, uint32>> itemScores;
+            for (VendorItem const* vendorItem : m_items_sorted)
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(vendorItem->item);
+                itemScores[vendorItem->item] = {calculator.CalculateItem(vendorItem->item),
+                                                proto ? proto->ItemLevel : 0};
+            }
+
             std::sort(m_items_sorted.begin(), m_items_sorted.end(),
-                [&calculator](VendorItem* i, VendorItem* j)
+                [&itemScores](VendorItem* i, VendorItem* j)
                 {
-                    ItemTemplate const* item1 = sObjectMgr->GetItemTemplate(i->item);
-                    ItemTemplate const* item2 = sObjectMgr->GetItemTemplate(j->item);
-
-                    if (!item1 || !item2)
-                        return false;
-
-                    float score1 = calculator.CalculateItem(item1->ItemId);
-                    float score2 = calculator.CalculateItem(item2->ItemId);
-
-                    // Fallback to itemlevel if either score is 0
-                    if (score1 == 0 || score2 == 0)
-                    {
-                        score1 = item1->ItemLevel;
-                        score2 = item2->ItemLevel;
-                    }
-                    return score1 > score2; // Sort in descending order (highest score first)
+                    auto const& score1 = itemScores.at(i->item);
+                    auto const& score2 = itemScores.at(j->item);
+                    if (score1.first != score2.first)
+                        return score1.first > score2.first;
+                    return score1.second > score2.second;
                 });
 
             std::unordered_map<uint32, float> bestPurchasedItemScore;  // Track best item score per InventoryType
@@ -112,8 +111,8 @@ bool BuyAction::Execute(Event event)
 
                     uint32 invType = proto->InventoryType;
 
-                    // Calculate item score
-                    float newScore = calculator.CalculateItem(proto->ItemId);
+                    // Reuse the score computed for the sort.
+                    float newScore = itemScores.at(proto->ItemId).first;
 
                     // Skip if we already bought a better item for this slot
                     if (bestPurchasedItemScore.find(invType) != bestPurchasedItemScore.end() &&
