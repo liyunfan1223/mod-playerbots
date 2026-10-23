@@ -58,8 +58,6 @@ struct BGStrategyData
     uint8 hordeStrategy = 0;
 };
 
-extern std::unordered_map<uint32, BGStrategyData> bgStrategies;
-
 struct BattleBotWaypoint
 {
     BattleBotWaypoint(float x_, float y_, float z_, BattleBotWaypointFunc func) : x(x_), y(y_), z(z_), pFunc(func){};
@@ -108,6 +106,8 @@ class BGTactics : public MovementAction
 public:
     static bool HandleConsoleCommand(ChatHandler* handler, char const* args);
     uint8 static GetBotStrategyForTeam(Battleground* bg, TeamId teamId);
+    static void SetBotStrategies(uint32 instanceId, BGStrategyData const& data);
+    static void ClearBotStrategies(uint32 instanceId);
 
     BGTactics(PlayerbotAI* botAI, std::string const name = "bg tactics") : MovementAction(botAI, name) {}
 

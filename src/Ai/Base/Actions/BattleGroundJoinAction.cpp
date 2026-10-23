@@ -11,8 +11,11 @@
 #include "Event.h"
 #include "GroupMgr.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotOperations.h"
+#include "PlayerbotWorldThreadProcessor.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
+#include "RandomPlayerbotFactory.h"
 
 bool BGJoinAction::Execute(Event /*event*/)
 {
@@ -108,6 +111,14 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
             if (member->InBattlegroundQueue())
                 continue;
 
+            // a member outside the captain's bracket keeps the team from queuing: it leaves the team (world thread)
+            if (!RandomPlayerbotFactory::SameArenaBracket(member->GetLevel(), bot->GetLevel()))
+            {
+                PlayerbotWorldThreadProcessor::instance().QueueOperation(
+                    std::make_unique<ArenaTeamDropMemberOperation>(arenateam->GetId(), member->GetGUID()));
+                continue;
+            }
+
             if (member->GetGroup())
                 member->GetGroup()->RemoveMember(member->GetGUID());
 
@@ -156,9 +167,6 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
 
         Player* member = ObjectAccessor::FindConnectedPlayer(*i);
         if (!member)
-            continue;
-
-        if (member->GetLevel() < 70)
             continue;
 
         if (!group->AddMember(member))

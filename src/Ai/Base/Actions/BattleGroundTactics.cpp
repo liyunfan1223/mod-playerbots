@@ -31,6 +31,7 @@
 #include "ServerFacade.h"
 #include "Vehicle.h"
 #include <algorithm>
+#include <mutex>
 
 // common bg positions
 Position const WS_WAITING_POS_HORDE_1 = {944.981f, 1423.478f, 345.434f, 6.18f};
@@ -112,7 +113,8 @@ enum BattleBotWsgWaitSpot
     BB_WSG_WAIT_SPOT_RIGHT
 };
 
-std::unordered_map<uint32, BGStrategyData> bgStrategies;
+static std::unordered_map<uint32, BGStrategyData> bgStrategies;
+static std::mutex bgStrategiesMutex;
 
 std::vector<uint32> const vFlagsAV = {
     BG_AV_OBJECTID_BANNER_H_B,      BG_AV_OBJECTID_BANNER_H,      BG_AV_OBJECTID_BANNER_A_B,
@@ -1433,8 +1435,23 @@ std::string const BGTactics::HandleConsoleCommandPrivate(WorldSession* session, 
 }
 
 // Depends on OnBattlegroundStart in playerbots.cpp
+void BGTactics::SetBotStrategies(uint32 instanceId, BGStrategyData const& data)
+{
+    std::lock_guard<std::mutex> lock(bgStrategiesMutex);
+    bgStrategies[instanceId] = data;
+}
+
+void BGTactics::ClearBotStrategies(uint32 instanceId)
+{
+    std::lock_guard<std::mutex> lock(bgStrategiesMutex);
+    bgStrategies.erase(instanceId);
+}
+
 uint8 BGTactics::GetBotStrategyForTeam(Battleground* bg, TeamId teamId)
 {
+    if (!bg)
+        return 0;
+    std::lock_guard<std::mutex> lock(bgStrategiesMutex);
     auto itr = bgStrategies.find(bg->GetInstanceID());
     if (itr == bgStrategies.end())
         return 0;

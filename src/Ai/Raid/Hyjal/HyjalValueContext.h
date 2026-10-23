@@ -68,25 +68,30 @@ public:
     }
 
 private:
-    static UntypedValue* hyjal_infernals(PlayerbotAI* botAI) {
+    static UntypedValue* hyjal_infernals(PlayerbotAI* botAI)
+    {
         return new HyjalInfernalsValue(botAI);
     }
-    static UntypedValue* kazrogal_below_mana_threshold(PlayerbotAI* botAI) {
+    static UntypedValue* kazrogal_below_mana_threshold(PlayerbotAI* botAI)
+    {
         return new KazrogalBelowManaThresholdValue(botAI);
     }
-    static UntypedValue* hyjal_death_and_decay(PlayerbotAI* botAI) {
+    static UntypedValue* hyjal_death_and_decay(PlayerbotAI* botAI)
+    {
         return new HyjalHazardPositionsValue(
             botAI, "hyjal death and decay",
             HyjalHelpers::Id(HyjalHelpers::HyjalSpells::SPELL_DEATH_AND_DECAY),
             HyjalHelpers::DEATH_AND_DECAY_SEARCH_RADIUS);
     }
-    static UntypedValue* hyjal_rain_of_fire(PlayerbotAI* botAI) {
+    static UntypedValue* hyjal_rain_of_fire(PlayerbotAI* botAI)
+    {
         return new HyjalHazardPositionsValue(
             botAI, "hyjal rain of fire",
             HyjalHelpers::Id(HyjalHelpers::HyjalSpells::SPELL_RAIN_OF_FIRE),
             HyjalHelpers::RAIN_OF_FIRE_SEARCH_RADIUS);
     }
-    static UntypedValue* hyjal_doomfire_trail(PlayerbotAI* botAI) {
+    static UntypedValue* hyjal_doomfire_trail(PlayerbotAI* botAI)
+    {
         return new HyjalHazardPositionsValue(
             botAI, "hyjal doomfire trail",
             HyjalHelpers::Id(HyjalHelpers::HyjalSpells::SPELL_DOOMFIRE_TRAIL),

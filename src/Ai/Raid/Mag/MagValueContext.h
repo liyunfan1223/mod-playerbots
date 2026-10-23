@@ -18,7 +18,8 @@ class MagBurningAbyssalsValue : public CalculatedValue<GuidVector>
 {
 public:
     MagBurningAbyssalsValue(PlayerbotAI* botAI)
-        : CalculatedValue<GuidVector>(botAI, "mag burning abyssals", 200) {}
+        : CalculatedValue<GuidVector>(
+            botAI, "mag burning abyssals", MagHelpers::MAG_CACHE_INTERVAL_MS) {}
 
 protected:
     GuidVector Calculate() override { return MagHelpers::FindBurningAbyssalGuids(bot); }
@@ -28,7 +29,8 @@ class MagDebrisPositionsValue : public CalculatedValue<std::vector<Position>>
 {
 public:
     MagDebrisPositionsValue(PlayerbotAI* botAI)
-        : CalculatedValue<std::vector<Position>>(botAI, "mag debris positions", 200) {}
+        : CalculatedValue<std::vector<Position>>(
+            botAI, "mag debris positions", MagHelpers::MAG_CACHE_INTERVAL_MS) {}
 
 protected:
     std::vector<Position> Calculate() override { return MagHelpers::FindDebrisPositions(bot); }
@@ -44,10 +46,12 @@ public:
     }
 
 private:
-    static UntypedValue* mag_burning_abyssals(PlayerbotAI* botAI) {
+    static UntypedValue* mag_burning_abyssals(PlayerbotAI* botAI)
+    {
         return new MagBurningAbyssalsValue(botAI);
     }
-    static UntypedValue* mag_debris_positions(PlayerbotAI* botAI) {
+    static UntypedValue* mag_debris_positions(PlayerbotAI* botAI)
+    {
         return new MagDebrisPositionsValue(botAI);
     }
 };

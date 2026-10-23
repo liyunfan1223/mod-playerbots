@@ -13,7 +13,7 @@
 using namespace ZaHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool ZulAmanNoEncounterInProgressTrigger::IsActive()
 {
@@ -23,7 +23,7 @@ bool ZulAmanNoEncounterInProgressTrigger::IsActive()
     return IsMechanicTrackerBot(bot, ZA_MAP_ID);
 }
 
-bool ZulAmanPullingBossTrigger::IsActiveInEncounter()
+bool ZulAmanHunterShouldMisdirectTrigger::IsActiveInEncounter()
 {
     if (bot->getClass() != CLASS_HUNTER)
         return false;
