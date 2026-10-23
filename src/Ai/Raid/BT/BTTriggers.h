@@ -9,7 +9,7 @@
 
 #include "Trigger.h"
 
-// General
+// Shared
 
 class BlackTempleBotIsNotInCombatTrigger : public Trigger
 {

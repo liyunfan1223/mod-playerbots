@@ -567,7 +567,6 @@ public:
     void OnBattlegroundStart(Battleground* bg) override
     {
         BGStrategyData data;
-
         BattlegroundTypeId bgType = bg->GetBgTypeID();
         if (bgType == BATTLEGROUND_RB)  // a random-queue game: the rolled map
             bgType = bg->GetBgTypeID(true);
@@ -594,10 +593,13 @@ public:
                 break;
         }
 
-        bgStrategies[bg->GetInstanceID()] = data;
+        BGTactics::SetBotStrategies(bg->GetInstanceID(), data);
     }
 
-    void OnBattlegroundEnd(Battleground* bg, TeamId /*winnerTeam*/) override { bgStrategies.erase(bg->GetInstanceID()); }
+    void OnBattlegroundEnd(Battleground* bg, TeamId /*winnerTeam*/) override
+    {
+        BGTactics::ClearBotStrategies(bg->GetInstanceID());
+    }
 };
 
 // Workaround for missing InitEnabledHooksIfNeeded for new BattlefieldScript in ScriptMgr

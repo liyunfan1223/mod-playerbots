@@ -96,12 +96,6 @@ public:
     MissileBarrageTrigger(PlayerbotAI* botAI) : HasAuraTrigger(botAI, "missile barrage") {}
 };
 
-class ArcaneBlastTrigger : public BuffTrigger
-{
-public:
-    ArcaneBlastTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "arcane blast") {}
-};
-
 class ArcaneBlastStackTrigger : public HasAuraStackTrigger
 {
 public:

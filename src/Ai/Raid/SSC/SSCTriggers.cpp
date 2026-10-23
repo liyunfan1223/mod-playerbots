@@ -357,8 +357,8 @@ bool LeotherasTheBlindHunterShouldMisdirectDemonFormTrigger::IsActiveInEncounter
     if (HasInnerDemon(bot))
         return false;
 
-    if (!bot->HasAura(Id(SscSpells::SPELL_MISDIRECTION)) &&
-        bot->HasSpellCooldown(Id(SscSpells::SPELL_MISDIRECTION_CAST)))
+    if (!bot->HasAura(Id(SscSpells::SPELL_MISDIRECTION_AURA)) &&
+        bot->HasSpellCooldown(Id(SscSpells::SPELL_MISDIRECTION)))
     {
         return false;
     }

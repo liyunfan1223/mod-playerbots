@@ -52,7 +52,8 @@ enum class HyjalSpells : uint32
 
     // Hunter
     SPELL_ASPECT_OF_THE_VIPER = 34074,
-    SPELL_MISDIRECTION        = 35079,
+    SPELL_MISDIRECTION        = 34477,
+    SPELL_MISDIRECTION_AURA   = 35079, // the aura on the hunter
 
     // Shaman
     SPELL_TREMOR_TOTEM        = 8143,
@@ -74,7 +75,7 @@ struct BlockedArc
     float halfWidth;
 };
 
-// General
+// Shared
 
 inline constexpr uint32 HYJAL_MAP_ID = 534;
 // The interval matches the default Playerbots.ReactDelay.

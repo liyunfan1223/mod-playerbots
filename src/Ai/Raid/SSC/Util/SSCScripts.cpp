@@ -67,7 +67,7 @@ public:
         {
             Player* player = it->GetSource();
             if (!player || !player->IsAlive() ||
-                caster->GetExactDist2d(player) >= TOXIC_SPORES_HIT_RADIUS)
+                caster->GetExactDist2d(player) >= TOXIC_SPORES_HAZARD_RADIUS)
             {
                 continue;
             }

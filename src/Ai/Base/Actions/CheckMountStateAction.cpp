@@ -194,6 +194,11 @@ bool CheckMountStateAction::isUseful()
     if (bot->HasAuraType(SPELL_AURA_TRANSFORM) && bot->IsInDisallowedMountForm())
         return false;
 
+    // Mount attempts stop movement, including active jumps.
+    if (bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == EFFECT_MOTION_TYPE && bot->movespline &&
+        !bot->movespline->Finalized())
+        return false;
+
     // BG Logic
     if (bot->InBattleground())
     {
