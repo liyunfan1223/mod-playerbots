@@ -63,6 +63,7 @@
 #include "NearestNonBotPlayersValue.h"
 #include "NearestNpcsValue.h"
 #include "NewPlayerNearbyValue.h"
+#include "NewRpgQuestGiverValue.h"
 #include "OutfitListValue.h"
 #include "PartyMemberSnaredTargetValue.h"
 #include "PartyMemberToDispel.h"
@@ -129,6 +130,7 @@ public:
         creators["possible rpg targets"] = &ValueContext::possible_rpg_targets;
         creators["possible new rpg targets"] = &ValueContext::possible_new_rpg_targets;
         creators["possible new rpg game objects"] = &ValueContext::possible_new_rpg_game_objects;
+        creators["new rpg quest giver"] = &ValueContext::new_rpg_quest_giver;
         creators["nearest corpses"] = &ValueContext::nearest_corpses;
         creators["log level"] = &ValueContext::log_level;
         creators["party member without aura"] = &ValueContext::party_member_without_aura;
@@ -441,6 +443,7 @@ private:
     static UntypedValue* possible_rpg_targets(PlayerbotAI* botAI) { return new PossibleRpgTargetsValue(botAI); }
     static UntypedValue* possible_new_rpg_targets(PlayerbotAI* botAI) { return new PossibleNewRpgTargetsValue(botAI); }
     static UntypedValue* possible_new_rpg_game_objects(PlayerbotAI* botAI) { return new PossibleNewRpgGameObjectsValue(botAI); }
+    static UntypedValue* new_rpg_quest_giver(PlayerbotAI* botAI) { return new NewRpgQuestGiverValue(botAI); }
     static UntypedValue* possible_targets(PlayerbotAI* botAI) { return new PossibleTargetsValue(botAI); }
     static UntypedValue* possible_triggers(PlayerbotAI* botAI) { return new PossibleTriggersValue(botAI); }
     static UntypedValue* possible_targets_no_los(PlayerbotAI* botAI)

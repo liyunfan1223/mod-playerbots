@@ -99,6 +99,13 @@ struct NewRpgInfo
     WorldPosition moveFarPos;
     // END MOVE_FAR
 
+    // QUEST GIVER
+    ObjectGuid questGiver;  // giver the bot is walking to or talking with
+    uint32 questGiverSince{0};
+    uint32 questGiverLastTry{0};
+    GuidSet ignoredQuestGivers;  // skipped until the next IDLE
+    // END QUEST GIVER
+
     using RpgData = std::variant<
         Idle,
         GoGrind,
