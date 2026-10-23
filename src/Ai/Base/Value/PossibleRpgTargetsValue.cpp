@@ -109,20 +109,27 @@ const std::vector<uint32> PossibleNewRpgTargetsValue::allowedNpcFlags = {
     UNIT_NPC_FLAG_REPAIR,
 };
 
+float PossibleNewRpgTargetsValue::GetSearchRange(Player* bot)
+{
+    float const configuredRange = sPlayerbotAIConfig.RpgTargetSearchDistance;
+    return configuredRange > 0.0f ? configuredRange : bot->GetVisibilityRange();
+}
+
 // Sparse starting zones where the default scan range is insufficient for WANDER_NPC (requires >= 3 NPCs)
 static const std::unordered_set<uint32> rpgRangeOverrideAreaIds = { 3526 /* Ammen Vale */, 2117 /* Deathknell */ };
 
-PossibleNewRpgTargetsValue::PossibleNewRpgTargetsValue(PlayerbotAI* botAI, float range)
-    : NearestUnitsValue(botAI, "possible new rpg targets", range, true), defaultRange(range)
+PossibleNewRpgTargetsValue::PossibleNewRpgTargetsValue(PlayerbotAI* botAI)
+    : NearestUnitsValue(botAI, "possible new rpg targets", sPlayerbotAIConfig.RpgTargetSearchDistance, true)
 {
 }
 
 GuidVector PossibleNewRpgTargetsValue::Calculate()
 {
-    if (rpgRangeOverrideAreaIds.count(bot->GetAreaId()) && defaultRange < 200.0f)
+    float const searchRange = GetSearchRange(bot);
+    if (rpgRangeOverrideAreaIds.count(bot->GetAreaId()) && searchRange < 200.0f)
         range = 200.0f;
     else
-        range = defaultRange;
+        range = searchRange;
 
     std::list<Unit*> targets;
     FindUnits(targets);
@@ -178,6 +185,8 @@ const std::vector<GameobjectTypes> PossibleNewRpgGameObjectsValue::allowedGOFlag
 
 GuidVector PossibleNewRpgGameObjectsValue::Calculate()
 {
+    float const range = PossibleNewRpgTargetsValue::GetSearchRange(bot);
+
     std::list<GameObject*> targets;
     AnyGameObjectInObjectRangeCheck u_check(bot, range);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);

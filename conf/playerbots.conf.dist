@@ -1428,6 +1428,10 @@ Playerbots.RestrictedHealerDPSMaps = "33,34,36,43,47,48,70,90,109,129,209,229,23
 # Default: 1 (enabled)
 Playerbots.EnableNewRpgStrategy = 1
 
+# Radius (yards) of the new RPG strategy's NPC and gameobject scans. Cost grows with the square of the radius. 
+# Default: 150.0
+Playerbots.RpgTargetSearchDistance = 150.0
+
 # Track per-quest accept/complete/reward/drop/abandon counts and drop/abandon reasons, reported by
 # ".playerbots rndbot queststats" and dumped to LogsDir/playerbots_quest_stats.json by
 # ".playerbots rndbot questdump". Adds per-bot maps that are cleared on every stats aggregation.

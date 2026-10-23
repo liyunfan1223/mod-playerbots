@@ -38,6 +38,10 @@ public:
     void SetPvpSpec(bool isPvp) { pvpSpec_ = isPvp; }
     void SetExcludeResilience(bool exclude) { exclude_resilience_ = exclude; }
 
+    // Read access for diagnostics (e.g. the `calc` chat command)
+    StatsCollector const* GetCollector() const { return collector_.get(); }
+    float const* GetStatWeights() const { return stats_weights_; }
+
     private:
     void GenerateWeights(Player* player);
     void GenerateBasicWeights(Player* player);

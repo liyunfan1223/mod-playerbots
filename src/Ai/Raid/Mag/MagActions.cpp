@@ -20,14 +20,8 @@ using namespace EncounterHelpers;
 
 bool MagtheridonResetEncounterStatesAction::Execute(Event /*event*/)
 {
-    uint32 const instanceId = bot->GetInstanceId();
     bool reset = false;
-
-    reset |= magDpsWaitTimer.erase(instanceId) > 0;
-    reset |= blastNovaTimer.erase(instanceId) > 0;
-    reset |= lastBlastNovaState.erase(instanceId) > 0;
-    reset |= ceilingCollapseApplied.erase(instanceId) > 0;
-    reset |= botToCubeAssignments.erase(instanceId) > 0;
+    reset |= MagResetInstance(bot->GetInstanceId());
     reset |= ClearStrategyTargetIcon(
         bot, RtiTargetValue::skullIndex, { Id(MagNpcs::NPC_HELLFIRE_CHANNELER) });
 
@@ -307,12 +301,9 @@ bool MagtheridonUseManticronCubeAction::Execute(Event /*event*/)
 
 CubeInfo const* MagtheridonUseManticronCubeAction::GetAssignedCube()
 {
-    auto mapIt = botToCubeAssignments.find(bot->GetInstanceId());
-    if (mapIt == botToCubeAssignments.end())
-        return nullptr;
-
-    auto it = mapIt->second.find(bot->GetGUID());
-    return it != mapIt->second.end() ? &it->second : nullptr;
+    auto const& assignments = MagState(bot->GetInstanceId()).botToCubeAssignments;
+    auto it = assignments.find(bot->GetGUID());
+    return it != assignments.end() ? &it->second : nullptr;
 }
 
 bool MagtheridonUseManticronCubeAction::HandleCubeRelease(Unit* magtheridon)
@@ -388,11 +379,11 @@ bool MagtheridonUseManticronCubeAction::HandleCubeInteraction(GameObject* cube)
 
 bool MagtheridonUseManticronCubeAction::HandleWaitingPhase(CubeInfo const& cubeInfo)
 {
-    auto timerIt = blastNovaTimer.find(bot->GetInstanceId());
-    if (timerIt == blastNovaTimer.end())
+    std::optional<uint32> const& blastNovaTimer = MagState(bot->GetInstanceId()).blastNovaTimer;
+    if (!blastNovaTimer)
         return false;
 
-    if (getMSTimeDiff(timerIt->second, getMSTime()) < BLAST_NOVA_INTERIM_MS)
+    if (getMSTimeDiff(*blastNovaTimer, getMSTime()) < BLAST_NOVA_INTERIM_MS)
         return false;
 
     // If a hazard appears at the waiting position, find a new waiting position at the same distance
@@ -517,23 +508,24 @@ bool MagtheridonUpdateTimersAndAssignmentsAction::Execute(Event /*event*/)
 
     uint32 const instanceId = magtheridon->GetInstanceId();
     uint32 const now = getMSTime();
+    MagInstanceState& state = MagState(instanceId);
 
     bool const isCasting = IsBlastNovaCasting(magtheridon);
-    bool& lastState = lastBlastNovaState.try_emplace(instanceId, false).first->second;
+    bool& lastState = state.lastBlastNovaState ?
+        *state.lastBlastNovaState : state.lastBlastNovaState.emplace(false);
     if (isCasting && !lastState)
-        blastNovaTimer[instanceId] = now;
+        state.blastNovaTimer = now;
 
     lastState = isCasting;
 
     bool updated = false;
-    updated |= blastNovaTimer.try_emplace(instanceId, now).second;
-    updated |= magDpsWaitTimer.try_emplace(instanceId, now).second;
+    updated |= EmplaceIfUnset(state.blastNovaTimer, now);
+    updated |= EmplaceIfUnset(state.magDpsWaitTimer, now);
 
-    if (magtheridon->GetHealthPct() < CEILING_COLLAPSE_HP_PCT &&
-        !ceilingCollapseApplied.contains(instanceId))
+    if (magtheridon->GetHealthPct() < CEILING_COLLAPSE_HP_PCT && !state.ceilingCollapseApplied)
     {
-        blastNovaTimer[instanceId] += CEILING_COLLAPSE_DELAY_MS;
-        ceilingCollapseApplied.insert(instanceId);
+        *state.blastNovaTimer += CEILING_COLLAPSE_DELAY_MS;
+        state.ceilingCollapseApplied = true;
         updated = true;
     }
 
@@ -546,7 +538,7 @@ bool MagtheridonUpdateTimersAndAssignmentsAction::AssignCubeClickers(
     uint32 instanceId, Unit* magtheridon)
 {
     std::vector<CubeInfo> cubes = GetAllCubeInfosByDbGuids(bot->GetMap(), MANTICRON_CUBE_DB_GUIDS);
-    auto& assignment = botToCubeAssignments[instanceId];
+    auto& assignment = MagState(instanceId).botToCubeAssignments;
     Group* group = bot->GetGroup();
 
     if (!group || cubes.empty())
@@ -632,11 +624,11 @@ bool MagtheridonUpdateTimersAndAssignmentsAction::AssignCubeClickers(
 
 bool MagtheridonUpdateTimersAndAssignmentsAction::NeedsCubeReassignment(uint32 instanceId)
 {
-    auto mapIt = botToCubeAssignments.find(instanceId);
-    if (mapIt == botToCubeAssignments.end() || mapIt->second.empty())
+    auto const& assignment = MagState(instanceId).botToCubeAssignments;
+    if (assignment.empty())
         return true;
 
-    for (auto const& pair : mapIt->second)
+    for (auto const& pair : assignment)
     {
         Player* assigned = ObjectAccessor::FindPlayer(pair.first);
         if (!assigned || !assigned->IsAlive() || assigned->GetMapId() != MAG_MAP_ID)
