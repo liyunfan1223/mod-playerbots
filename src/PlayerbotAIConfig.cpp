@@ -577,7 +577,7 @@ bool PlayerbotAIConfig::Initialize()
 
             // Backfill missing probability levels from the next defined level - moving from top to bottom
             uint32 fallbackProb = baseProb;
-            for (int32 level = MAX_LEVEL; level >= 1; --level)
+            for (int32 level = MAX_LEVEL - 1; level >= 1; --level)
             {
                 if (levelHasProb[level])
                 {

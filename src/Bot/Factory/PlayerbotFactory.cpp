@@ -145,10 +145,13 @@ constexpr uint32 SPELL_EARTHEN_POWER = 51524;
 constexpr uint32 SPELL_FOCUSED_MIND = 30866;
 
 constexpr uint32 SPELL_BURNOUT = 44472;
-constexpr uint32 SPELL_ICE_SHARDS = 15047;
+constexpr uint32 SPELL_ICE_SHARDS_1 = 11207;
+constexpr uint32 SPELL_ICE_SHARDS_2 = 12672;
+constexpr uint32 SPELL_ICE_SHARDS_3 = 15047;
 constexpr uint32 SPELL_IMPROVED_BLINK = 31570;
 constexpr uint32 SPELL_FIERY_PAYBACK = 64357;
 constexpr uint32 SPELL_SHATTERED_BARRIER = 54787;
+constexpr uint32 SPELL_INCINERATION = 54734;
 
 constexpr uint32 SPELL_IMPROVED_HOWL_OF_TERROR = 30057;
 constexpr uint32 SPELL_NEMESIS = 63123;
@@ -1731,6 +1734,49 @@ uint32 PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_temp
     {
         // match current talent with template
         specTab = AiFactory::GetPlayerSpecTab(bot);
+
+        // --- CUSTOM SPEC OVERRIDES ---
+        // fix cat druid hardcode
+        if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20)
+        {
+            bool isCat = !bot->HasAura(SPELL_DRUID_THICK_HIDE);
+
+            if (!isCat && currentLevel == 20)
+            {
+                uint32 bearP = GetClassSpecProbability(cls, 1, currentLevel);
+                uint32 catP = GetClassSpecProbability(cls, 3, currentLevel);
+
+                if (urand(1, bearP + catP) <= catP)
+                    isCat = true;
+            }
+
+            if (isCat)
+            {
+                specTab = 3;
+            }
+        }
+
+        // FrostFire check/roll
+        if (bot->getClass() == CLASS_MAGE && specTab == MAGE_TAB_FIRE)
+        {
+            bool isFrostfire = bot->HasAura(SPELL_BURNOUT) && bot->HasAura(SPELL_INCINERATION) &&
+                (bot->HasAura(SPELL_ICE_SHARDS_1) || bot->HasAura(SPELL_ICE_SHARDS_2) || bot->HasAura(SPELL_ICE_SHARDS_3));
+
+            if (!isFrostfire && currentLevel == 71)
+            {
+                uint32 fireP = GetClassSpecProbability(cls, 1, currentLevel);
+                uint32 frostFireP = GetClassSpecProbability(cls, 3, currentLevel);
+
+                if (urand(1, fireP + frostFireP) <= frostFireP)
+                    isFrostfire = true;
+            }
+
+            if (isFrostfire)
+            {
+                specTab = 3;
+            }
+        }
+        // --- END OF CUSTOM OVERRIDES ---
     }
     else
     {
@@ -1758,29 +1804,6 @@ uint32 PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_temp
         }
     }
 
-    // --- CUSTOM SPEC OVERRIDES ---
-    // fix cat druid hardcode
-    if (bot->getClass() == CLASS_DRUID && specTab == DRUID_TAB_FERAL && bot->GetLevel() >= 20)
-    {
-        bool isCat = !bot->HasAura(SPELL_DRUID_THICK_HIDE);
-
-        if (!isCat && currentLevel == 20)
-        {
-            uint32 bearP = GetClassSpecProbability(cls, 1, currentLevel);
-            uint32 catP = GetClassSpecProbability(cls, 3, currentLevel);
-
-            if (urand(1, bearP + catP) <= catP)
-                isCat = true;
-        }
-
-        if (isCat)
-        {
-            specTab = 3;
-        }
-    }
-
-    // --- END OF CUSTOM OVERRIDES ---
-
     if (reset)
     {
         bot->resetTalents(true);
@@ -1804,6 +1827,7 @@ uint32 PlayerbotFactory::InitTalentsTree(bool increment /*false*/, bool use_temp
     }
 
     bot->SendTalentsInfoData(false);
+
     return sPlayerbotAIConfig.RandomClassSpecIndex[cls][specTab];
 }
 
@@ -3774,6 +3798,34 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
         return;
     }
 
+    // Enforce a higher spec bracket if LimitTalentsExpansion is disabled.
+    // If enabled, all points might not be spent, and should be spent in InitTalentsTree instead.
+    if (!sPlayerbotAIConfig.LimitTalentsExpansion)
+    {
+        auto& links = sPlayerbotAIConfig.ParsedSpecLinkOrder[cls][specIndex];
+        auto templatePoints = [&](uint32 key)
+        {
+            uint32 sum = 0;
+            for (std::vector<uint32> const& p : links[key])
+                sum += p[3];
+            return sum;
+        };
+
+        std::map<uint8, uint32> spentTabs = AiFactory::GetPlayerSpecTabs(bot);
+        uint32 available = bot->GetFreeTalentPoints() + spentTabs[0] + spentTabs[1] + spentTabs[2];
+
+        // Template can't spend every point -> move to the next configured bracket
+        while (templatePoints(startLevel) < available)
+        {
+            uint32 next = startLevel + 1;
+            while (next <= 80 && (links[next].empty() || links[next] == links[startLevel]))
+                ++next;
+            if (next > 80)
+                break;
+            startLevel = next;
+        }
+    }
+
     for (std::vector<uint32>& p : sPlayerbotAIConfig.ParsedSpecLinkOrder[cls][specIndex][startLevel])
     {
         uint32 tab = p[0], row = p[1], col = p[2], lvl = p[3];
@@ -3819,6 +3871,7 @@ void PlayerbotFactory::InitTalentsByTemplate(uint32 specTab)
                     break;
                 }
             }
+
             learnLevel = std::min(lvl, bot->GetFreeTalentPoints() + currentTalentRank) - 1;
         }
 
@@ -4662,7 +4715,7 @@ void PlayerbotFactory::InitGlyphs(bool increment)
     if (bot->getClass() == CLASS_MAGE)
     {
         // Frostfire PvE (spec index 3): If the bot has both the Burnout talent and the Ice Shards talent
-        if (bot->HasAura(SPELL_BURNOUT) && bot->HasAura(SPELL_ICE_SHARDS))
+        if (bot->HasAura(SPELL_BURNOUT) && bot->HasAura(SPELL_ICE_SHARDS_3))
             tab = 3;
         // Arcane PvP (spec index 4): If the bot has the Improved Blink talent
         else if (bot->HasAura(SPELL_IMPROVED_BLINK))
