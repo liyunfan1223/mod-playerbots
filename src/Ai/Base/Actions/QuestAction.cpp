@@ -213,6 +213,24 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
     return true;
 }
 
+bool QuestAction::CanAcceptQuest(Player* bot, Quest const* quest)
+{
+    if (!bot || !quest)
+        return false;
+
+    // Core eligibility: level/race/class/reputation/chain/conditions/...
+    if (!bot->CanTakeQuest(quest, false))
+        return false;
+
+    // Never accept grey quests (well below the bot's level), same band as QuestValues.cpp.
+    // Player::GetQuestLevel falls back to the bot's own level for level-less quests
+    // (QuestLevel <= 0), so those are never treated as grey — like the core's dialog status.
+    if ((int32)bot->GetLevel() > bot->GetQuestLevel(quest) + GREY_QUEST_LEVEL_BAND)
+        return false;
+
+    return true;
+}
+
 bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
 {
     std::ostringstream out;

@@ -193,7 +193,7 @@ public:
         creators["cast random spell"] = &ActionContext::cast_random_spell;
         creators["free bg join"] = &ActionContext::free_bg_join;
         creators["use random recipe"] = &ActionContext::use_random_recipe;
-        creators["use random quest item"] = &ActionContext::use_random_quest_item;
+        creators["use start quest item"] = &ActionContext::use_start_quest_item;
         creators["craft random item"] = &ActionContext::craft_random_item;
         creators["smart destroy item"] = &ActionContext::smart_destroy_item;
         creators["disenchant random item"] = &ActionContext::disenchant_random_item;
@@ -399,7 +399,7 @@ private:
     static Action* free_bg_join(PlayerbotAI* botAI) { return new FreeBGJoinAction(botAI); }
 
     static Action* use_random_recipe(PlayerbotAI* botAI) { return new UseRandomRecipe(botAI); }
-    static Action* use_random_quest_item(PlayerbotAI* botAI) { return new UseRandomQuestItem(botAI); }
+    static Action* use_start_quest_item(PlayerbotAI* botAI) { return new UseStartQuestItem(botAI); }
     static Action* craft_random_item(PlayerbotAI* botAI) { return new CraftRandomItemAction(botAI); }
     static Action* smart_destroy_item(PlayerbotAI* botAI) { return new SmartDestroyItemAction(botAI); }
     static Action* disenchant_random_item(PlayerbotAI* botAI) { return new DisEnchantRandomItemAction(botAI); }
