@@ -1722,12 +1722,6 @@ bool BGTactics::Execute(Event /*event*/)
 
     if (getName() == "reset objective force")
     {
-        if (bgType == BATTLEGROUND_WS)
-        {
-            context->GetValue<WsgRouteState>("wsg route")->Reset();
-            return resetObjective();
-        }
-
         bool isCarryingFlag =
             bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) ||
             bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG) ||
@@ -1748,7 +1742,7 @@ bool BGTactics::Execute(Event /*event*/)
     {
         if (bg->GetStatus() == STATUS_WAIT_JOIN)
             return false;
-        if (bgType == BATTLEGROUND_WS || bot->isMoving())
+        if (bot->isMoving())
             return false;
 
         if (!bot->IsStopped())
@@ -2113,11 +2107,7 @@ bool WsgSupportAttackAction::isUseful()
            target != AI_VALUE(Unit*, "current target");
 }
 
-bool WsgSupportAttackAction::Execute(Event event) { return AttackAction::Execute(event); }
-
 bool WsgRegroupAction::isUseful() { return ShouldRegroupWsgEscort(botAI); }
-
-bool WsgRegroupAction::Execute(Event event) { return DropTargetAction::Execute(event); }
 
 bool BGTactics::ShouldYieldWsgTactics(PlayerbotAI* botAI)
 {

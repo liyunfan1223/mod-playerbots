@@ -272,7 +272,6 @@ public:
     WsgSupportAttackAction(PlayerbotAI* botAI) : AttackAction(botAI, "attack wsg support") {}
     Unit* GetTarget() override;
     bool isUseful() override;
-    bool Execute(Event event) override;
 };
 
 class WsgRegroupAction : public DropTargetAction
@@ -281,7 +280,6 @@ public:
     WsgRegroupAction(PlayerbotAI* botAI) : DropTargetAction(botAI) {}
     std::string const getName() override { return "wsg regroup"; }
     bool isUseful() override;
-    bool Execute(Event event) override;
 };
 
 class ArenaTactics : public MovementAction
