@@ -765,18 +765,12 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
         auto tryLoginBot = [&](CharacterInfo const& charInfo) -> bool
         {
             if (GetEventValue(charInfo.guid, "add") ||
-                // GetEventValue(charInfo.guid, "logout") ||    // Deprecated.
                 GetPlayerBot(charInfo.guid) ||
                 currentBots.contains(charInfo.guid) ||
                 (sPlayerbotAIConfig.DisableDeathKnightLogin && charInfo.rClass == CLASS_DEATH_KNIGHT))
-            {
                 return false;
-            }
 
-            uint32 add_time = YEAR;
-
-            SetEventValue(charInfo.guid, "add", 1, add_time);
-            // SetEventValue(charInfo.guid, "logout", 0, 0);    // Deprecated.
+            SetEventValue(charInfo.guid, "add", 1, YEAR);
             currentBots.insert(charInfo.guid);
 
             return true;
@@ -1633,23 +1627,6 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
         return true;
     }
 
-    /*
-    // Deprecated per-bot logout rotation timer code, part of the old EnablePeriodicOnlineOffline.
-    // Current login/logout system is based on population count, rather than based on an individual bot.
-    // Related code blocks here in ProcessBot, RandomizeFirst, and RandomizeMin remain commented-out
-    // for future reference.
-    uint32 logout = GetEventValue(bot, "logout");
-    if (player && !logout && !isValid)
-    {
-        LOG_DEBUG("playerbots", "Bot #{} {}:{} <{}>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H",
-                  player->GetLevel(), player->GetName().c_str());
-        LogoutPlayerBot(botGUID);
-        currentBots.erase(bot);
-        SetEventValue(bot, "logout", 1, DAY);
-        return true;
-    }
-    */
-
     return false;
 }
 
@@ -2277,15 +2254,6 @@ void RandomPlayerbotMgr::RandomizeFirst(Player* bot)
     stmt->SetData(2, bot->GetGUID().GetCounter());
     PlayerbotsDatabase.Execute(stmt);
 
-    /*
-    // Deprecated per-bot logout rotation timer code. Full details in ProcessBot.
-    stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_UPD_RANDOM_BOTS);
-    stmt->SetData(0, DAY);
-    stmt->SetData(1, "logout");
-    stmt->SetData(2, bot->GetGUID().GetCounter());
-    PlayerbotsDatabase.Execute(stmt);
-    */
-
     // teleport to a random inn for bot level
     botAI->Reset(true);
 
@@ -2318,15 +2286,6 @@ void RandomPlayerbotMgr::RandomizeMin(Player* bot)
     stmt->SetData(1, "bot_delete");
     stmt->SetData(2, bot->GetGUID().GetCounter());
     PlayerbotsDatabase.Execute(stmt);
-
-    /*
-    // Deprecated per-bot logout rotation timer code. Full details in ProcessBot.
-    stmt = PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_UPD_RANDOM_BOTS);
-    stmt->SetData(0, DAY);
-    stmt->SetData(1, "logout");
-    stmt->SetData(2, bot->GetGUID().GetCounter());
-    PlayerbotsDatabase.Execute(stmt);
-    */
 
     // teleport to a random inn for bot level
     botAI->Reset(true);
