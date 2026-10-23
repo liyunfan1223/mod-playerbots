@@ -61,11 +61,11 @@ bool AkilzonSpreadForStaticDisruptionTrigger::IsActiveInEncounter()
     if (!AI_VALUE2(Unit*, "find target", "akil'zon"))
         return false;
 
-    auto it = akilzonStormTimer.find(bot->GetInstanceId());
-    if (it == akilzonStormTimer.end())
+    std::optional<uint32> const& stormTimer = ZaState(bot->GetInstanceId()).akilzonStormTimer;
+    if (!stormTimer)
         return true;
 
-    return !IsInStormWindow(it->second);
+    return !IsInStormWindow(*stormTimer);
 }
 
 bool AkilzonElectricalStormIncomingTrigger::IsActiveInEncounter()
@@ -73,11 +73,11 @@ bool AkilzonElectricalStormIncomingTrigger::IsActiveInEncounter()
     if (!AI_VALUE2(Unit*, "find target", "akil'zon"))
         return false;
 
-    auto it = akilzonStormTimer.find(bot->GetInstanceId());
-    if (it == akilzonStormTimer.end())
+    std::optional<uint32> const& stormTimer = ZaState(bot->GetInstanceId()).akilzonStormTimer;
+    if (!stormTimer)
         return false;
 
-    return IsInStormWindow(it->second);
+    return IsInStormWindow(*stormTimer);
 }
 
 bool AkilzonShouldTrackElectricalStormTrigger::IsActiveInEncounter()

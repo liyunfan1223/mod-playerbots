@@ -10,9 +10,9 @@
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "Position.h"
+#include <optional>
 #include <type_traits>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 
 class Creature;
@@ -99,12 +99,6 @@ inline Position const MAGTHERIDON_TANK_POSITION =        {  -6.147f, -37.812f, -
 inline Position const NW_CHANNELER_TANK_POSITION =       { -11.764f,  30.818f, -0.411f,   0.0f };
 inline Position const NE_CHANNELER_TANK_POSITION =       { -12.490f, -26.211f, -0.411f,   0.0f };
 
-extern std::unordered_map<uint32, uint32> magDpsWaitTimer;
-extern std::unordered_map<uint32, uint32> blastNovaTimer;
-extern std::unordered_map<uint32, bool> lastBlastNovaState;
-extern std::unordered_set<uint32> ceilingCollapseApplied;
-extern std::unordered_map<uint32, std::unordered_map<ObjectGuid, CubeInfo>> botToCubeAssignments;
-
 extern std::vector<uint32> const MANTICRON_CUBE_DB_GUIDS;
 std::vector<CubeInfo> GetAllCubeInfosByDbGuids(Map* map, std::vector<uint32> const& cubeDbGuids);
 Creature* GetChanneler(Player* bot, uint32 dbGuid);
@@ -121,6 +115,20 @@ bool IsPositionInActiveDebris(
 std::vector<GameObject*> GetActiveConflagrations(PlayerbotAI* botAI);
 bool IsPositionInConflagration(std::vector<GameObject*> const& blazes, float x, float y);
 bool IsPositionInActiveConflagration(PlayerbotAI* botAI, float x, float y);
+
+// Shared encounter state
+
+struct MagInstanceState
+{
+    std::optional<uint32> magDpsWaitTimer;
+    std::optional<uint32> blastNovaTimer;
+    std::optional<bool> lastBlastNovaState;
+    bool ceilingCollapseApplied = false;
+    std::unordered_map<ObjectGuid, CubeInfo> botToCubeAssignments;
+};
+
+MagInstanceState& MagState(uint32 instanceId);
+bool MagResetInstance(uint32 instanceId);
 
 }
 
