@@ -283,6 +283,24 @@ void LootObject::AddLockRequirement(LootLockRequirement const& requirement)
         _lockRequirements[_lockRequirementCount++] = requirement;
 }
 
+bool LootObject::IsAtInteractDistance(Player* bot)
+{
+    if (IsEmpty() || !bot)
+        return false;
+
+    PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
+    if (!botAI)
+        return false;
+
+    if (Creature* creature = botAI->GetCreature(guid))
+        return bot->IsWithinDistInMap(creature, INTERACTION_DISTANCE);
+
+    if (GameObject* go = botAI->GetGameObject(guid))
+        return go->IsAtInteractDistance(bot);
+
+    return false;
+}
+
 bool LootObject::IsLootPossible(Player* bot)
 {
     if (IsEmpty() || !bot)
@@ -390,10 +408,19 @@ bool LootObjectStack::Add(ObjectGuid guid)
         availableLoot.clear();
     }
 
-    if (!availableLoot.insert(guid).second)
+    LootTargetList::iterator itr = availableLoot.find(guid);
+    if (itr != availableLoot.end())
+    {
+        // Refresh instead of dropping the re-add, or the entry expires 30s after the first add
+        // while the corpse is still there.
+        LootTarget target = *itr;
+        target.asOfTime = time(nullptr);
+        availableLoot.erase(itr);
+        availableLoot.insert(target);
         return false;
+    }
 
-    return true;
+    return availableLoot.insert(LootTarget(guid)).second;
 }
 
 void LootObjectStack::Remove(ObjectGuid guid)
@@ -487,17 +514,7 @@ bool LootObjectStack::CanAttemptLoot(ObjectGuid guid) const
     return itr == availableLoot.end() || itr->IsReady();
 }
 
-bool LootObjectStack::CanLoot(float maxDistance)
-{
-    LootObject nearest = GetNearest(maxDistance);
-    return !nearest.IsEmpty();
-}
-
-LootObject LootObjectStack::GetLoot(float maxDistance)
-{
-    LootObject nearest = GetNearest(maxDistance);
-    return nearest.IsEmpty() ? LootObject() : nearest;
-}
+LootObject LootObjectStack::GetLoot(float maxDistance) { return GetNearest(maxDistance); }
 
 LootObject LootObjectStack::GetNearest(float maxDistance)
 {
