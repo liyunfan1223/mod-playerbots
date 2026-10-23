@@ -4485,7 +4485,11 @@ std::vector<std::vector<uint32>> TravelMgr::GetOptimalFlightDestinations(Player*
 
 const std::vector<WorldLocation> TravelMgr::GetTeleportLocations(Player* bot)
 {
-    uint32 level = bot->GetLevel();
+    return GetTeleportLocations(bot, bot->GetLevel());
+}
+
+const std::vector<WorldLocation> TravelMgr::GetTeleportLocations(Player* bot, uint32 level)
+{
     std::map<uint8, std::vector<WorldLocation>> const& cache =
         !sPlayerbotAIConfig.EnableNewRpgStrategy ? locsPerLevelCache
         : bot->GetTeamId() == TEAM_ALLIANCE      ? allianceHubsPerLevelCache
