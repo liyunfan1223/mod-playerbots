@@ -21,7 +21,7 @@
 using namespace KaraHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool KarazhanResetEncounterStatesAction::Execute(Event /*event*/)
 {
@@ -1499,9 +1499,10 @@ bool NightbaneFlightPhaseStackAndMoveAction::Execute(Event /*event*/)
 bool NightbaneTeleportBackToTerraceAction::Execute(Event /*event*/)
 {
     Position const& position = NIGHTBANE_TELEPORT_POSITION;
-    return bot->TeleportTo(
-        KARA_MAP_ID, position.GetPositionX(), position.GetPositionY(),
+    bot->NearTeleportTo(
+        position.GetPositionX(), position.GetPositionY(),
         position.GetPositionZ(), bot->GetOrientation());
+    return true;
 }
 
 bool NightbaneManageTimersAndTrackersAction::Execute(Event /*event*/)

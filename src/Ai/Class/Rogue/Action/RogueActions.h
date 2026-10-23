@@ -155,7 +155,7 @@ public:
 class UseDeadlyPoisonAction : public UseItemAction
 {
 public:
-    UseDeadlyPoisonAction(PlayerbotAI* botAI) : UseItemAction(botAI, "Deadly Poison") {}
+    UseDeadlyPoisonAction(PlayerbotAI* botAI) : UseItemAction(botAI, "deadly poison") {}
 
     bool Execute(Event event) override;
     bool isPossible() override { return true; }
@@ -164,7 +164,7 @@ public:
 class UseInstantPoisonAction : public UseItemAction
 {
 public:
-    UseInstantPoisonAction(PlayerbotAI* botAI) : UseItemAction(botAI, "Instant Poison") {}
+    UseInstantPoisonAction(PlayerbotAI* botAI) : UseItemAction(botAI, "instant poison") {}
 
     bool Execute(Event event) override;
     bool isPossible() override { return true; }
@@ -174,7 +174,7 @@ class UseInstantPoisonOffHandAction : public UseItemAction
 {
 public:
     UseInstantPoisonOffHandAction(PlayerbotAI* botAI)
-        : UseItemAction(botAI, "Instant Poison Off Hand") {}
+        : UseItemAction(botAI, "instant poison off hand") {}
 
     bool Execute(Event event) override;
     bool isPossible() override { return true; }

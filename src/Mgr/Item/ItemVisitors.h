@@ -437,6 +437,18 @@ public:
     }
 };
 
+// Quest-starting items are not always ITEM_CLASS_QUEST (misc, consumable, armor, ... items
+// carry StartQuest too), so match on the field itself instead of on the class.
+class FindStartQuestItemVisitor : public FindUsableItemVisitor
+{
+public:
+    FindStartQuestItemVisitor(Player* bot) : FindUsableItemVisitor(bot) {}
+
+    // Runs on every item the bot receives: the cheap StartQuest check comes before CanUseItem.
+    bool Visit(Item* item) override;
+    bool Accept(ItemTemplate const* proto) override { return proto->StartQuest != 0; }
+};
+
 class FindRecipeVisitor : public FindUsableItemVisitor
 {
 public:

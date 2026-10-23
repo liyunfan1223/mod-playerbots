@@ -12,7 +12,7 @@
 #include "Trigger.h"
 #include <string>
 
-// General
+// Shared
 
 class TempestKeepEncounterTrigger : public Trigger
 {
@@ -33,8 +33,6 @@ protected:
 class TempestKeepNoEncounterInProgressTrigger : public Trigger
 {
 public:
-    // Throttled to once per second. This trigger is true for all trash and downtime and, being
-    // for between-encounter clean-up, has no real urgency to it.
     TempestKeepNoEncounterInProgressTrigger(PlayerbotAI* botAI)
         : Trigger(botAI, "tempest keep no encounter in progress", 1000) {}
     bool IsActive() override;
@@ -43,7 +41,7 @@ public:
 class TempestKeepStuckFallingTrigger : public Trigger
 {
 public:
-    // Same idea as above; this is to address a fringe wipe scenario during Kael'thas.
+    // This is to address a fringe wipe scenario during Kael'thas.
     TempestKeepStuckFallingTrigger(PlayerbotAI* botAI)
         : Trigger(botAI, "tempest keep stuck falling", 1000) {}
     bool IsActive() override;
@@ -61,11 +59,11 @@ public:
 
 // Al'ar <Phoenix God>
 
-class AlarPullingBossTrigger : public TempestKeepEncounterTrigger
+class AlarHunterShouldMisdirectTrigger : public TempestKeepEncounterTrigger
 {
 public:
-    AlarPullingBossTrigger(PlayerbotAI* botAI)
-        : TempestKeepEncounterTrigger(botAI, "al'ar pulling boss") {}
+    AlarHunterShouldMisdirectTrigger(PlayerbotAI* botAI)
+        : TempestKeepEncounterTrigger(botAI, "al'ar hunter should misdirect") {}
 
 protected:
     bool IsActiveInEncounter() override;
@@ -81,11 +79,11 @@ protected:
     bool IsActiveInEncounter() override;
 };
 
-class AlarEmbersExplodeUponDeathTrigger : public TempestKeepEncounterTrigger
+class AlarEmbersShouldBeTankedTrigger : public TempestKeepEncounterTrigger
 {
 public:
-    AlarEmbersExplodeUponDeathTrigger(PlayerbotAI* botAI)
-        : TempestKeepEncounterTrigger(botAI, "al'ar embers explode upon death") {}
+    AlarEmbersShouldBeTankedTrigger(PlayerbotAI* botAI)
+        : TempestKeepEncounterTrigger(botAI, "al'ar embers should be tanked") {}
 
 protected:
     bool IsActiveInEncounter() override;
@@ -229,11 +227,12 @@ protected:
     bool IsActiveInEncounter() override;
 };
 
-class KaelthasSunstriderPullingTankableAdvisorsTrigger : public TempestKeepEncounterTrigger
+class KaelthasSunstriderHunterShouldMisdirectAdvisorsTrigger : public TempestKeepEncounterTrigger
 {
 public:
-    KaelthasSunstriderPullingTankableAdvisorsTrigger(PlayerbotAI* botAI)
-        : TempestKeepEncounterTrigger(botAI, "kael'thas sunstrider pulling tankable advisors") {}
+    KaelthasSunstriderHunterShouldMisdirectAdvisorsTrigger(PlayerbotAI* botAI)
+        : TempestKeepEncounterTrigger(
+            botAI, "kael'thas sunstrider hunter should misdirect advisors") {}
 
 protected:
     bool IsActiveInEncounter() override;
@@ -284,12 +283,12 @@ protected:
     bool IsActiveInEncounter() override;
 };
 
-class KaelthasSunstriderDeterminingAdvisorKillOrderTrigger : public TempestKeepEncounterTrigger
+class KaelthasSunstriderShouldAssignAdvisorDpsPriorityTrigger : public TempestKeepEncounterTrigger
 {
 public:
-    KaelthasSunstriderDeterminingAdvisorKillOrderTrigger(PlayerbotAI* botAI)
+    KaelthasSunstriderShouldAssignAdvisorDpsPriorityTrigger(PlayerbotAI* botAI)
         : TempestKeepEncounterTrigger(
-            botAI, "kael'thas sunstrider determining advisor kill order") {}
+            botAI, "kael'thas sunstrider should assign advisor dps priority") {}
 
 protected:
     bool IsActiveInEncounter() override;

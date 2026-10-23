@@ -18,10 +18,12 @@ public:
 private:
     static ActionNode* use_deadly_poison_on_off_hand([[maybe_unused]] PlayerbotAI* botAI)
     {
-        return new ActionNode("use deadly poison on off hand",
-                              /*P*/ {},
-                              /*A*/ { NextAction("use instant poison on off hand") },
-                              /*C*/ {});
+        return new ActionNode(
+            "use deadly poison on off hand",
+            /*P*/ {},
+            /*A*/ { NextAction("use instant poison on off hand") },
+            /*C*/ {}
+        );
     }
 };
 
@@ -40,11 +42,11 @@ void GenericRogueNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& trig
                                        { NextAction("sprint", ACTION_EMERGENCY + 2) }));
     triggers.push_back(
         new TriggerNode("main hand weapon no enchant",
-                        { NextAction("use instant poison on main hand", 20.0f) }));
+                        { NextAction("use instant poison on main hand", ACTION_HIGH) }));
 
     triggers.push_back(
         new TriggerNode("off hand weapon no enchant",
-                        { NextAction("use deadly poison on off hand", 19.0f) }));
+                        { NextAction("use deadly poison on off hand", ACTION_HIGH - 1) }));
 
     triggers.push_back(new TriggerNode("often", { NextAction("unstealth", 30.0f) }));
 }

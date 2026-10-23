@@ -12,7 +12,7 @@
 #include "MovementActions.h"
 #include "Position.h"
 
-// General
+// Shared
 
 class GruulsLairResetEncounterStatesAction : public Action
 {

@@ -7,6 +7,7 @@
 #ifndef PLAYERBOTS_PLAYERBOTOPERATIONS_H
 #define PLAYERBOTS_PLAYERBOTOPERATIONS_H
 
+#include "ArenaTeamMgr.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
@@ -546,6 +547,43 @@ public:
     bool IsValid() const override { return ObjectAccessor::FindPlayer(m_botGuid) != nullptr; }
 
 private:
+    ObjectGuid m_botGuid;
+};
+
+// Drop a bot that has left its captain's arena bracket: the team can't queue with it
+class ArenaTeamDropMemberOperation : public PlayerbotOperation
+{
+public:
+    ArenaTeamDropMemberOperation(uint32 arenaTeamId, ObjectGuid botGuid)
+        : m_arenaTeamId(arenaTeamId), m_botGuid(botGuid)
+    {
+    }
+
+    bool Execute() override
+    {
+        ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(m_arenaTeamId);
+        Player* bot = ObjectAccessor::FindPlayer(m_botGuid);
+        Player* captain = team ? ObjectAccessor::FindPlayer(team->GetCaptain()) : nullptr;
+        if (!bot || !captain || captain == bot || !team->IsMember(m_botGuid))
+            return false;
+
+        // levels can change before this runs
+        if (RandomPlayerbotFactory::SameArenaBracket(bot->GetLevel(), captain->GetLevel()))
+            return false;
+
+        team->DelMember(m_botGuid, true);
+        RandomPlayerbotFactory::AssignBotToArenaTeam(bot);
+        return true;
+    }
+
+    ObjectGuid GetBotGuid() const override { return m_botGuid; }
+
+    std::string GetName() const override { return "ArenaTeamDropMember"; }
+
+    bool IsValid() const override { return ObjectAccessor::FindPlayer(m_botGuid) != nullptr; }
+
+private:
+    uint32 m_arenaTeamId;
     ObjectGuid m_botGuid;
 };
 

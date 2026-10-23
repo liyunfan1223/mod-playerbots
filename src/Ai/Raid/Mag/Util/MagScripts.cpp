@@ -20,6 +20,9 @@ public:
     void OnSpellCast(
         Spell* /*spell*/, Unit* caster, SpellInfo const* spellInfo, bool /*skipCheck*/) override
     {
+        if (!caster)
+            return;
+
         switch (spellInfo->Id)
         {
             case Id(MagSpells::SPELL_QUAKE):

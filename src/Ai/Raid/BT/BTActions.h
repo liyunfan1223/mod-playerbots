@@ -17,7 +17,7 @@ namespace BlackTempleHelpers
     struct EyeBlastDangerArea;
 }
 
-// General
+// Shared
 
 class BlackTempleEraseTimersAndTrackersAction : public Action
 {

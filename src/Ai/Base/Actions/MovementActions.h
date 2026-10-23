@@ -211,6 +211,13 @@ public:
     MoveToLootAction(PlayerbotAI* botAI) : MovementAction(botAI, "move to loot") {}
 
     bool Execute(Event event) override;
+
+private:
+    // Progress watchdog: stop chasing a loot target we are not actually getting closer to.
+    ObjectGuid lootWatchGuid;
+    float lootWatchDistance = -1.0f;
+    uint32 lootWatchMs = 0;
+    uint32 lootWatchLastEvalMs = 0;
 };
 
 class MoveOutOfEnemyContactAction : public MovementAction
