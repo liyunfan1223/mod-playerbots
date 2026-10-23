@@ -148,6 +148,13 @@ bool AttackAnythingAction::isUseful()
     if (bot->IsInCombat())
         return false;
 
+    // Do not open a fresh fight while hurt. Nothing here used to look at the bot's health,
+    // so one that had just fled at 30% picked the next mob on the way out and died to it.
+    // Below this it should be eating -- UseFoodStrategy now outranks this action, and the
+    // bot resumes pulling once it has healed up.
+    if (bot->GetHealthPct() < float(sPlayerbotAIConfig.lowHealth))
+        return false;
+
     Unit* target = GetTarget();
     if (!target || !target->IsInWorld())  // Checks if the target is valid and in the world
         return false;
