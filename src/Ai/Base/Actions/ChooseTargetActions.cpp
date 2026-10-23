@@ -5,6 +5,7 @@
  */
 
 #include "ChooseTargetActions.h"
+#include "BattlegroundSA.h"
 #include "ChooseRpgTargetAction.h"
 #include "Event.h"
 #include "LootObjectStack.h"
@@ -14,6 +15,17 @@
 #include "PvpTriggers.h"
 #include "RtiTargetValue.h"
 #include "ServerFacade.h"
+
+bool AttackEnemyPlayerAction::Execute(Event event)
+{
+    // item O: a defender on foot closes in on an enemy SotA demolisher (melee / normal spells need range)
+    Unit* target = AI_VALUE(Unit*, "enemy player target");
+    if (target && target->GetEntry() == NPC_DEMOLISHER_SA && !bot->GetVehicle() && !bot->IsWithinMeleeRange(target) &&
+        ReachCombatTo(target))
+        return true;
+
+    return AttackAction::Execute(event);
+}
 
 bool AttackEnemyPlayerAction::isUseful()
 {

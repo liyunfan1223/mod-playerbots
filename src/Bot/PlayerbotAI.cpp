@@ -51,11 +51,13 @@
 #include "SocialMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
+#include "Battleground.h"
 #include "Transport.h"
 #include "Unit.h"
 #include "UpdateTime.h"
 #include "Vehicle.h"
 #include <cmath>
+#include <map>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -417,7 +419,9 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         Transport* newTransport = bot->GetMap()->GetTransportForPos(bot->GetPhaseMask(), bot->GetPositionX(),
                                                                     bot->GetPositionY(), bot->GetPositionZ(), bot);
 
-        if (newTransport != bot->GetTransport())
+        // SotA: the boat carries its passengers by itself (StaticTransport::UpdatePassengerPositions). Do not let the
+        // hull ray test drop the bot into the water while the boat is travelling.
+        if (newTransport != bot->GetTransport() && !IsOnMovingSaBoat())
         {
             LOG_DEBUG("playerbots", "Bot {} is on a transport", bot->GetName());
 
@@ -4106,6 +4110,32 @@ static bool IsSiegeShot(Player* bot, AiObjectContext* context, uint32 spellId)
            base->GetExactDist2d(siege.x, siege.y) < 15.0f;
 }
 
+// real reach of a siege spell (Hurl Boulder 52338, Ram 60206, ...) read from the spell itself: the bot may only shoot
+// the gate at the siege position from inside it (it used to be a flat 120 yards, so gates were "hit" from afar)
+static float SiegeShotRange(SpellInfo const* info, Unit* caster)
+{
+    // siege reach is 10..60 yards (like the Antipersonal Cannon): never the whole map
+    float const range = info->GetMaxRange(false, caster);
+    return (range > 0.0f && range < 60.0f) ? range : 60.0f;
+}
+
+// own per-bot/per-spell last-shot register: vehicle spells were fired again every tick ignoring the spell cooldown
+static std::mutex sVehicleShotLock;
+static std::map<std::pair<ObjectGuid, uint32>, uint32> sVehicleShotAt;
+
+static uint32 VehicleSpellCooldownMs(SpellInfo const* info)
+{
+    uint32 cd = std::max(info->RecoveryTime, info->CategoryRecoveryTime);
+    return cd ? cd : 2000;  // Rocket Blast: 2 s
+}
+
+static bool VehicleSpellOnCooldown(ObjectGuid bot, SpellInfo const* info)
+{
+    std::lock_guard<std::mutex> g(sVehicleShotLock);
+    auto it = sVehicleShotAt.find({bot, info->Id});
+    return it != sVehicleShotAt.end() && getMSTimeDiff(it->second, getMSTime()) < VehicleSpellCooldownMs(info);
+}
+
 bool PlayerbotAI::CanCastVehicleSpell(uint32 spellId, Unit* target)
 {
     if (!spellId)
@@ -4141,6 +4171,9 @@ bool PlayerbotAI::CanCastVehicleSpell(uint32 spellId, Unit* target)
     if (!spellInfo)
         return false;
 
+    if (VehicleSpellOnCooldown(bot->GetGUID(), spellInfo))
+        return false;
+
     // check BG siege position set in BG Tactics
     PositionInfo siegePos = GetAiObjectContext()->GetValue<PositionMap&>("position")->Get()["bg siege"];
 
@@ -4157,7 +4190,8 @@ bool PlayerbotAI::CanCastVehicleSpell(uint32 spellId, Unit* target)
 
     if (!target && siegePos.isSet())
     {
-        if (ServerFacade::instance().GetDistance2d(vehicleBase, siegePos.x, siegePos.y) > 120.0f)
+        if (ServerFacade::instance().GetDistance2d(vehicleBase, siegePos.x, siegePos.y) >
+            SiegeShotRange(spellInfo, vehicleBase))
             return false;
     }
 
@@ -4225,11 +4259,15 @@ bool PlayerbotAI::CastVehicleSpell(uint32 spellId, Unit* target)
     if (!spellInfo)
         return false;
 
+    if (VehicleSpellOnCooldown(bot->GetGUID(), spellInfo))
+        return false;
+
     // check BG siege position set in BG Tactics
     PositionInfo siegePos = GetAiObjectContext()->GetValue<PositionMap&>("position")->Get()["bg siege"];
     if (!target && siegePos.isSet())
     {
-        if (ServerFacade::instance().GetDistance2d(vehicleBase, siegePos.x, siegePos.y) > 120.0f)
+        if (ServerFacade::instance().GetDistance2d(vehicleBase, siegePos.x, siegePos.y) >
+            SiegeShotRange(spellInfo, vehicleBase))
             return false;
     }
 
@@ -4304,6 +4342,11 @@ bool PlayerbotAI::CastVehicleSpell(uint32 spellId, Unit* target)
     }
 
     spell->prepare(&targets);
+
+    {
+        std::lock_guard<std::mutex> g(sVehicleShotLock);
+        sVehicleShotAt[{bot->GetGUID(), spellId}] = getMSTime();
+    }
 
     if (seat->CanControl() && vehicleBase->isMoving() && spell->GetCastTime())
     {
@@ -6133,6 +6176,36 @@ int32 PlayerbotAI::GetNearGroupMemberCount(float dis)
         }
     }
     return count;
+}
+
+bool PlayerbotAI::IsOnMovingSaBoat()
+{
+    Battleground* bg = bot->GetBattleground();
+    if (!bg || bg->GetBgTypeID() != BATTLEGROUND_SA)
+        return false;
+
+    // The boats travel during BG_SA_WARMUP (BattlegroundSA::PostUpdateImpl), when the BG status is STATUS_WAIT_JOIN.
+    // Bound the freeze to that period so a bot can never be stuck on a boat for the whole round.
+    if (bg->GetStatus() != STATUS_WAIT_JOIN)
+        return false;
+
+    // SA boats are StaticTransport game objects (GAMEOBJECT_TYPE_TRANSPORT)
+    Transport* transport = bot->GetTransport();
+    StaticTransport* boat = transport ? transport->ToStaticTransport() : nullptr;
+    if (!boat)
+        return false;
+
+    // BattlegroundSA::StartShips -> DoorOpen sets GO_STATE_ACTIVE; before that the boat is docked (GO_STATE_READY)
+    if (boat->GetGoState() != GO_STATE_ACTIVE)
+        return false;
+
+    // StaticTransport::Update: with a pause time the boat stops at PathProgress == PauseTime (arrived on the coast)
+    if (boat->GetPauseTime() && boat->GetPathProgress() >= boat->GetPauseTime())
+        return false;
+
+    // TODO: confirm in game that the SA boats (entries 193182-193185) have a pause time; without one PathProgress
+    // wraps around and only the STATUS_WAIT_JOIN check above ends the freeze.
+    return true;
 }
 
 bool PlayerbotAI::CanMove()

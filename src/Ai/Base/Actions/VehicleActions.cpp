@@ -6,6 +6,8 @@
 
 #include "VehicleActions.h"
 #include "BattlegroundIC.h"
+#include "BattlegroundSA.h"
+#include "BattleGroundTactics.h"
 #include "ItemVisitors.h"
 #include "ObjectDefines.h"
 #include "Playerbots.h"
@@ -14,6 +16,27 @@
 #include "ServerFacade.h"
 #include "Unit.h"
 #include "Vehicle.h"
+
+// SotA: the team that is not the attacker defends. BattlegroundSA keeps Attackers private, but ResetObjs spawns the
+// defender portals with the defender faction (same approach as SaGetAttackerTeam in BattleGroundTactics.cpp)
+static bool SaIsDefender(Player* bot)
+{
+    Battleground* bg = bot->GetBattleground();
+    if (!bg || bg->GetBgTypeID() != BATTLEGROUND_SA)
+        return false;
+
+    GameObject* portal = bg->GetBGObject(BG_SA_PORTAL_DEFFENDER_BLUE);
+    if (!portal)
+        return false;  // round not set up yet, do not guess
+
+    uint32 const defenderFaction = portal->GetFaction();
+    if (defenderFaction == BG_SA_Factions[TEAM_ALLIANCE])
+        return bot->GetTeamId() == TEAM_ALLIANCE;
+    if (defenderFaction == BG_SA_Factions[TEAM_HORDE])
+        return bot->GetTeamId() == TEAM_HORDE;
+
+    return false;
+}
 
 // TODO methods to enter/exit vehicle should be added to BGTactics or MovementAction (so that we can better control
 // whether bot is in vehicle, eg: get out of vehicle to cap flag, if we're down to final boss, etc),
@@ -54,6 +77,28 @@ bool EnterVehicleAction::Execute(Event event)
         // dont let them in catapult they cant use them at all
         if (NPC_KEEP_CANNON == vehicleBase->GetEntry() || NPC_CATAPULT == vehicleBase->GetEntry())
             continue;
+
+        // healers stay out of the SotA demolishers and towers: inside them they cannot heal
+        if ((NPC_DEMOLISHER_SA == vehicleBase->GetEntry() || NPC_ANTI_PERSONNAL_CANNON == vehicleBase->GetEntry()) &&
+            PlayerbotAI::IsHeal(bot, true))
+            continue;
+
+        // SotA anti-personnel towers: only the defenders use them (to shoot the enemy demolishers), and only when
+        // they are close; attackers never get in
+        // TODO: not tested in-game whether bots in the tower really fire Rocket Blast (49872)
+        if (NPC_ANTI_PERSONNAL_CANNON == vehicleBase->GetEntry())
+        {
+            if (!SaIsDefender(bot) || ServerFacade::instance().GetDistance2d(bot, vehicleBase) > 25.0f)
+                continue;
+
+            // the gate it covers is down: nothing to shoot, do not climb back in
+            if (SaTowerGateDestroyed(bot->GetBattleground(), vehicleBase))
+                continue;
+
+            // only the towers of the gate stage being held (beach gates first); the others stay empty
+            if (!SaTowerPhaseActive(bot->GetBattleground(), vehicleBase))
+                continue;
+        }
 
         if (!vehicleBase->IsFriendlyTo(bot))
             continue;

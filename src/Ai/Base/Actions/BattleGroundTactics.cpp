@@ -29,8 +29,10 @@
 #include "PositionValue.h"
 #include "PvpTriggers.h"
 #include "ServerFacade.h"
+#include "Transport.h"
 #include "Vehicle.h"
 #include <algorithm>
+#include <map>
 #include <mutex>
 
 // common bg positions
@@ -106,6 +108,10 @@ Position const IC_CANNON_POS_ALLIANCE2 = {425.525f, -779.538f, 87.717f, 5.88f};
 Position const IC_GATE_ATTACK_POS_HORDE = {478.3f, -830.2f, 40.0f, 0.0f};  // z from the map at runtime
 Position const IC_GATE_ATTACK_POS_ALLIANCE = {1091.273f, -763.619f, 42.352f, 0.0f};
 
+// Strand of the Ancients: position of the Titan relic (BG_SA_ObjSpawnlocs[BG_SA_TITAN_RELIC] in BattlegroundSA.h)
+float const SA_RELIC_APPROACH_RANGE = 15.0f;  // atFlag walks the last yards to the relic / a graveyard flag from here
+Position const SA_RELIC_POS = {837.065f, -107.537f, 127.025f, 0.0f};
+
 enum BattleBotWsgWaitSpot
 {
     BB_WSG_WAIT_SPOT_SPAWN,
@@ -173,6 +179,17 @@ std::vector<uint32> const vFlagsIC = {GO_HORDE_BANNER,
                                       GO_ALLIANCE_BANNER_GRAVEYARD_H_CONT,
                                       GO_HORDE_BANNER_GRAVEYARD_H,
                                       GO_HORDE_BANNER_GRAVEYARD_H_CONT};
+
+// SA objects the bots click: the Titan relic and the graveyard flags (left, right, central). The core spawns the
+// flag in the colour of its owner: BG_SA_ObjEntries holds the Alliance entry, the Horde one is that entry minus 1
+// (191308/191307 left, 191306/191305 right, 191310/191309 central, see BattlegroundSA::EventPlayerClickedOnFlag)
+std::vector<uint32> const vFlagsSA = {BG_SA_ObjEntries[BG_SA_TITAN_RELIC],
+                                      BG_SA_ObjEntries[BG_SA_LEFT_FLAG],    BG_SA_ObjEntries[BG_SA_LEFT_FLAG] - 1,
+                                      BG_SA_ObjEntries[BG_SA_RIGHT_FLAG],   BG_SA_ObjEntries[BG_SA_RIGHT_FLAG] - 1,
+                                      BG_SA_ObjEntries[BG_SA_CENTRAL_FLAG], BG_SA_ObjEntries[BG_SA_CENTRAL_FLAG] - 1};
+
+// TODO: no waypoint paths recorded for SA, bots move straight to the objective (MoveNear) when there is no path
+std::vector<BattleBotPath*> const vPaths_SA = {};
 
 // BG Waypoints (vmangos)
 
@@ -1596,7 +1613,16 @@ bool BGTactics::Execute(Event /*event*/)
     }
 
     if (bg->GetStatus() == STATUS_IN_PROGRESS)
+    {
+        SaWarmupBuffsActive(bot);  // item S: forget the warmup window, the next SA round starts a new one
         botAI->ChangeStrategy("-buff", BOT_STATE_NON_COMBAT);
+    }
+    // item P (warmup: buff round before leaving): the round above removes "buff" when the fight starts, and the
+    // strategy was never added back, so in the SA second round (status back to STATUS_WAIT_JOIN) the defenders
+    // had no class buff/consumable round and ran straight away. Restore it for the warmup; moveToStart (SA
+    // defense) keeps them still while GetStartDelayTime > 30 s, so the round runs before they mount and walk.
+    else if (bg->GetStatus() == STATUS_WAIT_JOIN && !botAI->HasStrategy("buff", BOT_STATE_NON_COMBAT))
+        botAI->ChangeStrategy("+buff", BOT_STATE_NON_COMBAT);
 
     std::vector<BattleBotPath*> const* vPaths;
     std::vector<uint32> const* vFlagIds;
@@ -1636,6 +1662,12 @@ bool BGTactics::Execute(Event /*event*/)
             vFlagIds = &vFlagsIC;
             break;
         }
+        case BATTLEGROUND_SA:
+        {
+            vPaths = &vPaths_SA;
+            vFlagIds = &vFlagsSA;
+            break;
+        }
         default:
             // can't use this in this BG - no vPaths/vFlagIds (will crash server)
             botAI->ResetStrategies();
@@ -1673,6 +1705,36 @@ bool BGTactics::Execute(Event /*event*/)
     {
         if (bg->GetStatus() == STATUS_WAIT_JOIN)
             return false;
+
+        // item O: a defender on foot with an enemy demolisher within 30 yards hits it; the guard spot must not
+        // pull him back while the demolisher lives
+        if (bgType == BATTLEGROUND_SA && !bot->GetVehicle())
+        {
+            std::list<Creature*> nearDems;
+            bot->GetCreatureListWithEntryInGrid(nearDems, NPC_DEMOLISHER_SA, 30.0f);
+            Creature* nearDem = nullptr;
+            for (Creature* d : nearDems)
+                if (d->IsAlive() && !d->IsFriendlyTo(bot) && !d->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) &&
+                    bot->IsWithinLOSInMap(d) && (!nearDem || bot->GetDistance(d) < bot->GetDistance(nearDem)))
+                    nearDem = d;
+            if (nearDem)
+            {
+                if (bot->GetVictim() == nearDem && bot->IsWithinMeleeRange(nearDem))
+                    return true;
+                if (!bot->IsWithinMeleeRange(nearDem) && ReachCombatTo(nearDem))
+                {
+                    context->GetValue<Unit*>("current target")->Set(nearDem);
+                    return true;
+                }
+                if (bot->IsWithinMeleeRange(nearDem))
+                {
+                    bot->SetSelection(nearDem->GetGUID());
+                    context->GetValue<Unit*>("current target")->Set(nearDem);
+                    bot->Attack(nearDem, true);
+                    return true;
+                }
+            }
+        }
 
         if (bot->isMoving())
             return false;
@@ -1741,6 +1803,776 @@ bool BGTactics::Execute(Event /*event*/)
         return resetObjective();
 
     return false;
+}
+
+// Strand of the Ancients: gates in the order the attackers have to break them. Of each pair only one gate has to
+// fall (see BattlegroundSA::CanInteractWithObject). Side 0 is the north one (green, purple), side 1 the south one
+// (blue, red); yellow and ancient are single gates.
+static uint32 const SA_GATE_STAGES = 4;
+static uint32 const SA_GateStages[SA_GATE_STAGES][2] = {
+    {BG_SA_GREEN_GATE, BG_SA_BLUE_GATE},
+    {BG_SA_PURPLE_GATE, BG_SA_RED_GATE},
+    {BG_SA_YELLOW_GATE, BG_SA_YELLOW_GATE},
+    {BG_SA_ANCIENT_GATE, BG_SA_ANCIENT_GATE},
+};
+
+// BattlegroundSA does not expose which team attacks (Attackers is private), but ResetObjs spawns the defender
+// portals with the defenders' faction (BG_SA_Factions[TEAM_ALLIANCE] = 1732, BG_SA_Factions[TEAM_HORDE] = 1735)
+static bool SaGetAttackerTeam(Battleground* bg, TeamId& attackerTeam)
+{
+    GameObject* portal = bg->GetBGObject(BG_SA_PORTAL_DEFFENDER_BLUE);
+    if (!portal)
+        return false;
+
+    uint32 const defenderFaction = portal->GetFaction();
+    if (defenderFaction == BG_SA_Factions[TEAM_ALLIANCE])
+        attackerTeam = TEAM_HORDE;
+    else if (defenderFaction == BG_SA_Factions[TEAM_HORDE])
+        attackerTeam = TEAM_ALLIANCE;
+    else
+        return false;
+
+    return true;
+}
+
+static bool SaGateDestroyed(Battleground* bg, uint32 gateId)
+{
+    GameObject* gate = bg->GetBGObject(gateId);
+    return gate && gate->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED;
+}
+
+// first gate stage that still blocks the way to the relic, SA_GATE_STAGES when the relic can be used
+// (same conditions as BattlegroundSA::CanInteractWithObject(BG_SA_TITAN_RELIC))
+static uint32 SaCurrentStage(Battleground* bg)
+{
+    for (uint32 stage = 0; stage < SA_GATE_STAGES; stage++)
+        if (!SaGateDestroyed(bg, SA_GateStages[stage][0]) && !SaGateDestroyed(bg, SA_GateStages[stage][1]))
+            return stage;
+
+    return SA_GATE_STAGES;
+}
+
+// SotA anti-personnel tower: true when the gate it covers (the nearest of the five outer gates) is already destroyed,
+// so there is nothing left to shoot at from the tower and the bot has to get out and move on
+bool SaTowerGateDestroyed(Battleground* bg, Unit* tower)
+{
+    GameObject* nearest = nullptr;
+    float nearestDist = 0.0f;
+    for (uint32 gateId : {BG_SA_GREEN_GATE, BG_SA_YELLOW_GATE, BG_SA_BLUE_GATE, BG_SA_RED_GATE, BG_SA_PURPLE_GATE})
+    {
+        GameObject* gate = bg->GetBGObject(gateId);
+        if (!gate)
+            continue;
+
+        float const dist = tower->GetExactDist2d(gate);
+        if (!nearest || dist < nearestDist)
+        {
+            nearest = gate;
+            nearestDist = dist;
+        }
+    }
+
+    // item N (SA): towers next to the yellow gate stay manned until the ANCIENT gate falls; only then do they get out
+    // and run to the last defence spot (torres ficam até o Ancient cair; depois desmontam e correm)
+    if (nearest && nearest == bg->GetBGObject(BG_SA_YELLOW_GATE))
+        return SaGateDestroyed(bg, BG_SA_ANCIENT_GATE);
+
+    return nearest && nearest->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED;
+}
+
+// SotA anti-personnel tower: true when the gate it covers is standing AND belongs to the gate stage the attackers are
+// at right now (SaCurrentStage). Towers of later stages stay empty until their gate is the one being held; when a gate
+// of the current pair falls the stage moves on and the towers of the stage left behind are abandoned (defenders fall
+// back to the next gates)
+bool SaTowerPhaseActive(Battleground* bg, Unit* tower)
+{
+    GameObject* nearest = nullptr;
+    float nearestDist = 0.0f;
+    uint32 nearestId = 0;
+    for (uint32 gateId : {BG_SA_GREEN_GATE, BG_SA_YELLOW_GATE, BG_SA_BLUE_GATE, BG_SA_RED_GATE, BG_SA_PURPLE_GATE})
+    {
+        GameObject* gate = bg->GetBGObject(gateId);
+        if (!gate)
+            continue;
+
+        float const dist = tower->GetExactDist2d(gate);
+        if (!nearest || dist < nearestDist)
+        {
+            nearest = gate;
+            nearestDist = dist;
+            nearestId = gateId;
+        }
+    }
+
+    // item N (SA): yellow-gate towers stay active while yellow or ancient is standing, inactive once ancient falls
+    if (nearest && nearestId == BG_SA_YELLOW_GATE)
+    {
+        if (SaGateDestroyed(bg, BG_SA_ANCIENT_GATE))
+            return false;
+        uint32 const yStage = SaCurrentStage(bg);
+        return yStage >= 2 && yStage < SA_GATE_STAGES;
+    }
+
+    if (!nearest || nearest->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED)
+        return false;
+
+    // item W (rotação de defesa por lado): when one gate of the first pair falls and the other still stands, the
+    // towers on the far side stay manned to cover the bridge: green down -> towers at the red gate keep shooting,
+    // blue down -> towers at the purple gate keep shooting
+    if (nearestId == BG_SA_RED_GATE && SaGateDestroyed(bg, BG_SA_GREEN_GATE) && !SaGateDestroyed(bg, BG_SA_BLUE_GATE))
+        return true;
+    if (nearestId == BG_SA_PURPLE_GATE && SaGateDestroyed(bg, BG_SA_BLUE_GATE) &&
+        !SaGateDestroyed(bg, BG_SA_GREEN_GATE))
+        return true;
+
+    uint32 const stage = SaCurrentStage(bg);
+    return stage < SA_GATE_STAGES && (SA_GateStages[stage][0] == nearestId || SA_GateStages[stage][1] == nearestId);
+}
+
+// Graveyard flags of the defenders' side. Only the attackers can capture, and only a graveyard that is not theirs yet
+// (BattlegroundSA::CaptureGraveyard); the flag is shown in the colour of the current owner
+static uint32 const SA_FLAG_COUNT = 3;
+static uint32 const SA_GraveyardFlags[SA_FLAG_COUNT] = {BG_SA_LEFT_FLAG, BG_SA_RIGHT_FLAG, BG_SA_CENTRAL_FLAG};
+
+// the flag object when the attackers can capture it right now, nullptr otherwise
+// (same conditions as BattlegroundSA::CanInteractWithObject(BG_SA_*_FLAG))
+static GameObject* SaGetCapturableFlag(Battleground* bg, TeamId attackerTeam, uint32 flagId)
+{
+    // left and right flag: the green or the blue gate has to be down, central flag: also the red or the purple one
+    if (!SaGateDestroyed(bg, BG_SA_GREEN_GATE) && !SaGateDestroyed(bg, BG_SA_BLUE_GATE))
+        return nullptr;
+
+    if (flagId == BG_SA_CENTRAL_FLAG && !SaGateDestroyed(bg, BG_SA_RED_GATE) && !SaGateDestroyed(bg, BG_SA_PURPLE_GATE))
+        return nullptr;
+
+    GameObject* flag = bg->GetBGObject(flagId);
+    if (!flag || !flag->isSpawned() || flag->GetGoState() != GO_STATE_READY)
+        return nullptr;
+
+    // already in the attackers' colour: the graveyard is theirs
+    bool const allianceFlag = flag->GetEntry() == BG_SA_ObjEntries[flagId];
+    if (allianceFlag == (attackerTeam == TEAM_ALLIANCE))
+        return nullptr;
+
+    return flag;
+}
+
+static GameObject* SaNearestCapturableFlag(Battleground* bg, TeamId attackerTeam, Unit* from)
+{
+    GameObject* nearest = nullptr;
+    for (uint32 flagId : SA_GraveyardFlags)
+    {
+        GameObject* flag = SaGetCapturableFlag(bg, attackerTeam, flagId);
+        if (flag && (!nearest || from->GetDistance(flag) < from->GetDistance(nearest)))
+            nearest = flag;
+    }
+
+    return nearest;
+}
+
+// max attackers on foot that may head for the same graveyard flag, so the rest keep escorting the demolishers
+static uint32 const SA_MAX_FLAG_ATTACKERS = 2;
+
+// how many other attackers on foot would go for this flag before the bot does: same team, alive, not in a vehicle,
+// this flag is their nearest capturable one and they are closer to it than the bot (guid breaks ties)
+// TODO: this is a proxy, the objective of the other bots is not readable from here (it is per bot AI)
+static uint32 SaFlagAttackersAhead(Battleground* bg, TeamId attackerTeam, GameObject* flag, Player* bot)
+{
+    uint32 count = 0;
+    float const botDist = bot->GetDistance(flag);
+    for (auto const& itr : bg->GetBgMap()->GetPlayers())
+    {
+        Player* player = itr.GetSource();
+        if (!player || player == bot || !player->IsAlive() || player->GetVehicle() ||
+            player->GetTeamId() != attackerTeam)
+            continue;
+
+        if (SaNearestCapturableFlag(bg, attackerTeam, player) != flag)
+            continue;
+
+        float const d = player->GetDistance(flag);
+        if (d < botDist || (d == botDist && player->GetGUID() < bot->GetGUID()))
+            ++count;
+    }
+
+    return count;
+}
+
+// nearest capturable flag that still has room for the bot (less than SA_MAX_FLAG_ATTACKERS attackers ahead of it)
+static GameObject* SaPickCapturableFlag(Battleground* bg, TeamId attackerTeam, Player* bot)
+{
+    GameObject* best = nullptr;
+    for (uint32 flagId : SA_GraveyardFlags)
+    {
+        GameObject* flag = SaGetCapturableFlag(bg, attackerTeam, flagId);
+        if (!flag || SaFlagAttackersAhead(bg, attackerTeam, flag, bot) >= SA_MAX_FLAG_ATTACKERS)
+            continue;
+
+        if (!best || bot->GetDistance(flag) < bot->GetDistance(best))
+            best = flag;
+    }
+
+    return best;
+}
+
+static bool SaIsCapturableFlag(Battleground* bg, TeamId attackerTeam, GameObject* go)
+{
+    for (uint32 flagId : SA_GraveyardFlags)
+        if (SaGetCapturableFlag(bg, attackerTeam, flagId) == go)
+            return true;
+
+    return false;
+}
+
+// The mmaps navmesh does not contain the SA gates (they are dynamic gameobjects), so a ground path happily leads
+// through a closed gate and server-side spline movement has no collision against it: the bot walks through the wall.
+// The gates are spawned with their orientation along the way through them (relic on the negative side of every gate),
+// so the defenders' side of a gate is the side the relic is on. These helpers keep a bot's destination on its own
+// side of the closed gates. TODO: the real fix is the navmesh/collision (see the report), this is only a guard.
+static float const SA_GATE_HALF_WIDTH = 25.0f;  // lateral reach of a gate, beyond it walls/terrain are in the way
+
+// +1 when the defenders' side is along the gate orientation, -1 when it is against it (the side of the relic)
+static float SaGateDefenderSign(GameObject* gate)
+{
+    float const dot = cos(gate->GetOrientation()) * (SA_RELIC_POS.GetPositionX() - gate->GetPositionX()) +
+                      sin(gate->GetOrientation()) * (SA_RELIC_POS.GetPositionY() - gate->GetPositionY());
+    return dot >= 0.0f ? 1.0f : -1.0f;
+}
+
+// point 'dist' yards from the gate on the defenders' side or on the attackers' side, along the way through the gate
+static Position SaGateSidePoint(GameObject* gate, bool defenderSide, float dist)
+{
+    float const sign = SaGateDefenderSign(gate) * (defenderSide ? 1.0f : -1.0f);
+    return Position(gate->GetPositionX() + sign * dist * cos(gate->GetOrientation()),
+                    gate->GetPositionY() + sign * dist * sin(gate->GetOrientation()), gate->GetPositionZ());
+}
+
+// first closed gate that the straight line from -> to crosses (nullptr when the way is free). The real path may bend,
+// so this only approximates what the pathfinder will do.
+// byAnnounce (attackers): a gate only counts as open once the BG announced its destruction (BattlegroundSA::DestroyGate:
+// GateStatus = DESTROYED and the gate collision object, BgObjects[gate + 9], deleted; GateStatus is private, the
+// collision object is its public trace, the ancient gate has none). The GO state alone changes a moment earlier.
+static bool SaGateOpenByAnnounce(Battleground* bg, uint32 gateId)
+{
+    GameObject* gate = bg->GetBGObject(gateId);
+    if (!gate || gate->GetDestructibleState() != GO_DESTRUCTIBLE_DESTROYED)
+        return false;
+
+    return gateId == BG_SA_ANCIENT_GATE || !bg->GetBGObject(gateId + 9);
+}
+
+static GameObject* SaFirstClosedGateOnLine(Battleground* bg, float fx, float fy, float tx, float ty,
+                                           bool byAnnounce = false)
+{
+    GameObject* first = nullptr;
+    float firstT = 2.0f;
+    for (uint32 gateId : {BG_SA_GREEN_GATE, BG_SA_YELLOW_GATE, BG_SA_BLUE_GATE, BG_SA_RED_GATE, BG_SA_PURPLE_GATE,
+                          BG_SA_ANCIENT_GATE})
+    {
+        GameObject* gate = bg->GetBGObject(gateId);
+        if (!gate || (byAnnounce ? SaGateOpenByAnnounce(bg, gateId)
+                                 : gate->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED))
+            continue;
+
+        float const ax = cos(gate->GetOrientation());
+        float const ay = sin(gate->GetOrientation());
+        float const d1 = ax * (fx - gate->GetPositionX()) + ay * (fy - gate->GetPositionY());
+        float const d2 = ax * (tx - gate->GetPositionX()) + ay * (ty - gate->GetPositionY());
+        if (d1 * d2 >= 0.0f)
+            continue;  // both on the same side
+
+        float const t = d1 / (d1 - d2);
+        float const px = fx + t * (tx - fx);
+        float const py = fy + t * (ty - fy);
+        float const lateral = -ay * (px - gate->GetPositionX()) + ax * (py - gate->GetPositionY());
+        if (fabs(lateral) <= SA_GATE_HALF_WIDTH && t < firstT)
+        {
+            first = gate;
+            firstT = t;
+        }
+    }
+
+    return first;
+}
+
+// item S (warmup: 30 s de buffs, depois movimento, ataque e defesa): the SA warmup is 120 s in round 1 and 60 s in
+// round 2 (GetStartDelayTime is not reliable in round 2), so each bot counts its own 30 s of buffs (class buffs and
+// consumables, "buff" strategy) from the first warmup tick it sees; after that moveToStart lets it move.
+bool SaWarmupBuffsActive(Player* bot)
+{
+    static std::mutex mtx;
+    static std::unordered_map<ObjectGuid, uint32> startTimes;
+
+    Battleground* bg = bot->GetBattleground();
+    std::lock_guard<std::mutex> lock(mtx);
+    if (!bg || bg->GetBgTypeID() != BATTLEGROUND_SA || bg->GetStatus() != STATUS_WAIT_JOIN)
+    {
+        startTimes.erase(bot->GetGUID());
+        return false;
+    }
+
+    uint32 const now = getMSTime();
+    auto it = startTimes.find(bot->GetGUID());
+    // a stale entry (older than any warmup) is a previous round
+    if (it == startTimes.end() || getMSTimeDiff(it->second, now) > 5 * MINUTE * IN_MILLISECONDS)
+        it = startTimes.insert_or_assign(bot->GetGUID(), now).first;
+
+    return getMSTimeDiff(it->second, now) < BG_START_DELAY_30S;
+}
+
+// Item Q (atacantes voltam a garagem para pegar nova demolidora): the factory demolishers (BG_SA_DEMOLISHER_5..8,
+// BG_SA_NpcSpawnlocs) spawn when the attackers capture the blue (5, 6) or green (7, 8) side graveyard
+// (BattlegroundSA::CaptureGraveyard). A foot attacker whose demolisher is gone heads for the nearest free one; the
+// seat is taken by EnterVehicleAction once within reach. Only a free, friendly, alive demolisher counts, and never
+// behind a closed gate on the line.
+// Item T (atacantes pegam as 4 demolidoras da praia): the beach posts (DEMOLISHER_1..4) count like the garage ones, so
+// a foot attacker without a demolisher goes to the nearest free one of all eight, not only to its own side's. Two bots
+// never head for the same one: a demolisher is claimed by the bot that is closest to it (claims last 15 s and are
+// renewed on every call), the other takes the next free one.
+static Creature* SaNearestGarageDemolisher(Battleground* bg, Player* bot)
+{
+    static std::mutex claimMtx;
+    static std::unordered_map<ObjectGuid, std::pair<ObjectGuid, uint32>> claims;
+    uint32 const now = getMSTime();
+    std::lock_guard<std::mutex> claimLock(claimMtx);
+
+    Creature* best = nullptr;
+    std::list<Creature*> demolishers;
+    bot->GetCreatureListWithEntryInGrid(demolishers, NPC_DEMOLISHER_SA, 250.0f);
+    for (Creature* dem : demolishers)
+    {
+        // only the ones standing at a demolisher post (BG_SA_NpcSpawnlocs DEMOLISHER_1..8: beach and garage)
+        bool atPost = false;
+        for (uint8 j = BG_SA_DEMOLISHER_1; j <= BG_SA_DEMOLISHER_8; ++j)
+            if (dem->GetExactDist2d(BG_SA_NpcSpawnlocs[j][0], BG_SA_NpcSpawnlocs[j][1]) < 30.0f)
+                atPost = true;
+        if (!atPost)
+            continue;
+
+        if (!dem->IsAlive() || !dem->IsInWorld() || !dem->IsFriendlyTo(bot) ||
+            dem->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || !dem->GetVehicleKit() ||
+            dem->GetVehicleKit()->IsVehicleInUse() || !dem->GetVehicleKit()->GetAvailableSeatCount())
+            continue;
+
+        if (SaFirstClosedGateOnLine(bg, bot->GetPositionX(), bot->GetPositionY(), dem->GetPositionX(),
+                                    dem->GetPositionY(), true))
+            continue;
+
+        // item T: claimed by another bot that is at least as close: leave it to that one
+        auto claim = claims.find(dem->GetGUID());
+        if (claim != claims.end() && claim->second.first != bot->GetGUID() &&
+            getMSTimeDiff(claim->second.second, now) < 15000)
+        {
+            Player* other = ObjectAccessor::FindPlayer(claim->second.first);
+            if (other && other->IsAlive() && !other->GetVehicle() &&
+                other->GetExactDist2d(dem) <= bot->GetExactDist2d(dem))
+                continue;
+        }
+
+        if (!best || bot->GetExactDist2d(dem) < bot->GetExactDist2d(best))
+            best = dem;
+    }
+
+    for (auto it = claims.begin(); it != claims.end();)
+        if (it->second.first == bot->GetGUID() || getMSTimeDiff(it->second.second, now) >= 15000)
+            it = claims.erase(it);
+        else
+            ++it;
+
+    if (best)
+        claims[best->GetGUID()] = {bot->GetGUID(), now};
+
+    return best;
+}
+
+// the gate to hold at: 'gate' itself when the bot reaches its guard point without crossing a closed gate, otherwise
+// the first closed gate on the way there
+static GameObject* SaReachableGate(Battleground* bg, Player* bot, GameObject* gate, bool defenderSide)
+{
+    // attackers (defenderSide false): a gate is open only after the announcement
+    Position const target = SaGateSidePoint(gate, defenderSide, 12.0f);
+    GameObject* blocker = SaFirstClosedGateOnLine(bg, bot->GetPositionX(), bot->GetPositionY(),
+                                                  target.GetPositionX(), target.GetPositionY(), !defenderSide);
+    return blocker ? blocker : gate;
+}
+
+// the gate to attack/defend at the given stage: stay on the side of the previous destroyed gate, otherwise
+// split by role
+static GameObject* SaPickGate(Battleground* bg, uint32 stage, uint32 role)
+{
+    uint32 side = role % 2;
+    if (stage > 0)
+    {
+        if (SaGateDestroyed(bg, SA_GateStages[stage - 1][0]))
+            side = 0;
+        else if (SaGateDestroyed(bg, SA_GateStages[stage - 1][1]))
+            side = 1;
+    }
+
+    GameObject* gate = bg->GetBGObject(SA_GateStages[stage][side]);
+    if (!gate || gate->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED)
+        gate = bg->GetBGObject(SA_GateStages[stage][1 - side]);
+
+    return gate;
+}
+
+// the gate ALL attackers go for in the current stage (they gather instead of spreading over the pair): the standing gate
+// of the stage that is nearest to the centre of the living attackers. Stage 0 = green/blue (item U: split in two
+// fronts by role, gather when one falls), stage 1 = the purple/red one closest to where the group is (the middle), then yellow, then ancient;
+// nullptr when the relic is open
+static GameObject* SaPickGroupGate(Battleground* bg, TeamId attackerTeam, uint32 stage, uint32 role)
+{
+    if (stage >= SA_GATE_STAGES)
+        return nullptr;
+
+    // item U: stage 0 (green/blue) = two fronts. The attackers split by role (even/odd) between the two gates; when one
+    // falls SaPickGate sends everybody to the one left (they gather). Later stages gather at the gate nearest the group
+    if (stage == 0)
+        return SaPickGate(bg, 0, role);
+
+    float sx = 0.0f, sy = 0.0f;
+    uint32 n = 0;
+    for (auto const& itr : bg->GetBgMap()->GetPlayers())
+    {
+        Player* player = itr.GetSource();
+        if (!player || !player->IsAlive() || player->GetTeamId() != attackerTeam)
+            continue;
+
+        sx += player->GetPositionX();
+        sy += player->GetPositionY();
+        ++n;
+    }
+
+    GameObject* best = nullptr;
+    float bestDist = 0.0f;
+    for (uint32 side = 0; side < 2; side++)
+    {
+        GameObject* gate = bg->GetBGObject(SA_GateStages[stage][side]);
+        if (!gate || gate->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED)
+            continue;
+
+        float const dist = n ? gate->GetExactDist2d(sx / n, sy / n) : 0.0f;
+        if (!best || dist < bestDist)
+        {
+            best = gate;
+            bestDist = dist;
+        }
+    }
+
+    return best;
+}
+
+// item W (rotação de defesa por lado): the gate the defenders hold, by the state of the gates. Green side = green and
+// purple, blue side = blue and red. Both of the first pair standing: current (beach). Green down: purple (yellow when
+// purple is down too); blue down: red (yellow when red is down too); both down: item V picks purple or red, yellow as
+// soon as one of them is down. Past yellow (ancient) current stays
+static GameObject* SaPickSideDefenseGate(Battleground* bg, TeamId attackerTeam, uint32 stage, GameObject* current);
+
+// item V: defender picks the gate of the stage-1 pair (purple/red) where the attackers are: the standing gate nearest
+// the centre of the living attackers. Keeps 'current' (SaPickGate) when the pair is not both standing, when no attacker
+// is alive or when the distances tie (within 1 yard)
+static GameObject* SaPickDefenseGate(Battleground* bg, TeamId attackerTeam, uint32 stage, GameObject* current)
+{
+    if (stage != 1)
+        return current;
+
+    GameObject* g0 = bg->GetBGObject(SA_GateStages[stage][0]);
+    GameObject* g1 = bg->GetBGObject(SA_GateStages[stage][1]);
+    if (!g0 || !g1 || g0->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED ||
+        g1->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED)
+        return current;
+
+    float sx = 0.0f, sy = 0.0f;
+    uint32 n = 0;
+    for (auto const& itr : bg->GetBgMap()->GetPlayers())
+    {
+        Player* player = itr.GetSource();
+        if (!player || !player->IsAlive() || player->GetTeamId() != attackerTeam)
+            continue;
+
+        sx += player->GetPositionX();
+        sy += player->GetPositionY();
+        ++n;
+    }
+
+    if (!n)
+        return current;
+
+    float const d0 = g0->GetExactDist2d(sx / n, sy / n);
+    float const d1 = g1->GetExactDist2d(sx / n, sy / n);
+    if (std::fabs(d0 - d1) < 1.0f)
+        return current;
+
+    return d0 < d1 ? g0 : g1;
+}
+
+static GameObject* SaPickSideDefenseGate(Battleground* bg, TeamId attackerTeam, uint32 stage, GameObject* current)
+{
+    if (stage >= 2)
+        return current;
+
+    bool const greenDown = SaGateDestroyed(bg, BG_SA_GREEN_GATE);
+    bool const blueDown = SaGateDestroyed(bg, BG_SA_BLUE_GATE);
+    if (!greenDown && !blueDown)
+        return current;
+
+    bool const purpleDown = SaGateDestroyed(bg, BG_SA_PURPLE_GATE);
+    bool const redDown = SaGateDestroyed(bg, BG_SA_RED_GATE);
+    uint32 target;
+    if (greenDown && blueDown)
+    {
+        if (purpleDown || redDown)
+            target = BG_SA_YELLOW_GATE;
+        else
+            return SaPickDefenseGate(bg, attackerTeam, stage, current);
+    }
+    else if (greenDown)
+        target = purpleDown ? BG_SA_YELLOW_GATE : BG_SA_PURPLE_GATE;
+    else
+        target = redDown ? BG_SA_YELLOW_GATE : BG_SA_RED_GATE;
+
+    GameObject* gate = bg->GetBGObject(target);
+    if (!gate || gate->GetDestructibleState() == GO_DESTRUCTIBLE_DESTROYED)
+        return current;
+
+    return gate;
+}
+
+// item X (atiradores nas torres do lado oposto ao portão caído): green down (blue standing) -> the towers at the RED
+// gate stay manned; blue down (green standing) -> the towers at the PURPLE gate. Besides the rotation of item W the
+// defenders all walk to the other side's gate, and EnterVehicleAction only takes a tower within 25 yards, so nobody
+// ever reached those towers. Here 1 shooter (2, or what is left) is elected, deterministic: the living
+// non-healer defender bots of lowest GUID. Returns the tower to walk to for the elected bot, nullptr otherwise.
+static Creature* SaPickSideTowerForShooter(Battleground* bg, Player* bot, TeamId attackerTeam, uint32 stage)
+{
+    if (stage >= 2 || !bot->IsAlive() || PlayerbotAI::IsHeal(bot, true))
+        return nullptr;
+
+    bool const greenDown = SaGateDestroyed(bg, BG_SA_GREEN_GATE);
+    bool const blueDown = SaGateDestroyed(bg, BG_SA_BLUE_GATE);
+    if (greenDown == blueDown)
+        return nullptr;
+
+    uint32 const coverGate = greenDown ? BG_SA_RED_GATE : BG_SA_PURPLE_GATE;
+
+    // towers whose nearest gate is the one to cover, still active (not destroyed, not abandoned)
+    std::vector<Creature*> towers;
+    for (uint32 idx = BG_SA_GUN_1; idx <= BG_SA_GUN_10; ++idx)
+    {
+        Creature* tower = bg->GetBGCreature(idx);
+        if (!tower || !tower->IsAlive() || tower->GetEntry() != NPC_ANTI_PERSONNAL_CANNON)
+            continue;
+
+        uint32 nearestId = 0;
+        float nearestDist = 0.0f;
+        for (uint32 gateId : {BG_SA_GREEN_GATE, BG_SA_YELLOW_GATE, BG_SA_BLUE_GATE, BG_SA_RED_GATE, BG_SA_PURPLE_GATE})
+        {
+            GameObject* gate = bg->GetBGObject(gateId);
+            if (!gate)
+                continue;
+            float const dist = tower->GetExactDist2d(gate);
+            if (!nearestId || dist < nearestDist)
+            {
+                nearestId = gateId;
+                nearestDist = dist;
+            }
+        }
+
+        if (nearestId == coverGate && SaTowerPhaseActive(bg, tower) && !SaTowerGateDestroyed(bg, tower))
+            towers.push_back(tower);
+    }
+
+    if (towers.empty())
+        return nullptr;
+
+    std::sort(towers.begin(), towers.end(), [](Creature* a, Creature* b) { return a->GetGUID() < b->GetGUID(); });
+
+    std::vector<ObjectGuid> candidates;
+    for (auto const& itr : bg->GetBgMap()->GetPlayers())
+    {
+        Player* player = itr.GetSource();
+        if (!player || !player->IsAlive() || player->GetTeamId() == attackerTeam)
+            continue;
+
+        if (player->GetSession() && GET_PLAYERBOT_AI(player) && !PlayerbotAI::IsHeal(player, true))
+            candidates.push_back(player->GetGUID());
+    }
+
+    // fixed 2 shooters (or what is left when fewer candidates are alive), confirmed by the owner
+    uint32 const wanted = 2;
+    std::sort(candidates.begin(), candidates.end());
+    for (uint32 rank = 0; rank < wanted && rank < candidates.size(); ++rank)
+        if (candidates[rank] == bot->GetGUID())
+            return towers[rank % towers.size()];
+
+    return nullptr;
+}
+
+// Group coordination of the attackers on foot: shared reservation table so they spread over the available
+// objectives instead of all picking the same gate or flag. Key = Battleground*, then objective id (the BG_SA_* object
+// index of the gate or flag), then the reserving bot's guid. A bot holds at most one reservation.
+// Lifetime: a reservation lasts SA_RESERVATION_MS and is refreshed each time the bot picks again; it is also dropped
+// when the bot is dead or in a vehicle (when it picks), when the objective stops being valid (it is not a candidate
+// anymore) and the whole table of a BG is cleared when the BG ends or its instance changes.
+// TODO: there is no hook for "bot died / left the BG / objective destroyed" that is called for the reservation, so
+// release relies on the timeout and on the checks above; add a real hook (death / leave BG) if the timeout proves too
+// coarse.
+static uint32 const SA_MAX_OBJECTIVE_ATTACKERS = 2;
+static uint32 const SA_RESERVATION_MS = 45000;
+
+struct SaReservation
+{
+    uint32 objective;
+    uint32 expires;
+};
+
+struct SaBgReservations
+{
+    uint32 instanceId = 0;
+    std::map<ObjectGuid, SaReservation> byBot;
+};
+
+static std::mutex saReservationMutex;
+static std::map<Battleground*, SaBgReservations> saReservations;
+
+// call with the mutex held: wipes the table of a recreated BG, drops expired reservations
+static SaBgReservations& SaReservationsFor(Battleground* bg, uint32 now)
+{
+    SaBgReservations& table = saReservations[bg];
+    if (table.instanceId != bg->GetInstanceID())
+    {
+        table.byBot.clear();
+        table.instanceId = bg->GetInstanceID();
+    }
+
+    for (auto it = table.byBot.begin(); it != table.byBot.end();)
+    {
+        if (static_cast<int32>(it->second.expires - now) <= 0)
+            it = table.byBot.erase(it);
+        else
+            ++it;
+    }
+
+    return table;
+}
+
+// forget the table of a BG that is over (and of any stale BG whose table is empty)
+static void SaReservationsCleanup(Battleground* bg)
+{
+    std::lock_guard<std::mutex> lock(saReservationMutex);
+    if (bg->GetStatus() == STATUS_WAIT_LEAVE)
+    {
+        saReservations.erase(bg);
+        return;
+    }
+
+    for (auto it = saReservations.begin(); it != saReservations.end();)
+    {
+        if (it->first != bg && it->second.byBot.empty())
+            it = saReservations.erase(it);
+        else
+            ++it;
+    }
+}
+
+static void SaReleaseReservation(Battleground* bg, Player* bot)
+{
+    std::lock_guard<std::mutex> lock(saReservationMutex);
+    auto it = saReservations.find(bg);
+    if (it != saReservations.end())
+        it->second.byBot.erase(bot->GetGUID());
+}
+
+// picks the candidate with the fewest reservations (nearest wins ties) among those below the limit and reserves it for
+// the bot, replacing its previous reservation. candidates = {objective id, object}; returns nullptr when all are full
+static GameObject* SaReserveObjective(Battleground* bg, Player* bot,
+                                      std::vector<std::pair<uint32, GameObject*>> const& candidates)
+{
+    SaReservationsCleanup(bg);
+
+    uint32 const now = getMSTime();
+    std::lock_guard<std::mutex> lock(saReservationMutex);
+    SaBgReservations& table = SaReservationsFor(bg, now);
+    table.byBot.erase(bot->GetGUID());  // do not count the bot twice
+
+    std::pair<uint32, GameObject*> const* best = nullptr;
+    uint32 bestCount = 0;
+    for (auto const& cand : candidates)
+    {
+        if (!cand.second)
+            continue;
+
+        uint32 count = 0;
+        for (auto const& res : table.byBot)
+            if (res.second.objective == cand.first)
+                ++count;
+
+        if (count >= SA_MAX_OBJECTIVE_ATTACKERS)
+            continue;
+
+        if (!best || count < bestCount ||
+            (count == bestCount && bot->GetDistance(cand.second) < bot->GetDistance(best->second)))
+        {
+            best = &cand;
+            bestCount = count;
+        }
+    }
+
+    if (!best)
+        return nullptr;
+
+    table.byBot[bot->GetGUID()] = SaReservation{best->first, now + SA_RESERVATION_MS};
+    return best->second;
+}
+
+// warmup: assigns a beach tower (BG_SA_GUN_*) to a defender, spreading them over the candidates {tower, distance}.
+// Uses the same table as SaReserveObjective (ids offset so they never meet a gate/flag id). No limit per tower: the
+// fewest assigned wins, the bot keeps its previous tower on a tie, the nearest breaks the other ties.
+// Returns false when there is no candidate.
+static uint32 const SA_TOWER_RESERVATION_BASE = 1000;
+
+static bool SaReserveTower(Battleground* bg, Player* bot, std::vector<std::pair<uint32, float>> const& candidates,
+                           uint32& tower)
+{
+    if (candidates.empty())
+        return false;
+
+    uint32 const now = getMSTime();
+    std::lock_guard<std::mutex> lock(saReservationMutex);
+    SaBgReservations& table = SaReservationsFor(bg, now);
+
+    uint32 previous = 0;
+    auto mine = table.byBot.find(bot->GetGUID());
+    if (mine != table.byBot.end())
+        previous = mine->second.objective;
+    table.byBot.erase(bot->GetGUID());  // do not count the bot twice
+
+    uint32 best = 0;
+    uint32 bestCount = 0;
+    float bestDist = 0.0f;
+    for (auto const& cand : candidates)
+    {
+        uint32 const id = SA_TOWER_RESERVATION_BASE + cand.first;
+        uint32 count = 0;
+        for (auto const& res : table.byBot)
+            if (res.second.objective == id)
+                ++count;
+
+        bool better = !best || count < bestCount;
+        if (!better && count == bestCount)
+            better = best != previous && (id == previous || cand.second < bestDist);
+
+        if (better)
+        {
+            best = id;
+            bestCount = count;
+            bestDist = cand.second;
+        }
+    }
+
+    table.byBot[bot->GetGUID()] = SaReservation{best, now + SA_RESERVATION_MS};
+    tower = best - SA_TOWER_RESERVATION_BASE;
+    return true;
 }
 
 bool BGTactics::moveToStart(bool force)
@@ -1825,6 +2657,79 @@ bool BGTactics::moveToStart(bool force)
             MoveTo(bg->GetMapId(), EY_WAITING_POS_ALLIANCE.GetPositionX(), EY_WAITING_POS_ALLIANCE.GetPositionZ(), EY_WAITING_POS_ALLIANCE.GetPositionZ());
         }
         */
+    }
+    else if (bgType == BATTLEGROUND_SA)
+    {
+        // Warmup (STATUS_WAIT_JOIN): attackers stay on the boat (IsOnMovingSaBoat) and are not moved here.
+        // Defenders start in the relic chamber and walk (ground path only) to the anti-personnel tower closest to
+        // them among the four on the beach-side gates (green/blue stage), so they are in place when the round starts.
+        TeamId attackerTeam;
+        // item S (warmup: 30 s de buffs, depois movimento, ataque e defesa): both sides spend the first 30 s on the
+        // buff round (non combat "buff" strategy: class buffs and consumables), then they move. The old rule (stay
+        // while GetStartDelayTime > 30 s) held the defenders for 90 of the 120 s of round 1 and the attackers never moved.
+        if (SaGetAttackerTeam(bg, attackerTeam) && bot->GetTeamId() == attackerTeam && !botAI->IsInVehicle())
+        {
+            if (SaWarmupBuffsActive(bot))
+                return false;
+
+            // on a boat that has not sailed yet (docked) or is still sailing: stay (IsMovingAllowed also blocks the
+            // sailing one); once it has arrived, or when the bot is not on a boat at all, go for a demolisher
+            if (Transport* transport = bot->GetTransport())
+            {
+                StaticTransport* boat = transport->ToStaticTransport();
+                if (!boat || boat->GetGoState() != GO_STATE_ACTIVE)
+                    return false;
+            }
+
+            // item T: nearest free demolisher of the four on the beach (and the garage ones, if any), claimed
+            if (!PlayerbotAI::IsHeal(bot, true))
+                if (Creature* dem = SaNearestGarageDemolisher(bg, bot))
+                    if (bot->GetExactDist2d(dem) > 6.0f)
+                        MoveTo(bg->GetMapId(), dem->GetPositionX(), dem->GetPositionY(), dem->GetPositionZ());
+        }
+        else if (SaGetAttackerTeam(bg, attackerTeam) && bot->GetTeamId() != attackerTeam && !botAI->IsInVehicle())
+        {
+            // first part of the warmup (item S): stay in the chamber for the 30 s buff round; then the walk starts
+            // and mounting is allowed too (CheckMountStateAction)
+            if (SaWarmupBuffsActive(bot))
+                return false;
+
+            // mount for the trip to the beach gates (only green and blue towers are candidates below)
+            if (!bot->IsMounted() && !bot->isMoving() && botAI->DoSpecificAction("check mount state", Event(), true))
+                return true;
+
+            // BG_SA_NpcSpawnlocs: GUN_1/GUN_2 = green gate towers, GUN_5/GUN_6 = blue gate towers
+            static uint32 const beachTowers[] = {BG_SA_GUN_1, BG_SA_GUN_2, BG_SA_GUN_5, BG_SA_GUN_6};
+            // spread the defenders over the four towers (shared table, like SaReserveObjective): the one with the
+            // fewest defenders assigned wins, the nearest breaks ties; towers behind a closed gate are not candidates
+            std::vector<std::pair<uint32, float>> towerCandidates;
+            for (uint32 tower : beachTowers)
+            {
+                float const* loc = BG_SA_NpcSpawnlocs[tower];
+                if (!SaFirstClosedGateOnLine(bg, bot->GetPositionX(), bot->GetPositionY(), loc[0], loc[1]))
+                    towerCandidates.push_back({tower, bot->GetExactDist2d(loc[0], loc[1])});
+            }
+
+            float bestDist = 0.0f;
+            float const* best = nullptr;
+            uint32 pickedTower = 0;
+            if (SaReserveTower(bg, bot, towerCandidates, pickedTower))
+            {
+                best = BG_SA_NpcSpawnlocs[pickedTower];
+                bestDist = bot->GetExactDist2d(best[0], best[1]);
+            }
+
+            // the towers are on the far side of the ancient/yellow/purple/red gates, all closed in the warmup: a ground
+            // path goes through them (defenders really use the defender portals). Stay in the chamber then (no
+            // candidate above).
+            // TODO: walk to the defender portal and click it (BattlegroundSA::DefendersPortalTeleport)
+
+            // already next to the tower: stay (EnterVehicleAction takes the seat within 25 yards)
+            if (best && bestDist > 6.0f)
+                MoveTo(bg->GetMapId(), best[0] + frand(-3.0f, 3.0f), best[1] + frand(-3.0f, 3.0f), best[2]);
+            // TODO: the tower stands on the wall; confirm in game that a ground path from the relic chamber exists
+            // and that the target never ends up over water (no path = MoveTo simply fails and the bot stays put)
+        }
     }
     else if (bgType == BATTLEGROUND_IC)
     {
@@ -3141,6 +4046,236 @@ bool BGTactics::selectObjective(bool reset)
             }
             break;
         }
+        case BATTLEGROUND_SA:
+        {
+            TeamId attackerTeam;
+            if (!SaGetAttackerTeam(bg, attackerTeam))
+                return false;  // TODO: round not set up yet (no defender portals), try again on the next tick
+
+            bool const isAttacker = bot->GetTeamId() == attackerTeam;
+            uint32 role = context->GetValue<uint32>("bg role")->Get();
+            bool inVehicle = botAI->IsInVehicle();
+            bool controlsVehicle = botAI->IsInVehicle(true);
+            uint32 vehicleId = inVehicle ? bot->GetVehicleBase()->GetEntry() : 0;
+
+            // anti-personnel tower whose gate is already down: get out, otherwise the bot stays in it for good
+            if (inVehicle && vehicleId == NPC_ANTI_PERSONNAL_CANNON &&
+                (SaTowerGateDestroyed(bg, bot->GetVehicleBase()) || !SaTowerPhaseActive(bg, bot->GetVehicleBase())))
+            {
+                bot->ExitVehicle();
+                return true;
+            }
+
+            // relic open and the bot is riding (driver or passenger): get out at the relic before clicking it
+            if (isAttacker && inVehicle && SaCurrentStage(bg) >= SA_GATE_STAGES)
+                if (GameObject* relic = bg->GetBGObject(BG_SA_TITAN_RELIC))
+                    if (bot->GetExactDist2d(relic) <= SA_RELIC_APPROACH_RANGE + 10.0f)
+                    {
+                        bot->ExitVehicle();
+                        return true;
+                    }
+
+            // skip if not the driver
+            if (inVehicle && !controlsVehicle)
+                return false;
+
+            // TODO: bots in cannons (defenders) or in vehicles other than the demolisher are left where they are
+            if (controlsVehicle && (!isAttacker || vehicleId != NPC_DEMOLISHER_SA))
+                return false;
+
+            PositionInfo siegePos = context->GetValue<PositionMap&>("position")->Get()["bg siege"];
+            uint32 const stage = SaCurrentStage(bg);
+            GameObject* gate = stage < SA_GATE_STAGES ? SaPickGate(bg, stage, role) : nullptr;
+
+            // attackers on foot take the nearest graveyard that is not theirs yet before anything else
+            // TODO: the order of the round (graveyards before the relic) is not confirmed in the core, the relic only
+            // needs the gates; here the flags simply come first whenever one can be captured
+            if (isAttacker && (inVehicle || !bot->IsAlive()))
+                SaReleaseReservation(bg, bot);
+
+            // attack order: green+blue (together), then the purple/red one nearest the middle, yellow, ancient, relic.
+            // Every attacker (drivers too) goes for the same gate of the stage
+            if (isAttacker && stage < SA_GATE_STAGES)
+                if (GameObject* groupGate = SaPickGroupGate(bg, attackerTeam, stage, role))
+                    gate = groupGate;
+
+            // item Q: on foot without a demolisher (the one picked up on the beach was destroyed): go to the
+            // garage of the captured graveyard and take a free demolisher there; healers stay out of them
+            if (isAttacker && !inVehicle && bot->IsAlive() && !PlayerbotAI::IsHeal(bot, true))
+                if (Creature* garageDem = SaNearestGarageDemolisher(bg, bot))
+                {
+                    if (bot->GetExactDist2d(garageDem) < 6.0f)
+                        pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
+                    else
+                        pos.Set(garageDem->GetPositionX(), garageDem->GetPositionY(), garageDem->GetPositionZ(),
+                                bot->GetMapId());
+                    posMap["bg objective"] = pos;
+                    return true;
+                }
+
+            if (isAttacker && !inVehicle)
+            {
+                // group coordination: spread the foot attackers over the capturable flags and the gates of the
+                // current stage (at most SA_MAX_OBJECTIVE_ATTACKERS reservations each, see SaReserveObjective)
+                std::vector<std::pair<uint32, GameObject*>> candidates;
+                // a flag behind a closed gate is no candidate: another flag (or the gate) is taken instead
+                for (uint32 flagId : SA_GraveyardFlags)
+                    if (GameObject* flag = SaGetCapturableFlag(bg, attackerTeam, flagId))
+                        if (!SaFirstClosedGateOnLine(bg, bot->GetPositionX(), bot->GetPositionY(), flag->GetPositionX(),
+                                                     flag->GetPositionY(), true))
+                            candidates.push_back({flagId, flag});
+
+                // the gates are not candidates: all attackers gather at the one group gate of the stage (below)
+
+                if (GameObject* picked = SaReserveObjective(bg, bot, candidates))
+                {
+                    if (SaIsCapturableFlag(bg, attackerTeam, picked) &&
+                        !SaFirstClosedGateOnLine(bg, bot->GetPositionX(), bot->GetPositionY(), picked->GetPositionX(),
+                                                 picked->GetPositionY(), true))
+                    {
+                        pos.Set(picked->GetPositionX(), picked->GetPositionY(), picked->GetPositionZ(),
+                                bot->GetMapId());
+                        posMap["bg objective"] = pos;
+                        return true;
+                    }
+
+                    // guard the demolishers at the gate that was assigned; a flag behind a closed gate is not
+                    // walked to, the bot holds in front of the gate in its way (SaReachableGate below)
+                    if (!SaIsCapturableFlag(bg, attackerTeam, picked))
+                        gate = picked;
+                }
+            }
+
+            if (stage >= SA_GATE_STAGES || !gate)
+            {
+                // every gate stage is down: the relic is open (attackers click it, defenders guard it)
+                if (controlsVehicle)
+                {
+                    siegePos.Reset();
+                    posMap["bg siege"] = siegePos;
+                }
+
+                if (GameObject* relic = bg->GetBGObject(BG_SA_TITAN_RELIC))
+                {
+                    if (isAttacker)
+                    {
+                        BgObjective = relic;
+                    }
+                    else
+                    {
+                        // defenders never enter the relic chamber: with the ancient gate down they keep holding the
+                        // same fixed spot outside it (J, defesa Ancient / relic)
+                        Position const holdPos(910.28625f, -107.65792f, 98.501146f, 0.06778228f);
+                        if (bot->GetExactDist2d(holdPos.GetPositionX(), holdPos.GetPositionY()) < 10.0f)
+                            pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
+                        else
+                        {
+                            float rx, ry, rz;
+                            bot->GetRandomPoint(holdPos, frand(0.0f, 5.0f), rx, ry, rz);
+                            pos.Set(rx, ry, rz, bot->GetMapId());
+                        }
+                        posMap["bg objective"] = pos;
+                        return true;
+                    }
+                }
+            }
+            else if (isAttacker)
+            {
+                if (controlsVehicle)  // demolisher driver: drive to the gate and break it
+                {
+                    // park on the attackers' side in front of the gate (never drive into the closed gate); the siege
+                    // position stays the gate itself, the shots are range checked against it (CanCastVehicleSpell)
+                    // never past a closed gate that lies between the driver and its target: park before that one
+                    gate = SaReachableGate(bg, bot, gate, false);
+                    Position const front = SaGateSidePoint(gate, false, 8.0f);
+                    pos.Set(front.GetPositionX(), front.GetPositionY(), gate->GetPositionZ(), bot->GetMapId());
+                    posMap["bg objective"] = pos;
+                    siegePos.Set(gate->GetPositionX(), gate->GetPositionY(), gate->GetPositionZ(), bot->GetMapId());
+                    posMap["bg siege"] = siegePos;
+                    return true;
+                }
+                else
+                {
+                    // guard the demolishers on the attackers' side of the gate while it is being broken
+                    // (also gets them in place to board a demolisher)
+                    // never ahead of a closed gate that lies between the bot and its target: hold in front of that one
+                    gate = SaReachableGate(bg, bot, gate, false);
+                    Position const guardPos = SaGateSidePoint(gate, false, 12.0f);
+                    float const gx = guardPos.GetPositionX();
+                    float const gy = guardPos.GetPositionY();
+                    if (bot->GetExactDist2d(gx, gy) < 10.0f)
+                        pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
+                    else
+                    {
+                        float rx, ry, rz;
+                        bot->GetRandomPoint(Position(gx, gy, gate->GetPositionZ()), frand(0.0f, 5.0f), rx, ry, rz);
+                        pos.Set(rx, ry, rz, bot->GetMapId());
+                    }
+                    posMap["bg objective"] = pos;
+                    return true;
+                }
+            }
+            else  // defender: hold the spot behind the gate attackers have to break next
+            {
+                // item X: elected shooters walk to a tower of the side opposite to the fallen gate and stay there
+                // (EnterVehicleAction boards within 25 yards); the others follow the rotation below
+                if (Creature* shooterTower = SaPickSideTowerForShooter(bg, bot, attackerTeam, stage))
+                {
+                    if (bot->GetExactDist2d(shooterTower) < 6.0f)
+                        pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
+                    else
+                        pos.Set(shooterTower->GetPositionX(), shooterTower->GetPositionY(),
+                                shooterTower->GetPositionZ(), bot->GetMapId());
+                    posMap["bg objective"] = pos;
+                    return true;
+                }
+                // item W: defence rotation by side; item V (purple/red where the attackers are) breaks the tie
+                gate = SaPickSideDefenseGate(bg, attackerTeam, stage, gate);
+                // never behind a closed gate that lies between the bot and its target: hold behind that one
+                gate = SaReachableGate(bg, bot, gate, true);
+                Position guardPos = SaGateSidePoint(gate, true, 12.0f);
+                // yellow gate: fixed guard spot outside the gate (attack side), measured in game
+                if (gate == bg->GetBGObject(BG_SA_YELLOW_GATE))
+                    guardPos = Position(1106.9973f, -106.67666f, 70.266174f, 3.1403756f);
+                // purple gate: fixed guard spot outside the gate (attack side), measured in game
+                else if (gate == bg->GetBGObject(BG_SA_PURPLE_GATE))
+                    guardPos = Position(1294.9806f, -68.84025f, 33.905514f, -0.7117851f);
+                // green gate: fixed guard spot outside the gate (attack side), measured in game
+                else if (gate == bg->GetBGObject(BG_SA_GREEN_GATE))
+                    guardPos = Position(1435.2815f, 83.46605f, 18.705872f, 5.759612f);
+                // red gate: fixed guard spot outside the gate (attack side), measured in game
+                else if (gate == bg->GetBGObject(BG_SA_RED_GATE))
+                    guardPos = Position(1223.8159f, -192.62447f, 65.84552f, 0.3904012f);
+                // blue gate: fixed guard spot outside the gate (attack side), measured in game
+                else if (gate == bg->GetBGObject(BG_SA_BLUE_GATE))
+                    guardPos = Position(1474.0236f, -163.58565f, 8.860785f, 3.972958f);
+                // ancient gate: fixed guard spot in front of the gate (attack side), where the PvP against the
+                // invaders breaking it happens, measured in game (J, defesa Ancient)
+                else if (gate == bg->GetBGObject(BG_SA_ANCIENT_GATE))
+                    guardPos = Position(1006.20074f, -107.50488f, 89.78014f, 0.027643878f);
+                float const gx = guardPos.GetPositionX();
+                float const gy = guardPos.GetPositionY();
+                if (bot->GetExactDist2d(gx, gy) < 10.0f)
+                    pos.Set(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId());
+                else
+                {
+                    float rx, ry, rz;
+                    bot->GetRandomPoint(Position(gx, gy, guardPos.GetPositionZ()), frand(0.0f, 5.0f), rx, ry, rz);
+                    pos.Set(rx, ry, rz, bot->GetMapId());
+                }
+                posMap["bg objective"] = pos;
+                return true;
+            }
+
+            if (BgObjective)
+            {
+                pos.Set(BgObjective->GetPositionX(), BgObjective->GetPositionY(), BgObjective->GetPositionZ(),
+                        bot->GetMapId());
+                posMap["bg objective"] = pos;
+                return true;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -3187,6 +4322,25 @@ bool BGTactics::moveToObjective(bool ignoreDist)
 
         // std::ostringstream out; out << "Moving to objective " << pos.x << ", " << pos.y << ", Distance: " <<
         // ServerFacade::instance().GetDistance2d(bot, pos.x, pos.y); bot->Say(out.str(), LANG_UNIVERSAL);
+
+        // Strand of the Ancients: no attacker destination (flag, relic, guard point, stale objective) may lie beyond a
+        // closed gate from where the bot is now: go to the attackers side of the first closed gate on the way
+        // (the mmaps navmesh ignores the dynamic gates, the spline would walk through them)
+        if (bgType == BATTLEGROUND_SA)
+        {
+            TeamId saAttacker;
+            if (SaGetAttackerTeam(bg, saAttacker) && bot->GetTeamId() == saAttacker)
+                if (GameObject* blocker = SaFirstClosedGateOnLine(bg, bot->GetPositionX(), bot->GetPositionY(), pos.x,
+                                                                  pos.y, true))
+                {
+                    Position const hold = SaGateSidePoint(blocker, false, 12.0f);
+                    if (bot->GetExactDist2d(hold.GetPositionX(), hold.GetPositionY()) < 4.0f)
+                        return true;
+
+                    return MoveNear(bot->GetMapId(), hold.GetPositionX(), hold.GetPositionY(), hold.GetPositionZ(),
+                                    1.5f);
+                }
+        }
 
         // dont increase from 1.5 will cause bugs with horde capping AV towers
         return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z, 1.5f);
@@ -3347,7 +4501,8 @@ bool BGTactics::resetObjective()
 
     if (bgType == BATTLEGROUND_WS)
         oddsToChangeRole = 2;
-    else if (bgType == BATTLEGROUND_EY || bgType == BATTLEGROUND_IC || bgType == BATTLEGROUND_AB)
+    else if (bgType == BATTLEGROUND_EY || bgType == BATTLEGROUND_IC || bgType == BATTLEGROUND_SA ||
+             bgType == BATTLEGROUND_AB)
         oddsToChangeRole = 1;
     else if (bgType == BATTLEGROUND_AV)
         oddsToChangeRole = 0;
@@ -3419,7 +4574,7 @@ bool BGTactics::startNewPathBegin(std::vector<BattleBotPath*> const& vPaths)
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
 
-    if (bgType == BATTLEGROUND_IC)
+    if (bgType == BATTLEGROUND_IC || bgType == BATTLEGROUND_SA)
         return false;
 
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
@@ -3480,7 +4635,7 @@ bool BGTactics::startNewPathFree(std::vector<BattleBotPath*> const& vPaths)
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
 
-    if (bgType == BATTLEGROUND_IC)
+    if (bgType == BATTLEGROUND_IC || bgType == BATTLEGROUND_SA)
         return false;
 
     PositionInfo pos = context->GetValue<PositionMap&>("position")->Get()["bg objective"];
@@ -3571,6 +4726,15 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
         {
             // For territory control BGs, use standard interaction range
             closeObjects = *context->GetValue<GuidVector>("closest game objects");
+            closePlayers = *context->GetValue<GuidVector>("closest friendly players");
+            flagRange = INTERACTION_DISTANCE;
+            break;
+        }
+        case BATTLEGROUND_SA:
+        {
+            // the "closest" list stops at INTERACTION_DISTANCE (5.5 yards), so the relic and the graveyard flags were
+            // never in it from where the bot is sent: use the wide list, the approach below walks the last yards
+            closeObjects = *context->GetValue<GuidVector>("nearest game objects no los");
             closePlayers = *context->GetValue<GuidVector>("closest friendly players");
             flagRange = INTERACTION_DISTANCE;
             break;
@@ -3754,7 +4918,10 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             continue;
 
         float const dist = bot->GetDistance(go);
-        if (flagRange && dist > flagRange)
+        // SA relic and graveyard flags: the bot is sent to a point around them (selectObjective), so a plain
+        // interaction-distance filter dropped them before the approach below could ever run and the bot never
+        // clicked. The click itself is only sent when the core accepts the distance (IsAtInteractDistance).
+        if (flagRange && dist > (bgType == BATTLEGROUND_SA ? SA_RELIC_APPROACH_RANGE : flagRange))
             continue;
 
         // Special handling for WSG and EY base flags
@@ -3827,6 +4994,88 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
                 spell->prepare(&spell->m_targets);
 
                 botAI->WaitForSpellCast(spell);
+
+                resetObjective();
+                return true;
+            }
+            case BATTLEGROUND_SA:
+            {
+                // only the attackers can use the relic (once the gates are down, BattlegroundSA::EventPlayerUsedGO)
+                // and the graveyard flags that are not theirs yet (BattlegroundSA::EventPlayerClickedOnFlag)
+                TeamId attackerTeam;
+                if (!SaGetAttackerTeam(bg, attackerTeam) || bot->GetTeamId() != attackerTeam)
+                    continue;
+
+                // relic open and in reach: leave the vehicle right away, the click needs the bot on foot
+                if (bot->GetVehicle())
+                {
+                    if (go->GetEntry() == BG_SA_ObjEntries[BG_SA_TITAN_RELIC] && SaCurrentStage(bg) >= SA_GATE_STAGES)
+                    {
+                        bot->ExitVehicle();
+                        return true;
+                    }
+
+                    continue;
+                }
+
+                if (go->GetEntry() == BG_SA_ObjEntries[BG_SA_TITAN_RELIC])
+                {
+                    if (SaCurrentStage(bg) < SA_GATE_STAGES)
+                        continue;
+                }
+                else if (!SaIsCapturableFlag(bg, attackerTeam, go))
+                    continue;
+
+                // Prevent using from inside the flag pole / relic (same handling as AB)
+                if (dist == 0.0f)
+                {
+                    float const moveDist = bot->GetObjectSize() + go->GetObjectSize() + 0.1f;
+                    return MoveTo(bot->GetMapId(), go->GetPositionX() + (urand(0, 1) ? -moveDist : moveDist),
+                                  go->GetPositionY() + (urand(0, 1) ? -moveDist : moveDist), go->GetPositionZ());
+                }
+
+                // walk the last yards until the core accepts the click (the distance it checks for a gameobject, not
+                // a fixed 5.5 yards); never through a closed gate that stands between the bot and the object
+                if (!go->IsAtInteractDistance(bot))
+                {
+                    if (SaFirstClosedGateOnLine(bg, bot->GetPositionX(), bot->GetPositionY(), go->GetPositionX(),
+                                                go->GetPositionY(), true))
+                        continue;
+
+                    return MoveTo(bot->GetMapId(), go->GetPositionX(), go->GetPositionY(), go->GetPositionZ());
+                }
+
+                // Dismount before using the relic or the flag
+                if (bot->IsMounted())
+                    bot->RemoveAurasByType(SPELL_AURA_MOUNTED);
+
+                if (bot->IsInDisallowedMountForm())
+                    bot->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+
+                // item R: graveyard flags are captured by spell, not by CMSG_GAMEOBJ_USE. The flags (191305-191310)
+                // are GAMEOBJECT_TYPE_BUTTON: the packet only toggles the button and never reaches
+                // EventPlayerClickedOnFlag; the core counts the capture on the spell path (OPEN_LOCK on a button).
+                if (go->GetEntry() != BG_SA_ObjEntries[BG_SA_TITAN_RELIC])
+                {
+                    SpellInfo const* saSpellInfo = sSpellMgr->GetSpellInfo(SPELL_CAPTURE_BANNER);
+                    if (!saSpellInfo)
+                        return false;
+
+                    Spell* saSpell = new Spell(bot, saSpellInfo, TRIGGERED_NONE);
+                    saSpell->m_targets.SetGOTarget(go);
+                    saSpell->prepare(&saSpell->m_targets);
+
+                    botAI->WaitForSpellCast(saSpell);
+
+                    resetObjective();
+                    return true;
+                }
+
+                // relic: keeps the packet use
+                // TODO: not confirmed that the relic stays in GO_STATE_READY (atFlag skips objects in another state)
+                WorldPacket data(CMSG_GAMEOBJ_USE);
+                data << go->GetGUID();
+                bot->GetSession()->HandleGameObjectUseOpcode(data);
 
                 resetObjective();
                 return true;

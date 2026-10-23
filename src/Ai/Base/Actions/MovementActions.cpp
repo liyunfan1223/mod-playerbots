@@ -914,6 +914,10 @@ bool MovementAction::IsWaitingForLastMove(MovementPriority priority)
 
 bool MovementAction::IsMovingAllowed()
 {
+    // SotA: stay still on the boat until it reaches the shore (central gate of MoveTo/MoveNear/Follow/Flee)
+    if (botAI->IsOnMovingSaBoat())
+        return false;
+
     return botAI->CanMove();
 }
 

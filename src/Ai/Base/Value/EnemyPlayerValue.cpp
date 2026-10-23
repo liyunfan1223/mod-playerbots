@@ -5,10 +5,79 @@
  */
 
 #include "EnemyPlayerValue.h"
+#include "BattlegroundSA.h"
 #include "CombatManager.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 #include "Vehicle.h"
+
+// Strand of the Ancients helpers. BattlegroundSA does not expose which team attacks (Attackers is private); same
+// approach as SaGetAttackerTeam in BattleGroundTactics.cpp: the defender portals have the defenders' faction
+static bool SaIsAttackerTeam(Battleground* bg, Player* bot)
+{
+    GameObject* portal = bg->GetBGObject(BG_SA_PORTAL_DEFFENDER_BLUE);
+    if (!portal)
+        return false;  // round not set up yet, do not guess
+
+    uint32 const defenderFaction = portal->GetFaction();
+    if (defenderFaction == BG_SA_Factions[TEAM_ALLIANCE])
+        return bot->GetTeamId() == TEAM_HORDE;
+    if (defenderFaction == BG_SA_Factions[TEAM_HORDE])
+        return bot->GetTeamId() == TEAM_ALLIANCE;
+
+    return false;
+}
+
+// a gate that is still standing within reach of the bot
+static bool SaGateInRange(Battleground* bg, Player* bot, float range)
+{
+    static uint32 const gates[] = {BG_SA_GREEN_GATE, BG_SA_BLUE_GATE,   BG_SA_PURPLE_GATE,
+                                   BG_SA_RED_GATE,   BG_SA_YELLOW_GATE, BG_SA_ANCIENT_GATE};
+    for (uint32 id : gates)
+    {
+        GameObject* gate = bg->GetBGObject(id);
+        if (gate && gate->GetDestructibleState() != GO_DESTRUCTIBLE_DESTROYED && bot->IsWithinDist(gate, range))
+            return true;
+    }
+
+    return false;
+}
+
+// a gate that is still standing (or the relic) within reach of this unit: the enemy demolisher is hitting it
+static bool SaSiegeTargetNear(Battleground* bg, Unit* unit, float range)
+{
+    static uint32 const gates[] = {BG_SA_GREEN_GATE, BG_SA_BLUE_GATE,   BG_SA_PURPLE_GATE,
+                                   BG_SA_RED_GATE,   BG_SA_YELLOW_GATE, BG_SA_ANCIENT_GATE};
+    for (uint32 id : gates)
+    {
+        GameObject* gate = bg->GetBGObject(id);
+        if (gate && gate->GetDestructibleState() != GO_DESTRUCTIBLE_DESTROYED && unit->IsWithinDist(gate, range))
+            return true;
+    }
+
+    GameObject* relic = bg->GetBGObject(BG_SA_TITAN_RELIC);
+    return relic && unit->IsWithinDist(relic, range);
+}
+
+// nearest enemy player that is attacking this unit directly
+static Unit* SaNearestPlayerAttacking(Player* bot, Unit* victim)
+{
+    Unit* best = nullptr;
+    for (Unit* attacker : victim->getAttackers())
+    {
+        if (!attacker || !attacker->IsPlayer() || !attacker->IsAlive() || !bot->IsHostileTo(attacker) ||
+            !bot->CanSeeOrDetect(attacker))
+            continue;
+
+        if (!best || bot->GetDistance(attacker) < bot->GetDistance(best))
+            best = attacker;
+    }
+
+    return best;
+}
 
 bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
 {
@@ -54,6 +123,37 @@ Unit* EnemyPlayerValue::Calculate()
             controllingVehicle = true;
     }
 
+    // Strand of the Ancients: the demolishers have to leave the beach, so the attackers do not fight PvP for fun
+    Battleground* saBg = bot->GetBattleground();
+    bool const saAttacker = saBg && saBg->GetBgTypeID() == BATTLEGROUND_SA && SaIsAttackerTeam(saBg, bot);
+    if (saAttacker)
+    {
+        Vehicle* myVehicle = bot->GetVehicle();
+        Unit* myBase = myVehicle ? myVehicle->GetBase() : nullptr;
+        if (myBase && myBase->GetEntry() == NPC_DEMOLISHER_SA)
+        {
+            // inside a demolisher (driver or passenger): break the gates, no PvP while there is a gate in reach.
+            // Only an enemy hitting the demolisher itself, with no gate in reach, is answered.
+            // TODO: 80 yards is a guess for "gate in reach"; the gate stage logic lives in BGTactics, not here
+            if (SaGateInRange(saBg, bot, 80.0f))
+                return nullptr;
+
+            // (driver does not attack on foot) players on foot are never picked from a demolisher: only enemy
+            // demolishers / towers, otherwise no target at all
+            if (Unit* siege = FindEnemySiegeOnFoot())
+                return siege;
+
+            return nullptr;
+        }
+        else if (!myVehicle)
+        {
+            // on foot, not yet in a demolisher: protect the friendly demolishers against enemy players hitting them
+            // TODO: boarding a demolisher is decided by EnterVehicleAction, not here
+            if (Unit* vehicleHitter = FindPlayerAttackingFriendlyDemolisher())
+                return vehicleHitter;
+        }
+    }
+
     // 1. Check units we are currently in PvP combat with.
     std::vector<Unit*> targets;
     Unit* pVictim = bot->GetVictim();
@@ -79,6 +179,46 @@ Unit* EnemyPlayerValue::Calculate()
                   { return bot->GetDistance(pUnit1) < bot->GetDistance(pUnit2); });
 
         return *targets.begin();
+    }
+
+    // 1b. SotA: attackers on foot go for the enemy anti-personnel towers / demolishers instead of idle PvP
+    // TODO: attackers cannot man the towers (defender faction, EnterVehicleAction refuses them), so "use the enemy
+    // tower" is not implemented; they hit it instead. Not confirmed that the attack action accepts a creature from
+    // this value when the bot is on foot
+    if (saAttacker && !bot->GetVehicle())
+        if (Unit* siege = FindEnemySiegeOnFoot())
+            return siege;
+
+    // 1c. SotA defenders (on foot or in a tower): the enemy demolisher that is breaking a gate / the relic comes
+    // before the players in range. TODO: 80 yards is a guess for "hitting the gate", same as above
+    if (saBg && saBg->GetBgTypeID() == BATTLEGROUND_SA && !saAttacker)
+        if (Unit* gateBreaker = FindEnemyDemolisher(true))
+            return gateBreaker;
+
+    // 1d. SotA tower (anti-personnel cannon): the "nearest enemy players" list stops at the grind distance, far less than
+    // the 120 yards of the cannon, so players on foot out of that list were never picked. Search the whole cannon
+    // range for the nearest enemy player (on foot or not) in line of sight.
+    if (controllingCannon && saBg && saBg->GetBgTypeID() == BATTLEGROUND_SA && !saAttacker)
+    {
+        float const towerRange = GetMaxAttackDistance();
+        std::list<Unit*> nearby;
+        Acore::AnyUnfriendlyUnitInObjectRangeCheck towerCheck(bot, bot, towerRange);
+        Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> towerSearcher(bot, nearby, towerCheck);
+        Cell::VisitObjects(bot, towerSearcher, towerRange);
+
+        Unit* nearestPlayer = nullptr;
+        for (Unit* unit : nearby)
+        {
+            if (!unit->IsPlayer() || !unit->IsAlive() || !bot->CanSeeOrDetect(unit) || !bot->IsWithinLOSInMap(unit) ||
+                unit->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) || unit->ToPlayer()->HasSpiritOfRedemptionAura())
+                continue;
+
+            if (!nearestPlayer || bot->GetDistance(unit) < bot->GetDistance(nearestPlayer))
+                nearestPlayer = unit;
+        }
+
+        if (nearestPlayer)
+            return nearestPlayer;
     }
 
     // 2. Find enemy player in range.
@@ -123,6 +263,12 @@ Unit* EnemyPlayerValue::Calculate()
             return pTarget;
     }
 
+    // 2b. SotA: a bot manning an anti-personnel tower shoots the enemy demolishers
+    // TODO: whether the vehicle spell action takes this unit as "current target" is not confirmed; Rocket Blast
+    // damage against demolishers is not confirmed either
+    if (Unit* demolisher = FindEnemyDemolisher())
+        return demolisher;
+
     // 3. Check party attackers.
 
     if (Group* pGroup = bot->GetGroup())
@@ -149,6 +295,102 @@ Unit* EnemyPlayerValue::Calculate()
     return nullptr;
 }
 
+Unit* EnemyPlayerValue::FindEnemyDemolisher(bool requireGate)
+{
+    Battleground* bg = bot->GetBattleground();
+    Vehicle* vehicle = bot->GetVehicle();
+    bool onFoot = false;
+    if (!bg || bg->GetBgTypeID() != BATTLEGROUND_SA)
+        return nullptr;
+
+    if (vehicle)
+    {
+        Unit* base = vehicle->GetBase();
+        if (!base || base->GetEntry() != NPC_ANTI_PERSONNAL_CANNON || !botAI->IsInVehicle(false, true))
+            return nullptr;
+    }
+    else
+    {
+        // on foot: only a defender (the round is set up) and only for a demolisher that is hitting a gate / the relic
+        if (!bg->GetBGObject(BG_SA_PORTAL_DEFFENDER_BLUE) || SaIsAttackerTeam(bg, bot))
+            return nullptr;
+
+        requireGate = true;
+        onFoot = true;
+    }
+
+    float range = GetMaxAttackDistance();
+    if (onFoot)
+        range = std::max(range, 30.0f);  // item O: the 30 yards must be searched
+    std::list<Unit*> units;
+    Acore::AnyUnfriendlyUnitInObjectRangeCheck check(bot, bot, range);
+    Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(bot, units, check);
+    Cell::VisitObjects(bot, searcher, range);
+
+    Unit* best = nullptr;
+    for (Unit* unit : units)
+    {
+        if (unit->GetEntry() != NPC_DEMOLISHER_SA || !unit->IsAlive() || unit->IsFriendlyTo(bot) ||
+            unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || !bot->IsWithinLOSInMap(unit))
+            continue;
+
+        // item O: a defender on foot also hits an enemy demolisher passing within 30 yards of him, even with no
+        // standing gate / relic near it (or with the gate already down)
+        if (requireGate && !SaSiegeTargetNear(bg, unit, 80.0f) && !(onFoot && bot->IsWithinDist(unit, 30.0f)))
+            continue;
+
+        if (!best || bot->GetDistance(unit) < bot->GetDistance(best))
+            best = unit;
+    }
+
+    return best;
+}
+
+Unit* EnemyPlayerValue::FindPlayerAttackingFriendlyDemolisher()
+{
+    float const range = 40.0f;
+    std::list<Unit*> units;
+    Acore::AnyFriendlyUnitInObjectRangeCheck check(bot, bot, range);
+    Acore::UnitListSearcher<Acore::AnyFriendlyUnitInObjectRangeCheck> searcher(bot, units, check);
+    Cell::VisitObjects(bot, searcher, range);
+
+    Unit* best = nullptr;
+    for (Unit* unit : units)
+    {
+        if (unit->GetEntry() != NPC_DEMOLISHER_SA || !unit->IsAlive())
+            continue;
+
+        Unit* hitter = SaNearestPlayerAttacking(bot, unit);
+        if (hitter && bot->IsWithinLOSInMap(hitter) && (!best || bot->GetDistance(hitter) < bot->GetDistance(best)))
+            best = hitter;
+    }
+
+    return best;
+}
+
+Unit* EnemyPlayerValue::FindEnemySiegeOnFoot()
+{
+    float const range = 40.0f;
+    std::list<Unit*> units;
+    Acore::AnyUnfriendlyUnitInObjectRangeCheck check(bot, bot, range);
+    Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(bot, units, check);
+    Cell::VisitObjects(bot, searcher, range);
+
+    Unit* best = nullptr;
+    for (Unit* unit : units)
+    {
+        if ((unit->GetEntry() != NPC_DEMOLISHER_SA && unit->GetEntry() != NPC_ANTI_PERSONNAL_CANNON) ||
+            !unit->IsAlive() || unit->IsFriendlyTo(bot) || unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) ||
+            !bot->IsWithinLOSInMap(unit))
+            continue;
+
+        if (!best || bot->GetDistance(unit) < bot->GetDistance(best))
+            best = unit;
+    }
+
+    return best;
+}
+
 float EnemyPlayerValue::GetMaxAttackDistance()
 {
     if (!bot->GetBattleground())
@@ -162,7 +404,7 @@ float EnemyPlayerValue::GetMaxAttackDistance()
     if (bgType == BATTLEGROUND_RB)
         bgType = bg->GetBgTypeID(true);
 
-    if (bgType == BATTLEGROUND_IC)
+    if (bgType == BATTLEGROUND_IC || bgType == BATTLEGROUND_SA)
     {
         if (botAI->IsInVehicle(false, true))
             return 120.0f;
