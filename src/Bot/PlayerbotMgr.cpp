@@ -28,6 +28,7 @@
 #include "PlayerbotTextMgr.h"
 #include "PlayerbotWorldThreadProcessor.h"
 #include "Playerbots.h"
+#include "RBAC.h"
 #include "RandomPlayerbotMgr.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
@@ -320,7 +321,7 @@ void PlayerbotHolder::HandleBotPackets(WorldSession* session)
     }
 }
 
-void PlayerbotHolder::LogoutAllBots()
+void PlayerbotHolder::LogoutAllBots(bool timed)
 {
     /*
     while (true)
@@ -346,7 +347,7 @@ void PlayerbotHolder::LogoutAllBots()
         if (!botAI || IsSelfBot(bot))
             continue;
 
-        LogoutPlayerBot(bot->GetGUID());
+        LogoutPlayerBot(bot->GetGUID(), timed);
     }
 }
 
@@ -391,13 +392,13 @@ void PlayerbotMgr::CancelLogout()
     }
 }
 
-void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
+bool PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid, bool timed)
 {
     if (Player* bot = GetPlayerBot(guid))
     {
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (!botAI)
-            return;
+            return false;
 
         // Queue group cleanup operation for world thread
         auto cleanupOp = std::make_unique<BotLogoutGroupCleanupOperation>(guid);
@@ -412,38 +413,54 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
         bot->SaveToDB(false, false);
 
         WorldSession* botWorldSessionPtr = bot->GetSession();
-        [[maybe_unused]] WorldSession* masterWorldSessionPtr = nullptr;     // Remove [[maybe_unused]] tag if timed logout implemented.
+        WorldSession* masterWorldSessionPtr = nullptr;
 
+        // Already counting down: finish now for an instant logout, or once the 20-second timer expires.
         if (botWorldSessionPtr->IsLoggingOut())
-            return;
+        {
+            if (!timed || botWorldSessionPtr->ShouldLogOut(time(nullptr)))
+            {
+                std::string message = PlayerbotTextMgr::instance().GetBotTextOrDefault(
+                    "goodbye", "Goodbye!", {});
+                botAI->TellMaster(message);
+                RemoveFromPlayerbotsMap(guid);
+                botWorldSessionPtr->LogoutPlayer(true);
+                delete botWorldSessionPtr;
+            }
+            return true;
+        }
 
         Player* master = botAI->GetMaster();
         if (master)
             masterWorldSessionPtr = master->GetSession();
 
-        // TODO: Review whether or not to implement timed logout.
-        // Unused block. Useful only for timed logout.
-/*
-        // check for instant logout
-        bool logout = botWorldSessionPtr->ShouldLogOut(time(nullptr));
+        // Instant logout checking:
+        bool logout =
+            bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ||
+            bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
+            botWorldSessionPtr->HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT) ||
+            (masterWorldSessionPtr && !masterWorldSessionPtr->GetPlayer()) ||
+            // Master's socket is already gone (EXIT GAME -> EXIT NOW is the most typical cause).
+            // Force instant logout. Without this, the bot restarts its 20-second countdown and fires LogoutPlayer() 20 seconds
+            // after the master's Player object has been deleted, causing the bot's logout to crash on the now deleted master.
+            (masterWorldSessionPtr && masterWorldSessionPtr->IsSocketClosed()) ||
+            (masterWorldSessionPtr && masterWorldSessionPtr->ShouldLogOut(time(nullptr))) ||
+            // If the bot's master holds RBAC_PERM_INSTANT_LOGOUT, so does the bot.
+            (master &&
+                (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ||
+                 master->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
+                 (masterWorldSessionPtr &&
+                  masterWorldSessionPtr->HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT))));
 
-        if (masterWorldSessionPtr && masterWorldSessionPtr->ShouldLogOut(time(nullptr)))
-            logout = true;
+        if (timed && !logout)
+        {
+            // Start the 20-second logout countdown. CancelLogout() can interrupt this.
+            WorldPackets::Character::LogoutRequest data = WorldPacket(CMSG_LOGOUT_REQUEST);
+            botWorldSessionPtr->HandleLogoutRequestOpcode(data);
+            // Core may refuse the request in combat, while falling, dueling, or AFK, and clears the timer.
+            return botWorldSessionPtr->IsLoggingOut();
+        }
 
-        if (masterWorldSessionPtr && !masterWorldSessionPtr->GetPlayer())
-            logout = true;
-
-        if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || bot->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
-            botWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
-            logout = true;
-
-        if (master &&
-            (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || master->HasUnitState(UNIT_STATE_IN_FLIGHT) ||
-             (masterWorldSessionPtr &&
-              masterWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))))
-            logout = true;
-*/
-        // Instant logout (the only option right now)
         {
             std::string message = PlayerbotTextMgr::instance().GetBotTextOrDefault(
                 "goodbye", "Goodbye!", {});
@@ -452,7 +469,10 @@ void PlayerbotHolder::LogoutPlayerBot(ObjectGuid guid)
             botWorldSessionPtr->LogoutPlayer(true);     // this will delete the bot Player object and PlayerbotAI object
             delete botWorldSessionPtr;                  // finally delete the bot's WorldSession
         }
+        return true;
     }
+
+    return false;
 }
 
 void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
@@ -461,9 +481,8 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
     {
         PlayerbotAI* botAI = GET_PLAYERBOT_AI(bot);
         if (!botAI)
-        {
             return;
-        }
+
         botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
             "goodbye", "Goodbye!", {}));
         bot->StopMoving();
@@ -471,14 +490,10 @@ void PlayerbotHolder::DisablePlayerBot(ObjectGuid guid)
 
         Group* group = bot->GetGroup();
         if (group && !bot->InBattleground() && !bot->InBattlegroundQueue() && IsRealPlayer(botAI->GetMaster()))
-        {
             PlayerbotRepository::instance().Save(botAI);
-        }
 
         LOG_DEBUG("playerbots", "Bot {} logged out", bot->GetName().c_str());
-
         bot->SaveToDB(false, false);
-
         RemoveFromPlayerbotsMap(guid);  // deletes bot player ptr inside this WorldSession PlayerBotMap
 
         delete botAI;
@@ -761,7 +776,9 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
         if (!GetPlayerBot(guid))
             return "not your bot";
 
-        LogoutPlayerBot(guid);
+        if (!LogoutPlayerBot(guid, true))
+            return "bot cannot logout right now";
+
         return "ok";
     }
 
@@ -1640,12 +1657,10 @@ void PlayerbotMgr::HandleMasterIncomingPacket(WorldPacket const& packet)
                                         && master->isAFK();
 
                 if (preventAfkSanctuaryLogout || preventAfkLogout)
-                {
                     break;
-                }
             }
 
-            LogoutAllBots();
+            LogoutAllBots(true);
             break;
         }
         // if master cancelled logout, cancel too

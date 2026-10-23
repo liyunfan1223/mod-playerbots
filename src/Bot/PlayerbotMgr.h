@@ -37,7 +37,7 @@ public:
     bool IsAccountLinked(uint32 accountId, uint32 masterAccountId);
     void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder, WorldSession* botSession);
 
-    void LogoutPlayerBot(ObjectGuid guid);
+    bool LogoutPlayerBot(ObjectGuid guid, bool timed = false);
     void DisablePlayerBot(ObjectGuid guid);
     void RemoveFromPlayerbotsMap(ObjectGuid guid);
     Player* GetPlayerBot(ObjectGuid guid) const;
@@ -51,7 +51,7 @@ public:
     static void UpdatePendingLogins();  // world thread, once per tick
     static void ClearPendingLogins();   // shutdown, outside any callback
 
-    void LogoutAllBots();
+    void LogoutAllBots(bool timed = false);
     void OnBotLogin(Player* const bot);
 
     std::vector<std::string> HandlePlayerbotCommand(char const* args, Player* master = nullptr);
