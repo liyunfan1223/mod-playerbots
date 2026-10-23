@@ -55,6 +55,11 @@ protected:
     bool TurnInQuest(Quest const* quest, ObjectGuid guid);
     bool OrganizeQuestLog();
 
+    /* STUCK / UNUSABLE AREA RECOVERY */
+    WorldPosition FindRecoveryAnchor();
+    bool IsStrandedInOpenWater();
+    bool RecoverToRpgArea();
+
 protected:
     bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete = false);
     static WorldPosition SelectRandomGrindPos(Player* bot);
@@ -74,6 +79,11 @@ protected:
     // the teleport fires, but long enough that a genuine long
     // walk that is slowly making progress never triggers it.
     const uint32 stuckTime = 90 * IN_MILLISECONDS;
+
+    /* FOR RECOVERY */
+    // A same-zone anchor closer than this means the bot is already in a serviced area
+    // (city, quest hub) whose level cache has no entries: recovering would only bounce it
+    // to a point at its feet.
 };
 
 #endif

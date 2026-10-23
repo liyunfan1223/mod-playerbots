@@ -409,6 +409,11 @@ Playerbots.SpellDistance = 28.5
 Playerbots.ShootDistance = 5.0
 Playerbots.HealDistance = 38.5
 Playerbots.LootDistance = 15.0
+
+# Let the new RPG status logic recover a bot stranded outside usable RPG areas (open water,
+# unreachable terrain) by walking or swimming it back to the nearest regular anchor.
+# Default: 0 (opt-in)
+Playerbots.RpgAreaRecovery = 0
 Playerbots.FleeDistance = 5.0
 Playerbots.AggroDistance = 22
 Playerbots.TooCloseDistance = 5.0

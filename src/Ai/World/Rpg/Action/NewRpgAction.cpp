@@ -273,8 +273,8 @@ bool NewRpgStatusUpdateAction::Execute(Event /*event*/)
             auto& data = std::get<NewRpgInfo::GoCamp>(info.data);
             WorldPosition& originalPos = data.pos;
             assert(data.pos != WorldPosition());
-            // GO_CAMP -> WANDER_NPC
-            if (bot->GetExactDist(originalPos) < 10.0f)
+            // Keep camping while still stranded: a near anchor must not flip the status early.
+            if (bot->GetExactDist(originalPos) < 10.0f && !IsStrandedInOpenWater())
             {
                 info.ChangeToWanderNpc();
                 return true;
