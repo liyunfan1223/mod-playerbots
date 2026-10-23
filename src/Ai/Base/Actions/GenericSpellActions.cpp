@@ -15,6 +15,8 @@
 #include "Player.h"
 #include "PlayerbotAI.h"
 #include "Playerbots.h"
+#include "BattlegroundSA.h"
+#include "Vehicle.h"
 #include "ServerFacade.h"
 #include "WorldPacket.h"
 #include <ctime>
@@ -480,8 +482,23 @@ std::string const CastProtectSpellAction::GetTargetName() { return "party member
 
 bool CastProtectSpellAction::isUseful() { return GetTarget() && !botAI->HasAura(spell, GetTarget()); }
 
+// a tower (fixed cannon seat) shoots what the enemy player value picked (players on foot, demolishers); the other
+// vehicles keep the current target
+std::string const CastVehicleSpellAction::GetTargetName()
+{
+    return botAI->IsInVehicle(false, false, false, false, true) ? "enemy player target" : "current target";
+}
+
 bool CastVehicleSpellAction::isPossible()
 {
+    // I (motorista não ataca a pé): a demolisher never shoots at players on foot, only gates, relic, demolishers, towers
+    if (Vehicle* vehicle = bot->GetVehicle())
+        if (Unit* base = vehicle->GetBase())
+            if (base->GetEntry() == NPC_DEMOLISHER_SA)
+                if (Unit* target = GetTarget())
+                    if (target->IsPlayer() && !target->GetVehicle())
+                        return false;
+
     uint32 spellId = AI_VALUE2(uint32, "vehicle spell id", spell);
     return botAI->CanCastVehicleSpell(spellId, GetTarget());
 }

@@ -12,6 +12,11 @@
 
 class ChatHandler;
 class Battleground;
+class Unit;
+
+bool SaTowerGateDestroyed(Battleground* bg, Unit* tower);
+bool SaTowerPhaseActive(Battleground* bg, Unit* tower);
+
 class PlayerbotAI;
 struct Position;
 
@@ -133,6 +138,10 @@ private:
     uint32 getPlayersInArea(TeamId teamId, Position point, float range, bool combat = true);
     bool IsLockedInsideKeep();
 };
+
+// item S (warmup: 30 s de buffs, depois movimento, ataque e defesa): true while the SA warmup buff window (30 s per
+// bot, counted from the first warmup tick it sees) is still open; false outside SA / outside the warmup
+bool SaWarmupBuffsActive(Player* bot);
 
 class ArenaTactics : public MovementAction
 {

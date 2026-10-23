@@ -38,6 +38,9 @@ public:
 
 private:
     float GetMaxAttackDistance();
+    Unit* FindEnemyDemolisher(bool requireGate = false);
+    Unit* FindPlayerAttackingFriendlyDemolisher();
+    Unit* FindEnemySiegeOnFoot();
 };
 
 #endif

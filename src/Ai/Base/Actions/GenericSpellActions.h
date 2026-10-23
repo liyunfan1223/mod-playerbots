@@ -398,7 +398,7 @@ public:
         range = 120.0f;
     }
 
-    std::string const GetTargetName() override { return "current target"; }
+    std::string const GetTargetName() override;
     bool Execute(Event event) override;
     bool isUseful() override;
     bool isPossible() override;

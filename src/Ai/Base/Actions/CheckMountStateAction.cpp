@@ -203,8 +203,16 @@ bool CheckMountStateAction::isUseful()
 
         // Only mount if BG starts in less than 30 sec
         if (Battleground* bg = bot->GetBattleground())
-            if (bg->GetStatus() == STATUS_WAIT_JOIN && bg->GetStartDelayTime() > BG_START_DELAY_30S)
+        {
+            // item S: SA warmup lasts 120 s (round 1) / 60 s (round 2): mount once the 30 s buff window is over
+            if (bg->GetBgTypeID() == BATTLEGROUND_SA)
+            {
+                if (SaWarmupBuffsActive(bot))
+                    return false;
+            }
+            else if (bg->GetStatus() == STATUS_WAIT_JOIN && bg->GetStartDelayTime() > BG_START_DELAY_30S)
                 return false;
+        }
     }
 
     return true;
