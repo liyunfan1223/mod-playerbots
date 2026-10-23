@@ -14,7 +14,6 @@
 #include "BattleGroundTactics.h"
 #include "BotStateActions.h"
 #include "BuyAction.h"
-#include "BuyExtendedCostItemAction.h"
 #include "CancelChannelAction.h"
 #include "CastCustomSpellAction.h"
 #include "ChangeStrategyAction.h"
@@ -200,7 +199,6 @@ public:
         creators["disenchant random item"] = &ActionContext::disenchant_random_item;
         creators["enchant random item"] = &ActionContext::enchant_random_item;
         creators["reset instances"] = &ActionContext::reset_instances;
-        creators["buy extended cost item"] = &ActionContext::buy_extended_cost_item;
         creators["buy petition"] = &ActionContext::buy_petition;
         creators["offer petition"] = &ActionContext::offer_petition;
         creators["offer petition nearby"] = &ActionContext::offer_petition_nearby;
@@ -407,7 +405,6 @@ private:
     static Action* disenchant_random_item(PlayerbotAI* botAI) { return new DisEnchantRandomItemAction(botAI); }
     static Action* enchant_random_item(PlayerbotAI* botAI) { return new EnchantRandomItemAction(botAI); }
     static Action* reset_instances(PlayerbotAI* botAI) { return new ResetInstancesAction(botAI); }
-    static Action* buy_extended_cost_item(PlayerbotAI* botAI) { return new BuyExtendedCostItemAction(botAI); }
     static Action* buy_petition(PlayerbotAI* botAI) { return new BuyPetitionAction(botAI); }
     static Action* offer_petition(PlayerbotAI* botAI) { return new PetitionOfferAction(botAI); }
     static Action* offer_petition_nearby(PlayerbotAI* botAI) { return new PetitionOfferNearbyAction(botAI); }
