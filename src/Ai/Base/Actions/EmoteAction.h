@@ -15,7 +15,7 @@ class Player;
 class PlayerbotAI;
 class Unit;
 
-enum TextEmotes : uint32;
+#include "SharedDefines.h"
 
 class EmoteActionBase : public Action
 {

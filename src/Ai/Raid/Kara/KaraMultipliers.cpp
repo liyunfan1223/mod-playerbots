@@ -26,10 +26,13 @@
 
 using namespace KaraHelpers;
 
-// General
+// Shared
 
 float KarazhanSetTremorTotemMultiplier::GetValue(Action* action)
 {
+    if (botAI->GetState() == BOT_STATE_NON_COMBAT)
+        return 1.0f;
+
     if (bot->getClass() != CLASS_SHAMAN)
         return 1.0f;
 
@@ -46,7 +49,8 @@ float KarazhanSetTremorTotemMultiplier::GetValue(Action* action)
         return 0.0f;
 
     if (AI_VALUE2(Unit*, "find target", "spectral charger") ||
-        AI_VALUE2(Unit*, "find target", "the big bad wolf"))
+        AI_VALUE2(Unit*, "find target", "the big bad wolf") ||
+        AI_VALUE2(Unit*, "find target", "roar"))
     {
         return 0.0f;
     }

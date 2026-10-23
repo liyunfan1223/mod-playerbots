@@ -17,6 +17,7 @@ public:
     ChatCommandHandlerStrategy(PlayerbotAI* botAI);
 
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitReactionTriggers(std::vector<TriggerNode*>& triggers) override;
     std::string const getName() override { return "chat"; }
 };
 

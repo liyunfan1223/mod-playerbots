@@ -11,7 +11,7 @@
 
 class PlayerbotAI;
 
-// Keeps a bot from wandering past AiPlayerbot.LeashDistance from the group
+// Keeps a bot from wandering past Playerbots.LeashDistance from the group
 // leader while an independent-movement strategy (new rpg, grind, ...) is also
 // active. Those strategies propose their own movement actions at relevance
 // 3.0-11.0 (see NewRpgStrategy::getDefaultActions, "the relevance should be

@@ -10,10 +10,12 @@
 #include "ChatHelper.h"
 #include "Creature.h"
 #include "GameObject.h"
+#include "GatherNodeMgr.h"
 #include "GossipDef.h"
 #include "GridTerrainData.h"
 #include "IVMapMgr.h"
 #include "NewRpgInfo.h"
+#include "QuestLevelRules.h"
 #include "NewRpgStrategy.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
@@ -50,14 +52,15 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
     if (bot->IsInFlight())
         return true;
 
-    if (dest != botAI->rpgInfo.moveFarPos)
+    bool newDest = dest != botAI->rpgInfo.moveFarPos;
+    if (newDest)
     {
         // clear stuck information if it's a new dest
         botAI->rpgInfo.SetMoveFarTo(dest);
     }
 
     // performance optimization
-    if (IsWaitingForLastMove(MovementPriority::MOVEMENT_NORMAL))
+    if (!newDest && IsWaitingForLastMove(MovementPriority::MOVEMENT_NORMAL))
     {
         return false;
     }
@@ -80,6 +83,12 @@ bool NewRpgBaseAction::MoveFarTo(WorldPosition dest)
     // finish. The stuck counter below continues to track real
     // progress toward dest and triggers teleport recovery if the
     // committed paths genuinely aren't closing the gap.
+    //
+    // A changed destination (e.g. the gather state switching to a
+    // live node it passes, or a quest POI change) skips this gate:
+    // letting the old spline finish would keep walking the bot
+    // toward a target it no longer has.
+    if (!newDest)
     {
         LastMovement& lastMove = AI_VALUE(LastMovement&, "last movement");
         if (bot->isMoving() && lastMove.lastMoveToMapId == bot->GetMapId())
@@ -330,7 +339,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
                     "Quest accepted %quest",
                     {{"%quest", ChatHelper::FormatQuest(quest)}}));
             BroadcastHelper::BroadcastQuestAccepted(botAI, bot, quest);
-            botAI->rpgStatistic.questAccepted++;
+            botAI->RecordQuestAccepted(quest->GetQuestId());
             LOG_DEBUG("playerbots", "[New RPG] {} accept quest {}", bot->GetName(), quest->GetQuestId());
         }
         if (status == QUEST_STATUS_COMPLETE && bot->CanRewardQuest(quest, 0, false))
@@ -342,7 +351,7 @@ bool NewRpgBaseAction::InteractWithNpcOrGameObjectForQuest(ObjectGuid guid)
                     "Quest rewarded %quest",
                     {{"%quest", ChatHelper::FormatQuest(quest)}}));
             BroadcastHelper::BroadcastQuestTurnedIn(botAI, bot, quest);
-            botAI->rpgStatistic.questRewarded++;
+            botAI->RecordQuestRewarded(quest->GetQuestId());
             LOG_DEBUG("playerbots", "[New RPG] {} turned in quest {}", bot->GetName(), quest->GetQuestId());
         }
     }
@@ -542,7 +551,12 @@ uint32 NewRpgBaseAction::BestRewardIndex(Quest const* quest)
             ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", quest->RewardChoiceItemId[i]);
             if (usage == bestUsage || usage == ITEM_USAGE_REPLACE)
             {
-                float score = calc.CalculateItem(quest->RewardChoiceItemId[i]);
+                uint32 const itemId = quest->RewardChoiceItemId[i];
+                ItemTemplate const* rewardProto = sObjectMgr->GetItemTemplate(itemId);
+                uint8 rewardSlot = NULL_SLOT;
+                if (rewardProto)
+                    rewardSlot = botAI->FindEquipSlot(rewardProto, NULL_SLOT, true);
+                float score = calc.CalculateItem(itemId, 0, rewardSlot);
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -573,7 +587,7 @@ bool NewRpgBaseAction::IsQuestWorthDoing(Quest const* quest)
 
 bool NewRpgBaseAction::IsQuestCapableDoing(Quest const* quest)
 {
-    bool highLevelQuest = bot->GetLevel() + 3 < bot->GetQuestLevel(quest);
+    bool highLevelQuest = bot->GetLevel() + QUEST_MAX_LEVELS_ABOVE_BOT < bot->GetQuestLevel(quest);
     if (highLevelQuest)
         return false;
 
@@ -612,9 +626,14 @@ bool NewRpgBaseAction::OrganizeQuestLog()
             continue;
 
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-        if (!IsQuestWorthDoing(quest) || !IsQuestCapableDoing(quest) ||
-            bot->GetQuestStatus(questId) == QUEST_STATUS_FAILED)
+        bool const worthDoing = IsQuestWorthDoing(quest);
+        bool const capableDoing = IsQuestCapableDoing(quest);
+        bool const failed = bot->GetQuestStatus(questId) == QUEST_STATUS_FAILED;
+        if (!worthDoing || !capableDoing || failed)
         {
+            QuestDropReason const reason = !worthDoing    ? QuestDropReason::NotWorth
+                                           : !capableDoing ? QuestDropReason::NotCapable
+                                                           : QuestDropReason::Failed;
             LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), questId);
             WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
             packet << (uint8)i;
@@ -626,7 +645,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
                     "new_rpg_quest_dropped",
                     "Quest dropped %quest",
                     {{"%quest", ChatHelper::FormatQuest(quest)}}));
-            botAI->rpgStatistic.questDropped++;
+            botAI->RecordQuestDropped(questId, reason);
             dropped++;
         }
     }
@@ -645,8 +664,11 @@ bool NewRpgBaseAction::OrganizeQuestLog()
         Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
         const int64_t botZoneId = this->bot->GetZoneId();
 
-        if (quest->GetZoneOrSort() < 0 || (quest->GetZoneOrSort() > 0 && quest->GetZoneOrSort() != botZoneId))
+        int32 const zoneOrSort = quest->GetZoneOrSort();
+        if (zoneOrSort < 0 || (zoneOrSort > 0 && zoneOrSort != botZoneId))
         {
+            QuestDropReason const reason = zoneOrSort < 0 ? QuestDropReason::ClassOrHoliday
+                                                          : QuestDropReason::OtherZone;
             LOG_DEBUG("playerbots", "[New RPG] {} drop quest {}", bot->GetName(), questId);
             WorldPacket packet(CMSG_QUESTLOG_REMOVE_QUEST);
             packet << (uint8)i;
@@ -658,7 +680,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
                     "new_rpg_quest_dropped",
                     "Quest dropped %quest",
                     {{"%quest", ChatHelper::FormatQuest(quest)}}));
-            botAI->rpgStatistic.questDropped++;
+            botAI->RecordQuestDropped(questId, reason);
             dropped++;
         }
     }
@@ -685,7 +707,7 @@ bool NewRpgBaseAction::OrganizeQuestLog()
                 "new_rpg_quest_dropped",
                 "Quest dropped %quest",
                 {{"%quest", ChatHelper::FormatQuest(quest)}}));
-        botAI->rpgStatistic.questDropped++;
+        botAI->RecordQuestDropped(questId, QuestDropReason::LogFull);
     }
 
     return true;
@@ -697,6 +719,9 @@ bool NewRpgBaseAction::SearchQuestGiverAndAcceptOrReward()
     if (ObjectGuid npcOrGo = ChooseNpcOrGameObjectToInteract(true, 80.0f))
     {
         WorldObject* object = ObjectAccessor::GetWorldObject(*bot, npcOrGo);
+        if (!object)
+            return false;
+
         if (bot->CanInteractWithQuestGiver(object))
         {
             InteractWithNpcOrGameObjectForQuest(npcOrGo);
@@ -814,7 +839,7 @@ bool NewRpgBaseAction::HasQuestToAcceptOrReward(WorldObject* object)
 }
 
 // True when either the "leash" strategy isn't active for this bot, the bot
-// has no real-player master, or (x, y) is within AiPlayerbot.LeashDistance of
+// has no real-player master, or (x, y) is within Playerbots.LeashDistance of
 // that master. Gates every destination new rpg's own status-selection can
 // pick (grind/camp/quest POIs) so it never proposes something a "leash too
 // far" recall (LeashStrategy.cpp) would just walk the bot straight back out
@@ -831,7 +856,7 @@ static bool WithinLeashRange(Player* bot, float x, float y)
     if (!master)
         return true;
 
-    return master->GetDistance2d(x, y) <= sPlayerbotAIConfig.leashDistance;
+    return master->GetDistance2d(x, y) <= sPlayerbotAIConfig.LeashDistance;
 }
 
 // Picks ONE real point from a QuestPOI's spawn/interaction points --
@@ -1274,6 +1299,11 @@ bool NewRpgBaseAction::RandomChangeStatus(std::vector<NewRpgStatus> candidateSta
             }
             return false;
         }
+        case RPG_DO_GATHER:
+        {
+            botAI->rpgInfo.ChangeToDoGather();
+            return true;
+        }
         case RPG_IDLE:
         {
             botAI->rpgInfo.ChangeToIdle();
@@ -1343,6 +1373,18 @@ bool NewRpgBaseAction::CheckRpgStatusAvailable(NewRpgStatus status)
                 }
             }
             return false;
+        }
+        case RPG_DO_GATHER:
+        {
+            if (!botAI->HasSkill(SKILL_HERBALISM) && !botAI->HasSkill(SKILL_MINING))
+                return false;
+
+            // No point farming with (nearly) full bags - the loot pipeline
+            // can't store the harvest (see StoreLootAction).
+            if (AI_VALUE(uint8, "bag space") > 80)
+                return false;
+
+            return sGatherNodeMgr.HasUsableNodes(bot);
         }
         case RPG_TRAVEL_FLIGHT:
         {

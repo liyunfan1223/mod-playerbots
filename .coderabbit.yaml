@@ -1,0 +1,222 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit config for mod-playerbots, adapted from azerothcore-wotlk/.coderabbit.yml.
+language: en-US
+
+tone_instructions: |
+  Be terse: at most three sentences per finding.
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  fail_commit_status: false
+
+  # Inline findings only; no per-PR boilerplate.
+  high_level_summary: false
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  assess_linked_issues: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: true
+  auto_apply_labels: true
+  suggested_reviewers: false
+  review_status: false
+  review_details: false
+  in_progress_fortune: false
+  poem: false
+  enable_prompt_for_ai_agents: false
+  collapse_walkthrough: true
+
+  labeling_instructions:
+    - label: "Multibot requires update"
+      instructions: |
+        Apply this label only when the PR requires a corresponding change in MultiBot-Chatless
+        (https://github.com/Wishmaster117/MultiBot-Chatless) or mod-multibot-bridge
+        (https://github.com/Wishmaster117/mod-multibot-bridge).
+
+        The integration surface is limited to playerbot chat controls: apply the label when a player-facing
+        chat command is added, removed, renamed, or has its syntax, subcommands, arguments, aliases, or
+        machine-consumed response format changed. Also apply when a strategy name that a player can select,
+        enable, disable, or otherwise manage through a playerbot chat command is added, removed, or renamed.
+
+        Do not apply the label for internal AI actions, triggers, values, strategies, states, stances,
+        configuration, item/equipment logic, bot lifecycle/management code, or ordinary chat text unless the
+        PR also changes the player-facing chat-control contract above. File paths and identifiers alone are
+        insufficient evidence: changes in ChatHelper, ChatActionContext, ChatTriggerContext,
+        ChatCommandHandlerStrategy, ChatShortcutActions, ChatFilter, ListSpellsAction, or similarly named
+        files do not require the label unless they alter that contract.
+
+        Examples that must not receive the label: refactors or bug fixes in chat helpers; changes to internal
+        strategy/action/trigger names that cannot be managed through chat; and gameplay changes such as
+        fleeing, item evaluation, selfbot behavior, or core-hook alignment.
+
+  pre_merge_checks:
+    docstrings:
+      mode: "off"
+    title:
+      mode: "off"
+    description:
+      mode: "off"
+    issue_assessment:
+      mode: "off"
+
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+    simplify:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: false
+    drafts: false
+    base_branches:
+      - "test-staging"
+    ignore_title_keywords:
+      # Promotion PRs test-staging -> master; already reviewed.
+      - "Test staging"
+      - "WIP"
+      - "DO NOT MERGE"
+      - "skip-review"
+
+  path_filters:
+    - "!data/sql/playerbots/base/**"
+    - "!data/sql/playerbots/create/**"
+    - "!data/sql/playerbots/archive/**"
+    - "!data/sql/characters/base/**"
+    - "!data/sql/world/base/**"
+    - "!README_CN.md"
+    - "!README_ES.md"
+    - "!**/*.png"
+
+  path_instructions:
+    - path: "src/**/*.{cpp,h,hpp}"
+      instructions: |
+        AzerothCore C++ code standards (https://www.azerothcore.org/wiki/cpp-code-standards);
+        flag violations:
+        - C++20. 4-space indent, tabs forbidden. UTF-8, LF, max 120 columns, trailing newline,
+          no trailing whitespace. Formatting is defined by .clang-format (Google base, Allman).
+        - Allman braces. No braces around single-line statements. `if (x)`, never `if(x)` or
+          `if ( x )`. `switch` always has a `default` case; use `[[fallthrough]]`.
+        - Naming: methods and public/protected members UpperCamelCase; private members
+          `_lowerCamelCase`; locals and parameters lowerCamelCase. No Hungarian notation.
+        - Float literals always carry the `f` suffix: `1.0f`, `234.3456f`.
+        - Pointer/reference star binds to the type: `Player* player`, never `Player *player`.
+          One pointer declaration per line. `const` after the type: `Player const* player`.
+          `static` first: `static float const x = 1.0f;`.
+        - No magic numbers: named `constexpr` or `enum`/`enum class`, never `#define`.
+          Prefixes: SPELL_, NPC_, ITEM_, GO_, QUEST_, SAY_, EMOTE_, EVENT_, DATA_, ACHIEV_.
+        - Never redefine `me`; it is reserved for the scripted object pointer.
+        - Header guards on every header. New files carry the mod-playerbots GPLv2 header.
+        - Logging: `LOG_INFO("playerbots", "msg {}", arg)` (also LOG_WARN/ERROR/DEBUG) with
+          fmt-style `{}`; never printf-style `%u`/`%s`, `sLog->`, or `printf`.
+        - Random: Random.h helpers (urand, irand, frand, rand_chance, roll_chance_f/i);
+          never `std::rand`, `rand()`, or `<random>` directly.
+        - Config: `sConfigMgr->GetOption<T>("Name", default)` at load time into
+          sPlayerbotAIConfig; never read config inside per-tick code.
+        - Never store a raw Player*/Creature*/Unit* past the current call or tick; store the
+          ObjectGuid and resolve at use time via ObjectAccessor or Map lookups.
+        - DB access: PreparedStatement, not raw query strings. Multi-statement writes wrap in
+          SQLTransaction.
+        - Namespace is `Acore::`; flag any `Trinity::` left over from ports.
+
+        Code comments: these should be used only where the code alone would mislead or context is
+        crucial to understanding it, such as a counterintuitive reason, an AzerothCore or spell-data
+        quirk, a known limitation, or an unusual game mechanic. They should never narrate change
+        history or conversations with the author. Flag any new or changed comment in violation of
+        these standards. Further, comments of more than two lines should be used only in exceptional
+        cases, and therefore flag any new or changed non-exceptional comment longer than two lines.
+        The GPLv2 file header is exempt.
+
+        mod-playerbots architecture rules (CLAUDE.md). The project's stated philosophy is
+        "stability, performance, and predictability over behavioral realism"; every action,
+        trigger, and value runs per bot per tick across thousands of bots:
+        - Threading: bot AI runs on map threads (Player::Update -> OnPlayerAfterUpdate).
+          Anything that touches groups, guilds, sessions, or other non-thread-safe world
+          state must be queued through PlayerbotWorldThreadProcessor, not called directly.
+          Flag new shared mutable state (statics, singletons, caches) without a mutex.
+        - No synchronous DB queries (`*Database.Query`/`PQuery`) in code reachable from map
+          thread AI: actions, triggers, values, strategies, PlayerbotAI. They block every bot
+          on that map. Factory and login paths on the world thread are the only exception.
+        - Triggers must be O(1) and cheap; they are evaluated every tick for every active
+          strategy. No iteration over the quest log, inventory, nearby units, or group
+          members inside Trigger::IsActive without a cached value.
+        - Actions gate expensive work behind isUseful()/isPossible(); Execute() must not run a
+          full search just to return false. Values that scan the world must cache with a
+          check interval.
+        - Three engines per bot (COMBAT, NON_COMBAT, DEAD); state transitions happen only in
+          PlayerbotAI::DoNextAction(). Flag engine switches elsewhere.
+        - Relevance uses the named bands from Strategy.h (ACTION_DEFAULT 5, ACTION_NORMAL 10,
+          ACTION_HIGH 20, ACTION_MOVE 30, ACTION_INTERRUPT 40, ACTION_DISPEL 50, ACTION_RAID
+          60, ACTION_EMERGENCY 90) plus a small offset. Flag bare floats that sit between bands
+          and any comment that justifies a number by listing competing actions.
+        - Multipliers scale relevance (`relevance *= GetValue(action)`; the base class returns
+          1.0f) and a result of 0 drops the action for that tick.
+        - Shared code (base actions, shared values, engine helpers) must not branch on
+          `botAI->HasStrategy("name")`; express variation as a trigger, multiplier, relevance,
+          or virtual override the strategy owns.
+        - Strategies in a sibling group (NamedObjectContext<Strategy>(shared, true), e.g.
+          follow/stay/guard/flee) are mutually exclusive; a strategy outside the group must not
+          queue the group's actions.
+        - One action, one job: an Execute() that cascades through several unrelated fallbacks
+          re-implements the relevance queue and should be split into separate actions.
+        - First-match-wins over a container ordered by ID (e.g. the quest status map) is an
+          arbitrary decision; collect candidates and choose by the real criterion.
+        - Anything a bot says in chat goes through GetBotTextOrDefault with an English
+          fallback and a translation SQL update under data/sql/playerbots/updates/.
+        - Expensive or behavior-changing features are opt-in via playerbots.conf.dist; flag
+          shared-code changes that ship ungated alongside a gated feature.
+
+        AI wiring (unregistered names compile but silently never run; check these first):
+        - Every new action name is registered in src/Ai/Base/ActionContext.h (creators["name"])
+          or the class's *AiObjectContext.cpp; every new trigger in TriggerContext.h; every
+          new strategy in StrategyContext.h or the class context.
+        - Chat-driven features are registered in ChatActionContext.h / ChatTriggerContext.h and
+          handled by ChatCommandHandlerStrategy.
+        - Names used in NextAction("..."), TriggerNode("..."), and engine->addStrategy("...")
+          in AiFactory.cpp must match a registered creator exactly (spelling, spaces, case).
+        - New bot text uses a stable key with matching rows in a translation SQL update.
+
+        Runtime safety (map-thread code; a crash takes the whole map down):
+        - Never dereference the result of a GUID, target, pet, or map lookup without a null
+          check; prefer early exits for guard conditions.
+        - Do not use a Unit/Object from a different map than the bot.
+        - An override that replaces a base Execute()/IsActive() must either call the base or
+          preserve the base's guards and side effects; flag silent drops.
+        - Check overload signatures before copying a nearby call pattern, e.g.
+          PlayerbotAI::CanCastSpell has string, spell-id, GameObject, and coordinate forms.
+        - Flag changes to default strategies, command routing, or target selection that alter
+          existing behavior without the PR saying so.
+        - A PR that depends on core changes outside modules/mod-playerbots (a companion PR to
+          mod-playerbots/azerothcore-wotlk) must say so; flag it as a compatibility risk.
+
+  tools:
+    # False positives without compile_commands.json and core headers.
+    clang:
+      enabled: false
+    fbinfer:
+      enabled: false
+    cppcheck:
+      enabled: true
+    languagetool:
+      enabled: false
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "PULL_REQUEST_TEMPLATE.md"
+
+chat:
+  auto_reply: true

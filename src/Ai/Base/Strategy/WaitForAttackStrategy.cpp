@@ -64,7 +64,7 @@ uint8 WaitForAttackStrategy::GetWaitTime(PlayerbotAI* botAI)
 
 float WaitForAttackStrategy::GetSafeDistance()
 {
-    return sPlayerbotAIConfig.spellDistance;
+    return sPlayerbotAIConfig.SpellDistance;
 }
 
 float WaitForAttackMultiplier::GetValue(Action* action)

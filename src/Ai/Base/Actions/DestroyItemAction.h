@@ -20,6 +20,7 @@ public:
     bool Execute(Event event) override;
 
 protected:
+    // Destroys every match. An unsaved Item is deleted here, so callers must not hold Item* across this.
     void DestroyItem(FindItemVisitor* visitor);
 };
 
@@ -30,6 +31,9 @@ public:
 
     bool Execute(Event event) override;
     bool isUseful() override;
+
+private:
+    bool DestroyUntilBagSpace(std::vector<uint32> const& itemIds);
 };
 
 #endif

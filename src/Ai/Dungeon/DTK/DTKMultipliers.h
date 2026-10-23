@@ -12,7 +12,7 @@
 class NovosMultiplier : public Multiplier
 {
     public:
-        NovosMultiplier(PlayerbotAI* ai) : Multiplier(ai, "novos the summoner") {}
+        NovosMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "novos the summoner") {}
 
     public:
         float GetValue(Action* action) override;
@@ -21,7 +21,7 @@ class NovosMultiplier : public Multiplier
 class TharonjaMultiplier : public Multiplier
 {
     public:
-        TharonjaMultiplier(PlayerbotAI* ai) : Multiplier(ai, "the prophet tharon'ja") {}
+        TharonjaMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "the prophet tharon'ja") {}
 
     public:
         float GetValue(Action* action) override;

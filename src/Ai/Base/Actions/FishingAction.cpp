@@ -272,9 +272,9 @@ bool MoveNearWaterAction::isPossible()
     float fishingSearchWindow;
 
     if (master)
-        fishingSearchWindow = sPlayerbotAIConfig.fishingDistanceFromMaster;
+        fishingSearchWindow = sPlayerbotAIConfig.FishingDistanceFromMaster;
     else
-        fishingSearchWindow = sPlayerbotAIConfig.fishingDistance;
+        fishingSearchWindow = sPlayerbotAIConfig.FishingDistance;
 
     WorldPosition fishingHole = FindFishingHole(botAI);
 
@@ -497,7 +497,7 @@ bool EndMasterFishingAction::isUseful()
         return false;
 
     WorldPosition nearWater = FindWaterRadial(bot, bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(),
-        bot->GetMap(), bot->GetPhaseMask(), MIN_DISTANCE_TO_WATER, sPlayerbotAIConfig.endFishingWithMaster, 10.0f);
+        bot->GetMap(), bot->GetPhaseMask(), MIN_DISTANCE_TO_WATER, sPlayerbotAIConfig.EndFishingWithMaster, 10.0f);
     return !nearWater.IsValid();
 }
 

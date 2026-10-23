@@ -59,7 +59,7 @@ bool PossibleRpgTargetsValue::AcceptUnit(Unit* unit)
     if (unit->IsHostileTo(bot) || unit->IsPlayer())
         return false;
 
-    if (ServerFacade::instance().GetDistance2d(bot, unit) <= sPlayerbotAIConfig.tooCloseDistance)
+    if (ServerFacade::instance().GetDistance2d(bot, unit) <= sPlayerbotAIConfig.TooCloseDistance)
         return false;
 
     if (unit->HasNpcFlag(UNIT_NPC_FLAG_SPIRITHEALER))
@@ -109,20 +109,27 @@ const std::vector<uint32> PossibleNewRpgTargetsValue::allowedNpcFlags = {
     UNIT_NPC_FLAG_REPAIR,
 };
 
+float PossibleNewRpgTargetsValue::GetSearchRange(Player* bot)
+{
+    float const configuredRange = sPlayerbotAIConfig.RpgTargetSearchDistance;
+    return configuredRange > 0.0f ? configuredRange : bot->GetVisibilityRange();
+}
+
 // Sparse starting zones where the default scan range is insufficient for WANDER_NPC (requires >= 3 NPCs)
 static const std::unordered_set<uint32> rpgRangeOverrideAreaIds = { 3526 /* Ammen Vale */, 2117 /* Deathknell */ };
 
-PossibleNewRpgTargetsValue::PossibleNewRpgTargetsValue(PlayerbotAI* botAI, float range)
-    : NearestUnitsValue(botAI, "possible new rpg targets", range, true), defaultRange(range)
+PossibleNewRpgTargetsValue::PossibleNewRpgTargetsValue(PlayerbotAI* botAI)
+    : NearestUnitsValue(botAI, "possible new rpg targets", sPlayerbotAIConfig.RpgTargetSearchDistance, true)
 {
 }
 
 GuidVector PossibleNewRpgTargetsValue::Calculate()
 {
-    if (rpgRangeOverrideAreaIds.count(bot->GetAreaId()) && defaultRange < 200.0f)
+    float const searchRange = GetSearchRange(bot);
+    if (rpgRangeOverrideAreaIds.count(bot->GetAreaId()) && searchRange < 200.0f)
         range = 200.0f;
     else
-        range = defaultRange;
+        range = searchRange;
 
     std::list<Unit*> targets;
     FindUnits(targets);
@@ -161,9 +168,9 @@ bool PossibleNewRpgTargetsValue::AcceptUnit(Unit* unit)
         return false;
 
     // LeashStrategy (see LeashStrategy.cpp) only recalls the bot once it has
-    // already wandered past AiPlayerbot.LeashDistance -- without this, new
+    // already wandered past Playerbots.LeashDistance -- without this, new
     // rpg could still pick an idle-interaction target beyond that distance
-    // (this value's own range is AiPlayerbot.RpgDistance, measured from the
+    // (this value's own range is Playerbots.RpgDistance, measured from the
     // bot itself, not the leader), walk toward it, get recalled by the leash,
     // then immediately re-pick the same distant target again. Refusing any
     // candidate outside the leash distance from the actual leader closes
@@ -175,7 +182,7 @@ bool PossibleNewRpgTargetsValue::AcceptUnit(Unit* unit)
     {
         if (Player* master = botAI->GetMaster())
         {
-            if (ServerFacade::instance().GetDistance2d(master, unit) > sPlayerbotAIConfig.leashDistance)
+            if (ServerFacade::instance().GetDistance2d(master, unit) > sPlayerbotAIConfig.LeashDistance)
                 return false;
         }
     }
@@ -198,6 +205,8 @@ const std::vector<GameobjectTypes> PossibleNewRpgGameObjectsValue::allowedGOFlag
 
 GuidVector PossibleNewRpgGameObjectsValue::Calculate()
 {
+    float const range = PossibleNewRpgTargetsValue::GetSearchRange(bot);
+
     std::list<GameObject*> targets;
     AnyGameObjectInObjectRangeCheck u_check(bot, range);
     Acore::GameObjectListSearcher<AnyGameObjectInObjectRangeCheck> searcher(bot, targets, u_check);
@@ -226,7 +235,7 @@ GuidVector PossibleNewRpgGameObjectsValue::Calculate()
         if (!ignoreLos && !bot->IsWithinLOSInMap(go))
             continue;
 
-        if (master && ServerFacade::instance().GetDistance2d(master, go) > sPlayerbotAIConfig.leashDistance)
+        if (master && ServerFacade::instance().GetDistance2d(master, go) > sPlayerbotAIConfig.LeashDistance)
             continue;
 
         guidDistancePairs.push_back({go->GetGUID(), bot->GetExactDist(go)});

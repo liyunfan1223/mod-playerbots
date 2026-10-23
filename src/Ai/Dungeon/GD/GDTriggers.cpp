@@ -69,7 +69,7 @@ ObjectGuid CalculateAssignedSnakeWrap(PlayerbotAI* botAI)
     }
 
     std::list<Creature*> wraps;
-    bot->GetCreatureListWithEntryInGrid(wraps, NPC_SNAKE_WRAP, sPlayerbotAIConfig.sightDistance);
+    bot->GetCreatureListWithEntryInGrid(wraps, NPC_SNAKE_WRAP, sPlayerbotAIConfig.SightDistance);
 
     std::vector<std::pair<float, Creature*>> candidates;
     candidates.reserve(wraps.size());

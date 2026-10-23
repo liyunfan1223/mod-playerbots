@@ -116,21 +116,21 @@ public:
 class MainHandWeaponNoEnchantTrigger : public BuffTrigger
 {
 public:
-    MainHandWeaponNoEnchantTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "main hand", 1) {}
+    MainHandWeaponNoEnchantTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "main hand", 1) {}
     virtual bool IsActive();
 };
 
 class OffHandWeaponNoEnchantTrigger : public BuffTrigger
 {
 public:
-    OffHandWeaponNoEnchantTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "off hand", 1) {}
+    OffHandWeaponNoEnchantTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "off hand", 1) {}
     virtual bool IsActive();
 };
 
 class TricksOfTheTradeOnMainTankTrigger : public BuffOnMainTankTrigger
 {
 public:
-    TricksOfTheTradeOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "tricks of the trade", true) {}
+    TricksOfTheTradeOnMainTankTrigger(PlayerbotAI* botAI) : BuffOnMainTankTrigger(botAI, "tricks of the trade", true) {}
 };
 
 #endif

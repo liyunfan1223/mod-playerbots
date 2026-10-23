@@ -7,7 +7,6 @@
 #ifndef PLAYERBOTS_UBSTRATEGY_H
 #define PLAYERBOTS_UBSTRATEGY_H
 
-#include "Multiplier.h"
 #include "Strategy.h"
 
 class TbcDungeonUnderbogStrategy : public Strategy

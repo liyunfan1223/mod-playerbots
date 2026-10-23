@@ -15,9 +15,17 @@ class ChatHandler;
 class PlayerbotAI;
 class PlayerbotLoginQueryHolder;
 class WorldPacket;
+class WorldSession;
 
 typedef std::map<ObjectGuid, Player*> PlayerBotMap;
 typedef std::map<std::string, std::set<std::string> > PlayerBotErrorMap;
+
+struct PendingBotLogin
+{
+    uint32 masterAccountId = 0;
+    WorldSession* session = nullptr;
+    bool failed = false;  // torn down by UpdatePendingLogins(), never inside the session's own callback
+};
 
 class PlayerbotHolder : public PlayerbotAIBase
 {
@@ -27,7 +35,7 @@ public:
 
     void AddPlayerBot(ObjectGuid guid, uint32 masterAccountId);
     bool IsAccountLinked(uint32 accountId, uint32 masterAccountId);
-    void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder);
+    void HandlePlayerBotLoginCallback(PlayerbotLoginQueryHolder const& holder, WorldSession* botSession);
 
     void LogoutPlayerBot(ObjectGuid guid);
     void DisablePlayerBot(ObjectGuid guid);
@@ -40,6 +48,8 @@ public:
     void UpdateAIInternal([[maybe_unused]] uint32 elapsed, [[maybe_unused]] bool minimal = false) override{};
     void UpdateSessions();
     void HandleBotPackets(WorldSession* session);
+    static void UpdatePendingLogins();  // world thread, once per tick
+    static void ClearPendingLogins();   // shutdown, outside any callback
 
     void LogoutAllBots();
     void OnBotLogin(Player* const bot);
@@ -58,7 +68,8 @@ protected:
     virtual void OnBotLoginInternal(Player* const bot) = 0;
 
     PlayerBotMap playerBots;
-    static std::unordered_map<ObjectGuid, uint32> botLoading;
+    static void AbandonPendingLogin(ObjectGuid guid);
+    static std::unordered_map<ObjectGuid, PendingBotLogin> botLoading;
 };
 
 class PlayerbotMgr : public PlayerbotHolder

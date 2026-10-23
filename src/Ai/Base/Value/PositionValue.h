@@ -68,7 +68,7 @@ public:
 
     bool EqualToLast(WorldPosition value) override
     {
-        return value.fDist(lastValue) < sPlayerbotAIConfig.tooCloseDistance;
+        return value.fDist(lastValue) < sPlayerbotAIConfig.TooCloseDistance;
     }
 
     WorldPosition Calculate() override;
@@ -77,7 +77,7 @@ public:
 class SinglePositionValue : public CalculatedValue<PositionInfo>, public Qualified
 {
 public:
-    SinglePositionValue(PlayerbotAI* ai, std::string name = "pos") : CalculatedValue(ai, name), Qualified() {};
+    SinglePositionValue(PlayerbotAI* botAI, std::string name = "pos") : CalculatedValue(botAI, name), Qualified() {};
     virtual PositionInfo Calculate() override;
     virtual void Set(PositionInfo value) override;
     virtual void Reset() override;

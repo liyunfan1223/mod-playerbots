@@ -67,6 +67,7 @@ protected:
     const int32 statusRestDuration = 30 * IN_MILLISECONDS ;
     const int32 statusDoQuestDuration = 30 * MINUTE  * IN_MILLISECONDS ;
     const int32 statusOutDoorPvPDuration = HOUR * IN_MILLISECONDS ;
+    const int32 statusDoGatherDuration = 15 * MINUTE * IN_MILLISECONDS;
 };
 
 class NewRpgGoGrindAction : public NewRpgBaseAction
@@ -96,7 +97,7 @@ public:
     NewRpgWanderNpcAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "new rpg move npcs") {}
     bool Execute(Event event) override;
 
-    const uint32 npcStayTime = 8 * 1000;
+    const uint32 npcStayTime = 8 * IN_MILLISECONDS;
 };
 
 class NewRpgDoQuestAction : public NewRpgBaseAction
@@ -109,7 +110,7 @@ protected:
     bool DoIncompleteQuest(NewRpgInfo::DoQuest& data);
     bool DoCompletedQuest(NewRpgInfo::DoQuest& data);
 
-    const uint32 poiStayTime = 5 * 60 * 1000;
+    const uint32 poiStayTime = 5 * MINUTE * IN_MILLISECONDS;
 };
 
 class NewRpgTravelFlightAction : public NewRpgBaseAction

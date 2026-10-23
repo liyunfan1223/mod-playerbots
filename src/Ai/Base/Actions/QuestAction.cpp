@@ -184,7 +184,7 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
 {
     ObjectGuid guid = questGiver->GetGUID();
 
-    if (bot->GetDistance(questGiver) > INTERACTION_DISTANCE && !sPlayerbotAIConfig.syncQuestWithPlayer)
+    if (bot->GetDistance(questGiver) > INTERACTION_DISTANCE && !sPlayerbotAIConfig.SyncQuestWithPlayer)
     {
         //if (botAI->HasStrategy("debug", BotState::BOT_STATE_COMBAT) || botAI->HasStrategy("debug", BotState::BOT_STATE_NON_COMBAT))
 
@@ -192,7 +192,7 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
         return false;
     }
 
-    if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, questGiver, sPlayerbotAIConfig.sightDistance))
+    if (!bot->HasInArc(CAST_ANGLE_IN_FRONT, questGiver, sPlayerbotAIConfig.SightDistance))
         bot->SetFacingToObject(questGiver);
 
     bot->SetTarget(guid);
@@ -209,6 +209,24 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
 
         ProcessQuest(quest, questGiver);
     }
+
+    return true;
+}
+
+bool QuestAction::CanAcceptQuest(Player* bot, Quest const* quest)
+{
+    if (!bot || !quest)
+        return false;
+
+    // Core eligibility: level/race/class/reputation/chain/conditions/...
+    if (!bot->CanTakeQuest(quest, false))
+        return false;
+
+    // Never accept grey quests (well below the bot's level), same band as QuestValues.cpp.
+    // Player::GetQuestLevel falls back to the bot's own level for level-less quests
+    // (QuestLevel <= 0), so those are never treated as grey — like the core's dialog status.
+    if ((int32)bot->GetLevel() > bot->GetQuestLevel(quest) + GREY_QUEST_LEVEL_BAND)
+        return false;
 
     return true;
 }
@@ -240,7 +258,7 @@ bool QuestAction::AcceptQuest(Quest const* quest, ObjectGuid questGiver)
         p.rpos(0);
         bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(p);
 
-        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && sPlayerbotAIConfig.syncQuestWithPlayer)
+        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && sPlayerbotAIConfig.SyncQuestWithPlayer)
         {
             Object* pObject = ObjectAccessor::GetObjectByTypeMask(*bot, questGiver,
                                                                   TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
@@ -290,7 +308,6 @@ bool QuestUpdateCompleteAction::Execute(Event event)
         if (botAI->GetMaster())
             botAI->TellMasterNoFacing("Quest completed " + format);
         BroadcastHelper::BroadcastQuestUpdateComplete(botAI, bot, qInfo);
-        botAI->rpgStatistic.questCompleted++;
         // LOG_DEBUG("playerbots", "[New rpg] {} complete quest {}", bot->GetName(), qInfo->GetQuestId());
         // botAI->rpgStatistic.questCompleted++;
     }
@@ -316,7 +333,7 @@ bool QuestUpdateAddKillAction::Execute(Event event)
         GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(entry);
         if (info)
         {
-            std::string infoName = botAI->GetLocalizedGameObjectName(entry);
+            std::string infoName = PlayerbotAI::GetLocalizedGameObjectName(entry);
             BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, infoName);
             if (botAI->GetMaster())
             {
@@ -331,7 +348,7 @@ bool QuestUpdateAddKillAction::Execute(Event event)
         CreatureTemplate const* info = sObjectMgr->GetCreatureTemplate(entry);
         if (info)
         {
-            std::string infoName = botAI->GetLocalizedCreatureName(entry);
+            std::string infoName = PlayerbotAI::GetLocalizedCreatureName(entry);
             BroadcastHelper::BroadcastQuestUpdateAddKill(botAI, bot, qInfo, available, required, infoName);
             if (botAI->GetMaster())
             {

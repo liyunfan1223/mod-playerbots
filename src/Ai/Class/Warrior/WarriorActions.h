@@ -114,7 +114,7 @@ ENEMY_HEALER_ACTION(CastShieldBashOnEnemyHealerAction, "shield bash");
 MELEE_ACTION(CastRevengeAction, "revenge");
 BUFF_ACTION(CastShieldBlockAction, "shield block");
 DEBUFF_ACTION_U(CastDisarmAction, "disarm",
-                GetTarget() && GetTarget()->IsPlayer() ? !botAI->IsRanged((Player*)GetTarget())
+                GetTarget() && GetTarget()->IsPlayer() ? !PlayerbotAI::IsRanged((Player*)GetTarget())
                                                        : CastDebuffSpellAction::isUseful());
 DEBUFF_ENEMY_ACTION(CastDisarmOnAttackerAction, "disarm");
 BUFF_ACTION(CastShieldWallAction, "shield wall");
@@ -143,12 +143,11 @@ public:
     bool isUseful() override;
 };
 
-class CastVigilanceAction : public BuffOnPartyAction
+class CastVigilanceAction : public CastBuffSpellAction
 {
 public:
-    CastVigilanceAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "vigilance") {}
+    CastVigilanceAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "vigilance") {}
 
-    bool Execute(Event event) override;
     Unit* GetTarget() override;
 };
 

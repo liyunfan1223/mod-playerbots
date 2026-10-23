@@ -28,6 +28,7 @@ public:
     FollowChatShortcutAction(PlayerbotAI* botAI) : MovementAction(botAI, "follow chat shortcut") {}
 
     bool Execute(Event event) override;
+    bool isUsefulWithoutControl() override { return true; }
 };
 
 class StayChatShortcutAction : public PositionsResetAction
@@ -36,6 +37,7 @@ public:
     StayChatShortcutAction(PlayerbotAI* botAI) : PositionsResetAction(botAI, "stay chat shortcut") {}
 
     bool Execute(Event event) override;
+    bool isUsefulWithoutControl() override { return true; }
 };
 
 class MoveFromGroupChatShortcutAction : public Action
@@ -52,6 +54,7 @@ public:
     FleeChatShortcutAction(PlayerbotAI* botAI) : PositionsResetAction(botAI, "flee chat shortcut") {}
 
     bool Execute(Event event) override;
+    bool isUsefulWithoutControl() override { return true; }
 };
 
 class GoawayChatShortcutAction : public PositionsResetAction
@@ -68,6 +71,7 @@ public:
     GrindChatShortcutAction(PlayerbotAI* botAI) : PositionsResetAction(botAI, "grind chat shortcut") {}
 
     bool Execute(Event event) override;
+    bool isUsefulWithoutControl() override { return true; }
 };
 
 class TankAttackChatShortcutAction : public PositionsResetAction
@@ -89,14 +93,14 @@ public:
 class NaxxChatShortcutAction : public Action
 {
 public:
-    NaxxChatShortcutAction(PlayerbotAI* ai) : Action(ai, "naxx chat shortcut") {}
+    NaxxChatShortcutAction(PlayerbotAI* botAI) : Action(botAI, "naxx chat shortcut") {}
     virtual bool Execute(Event event);
 };
 
 class BwlChatShortcutAction : public Action
 {
 public:
-    BwlChatShortcutAction(PlayerbotAI* ai) : Action(ai, "bwl chat shortcut") {}
+    BwlChatShortcutAction(PlayerbotAI* botAI) : Action(botAI, "bwl chat shortcut") {}
     virtual bool Execute(Event event);
 };
 #endif

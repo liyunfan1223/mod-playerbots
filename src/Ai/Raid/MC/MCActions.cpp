@@ -106,7 +106,8 @@ bool McMoveFromLavaAction::Execute(Event /*event*/)
 
     float const speed = bot->GetSpeed(MOVE_RUN);
     if (speed > MIN_ESCAPE_SPEED)
-        botAI->SetNextCheckDelay(std::min(MAX_ESCAPE_HOLD_MS, uint32(1000.0f * bot->GetDistance(dryTarget) / speed)));
+        botAI->SetNextCheckDelay(
+            std::min(MAX_ESCAPE_HOLD_MS, uint32(IN_MILLISECONDS * bot->GetDistance(dryTarget) / speed)));
 
     return true;
 }

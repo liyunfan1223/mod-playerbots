@@ -7,8 +7,6 @@
 #ifndef PLAYERBOTS_UPACTIONCONTEXT_H
 #define PLAYERBOTS_UPACTIONCONTEXT_H
 
-#include "Action.h"
-#include "ChooseTargetActions.h"
 #include "NamedObjectContext.h"
 #include "UPActions.h"
 
@@ -18,12 +16,10 @@ class WotlkDungeonUPActionContext : public NamedObjectContext<Action>
         WotlkDungeonUPActionContext() {
             creators["avoid freezing cloud"] = &WotlkDungeonUPActionContext::avoid_freezing_cloud;
             creators["avoid skadi whirlwind"] = &WotlkDungeonUPActionContext::avoid_whirlwind;
-            creators["stop attack"] = &WotlkDungeonUPActionContext::stop_attack;
         }
     private:
-        static Action* avoid_freezing_cloud(PlayerbotAI* ai) { return new AvoidFreezingCloudAction(ai); }
-        static Action* avoid_whirlwind(PlayerbotAI* ai) { return new AvoidSkadiWhirlwindAction(ai); }
-        static Action* stop_attack(PlayerbotAI* ai) { return new DropTargetAction(ai); }
+        static Action* avoid_freezing_cloud(PlayerbotAI* botAI) { return new AvoidFreezingCloudAction(botAI); }
+        static Action* avoid_whirlwind(PlayerbotAI* botAI) { return new AvoidSkadiWhirlwindAction(botAI); }
 };
 
 #endif

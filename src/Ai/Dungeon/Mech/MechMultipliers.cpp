@@ -1,3 +1,9 @@
+/*
+ * This file is part of the mod-playerbots module for AzerothCore. See AUTHORS file for Copyright
+ * information; released under GNU GPL v2 license, redistribute/modify under version 2 of the License,
+ * or (at your option) any later version.
+ */
+
 #include "MechMultipliers.h"
 #include "ChooseTargetActions.h"
 #include "FollowActions.h"
@@ -37,7 +43,7 @@ float SepethreaFocusBossMultiplier::GetValue(Action* action)
         dynamic_cast<DpsAssistAction*>(action) ||
         dynamic_cast<TankAssistAction*>(action) ||
         dynamic_cast<CastDebuffSpellOnAttackerAction*>(action) ||
-        (action->getThreatType() == Action::ActionThreatType::Aoe && botAI->IsDps(bot) &&
+        (action->getThreatType() == Action::ActionThreatType::Aoe && PlayerbotAI::IsDps(bot) &&
          !dynamic_cast<CastHealingSpellAction*>(action));
     if (!suppressed)
         return 1.0f;

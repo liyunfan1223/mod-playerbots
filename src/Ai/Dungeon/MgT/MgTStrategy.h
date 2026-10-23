@@ -7,8 +7,6 @@
 #ifndef PLAYERBOTS_MGTSTRATEGY_H
 #define PLAYERBOTS_MGTSTRATEGY_H
 
-#include "AiObjectContext.h"
-#include "Multiplier.h"
 #include "Strategy.h"
 
 class TbcDungeonMagistersTerraceStrategy : public Strategy

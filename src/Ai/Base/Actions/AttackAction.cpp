@@ -12,6 +12,7 @@
 #include "PlayerbotAI.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
+#include "PvpValues.h"
 #include "ServerFacade.h"
 #include "Unit.h"
 #include "WaitForAttackStrategy.h"
@@ -121,6 +122,9 @@ bool AttackAction::Attack(Unit* target, bool /*with_pet*/ /*true*/)
         return false;
     }
 
+    if (IsUnavailableCombatTarget(bot, target))
+        return false;
+
     if (!bot->IsWithinLOSInMap(target))
     {
         if (verbose)
@@ -138,7 +142,7 @@ bool AttackAction::Attack(Unit* target, bool /*with_pet*/ /*true*/)
         return false;
 
     Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
-    bool shouldMelee = bot->IsWithinMeleeRange(target) || botAI->IsMelee(bot);
+    bool shouldMelee = bot->IsWithinMeleeRange(target) || PlayerbotAI::IsMelee(bot);
 
     bool sameTarget = oldTarget == target && bot->GetVictim() == target;
     bool inCombat = botAI->GetState() == BOT_STATE_COMBAT;

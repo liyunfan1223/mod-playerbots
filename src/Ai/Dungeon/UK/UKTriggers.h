@@ -39,42 +39,42 @@ enum UtgardeKeepIDs
 class KelesethFrostTombTrigger : public Trigger
 {
 public:
-    KelesethFrostTombTrigger(PlayerbotAI* ai) : Trigger(ai, "keleseth frost tomb") {}
+    KelesethFrostTombTrigger(PlayerbotAI* botAI) : Trigger(botAI, "keleseth frost tomb") {}
     bool IsActive() override;
 };
 
 class DalronnDpsTrigger : public Trigger
 {
 public:
-    DalronnDpsTrigger(PlayerbotAI* ai) : Trigger(ai, "dalronn dps") {}
+    DalronnDpsTrigger(PlayerbotAI* botAI) : Trigger(botAI, "dalronn dps") {}
     bool IsActive() override;
 };
 
 class IngvarDreadfulRoarTrigger : public Trigger
 {
 public:
-    IngvarDreadfulRoarTrigger(PlayerbotAI* ai) : Trigger(ai, "ingvar dreadful roar") {}
+    IngvarDreadfulRoarTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ingvar dreadful roar") {}
     bool IsActive() override;
 };
 
 class IngvarSmashTankTrigger : public Trigger
 {
 public:
-    IngvarSmashTankTrigger(PlayerbotAI* ai) : Trigger(ai, "ingvar smash tank") {}
+    IngvarSmashTankTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ingvar smash tank") {}
     bool IsActive() override;
 };
 
 class IngvarSmashTankReturnTrigger : public Trigger
 {
 public:
-    IngvarSmashTankReturnTrigger(PlayerbotAI* ai) : Trigger(ai, "ingvar smash tank return") {}
+    IngvarSmashTankReturnTrigger(PlayerbotAI* botAI) : Trigger(botAI, "ingvar smash tank return") {}
     bool IsActive() override;
 };
 
 class NotBehindIngvarTrigger : public Trigger
 {
 public:
-    NotBehindIngvarTrigger(PlayerbotAI* ai) : Trigger(ai, "not behind ingvar") {}
+    NotBehindIngvarTrigger(PlayerbotAI* botAI) : Trigger(botAI, "not behind ingvar") {}
     bool IsActive() override;
 };
 

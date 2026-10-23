@@ -24,7 +24,7 @@ bool TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver
     QuestStatus status = bot->GetQuestStatus(quest->GetQuestId());
     Player* master = GetMaster();
 
-    if (sPlayerbotAIConfig.syncQuestForPlayer && master)
+    if (sPlayerbotAIConfig.SyncQuestForPlayer && master)
     {
         PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(master);
         if (!masterBotAI || IsSelfBot(master))
@@ -35,7 +35,7 @@ bool TalkToQuestGiverAction::ProcessQuest(Quest const* quest, Object* questGiver
         }
     }
 
-    if (sPlayerbotAIConfig.syncQuestWithPlayer)
+    if (sPlayerbotAIConfig.SyncQuestWithPlayer)
     {
         if (master && master->GetQuestStatus(quest->GetQuestId()) == QUEST_STATUS_COMPLETE &&
             (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED))
@@ -171,7 +171,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
     std::set<uint32> bestIds;
 
     std::ostringstream outid;
-    if (!botAI->IsAltBot() || sPlayerbotAIConfig.autoPickReward == "yes")
+    if (!botAI->IsAltBot() || sPlayerbotAIConfig.AutoPickReward == "yes")
     {
         bestIds = BestRewards(quest);
         if (!bestIds.empty())
@@ -181,7 +181,12 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
             float bestScore = 0;
             for (uint32 id : bestIds)
             {
-                float score = calc.CalculateItem(quest->RewardChoiceItemId[id]);
+                uint32 const itemId = quest->RewardChoiceItemId[id];
+                ItemTemplate const* rewardProto = sObjectMgr->GetItemTemplate(itemId);
+                uint8 rewardSlot = NULL_SLOT;
+                if (rewardProto)
+                    rewardSlot = botAI->FindEquipSlot(rewardProto, NULL_SLOT, true);
+                float score = calc.CalculateItem(itemId, 0, rewardSlot);
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -198,7 +203,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, Object* ques
             AskToSelectReward(quest, out, true);
         }
     }
-    else if (sPlayerbotAIConfig.autoPickReward == "no")
+    else if (sPlayerbotAIConfig.AutoPickReward == "no")
     {
         // Old functionality, list rewards.
         AskToSelectReward(quest, out, false);
@@ -258,7 +263,7 @@ bool TurnInQueryQuestAction::Execute(Event event)
     QuestStatus status = bot->GetQuestStatus(quest->GetQuestId());
     Player* master = GetMaster();
 
-    if (sPlayerbotAIConfig.syncQuestForPlayer && master)
+    if (sPlayerbotAIConfig.SyncQuestForPlayer && master)
     {
         PlayerbotAI* masterBotAI = GET_PLAYERBOT_AI(master);
         if (!masterBotAI || IsSelfBot(master))
@@ -269,7 +274,7 @@ bool TurnInQueryQuestAction::Execute(Event event)
         }
     }
 
-    if (sPlayerbotAIConfig.syncQuestWithPlayer)
+    if (sPlayerbotAIConfig.SyncQuestWithPlayer)
     {
         if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED)
         {

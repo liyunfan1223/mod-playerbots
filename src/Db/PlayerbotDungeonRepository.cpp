@@ -5,6 +5,7 @@
  */
 
 #include "PlayerbotDungeonRepository.h"
+#include "PlayerbotsDatabase.h"
 #include "DatabaseEnv.h"
 #include "Field.h"
 #include "Log.h"

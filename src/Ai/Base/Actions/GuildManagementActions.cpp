@@ -170,7 +170,7 @@ bool GuildManageNearbyAction::Execute(Event /*event*/)
             continue;
         }
 
-        if (!sPlayerbotAIConfig.randomBotGuildNearby)
+        if (!sPlayerbotAIConfig.RandomBotGuildNearby)
             return false;
 
         if (guild->GetMemberSize() > 1000)
@@ -184,7 +184,7 @@ bool GuildManageNearbyAction::Execute(Event /*event*/)
 
         PlayerbotAI* botAi = GET_PLAYERBOT_AI(player);
 
-        if (!sPlayerbotAIConfig.randomBotInvitePlayer && botAi && IsSelfBot(player))
+        if (!sPlayerbotAIConfig.RandomBotInvitePlayer && botAi && IsSelfBot(player))
             continue;
 
         if (botAi)
@@ -198,10 +198,10 @@ bool GuildManageNearbyAction::Execute(Event /*event*/)
 
         bool sameGroup = bot->GetGroup() && bot->GetGroup()->IsMember(player->GetGUID());
 
-        if (!sameGroup && ServerFacade::instance().GetDistance2d(bot, player) > sPlayerbotAIConfig.spellDistance)
+        if (!sameGroup && ServerFacade::instance().GetDistance2d(bot, player) > sPlayerbotAIConfig.SpellDistance)
             continue;
 
-        if (sPlayerbotAIConfig.inviteChat && (sRandomPlayerbotMgr.IsRandomBot(bot) || !IsRealPlayer(botAI->GetMaster())))
+        if (sPlayerbotAIConfig.InviteChat && (sRandomPlayerbotMgr.IsRandomBot(bot) || !IsRealPlayer(botAI->GetMaster())))
         {
             /* std::map<std::string, std::string> placeholders;
             placeholders["%name"] = player->GetName();
@@ -273,7 +273,7 @@ bool GuildManageNearbyAction::Execute(Event /*event*/)
 
         if (botAI->DoSpecificAction("guild invite", Event("guild management", guid), true))
         {
-            if (sPlayerbotAIConfig.inviteChat)
+            if (sPlayerbotAIConfig.InviteChat)
                 return true;
             found++;
         }

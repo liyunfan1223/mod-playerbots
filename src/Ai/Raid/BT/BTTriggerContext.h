@@ -15,7 +15,7 @@ class RaidBlackTempleTriggerContext : public NamedObjectContext<Trigger>
 public:
     RaidBlackTempleTriggerContext()
     {
-        // General
+        // Shared
         creators["black temple bot is not in combat"] =
             &RaidBlackTempleTriggerContext::black_temple_bot_is_not_in_combat;
 
@@ -210,206 +210,267 @@ public:
     }
 
 private:
-    // General
-    static Trigger* black_temple_bot_is_not_in_combat(PlayerbotAI* botAI) {
+    // Shared
+    static Trigger* black_temple_bot_is_not_in_combat(PlayerbotAI* botAI)
+    {
         return new BlackTempleBotIsNotInCombatTrigger(botAI);
     }
 
     // High Warlord Naj'entus
-    static Trigger* high_warlord_najentus_pulling_boss(PlayerbotAI* botAI) {
+    static Trigger* high_warlord_najentus_pulling_boss(PlayerbotAI* botAI)
+    {
         return new HighWarlordNajentusPullingBossTrigger(botAI);
     }
-    static Trigger* high_warlord_najentus_boss_engaged_by_tanks(PlayerbotAI* botAI) {
+    static Trigger* high_warlord_najentus_boss_engaged_by_tanks(PlayerbotAI* botAI)
+    {
         return new HighWarlordNajentusBossEngagedByTanksTrigger(botAI);
     }
-    static Trigger* high_warlord_najentus_casts_needle_spines(PlayerbotAI* botAI) {
+    static Trigger* high_warlord_najentus_casts_needle_spines(PlayerbotAI* botAI)
+    {
         return new HighWarlordNajentusCastsNeedleSpinesTrigger(botAI);
     }
-    static Trigger* high_warlord_najentus_player_is_impaled(PlayerbotAI* botAI) {
+    static Trigger* high_warlord_najentus_player_is_impaled(PlayerbotAI* botAI)
+    {
         return new HighWarlordNajentusPlayerIsImpaledTrigger(botAI);
     }
-    static Trigger* high_warlord_najentus_boss_has_tidal_shield(PlayerbotAI* botAI) {
+    static Trigger* high_warlord_najentus_boss_has_tidal_shield(PlayerbotAI* botAI)
+    {
         return new HighWarlordNajentusBossHasTidalShieldTrigger(botAI);
     }
 
     // Supremus
-    static Trigger* supremus_pulling_boss_or_changing_phase(PlayerbotAI* botAI) {
+    static Trigger* supremus_pulling_boss_or_changing_phase(PlayerbotAI* botAI)
+    {
         return new SupremusPullingBossOrChangingPhaseTrigger(botAI);
     }
-    static Trigger* supremus_boss_engaged_by_ranged(PlayerbotAI* botAI) {
+    static Trigger* supremus_boss_engaged_by_ranged(PlayerbotAI* botAI)
+    {
         return new SupremusBossEngagedByRangedTrigger(botAI);
     }
-    static Trigger* supremus_boss_is_fixated_on_bot(PlayerbotAI* botAI) {
+    static Trigger* supremus_boss_is_fixated_on_bot(PlayerbotAI* botAI)
+    {
         return new SupremusBossIsFixatedOnBotTrigger(botAI);
     }
-    static Trigger* supremus_volcano_is_nearby(PlayerbotAI* botAI) {
+    static Trigger* supremus_volcano_is_nearby(PlayerbotAI* botAI)
+    {
         return new SupremusVolcanoIsNearbyTrigger(botAI);
     }
-    static Trigger* supremus_need_to_manage_phase_timer(PlayerbotAI* botAI) {
+    static Trigger* supremus_need_to_manage_phase_timer(PlayerbotAI* botAI)
+    {
         return new SupremusNeedToManagePhaseTimerTrigger(botAI);
     }
 
     // Shade of Akama
-    static Trigger* shade_of_akama_killing_channelers_starts_phase_2(PlayerbotAI* botAI) {
+    static Trigger* shade_of_akama_killing_channelers_starts_phase_2(PlayerbotAI* botAI)
+    {
         return new ShadeOfAkamaKillingChannelersStartsPhase2Trigger(botAI);
     }
 
     // Teron Gorefiend
-    static Trigger* teron_gorefiend_pulling_boss(PlayerbotAI* botAI) {
+    static Trigger* teron_gorefiend_pulling_boss(PlayerbotAI* botAI)
+    {
         return new TeronGorefiendPullingBossTrigger(botAI);
     }
-    static Trigger* teron_gorefiend_boss_engaged_by_tanks(PlayerbotAI* botAI) {
+    static Trigger* teron_gorefiend_boss_engaged_by_tanks(PlayerbotAI* botAI)
+    {
         return new TeronGorefiendBossEngagedByTanksTrigger(botAI);
     }
-    static Trigger* teron_gorefiend_boss_engaged_by_ranged(PlayerbotAI* botAI) {
+    static Trigger* teron_gorefiend_boss_engaged_by_ranged(PlayerbotAI* botAI)
+    {
         return new TeronGorefiendBossEngagedByRangedTrigger(botAI);
     }
-    static Trigger* teron_gorefiend_boss_is_casting_shadow_of_death(PlayerbotAI* botAI) {
+    static Trigger* teron_gorefiend_boss_is_casting_shadow_of_death(PlayerbotAI* botAI)
+    {
         return new TeronGorefiendBossIsCastingShadowOfDeathTrigger(botAI);
     }
-    static Trigger* teron_gorefiend_bot_has_shadow_of_death(PlayerbotAI* botAI) {
+    static Trigger* teron_gorefiend_bot_has_shadow_of_death(PlayerbotAI* botAI)
+    {
         return new TeronGorefiendBotHasShadowOfDeathTrigger(botAI);
     }
-    static Trigger* teron_gorefiend_bot_transformed_into_vengeful_spirit(PlayerbotAI* botAI) {
+    static Trigger* teron_gorefiend_bot_transformed_into_vengeful_spirit(PlayerbotAI* botAI)
+    {
         return new TeronGorefiendBotTransformedIntoVengefulSpiritTrigger(botAI);
     }
 
     // Gurtogg Bloodboil
-    static Trigger* gurtogg_bloodboil_pulling_boss(PlayerbotAI* botAI) {
+    static Trigger* gurtogg_bloodboil_pulling_boss(PlayerbotAI* botAI)
+    {
         return new GurtoggBloodboilPullingBossTrigger(botAI);
     }
-    static Trigger* gurtogg_bloodboil_boss_engaged_by_tanks(PlayerbotAI* botAI) {
+    static Trigger* gurtogg_bloodboil_boss_engaged_by_tanks(PlayerbotAI* botAI)
+    {
         return new GurtoggBloodboilBossEngagedByTanksTrigger(botAI);
     }
-    static Trigger* gurtogg_bloodboil_boss_casts_bloodboil(PlayerbotAI* botAI) {
+    static Trigger* gurtogg_bloodboil_boss_casts_bloodboil(PlayerbotAI* botAI)
+    {
         return new GurtoggBloodboilBossCastsBloodboilTrigger(botAI);
     }
-    static Trigger* gurtogg_bloodboil_bot_has_fel_rage(PlayerbotAI* botAI) {
+    static Trigger* gurtogg_bloodboil_bot_has_fel_rage(PlayerbotAI* botAI)
+    {
         return new GurtoggBloodboilBotHasFelRageTrigger(botAI);
     }
-    static Trigger* gurtogg_bloodboil_need_to_manage_phase_timer(PlayerbotAI* botAI) {
+    static Trigger* gurtogg_bloodboil_need_to_manage_phase_timer(PlayerbotAI* botAI)
+    {
         return new GurtoggBloodboilNeedToManagePhaseTimerTrigger(botAI);
     }
 
     // Reliquary of Souls
-    static Trigger* reliquary_of_souls_aggro_resets_upon_phase_change(PlayerbotAI* botAI) {
+    static Trigger* reliquary_of_souls_aggro_resets_upon_phase_change(PlayerbotAI* botAI)
+    {
         return new ReliquaryOfSoulsAggroResetsUponPhaseChangeTrigger(botAI);
     }
-    static Trigger* reliquary_of_souls_essence_of_suffering_fixates_on_closest_target(PlayerbotAI* botAI) {
+    static Trigger* reliquary_of_souls_essence_of_suffering_fixates_on_closest_target(PlayerbotAI* botAI)
+    {
         return new ReliquaryOfSoulsEssenceOfSufferingFixatesOnClosestTargetTrigger(botAI);
     }
-    static Trigger* reliquary_of_souls_essence_of_suffering_disables_healing(PlayerbotAI* botAI) {
+    static Trigger* reliquary_of_souls_essence_of_suffering_disables_healing(PlayerbotAI* botAI)
+    {
         return new ReliquaryOfSoulsEssenceOfSufferingDisablesHealingTrigger(botAI);
     }
-    static Trigger* reliquary_of_souls_essence_of_desire_has_rune_shield(PlayerbotAI* botAI) {
+    static Trigger* reliquary_of_souls_essence_of_desire_has_rune_shield(PlayerbotAI* botAI)
+    {
         return new ReliquaryOfSoulsEssenceOfDesireHasRuneShieldTrigger(botAI);
     }
-    static Trigger* reliquary_of_souls_essence_of_desire_casting_deaden(PlayerbotAI* botAI) {
+    static Trigger* reliquary_of_souls_essence_of_desire_casting_deaden(PlayerbotAI* botAI)
+    {
         return new ReliquaryOfSoulsEssenceOfDesireCastingDeadenTrigger(botAI);
     }
 
     // Mother Shahraz
-    static Trigger* mother_shahraz_pulling_boss(PlayerbotAI* botAI) {
+    static Trigger* mother_shahraz_pulling_boss(PlayerbotAI* botAI)
+    {
         return new MotherShahrazPullingBossTrigger(botAI);
     }
-    static Trigger* mother_shahraz_boss_engaged_by_tanks(PlayerbotAI* botAI) {
+    static Trigger* mother_shahraz_boss_engaged_by_tanks(PlayerbotAI* botAI)
+    {
         return new MotherShahrazBossEngagedByTanksTrigger(botAI);
     }
-    static Trigger* mother_shahraz_tanks_are_positioning_boss(PlayerbotAI* botAI) {
+    static Trigger* mother_shahraz_tanks_are_positioning_boss(PlayerbotAI* botAI)
+    {
         return new MotherShahrazTanksArePositioningBossTrigger(botAI);
     }
-    static Trigger* mother_shahraz_sinister_beam_knocks_back_players(PlayerbotAI* botAI) {
+    static Trigger* mother_shahraz_sinister_beam_knocks_back_players(PlayerbotAI* botAI)
+    {
         return new MotherShahrazSinisterBeamKnocksBackPlayersTrigger(botAI);
     }
-    static Trigger* mother_shahraz_bots_are_linked_by_fatal_attraction(PlayerbotAI* botAI) {
+    static Trigger* mother_shahraz_bots_are_linked_by_fatal_attraction(PlayerbotAI* botAI)
+    {
         return new MotherShahrazBotsAreLinkedByFatalAttractionTrigger(botAI);
     }
 
     // Illidari Council
-    static Trigger* illidari_council_pulling_bosses(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_pulling_bosses(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilPullingBossesTrigger(botAI);
     }
-    static Trigger* illidari_council_gathios_engaged_by_main_tank(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_gathios_engaged_by_main_tank(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilGathiosEngagedByMainTankTrigger(botAI);
     }
-    static Trigger* illidari_council_gathios_casting_judgement_of_command(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_gathios_casting_judgement_of_command(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilGathiosCastingJudgementOfCommandTrigger(botAI);
     }
-    static Trigger* illidari_council_malande_engaged_by_first_assist_tank(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_malande_engaged_by_first_assist_tank(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilMalandeEngagedByFirstAssistTankTrigger(botAI);
     }
-    static Trigger* illidari_council_darkshadow_engaged_by_second_assist_tank(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_darkshadow_engaged_by_second_assist_tank(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilDarkshadowEngagedBySecondAssistTankTrigger(botAI);
     }
-    static Trigger* illidari_council_zerevor_engaged_by_mage_tank(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_zerevor_engaged_by_mage_tank(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilZerevorEngagedByMageTankTrigger(botAI);
     }
-    static Trigger* illidari_council_mage_tank_needs_dedicated_healer(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_mage_tank_needs_dedicated_healer(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilMageTankNeedsDedicatedHealerTrigger(botAI);
     }
-    static Trigger* illidari_council_zerevor_casts_dangerous_aoes(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_zerevor_casts_dangerous_aoes(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilZerevorCastsDangerousAoesTrigger(botAI);
     }
-    static Trigger* illidari_council_pets_screw_up_the_pull(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_pets_screw_up_the_pull(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilPetsScrewUpThePullTrigger(botAI);
     }
-    static Trigger* illidari_council_determining_dps_assignments(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_determining_dps_assignments(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilDeterminingDpsAssignmentsTrigger(botAI);
     }
-    static Trigger* illidari_council_need_to_manage_dps_timer(PlayerbotAI* botAI) {
+    static Trigger* illidari_council_need_to_manage_dps_timer(PlayerbotAI* botAI)
+    {
         return new IllidariCouncilNeedToManageDpsTimerTrigger(botAI);
     }
 
     // Illidan Stormrage <The Betrayer>
-    static Trigger* illidan_stormrage_tank_needs_aggro(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_tank_needs_aggro(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageTankNeedsAggroTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_boss_casts_flame_crash_in_front_of_main_tank(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_boss_casts_flame_crash_in_front_of_main_tank(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageBossCastsFlameCrashInFrontOfMainTankTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_bot_has_parasitic_shadowfiend(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_bot_has_parasitic_shadowfiend(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageBotHasParasiticShadowfiendTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_parasitic_shadowfiends_run_wild(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_parasitic_shadowfiends_run_wild(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageParasiticShadowfiendsRunWildTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_boss_summoned_flames_of_azzinoth(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_boss_summoned_flames_of_azzinoth(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageBossSummonedFlamesOfAzzinothTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_pets_die_to_fire(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_pets_die_to_fire(PlayerbotAI* botAI)
+    {
         return new IllidanStormragePetsDieToFireTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_grate_is_safe_from_flames(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_grate_is_safe_from_flames(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageGrateIsSafeFromFlamesTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_bot_struck_by_dark_barrage(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_bot_struck_by_dark_barrage(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageBotStruckByDarkBarrageTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_boss_is_preparing_to_land(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_boss_is_preparing_to_land(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageBossIsPreparingToLandTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_boss_deals_splash_damage(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_boss_deals_splash_damage(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageBossDealsSplashDamageTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_this_expansion_hates_melee(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_this_expansion_hates_melee(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageThisExpansionHatesMeleeTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_boss_transforms_into_demon(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_boss_transforms_into_demon(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageBossTransformsIntoDemonTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_boss_spawns_adds(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_boss_spawns_adds(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageBossSpawnsAddsTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_maiev_placed_shadow_trap(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_maiev_placed_shadow_trap(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageMaievPlacedShadowTrapTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_need_to_manage_dps_timer_and_rti(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_need_to_manage_dps_timer_and_rti(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageNeedToManageDpsTimerAndRtiTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_need_to_clear_hazards_between_phases(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_need_to_clear_hazards_between_phases(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageNeedToClearHazardsBetweenPhasesTrigger(botAI);
     }
-    static Trigger* illidan_stormrage_cheat(PlayerbotAI* botAI) {
+    static Trigger* illidan_stormrage_cheat(PlayerbotAI* botAI)
+    {
         return new IllidanStormrageCheatTrigger(botAI);
     }
 };

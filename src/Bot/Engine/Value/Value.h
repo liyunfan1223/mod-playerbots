@@ -9,6 +9,7 @@
 
 #include "AiObject.h"
 #include "ObjectGuid.h"
+#include "PerfMonitor.h"
 #include "Timer.h"
 #include "Unit.h"
 #include <time.h>
@@ -61,7 +62,7 @@ public:
     CalculatedValue(PlayerbotAI* botAI, std::string const name = "value", uint32 checkInterval = 1)
         : UntypedValue(botAI, name),
           checkInterval(
-              checkInterval == 1 ? 1 : (checkInterval < 100 ? checkInterval * 1000 : checkInterval)) /*turn s -> ms?*/,
+              checkInterval == 1 ? 1 : (checkInterval < 100 ? checkInterval * IN_MILLISECONDS : checkInterval)),
           lastCheckTime(0)
     {
     }
@@ -71,13 +72,17 @@ public:
     T Get() override
     {
         if (checkInterval < 2)
+        {
+            PerfMonitorScope scope(GetPerfData());
             value = Calculate();
+        }
         else
         {
             time_t now = getMSTime();
             if (!lastCheckTime || now - lastCheckTime >= checkInterval)
             {
                 lastCheckTime = now;
+                PerfMonitorScope scope(GetPerfData());
                 value = Calculate();
             }
         }
@@ -94,13 +99,17 @@ public:
     T& RefGet() override
     {
         if (checkInterval < 2)
+        {
+            PerfMonitorScope scope(GetPerfData());
             value = Calculate();
+        }
         else
         {
             time_t now = getMSTime();
             if (!lastCheckTime || now - lastCheckTime >= checkInterval)
             {
                 lastCheckTime = now;
+                PerfMonitorScope scope(GetPerfData());
                 value = Calculate();
             }
         }
@@ -113,9 +122,21 @@ public:
 protected:
     virtual T Calculate() = 0;
 
+    PerformanceData* GetPerfData()
+    {
+        if (!PerfMonitor::IsEnabled())
+            return nullptr;
+
+        if (!perfData)
+            perfData = sPerfMonitor.acquire(PERF_MON_VALUE, getName());
+
+        return perfData;
+    }
+
     uint32 checkInterval;
     uint32 lastCheckTime;
     T value;
+    PerformanceData* perfData = nullptr;
 };
 
 template <class T>
@@ -133,6 +154,7 @@ public:
         if (!this->lastCheckTime)
         {
             this->lastCheckTime = now;
+            PerfMonitorScope scope(this->GetPerfData());
             this->value = this->Calculate();
         }
 
@@ -358,24 +380,6 @@ class DisperseDistanceValue : public ManualSetValue<float>
 public:
     DisperseDistanceValue(PlayerbotAI* botAI, float defaultValue = -1.0f, std::string const name = "disperse distance")
         : ManualSetValue<float>(botAI, defaultValue, name)
-    {
-    }
-};
-
-class LastFleeAngleValue : public ManualSetValue<float>
-{
-public:
-    LastFleeAngleValue(PlayerbotAI* botAI, float defaultValue = 0.0f, std::string const name = "last flee angle")
-        : ManualSetValue<float>(botAI, defaultValue, name)
-    {
-    }
-};
-
-class LastFleeTimestampValue : public ManualSetValue<uint32>
-{
-public:
-    LastFleeTimestampValue(PlayerbotAI* botAI, uint32 defaultValue = 0, std::string const name = "last flee timestamp")
-        : ManualSetValue<uint32>(botAI, defaultValue, name)
     {
     }
 };

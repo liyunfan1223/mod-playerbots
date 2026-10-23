@@ -12,7 +12,7 @@ void LeashStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // (new rpg: 3.0-11.0; grind is lower still per NewRpgStrategy's own
     // comment) without hardcoding a value tied to any one of them, so it
     // stays correct if those get retuned later. "leash too far" only
-    // activates past AiPlayerbot.LeashDistance, so "follow" is not even
+    // activates past Playerbots.LeashDistance, so "follow" is not even
     // proposed -- let alone competing with anything -- while the bot is
     // within range.
     triggers.push_back(new TriggerNode("leash too far", { NextAction("follow", 15.0f) }));

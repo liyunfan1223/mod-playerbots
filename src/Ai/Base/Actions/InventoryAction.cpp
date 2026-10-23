@@ -14,7 +14,7 @@ namespace
 {
 bool isReservedQualifier(std::string const& text)
 {
-    static std::array<std::string_view, 14> const exactQualifiers = {
+    static std::array<std::string_view, 15> const exactQualifiers = {
         "ammo",
         "conjured drink",
         "conjured food",
@@ -28,6 +28,7 @@ bool isReservedQualifier(std::string const& text)
         "pet",
         "quest",
         "recipe",
+        "start quest",
         "water"
     };
 
@@ -320,6 +321,15 @@ std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateIt
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 
+    // "start quest" is every usable item that opens a quest, regardless of item class. Bags only:
+    // the core deletes the starting item on accept, so starters are never equipped.
+    if (text == "start quest")
+    {
+        FindStartQuestItemVisitor visitor(bot);
+        IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
+        found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
+    }
+
     if (text == "materials")
     {
         FindTradeMaterialsVisitor visitor(count);
@@ -327,11 +337,19 @@ std::vector<Item*> InventoryAction::parseItems(std::string const text, IterateIt
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 
-    if (text.find("usage ") != std::string::npos)
+    // "usage <n>" is only meaningful at the start of the qualifier, which is how
+    // isReservedQualifier() reads it. Matching it anywhere handed stoi() the text at a fixed
+    // offset instead of the number, so "bandage usage 3" ended up in stoi("ge usage 3").
+    // At most nine digits so the value always fits an int.
+    if (text.rfind("usage ", 0) == 0)
     {
-        FindItemUsageVisitor visitor(bot, ItemUsage(stoi(text.substr(6))));
-        IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
-        found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
+        std::string const usage = text.substr(6, text.find(' ', 6) - 6);
+        if (!usage.empty() && usage.size() <= 9 && usage.find_first_not_of("0123456789") == std::string::npos)
+        {
+            FindItemUsageVisitor visitor(bot, ItemUsage(stoi(usage)));
+            IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
+            found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
+        }
     }
 
     if (!isReservedQualifier(text))

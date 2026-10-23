@@ -182,11 +182,11 @@ bool PetitionOfferNearbyAction::Execute(Event /*event*/)
         }
         else
         {
-            if (!sPlayerbotAIConfig.randomBotGroupNearby)
+            if (!sPlayerbotAIConfig.RandomBotGroupNearby)
                 return false;
         }
 
-        if (ServerFacade::instance().GetDistance2d(bot, player) > sPlayerbotAIConfig.sightDistance)
+        if (ServerFacade::instance().GetDistance2d(bot, player) > sPlayerbotAIConfig.SightDistance)
             continue;
 
         // Parse rpg target to quest action.
@@ -257,7 +257,7 @@ bool PetitionTurnInAction::Execute(Event /*event*/)
             guild->HandleSetEmblem(emblemInfo); // official core handling
 
             // LANG_GUILD_VETERAN -> can invite
-            guild->HandleSetRankInfo(2, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK | GR_RIGHT_INVITE);
+            guild->HandleSetRankInfo(2, {}, GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK | GR_RIGHT_INVITE);
         }
 
         return true;

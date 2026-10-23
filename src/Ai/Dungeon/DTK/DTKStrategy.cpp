@@ -7,7 +7,7 @@
 #include "DTKStrategy.h"
 #include "DTKMultipliers.h"
 
-void WotlkDungeonDTKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonDTKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Trollgore
     triggers.push_back(new TriggerNode("corpse explode",
@@ -23,7 +23,7 @@ void WotlkDungeonDTKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         { NextAction("novos target priority", ACTION_NORMAL + 1) }));
 
     // King Dred
-    // TODO: Fear ward / tremor totem, or general anti-fear strat development
+    // TODO: tremor totem, or general anti-fear strat development
 
     //The Prophet Tharon'ja
     triggers.push_back(new TriggerNode("gift of tharon'ja",
@@ -39,7 +39,7 @@ void WotlkDungeonDTKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
         { NextAction("slaying strike", ACTION_NORMAL + 2) }));
 }
 
-void WotlkDungeonDTKStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonDTKStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new NovosMultiplier(botAI));
     multipliers.push_back(new TharonjaMultiplier(botAI));

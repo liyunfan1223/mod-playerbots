@@ -23,12 +23,12 @@ class WotlkDungeonUKTriggerContext : public NamedObjectContext<Trigger>
             creators["not behind ingvar"] = &WotlkDungeonUKTriggerContext::not_behind_ingvar;
         }
     private:
-        static Trigger* keleseth_frost_tomb(PlayerbotAI* ai) { return new KelesethFrostTombTrigger(ai); }
-        static Trigger* dalronn_priority_target(PlayerbotAI* ai) { return new DalronnDpsTrigger(ai); }
-        static Trigger* ingvar_dreadful_roar(PlayerbotAI* ai) { return new IngvarDreadfulRoarTrigger(ai); }
-        static Trigger* ingvar_smash_tank(PlayerbotAI* ai) { return new IngvarSmashTankTrigger(ai); }
-        static Trigger* ingvar_smash_tank_return(PlayerbotAI* ai) { return new IngvarSmashTankReturnTrigger(ai); }
-        static Trigger* not_behind_ingvar(PlayerbotAI* ai) { return new NotBehindIngvarTrigger(ai); }
+        static Trigger* keleseth_frost_tomb(PlayerbotAI* botAI) { return new KelesethFrostTombTrigger(botAI); }
+        static Trigger* dalronn_priority_target(PlayerbotAI* botAI) { return new DalronnDpsTrigger(botAI); }
+        static Trigger* ingvar_dreadful_roar(PlayerbotAI* botAI) { return new IngvarDreadfulRoarTrigger(botAI); }
+        static Trigger* ingvar_smash_tank(PlayerbotAI* botAI) { return new IngvarSmashTankTrigger(botAI); }
+        static Trigger* ingvar_smash_tank_return(PlayerbotAI* botAI) { return new IngvarSmashTankReturnTrigger(botAI); }
+        static Trigger* not_behind_ingvar(PlayerbotAI* botAI) { return new NotBehindIngvarTrigger(botAI); }
 };
 
 #endif

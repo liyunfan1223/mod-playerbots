@@ -7,6 +7,7 @@
 #ifndef PLAYERBOTS_TRIGGERCONTEXT_H
 #define PLAYERBOTS_TRIGGERCONTEXT_H
 
+#include "BotStateTriggers.h"
 #include "CureTriggers.h"
 #include "FishingTriggers.h"
 #include "GenericTriggers.h"
@@ -91,7 +92,6 @@ public:
         creators["target in sight"] = &TriggerContext::TargetInSight;
         creators["not dps target active"] = &TriggerContext::not_dps_target_active;
         creators["not dps aoe target active"] = &TriggerContext::not_dps_aoe_target_active;
-        creators["has nearest adds"] = &TriggerContext::has_nearest_adds;
         creators["enemy player near"] = &TriggerContext::enemy_player_near;
 
         creators["tank assist"] = &TriggerContext::TankAssist;
@@ -106,6 +106,8 @@ public:
         creators["medium aoe and healer should attack"] = &TriggerContext::medium_aoe_and_healer_should_attack;
 
         creators["has area debuff"] = &TriggerContext::HasAreaDebuff;
+
+        creators["combat start"] = &TriggerContext::combat_start;
 
         creators["enemy out of melee"] = &TriggerContext::EnemyOutOfMelee;
         creators["enemy out of spell"] = &TriggerContext::EnemyOutOfSpell;
@@ -146,8 +148,6 @@ public:
         creators["no drink"] = &TriggerContext::no_drink;
         creators["no food"] = &TriggerContext::no_food;
 
-        creators["panic"] = &TriggerContext::panic;
-        creators["outnumbered"] = &TriggerContext::outnumbered;
         creators["behind target"] = &TriggerContext::behind_target;
         creators["not behind target"] = &TriggerContext::not_behind_target;
         creators["not facing target"] = &TriggerContext::not_facing_target;
@@ -193,10 +193,12 @@ public:
         creators["team has flag"] = &TriggerContext::team_has_flag;
         creators["enemy team has flag"] = &TriggerContext::enemy_team_has_flag;
         creators["enemy flagcarrier near"] = &TriggerContext::enemy_flagcarrier_near;
+        creators["wsg flag state changed"] = &TriggerContext::wsg_flag_state_changed;
+        creators["wsg support threat"] = &TriggerContext::wsg_support_threat;
+        creators["wsg escort separated"] = &TriggerContext::wsg_escort_separated;
         creators["in Battleground"] = &TriggerContext::player_is_in_BATTLEGROUND;
         creators["in Battleground without flag"] = &TriggerContext::player_is_in_BATTLEGROUND_no_flag;
         creators["wants in bg"] = &TriggerContext::player_wants_in_bg;
-        creators["alliance no snowfall gy"] = &TriggerContext::alliance_no_snowfall_gy;
 
         creators["mounted"] = &TriggerContext::mounted;
 
@@ -245,6 +247,7 @@ public:
         creators["do quest status"] = &TriggerContext::do_quest_status;
         creators["travel flight status"] = &TriggerContext::travel_flight_status;
         creators["outdoor pvp status"] = &TriggerContext::outdoor_pvp_status;
+        creators["do gather status"] = &TriggerContext::do_gather_status;
         creators["can self resurrect"] = &TriggerContext::can_self_resurrect;
         creators["can fish"] = &TriggerContext::can_fish;
         creators["can use fishing bobber"] = &TriggerContext::can_use_fishing_bobber;
@@ -257,7 +260,7 @@ private:
     static Trigger* give_water(PlayerbotAI* botAI) { return new GiveWaterTrigger(botAI); }
     static Trigger* no_rti(PlayerbotAI* botAI) { return new NoRtiTrigger(botAI); }
     static Trigger* _return(PlayerbotAI* botAI) { return new ReturnTrigger(botAI); }
-    static Trigger* return_to_stay_position(PlayerbotAI* ai) { return new ReturnToStayPositionTrigger(ai); }
+    static Trigger* return_to_stay_position(PlayerbotAI* botAI) { return new ReturnToStayPositionTrigger(botAI); }
     static Trigger* sit(PlayerbotAI* botAI) { return new SitTrigger(botAI); }
     static Trigger* far_from_rpg_target(PlayerbotAI* botAI) { return new FarFromRpgTargetTrigger(botAI); }
     static Trigger* near_rpg_target(PlayerbotAI* botAI) { return new NearRpgTargetTrigger(botAI); }
@@ -282,13 +285,13 @@ private:
     {
         return new AoeHealTrigger(botAI, "almost full aoe heal", "almost full", 2);
     }
-    static Trigger* group_heal_occasion(PlayerbotAI* ai)
+    static Trigger* group_heal_occasion(PlayerbotAI* botAI)
     {
-        return new AoeInGroupTrigger(ai, "group heal setting", "almost full");
+        return new AoeInGroupTrigger(botAI, "group heal setting", "almost full");
     }
-    static Trigger* medium_group_heal_occasion(PlayerbotAI* ai)
+    static Trigger* medium_group_heal_occasion(PlayerbotAI* botAI)
     {
-        return new AoeInGroupTrigger(ai, "medium group heal setting", "medium");
+        return new AoeInGroupTrigger(botAI, "medium group heal setting", "medium");
     }
     static Trigger* target_changed(PlayerbotAI* botAI) { return new TargetChangedTrigger(botAI); }
     static Trigger* swimming(PlayerbotAI* botAI) { return new IsSwimmingTrigger(botAI); }
@@ -303,16 +306,14 @@ private:
     // Separate named instance (own distance/check-interval) from "far from
     // master" above -- that one is tied to the compiled-in 12.0f default and
     // other callers may depend on that; this one is configurable via
-    // AiPlayerbot.LeashDistance for LeashStrategy (see LeashStrategy.cpp).
+    // Playerbots.LeashDistance for LeashStrategy (see LeashStrategy.cpp).
     static Trigger* leash_too_far(PlayerbotAI* botAI)
     {
-        return new FarFromMasterTrigger(botAI, "leash too far", sPlayerbotAIConfig.leashDistance, 10);
+        return new FarFromMasterTrigger(botAI, "leash too far", sPlayerbotAIConfig.LeashDistance, 10);
     }
     static Trigger* behind_target(PlayerbotAI* botAI) { return new IsBehindTargetTrigger(botAI); }
     static Trigger* not_behind_target(PlayerbotAI* botAI) { return new IsNotBehindTargetTrigger(botAI); }
     static Trigger* not_facing_target(PlayerbotAI* botAI) { return new IsNotFacingTargetTrigger(botAI); }
-    static Trigger* panic(PlayerbotAI* botAI) { return new PanicTrigger(botAI); }
-    static Trigger* outnumbered(PlayerbotAI* botAI) { return new OutNumberedTrigger(botAI); }
     static Trigger* no_drink(PlayerbotAI* botAI) { return new NoDrinkTrigger(botAI); }
     static Trigger* no_food(PlayerbotAI* botAI) { return new NoFoodTrigger(botAI); }
     static Trigger* LightAoe(PlayerbotAI* botAI) { return new LightAoeTrigger(botAI); }
@@ -321,6 +322,7 @@ private:
     static Trigger* healer_should_attack(PlayerbotAI* botAI) { return new HealerShouldAttackTrigger(botAI); }
     static Trigger* medium_aoe_and_healer_should_attack(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "medium aoe", "healer should attack"); }
     static Trigger* HasAreaDebuff(PlayerbotAI* botAI) { return new HasAreaDebuffTrigger(botAI); }
+    static Trigger* combat_start(PlayerbotAI* botAI) { return new CombatStartTrigger(botAI); }
     static Trigger* LoseAggro(PlayerbotAI* botAI) { return new LoseAggroTrigger(botAI); }
     static Trigger* HasAggro(PlayerbotAI* botAI) { return new HasAggroTrigger(botAI); }
     static Trigger* LowHealth(PlayerbotAI* botAI) { return new LowHealthTrigger(botAI); }
@@ -351,8 +353,9 @@ private:
     static Trigger* TargetInSight(PlayerbotAI* botAI) { return new TargetInSightTrigger(botAI); }
     static Trigger* not_dps_target_active(PlayerbotAI* botAI) { return new NotDpsTargetActiveTrigger(botAI); }
     static Trigger* not_dps_aoe_target_active(PlayerbotAI* botAI) { return new NotDpsAoeTargetActiveTrigger(botAI); }
-    static Trigger* has_nearest_adds(PlayerbotAI* botAI) { return new HasNearestAddsTrigger(botAI); }
     static Trigger* enemy_player_near(PlayerbotAI* botAI) { return new EnemyPlayerNear(botAI); }
+    static Trigger* wsg_support_threat(PlayerbotAI* botAI) { return new WsgSupportThreat(botAI); }
+    static Trigger* wsg_escort_separated(PlayerbotAI* botAI) { return new WsgEscortSeparated(botAI); }
     static Trigger* Random(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "random", 20); }
     static Trigger* seldom(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "seldom", 300); }
     static Trigger* often(PlayerbotAI* botAI) { return new RandomTrigger(botAI, "often", 5); }
@@ -375,9 +378,9 @@ private:
     static Trigger* ComboPoints5Available(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI, 5); }
     static Trigger* ComboPoints4Available(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI, 4); }
     static Trigger* ComboPoints3Available(PlayerbotAI* botAI) { return new ComboPointsAvailableTrigger(botAI, 3); }
-    static Trigger* target_with_combo_points_almost_dead(PlayerbotAI* ai)
+    static Trigger* target_with_combo_points_almost_dead(PlayerbotAI* botAI)
     {
-        return new TargetWithComboPointsLowerHealTrigger(ai, 3, 3.0f);
+        return new TargetWithComboPointsLowerHealTrigger(botAI, 3, 3.0f);
     }
     static Trigger* ComboPointsNotFull(PlayerbotAI* botAI) { return new ComboPointsNotFullTrigger(botAI); }
     static Trigger* ComboPointsNotFullAndHighEnergy(PlayerbotAI* botAI) { return new TwoTriggers(botAI, "combo points not full", "high energy available"); }
@@ -423,9 +426,9 @@ private:
     static Trigger* team_has_flag(PlayerbotAI* botAI) { return new TeamHasFlag(botAI); }
     static Trigger* enemy_team_has_flag(PlayerbotAI* botAI) { return new EnemyTeamHasFlag(botAI); }
     static Trigger* enemy_flagcarrier_near(PlayerbotAI* botAI) { return new EnemyFlagCarrierNear(botAI); }
+    static Trigger* wsg_flag_state_changed(PlayerbotAI* botAI) { return new WsgFlagStateChanged(botAI); }
     static Trigger* player_is_in_BATTLEGROUND(PlayerbotAI* botAI) { return new PlayerIsInBattleground(botAI); }
     static Trigger* player_is_in_BATTLEGROUND_no_flag(PlayerbotAI* botAI) { return new PlayerIsInBattlegroundWithoutFlag(botAI); }
-    static Trigger* alliance_no_snowfall_gy(PlayerbotAI* botAI) { return new AllianceNoSnowfallGY(botAI); }
     static Trigger* mounted(PlayerbotAI* botAI) { return new IsMountedTrigger(botAI); }
     static Trigger* at_dark_portal_outland(PlayerbotAI* botAI) { return new AtDarkPortalOutlandTrigger(botAI); }
     static Trigger* at_dark_portal_azeroth(PlayerbotAI* botAI) { return new AtDarkPortalAzerothTrigger(botAI); }
@@ -468,11 +471,12 @@ private:
     static Trigger* do_quest_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_DO_QUEST); }
     static Trigger* travel_flight_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_TRAVEL_FLIGHT); }
     static Trigger* outdoor_pvp_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_OUTDOOR_PVP); }
-    static Trigger* can_self_resurrect(PlayerbotAI* ai) { return new SelfResurrectTrigger(ai); }
-    static Trigger* can_fish(PlayerbotAI* ai) { return new CanFishTrigger(ai); }
-    static Trigger* can_use_fishing_bobber(PlayerbotAI* ai) { return new CanUseFishingBobberTrigger(ai); }
-    static Trigger* new_pet(PlayerbotAI* ai) { return new NewPetTrigger(ai); }
-    static Trigger* wait_for_attack_safe_distance(PlayerbotAI* ai) { return new WaitForAttackSafeDistanceTrigger(ai); }
+    static Trigger* do_gather_status(PlayerbotAI* botAI) { return new NewRpgStatusTrigger(botAI, RPG_DO_GATHER); }
+    static Trigger* can_self_resurrect(PlayerbotAI* botAI) { return new SelfResurrectTrigger(botAI); }
+    static Trigger* can_fish(PlayerbotAI* botAI) { return new CanFishTrigger(botAI); }
+    static Trigger* can_use_fishing_bobber(PlayerbotAI* botAI) { return new CanUseFishingBobberTrigger(botAI); }
+    static Trigger* new_pet(PlayerbotAI* botAI) { return new NewPetTrigger(botAI); }
+    static Trigger* wait_for_attack_safe_distance(PlayerbotAI* botAI) { return new WaitForAttackSafeDistanceTrigger(botAI); }
 };
 
 #endif

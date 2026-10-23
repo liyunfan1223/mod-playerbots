@@ -70,7 +70,7 @@ bool CleanQuestLogAction::Execute(Event event)
     if (!requester)
         return false;
 
-    if (!sPlayerbotAIConfig.dropObsoleteQuests)
+    if (!sPlayerbotAIConfig.DropObsoleteQuests)
         return false;
 
     // Only output this message if "debug rpg" strategy is enabled
@@ -118,7 +118,7 @@ bool CleanQuestLogAction::Execute(Event event)
                     {{"%title", quest->GetTitle()}}));
 
             // Remove quest
-            botAI->rpgStatistic.questDropped++;
+            botAI->RecordQuestDropped(questId, QuestDropReason::Trivial);
             bot->SetQuestSlot(slot, 0);
             bot->TakeQuestSourceItem(questId, false);
             bot->SetQuestStatus(questId, QUEST_STATUS_NONE);

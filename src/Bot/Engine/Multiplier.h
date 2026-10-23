@@ -11,6 +11,7 @@
 
 class Action;
 class PlayerbotAI;
+struct PerformanceData;
 
 class Multiplier : public AiNamedObject
 {
@@ -19,6 +20,12 @@ public:
     virtual ~Multiplier() {}
 
     virtual float GetValue([[maybe_unused]] Action* action) { return 1.0f; }
+
+    PerformanceData* GetPerfData();
+    void NoteBlock();
+
+private:
+    PerformanceData* perfData = nullptr;
 };
 
 #endif

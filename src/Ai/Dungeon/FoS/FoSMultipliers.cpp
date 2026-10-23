@@ -46,7 +46,7 @@ float AttackFragmentMultiplier::GetValue(Action* action)
         }
     }
 
-    if (fragment && botAI->IsDps(bot) && dynamic_cast<BronjahmGroupPositionAction*>(action))
+    if (fragment && PlayerbotAI::IsDps(bot) && dynamic_cast<BronjahmGroupPositionAction*>(action))
         return 0.0f;
 
     return 1.0f;

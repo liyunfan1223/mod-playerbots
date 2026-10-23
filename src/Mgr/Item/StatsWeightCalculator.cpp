@@ -7,6 +7,7 @@
 #include "StatsWeightCalculator.h"
 #include "AiFactory.h"
 #include "DBCStores.h"
+#include "Item.h"
 #include "ItemEnchantmentMgr.h"
 #include "ItemTemplate.h"
 #include "ObjectMgr.h"
@@ -62,7 +63,7 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
     cls = player->getClass();
     lvl = player->GetLevel();
     tab = AiFactory::GetPlayerSpecTab(player);
-    collector_ = std::make_unique<StatsCollector>(type_, cls);
+    collector_ = std::make_unique<StatsCollector>(type_, cls, lvl);
 
     if (cls == CLASS_DEATH_KNIGHT && tab == DEATH_KNIGHT_TAB_UNHOLY)
         hitOverflowType_ = CollectorType::SPELL;
@@ -75,7 +76,6 @@ StatsWeightCalculator::StatsWeightCalculator(Player* player) : player_(player)
 
     enable_overflow_penalty_ = true;
     enable_item_set_bonus_ = true;
-    enable_quality_blend_ = true;
 }
 
 void StatsWeightCalculator::Reset()
@@ -102,8 +102,25 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
     if (randomPropertyIds != 0)
         CalculateRandomProperty(randomPropertyIds, itemId);
 
+    bool const checkSetBonus = enable_item_set_bonus_;
+    std::array<float, STATS_TYPE_MAX> setBonusStats{};
+    std::array<float, STATS_TYPE_MAX> setBonusBaseline{};
+
+    // Clamp the item's own stats first so the tier below is valued only on what the player can
+    // still use (a tier's hit at the hit cap must not make the piece look valued).
     if (enable_overflow_penalty_)
         ApplyOverflowPenalty(player_);
+
+    if (checkSetBonus)
+    {
+        for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+            setBonusBaseline[i] = collector_->stats[i];
+        CollectItemSetBonus(player_, proto, slot, setBonusStats);
+
+        // Clamp the combined stats: the tier's contribution is capped the same way.
+        if (enable_overflow_penalty_)
+            ApplyOverflowPenalty(player_);
+    }
 
     GenerateWeights(player_);
     for (uint32 i = 0; i < STATS_TYPE_MAX; i++)
@@ -113,30 +130,31 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
 
     CalculateItemTypePenalty(proto);
 
-    if (enable_item_set_bonus_)
+    // Value the tier on the stats that survive the clamp, on top of the item's own clamped
+    // stats. A tier whose weighted delta is ~zero (most raid tier procs only produce
+    // STATS_TYPE_BONUS, capped hit) falls back to the legacy completeness multiplier.
+    float setBonusValue = 0.0f;
+    if (checkSetBonus)
+    {
+        for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+            if (i != STATS_TYPE_BONUS)
+                setBonusValue += stats_weights_[i] * (collector_->stats[i] - setBonusBaseline[i]);
+    }
+    bool const setBonusValued = setBonusValue > 0.0001f;
+
+    if (enable_item_set_bonus_ && !setBonusValued)
         CalculateItemSetMod(player_, proto);
 
     CalculateSocketBonus(player_, proto);
 
-    if (enable_quality_blend_)
-    {
-        // Heirloom items scale with player level
-        // Use player level as effective item level for heirlooms - Quality EPIC
-        // Else - Blend with item quality and level for normal items
-        if (proto->Quality == ITEM_QUALITY_HEIRLOOM)
-            weight_ *= PlayerbotFactory::CalcMixedGearScore(lvl, ITEM_QUALITY_EPIC);
-        else
-            weight_ *= PlayerbotFactory::CalcMixedGearScore(proto->ItemLevel, proto->Quality);
-    }
-
     // Apply weapon speed governance if slot is provided and this is a weapon
-    if (sPlayerbotAIConfig.preferredSpecWeapons && slot >= 0 && proto->Class == ITEM_CLASS_WEAPON)
+    if (sPlayerbotAIConfig.PreferredSpecWeapons && slot >= 0 && proto->Class == ITEM_CLASS_WEAPON)
         weight_ *= ApplyPreferredSpecWeapons(proto, slot);
 
     return weight_;
 }
 
-float StatsWeightCalculator::CalculateEnchant(uint32 enchantId)
+float StatsWeightCalculator::CalculateEnchant(uint32 enchantId, uint32 weaponDelay, bool isRanged)
 {
     SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
 
@@ -145,7 +163,7 @@ float StatsWeightCalculator::CalculateEnchant(uint32 enchantId)
 
     Reset();
 
-    collector_->CollectEnchantStats(enchant);
+    collector_->CollectEnchantStats(enchant, 0, weaponDelay, isRanged);
 
     if (enable_overflow_penalty_)
         ApplyOverflowPenalty(player_);
@@ -314,7 +332,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_CRIT] += 1.5f;
         stats_weights_[STATS_TYPE_HASTE] += 2.1f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 2.1f;
-        stats_weights_[STATS_TYPE_MELEE_DPS] += 15.0f;
+        // Weapon DPS is taken into account as part of Attack Power for Cat Druids.
     }
     else if (cls == CLASS_ROGUE && (tab == ROGUE_TAB_ASSASSINATION || tab == ROGUE_TAB_SUBTLETY))
     {
@@ -517,7 +535,7 @@ void StatsWeightCalculator::GenerateBasicWeights(Player* player)
         stats_weights_[STATS_TYPE_CRIT] += 1.3f;
         stats_weights_[STATS_TYPE_HASTE] += 2.3f;
         stats_weights_[STATS_TYPE_EXPERTISE] += 3.7f;
-        stats_weights_[STATS_TYPE_MELEE_DPS] += 3.0f;
+        // Weapon DPS is taken into account as part of Attack Power for Bear Druids.
     }
 }
 
@@ -560,8 +578,60 @@ void StatsWeightCalculator::GenerateAdditionalWeights(Player* player)
 
     if (pvpSpec_ && !exclude_resilience_)
         stats_weights_[STATS_TYPE_RESILIENCE] += 7.0f;
-    else if (!pvpSpec_)
-        stats_weights_[STATS_TYPE_RESILIENCE] -= 3.0f;
+}
+
+void StatsWeightCalculator::CollectItemSetBonus(Player* player, ItemTemplate const* proto, int32 slot,
+                                                std::array<float, STATS_TYPE_MAX>& setBonusStats)
+{
+    uint32 itemSet = proto->ItemSet;
+    if (!itemSet)
+        return;
+
+    ItemSetEntry const* setEntry = sItemSetStore.LookupEntry(itemSet);
+    if (!setEntry)
+        return;
+
+    // Pieces worn while the candidate is evaluated: the item currently in the candidate's
+    // slot (if it is from the same set) is replaced, so it must not count. The candidate
+    // itself adds one piece, so only the tier at (worn + 1) is newly activated.
+    uint32 worn = 0;
+    for (ItemSetEffect* eff : player->ItemSetEff)
+    {
+        if (eff && eff->setid == itemSet)
+        {
+            worn = eff->item_count;
+            break;
+        }
+    }
+
+    if (worn && slot >= 0 && slot < EQUIPMENT_SLOT_END)
+    {
+        if (Item* oldItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, uint8(slot)))
+        {
+            if (oldItem->GetTemplate()->ItemSet == itemSet)
+                --worn;
+        }
+    }
+
+    // Value only the tier this item switches on. Tiers that are already active stay
+    // credited to the item providing them, so candidates are compared on their delta.
+    // Keep the stats the tier adds and let the caller weigh them after GenerateWeights.
+    for (uint32 j = 0; j < MAX_ITEM_SET_SPELLS; ++j)
+    {
+        uint32 threshold = setEntry->items_to_triggerspell[j];
+        uint32 spellId = setEntry->spells[j];
+        if (!threshold || !spellId || threshold != worn + 1)
+            continue;
+
+        std::array<float, STATS_TYPE_MAX> before{};
+        for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+            before[i] = collector_->stats[i];
+
+        collector_->CollectSpellStats(spellId, 1.0f, Milliseconds(0));
+
+        for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+            setBonusStats[i] += collector_->stats[i] - before[i];
+    }
 }
 
 void StatsWeightCalculator::CalculateItemSetMod(Player* player, ItemTemplate const* proto)
@@ -596,7 +666,7 @@ void StatsWeightCalculator::CalculateItemSetMod(Player* player, ItemTemplate con
             }
             else
             {
-                multiplier = 1.0f;  // All item set effect has been triggerred
+                multiplier = 1.0f;  // All item set effect has been triggered
             }
             break;
         }

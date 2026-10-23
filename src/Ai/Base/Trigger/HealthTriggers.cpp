@@ -28,7 +28,7 @@ bool HealerLowManaTrigger::IsActive()
     if (!target)
         return false;
 
-    return target->GetPowerPct(POWER_MANA) < sPlayerbotAIConfig.lowMana;
+    return target->GetPowerPct(POWER_MANA) < sPlayerbotAIConfig.LowMana;
 }
 
 bool AoeInGroupTrigger::IsActive()

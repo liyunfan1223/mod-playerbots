@@ -12,8 +12,8 @@
 class TellGlyphsAction : public Action
 {
 public:
-    TellGlyphsAction(PlayerbotAI* ai, std::string const name = "glyphs")
-        : Action(ai, name) {}
+    TellGlyphsAction(PlayerbotAI* botAI, std::string const name = "glyphs")
+        : Action(botAI, name) {}
 
     bool Execute(Event event) override;
 };

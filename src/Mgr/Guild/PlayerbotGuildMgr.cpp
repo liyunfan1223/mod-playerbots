@@ -11,12 +11,13 @@
 #include "GuildMgr.h"
 #include "Player.h"
 #include "PlayerbotAIConfig.h"
+#include "RandomPlayerbotFactory.h"
 #include "ScriptMgr.h"
 
 void PlayerbotGuildMgr::Init()
 {
     _guildCache.clear();
-    if (sPlayerbotAIConfig.deleteRandomBotGuilds)
+    if (sPlayerbotAIConfig.DeleteRandomBotGuilds)
         DeleteRandomBotGuilds();
 
     LoadGuildNames();
@@ -42,7 +43,7 @@ bool PlayerbotGuildMgr::CreateGuild(Player* player, std::string guildName)
     entry.name = guildName;
     entry.memberCount = 1;
     entry.status = 1;
-    entry.maxMembers = sPlayerbotAIConfig.randomBotGuildSizeMax;
+    entry.maxMembers = sPlayerbotAIConfig.RandomBotGuildSizeMax;
     entry.faction = player->GetTeamId();
 
     _guildCache[guild->GetId()] = entry;
@@ -63,27 +64,7 @@ bool PlayerbotGuildMgr::SetGuildEmblem(uint32 guildId)
     br = urand(0, 7);
     st = urand(0, 180);
 
-    LOG_DEBUG("playerbots",
-        "[TABARD] new guild id={} random -> style={}, color={}, borderStyle={}, borderColor={}, bgColor={}",
-        guild->GetId(), st, cl, br, bc, bg);
-
-    // populate guild table with a random tabard design
-    CharacterDatabase.Execute(
-        "UPDATE guild SET EmblemStyle={}, EmblemColor={}, BorderStyle={}, BorderColor={}, BackgroundColor={} "
-        "WHERE guildid={}",
-        st, cl, br, bc, bg, guild->GetId());
-    LOG_DEBUG("playerbots", "[TABARD] UPDATE done for guild id={}", guild->GetId());
-
-    // Immediate reading for log
-    if (QueryResult qr = CharacterDatabase.Query(
-            "SELECT EmblemStyle,EmblemColor,BorderStyle,BorderColor,BackgroundColor FROM guild WHERE guildid={}",
-            guild->GetId()))
-    {
-        Field* f = qr->Fetch();
-        LOG_DEBUG("playerbots",
-            "[TABARD] DB check guild id={} => style={}, color={}, borderStyle={}, borderColor={}, bgColor={}",
-            guild->GetId(), f[0].Get<uint8>(), f[1].Get<uint8>(), f[2].Get<uint8>(), f[3].Get<uint8>(), f[4].Get<uint8>());
-    }
+    guild->HandleSetEmblem(EmblemInfo(st, cl, br, bc, bg));
     return true;
 }
 
@@ -117,7 +98,7 @@ std::string PlayerbotGuildMgr::AssignToGuild(Player* player)
         }
         );
 
-    if (count < sPlayerbotAIConfig.randomBotGuildCount)
+    if (count < sPlayerbotAIConfig.RandomBotGuildCount)
     {
         for (auto& key : _shuffled_guild_keys)
         {
@@ -167,7 +148,12 @@ void PlayerbotGuildMgr::LoadGuildNames()
 {
     LOG_INFO("playerbots", "Loading guild names from playerbots_guild_names...");
 
-    QueryResult result = CharacterDatabase.Query("SELECT name_id, name FROM playerbots_guild_names");
+    _guildNames.clear();
+    _shuffled_guild_keys.clear();
+
+    QueryResult result = CharacterDatabase.Query(
+        "SELECT {} FROM playerbots_guild_names",
+        RandomPlayerbotFactory::GetGuildNameSelector("name"));
 
     if (!result)
     {
@@ -178,7 +164,10 @@ void PlayerbotGuildMgr::LoadGuildNames()
     do
     {
         Field* fields = result->Fetch();
-        _guildNames[fields[1].Get<std::string>()] = true;
+
+        std::string name = fields[0].Get<std::string>();
+        if (!name.empty())
+            _guildNames[name] = true;
     } while (result->NextRow());
 
     for (auto& pair : _guildNames)
@@ -215,7 +204,7 @@ void PlayerbotGuildMgr::ValidateGuildCache()
         uint32 guildId = it->first;
         GuildCache cache;
         cache.name = it->second;
-        cache.maxMembers = sPlayerbotAIConfig.randomBotGuildSizeMax;
+        cache.maxMembers = sPlayerbotAIConfig.RandomBotGuildSizeMax;
 
         Guild* guild = sGuildMgr ->GetGuildById(guildId);
         if (!guild)

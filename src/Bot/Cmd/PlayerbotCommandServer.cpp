@@ -70,19 +70,19 @@ void server(Acore::Asio::IoContext& io_service, short port)
 
 void Run()
 {
-    if (!sPlayerbotAIConfig.commandServerPort)
+    if (!sPlayerbotAIConfig.CommandServerPort)
     {
         return;
     }
 
     std::ostringstream s;
-    s << "Starting Playerbots Command Server on port " << sPlayerbotAIConfig.commandServerPort;
+    s << "Starting Playerbots Command Server on port " << sPlayerbotAIConfig.CommandServerPort;
     LOG_INFO("playerbots", "{}", s.str().c_str());
 
     try
     {
         Acore::Asio::IoContext io_service;
-        server(io_service, sPlayerbotAIConfig.commandServerPort);
+        server(io_service, sPlayerbotAIConfig.CommandServerPort);
     }
 
     catch (std::exception& e)

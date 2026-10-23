@@ -24,11 +24,11 @@ public:
     }
 
 private:
-    static Action* move_to_side(PlayerbotAI* ai) { return new RaidOnyxiaMoveToSideAction(ai); }
-    static Action* spread_out(PlayerbotAI* ai) { return new RaidOnyxiaSpreadOutAction(ai); }
-    static Action* move_to_safe_zone(PlayerbotAI* ai) { return new RaidOnyxiaMoveToSafeZoneAction(ai); }
-    static Action* kill_whelps(PlayerbotAI* ai) { return new RaidOnyxiaKillWhelpsAction(ai); }
-    static Action* avoid_eggs(PlayerbotAI* ai) { return new OnyxiaAvoidEggsAction(ai); }
+    static Action* move_to_side(PlayerbotAI* botAI) { return new RaidOnyxiaMoveToSideAction(botAI); }
+    static Action* spread_out(PlayerbotAI* botAI) { return new RaidOnyxiaSpreadOutAction(botAI); }
+    static Action* move_to_safe_zone(PlayerbotAI* botAI) { return new RaidOnyxiaMoveToSafeZoneAction(botAI); }
+    static Action* kill_whelps(PlayerbotAI* botAI) { return new RaidOnyxiaKillWhelpsAction(botAI); }
+    static Action* avoid_eggs(PlayerbotAI* botAI) { return new OnyxiaAvoidEggsAction(botAI); }
 };
 
 #endif

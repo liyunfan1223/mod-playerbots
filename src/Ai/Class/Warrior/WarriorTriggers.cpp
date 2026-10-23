@@ -19,7 +19,7 @@ constexpr uint32 SPELL_COMMANDING_PRESENCE_RANKS[] = { 12318, 12857, 12858, 1286
 
 bool BloodrageBuffTrigger::IsActive()
 {
-    return AI_VALUE2(uint8, "health", "self target") >= sPlayerbotAIConfig.mediumHealth &&
+    return AI_VALUE2(uint8, "health", "self target") >= sPlayerbotAIConfig.MediumHealth &&
            AI_VALUE2(uint8, "rage", "self target") < 20;
 }
 
@@ -32,45 +32,19 @@ bool VigilanceTrigger::IsActive()
     if (!group)
         return false;
 
-    Player* currentVigilanceTarget = nullptr;
-    Player* mainTank = nullptr;
-    Player* assistTank1 = nullptr;
-    Player* assistTank2 = nullptr;
-    Player* highestGearScorePlayer = nullptr;
-    uint32 highestGearScore = 0;
-
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
         if (!member || member == bot || !member->IsAlive())
             continue;
 
-        if (!currentVigilanceTarget && botAI->HasAura("vigilance", member, false, true))
-            currentVigilanceTarget = member;
-
-        if (!mainTank && botAI->IsMainTank(member))
-            mainTank = member;
-        else if (!assistTank1 && botAI->IsAssistTankOfIndex(member, 0))
-            assistTank1 = member;
-        else if (!assistTank2 && botAI->IsAssistTankOfIndex(member, 1))
-            assistTank2 = member;
-
-        uint32 gearScore = botAI->GetEquipGearScore(member);
-        if (gearScore > highestGearScore)
-        {
-            highestGearScore = gearScore;
-            highestGearScorePlayer = member;
-        }
+        // The action casts Vigilance on dps, but the trigger fails if any party member has
+        // Vigilance from the bot (so the player can have a bot cast Vigilance on any group member).
+        if (member->HasAura(SPELL_VIGILANCE, bot->GetGUID()))
+            return false;
     }
 
-    Player* highestPriorityTarget = mainTank ? mainTank :
-                                      (assistTank1 ? assistTank1 :
-                                      (assistTank2 ? assistTank2 : highestGearScorePlayer));
-
-    if (!currentVigilanceTarget || currentVigilanceTarget != highestPriorityTarget)
-        return true;
-
-    return false;
+    return true;
 }
 
 bool ShatteringThrowTrigger::IsActive()

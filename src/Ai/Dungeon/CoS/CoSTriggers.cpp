@@ -32,5 +32,5 @@ bool ExplodeGhoulTrigger::IsActive()
 
 bool EpochRangedTrigger::IsActive()
 {
-    return !botAI->IsMelee(bot) && AI_VALUE2(Unit*, "find target", "chrono-lord epoch");
+    return !PlayerbotAI::IsMelee(bot) && AI_VALUE2(Unit*, "find target", "chrono-lord epoch");
 }

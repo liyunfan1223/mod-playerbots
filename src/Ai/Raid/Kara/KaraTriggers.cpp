@@ -13,7 +13,7 @@
 using namespace KaraHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool KarazhanBotIsNotInCombatTrigger::IsActive()
 {
@@ -22,12 +22,19 @@ bool KarazhanBotIsNotInCombatTrigger::IsActive()
 
 bool KarazhanEnemiesCastFearTrigger::IsActive()
 {
-    if (bot->getClass() != CLASS_SHAMAN && bot->getClass() != CLASS_PRIEST)
+    if (bot->getClass() != CLASS_SHAMAN)
         return false;
 
-    return AI_VALUE2(Unit*, "find target", "nightbane") ||
-        AI_VALUE2(Unit*, "find target", "spectral charger") ||
-        AI_VALUE2(Unit*, "find target", "the big bad wolf");
+    if (AI_VALUE2(bool, "has totem", "tremor totem"))
+        return false;
+
+    Unit* nightbane = AI_VALUE2(Unit*, "find target", "nightbane");
+    if (nightbane && nightbane->GetPositionZ() <= NIGHTBANE_FLIGHT_Z)
+        return true;
+
+    return AI_VALUE2(Unit*, "find target", "spectral charger") ||
+        AI_VALUE2(Unit*, "find target", "the big bad wolf") ||
+        AI_VALUE2(Unit*, "find target", "roar");
 }
 
 // Trash

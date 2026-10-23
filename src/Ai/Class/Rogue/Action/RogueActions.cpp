@@ -22,7 +22,7 @@ constexpr uint32 SPELL_MASTER_POISONER_RANK_3 = 58410;
 bool CastStealthAction::isUseful()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    if (target && bot->GetDistance(target) >= sPlayerbotAIConfig.spellDistance)
+    if (target && bot->GetDistance(target) >= sPlayerbotAIConfig.SpellDistance)
         return false;
     return true;
 }
@@ -37,7 +37,7 @@ bool CastStealthAction::isPossible()
 bool UnstealthAction::Execute(Event /*event*/)
 {
     botAI->RemoveAura("stealth");
-    // botAI->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
+    // botAI->ChangeStrategy("+combat,-stealthed", BOT_STATE_COMBAT);
 
     return true;
 }
@@ -46,11 +46,11 @@ bool CheckStealthAction::Execute(Event /*event*/)
 {
     if (botAI->HasAura("stealth", bot))
     {
-        botAI->ChangeStrategy("-dps,+stealthed", BOT_STATE_COMBAT);
+        botAI->ChangeStrategy("-combat,+stealthed", BOT_STATE_COMBAT);
     }
     else
     {
-        botAI->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
+        botAI->ChangeStrategy("+combat,-stealthed", BOT_STATE_COMBAT);
     }
 
     return true;

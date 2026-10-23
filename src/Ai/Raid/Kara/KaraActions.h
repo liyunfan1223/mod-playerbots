@@ -20,16 +20,12 @@ public:
     bool Execute(Event event) override;
 };
 
-class KarazhanCastFearProtectionSpellAction : public Action
+class KarazhanSetTremorTotemAction : public Action
 {
 public:
-    KarazhanCastFearProtectionSpellAction(PlayerbotAI* botAI)
-        : Action(botAI, "karazhan cast fear protection spell") {}
+    KarazhanSetTremorTotemAction(PlayerbotAI* botAI)
+        : Action(botAI, "karazhan set tremor totem") {}
     bool Execute(Event event) override;
-
-private:
-    bool CastFearWardOnMainTank();
-    bool SetTremorTotem();
 };
 
 class ManaWarpStunCreatureBeforeWarpBreachAction : public AttackAction

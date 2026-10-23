@@ -7,7 +7,7 @@
 #include "UKStrategy.h"
 #include "UKMultipliers.h"
 
-void WotlkDungeonUKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
+void WotlkDungeonUKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     // Prince Keleseth
     triggers.push_back(new TriggerNode("keleseth frost tomb",
@@ -36,7 +36,7 @@ void WotlkDungeonUKStrategy::InitTriggers(std::vector<TriggerNode*> &triggers)
 
 }
 
-void WotlkDungeonUKStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void WotlkDungeonUKStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
     multipliers.push_back(new PrinceKelesethMultiplier(botAI));
     multipliers.push_back(new SkarvaldAndDalronnMultiplier(botAI));

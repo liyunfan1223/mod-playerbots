@@ -33,15 +33,15 @@ WorldLocation ArrowFormation::GetLocationInternal()
     tanks.PlaceUnits(&placer);
     tanks.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
-    offset += tankLines * sPlayerbotAIConfig.followDistance + sPlayerbotAIConfig.tooCloseDistance / 2;
+    offset += tankLines * sPlayerbotAIConfig.FollowDistance + sPlayerbotAIConfig.TooCloseDistance / 2;
     melee.PlaceUnits(&placer);
     melee.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
-    offset += meleeLines * sPlayerbotAIConfig.followDistance + sPlayerbotAIConfig.tooCloseDistance / 2;
+    offset += meleeLines * sPlayerbotAIConfig.FollowDistance + sPlayerbotAIConfig.TooCloseDistance / 2;
     ranged.PlaceUnits(&placer);
     ranged.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
-    offset += rangedLines * sPlayerbotAIConfig.followDistance;
+    offset += rangedLines * sPlayerbotAIConfig.FollowDistance;
     healers.PlaceUnits(&placer);
     healers.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
@@ -75,11 +75,11 @@ void ArrowFormation::Build()
 
 FormationSlot* ArrowFormation::FindSlot(Player* member)
 {
-    if (botAI->IsTank(member))
+    if (PlayerbotAI::IsTank(member))
         return &tanks;
-    else if (botAI->IsHeal(member))
+    else if (PlayerbotAI::IsHeal(member))
         return &healers;
-    else if (botAI->IsRanged(member))
+    else if (PlayerbotAI::IsRanged(member))
         return &ranged;
     else
         return &melee;
@@ -151,8 +151,8 @@ UnitPosition MultiLineUnitPlacer::Place(FormationUnit* unit, uint32 index, uint3
 UnitPosition SingleLineUnitPlacer::Place(FormationUnit* /*unit*/, uint32 index, uint32 count)
 {
     float angle = orientation - M_PI / 2.0f;
-    float x = cos(angle) * sPlayerbotAIConfig.followDistance * ((float)index - (float)count / 2);
-    float y = sin(angle) * sPlayerbotAIConfig.followDistance * ((float)index - (float)count / 2);
+    float x = cos(angle) * sPlayerbotAIConfig.FollowDistance * ((float)index - (float)count / 2);
+    float y = sin(angle) * sPlayerbotAIConfig.FollowDistance * ((float)index - (float)count / 2);
     return UnitPosition(x, y);
 }
 

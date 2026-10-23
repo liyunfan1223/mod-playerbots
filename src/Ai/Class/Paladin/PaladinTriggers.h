@@ -52,13 +52,13 @@ class BlessingOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     BlessingOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "blessing of kings,blessing of might,blessing of wisdom", 2 * 2000) {}
+        : BuffOnPartyTrigger(botAI, "blessing of kings,blessing of might,blessing of wisdom", 4 * IN_MILLISECONDS) {}
 };
 
 class BlessingTrigger : public BuffTrigger
 {
 public:
-    BlessingTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of sanctuary", 2 * 2000) {}
+    BlessingTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of sanctuary", 4 * IN_MILLISECONDS) {}
 
     bool IsActive() override;
 };

@@ -40,12 +40,13 @@ bool BankAction::ExecuteBank(std::string const text, Unit* /*bank*/)
     bool result = false;
     if (text[0] == '-')
     {
-        std::vector<Item*> found = parseItems(text.substr(1), ITERATE_ITEMS_IN_BANK);
-        for (std::vector<Item*>::iterator i = found.begin(); i != found.end(); i++)
-        {
-            Item* item = *i;
-            result &= Withdraw(item->GetTemplate()->ItemId);
-        }
+        // A withdrawal can free a later entry, so read every id first.
+        std::vector<uint32> itemIds;
+        for (Item* item : parseItems(text.substr(1), ITERATE_ITEMS_IN_BANK))
+            itemIds.push_back(item->GetEntry());
+
+        for (uint32 const itemId : itemIds)
+            result &= Withdraw(itemId);
     }
     else
     {
@@ -80,19 +81,18 @@ bool BankAction::Withdraw(uint32 itemid)
         return false;
     }
 
+    std::ostringstream out;
+    out << "got " << chat->FormatItem(pItem->GetTemplate(), pItem->GetCount()) << " from bank";
+
     bot->RemoveItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
     bot->StoreItem(dest, pItem, true);
 
-    std::ostringstream out;
-    out << "got " << chat->FormatItem(pItem->GetTemplate(), pItem->GetCount()) << " from bank";
     botAI->TellMaster(out.str());
     return true;
 }
 
 bool BankAction::Deposit(Item* pItem)
 {
-    std::ostringstream out;
-
     ItemPosCountVec dest;
     InventoryResult msg = bot->CanBankItem(NULL_BAG, NULL_SLOT, dest, pItem, false);
     if (msg != EQUIP_ERR_OK)
@@ -101,10 +101,12 @@ bool BankAction::Deposit(Item* pItem)
         return false;
     }
 
+    std::ostringstream out;
+    out << "put " << chat->FormatItem(pItem->GetTemplate(), pItem->GetCount()) << " to bank";
+
     bot->RemoveItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
     bot->BankItem(dest, pItem, true);
 
-    out << "put " << chat->FormatItem(pItem->GetTemplate(), pItem->GetCount()) << " to bank";
     botAI->TellMaster(out.str());
     return true;
 }

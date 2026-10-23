@@ -7,7 +7,6 @@
 #ifndef PLAYERBOTS_ACSTRATEGY_H
 #define PLAYERBOTS_ACSTRATEGY_H
 
-#include "Multiplier.h"
 #include "Strategy.h"
 #include <string>
 #include <vector>
@@ -16,10 +15,10 @@ class TbcDungeonAuchenaiCryptsStrategy : public Strategy
 {
 public:
     TbcDungeonAuchenaiCryptsStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
-    virtual std::string const getName() override { return "tbc-ac"; }
+    std::string const getName() override { return "tbc-ac"; }
 
-    virtual void InitTriggers(std::vector<TriggerNode*> &triggers) override;
-    virtual void InitMultipliers(std::vector<Multiplier*> &multipliers) override;
+    void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
 };
 
 #endif

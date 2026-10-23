@@ -21,8 +21,8 @@ namespace
         if (!p)
             return nullptr;
 
-        PlayerbotAI* ai = GET_PLAYERBOT_AI(p);
-        if (!ai || IsSelfBot(p))
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(p);
+        if (!botAI || IsSelfBot(p))
             return nullptr;
 
         return p;
@@ -33,12 +33,12 @@ namespace
         if (!target)
             return;
 
-        PlayerbotAI* ai = GET_PLAYERBOT_AI(target);
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(target);
 
-        if (!ai)
+        if (!botAI)
             return;
 
-        if (Player* master = ai->GetMaster())
+        if (Player* master = botAI->GetMaster())
         {
             if (PlayerbotMgr* mgr = GET_PLAYERBOT_MGR(master))
             {
@@ -56,8 +56,6 @@ class PlayerbotsSecureLoginServerScript : public ServerScript
 public:
     PlayerbotsSecureLoginServerScript()
         : ServerScript("PlayerbotsSecureLoginServerScript", { SERVERHOOK_CAN_PACKET_RECEIVE }) {}
-
-    using ServerScript::CanPacketReceive;  // keep the non-const WorldPacket& overload visible
 
     bool CanPacketReceive(WorldSession* /*session*/, WorldPacket const& packet) override
     {

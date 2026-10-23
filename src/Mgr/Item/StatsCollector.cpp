@@ -15,7 +15,10 @@
 #include "SpellMgr.h"
 #include "Util.h"
 
-StatsCollector::StatsCollector(CollectorType type, int32 cls) : type_(type), cls_(cls) { Reset(); }
+StatsCollector::StatsCollector(CollectorType type, int32 cls, int32 lvl) : type_(type), cls_(cls), lvl_(lvl)
+{
+    Reset();
+}
 
 void StatsCollector::Reset()
 {
@@ -27,24 +30,38 @@ void StatsCollector::Reset()
 
 void StatsCollector::CollectItemStats(ItemTemplate const* proto)
 {
-    if (proto->IsRangedWeapon())
+    // Heirlooms and other scaling items hold their real stats in DBC, keyed by wearer level (Player::_ApplyItemBonuses)
+    ScalingStatDistributionEntry const* ssd =
+        proto->ScalingStatDistribution ? sScalingStatDistributionStore.LookupEntry(proto->ScalingStatDistribution)
+                                       : nullptr;
+
+    uint32 ssdLevel = lvl_ > 0 ? uint32(lvl_) : 0;
+    if (ssd && ssdLevel > ssd->MaxLevel)
+        ssdLevel = ssd->MaxLevel;
+
+    // Without a wearer level (lvl_ -1) a scaling item keeps its template values.
+    ScalingStatValuesEntry const* ssv =
+        proto->ScalingStatValue && ssdLevel ? sScalingStatValuesStore.LookupEntry(ssdLevel) : nullptr;
+
+    CollectWeaponDamageStats(proto, ssv);
+    CollectItemStatValues(proto, ssd, ssv);
+
+    if (ssv)
     {
-        float val = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2 / proto->Delay;
-        stats[STATS_TYPE_RANGED_DPS] += val;
+        if (uint32 spellBonus = ssv->getSpellBonus(proto->ScalingStatValue))
+            CollectByItemStatType(ITEM_MOD_SPELL_POWER, spellBonus);
     }
-    else if (proto->IsWeapon())
+
+    uint32 armor = proto->Armor;
+    if (ssv)
     {
-        float val = (proto->Damage[0].DamageMin + proto->Damage[0].DamageMax) * 1000 / 2 / proto->Delay;
-        stats[STATS_TYPE_MELEE_DPS] += val;
+        // An ssv entry exists only for scaling items, so the scaled armor always replaces the template value.
+        if (uint32 ssvArmor = ssv->getArmorMod(proto->ScalingStatValue))
+            armor = ssvArmor;
     }
-    stats[STATS_TYPE_ARMOR] += proto->Armor;
+
+    stats[STATS_TYPE_ARMOR] += armor;
     stats[STATS_TYPE_BLOCK_VALUE] += proto->Block;
-    for (uint32 i = 0; i < proto->StatsCount; i++)
-    {
-        _ItemStat const& stat = proto->ItemStat[i];
-        int32 const& val = stat.ItemStatValue;
-        CollectByItemStatType(stat.ItemStatType, val);
-    }
     for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; j++)
     {
         switch (proto->Spells[j].SpellTrigger)
@@ -56,7 +73,15 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
                 CollectSpellStats(proto->Spells[j].SpellId, 1.0f, Milliseconds(0));
                 break;
             case ITEM_SPELLTRIGGER_CHANCE_ON_HIT:
-                if (type_ & CollectorType::MELEE)
+            {
+                // The core fires weapon procs only for the active weapon slot: ranged procs for
+                // RANGED_ATTACK, melee procs otherwise.
+                if (type_ == CollectorType::RANGED && proto->Class == ITEM_CLASS_WEAPON && !proto->IsRangedWeapon())
+                    break;
+
+                // Weapon on-hit procs trigger on melee/ranged attacks, not spell casts, so only
+                // value them for the collectors that can actually trigger them.
+                if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
                 {
                     if (proto->Spells[j].SpellPPMRate > 0.01f)
                         CollectSpellStats(proto->Spells[j].SpellId, 1.0f, Milliseconds(static_cast<int>(60000 / proto->Spells[j].SpellPPMRate)));
@@ -64,6 +89,7 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
                         CollectSpellStats(proto->Spells[j].SpellId, 1.0f, Milliseconds(static_cast<int>(60000 / 1.8f)));  // Default PPM = 1.8
                 }
                 break;
+            }
             default:
                 break;
         }
@@ -72,7 +98,72 @@ void StatsCollector::CollectItemStats(ItemTemplate const* proto)
     if (proto->socketBonus)
     {
         if (SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(proto->socketBonus))
-            CollectEnchantStats(enchant);
+            CollectEnchantStats(enchant, 0, proto->Delay, proto->IsRangedWeapon());
+    }
+}
+
+void StatsCollector::CollectWeaponDamageStats(ItemTemplate const* proto, ScalingStatValuesEntry const* ssv)
+{
+    if (!proto->IsWeapon() || proto->Delay == 0)
+        return;
+
+    int32 extraDps = ssv ? ssv->getDPSMod(proto->ScalingStatValue) : 0;
+    float dps = 0.0f;
+
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+    {
+        float minDamage = proto->Damage[i].DamageMin;
+        float maxDamage = proto->Damage[i].DamageMax;
+
+        // Scaling replaces the first damage entry: min 70% / max 130% of the scaled average, 80% / 120% two-hand.
+        if (extraDps && i == 0)
+        {
+            float average = extraDps * proto->Delay / 1000.0f;
+            float mod = ssv->IsTwoHand(proto->ScalingStatValue) ? 0.2f : 0.3f;
+
+            minDamage = (1.0f - mod) * average;
+            maxDamage = (1.0f + mod) * average;
+        }
+
+        dps += (minDamage + maxDamage) * 1000 / 2 / proto->Delay;
+    }
+
+    if (proto->IsRangedWeapon())
+    {
+        stats[STATS_TYPE_RANGED_DPS] += dps;
+        return;
+    }
+
+    stats[STATS_TYPE_MELEE_DPS] += dps;
+    // Feral forms convert weapon DPS into attack power, so treat it as attack power for Feral Druids.
+    if (cls_ == CLASS_DRUID && (type_ & CollectorType::MELEE))
+        stats[STATS_TYPE_ATTACK_POWER] += proto->getFeralBonus(extraDps);
+}
+
+void StatsCollector::CollectItemStatValues(ItemTemplate const* proto, ScalingStatDistributionEntry const* ssd,
+                                           ScalingStatValuesEntry const* ssv)
+{
+    if (ssv)
+    {
+        // A scaling item draws its stats from the distribution entry alone; its template stats are ignored, as in core.
+        if (!ssd)
+            return;
+
+        uint32 multiplier = ssv->getssdMultiplier(proto->ScalingStatValue);
+        for (uint8 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+        {
+            if (ssd->StatMod[i] < 0)
+                continue;
+
+            CollectByItemStatType(ssd->StatMod[i], int32(multiplier * ssd->Modifier[i] / 10000));
+        }
+        return;
+    }
+
+    for (uint32 i = 0; i < proto->StatsCount; ++i)
+    {
+        _ItemStat const& stat = proto->ItemStat[i];
+        CollectByItemStatType(stat.ItemStatType, stat.ItemStatValue);
     }
 }
 
@@ -84,6 +175,10 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
         return;
 
     if (SpecialSpellFilter(spellId))
+        return;
+
+    // Form-restricted item auras (e.g., feral attack power, idol boosts) should be considered by Druids only.
+    if (spellInfo->Stances && cls_ != CLASS_DRUID)
         return;
 
     SpellProcEntry const* eventEntry = sSpellMgr->GetSpellProcEntry(spellInfo->Id);
@@ -142,8 +237,9 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
                     stats[STATS_TYPE_BONUS] += 1;
                 }
 
-                /// @todo Handle negative spell
-                if (!spellInfo->IsPositive())
+                // Skip harmful self-auras, but value offensive periodic damage (enemy DoTs),
+                // which is stored as a negative spell.
+                if (!spellInfo->IsPositive() && effectInfo.ApplyAuraName != SPELL_AURA_PERIODIC_DAMAGE)
                     break;
 
                 float coverage;
@@ -154,7 +250,7 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
                         std::min(1.0f, (float)spellInfo->GetDuration() / (spellInfo->GetDuration() + spellCooldown.count()));
 
                 multiplier *= coverage;
-                HandleApplyAura(effectInfo, multiplier, canNextTrigger, triggerCooldown);
+                HandleApplyAura(effectInfo, spellInfo, multiplier, canNextTrigger, triggerCooldown);
                 break;
             }
             case SPELL_EFFECT_HEAL:
@@ -163,7 +259,7 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
                 if (!spellCooldown.count())
                     break;
                 float normalizedCd = std::max((float)spellCooldown.count() / 1000, 5.0f);
-                int32 val = AverageValue(effectInfo);
+                int32 val = AverageValue(effectInfo, spellInfo);
                 float transfer_multiplier = 1;
                 stats[STATS_TYPE_HEAL_POWER] += (float)val / normalizedCd * multiplier * transfer_multiplier;
                 break;
@@ -176,7 +272,7 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
                 if (effectInfo.MiscValue != POWER_MANA)
                     break;
                 float normalizedCd = std::max((float)spellCooldown.count() / 1000, 5.0f);
-                int32 val = AverageValue(effectInfo);
+                int32 val = AverageValue(effectInfo, spellInfo);
                 float transfer_multiplier = 0.2;
                 stats[STATS_TYPE_MANA_REGENERATION] += (float)val / normalizedCd * multiplier * transfer_multiplier;
                 break;
@@ -187,7 +283,7 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
                 if (!spellCooldown.count())
                     break;
                 float normalizedCd = std::max((float)spellCooldown.count() / 1000, 5.0f);
-                int32 val = AverageValue(effectInfo);
+                int32 val = AverageValue(effectInfo, spellInfo);
                 if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
                 {
                     float transfer_multiplier = 1;
@@ -206,7 +302,8 @@ void StatsCollector::CollectSpellStats(uint32 spellId, float multiplier, Millise
     }
 }
 
-void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount)
+void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchant, uint32 default_enchant_amount,
+                                          uint32 weaponDelay, bool isRanged)
 {
     for (int s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
     {
@@ -225,6 +322,22 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
                     CollectSpellStats(enchant_spell_id, 0.25f);
                 break;
             }
+            case ITEM_ENCHANTMENT_TYPE_DAMAGE:
+            {
+                // Flat weapon-damage enchant is per swing; convert to DPS using the weapon delay.
+                if (!weaponDelay)
+                    break;
+
+                float const dps = enchant_amount * 1000.0f / weaponDelay;
+                if (isRanged)
+                {
+                    if (type_ & CollectorType::RANGED)
+                        stats[STATS_TYPE_RANGED_DPS] += dps;
+                }
+                else if (type_ & CollectorType::MELEE)
+                    stats[STATS_TYPE_MELEE_DPS] += dps;
+                break;
+            }
             case ITEM_ENCHANTMENT_TYPE_EQUIP_SPELL:
             {
                 CollectSpellStats(enchant_spell_id, 1.0f);
@@ -241,6 +354,19 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
                     break;
                 }
                 CollectByItemStatType(enchant_spell_id, enchant_amount);
+                break;
+            }
+            case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
+            {
+                // spellid holds the school; school 0 is armor (e.g. Enchant Cloak - Superior Defense)
+                if (enchant_spell_id != SPELL_SCHOOL_NORMAL)
+                    break;
+
+                // for item random suffix
+                if (!enchant_amount)
+                    enchant_amount = default_enchant_amount;
+
+                stats[STATS_TYPE_ARMOR] += enchant_amount;
                 break;
             }
             default:
@@ -552,13 +678,13 @@ void StatsCollector::CollectByItemStatType(uint32 itemStatType, int32 val)
     }
 }
 
-void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, float multiplier, bool canNextTrigger,
-                                     Milliseconds triggerCooldown)
+void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, SpellInfo const* spellInfo, float multiplier,
+                                     bool canNextTrigger, Milliseconds triggerCooldown)
 {
     if (effectInfo.Effect != SPELL_EFFECT_APPLY_AURA)
         return;
 
-    int32 val = AverageValue(effectInfo);
+    int32 val = AverageValue(effectInfo, spellInfo);
 
     switch (effectInfo.ApplyAuraName)
     {
@@ -574,6 +700,30 @@ void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, float mu
         case SPELL_AURA_MOD_HEALING_DONE:
             stats[STATS_TYPE_HEAL_POWER] += val * multiplier;
             break;
+        case SPELL_AURA_PERIODIC_DAMAGE:
+        {
+            // Self-damage auras (e.g. Circle of Flame) must not score as attack/spell power.
+            if (effectInfo.TargetA.GetTarget() == TARGET_UNIT_CASTER)
+                break;
+
+            // Value is damage per tick; Amplitude is the tick interval in ms.
+            float perSecond = effectInfo.Amplitude ? (val * 1000.0f / effectInfo.Amplitude) : val;
+            if (type_ & (CollectorType::MELEE | CollectorType::RANGED))
+                stats[STATS_TYPE_ATTACK_POWER] += perSecond * multiplier;
+            else if (type_ & CollectorType::SPELL_DMG)
+                stats[STATS_TYPE_SPELL_POWER] += perSecond * multiplier * 0.5f;
+            break;
+        }
+        case SPELL_AURA_PERIODIC_HEAL:
+        {
+            // Self-heals are not healing power for the bot's role.
+            if (effectInfo.TargetA.GetTarget() == TARGET_UNIT_CASTER)
+                break;
+
+            float perSecond = effectInfo.Amplitude ? (val * 1000.0f / effectInfo.Amplitude) : val;
+            stats[STATS_TYPE_HEAL_POWER] += perSecond * multiplier;
+            break;
+        }
         case SPELL_AURA_MOD_INCREASE_HEALTH:
             stats[STATS_TYPE_STAMINA] += val * multiplier / 15;
             break;
@@ -716,6 +866,10 @@ void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, float mu
             }
             break;
         }
+        case SPELL_AURA_MOD_INCREASE_HEALTH_2:
+            // Same as SPELL_AURA_MOD_INCREASE_HEALTH: flat max health -> stamina (15 hp per stamina)
+            stats[STATS_TYPE_STAMINA] += val * multiplier / 15;
+            break;
         case SPELL_AURA_PROC_TRIGGER_SPELL:
         {
             if (canNextTrigger)
@@ -749,9 +903,8 @@ void StatsCollector::HandleApplyAura(SpellEffectInfo const& effectInfo, float mu
     }
 }
 
-float StatsCollector::AverageValue(SpellEffectInfo const& effectInfo)
+float StatsCollector::AverageValue(SpellEffectInfo const& effectInfo, SpellInfo const* spellInfo)
 {
-    // float basePointsPerLevel = effectInfo.RealPointsPerLevel; //not used, line marked for removal.
     float basePoints = effectInfo.BasePoints;
     int32 randomPoints = effectInfo.DieSides;
 
@@ -767,6 +920,19 @@ float StatsCollector::AverageValue(SpellEffectInfo const& effectInfo)
             basePoints += randvalue;
             break;
     }
+
+    // Level-scaled effects (mirrors SpellEffectInfo::CalcValue in the core)
+    if (spellInfo && lvl_ > 0 && effectInfo.RealPointsPerLevel != 0.0f)
+    {
+        int32 level = lvl_;
+        if (spellInfo->MaxLevel > 0 && level > int32(spellInfo->MaxLevel))
+            level = int32(spellInfo->MaxLevel);
+        else if (level < int32(spellInfo->BaseLevel))
+            level = int32(spellInfo->BaseLevel);
+        level -= int32(std::max(spellInfo->BaseLevel, spellInfo->SpellLevel));
+        basePoints += level * effectInfo.RealPointsPerLevel;
+    }
+
     return basePoints;
 }
 

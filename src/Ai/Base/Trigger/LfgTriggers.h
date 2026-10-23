@@ -14,7 +14,7 @@ class PlayerbotAI;
 class LfgProposalActiveTrigger : public Trigger
 {
 public:
-    LfgProposalActiveTrigger(PlayerbotAI* botAI) : Trigger(botAI, "lfg proposal active", 20 * 2000) {}
+    LfgProposalActiveTrigger(PlayerbotAI* botAI) : Trigger(botAI, "lfg proposal active", 40 * IN_MILLISECONDS) {}
 
     bool IsActive() override;
 };
@@ -22,7 +22,7 @@ public:
 class UnknownDungeonTrigger : public Trigger
 {
 public:
-    UnknownDungeonTrigger(PlayerbotAI* botAI) : Trigger(botAI, "unknown dungeon", 20 * 2000) {}
+    UnknownDungeonTrigger(PlayerbotAI* botAI) : Trigger(botAI, "unknown dungeon", 40 * IN_MILLISECONDS) {}
 
     bool IsActive() override;
 };

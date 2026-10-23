@@ -12,10 +12,12 @@
 class RaidBwlStrategy : public Strategy
 {
 public:
-    RaidBwlStrategy(PlayerbotAI* ai) : Strategy(ai) {}
+    RaidBwlStrategy(PlayerbotAI* botAI) : Strategy(botAI) {}
     std::string const getName() override { return "bwl"; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
     void InitMultipliers(std::vector<Multiplier*> &multipliers) override;
+    void AppendTargetExclusions(GuidSet& exclusions, TargetValueExclusionType type) override;
+    bool HasTargetExclusions() const override { return true; }
 };
 
 #endif

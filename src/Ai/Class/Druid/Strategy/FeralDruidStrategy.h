@@ -85,7 +85,7 @@ protected:
 
 public:
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    uint32 GetType() const override { return STRATEGY_TYPE_COMBAT | STRATEGY_TYPE_MELEE; }
+    uint32 GetType() const override { return STRATEGY_TYPE_MELEE; }
 };
 
 // Optional strategy — enabled by default for cat and bear.

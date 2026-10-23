@@ -16,7 +16,7 @@ public:
 
 public:
     virtual void InitTriggers(std::vector<TriggerNode*>& triggers) override;
-    virtual std::string const getName() override { return "melee"; }
+    virtual std::string const getName() override { return "assassin"; }
     virtual std::vector<NextAction> getDefaultActions() override;
 };
 

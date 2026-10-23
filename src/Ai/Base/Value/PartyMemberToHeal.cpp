@@ -5,6 +5,7 @@
  */
 
 #include "PartyMemberToHeal.h"
+#include "BattlegroundWS.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
@@ -32,10 +33,15 @@ Unit* PartyMemberToHeal::Calculate()
     IsTargetOfHealingSpell predicate;
 
     Group* group = bot->GetGroup();
+    Battleground* bg = bot->GetBattleground();
+    bool isWarsong = bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS;
+    ObjectGuid carrierGuid;
+    if (isWarsong && bg->GetStatus() == STATUS_IN_PROGRESS && PlayerbotAI::IsHeal(bot))
+        carrierGuid = static_cast<BattlegroundWS*>(bg)->GetFlagPickerGUID(bg->GetOtherTeamId(bot->GetTeamId()));
     if (!group)
         return bot;
 
-    bool isRaid = bot->GetGroup()->isRaidGroup();
+    bool isRaid = group->isRaidGroup();
     MinValueCalculator calc(100);
 
     // If focus heal targets strategy is active, only heal those targets
@@ -51,11 +57,11 @@ Unit* PartyMemberToHeal::Calculate()
                 continue;
 
             float health = player->GetHealthPct();
-            if (isRaid || health < sPlayerbotAIConfig.mediumHealth ||
+            if (isRaid || health < sPlayerbotAIConfig.MediumHealth ||
                 !IsTargetOfSpellCast(player, predicate))
             {
                 float probeValue = 100.0f;
-                if (player->GetDistance2d(bot) > sPlayerbotAIConfig.healDistance)
+                if (player->GetDistance2d(bot) > sPlayerbotAIConfig.HealDistance)
                     probeValue = health + 30.0f;
                 else
                     probeValue = health + player->GetDistance2d(bot) / 10.0f;
@@ -71,15 +77,15 @@ Unit* PartyMemberToHeal::Calculate()
     for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
     {
         Player* player = gref->GetSource();
-        if (player->IsGameMaster())
+        if (!player || player->IsGameMaster())
             continue;
         if (player && player->IsAlive())
         {
             float health = player->GetHealthPct();
-            if (isRaid || health < sPlayerbotAIConfig.mediumHealth || !IsTargetOfSpellCast(player, predicate))
+            if (isRaid || health < sPlayerbotAIConfig.MediumHealth || !IsTargetOfSpellCast(player, predicate))
             {
                 float probeValue = 100.0f;
-                if (player->GetDistance2d(bot) > sPlayerbotAIConfig.healDistance)
+                if (player->GetDistance2d(bot) > sPlayerbotAIConfig.HealDistance)
                 {
                     probeValue = health + 30.0f;
                 }
@@ -87,11 +93,15 @@ Unit* PartyMemberToHeal::Calculate()
                 {
                     probeValue = health + player->GetDistance2d(bot) / 10.0f;
                 }
+                constexpr float carrierPriority = 15.0f;
+                if (!carrierGuid.IsEmpty() && player->GetGUID() == carrierGuid &&
+                    player->GetHealthPct() < sPlayerbotAIConfig.MediumHealth &&
+                    player->GetDistance2d(bot) <= sPlayerbotAIConfig.HealDistance && player->IsInWorld() &&
+                    player->GetMap() == bot->GetMap())
+                    probeValue -= carrierPriority;
                 // delay Check player to here for better performance
                 if (probeValue < calc.minValue && Check(player))
-                {
                     calc.probe(probeValue, player);
-                }
             }
         }
 
@@ -100,7 +110,7 @@ Unit* PartyMemberToHeal::Calculate()
         {
             float health = ((Unit*)pet)->GetHealthPct();
             float probeValue = 100.0f;
-            if (isRaid || health < sPlayerbotAIConfig.mediumHealth)
+            if (isRaid || health < sPlayerbotAIConfig.MediumHealth)
                 probeValue = health + 30.0f;
             // delay Check pet to here for better performance
             if (probeValue < calc.minValue && Check(pet))
@@ -114,7 +124,7 @@ Unit* PartyMemberToHeal::Calculate()
         {
             float health = charm->GetHealthPct();
             float probeValue = 100.0f;
-            if (isRaid || health < sPlayerbotAIConfig.mediumHealth)
+            if (isRaid || health < sPlayerbotAIConfig.MediumHealth)
                 probeValue = health + 30.0f;
             // delay Check charm to here for better performance
             if (probeValue < calc.minValue && Check(charm))
@@ -123,16 +133,16 @@ Unit* PartyMemberToHeal::Calculate()
             }
         }
     }
-    return (Unit*)calc.param;
+    return static_cast<Unit*>(calc.param);
 }
 
 bool PartyMemberToHeal::Check(Unit* player)
 {
     // return player && player != bot && player->GetMapId() == bot->GetMapId() && player->IsInWorld() &&
-    //     ServerFacade::instance().GetDistance2d(bot, player) < (player->IsPlayer() && botAI->IsTank((Player*)player) ? 50.0f
+    //     ServerFacade::instance().GetDistance2d(bot, player) < (player->IsPlayer() && PlayerbotAI::IsTank((Player*)player) ? 50.0f
     //     : 40.0f);
     return player->GetMapId() == bot->GetMapId() && !player->IsCharmed() &&
-           bot->GetDistance2d(player) < sPlayerbotAIConfig.healDistance * 2 && bot->IsWithinLOSInMap(player);
+           bot->GetDistance2d(player) < sPlayerbotAIConfig.HealDistance * 2 && bot->IsWithinLOSInMap(player);
 }
 
 Unit* HealerLowMana::Calculate()
@@ -150,7 +160,7 @@ Unit* HealerLowMana::Calculate()
             continue;
         if (player->IsGameMaster() || !player->IsAlive())
             continue;
-        if (!botAI->IsHeal(player))
+        if (!PlayerbotAI::IsHeal(player))
             continue;
 
         float mana = player->GetPowerPct(POWER_MANA);
@@ -188,7 +198,7 @@ Unit* PartyMemberToProtect::Calculate()
         if (ServerFacade::instance().GetDistance2d(pVictim, unit) > attackDistance)
             continue;
 
-        if (botAI->IsTank((Player*)pVictim) && pVictim->GetHealthPct() > 10)
+        if (PlayerbotAI::IsTank((Player*)pVictim) && pVictim->GetHealthPct() > 10)
             continue;
         else if (pVictim->GetHealthPct() > 30)
             continue;

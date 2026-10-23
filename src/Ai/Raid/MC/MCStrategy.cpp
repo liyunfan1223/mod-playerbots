@@ -20,7 +20,7 @@ void RaidMcStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
                         { NextAction("mc lucifron shadow resistance", ACTION_RAID) }));
 
     // Magmadar
-    // TODO: Fear ward / tremor totem, or general anti-fear strat development. Same as King Dred (Drak'Tharon) and faction commander (Nexus).
+    // TODO: tremor totem, or general anti-fear strat development. Same as King Dred (Drak'Tharon) and faction commander (Nexus).
     triggers.push_back(
         new TriggerNode("mc magmadar fire resistance",
                         { NextAction("mc magmadar fire resistance", ACTION_RAID) }));
@@ -107,7 +107,8 @@ void RaidMcStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 
 void RaidMcStrategy::AppendTargetExclusions(GuidSet& exclusions, TargetValueExclusionType type)
 {
-    if (type != TargetValueExclusionType::Dps && type != TargetValueExclusionType::Attacker)
+    if (type == TargetValueExclusionType::TankTarget ||
+        (type == TargetValueExclusionType::Aoe && PlayerbotAI::IsTank(botAI->GetBot())))
         return;
 
     // Damage into these is wasted: Core Ragers are unkillable while Golemagg

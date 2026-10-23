@@ -128,17 +128,17 @@ bool RsHalionAvoidConesAction::Execute(Event )
     if (PlayerbotAI::IsMainTank(bot))
         return false;
 
-    if (botAI->IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
+    if (PlayerbotAI::IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
         return false;
 
     Unit* boss = RsHalionAnyPhysicalBoss(botAI);
     if (!boss)
         return false;
 
-    bool const melee = botAI->IsMelee(bot);
+    bool const melee = PlayerbotAI::IsMelee(bot);
     bool const addsUp = RsHalionAnyAddAlive(botAI);
 
-    if (!botAI->IsTank(bot) && !addsUp && RsHalionRealmThrottled(botAI, bot) &&
+    if (!PlayerbotAI::IsTank(bot) && !addsUp && RsHalionRealmThrottled(botAI, bot) &&
         (RsHalionLeadingTooMuch(botAI, bot) || RsHalionInThrottledHalf(bot)))
     {
         if (bot->GetVictim())
@@ -255,7 +255,7 @@ bool RsHalionCombustionAction::Execute(Event )
 
 bool RsHalionMeteorAction::Execute(Event )
 {
-    if (botAI->IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
+    if (PlayerbotAI::IsTank(bot) && !RsHalionAssistTankAsMelee(botAI))
         return false;
 
     if (!RsHalionAnyPhysicalBoss(botAI))
@@ -613,7 +613,7 @@ bool RsHalionP2AvoidConesAction::Execute(Event )
     float const bossX = boss->GetPositionX();
     float const bossY = boss->GetPositionY();
     float const bossToTank = std::atan2(tank->GetPositionY() - bossY, tank->GetPositionX() - bossX);
-    float const radius = botAI->IsMelee(bot) ? RS_HALION_P2_MELEE_DIST : RS_HALION_P2_RANGED_DIST;
+    float const radius = PlayerbotAI::IsMelee(bot) ? RS_HALION_P2_MELEE_DIST : RS_HALION_P2_RANGED_DIST;
     float slotAngle = bossToTank + static_cast<float>(M_PI) * 95.0f / 180.0f;
 
     if (singleCutter && cutterFiring)

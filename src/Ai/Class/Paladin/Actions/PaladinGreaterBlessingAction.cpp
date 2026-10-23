@@ -21,7 +21,7 @@ namespace ai::gbless
 {
 namespace
 {
-    constexpr uint32 GREATER_BLESSING_ASSIGNMENT_CACHE_MS = 4 * 1000;
+    constexpr uint32 GREATER_BLESSING_ASSIGNMENT_CACHE_MS = 4 * IN_MILLISECONDS;
     constexpr uint32 GREATER_BLESSING_PENDING_ASSIGNMENT_CACHE_MS = 500;
     constexpr uint8 MAX_BLESSING_SLOTS = 4;
     constexpr uint8 MAX_CLASS_ID = 12;
@@ -835,7 +835,7 @@ bool IsEligibleGroupForAutoBlessings(Group const* group)
     if (!group)
         return false;
 
-    switch (sPlayerbotAIConfig.autoGreaterBlessings)
+    switch (sPlayerbotAIConfig.AutoGreaterBlessings)
     {
         case AutoPartyBuffMode::RAID_ONLY:
             return group->isRaidGroup();

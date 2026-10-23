@@ -42,7 +42,7 @@ bool BwlRazorgoreNotMindControlledTrigger::IsActive()
 
 bool BwlVaelastraszPositioningTrigger::IsActive()
 {
-    // Prevent non-tanks from rotating the boss while the tanks gain thread.
+    // Prevent non-tanks from rotating the boss while the tanks gain threat.
     if (Unit* boss = AI_VALUE2(Unit*, "find target", "vaelastrasz the corrupt"))
         return boss->GetVictim() != bot;
     return false;
@@ -54,6 +54,34 @@ bool BwlVaelastraszBurningAdrenalineTrigger::IsActive()
     return bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_BURNING_ADRENALINE));
 }
 
+// Broodlord Lashlayer
+
+bool BwlBroodlordRangedTooCloseTrigger::IsActive()
+{
+    if (!PlayerbotAI::IsRanged(bot))
+        return false;
+
+    if (Unit* boss = AI_VALUE2(Unit*, "find target", "broodlord lashlayer"))
+    {
+        // In case the bot pulled aggro, prevent it from kiting the boss through the room.
+        if (boss->GetVictim() != bot)
+            return bot->GetDistance2d(boss) < BROODLORD_SAFE_DISTANCE;
+    }
+    return false;
+}
+
+// Firemaw / Ebonroc / Flamegor
+
+bool BwlBlackDrakeNotVictimTrigger::IsActive()
+{
+    Unit* boss = AI_VALUE2(Unit*, "find target", bossName);
+    if (!boss)
+        return false;
+
+    // The tank holding the boss stays where it is to avoid rotating the boss.
+    return boss->GetVictim() != bot;
+}
+
 // Chromaggus
 
 bool BwlAfflictionBronzeTrigger::IsActive()
@@ -63,26 +91,18 @@ bool BwlAfflictionBronzeTrigger::IsActive()
 
 // Nefarian
 
-bool BwlWildMagicTrigger::IsActive()
+bool BwlNefarianPositioningTrigger::IsActive()
+{
+    // Prevent non-tanks from rotating the boss while the tanks gain threat.
+    if (Unit* boss = AI_VALUE2(Unit*, "find target", "nefarian"))
+        return boss->GetVictim() != bot;
+    return false;
+}
+
+bool BwlNefarianWildMagicTrigger::IsActive()
 {
     return bot->getClass() == CLASS_MAGE &&
         bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_WILD_MAGIC));
-}
-
-bool BwlNefarianFearWardTrigger::IsActive()
-{
-    if (bot->getClass() != CLASS_PRIEST)
-        return false;
-
-    Unit* nefarian = AI_VALUE2(Unit*, "find target", "nefarian");
-    if (!nefarian || !nefarian->IsInCombat())
-        return false;
-
-    Unit* victim = nefarian->GetVictim();
-    if (!victim)
-        return false;
-
-    return !botAI->HasAura("fear ward", victim);
 }
 
 // Trash

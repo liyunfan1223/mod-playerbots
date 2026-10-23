@@ -12,7 +12,7 @@
 class EpochMultiplier : public Multiplier
 {
     public:
-        EpochMultiplier(PlayerbotAI* ai) : Multiplier(ai, "chrono-lord epoch") {}
+        EpochMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "chrono-lord epoch") {}
 
     public:
         float GetValue(Action* action) override;

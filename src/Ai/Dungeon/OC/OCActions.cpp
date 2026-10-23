@@ -75,7 +75,7 @@ bool MountDrakeAction::Execute(Event /*event*/)
             continue;
 
         WorldSession* session = player->GetSession();
-        if (!session || !session->IsBot())
+        if (!session || !session->IsHeadless())
             continue;
 
         int slot = botAI->GetGroupSlotIndex(player);

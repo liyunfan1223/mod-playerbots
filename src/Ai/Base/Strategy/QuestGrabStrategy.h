@@ -13,7 +13,7 @@ class PlayerbotAI;
 
 // Two rules, meant to replace relying on "leash" + "new rpg" for a bot that
 // should just stick close and pick up whatever quest-relevant thing is
-// already in reach: if something within AiPlayerbot.QuestGrabDistance
+// already in reach: if something within Playerbots.QuestGrabDistance
 // satisfies an incomplete quest right now, interact with it (GrabQuestItemAction);
 // otherwise do nothing here and let plain "follow" (relevance 1.0, already
 // on by default) keep the bot near the leader.

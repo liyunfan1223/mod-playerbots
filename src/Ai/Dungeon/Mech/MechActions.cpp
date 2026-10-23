@@ -1,3 +1,9 @@
+/*
+ * This file is part of the mod-playerbots module for AzerothCore. See AUTHORS file for Copyright
+ * information; released under GNU GPL v2 license, redistribute/modify under version 2 of the License,
+ * or (at your option) any later version.
+ */
+
 #include "MechActions.h"
 #include "AiFactory.h"
 #include "Creature.h"
@@ -209,7 +215,7 @@ bool SepethreaKiteFlameAction::Execute(Event)
 
     float tankX = 0.0f, tankY = 0.0f;
     bool const haveTank = TankPosition(bot, tankX, tankY);
-    bool const leashed = botAI->IsHeal(bot) && haveTank;
+    bool const leashed = PlayerbotAI::IsHeal(bot) && haveTank;
     float const tankDist = leashed ? bot->GetExactDist2d(tankX, tankY) : 0.0f;
 
     float px = tankX, py = tankY;
@@ -453,7 +459,7 @@ bool SepethreaAvoidFlameAction::Execute(Event)
         return false;
 
     MovementPriority const priority =
-        botAI->IsHeal(bot) ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_FORCED;
+        PlayerbotAI::IsHeal(bot) ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_FORCED;
     return MoveTo(bot->GetMapId(), bestX, bestY, bot->GetPositionZ(), false, false, false, false,
                   priority, true, false);
 }
@@ -511,7 +517,7 @@ bool SepethreaAvoidTrailAction::Execute(Event)
         MechanarFlames::ClampIntoRoom(destX, destY);
 
     MovementPriority const priority =
-        botAI->IsHeal(bot) ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_FORCED;
+        PlayerbotAI::IsHeal(bot) ? MovementPriority::MOVEMENT_COMBAT : MovementPriority::MOVEMENT_FORCED;
 
     return MoveTo(bot->GetMapId(), destX, destY, bot->GetPositionZ(), false, false, false, false,
                   priority, true, false);

@@ -30,7 +30,7 @@ GuidVector FindMaxDensity(Player* bot)
                 continue;
 
             float d = ServerFacade::instance().GetDistance2d(unit, other);
-            if (ServerFacade::instance().IsDistanceLessOrEqualThan(d, sPlayerbotAIConfig.aoeRadius * 2))
+            if (ServerFacade::instance().IsDistanceLessOrEqualThan(d, sPlayerbotAIConfig.AoeRadius * 2))
                 groups[*i].push_back(*j);
         }
 

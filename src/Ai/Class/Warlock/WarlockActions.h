@@ -209,13 +209,13 @@ public:
 class CastShadowWardAction : public CastBuffSpellAction
 {
 public:
-    CastShadowWardAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "shadow ward") {}
+    CastShadowWardAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "shadow ward") {}
 };
 
 class CastSoulshatterAction : public CastSpellAction
 {
 public:
-    CastSoulshatterAction(PlayerbotAI* ai) : CastSpellAction(ai, "soulshatter") {}
+    CastSoulshatterAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "soulshatter") {}
     bool isUseful() override;
 };
 
@@ -231,7 +231,7 @@ public:
 class DemonChargeAction : public CastSpellAction
 {
 public:
-    DemonChargeAction(PlayerbotAI* ai) : CastSpellAction(ai, "demon charge") {}
+    DemonChargeAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "demon charge") {}
 };
 
 // Cooldown Spells
@@ -239,13 +239,13 @@ public:
 class CastMetamorphosisAction : public CastBuffSpellAction
 {
 public:
-    CastMetamorphosisAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "metamorphosis") {}
+    CastMetamorphosisAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "metamorphosis") {}
 };
 
 class CastDemonicEmpowermentAction : public CastBuffSpellAction
 {
 public:
-    CastDemonicEmpowermentAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "demonic empowerment") {}
+    CastDemonicEmpowermentAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "demonic empowerment") {}
     std::string const GetTargetName() override { return "pet target"; }
 };
 
@@ -298,7 +298,7 @@ public:
 class CastUnstableAfflictionAction : public CastDebuffSpellAction
 {
 public:
-    CastUnstableAfflictionAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "unstable affliction", true) {}
+    CastUnstableAfflictionAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "unstable affliction", true) {}
     bool isUseful() override
     {
         // Bypass TTL check
@@ -309,8 +309,8 @@ public:
 class CastUnstableAfflictionOnAttackerAction : public CastDebuffSpellOnAttackerAction
 {
 public:
-    CastUnstableAfflictionOnAttackerAction(PlayerbotAI* ai)
-        : CastDebuffSpellOnAttackerAction(ai, "unstable affliction", true)
+    CastUnstableAfflictionOnAttackerAction(PlayerbotAI* botAI)
+        : CastDebuffSpellOnAttackerAction(botAI, "unstable affliction", true)
     {
     }
     bool isUseful() override
@@ -348,7 +348,7 @@ public:
 class CastCurseOfTheElementsAction : public CastDebuffSpellAction
 {
 public:
-    CastCurseOfTheElementsAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "curse of the elements", true) {}
+    CastCurseOfTheElementsAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "curse of the elements", true) {}
     bool isUseful() override
     {
         // Bypass TTL check
@@ -437,31 +437,31 @@ public:
 class CastIncinerateAction : public CastSpellAction
 {
 public:
-    CastIncinerateAction(PlayerbotAI* ai) : CastSpellAction(ai, "incinerate") {}
+    CastIncinerateAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "incinerate") {}
 };
 
 class CastHauntAction : public CastSpellAction
 {
 public:
-    CastHauntAction(PlayerbotAI* ai) : CastSpellAction(ai, "haunt") {}
+    CastHauntAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "haunt") {}
 };
 
 class CastSoulFireAction : public CastSpellAction
 {
 public:
-    CastSoulFireAction(PlayerbotAI* ai) : CastSpellAction(ai, "soul fire") {}
+    CastSoulFireAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "soul fire") {}
 };
 
 class CastShadowburnAction : public CastSpellAction
 {
 public:
-    CastShadowburnAction(PlayerbotAI* ai) : CastSpellAction(ai, "shadowburn") {}
+    CastShadowburnAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "shadowburn") {}
 };
 
 class CastChaosBoltAction : public CastSpellAction
 {
 public:
-    CastChaosBoltAction(PlayerbotAI* ai) : CastSpellAction(ai, "chaos bolt") {}
+    CastChaosBoltAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "chaos bolt") {}
 };
 
 class CastSearingPainAction : public CastSpellAction
@@ -539,6 +539,6 @@ public:
 class ShadowCleaveAction : public CastMeleeSpellAction
 {
 public:
-    ShadowCleaveAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "shadow cleave") {}
+    ShadowCleaveAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "shadow cleave") {}
 };
 #endif

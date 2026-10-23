@@ -5,17 +5,15 @@
  */
 
 #include "VHMultipliers.h"
-#include "Action.h"
 #include "ChooseTargetActions.h"
-#include "GenericSpellActions.h"
-#include "MovementActions.h"
+#include "Playerbots.h"
 #include "VHActions.h"
 #include "VHTriggers.h"
 
 float ErekemMultiplier::GetValue(Action* action)
 {
     Unit* boss = AI_VALUE2(Unit*, "find target", "erekem");
-    if (!boss || !botAI->IsDps(bot)) { return 1.0f; }
+    if (!boss || !PlayerbotAI::IsDps(bot)) { return 1.0f; }
 
     if (dynamic_cast<DpsAssistAction*>(action))
     {

@@ -16,7 +16,7 @@ class NeedCureTrigger : public SpellTrigger
 {
 public:
     NeedCureTrigger(PlayerbotAI* botAI, std::string const spell, uint32 dispelType)
-        : SpellTrigger(botAI, spell, 1 * 1000), dispelType(dispelType)
+        : SpellTrigger(botAI, spell, 1 * IN_MILLISECONDS), dispelType(dispelType)
     {
     }
 

@@ -21,7 +21,7 @@
 using namespace KaraHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool KarazhanResetEncounterStatesAction::Execute(Event /*event*/)
 {
@@ -96,39 +96,10 @@ bool KarazhanResetEncounterStatesAction::Execute(Event /*event*/)
     return reset;
 }
 
-bool KarazhanCastFearProtectionSpellAction::Execute(Event /*event*/)
+bool KarazhanSetTremorTotemAction::Execute(Event /*event*/)
 {
-    if (bot->getClass() == CLASS_PRIEST)
-        return CastFearWardOnMainTank();
-
-    return SetTremorTotem();
-}
-
-bool KarazhanCastFearProtectionSpellAction::CastFearWardOnMainTank()
-{
-    Player* mainTank = GetGroupMainTank(bot);
-    if (!mainTank || mainTank->HasAura(Id(KaraSpells::SPELL_FEAR_WARD)))
-        return false;
-
-    if (!botAI->CanCastSpell(Id(KaraSpells::SPELL_FEAR_WARD), mainTank))
-        return false;
-
-    return botAI->CastSpell(Id(KaraSpells::SPELL_FEAR_WARD), mainTank);
-}
-
-bool KarazhanCastFearProtectionSpellAction::SetTremorTotem()
-{
-    Unit* nightbane = AI_VALUE2(Unit*, "find target", "nightbane");
-    if (!nightbane || nightbane->GetPositionZ() > NIGHTBANE_FLIGHT_Z)
-        return false;
-
-    if (AI_VALUE2(bool, "has totem", "tremor totem"))
-        return false;
-
-    if (!botAI->CanCastSpell(Id(KaraSpells::SPELL_TREMOR_TOTEM), bot))
-        return false;
-
-    return botAI->CastSpell(Id(KaraSpells::SPELL_TREMOR_TOTEM), bot);
+    return botAI->CanCastSpell(Id(KaraSpells::SPELL_TREMOR_TOTEM), bot) &&
+        botAI->CastSpell(Id(KaraSpells::SPELL_TREMOR_TOTEM), bot);
 }
 
 // Trash
@@ -1528,9 +1499,10 @@ bool NightbaneFlightPhaseStackAndMoveAction::Execute(Event /*event*/)
 bool NightbaneTeleportBackToTerraceAction::Execute(Event /*event*/)
 {
     Position const& position = NIGHTBANE_TELEPORT_POSITION;
-    return bot->TeleportTo(
-        KARA_MAP_ID, position.GetPositionX(), position.GetPositionY(),
+    bot->NearTeleportTo(
+        position.GetPositionX(), position.GetPositionY(),
         position.GetPositionZ(), bot->GetOrientation());
+    return true;
 }
 
 bool NightbaneManageTimersAndTrackersAction::Execute(Event /*event*/)

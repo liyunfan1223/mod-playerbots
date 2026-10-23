@@ -5,6 +5,8 @@
  */
 
 #include "ChooseTargetActions.h"
+
+#include "Battleground.h"
 #include "ChooseRpgTargetAction.h"
 #include "Event.h"
 #include "LootObjectStack.h"
@@ -12,6 +14,7 @@
 #include "Playerbots.h"
 #include "PossibleRpgTargetsValue.h"
 #include "PvpTriggers.h"
+#include "PvpValues.h"
 #include "RtiTargetValue.h"
 #include "ServerFacade.h"
 
@@ -26,8 +29,20 @@ bool AttackEnemyPlayerAction::isUseful()
 bool AttackEnemyFlagCarrierAction::isUseful()
 {
     Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
-    return target && ServerFacade::instance().IsDistanceLessOrEqualThan(ServerFacade::instance().GetDistance2d(bot, target), 100.0f) &&
-           PlayerHasFlag::IsCapturingFlag(bot);
+    Battleground* bg = bot->GetBattleground();
+    if (bg && bg->GetBgTypeID(true) == BATTLEGROUND_WS)
+    {
+        if (botAI->GetState() == BOT_STATE_COMBAT && AI_VALUE(Unit*, "current target") == target)
+            return false;
+        // A queued action can outlive the trigger that selected the carrier.
+        return CanRespondToWsgCarrier(botAI, target);
+    }
+
+    if (!target || !ServerFacade::instance().IsDistanceLessOrEqualThan(
+                       ServerFacade::instance().GetDistance2d(bot, target), 100.0f))
+        return false;
+
+    return PlayerHasFlag::IsCapturingFlag(bot);
 }
 
 bool AggressiveTargetAction::isUseful()
@@ -81,6 +96,24 @@ bool DropTargetAction::Execute(Event /*event*/)
     //         pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
     //     }
     // }
+
+    return true;
+}
+
+bool TargetRequesterAction::Execute(Event event)
+{
+    Player* requester = event.getOwner();
+
+    if (!requester)
+        return false;
+
+    bot->SetSelection(requester->GetGUID());
+
+    botAI->TellMasterNoFacing(
+        PlayerbotTextMgr::instance().GetBotTextOrDefault(
+            "target_requester_success",
+            "Targeting %target",
+            {{"%target", requester->GetName()}}));
 
     return true;
 }

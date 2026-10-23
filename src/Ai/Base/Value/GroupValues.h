@@ -15,7 +15,8 @@ class PlayerbotAI;
 class GroupMembersValue : public ObjectGuidListCalculatedValue
 {
 public:
-    GroupMembersValue(PlayerbotAI* botAI) : ObjectGuidListCalculatedValue(botAI, "group members", 2 * 1000) {}
+    GroupMembersValue(PlayerbotAI* botAI)
+        : ObjectGuidListCalculatedValue(botAI, "group members", 2 * IN_MILLISECONDS) {}
 
     GuidVector Calculate() override;
 };
@@ -71,7 +72,7 @@ public:
 class GroupReadyValue : public BoolCalculatedValue, public Qualified
 {
 public:
-    GroupReadyValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "group ready", 2 * 2000) {}
+    GroupReadyValue(PlayerbotAI* botAI) : BoolCalculatedValue(botAI, "group ready", 4 * IN_MILLISECONDS) {}
 
     bool Calculate() override;
 };

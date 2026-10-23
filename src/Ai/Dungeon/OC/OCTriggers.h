@@ -79,56 +79,56 @@ const uint32 OCULUS_MAP_ID = 578;
 class DrakosUnstableSphereTrigger : public Trigger
 {
 public:
-    DrakosUnstableSphereTrigger(PlayerbotAI* ai) : Trigger(ai, "drakos unstable sphere") {}
+    DrakosUnstableSphereTrigger(PlayerbotAI* botAI) : Trigger(botAI, "drakos unstable sphere") {}
     bool IsActive() override;
 };
 
 class DrakeMountTrigger : public Trigger
 {
 public:
-    DrakeMountTrigger(PlayerbotAI* ai) : Trigger(ai, "drake mount") {}
+    DrakeMountTrigger(PlayerbotAI* botAI) : Trigger(botAI, "drake mount") {}
     bool IsActive() override;
 };
 
 class DrakeDismountTrigger : public Trigger
 {
 public:
-    DrakeDismountTrigger(PlayerbotAI* ai) : Trigger(ai, "drake dismount") {}
+    DrakeDismountTrigger(PlayerbotAI* botAI) : Trigger(botAI, "drake dismount") {}
     bool IsActive() override;
 };
 
 class GroupFlyingTrigger : public Trigger
 {
 public:
-    GroupFlyingTrigger(PlayerbotAI* ai) : Trigger(ai, "drake fly") {}
+    GroupFlyingTrigger(PlayerbotAI* botAI) : Trigger(botAI, "drake fly") {}
     bool IsActive() override;
 };
 
 class DrakeCombatTrigger : public Trigger
 {
 public:
-    DrakeCombatTrigger(PlayerbotAI* ai) : Trigger(ai, "drake combat") {}
+    DrakeCombatTrigger(PlayerbotAI* botAI) : Trigger(botAI, "drake combat") {}
     bool IsActive() override;
 };
 
 class VarosCloudstriderTrigger : public Trigger
 {
 public:
-    VarosCloudstriderTrigger(PlayerbotAI* ai) : Trigger(ai, "varos cloudstrider") {}
+    VarosCloudstriderTrigger(PlayerbotAI* botAI) : Trigger(botAI, "varos cloudstrider") {}
     bool IsActive() override;
 };
 
 class UromArcaneExplosionTrigger : public Trigger
 {
 public:
-    UromArcaneExplosionTrigger(PlayerbotAI* ai) : Trigger(ai, "urom arcane explosion") {}
+    UromArcaneExplosionTrigger(PlayerbotAI* botAI) : Trigger(botAI, "urom arcane explosion") {}
     bool IsActive() override;
 };
 
 class UromTimeBombTrigger : public Trigger
 {
 public:
-    UromTimeBombTrigger(PlayerbotAI* ai) : Trigger(ai, "urom time bomb") {}
+    UromTimeBombTrigger(PlayerbotAI* botAI) : Trigger(botAI, "urom time bomb") {}
     bool IsActive() override;
 };
 

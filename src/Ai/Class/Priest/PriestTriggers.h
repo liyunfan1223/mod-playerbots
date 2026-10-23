@@ -43,7 +43,7 @@ class ShadowProtectionTrigger : public BuffTrigger
 {
 public:
     ShadowProtectionTrigger(PlayerbotAI* botAI)
-    : BuffTrigger(botAI, "shadow protection", 4 * 2000) {}
+        : BuffTrigger(botAI, "shadow protection", 8 * IN_MILLISECONDS) {}
 
     bool IsActive() override;
 };
@@ -52,21 +52,21 @@ class ShadowProtectionOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     ShadowProtectionOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "shadow protection", 4 * 2000) {}
+        : BuffOnPartyTrigger(botAI, "shadow protection", 8 * IN_MILLISECONDS) {}
 };
 
 class PowerWordFortitudeOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     PowerWordFortitudeOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "power word: fortitude", 4 * 2000) {}
+        : BuffOnPartyTrigger(botAI, "power word: fortitude", 8 * IN_MILLISECONDS) {}
 };
 
 class PowerWordFortitudeTrigger : public BuffTrigger
 {
 public:
     PowerWordFortitudeTrigger(PlayerbotAI* botAI)
-        : BuffTrigger(botAI, "power word: fortitude", 4 * 2000) {}
+        : BuffTrigger(botAI, "power word: fortitude", 8 * IN_MILLISECONDS) {}
 
     bool IsActive() override;
 };
@@ -75,14 +75,14 @@ class DivineSpiritOnPartyTrigger : public BuffOnPartyTrigger
 {
 public:
     DivineSpiritOnPartyTrigger(PlayerbotAI* botAI)
-        : BuffOnPartyTrigger(botAI, "divine spirit", 4 * 2000) {}
+        : BuffOnPartyTrigger(botAI, "divine spirit", 8 * IN_MILLISECONDS) {}
 };
 
 class DivineSpiritTrigger : public BuffTrigger
 {
 public:
     DivineSpiritTrigger(PlayerbotAI* botAI)
-        : BuffTrigger(botAI, "divine spirit", 4 * 2000) {}
+        : BuffTrigger(botAI, "divine spirit", 8 * IN_MILLISECONDS) {}
 
     bool IsActive() override;
 };
@@ -91,7 +91,7 @@ class FearWardOnMainTankTrigger : public BuffOnMainTankTrigger
 {
 public:
     FearWardOnMainTankTrigger(PlayerbotAI* botAI)
-        : BuffOnMainTankTrigger(botAI, "fear ward", false, 2000) {}
+        : BuffOnMainTankTrigger(botAI, "fear ward", false, 2 * IN_MILLISECONDS) {}
 
     bool IsActive() override;
 };

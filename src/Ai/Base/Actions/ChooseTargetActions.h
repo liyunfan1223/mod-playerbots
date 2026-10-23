@@ -100,4 +100,12 @@ public:
     bool Execute(Event event) override;
 };
 
+class TargetRequesterAction : public Action
+{
+public:
+    TargetRequesterAction(PlayerbotAI* botAI) : Action(botAI, "target me") {}
+
+    bool Execute(Event event) override;
+};
+
 #endif

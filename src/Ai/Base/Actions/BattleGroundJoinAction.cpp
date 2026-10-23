@@ -11,8 +11,11 @@
 #include "Event.h"
 #include "GroupMgr.h"
 #include "PlayerbotAI.h"
+#include "PlayerbotOperations.h"
+#include "PlayerbotWorldThreadProcessor.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
+#include "RandomPlayerbotFactory.h"
 
 bool BGJoinAction::Execute(Event /*event*/)
 {
@@ -108,6 +111,14 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
             if (member->InBattlegroundQueue())
                 continue;
 
+            // a member outside the captain's bracket keeps the team from queuing: it leaves the team (world thread)
+            if (!RandomPlayerbotFactory::SameArenaBracket(member->GetLevel(), bot->GetLevel()))
+            {
+                PlayerbotWorldThreadProcessor::instance().QueueOperation(
+                    std::make_unique<ArenaTeamDropMemberOperation>(arenateam->GetId(), member->GetGUID()));
+                continue;
+            }
+
             if (member->GetGroup())
                 member->GetGroup()->RemoveMember(member->GetGUID());
 
@@ -156,9 +167,6 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
 
         Player* member = ObjectAccessor::FindConnectedPlayer(*i);
         if (!member)
-            continue;
-
-        if (member->GetLevel() < 70)
             continue;
 
         if (!group->AddMember(member))
@@ -291,17 +299,17 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
     uint32 bgAlliancePlayerCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgAlliancePlayerCount;
     uint32 bgHordeBotCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgHordeBotCount;
     uint32 bgHordePlayerCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount;
-    uint32 activeBgQueue = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].activeBgQueue;
-    uint32 bgInstanceCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgInstanceCount;
+    uint32 demandedSlots =
+        sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].DemandedBgSlotsPerTeam(TeamSize, teamId);
 
     if (teamId == TEAM_ALLIANCE)
     {
-        if ((bgAllianceBotCount + bgAlliancePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
+        if ((bgAllianceBotCount + bgAlliancePlayerCount) < demandedSlots)
             return true;
     }
     else
     {
-        if ((bgHordeBotCount + bgHordePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
+        if ((bgHordeBotCount + bgHordePlayerCount) < demandedSlots)
             return true;
     }
 
@@ -311,7 +319,7 @@ bool BGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battlegroun
 bool BGJoinAction::isUseful()
 {
     // do not try if BG bots disabled
-    if (!sPlayerbotAIConfig.randomBotJoinBG)
+    if (!sPlayerbotAIConfig.RandomBotJoinBG)
         return false;
 
     // can't queue while in BG/Arena
@@ -622,17 +630,17 @@ bool FreeBGJoinAction::shouldJoinBg(BattlegroundQueueTypeId queueTypeId, Battleg
     uint32 bgAlliancePlayerCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgAlliancePlayerCount;
     uint32 bgHordeBotCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgHordeBotCount;
     uint32 bgHordePlayerCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgHordePlayerCount;
-    uint32 activeBgQueue = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].activeBgQueue;
-    uint32 bgInstanceCount = sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].bgInstanceCount;
+    uint32 demandedSlots =
+        sRandomPlayerbotMgr.BattlegroundData[queueTypeId][bracketId].DemandedBgSlotsPerTeam(TeamSize, teamId);
 
     if (teamId == TEAM_ALLIANCE)
     {
-        if ((bgAllianceBotCount + bgAlliancePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
+        if ((bgAllianceBotCount + bgAlliancePlayerCount) < demandedSlots)
             return true;
     }
     else
     {
-        if ((bgHordeBotCount + bgHordePlayerCount) < TeamSize * (activeBgQueue + bgInstanceCount))
+        if ((bgHordeBotCount + bgHordePlayerCount) < demandedSlots)
             return true;
     }
 
@@ -934,7 +942,7 @@ bool BGStatusAction::Execute(Event event)
         if (isArena)
             timer = TIME_TO_AUTOREMOVE;
         else
-            timer = TIME_TO_AUTOREMOVE + 1000 * (bg->GetMaxPlayersPerTeam() * 8);
+            timer = TIME_TO_AUTOREMOVE + IN_MILLISECONDS * (bg->GetMaxPlayersPerTeam() * 8);
 
         if (Time2 > timer && isArena)  // disabled for BG
             leaveQ = true;

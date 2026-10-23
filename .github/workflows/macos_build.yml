@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-14
+          - macos-15
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
 
@@ -24,17 +24,17 @@ jobs:
       MAKEFLAGS: "-k"
     steps:
       - name: Checkout AzerothCore
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: 'mod-playerbots/azerothcore-wotlk'
           ref: ${{ (github.base_ref || github.ref_name) == 'test-staging' && 'test-staging' || 'Playerbot' }}
 
       - name: Checkout Playerbot Module
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: 'modules/mod-playerbots'
       - name: Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/Library/Caches/ccache
           key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
