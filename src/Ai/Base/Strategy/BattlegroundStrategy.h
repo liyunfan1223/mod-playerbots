@@ -36,6 +36,7 @@ public:
 
     uint32 GetType() const override { return STRATEGY_TYPE_GENERIC; }
     void InitTriggers(std::vector<TriggerNode*>& triggers) override;
+    void InitMultipliers(std::vector<Multiplier*>& multipliers) override;
     std::string const getName() override { return "warsong"; }
 };
 

@@ -40,9 +40,9 @@ private:
     // To account for Blast Nova delay caused by Quake's DelayAll.
     void HandleQuake(Unit* caster)
     {
-        auto it = blastNovaTimer.find(caster->GetInstanceId());
-        if (it != blastNovaTimer.end())
-            it->second += QUAKE_DELAY_MS;
+        std::optional<uint32>& blastNovaTimer = MagState(caster->GetInstanceId()).blastNovaTimer;
+        if (blastNovaTimer)
+            *blastNovaTimer += QUAKE_DELAY_MS;
     }
 
     // Cube clickers are permitted to continue casting while in the waiting position, so a spell

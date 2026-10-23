@@ -7,9 +7,17 @@
 #ifndef PLAYERBOTS_PVPTRIGGERS_H
 #define PLAYERBOTS_PVPTRIGGERS_H
 
+#include "ObjectGuid.h"
 #include "Trigger.h"
 
 class PlayerbotAI;
+
+class WsgSupportThreat : public Trigger
+{
+public:
+    WsgSupportThreat(PlayerbotAI* botAI) : Trigger(botAI, "wsg support threat", 250) {}
+    bool IsActive() override;
+};
 
 class EnemyPlayerNear : public Trigger
 {
@@ -46,12 +54,47 @@ public:
     bool IsActive() override;
 };
 
-class TeamFlagCarrierNear : public Trigger
+class WsgEscortSeparated : public Trigger
 {
 public:
-    TeamFlagCarrierNear(PlayerbotAI* botAI) : Trigger(botAI, "team flagcarrier near") {}
+    WsgEscortSeparated(PlayerbotAI* botAI) : Trigger(botAI, "wsg escort separated", 250) {}
+    bool IsActive() override;
+};
+
+class WsgFlagStateChanged : public Trigger
+{
+public:
+    WsgFlagStateChanged(PlayerbotAI* botAI) : Trigger(botAI, "wsg flag state changed", 250) {}
 
     bool IsActive() override;
+
+private:
+    bool _initialized = false;
+    uint32 _instanceId = 0;
+    uint8 _allianceFlagState = 0;
+    uint8 _hordeFlagState = 0;
+    ObjectGuid _alliancePicker;
+    ObjectGuid _hordePicker;
+    ObjectGuid _allianceDropped;
+    ObjectGuid _hordeDropped;
+    bool _allianceBaseReady = false;
+    bool _hordeBaseReady = false;
+    uint32 _role = 0;
+    uint8 _defenders = 0;
+    uint8 _escorts = 0;
+    uint8 _escortIndex = 0;
+    bool _escort = false;
+    bool _baseDefender = false;
+    bool _defender = false;
+    bool _attacker = false;
+    bool _returner = false;
+    bool _committedAttack = false;
+    bool _assignmentValid = false;
+    uint32 _lastMarkerSampleMs = 0;
+    ObjectGuid _markerGuid;
+    float _markerX = 0.0f;
+    float _markerY = 0.0f;
+    bool _markerValid = false;
 };
 
 class TeamHasFlag : public Trigger

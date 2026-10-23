@@ -4,7 +4,7 @@
  * or (at your option) any later version.
  */
 
- #ifndef PLAYERBOTS_OFFHEALRETPALADINSTRATEGY_H
+#ifndef PLAYERBOTS_OFFHEALRETPALADINSTRATEGY_H
 #define PLAYERBOTS_OFFHEALRETPALADINSTRATEGY_H
 
 #include "GenericPaladinStrategy.h"
@@ -21,7 +21,7 @@ public:
     std::vector<NextAction> getDefaultActions() override;
     uint32 GetType() const override
     {
-        return STRATEGY_TYPE_DPS | STRATEGY_TYPE_HEAL | STRATEGY_TYPE_MELEE;
+        return STRATEGY_TYPE_DPS | STRATEGY_TYPE_MELEE;
     }
 };
 
