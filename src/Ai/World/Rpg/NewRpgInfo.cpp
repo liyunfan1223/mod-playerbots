@@ -60,6 +60,12 @@ void NewRpgInfo::ChangeToOutdoorPvp(ObjectGuid::LowType capturePointSpawnId)
     data = pvp;
 }
 
+void NewRpgInfo::ChangeToDoGather()
+{
+    startT = getMSTime();
+    data = DoGather{};
+}
+
 void NewRpgInfo::ChangeToRest()
 {
     startT = getMSTime();
@@ -102,6 +108,7 @@ NewRpgStatus NewRpgInfo::StatusFromString(std::string const& name)
     if (name == "do quest")       return RPG_DO_QUEST;
     if (name == "travel flight")  return RPG_TRAVEL_FLIGHT;
     if (name == "outdoor pvp")    return RPG_OUTDOOR_PVP;
+    if (name == "do gather")      return RPG_DO_GATHER;
     return RPG_STATUS_END;
 }
 
@@ -118,6 +125,7 @@ NewRpgStatus NewRpgInfo::GetStatus()
         if constexpr (std::is_same_v<T, DoQuest>) return RPG_DO_QUEST;
         if constexpr (std::is_same_v<T, TravelFlight>) return RPG_TRAVEL_FLIGHT;
         if constexpr (std::is_same_v<T, OutdoorPvP>) return RPG_OUTDOOR_PVP;
+        if constexpr (std::is_same_v<T, DoGather>) return RPG_DO_GATHER;
         return RPG_IDLE;
     }, data);
 }
@@ -189,6 +197,15 @@ std::string NewRpgInfo::ToString()
                 out << "\nNo capture point assigned.";
             else
                 out << "\ncapturePointSpawnId: " << arg.capturePointSpawnId;
+        }
+        else if constexpr (std::is_same_v<T, DoGather>)
+        {
+            out << "DO_GATHER";
+            out << "\nnodeSpawnId: " << arg.nodeSpawnId;
+            out << "\nnodePos: " << arg.nodePos.GetMapId() << " " << arg.nodePos.GetPositionX() << " "
+                << arg.nodePos.GetPositionY() << " " << arg.nodePos.GetPositionZ();
+            out << "\nvisited: " << arg.visited.size();
+            out << "\nlastReach: " << (arg.lastReach ? GetMSTimeDiffToNow(arg.lastReach) : 0);
         }
         else
             out << "UNKNOWN";

@@ -329,6 +329,19 @@ void StatsCollector::CollectEnchantStats(SpellItemEnchantmentEntry const* enchan
                 CollectByItemStatType(enchant_spell_id, enchant_amount);
                 break;
             }
+            case ITEM_ENCHANTMENT_TYPE_RESISTANCE:
+            {
+                // spellid holds the school; school 0 is armor (e.g. Enchant Cloak - Superior Defense)
+                if (enchant_spell_id != SPELL_SCHOOL_NORMAL)
+                    break;
+
+                // for item random suffix
+                if (!enchant_amount)
+                    enchant_amount = default_enchant_amount;
+
+                stats[STATS_TYPE_ARMOR] += enchant_amount;
+                break;
+            }
             default:
                 break;
         }

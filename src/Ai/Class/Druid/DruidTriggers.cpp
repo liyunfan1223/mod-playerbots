@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "TargetValue.h"
 
 bool MarkOfTheWildTrigger::IsActive()
 {
@@ -124,19 +125,7 @@ bool HurricaneChannelCheckTrigger::IsActive()
             return false;
 
         // Count attackers actually inside the Hurricane AoE
-        float radius = dynObj->GetRadius();
-        GuidVector attackers = AI_VALUE(GuidVector, "attackers");
-        uint32 count = 0;
-        for (ObjectGuid const& guid : attackers)
-        {
-            Unit* unit = botAI->GetUnit(guid);
-            if (!unit || !unit->IsAlive())
-                continue;
-            if (unit->GetDistance(dynObj->GetPosition()) <= radius)
-                count++;
-        }
-
-        return count < minEnemies;
+        return !HasEnoughAoeTargets(botAI, dynObj->GetPosition(), dynObj->GetRadius(), minEnemies);
     }
 
     return false;

@@ -17,7 +17,7 @@
 GuidSet GatherStrategyTargetExclusions(PlayerbotAI* botAI, TargetValueExclusionType type)
 {
     GuidSet exclusions;
-    if (!botAI || type == TargetValueExclusionType::None || !botAI->HasTargetExclusions())
+    if (!botAI || !botAI->HasTargetExclusions())
         return exclusions;
 
     for (auto const& strategyName : botAI->GetStrategies(BOT_STATE_COMBAT))
@@ -32,18 +32,41 @@ GuidSet GatherStrategyTargetExclusions(PlayerbotAI* botAI, TargetValueExclusionT
     return exclusions;
 }
 
-Unit* FindTargetStrategy::GetResult() { return result; }
-
-TargetValueExclusionType FindTargetStrategy::GetExclusionType() { return TargetValueExclusionType::None; }
-
-Unit* TargetValue::FindTarget(FindTargetStrategy* strategy)
+bool HasEnoughAoeTargets(PlayerbotAI* botAI, Position const& center, float range, uint32 minCount)
 {
     GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
-    GuidSet const dynamicExclusions = GatherStrategyTargetExclusions(botAI, strategy->GetExclusionType());
+    auto const isInRange = [&center, range](Unit* unit)
+    { return unit && unit->IsAlive() && unit->GetDistance(center) <= range; };
+
+    uint32 count = 0;
+    for (ObjectGuid const guid : attackers)
+    {
+        if (isInRange(botAI->GetUnit(guid)))
+            ++count;
+    }
+
+    if (count < minCount || !botAI->HasTargetExclusions())
+        return count >= minCount;
+
+    GuidSet const exclusions = GatherStrategyTargetExclusions(botAI, TargetValueExclusionType::Aoe);
+    for (ObjectGuid const guid : attackers)
+    {
+        if (exclusions.find(guid) != exclusions.end() && isInRange(botAI->GetUnit(guid)))
+            --count;
+    }
+
+    return count >= minCount;
+}
+
+Unit* FindTargetStrategy::GetResult() { return result; }
+
+Unit* TargetValue::FindTarget(FindTargetStrategy* strategy, GuidSet const& exclusions)
+{
+    GuidVector attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
     for (ObjectGuid const guid : attackers)
     {
         Unit* unit = botAI->GetUnit(guid);
-        if (!unit || dynamicExclusions.find(guid) != dynamicExclusions.end())
+        if (!unit || exclusions.find(guid) != exclusions.end())
             continue;
 
         ThreatManager& threatMgr = unit->GetThreatMgr();

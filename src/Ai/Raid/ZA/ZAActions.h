@@ -12,7 +12,7 @@
 #include "MovementActions.h"
 #include <string>
 
-// General
+// Shared
 
 class ZulAmanResetEncounterStatesAction : public Action
 {

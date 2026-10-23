@@ -74,6 +74,14 @@ void NewRpgStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
             }
         )
     );
+    triggers.push_back(
+        new TriggerNode(
+            "do gather status",
+            {
+                NextAction("new rpg do gather", 3.0f)
+            }
+        )
+    );
 }
 
 void NewRpgStrategy::InitMultipliers(std::vector<Multiplier*>&)
