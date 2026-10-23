@@ -11,7 +11,6 @@
 #include "DBCStores.h"
 #include "GossipDef.h"
 #include "IVMapMgr.h"
-#include "LootMgr.h"
 #include "MotionMaster.h"
 #include "MoveSpline.h"
 #include "NewRpgInfo.h"
@@ -31,7 +30,6 @@
 #include "SharedDefines.h"
 #include "Timer.h"
 #include "TravelMgr.h"
-#include "UseItemAction.h"
 #include "WaypointMovementGenerator.h"
 #include "G3D/Vector2.h"
 #include <cmath>
@@ -544,14 +542,7 @@ bool NewRpgDoQuestAction::DoIncompleteQuest(NewRpgInfo::DoQuest& data)
 
         float dx = nearestPoi.x, dy = nearestPoi.y;
 
-        // We do not know the accurate z, but GetHeight's vmap probe only
-        // searches maxSearchDist (default 50yd) below the z it's given --
-        // starting from MAX_HEIGHT never lands near real geometry, so vmap
-        // always misses and this silently fell back to the flat
-        // single-value-per-column .map heightmap, which is wrong on any
-        // multi-level structure (e.g. Teldrassil's tiered tree). The bot's
-        // own Z is a much better search origin since POIs are always close by.
-        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, bot->GetPositionZ()), bot->GetMap()->GetWaterLevel(dx, dy));
+        float dz = GetGroundZ(dx, dy);
 
         // double check for GetQuestPOIPosAndObjectiveIdx
         if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
@@ -646,9 +637,7 @@ bool NewRpgDoQuestAction::DoCompletedQuest(NewRpgInfo::DoQuest& data)
         assert(poiInfo.size() > 0);
         // now we get the place to get rewarded
         float dx = poiInfo[0].pos.x, dy = poiInfo[0].pos.y;
-        // See DoIncompleteQuest above for why this starts from the bot's Z
-        // instead of MAX_HEIGHT.
-        float dz = std::max(bot->GetMap()->GetHeight(dx, dy, bot->GetPositionZ()), bot->GetMap()->GetWaterLevel(dx, dy));
+        float dz = GetGroundZ(dx, dy);
 
         // double check for GetQuestPOIPosAndObjectiveIdx
         if (dz == INVALID_HEIGHT || dz == VMAP_INVALID_HEIGHT_VALUE)
@@ -774,197 +763,4 @@ void NewRpgTravelFlightAction::ContinueCrossMapTaxi()
     flight->SkipCurrentNode();
 
     bot->TeleportTo(nextNode->map_id, node->x, node->y, node->z, bot->GetOrientation(), TELE_TO_NOT_LEAVE_TAXI);
-}
-
-bool GrabQuestItemAction::Execute(Event /*event*/)
-{
-    if (SearchQuestGiverAndAcceptOrReward())
-        return true;
-
-    if (UseQuestItemOnRequiredTarget())
-        return true;
-
-    if (UseQuestItemToCreateRequiredItem())
-        return true;
-
-    GuidVector candidates = AI_VALUE(GuidVector, "possible quest grab targets");
-    if (candidates.empty())
-        return false;
-
-    ObjectGuid guid = candidates.front();
-    GameObject* go = botAI->GetGameObject(guid);
-    if (!go)
-        return false;
-
-    if (!IsWithinInteractionDist(go))
-        return MoveWorldObjectTo(guid);
-
-    // ActivateToQuest() (the filter behind "possible quest grab targets") accepts
-    // CHEST/GENERIC/GOOBER/SPELL_FOCUS/QUESTGIVER alike, but only CHEST is opened as
-    // loot -- the others grant quest credit via GameObject::Use() (KillCreditGO()),
-    // same as a player right-clicking them. SendLoot() is a no-op for those types.
-    if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST)
-    {
-        // SendLoot releases any loot the bot already has open before opening a
-        // new one (Player::SendLoot) -- skip re-issuing it for the same object
-        // so a loot window already in progress gets a chance to actually be
-        // stored (via the "loot response" -> "store loot" pipeline, already
-        // wired unconditionally for every bot in WorldPacketHandlerStrategy)
-        // instead of being released and reopened every tick.
-        if (bot->GetLootGUID() != guid)
-        {
-            LOG_DEBUG("playerbots", "[Quest Grab] {} looting quest chest {} ({} yd away)", bot->GetName(),
-                      go->GetGOInfo()->name, bot->GetDistance(go));
-            bot->SendLoot(guid, LOOT_SKINNING);
-        }
-    }
-    else
-    {
-        LOG_DEBUG("playerbots", "[Quest Grab] {} using quest object {} ({} yd away)", bot->GetName(),
-                  go->GetGOInfo()->name, bot->GetDistance(go));
-        go->Use(bot);
-    }
-    return true;
-}
-
-bool GrabQuestItemAction::UseQuestItemOnRequiredTarget()
-{
-    std::vector<Item*> questItems = AI_VALUE2(std::vector<Item*>, "inventory items", "quest");
-    if (questItems.empty())
-        return false;
-
-    for (Item* item : questItems)
-    {
-        ItemTemplate const* proto = item->GetTemplate();
-        // Items that start a quest are handled by the always-on "use random quest item"
-        // maintenance action -- this is only for items used mid-quest on a target.
-        if (proto->StartQuest)
-            continue;
-
-        for (auto const& [questId, status] : bot->getQuestStatusMap())
-        {
-            if (status.Status != QUEST_STATUS_INCOMPLETE)
-                continue;
-
-            Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-            if (!quest)
-                continue;
-
-            for (uint8 i = 0; i < QUEST_OBJECTIVES_COUNT; ++i)
-            {
-                int32 reqEntry = quest->RequiredNpcOrGo[i];
-                if (!reqEntry || status.CreatureOrGOCount[i] >= quest->RequiredNpcOrGoCount[i])
-                    continue;
-
-                Object* target = nullptr;
-                GameObject* go = nullptr;
-                Creature* creature = nullptr;
-                if (reqEntry < 0)
-                {
-                    go = bot->FindNearestGameObject(uint32(-reqEntry), sPlayerbotAIConfig.QuestGrabDistance, true);
-                    target = go;
-                }
-                else
-                {
-                    creature = bot->FindNearestCreature(uint32(reqEntry), sPlayerbotAIConfig.QuestGrabDistance);
-                    target = creature;
-                }
-                if (!target)
-                    continue;
-
-                if (!IsWithinInteractionDist(target))
-                    return MoveWorldObjectTo(target->GetGUID());
-
-                LOG_DEBUG("playerbots",
-                          "[Quest Item Use] {} trying {} on {} {} for quest {} objective {} ({}/{} done)",
-                          bot->GetName(), proto->Name1, go ? "gameobject" : "creature", reqEntry, questId, i,
-                          status.CreatureOrGOCount[i], quest->RequiredNpcOrGoCount[i]);
-
-                bool used;
-                UseItemAction useItemAction(botAI);
-                if (go)
-                    used = useItemAction.UseItemOnGameObject(item, go->GetGUID());
-                else
-                    used = useItemAction.UseItemOnUnit(item, creature);
-
-                LOG_DEBUG("playerbots", "[Quest Item Use] {} {} using {} on {}", bot->GetName(),
-                          used ? "succeeded" : "failed", proto->Name1, target->GetGUID().ToString().c_str());
-
-                if (used)
-                    return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool GrabQuestItemAction::UseQuestItemToCreateRequiredItem()
-{
-    std::vector<Item*> questItems = AI_VALUE2(std::vector<Item*>, "inventory items", "quest");
-    if (questItems.empty())
-        return false;
-
-    for (Item* item : questItems)
-    {
-        ItemTemplate const* proto = item->GetTemplate();
-        if (proto->StartQuest)
-            continue;
-
-        for (uint8 spellIdx = 0; spellIdx < MAX_ITEM_PROTO_SPELLS; ++spellIdx)
-        {
-            uint32 spellId = proto->Spells[spellIdx].SpellId;
-            if (!spellId)
-                continue;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellInfo)
-                continue;
-
-            for (uint8 effectIdx = 0; effectIdx < MAX_SPELL_EFFECTS; ++effectIdx)
-            {
-                if (spellInfo->Effects[effectIdx].Effect != SPELL_EFFECT_CREATE_ITEM)
-                    continue;
-
-                uint32 createdItemId = spellInfo->Effects[effectIdx].ItemType;
-
-                for (auto const& [questId, status] : bot->getQuestStatusMap())
-                {
-                    if (status.Status != QUEST_STATUS_INCOMPLETE)
-                        continue;
-
-                    Quest const* quest = sObjectMgr->GetQuestTemplate(questId);
-                    if (!quest)
-                        continue;
-
-                    for (uint8 j = 0; j < QUEST_ITEM_OBJECTIVES_COUNT; ++j)
-                    {
-                        if (quest->RequiredItemId[j] != createdItemId ||
-                            status.ItemCount[j] >= quest->RequiredItemCount[j])
-                            continue;
-
-                        // No explicit target: items like this (e.g. "Jade Phial" filled into
-                        // "Filled Jade Phial") are gated by the spell's own range/spell-focus
-                        // requirement, not by anything the bot selects -- the bot only needs
-                        // to already be standing in the right spot, which "grab" doesn't move
-                        // it for. UseItemAuto() lets the server's own cast validation decide;
-                        // a bot outside the required area just gets a harmless failed cast.
-                        LOG_DEBUG("playerbots",
-                                  "[Quest Item Use] {} trying {} (creates {}) for quest {} objective {} ({}/{} done)",
-                                  bot->GetName(), proto->Name1, createdItemId, questId, j, status.ItemCount[j],
-                                  quest->RequiredItemCount[j]);
-
-                        UseItemAction useItemAction(botAI);
-                        bool used = useItemAction.UseItemAuto(item);
-
-                        LOG_DEBUG("playerbots", "[Quest Item Use] {} {} using {}", bot->GetName(),
-                                  used ? "succeeded" : "failed", proto->Name1);
-
-                        if (used)
-                            return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
 }

@@ -149,7 +149,10 @@ bool UseItemAction::UseItemAuto(Item* item) { return UseItem(item, ObjectGuid::E
 
 bool UseItemAction::UseItemOnGameObject(Item* item, ObjectGuid go) { return UseItem(item, go, nullptr); }
 
-bool UseItemAction::UseItemOnUnit(Item* item, Unit* unitTarget) { return UseItem(item, ObjectGuid::Empty, nullptr, unitTarget); }
+bool UseItemAction::UseItemOnUnit(Item* item, Unit* unitTarget)
+{
+    return UseItem(item, ObjectGuid::Empty, nullptr, unitTarget);
+}
 
 bool UseItemAction::UseItemOnItem(Item* item, Item* itemTarget) { return UseItem(item, ObjectGuid::Empty, itemTarget); }
 

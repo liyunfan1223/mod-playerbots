@@ -123,44 +123,4 @@ protected:
     void ContinueCrossMapTaxi();
 };
 
-// Used by the "grab" strategy (QuestGrabStrategy), independent of "new rpg" --
-// reuses NewRpgBaseAction purely for its movement/quest-interaction helpers.
-// Four rules, tried in order: accept/turn in at a nearby questgiver if one's
-// ready (existing, unmodified SearchQuestGiverAndAcceptOrReward); else use a
-// carried quest item on the specific creature/GO a current objective still
-// needs (UseQuestItemOnRequiredTarget); else try a carried quest item that
-// has no target at all -- a spell-focus-gated "fill this near the right
-// spot" item like Jade Phial (UseQuestItemToCreateRequiredItem); else walk
-// to and use the nearest quest-relevant GameObject already in sight.
-class GrabQuestItemAction : public NewRpgBaseAction
-{
-public:
-    GrabQuestItemAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "grab quest item") {}
-    bool Execute(Event event) override;
-
-protected:
-    // Quest data (Quest::RequiredNpcOrGo[]) tells us exactly which creature (>0) or
-    // gameobject (<0) entry each objective slot still needs -- the same array
-    // NewRpgDoQuestAction already reads via RequiredNpcOrGoCount. What quest data does
-    // NOT tell us is which carried item resolves that objective (this codebase has no
-    // TrinityCore-style RequiredSourceItemId; classic "use item on target" quests grant
-    // credit via per-item hardcoded SpellScripts, e.g. spell_item_branns_communicator).
-    // So this tries each non-StartQuest "quest" category item against a nearby target
-    // matching an outstanding objective and lets the server's own item/spell target
-    // validation decide -- identical to what the manual "use <item> <target>" chat
-    // command already relies on.
-    bool UseQuestItemOnRequiredTarget();
-
-    // Covers RequiredItemId-only objectives satisfied by a *different* item than the one
-    // in the bot's bag -- e.g. quest 929 needs "Filled Jade Phial" (5639), obtained by
-    // using the empty "Jade Phial" (5619) while standing near a spell-focus gameobject
-    // the quest data never names. No script/table anywhere links 5619 -> 5639 -> quest
-    // 929 directly; the only place that link exists is the tool item's own on-use spell
-    // effect (SPELL_EFFECT_CREATE_ITEM), which ItemUsageValue::IsItemUsefulForQuest
-    // already walks for a different purpose. Reuses that same walk to find candidate
-    // tool items, then just calls UseItemAuto() with no target and lets the server's own
-    // spell-focus/range check decide -- there is nothing to path to or aim at.
-    bool UseQuestItemToCreateRequiredItem();
-};
-
 #endif

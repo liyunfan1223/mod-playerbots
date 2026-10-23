@@ -50,12 +50,13 @@ protected:
     bool IsQuestCapableDoing(Quest const* quest);
 
     /* QUEST RELATED ACTION */
-    bool SearchQuestGiverAndAcceptOrReward();
+    bool SearchQuestGiverAndAcceptOrReward(float distanceLimit = 80.0f, bool organizeQuestLog = true);
     bool AcceptQuest(Quest const* quest, ObjectGuid guid);
     bool TurnInQuest(Quest const* quest, ObjectGuid guid);
     bool OrganizeQuestLog();
 
 protected:
+    float GetGroundZ(float x, float y);
     bool GetQuestPOIPosAndObjectiveIdx(uint32 questId, std::vector<POIInfo>& poiInfo, bool toComplete = false);
     static WorldPosition SelectRandomGrindPos(Player* bot);
     static WorldPosition SelectRandomCampPos(Player* bot);

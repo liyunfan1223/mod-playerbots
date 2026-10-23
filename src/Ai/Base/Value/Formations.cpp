@@ -102,7 +102,7 @@ public:
 class NearFormation : public MoveAheadFormation
 {
 public:
-    NearFormation(PlayerbotAI* botAI) : MoveAheadFormation(botAI, "near") {}
+    NearFormation(PlayerbotAI* botAI, std::string const name = "near") : MoveAheadFormation(botAI, name) {}
 
     WorldLocation GetLocationInternal() override
     {
@@ -128,6 +128,16 @@ public:
     }
 
     float GetMaxDistance() override { return sPlayerbotAIConfig.FollowDistance; }
+};
+
+// Like "near", but "follow" only kicks in once the bot is past Playerbots.LeashDistance, so new rpg,
+// grind or "quest grab" can act freely around the leader (see "leash too far").
+class LeashFormation : public NearFormation
+{
+public:
+    LeashFormation(PlayerbotAI* botAI) : NearFormation(botAI, "leash") {}
+
+    float GetMaxDistance() override { return sPlayerbotAIConfig.LeashDistance; }
 };
 
 class ChaosFormation : public MoveAheadFormation
@@ -502,6 +512,12 @@ float Formation::GetFollowAngle()
     return start + (0.125f + 1.75f * index / total + (total == 2 ? 0.125f : 0.0f)) * M_PI;
 }
 
+bool IsLeashFormation(PlayerbotAI* botAI)
+{
+    Formation* formation = botAI->GetAiObjectContext()->GetValue<Formation*>("formation")->Get();
+    return formation && formation->getName() == "leash";
+}
+
 FormationValue::FormationValue(PlayerbotAI* botAI)
     : ManualSetValue<Formation*>(botAI, new ChaosFormation(botAI), "formation")
 {
@@ -583,6 +599,13 @@ bool FormationValue::Load(std::string const formation)
 
         value = new FarFormation(botAI);
     }
+    else if (formation == "leash")
+    {
+        if (value)
+            delete value;
+
+        value = new LeashFormation(botAI);
+    }
     else
         return false;
 
@@ -617,7 +640,7 @@ bool SetFormationAction::Execute(Event event)
         str << "Invalid formation: |cffff0000" << formation;
         botAI->TellMaster(str);
         botAI->TellMaster(
-            "Please set to any of:|cffffffff chaos (default), near, queue, circle, line, shield, arrow, melee, far");
+            "Please set to any of:|cffffffff chaos (default), near, queue, circle, line, shield, arrow, melee, far, leash");
         return false;
     }
 

@@ -57,6 +57,9 @@ public:
     virtual WorldLocation GetLocationInternal() { return NullLocation; }
 };
 
+// True when the bot's formation is "leash": it may roam up to Playerbots.LeashDistance from the leader.
+bool IsLeashFormation(PlayerbotAI* botAI);
+
 class FormationValue : public ManualSetValue<Formation*>
 {
 public:

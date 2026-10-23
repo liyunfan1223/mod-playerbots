@@ -51,6 +51,7 @@
 #include "PetsAction.h"
 #include "PositionAction.h"
 #include "PullActions.h"
+#include "QuestGrabActions.h"
 #include "RandomBotUpdateAction.h"
 #include "ReachTargetActions.h"
 #include "ReleaseSpiritAction.h"
@@ -285,7 +286,10 @@ public:
         creators["new rpg travel flight"] = &ActionContext::new_rpg_travel_flight;
         creators["new rpg outdoor pvp"] = &ActionContext::new_rpg_outdoor_pvp;
         creators["new rpg do gather"] = &ActionContext::new_rpg_do_gather;
-        creators["grab quest item"] = &ActionContext::grab_quest_item;
+        creators["quest grab giver"] = &ActionContext::quest_grab_giver;
+        creators["quest grab use item"] = &ActionContext::quest_grab_use_item;
+        creators["quest grab create item"] = &ActionContext::quest_grab_create_item;
+        creators["quest grab object"] = &ActionContext::quest_grab_object;
         creators["wait for attack keep safe distance"] = &ActionContext::wait_for_attack_keep_safe_distance;
     }
 
@@ -498,7 +502,10 @@ private:
     static Action* new_rpg_travel_flight(PlayerbotAI* botAI) { return new NewRpgTravelFlightAction(botAI); }
     static Action* new_rpg_outdoor_pvp(PlayerbotAI* botAI) { return new NewRpgOutdoorPvpAction(botAI); }
     static Action* new_rpg_do_gather(PlayerbotAI* botAI) { return new NewRpgDoGatherAction(botAI); }
-    static Action* grab_quest_item(PlayerbotAI* botAI) { return new GrabQuestItemAction(botAI); }
+    static Action* quest_grab_giver(PlayerbotAI* botAI) { return new QuestGrabGiverAction(botAI); }
+    static Action* quest_grab_use_item(PlayerbotAI* botAI) { return new QuestGrabUseItemAction(botAI); }
+    static Action* quest_grab_create_item(PlayerbotAI* botAI) { return new QuestGrabCreateItemAction(botAI); }
+    static Action* quest_grab_object(PlayerbotAI* botAI) { return new QuestGrabObjectAction(botAI); }
     static Action* wait_for_attack_keep_safe_distance(PlayerbotAI* botAI) { return new WaitForAttackKeepSafeDistanceAction(botAI); }
 };
 

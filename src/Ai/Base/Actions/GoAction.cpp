@@ -9,6 +9,7 @@
 #include "Event.h"
 #include "Formations.h"
 #include "PathGenerator.h"
+#include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "ServerFacade.h"
@@ -67,16 +68,18 @@ bool GoAction::Execute(Event event)
         }
     }
 
-    // Manual, on-demand equivalent of the "grab" strategy (QuestGrabStrategy) for players
-    // who don't want it running automatically every "timer" tick -- same one-shot pattern
-    // BossAuraActions/GuildCreateActions already use to invoke another action directly,
-    // bypassing relevance/strategy gating entirely.
+    // One-shot "quest grab", for players who don't want the strategy running all the time.
     if (param == "quest" || param == "grab")
     {
-        if (botAI->DoSpecificAction("grab quest item", Event(), true))
-            return true;
+        for (char const* action : { "quest grab giver", "quest grab use item", "quest grab create item",
+                                    "quest grab object" })
+        {
+            if (botAI->DoSpecificAction(action, Event(), true))
+                return true;
+        }
 
-        botAI->TellError("Nothing quest-relevant to grab right now");
+        botAI->TellError(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+            "go_quest_nothing_error", "Nothing quest-related to grab right now", {}));
         return false;
     }
 
@@ -235,7 +238,8 @@ bool GoAction::Execute(Event event)
         return MoveNear(bot->GetMapId(), pos.x, pos.y, pos.z + 0.5f, sPlayerbotAIConfig.FollowDistance);
     }
 
-    botAI->TellMaster(
-        "Whisper 'go x,y', 'go [game object]', 'go unit', 'go position' or 'go quest' and I will go there");
+    botAI->TellMaster(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+        "go_help", "Whisper 'go x,y', 'go [game object]', 'go unit', 'go position' or 'go quest' and I will go there",
+        {}));
     return false;
 }

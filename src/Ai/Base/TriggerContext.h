@@ -303,14 +303,7 @@ private:
     static Trigger* can_loot(PlayerbotAI* botAI) { return new CanLootTrigger(botAI); }
     static Trigger* far_from_loot_target(PlayerbotAI* botAI) { return new FarFromCurrentLootTrigger(botAI); }
     static Trigger* far_from_master(PlayerbotAI* botAI) { return new FarFromMasterTrigger(botAI); }
-    // Separate named instance (own distance/check-interval) from "far from
-    // master" above -- that one is tied to the compiled-in 12.0f default and
-    // other callers may depend on that; this one is configurable via
-    // Playerbots.LeashDistance for LeashStrategy (see LeashStrategy.cpp).
-    static Trigger* leash_too_far(PlayerbotAI* botAI)
-    {
-        return new FarFromMasterTrigger(botAI, "leash too far", sPlayerbotAIConfig.LeashDistance, 10);
-    }
+    static Trigger* leash_too_far(PlayerbotAI* botAI) { return new LeashTooFarTrigger(botAI); }
     static Trigger* behind_target(PlayerbotAI* botAI) { return new IsBehindTargetTrigger(botAI); }
     static Trigger* not_behind_target(PlayerbotAI* botAI) { return new IsNotBehindTargetTrigger(botAI); }
     static Trigger* not_facing_target(PlayerbotAI* botAI) { return new IsNotFacingTargetTrigger(botAI); }

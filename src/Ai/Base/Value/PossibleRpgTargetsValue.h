@@ -56,13 +56,8 @@ private:
     bool ignoreLos;
 };
 
-// GameObjects the "grab" strategy (QuestGrabStrategy) should walk over to and
-// use. Unlike PossibleNewRpgGameObjectsValue (which only ever accepts
-// GAMEOBJECT_TYPE_QUESTGIVER), this filters with GameObject::ActivateToQuest
-// -- the same core-provided check the client itself uses to decide whether an
-// object should sparkle for a player's quests, covering CHEST/GOOBER/GENERIC/
-// SPELL_FOCUS/QUESTGIVER. Range is measured from the bot's own current
-// position, not the leader -- see the comment on Playerbots.QuestGrabDistance.
+// Quest objects near the bot that "quest grab object" can use: the ones ActivateToQuest makes
+// sparkle for the bot, and whose lock it can open. Range is from the bot, not the leader.
 class PossibleQuestGrabTargetsValue : public ObjectGuidListCalculatedValue
 {
 public:
