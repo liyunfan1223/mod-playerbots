@@ -7,6 +7,7 @@
 #ifndef PLAYERBOTS_QUESTGRABACTIONS_H
 #define PLAYERBOTS_QUESTGRABACTIONS_H
 
+#include "MovementActions.h"
 #include "NewRpgBaseAction.h"
 
 // "quest grab" actions: they only react to things within Playerbots.QuestGrabDistance of the bot.
@@ -20,29 +21,29 @@ public:
 };
 
 // Use a carried quest item on a nearby creature or gameobject an incomplete objective still needs.
-class QuestGrabUseItemAction : public NewRpgBaseAction
+class QuestGrabUseItemAction : public MovementAction
 {
 public:
-    explicit QuestGrabUseItemAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab use item") {}
+    explicit QuestGrabUseItemAction(PlayerbotAI* botAI) : MovementAction(botAI, "quest grab use item") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
 
 // Use a carried quest item with no target whose spell creates an item a quest needs
 // (e.g. Jade Phial -> Filled Jade Phial near a spell focus).
-class QuestGrabCreateItemAction : public NewRpgBaseAction
+class QuestGrabCreateItemAction : public MovementAction
 {
 public:
-    explicit QuestGrabCreateItemAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab create item") {}
+    explicit QuestGrabCreateItemAction(PlayerbotAI* botAI) : MovementAction(botAI, "quest grab create item") {}
     bool Execute(Event event) override;
     bool isUseful() override;
 };
 
 // Walk to and use the nearest quest-relevant gameobject. Chests are handed to the loot pipeline.
-class QuestGrabObjectAction : public NewRpgBaseAction
+class QuestGrabObjectAction : public MovementAction
 {
 public:
-    explicit QuestGrabObjectAction(PlayerbotAI* botAI) : NewRpgBaseAction(botAI, "quest grab object") {}
+    explicit QuestGrabObjectAction(PlayerbotAI* botAI) : MovementAction(botAI, "quest grab object") {}
     bool Execute(Event event) override;
 };
 

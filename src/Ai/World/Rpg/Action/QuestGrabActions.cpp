@@ -72,6 +72,14 @@ namespace
         return false;
     }
 
+    bool IsInReach(Player* bot, WorldObject* target)
+    {
+        if (GameObject* go = target->ToGameObject())
+            return go->IsAtInteractDistance(bot);
+
+        return bot->IsWithinDistInMap(target, INTERACTION_DISTANCE);
+    }
+
     // Whether one of the item's spells creates an item a quest still needs.
     bool CreatesNeededQuestItem(Player* bot, ItemTemplate const* proto)
     {
@@ -118,7 +126,7 @@ bool QuestGrabUseItemAction::Execute(Event /*event*/)
     WorldObject* moveTarget = nullptr;
     for (WorldObject* target : targets)
     {
-        if (!IsWithinInteractionDist(target))
+        if (!IsInReach(bot, target))
         {
             if (!moveTarget || bot->GetExactDist(target) < bot->GetExactDist(moveTarget))
                 moveTarget = target;
@@ -140,7 +148,7 @@ bool QuestGrabUseItemAction::Execute(Event /*event*/)
         }
     }
 
-    return moveTarget && MoveWorldObjectTo(moveTarget->GetGUID());
+    return moveTarget && MoveNear(moveTarget, INTERACTION_DISTANCE - 1.0f);
 }
 
 bool QuestGrabCreateItemAction::isUseful() { return !GetQuestUseItems(botAI).empty(); }
@@ -177,8 +185,8 @@ bool QuestGrabObjectAction::Execute(Event /*event*/)
     if (!go)
         return false;
 
-    if (!IsWithinInteractionDist(go))
-        return MoveWorldObjectTo(guid);
+    if (!IsInReach(bot, go))
+        return MoveNear(go, INTERACTION_DISTANCE - 1.0f);
 
     // Chests go through the loot pipeline, which casts the opening/gathering spell or uses the
     // key their lock needs. The other types grant credit through GameObject::Use(), like a click.
