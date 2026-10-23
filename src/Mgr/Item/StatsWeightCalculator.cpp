@@ -99,16 +99,28 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
 
     collector_->CollectItemStats(proto);
 
-    bool const checkSetBonus = enable_item_set_bonus_ && sPlayerbotAIConfig.ItemSetSpellScoring;
-    std::array<float, STATS_TYPE_MAX> setBonusStats{};
-    if (checkSetBonus)
-        CollectItemSetBonus(player_, proto, slot, setBonusStats);
-
     if (randomPropertyIds != 0)
         CalculateRandomProperty(randomPropertyIds, itemId);
 
+    bool const checkSetBonus = enable_item_set_bonus_ && sPlayerbotAIConfig.ItemSetSpellScoring;
+    std::array<float, STATS_TYPE_MAX> setBonusStats{};
+    std::array<float, STATS_TYPE_MAX> setBonusBaseline{};
+
+    // Clamp the item's own stats first so the tier below is valued only on what the player can
+    // still use (a tier's hit at the hit cap must not make the piece look valued).
     if (enable_overflow_penalty_)
         ApplyOverflowPenalty(player_);
+
+    if (checkSetBonus)
+    {
+        for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+            setBonusBaseline[i] = collector_->stats[i];
+        CollectItemSetBonus(player_, proto, slot, setBonusStats);
+
+        // Clamp the combined stats: the tier's contribution is capped the same way.
+        if (enable_overflow_penalty_)
+            ApplyOverflowPenalty(player_);
+    }
 
     GenerateWeights(player_);
     for (uint32 i = 0; i < STATS_TYPE_MAX; i++)
@@ -118,17 +130,17 @@ float StatsWeightCalculator::CalculateItem(uint32 itemId, int32 randomPropertyId
 
     CalculateItemTypePenalty(proto);
 
-    // Weight the tier only now that the weights exist. A tier whose weighted delta is zero
-    // (most raid tier procs only produce STATS_TYPE_BONUS) falls back to the legacy
-    // completeness multiplier so tier pieces are not undervalued.
+    // Value the tier on the stats that survive the clamp, on top of the item's own clamped
+    // stats. A tier whose weighted delta is ~zero (most raid tier procs only produce
+    // STATS_TYPE_BONUS, capped hit) falls back to the legacy completeness multiplier.
     float setBonusValue = 0.0f;
     if (checkSetBonus)
     {
         for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
             if (i != STATS_TYPE_BONUS)
-                setBonusValue += stats_weights_[i] * setBonusStats[i];
+                setBonusValue += stats_weights_[i] * (collector_->stats[i] - setBonusBaseline[i]);
     }
-    bool const setBonusValued = setBonusValue > 0.0f;
+    bool const setBonusValued = setBonusValue > 0.0001f;
 
     if (enable_item_set_bonus_ && (!sPlayerbotAIConfig.ItemSetSpellScoring || !setBonusValued))
         CalculateItemSetMod(player_, proto);
