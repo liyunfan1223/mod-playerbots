@@ -12,6 +12,9 @@
 #include "Playerbots.h"
 #include "StatsWeightCalculator.h"
 #include "World.h"
+#include <charconv>
+#include <iomanip>
+#include <iterator>
 #include <sstream>
 
 bool TellLosAction::Execute(Event event)
@@ -138,15 +141,104 @@ bool TellCalculateItemAction::Execute(Event event)
 {
     std::string const text = event.getParam();
     ItemWithRandomProperty item = chat->parseItemWithRandomProperty(text);
+    if (!item.itemId && text.find("Hitem:") == std::string::npos)
+    {
+        // Accept only a complete bare item id; atol() would accept a numeric prefix.
+        char const* begin = text.c_str();
+        while (*begin == ' ' || *begin == '\t')
+            ++begin;
+
+        char const* digitsEnd = begin;
+        while (*digitsEnd >= '0' && *digitsEnd <= '9')
+            ++digitsEnd;
+        char const* tail = digitsEnd;
+        while (*tail == ' ' || *tail == '\t')
+            ++tail;
+
+        uint32 parsedId = 0;
+        auto const [ptr, ec] = std::from_chars(begin, digitsEnd, parsedId);
+        if (begin == digitsEnd || *tail != '\0' || ec != std::errc() || ptr != digitsEnd || parsedId == 0)
+            return false;
+
+        item.itemId = parsedId;
+    }
+
     StatsWeightCalculator calculator(bot);
+
+    if (!item.itemId)
+        return false;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemId);
     if (!proto)
         return false;
+
     float score = calculator.CalculateItem(item.itemId, item.randomPropertyId);
 
     std::ostringstream out;
     out << "Calculated score of " << chat->FormatItem(proto) << " : " << score;
     botAI->TellMasterNoFacing(out.str());
+
+    // Per-stat breakdown (value * weight = contribution) so score tuning is verifiable.
+    // Keep in sync with enum StatsType in StatsCollector.h.
+    // clang-format off
+    static char const* statNames[] = {
+        "agility",   "strength",   "intellect",     "spirit",          "stamina",
+        "hit",       "crit",       "haste",         "armor",           "defense",
+        "dodge",     "parry",      "block_value",   "block_rating",    "resilience",
+        "health_regen", "spell_power", "spell_penetration", "heal_power", "mana_regen",
+        "attack_power", "armor_penetration", "expertise", "melee_dps", "ranged_dps",
+        "bonus"
+    };
+    // clang-format on
+    static_assert(std::size(statNames) == STATS_TYPE_MAX, "statNames must stay in sync with StatsType");
+
+    StatsCollector const* collector = calculator.GetCollector();
+    float const* weights = calculator.GetStatWeights();
+    float sum = 0.0f;
+    std::vector<std::string> lines;
+    std::string line;
+    for (uint32 i = 0; i < STATS_TYPE_MAX; ++i)
+    {
+        if (collector->stats[i] == 0.0f)
+            continue;
+
+        float const contribution = collector->stats[i] * weights[i];
+        sum += contribution;
+
+        std::ostringstream term;
+        term << std::fixed << std::setprecision(2) << statNames[i] << " " << collector->stats[i] << " * " << weights[i]
+             << " = " << contribution;
+
+        // Split into several whispers so no line exceeds the client limit.
+        if (!line.empty() && line.size() + 2 + term.str().size() > PlayerbotAI::MAX_CHAT_MESSAGE_BYTES)
+        {
+            lines.push_back(line);
+            line.clear();
+        }
+
+        if (!line.empty())
+            line += ", ";
+        line += term.str();
+    }
+
+    if (line.empty())
+        return true;
+
+    lines.push_back(line);
+
+    std::ostringstream sumText;
+    std::ostringstream multText;
+    sumText << std::fixed << std::setprecision(2) << sum;
+    multText << std::fixed << std::setprecision(2) << (sum != 0.0f ? score / sum : 0.0f);
+
+    std::map<std::string, std::string> placeholders;
+    placeholders["%sum"] = sumText.str();
+    placeholders["%mult"] = multText.str();
+    botAI->TellMasterNoFacing(PlayerbotTextMgr::instance().GetBotTextOrDefault(
+        "calc_item_breakdown", "Breakdown: weighted sum %sum, multipliers x%mult", placeholders));
+
+    for (std::string const& chunk : lines)
+        botAI->TellMasterNoFacing(chunk);
+
     return true;
 }

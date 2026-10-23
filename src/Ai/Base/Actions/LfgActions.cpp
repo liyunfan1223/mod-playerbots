@@ -16,6 +16,29 @@
 
 using namespace lfg;
 
+namespace
+{
+    constexpr uint8 CLASSIC_MAX_LEVEL = 60;
+    constexpr uint8 TBC_MAX_LEVEL = 70;
+
+    bool IsExpansionOutleveled(LFGDungeonEntry const* dungeon, uint8 level)
+    {
+        // Seasonal bosses keep their original expansion but are level 78-82.
+        if (dungeon->Flags & LFG_FLAG_SEASONAL)
+            return false;
+
+        switch (dungeon->ExpansionLevel)
+        {
+            case EXPANSION_CLASSIC:
+                return level > CLASSIC_MAX_LEVEL;
+            case EXPANSION_THE_BURNING_CRUSADE:
+                return level > TBC_MAX_LEVEL;
+            default:
+                return false;
+        }
+    }
+}
+
 bool LfgJoinAction::Execute(Event /*event*/) { return JoinLFG(); }
 
 uint32 LfgJoinAction::GetRoles()
@@ -117,6 +140,10 @@ bool LfgJoinAction::JoinLFG()
         /*LFG_TYPE_RANDOM on classic is 15-58 so bot over level 25 will never queue*/
         if ((dungeon->MinLevel && (botLevel < dungeon->MinLevel || botLevel > dungeon->MaxLevel)) ||
             (botLevel > dungeon->MinLevel + 10 && dungeon->TypeID == LFG_TYPE_DUNGEON))
+            continue;
+
+        // LFG level ranges run past the expansion cap: Stratholme is 55-65.
+        if (!sPlayerbotAIConfig.RandomBotJoinLfgOutleveledExpansion && IsExpansionOutleveled(dungeon, botLevel))
             continue;
 
         selected.push_back(dungeon->ID);

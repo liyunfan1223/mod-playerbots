@@ -49,7 +49,7 @@ bool AnzuBirdSpiritsProvideBuffsTrigger::IsActive()
         AI_VALUE2(Unit*, "find target", "anzu");
 }
 
-bool TalonKingIkissBossEngagedByTankTrigger::IsActive()
+bool TalonKingIkissShouldBeTankedTrigger::IsActive()
 {
     if (!PlayerbotAI::IsTank(bot))
         return false;
@@ -58,7 +58,7 @@ bool TalonKingIkissBossEngagedByTankTrigger::IsActive()
     return ikiss && ikiss->GetVictim() == bot && bot->IsWithinMeleeRange(ikiss);
 }
 
-bool TalonKingIkissRangedPrepareForArcaneExplosionTrigger::IsActive()
+bool TalonKingIkissRangedShouldStayNearTankTrigger::IsActive()
 {
     if (!PlayerbotAI::IsRanged(bot))
         return false;
@@ -75,7 +75,7 @@ bool TalonKingIkissBossCastingArcaneExplosionTrigger::IsActive()
     return ikiss && ikiss->HasAura(Id(SethSpells::SPELL_ARCANE_BUBBLE));
 }
 
-bool TalonKingIkissBossOutOfLosTrigger::IsActive()
+bool TalonKingIkissOutOfLosTrigger::IsActive()
 {
     Unit* ikiss = AI_VALUE2(Unit*, "find target", "talon king ikiss");
     return ikiss && !ikiss->HasAura(Id(SethSpells::SPELL_ARCANE_BUBBLE)) &&

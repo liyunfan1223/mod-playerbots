@@ -15,14 +15,14 @@ class TbcDungeonSethekkHallsActionContext : public NamedObjectContext<Action>
 public:
     TbcDungeonSethekkHallsActionContext()
     {
-        creators["time-lost controller mark charming totem with skull"] =
-            &TbcDungeonSethekkHallsActionContext::time_lost_controller_mark_charming_totem_with_skull;
+        creators["time-lost controller mark charming totem"] =
+            &TbcDungeonSethekkHallsActionContext::time_lost_controller_mark_charming_totem;
 
         creators["sethekk prophet set tremor totem"] =
             &TbcDungeonSethekkHallsActionContext::sethekk_prophet_set_tremor_totem;
 
-        creators["darkweaver syth mark elementals with skull"] =
-            &TbcDungeonSethekkHallsActionContext::darkweaver_syth_mark_elementals_with_skull;
+        creators["darkweaver syth mark elementals"] =
+            &TbcDungeonSethekkHallsActionContext::darkweaver_syth_mark_elementals;
 
         creators["anzu alternate marks on boss"] =
             &TbcDungeonSethekkHallsActionContext::anzu_alternate_marks_on_boss;
@@ -30,45 +30,54 @@ public:
         creators["anzu cast heal over time spell on bird spirit"] =
             &TbcDungeonSethekkHallsActionContext::anzu_cast_heal_over_time_spell_on_bird_spirit;
 
-        creators["talon king ikiss tank move boss to pillar position"] =
-            &TbcDungeonSethekkHallsActionContext::talon_king_ikiss_tank_move_boss_to_pillar_position;
+        creators["talon king ikiss position tank near pillar"] =
+            &TbcDungeonSethekkHallsActionContext::talon_king_ikiss_position_tank_near_pillar;
 
-        creators["talon king ikiss ranged stay near victim of boss"] =
-            &TbcDungeonSethekkHallsActionContext::talon_king_ikiss_ranged_stay_near_victim_of_boss;
+        creators["talon king ikiss ranged move near tank"] =
+            &TbcDungeonSethekkHallsActionContext::talon_king_ikiss_ranged_move_near_tank;
 
         creators["talon king ikiss los arcane explosion"] =
             &TbcDungeonSethekkHallsActionContext::talon_king_ikiss_los_arcane_explosion;
 
-        creators["talon king ikiss move to within los"] =
-            &TbcDungeonSethekkHallsActionContext::talon_king_ikiss_move_to_within_los;
+        creators["talon king ikiss move within los"] =
+            &TbcDungeonSethekkHallsActionContext::talon_king_ikiss_move_within_los;
     }
 private:
-    static Action* time_lost_controller_mark_charming_totem_with_skull(PlayerbotAI* botAI) {
-        return new TimeLostControllerMarkCharmingTotemWithSkullAction(botAI);
+    static Action* time_lost_controller_mark_charming_totem(PlayerbotAI* botAI)
+    {
+        return new TimeLostControllerMarkCharmingTotemAction(botAI);
     }
-    static Action* sethekk_prophet_set_tremor_totem(PlayerbotAI* botAI) {
+    static Action* sethekk_prophet_set_tremor_totem(PlayerbotAI* botAI)
+    {
         return new SethekkProphetSetTremorTotemAction(botAI);
     }
-    static Action* darkweaver_syth_mark_elementals_with_skull(PlayerbotAI* botAI) {
-        return new DarkweaverSythMarkElementalsWithSkullAction(botAI);
+    static Action* darkweaver_syth_mark_elementals(PlayerbotAI* botAI)
+    {
+        return new DarkweaverSythMarkElementalsAction(botAI);
     }
-    static Action* anzu_alternate_marks_on_boss(PlayerbotAI* botAI) {
+    static Action* anzu_alternate_marks_on_boss(PlayerbotAI* botAI)
+    {
         return new AnzuAlternateMarksOnBossAction(botAI);
     }
-    static Action* anzu_cast_heal_over_time_spell_on_bird_spirit(PlayerbotAI* botAI) {
+    static Action* anzu_cast_heal_over_time_spell_on_bird_spirit(PlayerbotAI* botAI)
+    {
         return new AnzuCastHealOverTimeSpellOnBirdSpiritAction(botAI);
     }
-    static Action* talon_king_ikiss_tank_move_boss_to_pillar_position(PlayerbotAI* botAI) {
-        return new TalonKingIkissTankMoveBossToPillarPositionAction(botAI);
+    static Action* talon_king_ikiss_position_tank_near_pillar(PlayerbotAI* botAI)
+    {
+        return new TalonKingIkissPositionTankNearPillarAction(botAI);
     }
-    static Action* talon_king_ikiss_ranged_stay_near_victim_of_boss(PlayerbotAI* botAI) {
-        return new TalonKingIkissRangedStayNearVictimOfBossAction(botAI);
+    static Action* talon_king_ikiss_ranged_move_near_tank(PlayerbotAI* botAI)
+    {
+        return new TalonKingIkissRangedMoveNearTankAction(botAI);
     }
-    static Action* talon_king_ikiss_los_arcane_explosion(PlayerbotAI* botAI) {
+    static Action* talon_king_ikiss_los_arcane_explosion(PlayerbotAI* botAI)
+    {
         return new TalonKingIkissLosArcaneExplosionAction(botAI);
     }
-    static Action* talon_king_ikiss_move_to_within_los(PlayerbotAI* botAI) {
-        return new TalonKingIkissMoveToWithinLosAction(botAI);
+    static Action* talon_king_ikiss_move_within_los(PlayerbotAI* botAI)
+    {
+        return new TalonKingIkissMoveWithinLosAction(botAI);
     }
 };
 

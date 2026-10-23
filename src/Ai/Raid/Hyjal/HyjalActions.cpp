@@ -17,7 +17,7 @@
 using namespace HyjalHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool HyjalResetEncounterStatesAction::Execute(Event /*event*/)
 {
@@ -43,7 +43,7 @@ bool HyjalResetEncounterStatesAction::Execute(Event /*event*/)
         reset = true;
     }
 
-    reset |= archimondeAirBurstTargets.erase(bot->GetInstanceId()) > 0;
+    reset |= HyjalResetInstance(bot->GetInstanceId());
 
     return reset;
 }
@@ -58,10 +58,10 @@ bool HyjalMisdirectBossToMainTankAction::Execute(Event /*event*/)
     if (!mainTank || !mainTank->IsAlive())
         return false;
 
-    if (botAI->CanCastSpell("misdirection", mainTank))
-        return botAI->CastSpell("misdirection", mainTank);
+    if (botAI->CanCastSpell(Id(HyjalSpells::SPELL_MISDIRECTION), mainTank))
+        return botAI->CastSpell(Id(HyjalSpells::SPELL_MISDIRECTION), mainTank);
 
-    if (!bot->HasAura(Id(HyjalSpells::SPELL_MISDIRECTION)))
+    if (!bot->HasAura(Id(HyjalSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", boss) && botAI->CastSpell("steady shot", boss);
@@ -188,10 +188,10 @@ bool AnetheronMisdirectBossAndInfernalsToTanksAction::Execute(Event /*event*/)
     if (!enemy || !tank || !tank->IsAlive())
         return false;
 
-    if (botAI->CanCastSpell("misdirection", tank))
-        return botAI->CastSpell("misdirection", tank);
+    if (botAI->CanCastSpell(Id(HyjalSpells::SPELL_MISDIRECTION), tank))
+        return botAI->CastSpell(Id(HyjalSpells::SPELL_MISDIRECTION), tank);
 
-    if (!bot->HasAura(Id(HyjalSpells::SPELL_MISDIRECTION)))
+    if (!bot->HasAura(Id(HyjalSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", enemy) && botAI->CastSpell("steady shot", enemy);

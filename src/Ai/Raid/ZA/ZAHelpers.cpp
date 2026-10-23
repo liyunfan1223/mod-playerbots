@@ -11,6 +11,8 @@
 #include <cmath>
 #include <limits>
 #include <list>
+#include <mutex>
+#include <unordered_map>
 
 using namespace EncounterHelpers;
 
@@ -62,9 +64,15 @@ bool IsPositionSafeFromHazards(
 namespace ZaHelpers
 {
 
-// Akil'zon <Eagle Avatar>
+namespace
+{
 
-std::unordered_map<uint32, uint32> akilzonStormTimer;
+std::mutex zaStateMutex;
+std::unordered_map<uint32, ZaInstanceState> zaStates;
+
+}
+
+// Akil'zon <Eagle Avatar>
 
 bool IsInStormWindow(uint32 startMs)
 {
@@ -180,7 +188,7 @@ std::vector<Unit*> GetNearbyFireBombs(PlayerbotAI* botAI)
     return bombs;
 }
 
-// Shortest move to a spot that is safe from Fire Bombs, within the measured area
+// Shortest move to a spot that is safe from Fire Bombs, within the measured area.
 bool FindSafeStepInJanalaiZone(
     Player* bot, std::vector<Unit*> const& hazards, std::vector<Position> const& safeZone,
     float maxSearchDistance, float hazardRadius, float moveDist,
@@ -307,6 +315,26 @@ Player* GetZuljinCreepingParalysisDispelTarget(Player* bot)
     }
 
     return closestTarget;
+}
+
+// Shared encounter state
+
+ZaInstanceState& ZaState(uint32 instanceId)
+{
+    std::lock_guard lock(zaStateMutex);
+    return zaStates[instanceId];
+}
+
+bool ZaResetInstance(uint32 instanceId)
+{
+    std::lock_guard lock(zaStateMutex);
+    auto it = zaStates.find(instanceId);
+    if (it == zaStates.end())
+        return false;
+
+    bool const wasSet = it->second.akilzonStormTimer.has_value();
+    zaStates.erase(it);
+    return wasSet;
 }
 
 }

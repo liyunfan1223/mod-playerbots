@@ -30,13 +30,17 @@ public:
     StatsWeightCalculator(Player* player);
     void Reset();
     float CalculateItem(uint32 itemId, int32 randomPropertyId = 0, int32 slot = -1);
-    float CalculateEnchant(uint32 enchantId);
+    float CalculateEnchant(uint32 enchantId, uint32 weaponDelay = 0, bool isRanged = false);
     int32 PickBestRandomPropertyId(uint32 itemId);
 
     void SetOverflowPenalty(bool apply) { enable_overflow_penalty_ = apply; }
     void SetItemSetBonus(bool apply) { enable_item_set_bonus_ = apply; }
     void SetPvpSpec(bool isPvp) { pvpSpec_ = isPvp; }
     void SetExcludeResilience(bool exclude) { exclude_resilience_ = exclude; }
+
+    // Read access for diagnostics (e.g. the `calc` chat command)
+    StatsCollector const* GetCollector() const { return collector_.get(); }
+    float const* GetStatWeights() const { return stats_weights_; }
 
     private:
     void GenerateWeights(Player* player);
@@ -45,6 +49,8 @@ public:
 
     void CalculateRandomProperty(int32 randomPropertyId, uint32 itemId);
     void CalculateItemSetMod(Player* player, ItemTemplate const* proto);
+    void CollectItemSetBonus(Player* player, ItemTemplate const* proto, int32 slot,
+                             std::array<float, STATS_TYPE_MAX>& setBonusStats);
     void CalculateSocketBonus(Player* player, ItemTemplate const* proto);
 
     void CalculateItemTypePenalty(ItemTemplate const* proto);

@@ -13,6 +13,7 @@
 #include "MotionMaster.h"
 #include "MoveSpline.h"
 #include "Playerbots.h"
+#include "RtiTargetValue.h"
 #include "StatsWeightCalculator.h"
 #include "TKHelpers.h"
 #include <algorithm>
@@ -24,17 +25,19 @@
 using namespace TkHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool TempestKeepResetEncounterStatesAction::Execute(Event /*event*/)
 {
-    uint32 const instanceId = bot->GetInstanceId();
-
     bool reset = false;
-    reset |= isAlarInPhase2.erase(instanceId) > 0;
-    reset |= lastRebirthState.erase(instanceId) > 0;
-    reset |= voidReaverArcaneOrbs.erase(instanceId) > 0;
-    reset |= advisorDpsWaitTimer.erase(instanceId) > 0;
+    reset |= TkResetInstance(bot->GetInstanceId());
+    reset |= ClearStrategyTargetIcon(bot, RtiTargetValue::skullIndex, {
+        Id(TkNpcs::NPC_THALADRED_THE_DARKENER),
+        Id(TkNpcs::NPC_LORD_SANGUINAR),
+        Id(TkNpcs::NPC_MASTER_ENGINEER_TELONICUS),
+    });
+    reset |= ClearStrategyTargetIcon(
+        bot, RtiTargetValue::crossIndex, { Id(TkNpcs::NPC_GRAND_ASTROMANCER_CAPERNIAN) });
 
     return reset;
 }
@@ -103,10 +106,10 @@ bool AlarMisdirectBossToMainTankAction::Execute(Event /*event*/)
     if (!mainTank)
         return false;
 
-    if (botAI->CanCastSpell("misdirection", mainTank))
-        return botAI->CastSpell("misdirection", mainTank);
+    if (botAI->CanCastSpell(Id(TkSpells::SPELL_MISDIRECTION), mainTank))
+        return botAI->CastSpell(Id(TkSpells::SPELL_MISDIRECTION), mainTank);
 
-    if (!bot->HasAura(Id(TkSpells::SPELL_MISDIRECTION)))
+    if (!bot->HasAura(Id(TkSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", alar) && botAI->CastSpell("steady shot", alar);
@@ -460,12 +463,13 @@ bool AlarAvoidFlamePatchesAndDiveBombsAction::AvoidFlamePatch()
     std::vector<Unit*> const flamePatches = GetFlamePatches(botAI);
 
     constexpr float hazardRadius = 8.0f;
+    constexpr float avoidRadius = 9.0f;
 
     for (Unit* flamePatch : flamePatches)
     {
         if (bot->GetExactDist2d(flamePatch) < hazardRadius)
         {
-            Position safestPos = FindSafestNearbyPosition(flamePatches, hazardRadius);
+            Position safestPos = FindSafestNearbyPosition(flamePatches, avoidRadius);
             bot->CastStop();
             return MoveTo(
                 TK_MAP_ID, safestPos.GetPositionX(), safestPos.GetPositionY(),
@@ -545,7 +549,8 @@ bool AlarAvoidFlamePatchesAndDiveBombsAction::IsPathSafe(
 
         for (Unit* flamePatch : flamePatches)
         {
-            if (flamePatch->GetExactDist2d(checkX, checkY) < hazardRadius)
+            float const limit = std::min(flamePatch->GetExactDist2d(start), hazardRadius);
+            if (flamePatch->GetExactDist2d(checkX, checkY) < limit)
                 return false;
         }
     }
@@ -590,16 +595,17 @@ bool AlarManagePhaseTrackerAction::Execute(Event /*event*/)
     if (!alar)
         return false;
 
-    uint32 const instanceId = alar->GetInstanceId();
+    TkInstanceState& state = TkState(alar->GetInstanceId());
     bool const rebirthActive = alar->FindCurrentSpellBySpellId(Id(TkSpells::SPELL_REBIRTH_PHASE2));
 
-    if (!IsAlarInPhase2(instanceId) && lastRebirthState[instanceId] && !rebirthActive)
+    if (!state.isAlarInPhase2.value_or(false) && state.lastRebirthState.value_or(false) &&
+        !rebirthActive)
     {
-        isAlarInPhase2[instanceId] = true;
+        state.isAlarInPhase2 = true;
         return true;
     }
 
-    lastRebirthState[instanceId] = rebirthActive;
+    state.lastRebirthState = rebirthActive;
 
     return false;
 }
@@ -894,10 +900,10 @@ bool KaelthasSunstriderMisdirectAdvisorsToTanksAction::Execute(Event /*event*/)
     if (!tank || !tank->IsAlive())
         return false;
 
-    if (botAI->CanCastSpell("misdirection", tank))
-        return botAI->CastSpell("misdirection", tank);
+    if (botAI->CanCastSpell(Id(TkSpells::SPELL_MISDIRECTION), tank))
+        return botAI->CastSpell(Id(TkSpells::SPELL_MISDIRECTION), tank);
 
-    if (!bot->HasAura(Id(TkSpells::SPELL_MISDIRECTION)))
+    if (!bot->HasAura(Id(TkSpells::SPELL_MISDIRECTION_AURA)))
         return false;
 
     return botAI->CanCastSpell("steady shot", advisor) && botAI->CastSpell("steady shot", advisor);
@@ -1207,19 +1213,18 @@ bool KaelthasSunstriderManageAdvisorDpsTimerAction::Execute(Event /*event*/)
     if (!kaelthas)
         return false;
 
-    uint32 const instanceId = kaelthas->GetInstanceId();
+    std::optional<uint32>& waitStart = TkState(kaelthas->GetInstanceId()).advisorDpsWaitTimer;
 
     if (advisorAtFullHp)
     {
-        advisorDpsWaitTimer[instanceId] = ADVISOR_DPS_WAIT_NOT_STARTED;
+        waitStart = ADVISOR_DPS_WAIT_NOT_STARTED;
         return false;
     }
 
-    auto it = advisorDpsWaitTimer.find(instanceId);
-    if (it == advisorDpsWaitTimer.end() || it->second != ADVISOR_DPS_WAIT_NOT_STARTED)
+    if (!waitStart || *waitStart != ADVISOR_DPS_WAIT_NOT_STARTED)
         return false;
 
-    it->second = getMSTime();
+    waitStart = getMSTime();
     return true;
 }
 
@@ -1878,29 +1883,24 @@ bool KaelthasSunstriderAssignFinalPhaseTargetAction::AssistTankPicksUpPhoenix(Un
     return MoveFromGroup(safeDistance);
 }
 
-// Priority: (1) Kael with Shock Barrier (to interrupt Pyroblast), (2) Eggs (ranged only), (3) Kael
-// without Shock Barrier, and (4) Phoenixes but only for ranged during Kael's RP power-up scene.
-// Phoenixes kill themselves so having them included is only because bots have nothing else to do
-// during the scene.
+// Priority: (1) Kael with Shock Barrier (to interrupt Pyroblast), (2) Eggs (ranged only so melee
+// doesn't waste time or risk getting hit by Flame Strike running to them), (3) Kael without Shock
+// Barrier, and (4) Phoenixes (ranged when they have nothing to do during Kael's RP power-up scene).
 bool KaelthasSunstriderAssignFinalPhaseTargetAction::NonTanksAssignTargetAndAvoidPhoenixes()
 {
-    // Phoenixes that turn into eggs remain alive and on threat lists. They simply become
-    // unattackable and invisible on top of the egg.
-    //
-    // Silly AC bug: the "dead" phoenix keeps its Burn aura (36720) so the egg sits inside an active
-    // 8-yard, ~5k-per-2s Burn. The egg is therefore ranged-only, like the phoenix.
     Unit* phoenix = AI_VALUE2(Unit*, "find target", "phoenix");
-    if (phoenix && phoenix->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+    // When it "dies" and reverts to an egg, the Phoenix becomes invisible but remains alive on top
+    // of the egg with 1 HP. At that point, there should be no avoidance. The aura check is the
+    // most consistent as flags (like NON_ATTACKABLE) are not changed until 2s after Rebirth.
+    if (phoenix && phoenix->HasAura(Id(TkSpells::SPELL_EMBER_BLAST)))
         phoenix = nullptr;
 
     if (phoenix)
     {
         constexpr float safeDistance = 15.0f;
         float const currentDistance = bot->GetExactDist2d(phoenix);
-
-        // A Phoenix is survivable and a Flame Strike is not, so don't try to avoid Phoenixes when
-        // too close to a Flame Strike
         constexpr float flameStrikeRadius = 15.0f;
+
         if (currentDistance < safeDistance &&
             !GetNearestFlameStrikeInRadius(bot, flameStrikeRadius))
         {

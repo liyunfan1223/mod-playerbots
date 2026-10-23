@@ -24,7 +24,7 @@
 using namespace BlackTempleHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 // Illidan is handled separately
 float BlackTempleDelayDpsCooldownsMultiplier::GetValue(Action* action)
@@ -377,7 +377,7 @@ float IllidariCouncilDisableIceBlockMultiplier::GetValue(Action* action)
     return 1.0f;
 }
 
-float IllidariCouncilDisableArcaneShotOnZerevorMultiplier::GetValue(Action* action)
+float IllidariCouncilDisableTranquilizingShotOnZerevorMultiplier::GetValue(Action* action)
 {
     Unit* zerevor = AI_VALUE2(Unit*, "find target", "high nethermancer zerevor");
     if (!zerevor)
@@ -387,7 +387,7 @@ float IllidariCouncilDisableArcaneShotOnZerevorMultiplier::GetValue(Action* acti
     if (!target || target->GetGUID() != zerevor->GetGUID())
         return 1.0f;
 
-    if (dynamic_cast<CastArcaneShotAction*>(action))
+    if (dynamic_cast<CastTranquilizingShotAction*>(action))
         return 0.0f;
 
     return 1.0f;

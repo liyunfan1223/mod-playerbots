@@ -17,6 +17,7 @@
 #include "Playerbots.h"
 #include "PositionValue.h"
 #include "SharedDefines.h"
+#include "TargetValue.h"
 #include "TemporarySummon.h"
 #include "ThreatManager.h"
 #include "Timer.h"
@@ -196,18 +197,7 @@ bool AoeTrigger::IsActive()
     if (!current_target)
         return false;
 
-    GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
-    int attackers_count = 0;
-    for (ObjectGuid const guid : attackers)
-    {
-        Unit* unit = botAI->GetUnit(guid);
-        if (!unit || !unit->IsAlive())
-            continue;
-
-        if (unit->GetDistance(current_target->GetPosition()) <= range)
-            attackers_count++;
-    }
-    return attackers_count >= amount;
+    return HasEnoughAoeTargets(botAI, current_target->GetPosition(), range, static_cast<uint32>(amount));
 }
 
 bool NoFoodTrigger::IsActive()

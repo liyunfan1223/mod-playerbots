@@ -78,14 +78,14 @@ public:
 
     void OnSpellPrepare(Spell* spell, Unit* caster, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id != Id(HyjalSpells::SPELL_AIR_BURST))
+        if (!caster || spellInfo->Id != Id(HyjalSpells::SPELL_AIR_BURST))
             return;
 
         Player* target = GetTargetedPlayer(spell);
         if (!target)
             return;
 
-        archimondeAirBurstTargets[caster->GetInstanceId()] =
+        HyjalState(caster->GetInstanceId()).archimondeAirBurstTarget =
             AirBurstData{ target->GetGUID(), getMSTime() };
 
         Map::PlayerList const& players = caster->GetMap()->GetPlayers();

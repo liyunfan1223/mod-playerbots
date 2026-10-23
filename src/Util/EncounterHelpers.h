@@ -9,7 +9,10 @@
 
 #include "Common.h"
 #include "Position.h"
+#include <initializer_list>
+#include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 class Action;
@@ -43,17 +46,37 @@ bool MarkTargetWithTriangle(Player* bot, Unit* target);
 bool MarkTargetWithCross(Player* bot, Unit* target);
 bool MarkTargetWithMoon(Player* bot, Unit* target);
 bool ClearTargetIcon(Player* bot, uint8 iconId);
+bool ClearStrategyTargetIcon(Player* bot, uint8 iconId, std::initializer_list<uint32> entries);
 void SetRtiTarget(PlayerbotAI* botAI, std::string const& rtiName);
 bool IsMechanicTrackerBot(Player* bot, uint32 mapId);
 Player* GetGroupMainTank(Player* bot);
 Player* GetGroupAssistTank(Player* bot, uint8 index);
-Unit* GetFirstAliveUnitByEntry(PlayerbotAI* botAI, uint32 entry); // DO NOT USE, WILL BE REMOVED
 Player* GetNearestPlayerInRadius(Player* bot, float radius);
 std::vector<Position> GetDynamicObjectPositions(Player* bot, float searchRadius, uint32 spellId);
 uint32 GetSelfImmunitySpell(Player* bot);
 bool IsDpsCooldownAction(Player* bot, Action* action);
 bool IsTauntAction(Player* bot, Action* action);
 bool IsAoeThreatAction(Player* bot, Action* action);
+
+// Sets the field if it is empty. Returns true if it did.
+template <typename T, typename U>
+bool EmplaceIfUnset(std::optional<T>& field, U&& value)
+{
+    if (field)
+        return false;
+
+    field.emplace(std::forward<U>(value));
+    return true;
+}
+
+// Clears the field. Returns true if it had a value.
+template <typename T>
+bool ResetIfSet(std::optional<T>& field)
+{
+    bool const wasSet = field.has_value();
+    field.reset();
+    return wasSet;
+}
 
 }
 

@@ -24,7 +24,7 @@ public:
     void OnSpellCast(
         Spell* spell, Unit* caster, SpellInfo const* spellInfo, bool /*skipCheck*/) override
     {
-        if (spellInfo->Id != Id(TkSpells::SPELL_ARCANE_ORB))
+        if (!caster || spellInfo->Id != Id(TkSpells::SPELL_ARCANE_ORB))
             return;
 
         std::list<TargetInfo> const& targets = *spell->GetUniqueTargetInfo();
@@ -35,7 +35,7 @@ public:
         if (!target)
             return;
 
-        auto& orbs = voidReaverArcaneOrbs[caster->GetInstanceId()];
+        auto& orbs = TkState(caster->GetInstanceId()).voidReaverArcaneOrbs;
         uint32 const now = getMSTime();
 
         ArcaneOrbData orbData;

@@ -15,7 +15,7 @@
 using namespace BlackTempleHelpers;
 using namespace EncounterHelpers;
 
-// General
+// Shared
 
 bool BlackTempleBotIsNotInCombatTrigger::IsActive()
 {

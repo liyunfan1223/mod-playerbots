@@ -36,7 +36,9 @@ void AutoMaintenanceOnLevelupAction::AutoTeleportForLevel()
 
 void AutoMaintenanceOnLevelupAction::AutoPickTalents()
 {
-    if (!sPlayerbotAIConfig.AutoPickTalents || !sRandomPlayerbotMgr.IsRandomBot(bot))
+    bool const isRandomBot = sRandomPlayerbotMgr.IsRandomBot(bot);
+    if (!(isRandomBot ? sPlayerbotAIConfig.AutoPickTalents
+                      : sPlayerbotAIConfig.AutoPickTalentsForPlayerControlledBots))
         return;
 
     uint32 currentLevel = bot->GetLevel();
@@ -47,14 +49,14 @@ void AutoMaintenanceOnLevelupAction::AutoPickTalents()
     if (bot->GetFreeTalentPoints() <= 0)
         return;
 
-    bool resetTalents = true;
+    bool resetTalents = isRandomBot;
     bool increment = true;
 
-    //Reroll specs at 60, 61, 70, 71 and 80 if enabled.
-    if (sPlayerbotAIConfig.BotAdaptiveTalents)
+    // Reroll specs at 60, 61, 70, 71 and 80 if enabled.
+    if (sPlayerbotAIConfig.BotAdaptiveTalents && isRandomBot)
     {
         resetTalents = (currentLevel == 60 || currentLevel == 61 ||
-            currentLevel == 70 ||currentLevel == 71 || currentLevel == 80);
+            currentLevel == 70 || currentLevel == 71 || currentLevel == 80);
 
         increment = !resetTalents;
     }

@@ -11,8 +11,8 @@
 #include "ObjectGuid.h"
 #include "Position.h"
 #include <functional>
+#include <optional>
 #include <type_traits>
-#include <unordered_map>
 #include <vector>
 
 class Player;
@@ -52,7 +52,8 @@ enum class HyjalSpells : uint32
 
     // Hunter
     SPELL_ASPECT_OF_THE_VIPER = 34074,
-    SPELL_MISDIRECTION        = 35079,
+    SPELL_MISDIRECTION        = 34477,
+    SPELL_MISDIRECTION_AURA   = 35079, // the aura on the hunter
 
     // Shaman
     SPELL_TREMOR_TOTEM        = 8143,
@@ -60,10 +61,21 @@ enum class HyjalSpells : uint32
 
 enum class HyjalNpcs : uint32
 {
+    // Rage Winterchill
+    NPC_RAGE_WINTERCHILL  = 17767,
+
     // Anetheron
+    NPC_ANETHERON         = 17808,
     NPC_TOWERING_INFERNAL = 17818,
 
+    // Kaz'rogal
+    NPC_KAZROGAL          = 17888,
+
+    // Azgalor
+    NPC_AZGALOR           = 17842,
+
     // Archimonde
+    NPC_ARCHIMONDE        = 17968,
     NPC_DOOMFIRE          = 18095,
 };
 
@@ -74,7 +86,7 @@ struct BlockedArc
     float halfWidth;
 };
 
-// General
+// Shared
 
 inline constexpr uint32 HYJAL_MAP_ID = 534;
 // The interval matches the default Playerbots.ReactDelay.
@@ -246,8 +258,6 @@ inline constexpr float ARCHIMONDE_RANGED_SPREAD_DISTANCE = 10.0f;
 // Archimonde slaps so the tank will pause moving whenever below 60% HP.
 inline Position const ARCHIMONDE_INITIAL_POSITION = { 5640.502f, -3421.238f, 1587.453f };
 
-extern std::unordered_map<uint32, AirBurstData> archimondeAirBurstTargets;
-
 // Invincibility applied by Tyrande when Archimonde is at 10% HP. Used to cut off boss strategies
 // since the fight is effectively over at this point.
 bool HasProtectionOfElune(Player* bot);
@@ -257,6 +267,16 @@ bool IsPositionNearDoomfire(PlayerbotAI* botAI, float x, float y, float radius);
 // determine where bots should move to.
 std::vector<Position> GetDoomfirePositions(PlayerbotAI* botAI);
 bool GetPendingAirBurstCast(uint32 instanceId, AirBurstData& airBurst);
+
+// Shared encounter state
+
+struct HyjalInstanceState
+{
+    std::optional<AirBurstData> archimondeAirBurstTarget;
+};
+
+HyjalInstanceState& HyjalState(uint32 instanceId);
+bool HyjalResetInstance(uint32 instanceId);
 
 }
 
