@@ -58,7 +58,7 @@ bool LootRollAction::Execute(Event /*event*/)
         }
         else if (usage == ITEM_USAGE_DISENCHANT)
             vote = sPlayerbotAIConfig.LootRollDisenchant ? DISENCHANT : GREED;
-        // Don't roll on items we already have copies of or if we can't equip additional copies of them.
+        // Don't roll on unique items we already have copies of or if we can't equip additional copies of unique-equipped.
         else if (RollUniqueCheck(proto, bot))
             vote = PASS;
         else
