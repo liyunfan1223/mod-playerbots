@@ -94,7 +94,7 @@ float FreyaLasherFinishAoeMultiplier::GetValue(Action* action)
 
 float FreyaLasherTrapReserveMultiplier::GetValue(Action* action)
 {
-    if (!dynamic_cast<CastExplosiveTrapAction*>(action) && !dynamic_cast<CastTrapLauncherExplosiveAction*>(action))
+    if (!dynamic_cast<CastExplosiveTrapAction*>(action))
         return 1.0f;
 
     Unit* freya = GetFreyaScan(botAI).Boss();
