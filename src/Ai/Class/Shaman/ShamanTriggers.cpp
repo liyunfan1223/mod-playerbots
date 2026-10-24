@@ -15,6 +15,12 @@
 #include "Unit.h"
 #include <ctime>
 
+namespace
+{
+constexpr uint32 SPELL_EXHAUSTION = 57723;
+constexpr uint32 SPELL_SATED = 57724;
+}  // namespace
+
 bool MainHandWeaponNoImbueTrigger::IsActive()
 {
     Item* const itemForSpell = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
@@ -470,4 +476,25 @@ bool SetTotemTrigger::IsActive()
        return true;
 
    return false;
+}
+
+bool ShamanBoostTrigger::IsActive()
+{
+    // Someone already lusted the group, a second one would be wasted
+    if (bot->HasAura(SPELL_SATED) || bot->HasAura(SPELL_EXHAUSTION))
+        return false;
+
+    if (!BuffTrigger::IsActive())
+        return false;
+
+    Unit* target = AI_VALUE(Unit*, "current target");
+    if (!target)
+        return false;
+
+    if (target->IsPlayer())
+        return true;
+
+    // 10 min cooldown and Sated: one spent on a trash pack leaves the next boss without it
+    Creature* creature = target->ToCreature();
+    return creature && (creature->IsDungeonBoss() || creature->isWorldBoss());
 }
