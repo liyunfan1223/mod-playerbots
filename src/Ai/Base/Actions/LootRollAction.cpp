@@ -58,16 +58,16 @@ bool LootRollAction::Execute(Event /*event*/)
         }
         else if (usage == ITEM_USAGE_DISENCHANT)
             vote = sPlayerbotAIConfig.LootRollDisenchant ? DISENCHANT : GREED;
-        // Don't roll on unique items we already have copies of or if we can't equip additional copies of unique-equipped.
-        else if (RollUniqueCheck(proto, bot))
-            vote = PASS;
         else
         {
             switch (proto->Class)
             {
                 case ITEM_CLASS_WEAPON:
                 case ITEM_CLASS_ARMOR:
-                    if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
+                    // Don't roll on unique/unique-equip equipment we already have copies of.
+                    if (RollUniqueCheck(proto, bot))
+                        vote = PASS;
+                    else if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
                         vote = NEED;
                     else if (usage != ITEM_USAGE_NONE)
                         vote = GREED;
