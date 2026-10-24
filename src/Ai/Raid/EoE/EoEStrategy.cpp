@@ -5,23 +5,14 @@
  */
 
 #include "EoEStrategy.h"
-#include "EoEMultipliers.h"
-#include "Strategy.h"
+#include "EoEDefinitions.h"
 
 void RaidEoEStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
-    triggers.push_back(new TriggerNode("malygos",
-        { NextAction("malygos position", ACTION_MOVE) }));
-    triggers.push_back(new TriggerNode("malygos",
-        { NextAction("malygos target", ACTION_RAID + 1) }));
-
-    triggers.push_back(new TriggerNode("group flying",
-        { NextAction("eoe fly drake", ACTION_NORMAL + 1) }));
-    triggers.push_back(new TriggerNode("drake combat",
-        { NextAction("eoe drake attack", ACTION_NORMAL + 5) }));
+    EoEMalygosDefinition().AddTriggerNodes(triggers);
 }
 
-void RaidEoEStrategy::InitMultipliers(std::vector<Multiplier*> &multipliers)
+void RaidEoEStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
 {
-    multipliers.push_back(new MalygosMultiplier(botAI));
+    EoEMalygosDefinition().AddMultipliers(botAI, multipliers);
 }

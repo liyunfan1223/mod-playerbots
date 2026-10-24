@@ -9,12 +9,13 @@
 
 #include "Multiplier.h"
 
-class MalygosMultiplier : public Multiplier
+// P2: Scions hover 20 yd up, where only a disk rider reaches them, so a tank that picks one ends up
+// standing under it.
+class MalygosScionTankAssistMultiplier : public Multiplier
 {
 public:
-    MalygosMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "malygos") {}
+    MalygosScionTankAssistMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "malygos") {}
 
-public:
     float GetValue(Action* action) override;
 };
 

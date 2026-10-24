@@ -37,6 +37,9 @@ public:
     virtual std::string const GetTargetName() { return "self target"; }
 
     bool needCheck(uint32 now);
+    // For a wrapper that has to reproduce the cadence of the trigger it holds: checkInterval is
+    // protected, and protected access does not reach another instance through a base pointer.
+    [[nodiscard]] int32_t getCheckInterval() const { return checkInterval; }
 
 protected:
     int32_t checkInterval;

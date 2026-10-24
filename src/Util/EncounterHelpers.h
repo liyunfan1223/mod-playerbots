@@ -57,6 +57,8 @@ uint32 GetSelfImmunitySpell(Player* bot);
 bool IsDpsCooldownAction(Player* bot, Action* action);
 bool IsTauntAction(Player* bot, Action* action);
 bool IsAoeThreatAction(Player* bot, Action* action);
+void CommandPetAttack(PlayerbotAI* botAI, Unit* target);
+void StopPet(PlayerbotAI* botAI);
 
 // Sets the field if it is empty. Returns true if it did.
 template <typename T, typename U>

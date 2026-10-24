@@ -7,21 +7,13 @@
 #ifndef PLAYERBOTS_EOETRIGGERCONTEXT_H
 #define PLAYERBOTS_EOETRIGGERCONTEXT_H
 
-#include "EoETriggers.h"
+#include "EoEDefinitions.h"
 #include "NamedObjectContext.h"
 
 class RaidEoETriggerContext : public NamedObjectContext<Trigger>
 {
 public:
-    RaidEoETriggerContext()
-    {
-        creators["malygos"] = &RaidEoETriggerContext::malygos;
-        creators["power spark"] = &RaidEoETriggerContext::power_spark;
-    }
-
-private:
-    static Trigger* power_spark(PlayerbotAI* botAI) { return new PowerSparkTrigger(botAI); }
-    static Trigger* malygos(PlayerbotAI* botAI) { return new MalygosTrigger(botAI); }
+    RaidEoETriggerContext() { EoEMalygosDefinition().RegisterTriggers(creators); }
 };
 
 #endif
