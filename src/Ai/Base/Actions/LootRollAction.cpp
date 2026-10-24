@@ -48,13 +48,8 @@ bool LootRollAction::Execute(Event /*event*/)
 
         ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", itemUsageParam);
 
-        // If the bot already has a copy of a unique or unique-equipped item, no point doing any roll logic.
-        // They can't equip it anyway.
-        if (RollUniqueCheck(proto, bot))
-            vote = PASS;
-        // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), luckily no other items I found have class bits
-        // and epic quality.
-        else if (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK && proto->Quality == ITEM_QUALITY_EPIC)
+        // Armor Tokens are classed as MISC JUNK (Class 15, Subclass 0), luckily no other items I found have class bits and epic quality.
+        if (proto->Class == ITEM_CLASS_MISC && proto->SubClass == ITEM_SUBCLASS_JUNK && proto->Quality == ITEM_QUALITY_EPIC)
         {
             if (CanBotUseToken(proto, bot))
                 vote = NEED; // Eligible for "Need"
@@ -90,7 +85,9 @@ bool LootRollAction::Execute(Event /*event*/)
         }
         if (vote == NEED)
         {
-            if (sPlayerbotAIConfig.LootNeedRollLevel == 0)
+            if (RollUniqueCheck(proto, bot))
+                vote = PASS;
+            else if (sPlayerbotAIConfig.LootNeedRollLevel == 0)
                 vote = PASS;
             else if (sPlayerbotAIConfig.LootNeedRollLevel == 1)
                 vote = GREED;
@@ -228,8 +225,6 @@ bool RollAction::Execute(Event event)
     if (!proto)
         return false;
 
-    // Abort loot roll if they're rolling on a unique or unique-equip item they
-    // already have a copy of.
     if (RollUniqueCheck(proto, bot))
         return false;
 
