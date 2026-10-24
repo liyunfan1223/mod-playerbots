@@ -53,6 +53,14 @@ std::string UpgradeToGroupIfAppropriate(
     std::string const& baseName,
     std::string* outMissingReagentGroupName = nullptr);
 
+// Same name match as the "find target" value, but over every possible target instead of the bot's threat
+// list, which never holds the boss for a bot parked on an add
+Unit* FindBossByName(PlayerbotAI* botAI, std::string const& bossName);
+
+// The one hunter who keeps Aspect of the Wild up for the raid, a second copy adds nothing. nullptr when nobody
+// should: no raid group, nobody knows it, or one too low for the role still has it while another could take it.
+Player* GetNatureResistanceHunter(PlayerbotAI* botAI, Player* bot);
+
 }
 
 namespace ai::spell

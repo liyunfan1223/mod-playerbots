@@ -6,6 +6,7 @@
 
 #include "EncounterHelpers.h"
 #include "CellImpl.h"
+#include "CreatureAI.h"
 #include "DKActions.h"
 #include "DruidActions.h"
 #include "DruidBearActions.h"
@@ -17,6 +18,7 @@
 #include "InstanceScript.h"
 #include "MageActions.h"
 #include "PaladinActions.h"
+#include "PathGenerator.h"
 #include "Playerbots.h"
 #include "RogueActions.h"
 #include "RtiTargetValue.h"
@@ -248,6 +250,21 @@ void SetRtiTarget(PlayerbotAI* botAI, std::string const& rtiName)
         rtiValue->Set(rtiName);
 }
 
+void SetRtiTarget(PlayerbotAI* botAI, std::string const& rtiName, Unit* target)
+{
+    if (!target)
+        return;
+
+    std::string currentRti = botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Get();
+    Unit* currentTarget = botAI->GetAiObjectContext()->GetValue<Unit*>("rti target")->Get();
+
+    if (currentRti != rtiName || currentTarget != target)
+    {
+        botAI->GetAiObjectContext()->GetValue<std::string>("rti")->Set(rtiName);
+        botAI->GetAiObjectContext()->GetValue<Unit*>("rti target")->Set(target);
+    }
+}
+
 // Return the first alive bot in the specified instance map for purposes of assigning
 // a single bot to manage associative containers, mark targets, etc.
 bool IsMechanicTrackerBot(Player* bot, uint32 mapId)
@@ -335,6 +352,14 @@ Player* GetGroupAssistTank(Player* bot, uint8 index)
     return nullptr;
 }
 
+bool IsDownOrFeigning(Unit const* unit)
+{
+    if (!unit || !unit->IsAlive())
+        return true;
+
+    return unit->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || unit->getStandState() == UNIT_STAND_STATE_DEAD;
+}
+
 // Return the nearest alive player (human or bot) within the specified radius. Distance is
 // measured by GetExactDist2d(), which does not take into account either player's CombatReach
 // (i.e., their hitboxes), which are 1.5y for all races (or 1.95y with Bloodlust/Heroism active).
@@ -364,8 +389,19 @@ Player* GetNearestPlayerInRadius(Player* bot, float radius)
     return nearestPlayer;
 }
 
+bool IsBotInFrontalCone(Player* bot, Unit* source, float coneAngle, float range)
+{
+    return bot && source && source->GetExactDist2d(bot) <= range && source->HasInArc(coneAngle, bot);
+}
+
 // Grid search for dynamic objects for methods to avoid dynobj-based AoE hazards.
 std::vector<Position> GetDynamicObjectPositions(Player* bot, float searchRadius, uint32 spellId)
+{
+    return GetDynamicObjectPositions(bot, searchRadius, {spellId});
+}
+
+std::vector<Position> GetDynamicObjectPositions(Player* bot, float searchRadius,
+                                                std::initializer_list<uint32> spellIds)
 {
     std::list<WorldObject*> objs;
     Acore::AllWorldObjectsInRange check(bot, searchRadius);
@@ -380,7 +416,7 @@ std::vector<Position> GetDynamicObjectPositions(Player* bot, float searchRadius,
             continue;
 
         DynamicObject* dynObj = static_cast<DynamicObject*>(obj);
-        if (dynObj->GetSpellId() == spellId)
+        if (std::find(spellIds.begin(), spellIds.end(), dynObj->GetSpellId()) != spellIds.end())
         {
             dynObjs.emplace_back(
                 dynObj->GetPositionX(), dynObj->GetPositionY(), dynObj->GetPositionZ());
@@ -388,6 +424,156 @@ std::vector<Position> GetDynamicObjectPositions(Player* bot, float searchRadius,
     }
 
     return dynObjs;
+}
+
+Position FindNearestPositionClearOfHazards(Player* bot, std::vector<HazardCircle> const& hazards, float maxRadius,
+                                           float distanceStep, float angleStep, Position const* preferNear,
+                                           std::function<bool(float, float)> const& accept, HazardSweepCache* cache)
+{
+    if (hazards.empty() || distanceStep <= 0.0f || angleStep <= 0.0f)
+        return Position();
+
+    // a cache filled from another spot or for another grid shape describes other points
+    if (cache && (cache->distanceStep != distanceStep || cache->angleStep != angleStep ||
+                  cache->originX != bot->GetPositionX() || cache->originY != bot->GetPositionY() ||
+                  cache->originZ != bot->GetPositionZ()))
+    {
+        cache->tested.clear();
+        cache->distanceStep = distanceStep;
+        cache->angleStep = angleStep;
+        cache->originX = bot->GetPositionX();
+        cache->originY = bot->GetPositionY();
+        cache->originZ = bot->GetPositionZ();
+    }
+
+    auto const clearOf = [&hazards](float x, float y)
+    {
+        for (HazardCircle const& hazard : hazards)
+            if (hazard.first.GetExactDist2d(x, y) < hazard.second)
+                return false;
+
+        return true;
+    };
+
+    // Rings outward, so the first hit is the shortest walk. The path isn't checked: crossing a hazard to
+    // get out of one still beats standing in it.
+    uint32 ringIndex = 0;
+    for (float distance = distanceStep; distance <= maxRadius; distance += distanceStep, ++ringIndex)
+    {
+        Position best;
+        float bestScore = 0.0f;
+        bool found = false;
+
+        uint32 angleIndex = 0;
+        for (float angle = 0.0f; angle < 2.0f * static_cast<float>(M_PI); angle += angleStep, ++angleIndex)
+        {
+            float x = bot->GetPositionX() + distance * std::cos(angle);
+            float y = bot->GetPositionY() + distance * std::sin(angle);
+            float z = bot->GetPositionZ();
+
+            if (!clearOf(x, y))
+                continue;
+
+            // ring and angle name the point, the grid is the same for every call of a chain
+            uint32 const key = (ringIndex << 16) | angleIndex;
+
+            bool passable = false;
+            bool remembered = false;
+            if (cache)
+            {
+                auto const answer = cache->tested.find(key);
+                if (answer != cache->tested.end())
+                {
+                    passable = answer->second.first;
+                    x = answer->second.second.GetPositionX();
+                    y = answer->second.second.GetPositionY();
+                    z = answer->second.second.GetPositionZ();
+                    remembered = true;
+                }
+            }
+
+            if (!remembered)
+            {
+                passable = bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(),
+                                                                         bot->GetPositionY(),
+                                                                         bot->GetPositionZ(), x, y, z);
+                if (cache)
+                    cache->tested[key] = {passable, Position(x, y, z, 0.0f)};
+            }
+
+            if (!passable)
+                continue;
+
+            // the collision check can pull the spot back short of the hazard it was clearing
+            if (!clearOf(x, y))
+                continue;
+
+            if (accept && !accept(x, y))
+                continue;
+
+            if (!preferNear)
+                return Position(x, y, z, 0.0f);
+
+            float const score = preferNear->GetExactDist2d(x, y);
+            if (!found || score < bestScore)
+            {
+                best = Position(x, y, z, 0.0f);
+                bestScore = score;
+                found = true;
+            }
+        }
+
+        // per ring, so preferNear never trades the bot into a longer walk
+        if (found)
+            return best;
+    }
+
+    return Position();
+}
+
+Position FindNearestPositionClearOfHazards(Player* bot, std::vector<Position> const& hazards, float clearRadius,
+                                           float maxRadius, float distanceStep, float angleStep,
+                                           HazardSweepCache* cache)
+{
+    std::vector<HazardCircle> circles;
+    circles.reserve(hazards.size());
+    for (Position const& hazard : hazards)
+        circles.emplace_back(hazard, clearRadius);
+
+    return FindNearestPositionClearOfHazards(bot, circles, maxRadius, distanceStep, angleStep, nullptr, {}, cache);
+}
+
+Position FindNearestPositionClearOfHazards(Player* bot, std::vector<Position> const& hazards, float clearRadius,
+                                           float maxRadius, HazardSweepCache* cache)
+{
+    return FindNearestPositionClearOfHazards(bot, hazards, clearRadius, maxRadius, 2.0f,
+                                             static_cast<float>(M_PI) / 8.0f, cache);
+}
+
+Position FindNearestPositionClearOfHazards(Player* bot, std::vector<HazardCircle> const& hazards, float maxRadius,
+                                           HazardSweepCache* cache)
+{
+    return FindNearestPositionClearOfHazards(bot, hazards, maxRadius, 2.0f, static_cast<float>(M_PI) / 8.0f, nullptr,
+                                             {}, cache);
+}
+
+Position GetPositionOutsideFrontalCone(Player* bot, Unit* source, float coneAngle, float margin)
+{
+    float const distance = std::max(5.0f, source->GetExactDist2d(bot));
+    float const facing = source->GetOrientation();
+
+    // the bot's bearing off the source's facing, in (-pi, pi]
+    float diff = Position::NormalizeOrientation(source->GetAngle(bot) - facing);
+    if (diff > M_PI)
+        diff -= 2.0f * static_cast<float>(M_PI);
+
+    // just past the cone edge on the side the bot already stands
+    float const edge = coneAngle / 2.0f + margin;
+    float const targetAngle = Position::NormalizeOrientation(facing + (diff >= 0.0f ? edge : -edge));
+
+    float const x = source->GetPositionX() + std::cos(targetAngle) * distance;
+    float const y = source->GetPositionY() + std::sin(targetAngle) * distance;
+    return Position(x, y, bot->GetPositionZ(), 0.0f);
 }
 
 // Ice Block, Divine Shield, and/or Cloak of Shadows can be used to nullify or ignore several
@@ -573,6 +759,151 @@ bool IsAoeThreatAction(Player* bot, Action* action)
         default:
             return false;
     }
+}
+
+// "pet attack" only runs as a chat command, so a fight that has to put the pet on a target uses this.
+void CommandPetAttack(PlayerbotAI* botAI, Unit* target)
+{
+    Player* bot = botAI->GetBot();
+    Guardian* pet = bot->GetGuardianPet();
+    if (!pet || !target)
+        return;
+
+    if (pet->GetReactState() == REACT_PASSIVE)
+        return;
+
+    if (!bot->IsValidAttackTarget(target))
+        return;
+
+    // re-issuing it every tick makes the pet stutter
+    if (pet->GetVictim() == target)
+        return;
+
+    pet->ClearUnitState(UNIT_STATE_FOLLOW);
+    pet->AttackStop();
+    pet->SetTarget(target->GetGUID());
+
+    pet->GetCharmInfo()->SetIsCommandAttack(true);
+    pet->GetCharmInfo()->SetIsAtStay(false);
+    pet->GetCharmInfo()->SetIsFollowing(false);
+    pet->GetCharmInfo()->SetIsCommandFollow(false);
+    pet->GetCharmInfo()->SetIsReturning(false);
+
+    pet->ToCreature()->AI()->AttackStart(target);
+}
+
+void StopPet(PlayerbotAI* botAI)
+{
+    Player* bot = botAI->GetBot();
+    Guardian* pet = bot->GetGuardianPet();
+    if (!pet)
+        return;
+
+    pet->AttackStop();
+    pet->SetTarget(ObjectGuid::Empty);
+    pet->GetCharmInfo()->SetIsCommandAttack(false);
+}
+
+Position ValidateFloorPoint(Player* bot, Position const& point)
+{
+    float x = point.GetPositionX();
+    float y = point.GetPositionY();
+
+    float z = bot->GetMapWaterOrGroundLevel(x, y, point.GetPositionZ());
+    if (z <= INVALID_HEIGHT)
+        z = point.GetPositionZ();
+
+    bot->GetMap()->CheckCollisionAndGetValidCoords(bot, bot->GetPositionX(), bot->GetPositionY(),
+                                                   bot->GetPositionZ(), x, y, z, false);
+
+    return Position(x, y, z);
+}
+
+Position ValidateStaticFloorPoint(Player* bot, Position const& point)
+{
+    float x = point.GetPositionX();
+    float y = point.GetPositionY();
+
+    float z = bot->GetMapWaterOrGroundLevel(x, y, point.GetPositionZ());
+    if (z <= INVALID_HEIGHT)
+        z = point.GetPositionZ();
+
+    // the navmesh raycast and path type filter CheckCollisionAndGetValidCoords runs first, so an off-mesh
+    // point still lands back on the floor
+    PathGenerator path(bot);
+    path.SetUseRaycast(true);
+    if (path.CalculatePath(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), x, y, z, false) &&
+        !(path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
+    {
+        G3D::Vector3 const& end = path.GetPath().back();
+        x = end.x;
+        y = end.y;
+
+        float const ground = bot->GetMapWaterOrGroundLevel(x, y, end.z);
+        z = ground > INVALID_HEIGHT ? ground : end.z;
+    }
+
+    return Position(x, y, z);
+}
+
+namespace
+{
+char const* ClassTauntSpell(Player* bot)
+{
+    switch (bot->getClass())
+    {
+        case CLASS_WARRIOR:
+            return "taunt";
+        case CLASS_PALADIN:
+            return "hand of reckoning";
+        case CLASS_DEATH_KNIGHT:
+            return "dark command";
+        case CLASS_DRUID:
+            return "growl";
+        default:
+            return nullptr;
+    }
+}
+}  // namespace
+
+bool CastClassTaunt(PlayerbotAI* botAI, Unit* target)
+{
+    char const* taunt = ClassTauntSpell(botAI->GetBot());
+    return target && taunt && botAI->CastSpell(taunt, target);
+}
+
+bool ClassTauntReady(PlayerbotAI* botAI)
+{
+    char const* taunt = ClassTauntSpell(botAI->GetBot());
+    uint32 const spellId = taunt ? botAI->GetAiObjectContext()->GetValue<uint32>("spell id", taunt)->Get() : 0;
+    return spellId && !botAI->GetBot()->HasSpellCooldown(spellId);
+}
+
+Item* GetNitroBoostBoots(Player* bot)
+{
+    Item* boots = bot ? bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_FEET) : nullptr;
+    return boots && boots->GetEnchantmentId(PERM_ENCHANTMENT_SLOT) == NITRO_BOOSTS_ENCHANT ? boots : nullptr;
+}
+
+bool NitroBoostsReady(Player* bot)
+{
+    Item* boots = GetNitroBoostBoots(bot);
+    return boots && !bot->HasSpellCooldown(NITRO_BOOSTS_USE_SPELL) && bot->CanUseItem(boots) == EQUIP_ERR_OK;
+}
+
+bool UseNitroBoosts(Player* bot)
+{
+    if (!NitroBoostsReady(bot) || bot->IsNonMeleeSpellCast(false, true, true))
+        return false;
+
+    // the use spell comes with the enchant and isn't in the spellbook, so use the boots like a client would
+    Item* boots = GetNitroBoostBoots(bot);
+    WorldPacket packet(CMSG_USE_ITEM);
+    packet << boots->GetBagSlot() << boots->GetSlot() << uint8(1) << uint32(NITRO_BOOSTS_USE_SPELL)
+           << boots->GetGUID() << uint32(0) << uint8(0);
+    packet << uint32(TARGET_FLAG_NONE) << bot->GetPackGUID();
+    bot->GetSession()->HandleUseItemOpcode(packet);
+    return true;
 }
 
 }

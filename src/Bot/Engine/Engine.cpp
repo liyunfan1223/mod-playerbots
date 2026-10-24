@@ -154,6 +154,9 @@ bool Engine::DoNextAction(Unit* /*unit*/, uint32 /*depth*/, bool minimal)
     if (!minimal)
         botAI->forceRebuff.RollBuffPendingCycle();
 
+    for (auto const& entry : strategies)
+        entry.second->OnTick();
+
     // Update triggers and push default actions
     ProcessTriggers(minimal);
     PushDefaultActions();
