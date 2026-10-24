@@ -7,8 +7,10 @@
 #include "PlayerbotTextMgr.h"
 #include "PlayerbotsDatabase.h"
 #include "DatabaseEnv.h"
+#include "LocaleColumns.h"
 #include "QueryResult.h"    // Required due to a poor implementation by AC
 #include "Random.h"
+#include "StringFormat.h"
 #include "WorldSessionMgr.h"
 
 namespace
@@ -37,9 +39,18 @@ void PlayerbotTextMgr::LoadBotTexts()
 {
     LOG_INFO("playerbots", "Loading playerbots texts...");
 
+    // `text` holds enUS; fields[4 + k] holds localeColumns[k]
+    std::vector<LocaleColumn> const localeColumns = GetLocaleColumns(
+        PlayerbotsDatabase, "ai_playerbot_texts",
+        [](LocaleConstant locale) { return Acore::StringFormat("text_loc{}", static_cast<uint32>(locale)); });
+
+    std::string sql = "SELECT `name`, `text`, `say_type`, `reply_type`";
+    for (LocaleColumn const& localeColumn : localeColumns)
+        sql += Acore::StringFormat(", `{}`", localeColumn.Column);
+    sql += " FROM `ai_playerbot_texts`";
+
     uint32 count = 0;
-    if (PreparedQueryResult result =
-            PlayerbotsDatabase.Query(PlayerbotsDatabase.GetPreparedStatement(PLAYERBOTS_SEL_TEXT)))
+    if (QueryResult result = PlayerbotsDatabase.Query(sql))
     {
         do
         {
@@ -49,10 +60,8 @@ void PlayerbotTextMgr::LoadBotTexts()
             text[0] = fields[1].Get<std::string>();
             uint8 sayType = fields[2].Get<uint8>();
             uint8 replyType = fields[3].Get<uint8>();
-            for (uint8 i = 1; i < TOTAL_LOCALES; ++i)
-            {
-                text[i] = fields[i + 3].Get<std::string>();
-            }
+            for (std::size_t k = 0; k < localeColumns.size(); ++k)
+                text[localeColumns[k].Locale] = fields[4 + k].Get<std::string>();
 
             botTexts[name].push_back(BotTextEntry(name, text, sayType, replyType));
             ++count;

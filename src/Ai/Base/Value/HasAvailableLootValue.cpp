@@ -8,8 +8,4 @@
 #include "LootObjectStack.h"
 #include "Playerbots.h"
 
-bool HasAvailableLootValue::Calculate()
-{
-    return !AI_VALUE(bool, "can loot") &&
-           AI_VALUE(LootObjectStack*, "available loot")->CanLoot(sPlayerbotAIConfig.LootDistance);
-}
+bool HasAvailableLootValue::Calculate() { return !AI_VALUE(LootObject, "nearest loot").IsEmpty(); }
