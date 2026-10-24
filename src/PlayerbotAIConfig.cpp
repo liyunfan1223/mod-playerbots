@@ -476,6 +476,10 @@ bool PlayerbotAIConfig::Initialize()
     ReactStrategies = sConfigMgr->GetOption<std::string>("Playerbots.ReactStrategies", "");
     RandomBotReactStrategies = sConfigMgr->GetOption<std::string>("Playerbots.RandomBotReactStrategies", "");
     ApplyInstanceStrategies = sConfigMgr->GetOption<bool>("Playerbots.ApplyInstanceStrategies", true);
+    UlduarVezaxHardMode = sConfigMgr->GetOption<bool>("Playerbots.UlduarVezaxHardMode", false);
+    UlduarIronAssemblyHardMode = sConfigMgr->GetOption<bool>("Playerbots.UlduarIronAssemblyHardMode", false);
+    UlduarMimironHardMode = sConfigMgr->GetOption<bool>("Playerbots.UlduarMimironHardMode", false);
+    UlduarXT002HardMode = sConfigMgr->GetOption<bool>("Playerbots.UlduarXT002HardMode", false);
 
     CommandPrefix = sConfigMgr->GetOption<std::string>("Playerbots.CommandPrefix", "");
     CommandSeparator = sConfigMgr->GetOption<std::string>("Playerbots.CommandSeparator", "\\\\");

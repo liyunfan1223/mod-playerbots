@@ -473,6 +473,53 @@ Playerbots.DropObsoleteQuests = 1
 # Auto add dungeon/raid strategies when entering the instance if implemented
 Playerbots.ApplyInstanceStrategies = 1
 
+# Ulduar hard modes.
+#
+# Hard modes are optional harder versions of an Ulduar encounter that the raid opts into (keep the
+# Saronite Vapors alive, kill XT-002's Heart, press Mimiron's button, ...). They are not the 10/25
+# heroic setting. The options below cover the hard modes that change the bots' plan before the hard
+# mode shows itself. Bots do not detect those: each option is the declaration, and while it is on that
+# boss' hard-mode behaviour is armed for the whole encounter, so set it to match what your raid
+# actually does. It still only fires when the mechanic it reacts to is really there, so an option left
+# on for a boss run in normal mode mostly costs nothing - the exceptions are called out per option.
+# Flame Leviathan's towers, Freya's Elders, Thorim's Sif and Yogg-Saron's Keepers need no option: bots
+# react to their mechanics whenever they appear.
+
+# Enable Vezax hard-mode behaviour (fight the Saronite Animus). When on, bots leave the Saronite
+# Vapors alive, hold Heroism/Bloodlust for the Animus, and stop damaging Vezax at 15% health (tanks
+# at 2%) until the Animus spawns, so the raid can't kill him first. Then they switch to the Animus.
+# With it off they play Vezax as normal mode even if the Animus spawns.
+# Default: 0 (disabled)
+Playerbots.UlduarVezaxHardMode = 0
+
+# Enable Assembly of Iron hard-mode behaviour (kill Steelbreaker last). When on, bots mark the
+# kill order Brundir -> Molgeim -> Steelbreaker and, once Steelbreaker is the last one alive and
+# empowered, tank-swap him off a tank stacking Overwhelming Power. With it off they kill the council
+# in whatever order the raid marks and skip the empowered tank-swap.
+# Default: 0 (disabled)
+Playerbots.UlduarIronAssemblyHardMode = 0
+
+# Enable XT-002 Deconstructor hard-mode behaviour (kill the exposed Heart). At 75%, 50% and 25% XT
+# submerges and exposes his Heart for 30 seconds; killing it full-heals him and gives him Heartbreak
+# for the rest of the fight, which also makes Searing Light spawn Life Sparks and Gravity Bomb drop
+# Void Zones. Bots cannot tell what the raid intends, so this option is the intent: with it on they
+# hold Bloodlust and the other burst cooldowns until the first Heart appears and then burn the Heart
+# to zero, and from Heartbreak onwards they focus Life Sparks and dodge Void Zones. With it off they
+# still damage the Heart during each window but stop at 15% health so the fight never flips, and the
+# burst cooldowns are saved for the push below 25%. Dodging the debuff splash, avoiding Boombots and
+# tanking the Pummeller happen either way.
+# Default: 0 (disabled)
+Playerbots.UlduarXT002HardMode = 0
+
+# Enable Mimiron hard-mode behaviour ("Firefighter", the Big Red Button pressed before the pull).
+# Firefighter adds two hazards on top of the normal fight: a persistent, spreading ground fire and
+# VX-001's Frost Bomb (a large delayed explosion). When on, bots step out of the fire and clear the
+# Frost Bomb radius before it detonates; with it off they play the fight as normal mode. The Emergency
+# Fire Bots that spawn in phase 3 put the fire out, so when on bots keep two of them alive, stay out of
+# their spray and silence, kill any extras, and kill the rest before phase 4.
+# Default: 0 (disabled)
+Playerbots.UlduarMimironHardMode = 0
+
 # Enable auto avoid aoe strategy
 # Default: 1 (enabled)
 Playerbots.AutoAvoidAoe = 1
