@@ -82,6 +82,8 @@ public:
     virtual void AppendTargetExclusions([[maybe_unused]] GuidSet& exclusions,
                                         [[maybe_unused]] TargetValueExclusionType type) {}
     virtual bool HasTargetExclusions() const { return false; }
+    // Once per engine tick, before any trigger is checked. For housekeeping a predicate must not do.
+    virtual void OnTick() {}
     virtual std::string const getName() = 0;
     virtual uint32 GetType() const { return STRATEGY_TYPE_GENERIC; }
     virtual ActionNode* GetAction(std::string const name);
