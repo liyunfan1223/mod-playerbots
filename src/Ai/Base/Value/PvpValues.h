@@ -10,9 +10,19 @@
 #include "NamedObjectContext.h"
 #include "SharedDefines.h"
 #include "Value.h"
+#include <map>
+#include <vector>
 
+class Player;
 class PlayerbotAI;
 class Unit;
+
+bool IsUnavailableCombatTarget(Player const* player, Unit const* target);
+bool IsValidWsgCarrier(Player const* player, Unit const* carrier, bool friendly);
+bool CanRespondToWsgCarrier(PlayerbotAI* botAI, Unit* carrier);
+bool IsWsgEscortTargetAllowed(PlayerbotAI* botAI, Unit const* target);
+bool ShouldRegroupWsgEscort(PlayerbotAI* botAI);
+bool IsWsgSupportTarget(PlayerbotAI* botAI, Unit const* target);
 
 class BgTypeValue : public ManualSetValue<uint32>
 {
@@ -24,6 +34,42 @@ class ArenaTypeValue : public ManualSetValue<uint32>
 {
 public:
     ArenaTypeValue(PlayerbotAI* botAI) : ManualSetValue<uint32>(botAI, 0, "arena type") {}
+};
+
+struct WsgTeamAssignment
+{
+    uint32 Role = 0;
+    uint8 Defenders = 0;
+    uint8 Escorts = 0;
+    uint8 EscortIndex = 0;
+    bool Escort = false;
+    bool BaseDefender = false;
+    bool Defender = false;
+    bool Attacker = false;
+    bool Returner = false;
+    bool CommittedAttack = false;
+    bool Valid = false;
+};
+
+class WsgTeamAssignmentValue : public CalculatedValue<WsgTeamAssignment>
+{
+public:
+    WsgTeamAssignmentValue(PlayerbotAI* botAI)
+        : CalculatedValue<WsgTeamAssignment>(botAI, "wsg team assignment", 2 * IN_MILLISECONDS)
+    {
+    }
+
+    WsgTeamAssignment Calculate() override;
+
+private:
+    std::vector<ObjectGuid> _escortGuids;
+};
+
+class WsgSupportTargetValue : public CalculatedValue<ObjectGuid>
+{
+public:
+    WsgSupportTargetValue(PlayerbotAI* botAI) : CalculatedValue<ObjectGuid>(botAI, "wsg support target", 250) {}
+    ObjectGuid Calculate() override;
 };
 
 class BgRoleValue : public ManualSetValue<uint32>

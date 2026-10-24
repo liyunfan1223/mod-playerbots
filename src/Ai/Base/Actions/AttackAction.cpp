@@ -12,6 +12,7 @@
 #include "PlayerbotAI.h"
 #include "PlayerbotTextMgr.h"
 #include "Playerbots.h"
+#include "PvpValues.h"
 #include "ServerFacade.h"
 #include "Unit.h"
 #include "WaitForAttackStrategy.h"
@@ -120,6 +121,9 @@ bool AttackAction::Attack(Unit* target, bool /*with_pet*/ /*true*/)
 
         return false;
     }
+
+    if (IsUnavailableCombatTarget(bot, target))
+        return false;
 
     if (!bot->IsWithinLOSInMap(target))
     {

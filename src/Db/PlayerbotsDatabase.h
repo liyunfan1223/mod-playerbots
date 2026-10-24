@@ -66,7 +66,6 @@ enum PlayerbotsDatabaseStatements : uint32
     PLAYERBOTS_SEL_TELE_CACHE,
     PLAYERBOTS_INS_TELE_CACHE,
 
-    PLAYERBOTS_SEL_TEXT,
     PLAYERBOTS_SEL_DUNGEON_SUGGESTION,
 
     PLAYERBOTS_SEL_TRAVELNODE,
@@ -168,7 +167,7 @@ protected:
         return new PlayerbotsDatabaseConnection(connInfo);
     }
 
-    MySQLConnection* CreateConnection(ProducerConsumerQueue<SQLOperation*>* queue,
+    MySQLConnection* CreateAsyncConnection(ProducerConsumerQueue<SQLOperation*>* queue,
         MySQLConnectionInfo& connInfo) override
     {
         return new PlayerbotsDatabaseConnection(queue, connInfo);

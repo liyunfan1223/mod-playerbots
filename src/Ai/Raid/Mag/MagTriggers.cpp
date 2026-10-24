@@ -90,11 +90,12 @@ bool MagtheridonRangedShouldSpreadTrigger::IsActiveInEncounter()
     if (!IsCubeClicker(bot))
         return true;
 
-    auto timerIt = blastNovaTimer.find(magtheridon->GetInstanceId());
-    if (timerIt == blastNovaTimer.end())
+    std::optional<uint32> const& blastNovaTimer =
+        MagState(magtheridon->GetInstanceId()).blastNovaTimer;
+    if (!blastNovaTimer)
         return true;
 
-    return getMSTimeDiff(timerIt->second, getMSTime()) < BLAST_NOVA_INTERIM_MS;
+    return getMSTimeDiff(*blastNovaTimer, getMSTime()) < BLAST_NOVA_INTERIM_MS;
 }
 
 bool MagtheridonStandingInDebrisTrigger::IsActiveInEncounter()

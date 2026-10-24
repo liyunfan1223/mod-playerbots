@@ -17,6 +17,7 @@
 #include "ReachTargetActions.h"
 #include "RogueActions.h"
 #include "ShamanActions.h"
+#include "ThreatManager.h"
 #include "WarriorActions.h"
 #include "ZAActions.h"
 #include "ZAHelpers.h"
@@ -45,6 +46,26 @@ bool IsHazardousMovement(Action* action)
         dynamic_cast<CastDisengageAction*>(action);
 }
 
+bool IsZulAmanBoss(uint32 entry)
+{
+    return entry == Id(ZaNpcs::NPC_AKILZON) || entry == Id(ZaNpcs::NPC_NALORAKK) ||
+        entry == Id(ZaNpcs::NPC_JANALAI) || entry == Id(ZaNpcs::NPC_HALAZZI) ||
+        entry == Id(ZaNpcs::NPC_HALAZZI_TROLL) || entry == Id(ZaNpcs::NPC_HEX_LORD_MALACRASS) ||
+        entry == Id(ZaNpcs::NPC_ZULJIN);
+}
+
+Unit* GetZulAmanBoss(Player* bot)
+{
+    for (auto const& [guid, ref] : bot->GetThreatMgr().GetThreatenedByMeList())
+    {
+        Unit* unit = ref->GetOwner();
+        if (unit && IsZulAmanBoss(unit->GetEntry()))
+            return unit;
+    }
+
+    return nullptr;
+}
+
 }
 
 // Shared
@@ -57,20 +78,7 @@ float ZulAmanDelayDpsCooldownsMultiplier::GetValueInEncounter(Action* action)
     if (!IsDpsCooldownAction(bot, action))
         return 1.0f;
 
-    Unit* boss = nullptr;
-    static constexpr std::array zulAmanBosses = {
-        "zul'jin", "hex lord malacrass", "halazzi", "jan'alai", "nalorakk", "akil'zon",
-    };
-
-    for (char const* name : zulAmanBosses)
-    {
-        if (Unit* target = AI_VALUE2(Unit*, "find target", name))
-        {
-            boss = target;
-            break;
-        }
-    }
-
+    Unit* boss = GetZulAmanBoss(bot);
     if (!boss)
         return 1.0f;
 
@@ -154,21 +162,27 @@ float ZulAmanDisableTankActionsMultiplier::GetValueInEncounter(Action* action)
     if (!isTankFace && !isTankAssist && !isTaunt)
         return 1.0f;
 
+    Unit* boss = GetZulAmanBoss(bot);
+    if (!boss)
+        return 1.0f;
+
+    uint32 const bossEntry = boss->GetEntry();
+
     // Nalorakk: A tank swap is used by form, so only the tank assigned to the current form may
     // taunt. Same as NalorakkTanksPositionBossAction: main tank gets bear, assist tank gets troll.
-    if (Unit* nalorakk = AI_VALUE2(Unit*, "find target", "nalorakk"))
+    if (bossEntry == Id(ZaNpcs::NPC_NALORAKK))
     {
         if (!isTaunt)
             return 0.0f;
 
-        bool const isFormTank = IsNalorakkInBearForm(nalorakk)
+        bool const isFormTank = IsNalorakkInBearForm(boss)
             ? PlayerbotAI::IsMainTank(bot) : PlayerbotAI::IsAssistTankOfIndex(bot, 0, true);
 
         return isFormTank ? 1.0f : 0.0f;
     }
 
     // Halazzi: The assist tank picks up the lynx so disable the main tank from taunting it.
-    if (AI_VALUE2(Unit*, "find target", "halazzi"))
+    if (bossEntry == Id(ZaNpcs::NPC_HALAZZI) || bossEntry == Id(ZaNpcs::NPC_HALAZZI_TROLL))
     {
         if (!isTaunt)
             return 0.0f;
@@ -184,16 +198,16 @@ float ZulAmanDisableTankActionsMultiplier::GetValueInEncounter(Action* action)
         return 1.0f;
 
     // Zul'jin: Allow tank face in Phase 5 for the tank to turn him away from the raid.
-    if (Unit* zuljin = AI_VALUE2(Unit*, "find target", "zul'jin"))
+    if (bossEntry == Id(ZaNpcs::NPC_ZULJIN))
     {
         return isTankFace &&
-            !zuljin->HasAura(Id(ZaSpells::SPELL_SHAPE_OF_THE_DRAGONHAWK)) ? 0.0f : 1.0f;
+            !boss->HasAura(Id(ZaSpells::SPELL_SHAPE_OF_THE_DRAGONHAWK)) ? 0.0f : 1.0f;
     }
 
     // Jan'alai: Allow tank assist for the assist tank to pick up the Hatchlings. Tank face is
     // already disabled as part of ZulAmanDisableCombatFormationMoveMultiplier so the addition here
     // is just belt-and-suspenders for no cost.
-    if (AI_VALUE2(Unit*, "find target", "jan'alai"))
+    if (bossEntry == Id(ZaNpcs::NPC_JANALAI))
         return isTankFace || PlayerbotAI::IsMainTank(bot) ? 0.0f : 1.0f;
 
     // Akil'zon disables only tank face action, and that is already handled by
@@ -230,12 +244,16 @@ float ZulAmanDisableCombatFormationMoveMultiplier::GetValueInEncounter(Action* a
     if (dynamic_cast<SetBehindTargetAction*>(action))
         return 1.0f;
 
-    Unit* zuljin = AI_VALUE2(Unit*, "find target", "zul'jin");
-    if (zuljin && zuljin->HasAura(Id(ZaSpells::SPELL_SHAPE_OF_THE_EAGLE)))
-        return 0.0f;
+    Unit* boss = GetZulAmanBoss(bot);
+    if (!boss)
+        return 1.0f;
 
-    return AI_VALUE2(Unit*, "find target", "jan'alai") ||
-        AI_VALUE2(Unit*, "find target", "akil'zon") ? 0.0f : 1.0f;
+    uint32 const bossEntry = boss->GetEntry();
+    if (bossEntry == Id(ZaNpcs::NPC_ZULJIN))
+        return boss->HasAura(Id(ZaSpells::SPELL_SHAPE_OF_THE_EAGLE)) ? 0.0f : 1.0f;
+
+    return bossEntry == Id(ZaNpcs::NPC_JANALAI) || bossEntry == Id(ZaNpcs::NPC_AKILZON) ?
+        0.0f : 1.0f;
 }
 
 // Akil'zon <Eagle Avatar>
@@ -252,11 +270,11 @@ float AkilzonStayInEyeOfTheStormMultiplier::GetValueInEncounter(Action* action)
     if (dynamic_cast<AkilzonMoveToEyeOfTheStormAction*>(action))
         return 1.0f;
 
-    auto it = akilzonStormTimer.find(bot->GetInstanceId());
-    if (it == akilzonStormTimer.end())
+    std::optional<uint32> const& stormTimer = ZaState(bot->GetInstanceId()).akilzonStormTimer;
+    if (!stormTimer)
         return 1.0f;
 
-    return IsInStormWindow(it->second) ? 0.0f : 1.0f;
+    return IsInStormWindow(*stormTimer) ? 0.0f : 1.0f;
 }
 
 // Nalorakk <Bear Avatar>
