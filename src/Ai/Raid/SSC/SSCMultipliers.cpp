@@ -27,6 +27,7 @@
 #include "SSCActions.h"
 #include "SSCHelpers.h"
 #include "ShamanActions.h"
+#include "ThreatManager.h"
 #include "WarlockActions.h"
 #include "WarriorActions.h"
 #include <algorithm>
@@ -114,6 +115,28 @@ bool IsAnyVashjAddUntanked(PlayerbotAI* botAI)
     return false;
 }
 
+bool IsSscBoss(uint32 entry)
+{
+    return entry == Id(SscNpcs::NPC_HYDROSS_THE_UNSTABLE) ||
+        entry == Id(SscNpcs::NPC_THE_LURKER_BELOW) ||
+        entry == Id(SscNpcs::NPC_LEOTHERAS_THE_BLIND) ||
+        entry == Id(SscNpcs::NPC_FATHOM_LORD_KARATHRESS) ||
+        entry == Id(SscNpcs::NPC_MOROGRIM_TIDEWALKER) ||
+        entry == Id(SscNpcs::NPC_LADY_VASHJ);
+}
+
+Unit* GetSscBoss(Player* bot)
+{
+    for (auto const& [guid, ref] : bot->GetThreatMgr().GetThreatenedByMeList())
+    {
+        Unit* unit = ref->GetOwner();
+        if (unit && IsSscBoss(unit->GetEntry()))
+            return unit;
+    }
+
+    return nullptr;
+}
+
 } // end anonymous namespace
 
 // Shared
@@ -129,24 +152,30 @@ float SscControlMisdirectionMultiplier::GetValueInEncounter(Action* action)
     if (!dynamic_cast<CastMisdirectionOnMainTankAction*>(action))
         return 1.0f;
 
-    Unit* vashj = AI_VALUE2(Unit*, "find target", "lady vashj");
-    if (vashj && GetLadyVashjPhase(vashj) != 1)
-        return 0.0f;
+    Unit* boss = GetSscBoss(bot);
+    if (!boss)
+        return 1.0f;
 
-    if (Unit* leotheras = AI_VALUE2(Unit*, "find target", "leotheras the blind"))
+    uint32 const bossEntry = boss->GetEntry();
+    if (bossEntry == Id(SscNpcs::NPC_LADY_VASHJ))
+        return GetLadyVashjPhase(boss) != 1 ? 0.0f : 1.0f;
+
+    if (bossEntry == Id(SscNpcs::NPC_LEOTHERAS_THE_BLIND))
     {
         if (HasInnerDemon(bot))
             return 0.0f;
 
-        if (IsLeotherasChannelingWhirlwind(leotheras))
+        if (IsLeotherasChannelingWhirlwind(boss))
             return 0.0f;
 
         if (GetLeotherasDemonOrShadow(botAI) && GetLeotherasWarlockTank(bot))
             return 0.0f;
+
+        return 1.0f;
     }
 
-    return AI_VALUE2(Unit*, "find target", "fathom-lord karathress") ||
-        AI_VALUE2(Unit*, "find target", "hydross the unstable") ? 0.0f : 1.0f;
+    return bossEntry == Id(SscNpcs::NPC_FATHOM_LORD_KARATHRESS) ||
+        bossEntry == Id(SscNpcs::NPC_HYDROSS_THE_UNSTABLE) ? 0.0f : 1.0f;
 }
 
 float SscDelayDpsCooldownsMultiplier::GetValue(Action* action)
@@ -160,10 +189,13 @@ float SscDelayDpsCooldownsMultiplier::GetValue(Action* action)
     bool const isBloodlust = bot->getClass() == CLASS_SHAMAN &&
         (dynamic_cast<CastBloodlustAction*>(action) || dynamic_cast<CastHeroismAction*>(action));
 
+    Unit* boss = GetSscBoss(bot);
+    uint32 const bossEntry = boss ? boss->GetEntry() : 0;
+
     // Vashj: Bloodlust/Heroism are phase 3 only; other dps cooldowns can be used from phase 2.
-    if (Unit* vashj = AI_VALUE2(Unit*, "find target", "lady vashj"))
+    if (bossEntry == Id(SscNpcs::NPC_LADY_VASHJ))
     {
-        int8 const phase = GetLadyVashjPhase(vashj);
+        int8 const phase = GetLadyVashjPhase(boss);
         if (phase == 3)
             return 1.0f;
 
@@ -171,33 +203,33 @@ float SscDelayDpsCooldownsMultiplier::GetValue(Action* action)
     }
 
     // Tidewalker: Bloodlust/Heroism are phase 2 only, once the raid is stacked in the corner.
-    if (Unit* tidewalker = AI_VALUE2(Unit*, "find target", "morogrim tidewalker"))
+    if (bossEntry == Id(SscNpcs::NPC_MOROGRIM_TIDEWALKER))
     {
         if (isBloodlust)
-            return tidewalker->GetHealthPct() <= TIDEWALKER_PHASE_2_HEALTH_PCT ? 1.0f : 0.0f;
+            return boss->GetHealthPct() <= TIDEWALKER_PHASE_2_HEALTH_PCT ? 1.0f : 0.0f;
 
-        return tidewalker->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
+        return boss->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
     }
 
     // Karathress: Hold until Tidalvess, the first council member in the kill order, is under 95%.
-    if (AI_VALUE2(Unit*, "find target", "fathom-lord karathress"))
+    if (bossEntry == Id(SscNpcs::NPC_FATHOM_LORD_KARATHRESS))
     {
         Unit* tidalvess = AI_VALUE2(Unit*, "find target", "fathom-guard tidalvess");
         return tidalvess && tidalvess->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
     }
 
     // Lurker: No dps cooldowns while spouting or submerged.
-    if (Unit* lurker = AI_VALUE2(Unit*, "find target", "the lurker below"))
+    if (bossEntry == Id(SscNpcs::NPC_THE_LURKER_BELOW))
     {
-        if (!IsLurkerSurfacedAndCalm(lurker))
+        if (!IsLurkerSurfacedAndCalm(boss))
             return 0.0f;
 
-        return lurker->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
+        return boss->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
     }
 
     // Hydross and Leotheras: Only the standard hold on pull until 95%.
-    if (Unit* hydross = AI_VALUE2(Unit*, "find target", "hydross the unstable"))
-        return hydross->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
+    if (bossEntry == Id(SscNpcs::NPC_HYDROSS_THE_UNSTABLE))
+        return boss->GetHealthPct() > BOSS_ENGAGED_HEALTH_PCT ? 0.0f : 1.0f;
 
     if (bot->GetExactDist(LEOTHERAS_SPAWN_POSITION) > LEOTHERAS_SEARCH_DISTANCE)
         return 1.0f;

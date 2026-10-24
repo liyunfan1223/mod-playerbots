@@ -42,11 +42,11 @@ float MagtheridonUseManticronCubeMultiplier::GetValueInEncounter(Action* action)
     if (!magtheridon || !IsMagtheridonActive(magtheridon))
         return 1.0f;
 
-    auto timerIt = blastNovaTimer.find(bot->GetInstanceId());
-    if (timerIt == blastNovaTimer.end())
+    std::optional<uint32> const& blastNovaTimer = MagState(bot->GetInstanceId()).blastNovaTimer;
+    if (!blastNovaTimer)
         return 1.0f;
 
-    return getMSTimeDiff(timerIt->second, getMSTime()) >= BLAST_NOVA_INTERIM_MS ? 0.0f : 1.0f;
+    return getMSTimeDiff(*blastNovaTimer, getMSTime()) >= BLAST_NOVA_INTERIM_MS ? 0.0f : 1.0f;
 }
 
 float MagtheridonHoldDpsMultiplier::GetValueInEncounter(Action* action)
@@ -64,11 +64,11 @@ float MagtheridonHoldDpsMultiplier::GetValueInEncounter(Action* action)
     if (PlayerbotAI::IsMainTank(bot))
         return 1.0f;
 
-    auto it = magDpsWaitTimer.find(magtheridon->GetInstanceId());
-    if (it == magDpsWaitTimer.end())
+    std::optional<uint32> const& waitStart = MagState(magtheridon->GetInstanceId()).magDpsWaitTimer;
+    if (!waitStart)
         return 0.0f;
 
-    return getMSTimeDiff(it->second, getMSTime()) <= MAG_DPS_HOLD_MS ? 0.0f : 1.0f;
+    return getMSTimeDiff(*waitStart, getMSTime()) <= MAG_DPS_HOLD_MS ? 0.0f : 1.0f;
 }
 
 float MagtheridonControlTankActionsMultiplier::GetValueInEncounter(Action* action)

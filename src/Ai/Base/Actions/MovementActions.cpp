@@ -2597,14 +2597,56 @@ bool RunAwayAction::Execute(Event /*event*/) { return Flee(AI_VALUE(Unit*, "grou
 
 bool MoveToLootAction::Execute(Event /*event*/)
 {
-    if (AI_VALUE(LootObjectStack*, "available loot")->IsLootPending() || bot->GetLootGUID())
+    LootObjectStack* availableLoot = AI_VALUE(LootObjectStack*, "available loot");
+    if (availableLoot->IsLootPending() || bot->GetLootGUID())
+    {
+        lootWatchGuid.Clear();
         return false;
+    }
 
     LootObject loot = AI_VALUE(LootObject, "loot target");
     if (!loot.IsLootPossible(bot))
+    {
+        lootWatchGuid.Clear();
+        return false;
+    }
+
+    WorldObject* target = loot.GetWorldObject(bot);
+    if (!target)
         return false;
 
-    return MoveNear(loot.GetWorldObject(bot), sPlayerbotAIConfig.ContactDistance);
+    float const distance = bot->GetDistance(target);
+    uint32 const nowMs = getMSTime();
+
+    constexpr uint32 evalGapMs = 10000;    // longer than the slowest out-of-combat tick (1-3 s)
+    constexpr uint32 noProgressMs = 5000;  // give up on a target after 5s without progress
+    constexpr float reachedMargin = 2.0f;  // near-target distance jitter margin
+
+    if (loot.guid != lootWatchGuid || nowMs - lootWatchLastEvalMs > evalGapMs)
+    {
+        lootWatchGuid = loot.guid;
+        lootWatchDistance = distance;
+        lootWatchMs = nowMs;
+    }
+    else if (distance < lootWatchDistance - 0.5f)
+    {
+        lootWatchDistance = distance;
+        lootWatchMs = nowMs;
+    }
+    lootWatchLastEvalMs = nowMs;
+
+    // Drop a target the bot is not getting closer to (blocked path, pulled elsewhere), so the next
+    // pickup chooses a closer reachable one.
+    if (distance > sPlayerbotAIConfig.ContactDistance + reachedMargin && nowMs - lootWatchMs >= noProgressMs)
+    {
+        availableLoot->DeferLoot(loot.guid);
+        if (AI_VALUE(LootObject, "loot target").guid == loot.guid)
+            context->GetValue<LootObject>("loot target")->Set(LootObject());
+        lootWatchGuid.Clear();
+        return false;
+    }
+
+    return MoveNear(target, sPlayerbotAIConfig.ContactDistance);
 }
 
 bool MoveOutOfEnemyContactAction::Execute(Event /*event*/)

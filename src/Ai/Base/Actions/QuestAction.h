@@ -23,11 +23,19 @@ class QuestAction : public Action
 public:
     QuestAction(PlayerbotAI* botAI, std::string const name) : Action(botAI, name) { }
     bool Execute(Event event) override;
+    // Shared quest-accept path (guards, packet, sync fallback, broadcast); also used for quest-starting items
+    bool AcceptQuest(Quest const* quest, ObjectGuid questGiver);
+    // Level band below the bot's level at which a quest counts as grey (shared with QuestValues).
+    static constexpr int32 GREY_QUEST_LEVEL_BAND = 10;
+    // Whether the bot can and should accept this quest: core eligibility (level/race/class/rep/chain/...)
+    // plus the module's "no grey quests" level band (same as QuestValues.cpp). Null-safe.
+    // Used for quest-starting items (selection, use and item valuation) only; the NPC/GO quest-giver
+    // path and player-driven sharing keep the core's CanTakeQuest + dialog-status behaviour.
+    static bool CanAcceptQuest(Player* bot, Quest const* quest);
 
 protected:
     bool CompleteQuest(Player* player, uint32 entry);
     virtual bool ProcessQuest(Quest const* quest, Object* questGiver) = 0;
-    bool AcceptQuest(Quest const* quest, ObjectGuid questGiver);
     bool ProcessQuests(ObjectGuid questGiver);
     bool ProcessQuests(WorldObject* questGiver);
 };

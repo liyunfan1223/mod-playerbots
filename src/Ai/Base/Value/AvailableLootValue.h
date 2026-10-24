@@ -28,9 +28,13 @@ public:
 class CanLootValue : public BoolCalculatedValue
 {
 public:
-    CanLootValue(PlayerbotAI* botAI, std::string const name = "can loot") : BoolCalculatedValue(botAI, name) {}
+    CanLootValue(PlayerbotAI* botAI, std::string const name = "can loot") : BoolCalculatedValue(botAI, name, 100) {}
 
+    bool Get() override;
     bool Calculate() override;
+
+private:
+    ObjectGuid _lootGuid;
 };
 
 #endif

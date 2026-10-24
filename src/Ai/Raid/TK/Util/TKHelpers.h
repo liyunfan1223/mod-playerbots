@@ -11,8 +11,8 @@
 #include "ObjectGuid.h"
 #include "Position.h"
 #include <array>
+#include <optional>
 #include <type_traits>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -188,9 +188,6 @@ inline Position const ALAR_ROOM_S_CENTER       = { 281.064f,   0.000f, -2.389f }
 
 inline constexpr float ALAR_FLAME_PATCH_SEARCH_DISTANCE = 40.0f;
 
-extern std::unordered_map<uint32, bool> lastRebirthState;
-extern std::unordered_map<uint32, bool> isAlarInPhase2;
-
 bool IsAlarInPhase2(uint32 instanceId);
 int8 GetAlarDestinationLocationIndex(Unit* alar);
 int8 GetAlarCurrentLocationIndex(Unit* alar);
@@ -219,8 +216,6 @@ inline constexpr float ARCANE_ORB_BUFFER_DISTANCE = ARCANE_ORB_HAZARD_RADIUS + 1
 
 // Center of the room
 inline Position const VOID_REAVER_TANK_POSITION = { 423.845f, 371.733f, 14.897f };
-
-extern std::unordered_map<uint32, std::vector<ArcaneOrbData>> voidReaverArcaneOrbs;
 
 std::vector<Position> GetActiveArcaneOrbs(uint32 instanceId);
 bool IsNearArcaneOrb(Player* bot, std::vector<Position> const& orbs, float radius);
@@ -261,7 +256,6 @@ inline Position const ADVISOR_HEAL_POSITION      = { 752.171f,  19.494f, 46.779f
 inline Position const KAELTHAS_TANK_POSITION     = { 774.008f,  -0.631f, 48.729f };
 
 inline constexpr uint32 ADVISOR_DPS_WAIT_NOT_STARTED = 0;
-extern std::unordered_map<uint32, uint32> advisorDpsWaitTimer;
 
 uint32 GetKaelthasTkPhase(Unit* kaelthas);
 bool IsAdvisorActive(Unit* advisor);
@@ -277,6 +271,19 @@ bool HasEquippableItemForSlot(Player* bot, uint8 slot);
 Item* GetEquippedItemInSlot(Player* bot, uint8 slot, uint32 itemId);
 Creature* GetNearestFlameStrikeInRadius(Player* bot, float radius);
 Creature* GetPhoenixEgg(Player* bot);
+
+// Shared encounter state
+
+struct TkInstanceState
+{
+    std::optional<bool> lastRebirthState;
+    std::optional<bool> isAlarInPhase2;
+    std::vector<ArcaneOrbData> voidReaverArcaneOrbs;
+    std::optional<uint32> advisorDpsWaitTimer;
+};
+
+TkInstanceState& TkState(uint32 instanceId);
+bool TkResetInstance(uint32 instanceId);
 
 }
 

@@ -879,6 +879,10 @@ public:
     const std::vector<WorldLocation> GetTeleportLocations(Player* bot);
     const std::vector<WorldLocation> GetTravelHubs(Player* bot);
     std::vector<WorldLocation> GetCityLocations(Player* bot);
+    // Returns the world locations of quest givers the bot can accept a quest from right now
+    // (level/faction valid, no unmet prereq, not in progress, quest-log + item room).
+    // Backed by a startup-built per-(level, team) index; empty when there is no valid giver.
+    std::vector<WorldLocation> GetValidQuestGiverLocations(Player* bot);
     std::vector<uint32> GetFlightNodesInZone(uint32 zoneId, TeamId team, uint32 excludeNode = 0) const;
     bool SelectAuctioneerByMap(Player* bot, NpcLocation& outAuctioneer);
     std::vector<WorldLocation> const& GetLocsPerLevelCache(uint8 level) { return locsPerLevelCache[level]; }
@@ -976,6 +980,7 @@ private:
     // Navigation initialization
     void PrepareZone2LevelBracket();
     void PrepareDestinationCache();
+    void PrepareQuestGiverTeleportIndex();
 
     // Internal types
     struct LevelBracket
@@ -991,6 +996,18 @@ private:
         uint32 entry;
     };
 
+    // One (quest, giver-spawn) pair a bot might accept. Static fields are pre-extracted so
+    // GetValidQuestGiverLocations can early-exit on level/race/class without touching the Quest.
+    struct QuestGiverTeleportCandidate
+    {
+        uint32 questId;
+        uint32 giverEntry;       // creature entry (used for the fine faction-reaction check at call time)
+        WorldLocation loc;       // precomputed: ~5y in front of the giver spawn
+        uint16 questLevel;       // 0 = unknown (falls back to bot level), mirrors Player::GetQuestLevel
+        uint32 allowableRaces;   // 0 = all; Quest::GetAllowableRaces bitmask
+        uint32 requiredClasses;  // 0 = all; Quest::GetRequiredClasses bitmask
+    };
+
     // Navigation caches
     std::map<uint32, FlightMasterInfo> allianceFlightMasterCache;
     std::map<uint32, FlightMasterInfo> hordeFlightMasterCache;
@@ -1001,6 +1018,9 @@ private:
     std::map<uint8, std::vector<WorldLocation>> locsPerLevelCache;
     std::unordered_map<uint32, std::vector<WorldLocation>> creatureSpawnsByTemplate;
     std::map<uint32, LevelBracket> zone2LevelBracket;
+    // Quest-giver teleport index, built once at startup by PrepareQuestGiverTeleportIndex.
+    // Keyed by (level -> team -> candidates) so the hot path is an O(1) bucket lookup.
+    std::map<uint32, std::map<TeamId, std::vector<QuestGiverTeleportCandidate>>> questGiverTeleportIndex;
 };
 
 #define sTravelMgr TravelMgr::instance()

@@ -19,6 +19,7 @@
 #include "FleeManager.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "JsonUtils.h"
 #include "LFGMgr.h"
 #include "MapMgr.h"
 #include "NewRpgInfo.h"
@@ -1041,6 +1042,12 @@ void RandomPlayerbotMgr::CheckBgQueue()
                         instanceIds->push_back(instanceId);
 
                     BattlegroundData[queueTypeId][bracketId].bgInstanceCount = instanceIds->size();
+
+                    std::vector<uint32>& playerInstances = BattlegroundData[queueTypeId][bracketId].bgPlayerInstances;
+                    if (std::find(playerInstances.begin(), playerInstances.end(), instanceId) == playerInstances.end())
+                        playerInstances.push_back(instanceId);
+                    BattlegroundData[queueTypeId][bracketId].bgInstanceCapacity[instanceId] =
+                        bg->GetMaxPlayersPerTeam();
                 }
             }
 
@@ -1141,6 +1148,9 @@ void RandomPlayerbotMgr::CheckBgQueue()
                 else
                 {
                     instanceIds = &BattlegroundData[queueTypeId][bracketId].bgInstances;
+                    BattlegroundData[queueTypeId][bracketId].bgInstanceCapacity[instanceId] =
+                        bg->GetMaxPlayersPerTeam();
+                    ++BattlegroundData[queueTypeId][bracketId].bgInstanceBots[instanceId][teamId];
                 }
 
                 if (instanceIds &&
@@ -1196,6 +1206,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
         {
             for (uint32 bracket : brackets)
             {
+                BattlegroundData[queueType][bracket].bgAutoJoinTarget = minCount;
                 if (BattlegroundData[queueType][bracket].activeBgQueue == 0 &&
                     BattlegroundData[queueType][bracket].bgInstanceCount < minCount &&
                     BattlegroundData[queueType][bracket].bgInstances.size() < minCount)
@@ -1836,15 +1847,45 @@ void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
     if (bot->InBattleground())
         return;
 
-    if (bot->GetLevel() >= 10 && urand(0, 100) < sPlayerbotAIConfig.ProbTeleToBankers * 100)
+    // One weighted roll across the three destination classes, so each config value is an exact
+    // share of the roll (they are peers, not nested gates):
+    //   quest giver   : ProbTeleToQuestGivers
+    //   city/banker   : ProbTeleToBankers (level >= 10 only)
+    //   innkeeper/hub : the remainder (1 - quest giver - banker); absorbs any branch that had
+    //                   no destination (no valid giver, below level 10, empty city cache)
+    uint32 roll = urand(0, 99);
+
+    if (roll < sPlayerbotAIConfig.ProbTeleToQuestGivers * 100)
+    {
+        std::vector<WorldLocation> qlocs = sTravelMgr.GetValidQuestGiverLocations(bot);
+
+        // Concentrated servers keep bots near players: only givers in a player zone count, and
+        // otherwise the roll falls through to the hub path.
+        if (!qlocs.empty() && sPlayerbotAIConfig.RandomBotConcentrateInPlayerZone)
+        {
+            std::vector<WorldLocation> playerZoneLocs = GetPlayerZoneTeleportLocations(qlocs, bot);
+            qlocs = std::move(playerZoneLocs);
+        }
+
+        if (!qlocs.empty())
+        {
+            LOG_DEBUG("playerbots", "Random teleporting bot {} to a quest giver ({} candidates)",
+                      bot->GetName().c_str(), qlocs.size());
+            RandomTeleport(bot, qlocs, /*hearth=*/false);
+            return;
+        }
+    }
+    else if (bot->GetLevel() >= 10
+             && roll < (sPlayerbotAIConfig.ProbTeleToQuestGivers + sPlayerbotAIConfig.ProbTeleToBankers) * 100)
     {
         std::vector<WorldLocation> locs = sTravelMgr.GetCityLocations(bot);
         if (!locs.empty())
         {
-            RandomTeleport(bot, locs, true);
+            RandomTeleport(bot, locs, /*hearth=*/true);
             return;
         }
     }
+
     std::vector<WorldLocation> locs = sTravelMgr.GetTeleportLocations(bot);
 
     if (sPlayerbotAIConfig.RandomBotConcentrateInPlayerZone && !locs.empty())
@@ -2531,7 +2572,7 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* /*handler*/,
 
     if (!args || !*args)
     {
-        LOG_ERROR("playerbots", "Usage: rndbot stats/update/reset/init/refresh/add/remove");
+        LOG_ERROR("playerbots", "Usage: rndbot stats/queststats/questdump/update/reset/init/refresh/add/remove");
         return false;
     }
 
@@ -2549,6 +2590,18 @@ bool RandomPlayerbotMgr::HandlePlayerbotConsoleCommand(ChatHandler* /*handler*/,
     {
         sRandomPlayerbotMgr.PrintStats();
         // activatePrintStatsThread();
+        return true;
+    }
+
+    if (cmd == "queststats")
+    {
+        sRandomPlayerbotMgr.PrintQuestStats();
+        return true;
+    }
+
+    if (cmd == "questdump")
+    {
+        sRandomPlayerbotMgr.ExportQuestStatsToJson();
         return true;
     }
 
@@ -3048,13 +3101,277 @@ void RandomPlayerbotMgr::PrintStats()
                  rpgStatusCount[RPG_DO_QUEST], rpgStatusCount[RPG_TRAVEL_FLIGHT], rpgStatusCount[RPG_OUTDOOR_PVP],
                  rpgStatusCount[RPG_DO_GATHER]);
 
-        LOG_INFO("playerbots", "Bots total quests:");
-        LOG_INFO("playerbots", "    Accepted: {}, Rewarded: {}, Dropped: {}", rpgStasticTotal.questAccepted,
-                 rpgStasticTotal.questRewarded, rpgStasticTotal.questDropped);
+        PrintQuestTotals(rpgStasticTotal);
     }
 
     LOG_INFO("playerbots", "Bots engine:", dead);
     LOG_INFO("playerbots", "    Non-combat: {}, Combat: {}, Dead: {}", engine_noncombat, engine_combat, engine_dead);
+}
+
+NewRpgStatistic RandomPlayerbotMgr::CollectQuestStats()
+{
+    // Merge each bot's pending statistics on top of the last aggregation, so the report is fresh
+    // even when PrintStats has not run yet.
+    NewRpgStatistic total = rpgStasticTotal;
+    for (PlayerBotMap::iterator i = playerBots.begin(); i != playerBots.end(); ++i)
+    {
+        PlayerbotAI* botAI = GET_PLAYERBOT_AI(i->second);
+        if (!botAI)
+            continue;
+
+        total += botAI->rpgStatistic;
+    }
+    return total;
+}
+
+void RandomPlayerbotMgr::PrintQuestTotals(NewRpgStatistic const& stats)
+{
+    LOG_INFO("playerbots", "Bots total quests:");
+    LOG_INFO("playerbots", "    Accepted: {}, Completed: {}, Rewarded: {}, Dropped: {}, Abandoned: {}",
+             stats.questAccepted, stats.questCompleted, stats.questRewarded, stats.questDropped,
+             stats.questAbandoned);
+
+    if (stats.questAccepted > 0)
+    {
+        LOG_INFO("playerbots", "    Completed: {:.2f}%, Rewarded: {:.2f}%, Dropped: {:.2f}%, Abandoned: {:.2f}%",
+                 stats.questCompleted * 100.0f / stats.questAccepted,
+                 stats.questRewarded * 100.0f / stats.questAccepted,
+                 stats.questDropped * 100.0f / stats.questAccepted,
+                 stats.questAbandoned * 100.0f / stats.questAccepted);
+    }
+}
+
+void RandomPlayerbotMgr::PrintQuestStats()
+{
+    if (!sPlayerbotAIConfig.EnableNewRpgStrategy)
+    {
+        LOG_INFO("playerbots", "New RPG strategy is not enabled. Quest stats not available.");
+        return;
+    }
+
+    LOG_INFO("playerbots", "=== QUEST STATISTICS REPORT ===");
+    NewRpgStatistic const total = CollectQuestStats();
+    PrintQuestTotals(total);
+    LOG_INFO("playerbots", "");
+
+    if (!sPlayerbotAIConfig.CollectDetailedQuestStats)
+    {
+        LOG_INFO("playerbots", "Detailed quest stats are disabled. Set Playerbots.CollectDetailedQuestStats = 1.");
+        return;
+    }
+
+    constexpr size_t dropReasonCount = static_cast<size_t>(QuestDropReason::Count);
+    constexpr size_t abandonReasonCount = static_cast<size_t>(QuestAbandonReason::Count);
+    std::array<uint32, dropReasonCount> dropTotals{};
+    std::array<uint32, abandonReasonCount> abandonTotals{};
+    for (auto const& [questId, counters] : total.byQuest)
+    {
+        for (size_t i = 0; i < dropReasonCount; ++i)
+            dropTotals[i] += counters.dropped[i];
+        for (size_t i = 0; i < abandonReasonCount; ++i)
+            abandonTotals[i] += counters.abandoned[i];
+    }
+
+    uint32 dropTotal = 0;
+    for (uint32 count : dropTotals)
+        dropTotal += count;
+    if (dropTotal)
+    {
+        LOG_INFO("playerbots", "Quest drop reasons:");
+        for (size_t i = 0; i < dropReasonCount; ++i)
+            if (dropTotals[i])
+                LOG_INFO("playerbots", "    {}: {}", QuestDropReasonName(static_cast<QuestDropReason>(i)),
+                         dropTotals[i]);
+        LOG_INFO("playerbots", "");
+    }
+
+    uint32 abandonTotal = 0;
+    for (uint32 count : abandonTotals)
+        abandonTotal += count;
+    if (abandonTotal)
+    {
+        LOG_INFO("playerbots", "Quest abandon reasons:");
+        for (size_t i = 0; i < abandonReasonCount; ++i)
+            if (abandonTotals[i])
+                LOG_INFO("playerbots", "    {}: {}", QuestAbandonReasonName(static_cast<QuestAbandonReason>(i)),
+                         abandonTotals[i]);
+        LOG_INFO("playerbots", "");
+    }
+
+    struct ProblemQuest
+    {
+        uint32 questId{0};
+        uint32 problems{0};
+        std::string reasons;
+    };
+
+    std::vector<ProblemQuest> problems;
+    problems.reserve(total.byQuest.size());
+    for (auto const& [questId, counters] : total.byQuest)
+    {
+        uint32 problemCount = 0;
+        std::string reasons;
+        for (size_t i = 0; i < dropReasonCount; ++i)
+        {
+            if (!counters.dropped[i])
+                continue;
+            problemCount += counters.dropped[i];
+            if (!reasons.empty())
+                reasons += ", ";
+            reasons += std::string(QuestDropReasonName(static_cast<QuestDropReason>(i))) + " x" +
+                       std::to_string(counters.dropped[i]);
+        }
+        for (size_t i = 0; i < abandonReasonCount; ++i)
+        {
+            if (!counters.abandoned[i])
+                continue;
+            problemCount += counters.abandoned[i];
+            if (!reasons.empty())
+                reasons += ", ";
+            reasons += std::string(QuestAbandonReasonName(static_cast<QuestAbandonReason>(i))) + " x" +
+                       std::to_string(counters.abandoned[i]);
+        }
+
+        if (problemCount)
+            problems.push_back({questId, problemCount, std::move(reasons)});
+    }
+
+    if (!problems.empty())
+    {
+        std::sort(problems.begin(), problems.end(),
+                  [](ProblemQuest const& a, ProblemQuest const& b) { return a.problems > b.problems; });
+
+        LOG_INFO("playerbots", "Top quest problems (dropped + abandoned):");
+        for (size_t i = 0; i < problems.size() && i < 10; ++i)
+        {
+            Quest const* quest = sObjectMgr->GetQuestTemplate(problems[i].questId);
+            LOG_INFO("playerbots", "    [{}] {} x{} ({})", problems[i].questId,
+                     quest ? quest->GetTitle() : "Unknown Quest", problems[i].problems, problems[i].reasons);
+        }
+    }
+
+    LOG_INFO("playerbots", "=== END QUEST STATISTICS REPORT ===");
+}
+
+void RandomPlayerbotMgr::ExportQuestStatsToJson()
+{
+    if (!sPlayerbotAIConfig.EnableNewRpgStrategy)
+    {
+        LOG_ERROR("playerbots", "New RPG strategy is not enabled. Quest stats not available.");
+        return;
+    }
+
+    if (!sPlayerbotAIConfig.CollectDetailedQuestStats)
+    {
+        LOG_ERROR("playerbots", "Detailed quest stats are disabled. Set Playerbots.CollectDetailedQuestStats = 1.");
+        return;
+    }
+
+    NewRpgStatistic const total = CollectQuestStats();
+
+    auto dropName = [](size_t i) { return QuestDropReasonName(static_cast<QuestDropReason>(i)); };
+    auto abandonName = [](size_t i) { return QuestAbandonReasonName(static_cast<QuestAbandonReason>(i)); };
+
+    auto reasonsToJson = [](auto const& counts, auto nameFor)
+    {
+        std::ostringstream out;
+        out << "{";
+        bool first = true;
+        for (size_t i = 0; i < counts.size(); ++i)
+        {
+            if (!counts[i])
+                continue;
+            if (!first)
+                out << ", ";
+            out << "\"" << JsonEscape(nameFor(i)) << "\": " << counts[i];
+            first = false;
+        }
+        out << "}";
+        return out.str();
+    };
+
+    struct QuestRow
+    {
+        uint32 questId{0};
+        QuestCounters counters;
+        uint32 Total() const
+        {
+            uint32 count = counters.accepted + counters.completed + counters.rewarded;
+            for (uint32 value : counters.dropped)
+                count += value;
+            for (uint32 value : counters.abandoned)
+                count += value;
+            return count;
+        }
+    };
+
+    std::vector<QuestRow> rows;
+    rows.reserve(total.byQuest.size());
+    for (auto const& [questId, counters] : total.byQuest)
+        rows.push_back({questId, counters});
+
+    std::sort(rows.begin(), rows.end(), [](QuestRow const& a, QuestRow const& b) { return a.Total() > b.Total(); });
+
+    constexpr size_t dropReasonCount = static_cast<size_t>(QuestDropReason::Count);
+    constexpr size_t abandonReasonCount = static_cast<size_t>(QuestAbandonReason::Count);
+    std::array<uint32, dropReasonCount> dropTotals{};
+    std::array<uint32, abandonReasonCount> abandonTotals{};
+    for (QuestRow const& row : rows)
+    {
+        for (size_t i = 0; i < dropReasonCount; ++i)
+            dropTotals[i] += row.counters.dropped[i];
+        for (size_t i = 0; i < abandonReasonCount; ++i)
+            abandonTotals[i] += row.counters.abandoned[i];
+    }
+
+    char stamp[32] = "";
+    std::time_t const now = std::time(nullptr);
+    if (std::tm const* utc = std::gmtime(&now))
+        std::strftime(stamp, sizeof(stamp), "%Y-%m-%dT%H:%M:%SZ", utc);
+
+    std::ostringstream out;
+    out << "{\n";
+    out << "  \"generatedAt\": " << static_cast<uint64>(now) << ",\n";
+    out << "  \"generatedAtUtc\": \"" << stamp << "\",\n";
+    out << "  \"totals\": {\n";
+    out << "    \"accepted\": " << total.questAccepted << ",\n";
+    out << "    \"completed\": " << total.questCompleted << ",\n";
+    out << "    \"rewarded\": " << total.questRewarded << ",\n";
+    out << "    \"dropped\": " << total.questDropped << ",\n";
+    out << "    \"abandoned\": " << total.questAbandoned << "\n";
+    out << "  },\n";
+    out << "  \"dropReasons\": " << reasonsToJson(dropTotals, dropName) << ",\n";
+    out << "  \"abandonReasons\": " << reasonsToJson(abandonTotals, abandonName) << ",\n";
+    out << "  \"quests\": [\n";
+
+    for (size_t i = 0; i < rows.size(); ++i)
+    {
+        QuestRow const& row = rows[i];
+        Quest const* quest = sObjectMgr->GetQuestTemplate(row.questId);
+        uint32 dropped = 0;
+        uint32 abandoned = 0;
+        for (uint32 value : row.counters.dropped)
+            dropped += value;
+        for (uint32 value : row.counters.abandoned)
+            abandoned += value;
+
+        out << "    {\n";
+        out << "      \"id\": " << row.questId << ",\n";
+        out << "      \"name\": \"" << JsonEscape(quest ? quest->GetTitle() : "Unknown Quest") << "\",\n";
+        out << "      \"accepted\": " << row.counters.accepted << ",\n";
+        out << "      \"completed\": " << row.counters.completed << ",\n";
+        out << "      \"rewarded\": " << row.counters.rewarded << ",\n";
+        out << "      \"dropped\": " << dropped << ",\n";
+        out << "      \"abandoned\": " << abandoned << ",\n";
+        out << "      \"dropReasons\": " << reasonsToJson(row.counters.dropped, dropName) << ",\n";
+        out << "      \"abandonReasons\": " << reasonsToJson(row.counters.abandoned, abandonName) << "\n";
+        out << "    }" << (i + 1 < rows.size() ? "," : "") << "\n";
+    }
+
+    out << "  ]\n";
+    out << "}\n";
+
+    WriteJsonFile(LogsJsonPath("playerbots_quest_stats.json"), out.str(), "Quest stats");
 }
 
 double RandomPlayerbotMgr::GetBuyMultiplier(Player* bot)
