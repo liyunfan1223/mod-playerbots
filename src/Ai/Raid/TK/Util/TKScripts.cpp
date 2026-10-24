@@ -35,7 +35,7 @@ public:
         if (!target)
             return;
 
-        auto& orbs = voidReaverArcaneOrbs[caster->GetInstanceId()];
+        auto& orbs = TkState(caster->GetInstanceId()).voidReaverArcaneOrbs;
         uint32 const now = getMSTime();
 
         ArcaneOrbData orbData;

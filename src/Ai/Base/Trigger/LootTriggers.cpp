@@ -14,33 +14,34 @@ bool LootAvailableTrigger::IsActive()
     if (!AI_VALUE(bool, "has available loot"))
         return false;
 
-    bool distanceCheck = false;
-    if (botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT))
-    {
-        distanceCheck =
-            ServerFacade::instance().IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"), CONTACT_DISTANCE);
-    }
-    else
-    {
-        distanceCheck = ServerFacade::instance().IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "loot target"),
-                                                                 INTERACTION_DISTANCE - 2.0f);
-    }
-
-    // Loot target in range, or no hostile targets to deal with first.
-    if (distanceCheck || AI_VALUE(GuidVector, "all targets").empty())
+    LootObject lootTarget = AI_VALUE(LootObject, "loot target");
+    if (lootTarget.IsEmpty())
         return true;
 
-    LootObject lootTarget = AI_VALUE(LootObject, "loot target");
-    return !lootTarget.IsEmpty() && !lootTarget.IsLootPossible(bot);
+    // A different nearest entry may be worth switching to; LootAction::isUseful applies the margin.
+    if (AI_VALUE(LootObject, "nearest loot").guid != lootTarget.guid)
+        return true;
+
+    bool const inRange = botAI->HasStrategy("stay", BOT_STATE_NON_COMBAT)
+                             ? ServerFacade::instance().IsDistanceLessOrEqualThan(
+                                   AI_VALUE2(float, "distance", "loot target"), CONTACT_DISTANCE)
+                             : AI_VALUE(bool, "can loot");
+    if (inRange || !AI_VALUE(LootObjectStack*, "available loot")->CanAttemptLoot(lootTarget.guid) ||
+        !lootTarget.IsLootPossible(bot))
+        return true;
+
+    // No hostile targets to deal with first. Last because "all targets" is an uncached grid search.
+    return AI_VALUE(GuidVector, "all targets").empty();
 }
 
 bool FarFromCurrentLootTrigger::IsActive()
 {
     LootObject loot = AI_VALUE(LootObject, "loot target");
-    if (!loot.IsLootPossible(bot))
+    if (loot.IsEmpty() || AI_VALUE(bool, "can loot") ||
+        !AI_VALUE(LootObjectStack*, "available loot")->CanAttemptLoot(loot.guid))
         return false;
 
-    return AI_VALUE2(float, "distance", "loot target") >= INTERACTION_DISTANCE - 2.0f;
+    return loot.IsLootPossible(bot);
 }
 
 bool CanLootTrigger::IsActive() { return AI_VALUE(bool, "can loot"); }

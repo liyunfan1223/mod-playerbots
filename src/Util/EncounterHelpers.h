@@ -10,7 +10,9 @@
 #include "Common.h"
 #include "Position.h"
 #include <initializer_list>
+#include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 class Action;
@@ -55,6 +57,26 @@ uint32 GetSelfImmunitySpell(Player* bot);
 bool IsDpsCooldownAction(Player* bot, Action* action);
 bool IsTauntAction(Player* bot, Action* action);
 bool IsAoeThreatAction(Player* bot, Action* action);
+
+// Sets the field if it is empty. Returns true if it did.
+template <typename T, typename U>
+bool EmplaceIfUnset(std::optional<T>& field, U&& value)
+{
+    if (field)
+        return false;
+
+    field.emplace(std::forward<U>(value));
+    return true;
+}
+
+// Clears the field. Returns true if it had a value.
+template <typename T>
+bool ResetIfSet(std::optional<T>& field)
+{
+    bool const wasSet = field.has_value();
+    field.reset();
+    return wasSet;
+}
 
 }
 

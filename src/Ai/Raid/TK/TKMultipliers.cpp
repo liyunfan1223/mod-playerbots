@@ -244,9 +244,9 @@ float KaelthasSunstriderWaitForDpsMultiplier::GetValueInEncounter(Action* action
         return 1.0f;
 
     constexpr uint32 dpsWaitMs = 10 * IN_MILLISECONDS;
-    auto it = advisorDpsWaitTimer.find(kaelthas->GetInstanceId());
-    if (it != advisorDpsWaitTimer.end() && it->second != ADVISOR_DPS_WAIT_NOT_STARTED &&
-        getMSTimeDiff(it->second, getMSTime()) >= dpsWaitMs)
+    std::optional<uint32> const& waitStart = TkState(kaelthas->GetInstanceId()).advisorDpsWaitTimer;
+    if (waitStart && *waitStart != ADVISOR_DPS_WAIT_NOT_STARTED &&
+        getMSTimeDiff(*waitStart, getMSTime()) >= dpsWaitMs)
     {
         return 1.0f;
     }

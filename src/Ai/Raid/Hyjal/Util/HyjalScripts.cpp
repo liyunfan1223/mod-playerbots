@@ -85,7 +85,7 @@ public:
         if (!target)
             return;
 
-        archimondeAirBurstTargets[caster->GetInstanceId()] =
+        HyjalState(caster->GetInstanceId()).archimondeAirBurstTarget =
             AirBurstData{ target->GetGUID(), getMSTime() };
 
         Map::PlayerList const& players = caster->GetMap()->GetPlayers();

@@ -12,9 +12,34 @@
 #include "HyjalHelpers.h"
 #include "ReachTargetActions.h"
 #include "ShamanActions.h"
+#include "ThreatManager.h"
 
 using namespace HyjalHelpers;
 using namespace EncounterHelpers;
+
+namespace
+{
+
+bool IsHyjalBoss(uint32 entry)
+{
+    return entry == Id(HyjalNpcs::NPC_RAGE_WINTERCHILL) || entry == Id(HyjalNpcs::NPC_ANETHERON) ||
+        entry == Id(HyjalNpcs::NPC_KAZROGAL) || entry == Id(HyjalNpcs::NPC_AZGALOR) ||
+        entry == Id(HyjalNpcs::NPC_ARCHIMONDE);
+}
+
+Unit* GetHyjalBoss(Player* bot)
+{
+    for (auto const& [guid, ref] : bot->GetThreatMgr().GetThreatenedByMeList())
+    {
+        Unit* unit = ref->GetOwner();
+        if (unit && IsHyjalBoss(unit->GetEntry()))
+            return unit;
+    }
+
+    return nullptr;
+}
+
+}
 
 // Note: BOT_STATE_NON_COMBAT checks cannot be used by any multiplier that could result in a bot
 // having no valid targets, as it will then swap to the non-combat engine, even during a boss fight.
@@ -32,7 +57,7 @@ float HyjalDelayDpsCooldownsMultiplier::GetValue(Action* action)
         return 1.0f;
 
     // Suppress Bloodlust/Heroism during all trash waves. It's blown on CD otherwise.
-    Unit* boss = AI_VALUE(Unit*, "boss target");
+    Unit* boss = GetHyjalBoss(bot);
     if (!boss)
     {
         return bot->getClass() == CLASS_SHAMAN &&
@@ -57,9 +82,13 @@ float HyjalDisableDisperseAndTankFaceMultiplier::GetValueInEncounter(Action* act
     if (HasProtectionOfElune(bot))
         return 1.0f;
 
-    return AI_VALUE2(Unit*, "find target", "archimonde") ||
-        AI_VALUE2(Unit*, "find target", "kaz'rogal") ||
-        AI_VALUE2(Unit*, "find target", "rage winterchill") ? 0.0f : 1.0f;
+    Unit* boss = GetHyjalBoss(bot);
+    if (!boss)
+        return 1.0f;
+
+    uint32 const bossEntry = boss->GetEntry();
+    return bossEntry == Id(HyjalNpcs::NPC_ARCHIMONDE) || bossEntry == Id(HyjalNpcs::NPC_KAZROGAL) ||
+        bossEntry == Id(HyjalNpcs::NPC_RAGE_WINTERCHILL) ? 0.0f : 1.0f;
 }
 
 // Rage Winterchill
