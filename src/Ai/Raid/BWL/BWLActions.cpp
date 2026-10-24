@@ -297,6 +297,14 @@ bool BwlUseHourglassSandAction::Execute(Event /*event*/)
     return botAI->CastSpell(static_cast<uint32>(BlackwingLairSpells::SPELL_HOURGLASS_SAND), bot);
 }
 
+// Nefarian
+
+bool BwlNefarianKillCorruptedTotemAction::Execute(Event /*event*/)
+{
+    Unit* totem = FindCorruptedTotem(botAI);
+    return totem && Attack(totem);
+}
+
 // Trash
 
 static constexpr float WYRMGUARD_SAFE_DISTANCE = 16.0f;

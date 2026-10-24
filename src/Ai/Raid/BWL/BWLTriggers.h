@@ -91,6 +91,16 @@ public:
     bool IsActive() override;
 };
 
+class BwlNefarianCorruptedTotemTrigger : public Trigger
+{
+public:
+    BwlNefarianCorruptedTotemTrigger(PlayerbotAI* botAI)
+        : Trigger(botAI, "bwl nefarian corrupted totem", 1 * IN_MILLISECONDS)
+    {
+    }
+    bool IsActive() override;
+};
+
 // Trash
 
 class BwlDeathTalonWyrmguardTankTrigger : public Trigger

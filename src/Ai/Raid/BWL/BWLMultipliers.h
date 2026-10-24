@@ -33,4 +33,20 @@ public:
     float GetValue(Action* action) override;
 };
 
+class NefarianCorruptedHealingMultiplier : public Multiplier
+{
+public:
+    NefarianCorruptedHealingMultiplier(
+        PlayerbotAI* botAI) : Multiplier(botAI, "nefarian corrupted healing multiplier") {}
+    float GetValue(Action* action) override;
+};
+
+class NefarianCorruptedTotemMultiplier : public Multiplier
+{
+public:
+    NefarianCorruptedTotemMultiplier(
+        PlayerbotAI* botAI) : Multiplier(botAI, "nefarian corrupted totem multiplier") {}
+    float GetValue(Action* action) override;
+};
+
 #endif

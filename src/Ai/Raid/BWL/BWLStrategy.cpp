@@ -53,6 +53,8 @@ void RaidBwlStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         NextAction("bwl nefarian rear flank", ACTION_MOVE + 4) }));
     triggers.push_back(new TriggerNode("bwl nefarian wild magic", {
         NextAction("ice block", ACTION_RAID) }));
+    triggers.push_back(new TriggerNode("bwl nefarian corrupted totem", {
+        NextAction("bwl nefarian kill corrupted totem", ACTION_RAID + 1) }));
 
     triggers.push_back(new TriggerNode("bwl death talon wyrmguard tank", {
         NextAction("bwl death talon wyrmguard tank move away", ACTION_RAID) }));
@@ -65,6 +67,8 @@ void RaidBwlStrategy::InitMultipliers(std::vector<Multiplier*>& multipliers)
     multipliers.push_back(new RazorgoreTankMultiplier(botAI));
     multipliers.push_back(new VaelastraszTankMultiplier(botAI));
     multipliers.push_back(new VaelastraszBurningAdrenalineMultiplier(botAI));
+    multipliers.push_back(new NefarianCorruptedHealingMultiplier(botAI));
+    multipliers.push_back(new NefarianCorruptedTotemMultiplier(botAI));
 }
 
 void RaidBwlStrategy::AppendTargetExclusions(GuidSet& exclusions, TargetValueExclusionType type)
