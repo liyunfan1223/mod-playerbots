@@ -30,7 +30,7 @@ public:
             result = creature;
         }
         // neglect if victim is main tank, or no victim (for untauntable target)
-        if (Unit* victim = threatMgr->GetCurrentVictim())
+        if (Unit* victim = threatMgr->CanHaveThreatList() ? threatMgr->GetCurrentVictim() : creature->GetVictim())
         {
             if (victim->ToPlayer() && PlayerbotAI::IsMainTank(victim->ToPlayer()))
                 return;
