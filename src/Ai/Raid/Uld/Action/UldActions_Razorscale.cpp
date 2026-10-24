@@ -460,7 +460,7 @@ bool RazorscaleHarpoonAction::Execute(Event /*event*/)
     for (ObjectGuid const& guid : groupBots)
     {
         Player* member = ObjectAccessor::FindPlayer(guid);
-        if (member && member->IsAlive() && IsRazorscaleHarpoonCrew(botAI, member))
+        if (member && member->IsAlive() && IsRazorscaleHarpoonCrew(member))
         {
             float distance = member->GetDistance2d(closestHarpoon);
             if (distance < minDistance)
@@ -510,7 +510,7 @@ bool RazorscaleHarpoonAction::isUseful()
         return false;
 
     // Before the harpoon search: anyone else gets false whatever it finds.
-    if (!IsRazorscaleHarpoonCrew(botAI, bot))
+    if (!IsRazorscaleHarpoonCrew(bot))
         return false;
 
     return GetRazorscaleClosestReadyHarpoon(botAI) != nullptr;

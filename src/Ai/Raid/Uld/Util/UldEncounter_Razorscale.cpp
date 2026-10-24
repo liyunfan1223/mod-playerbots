@@ -418,7 +418,7 @@ RazorscaleScan& GetRazorscaleScan(PlayerbotAI* botAI)
     return *botAI->GetAiObjectContext()->GetValue<RazorscaleScan*>("razorscale scan")->Get();
 }
 
-bool IsRazorscaleHarpoonCrew(PlayerbotAI* botAI, Player* bot)
+bool IsRazorscaleHarpoonCrew(Player* bot)
 {
     return PlayerbotAI::IsRanged(bot) && PlayerbotAI::IsDps(bot) && !PlayerbotAI::IsHeal(bot);
 }

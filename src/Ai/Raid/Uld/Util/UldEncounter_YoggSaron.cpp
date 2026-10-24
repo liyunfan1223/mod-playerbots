@@ -2581,7 +2581,7 @@ bool YoggSaronWalkMakingProgress(PlayerbotAI* botAI, char const* node, Position 
     return !giveUp;
 }
 
-void YoggSaronReleaseStalledWalk(PlayerbotAI* botAI, char const* node, Position const& destination)
+void YoggSaronReleaseStalledWalk(PlayerbotAI* botAI)
 {
     Player* bot = botAI->GetBot();
 
@@ -3761,7 +3761,7 @@ bool YoggSaronIllusionHealerStation(PlayerbotAI* botAI, Position& station)
     return found;
 }
 
-Unit* YoggSaronPetFallbackTarget(PlayerbotAI* botAI, Creature* pet)
+Unit* YoggSaronPetFallbackTarget(Creature* pet)
 {
     if (!pet)
         return nullptr;
@@ -4571,7 +4571,6 @@ void YoggSaronNudgeDrainLifeKicker(PlayerbotAI* botAI)
 
         bool waiting = false;
         Player* pick = nullptr;
-        char const* pickSpell = nullptr;
         std::tuple<uint32, int32> pickKey;
         for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
@@ -4615,7 +4614,6 @@ void YoggSaronNudgeDrainLifeKicker(PlayerbotAI* botAI)
             if (!pick || key < pickKey)
             {
                 pick = member;
-                pickSpell = ready;
                 pickKey = key;
             }
         }

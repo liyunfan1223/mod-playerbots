@@ -550,7 +550,7 @@ bool FreyaTankAddsAction::ParkConservator(Unit* conservator)
     Unit* spore = botAI->GetUnit(parkedSpore);
     if (!spore || !spore->IsAlive())
     {
-        spore = GetFreyaConservatorSpore(botAI, conservator);
+        spore = GetFreyaConservatorSpore(conservator);
         parkedSpore = spore ? spore->GetGUID() : ObjectGuid::Empty;
     }
 

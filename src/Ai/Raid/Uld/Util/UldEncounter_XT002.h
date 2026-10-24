@@ -160,7 +160,7 @@ uint32 GetXT002HeartbreakSpellId(Player* bot);
 
 // This bot owns the Pummeller: the first assist tank, else the main tank once no second tank is left. Taunt
 // and target priority both read it, so they agree on who holds the add.
-bool IsXT002PummellerTank(PlayerbotAI* botAI, Player* bot);
+bool IsXT002PummellerTank(Player* bot);
 
 // Close enough to XT to engage; anything further is still at its toy pile. True without an XT, so the gate
 // never strands a bot with nothing to hit.
@@ -180,6 +180,6 @@ std::vector<Position> GetXT002OtherFormationSlots(Player* bot);
 
 // The parking grids this bot's role may drop a Void Zone in. The mover and the "am I in a lot" test both read
 // it, so they can't disagree.
-std::vector<XT002BombLot> GetXT002BombLots(PlayerbotAI* botAI, Player* bot);
+std::vector<XT002BombLot> GetXT002BombLots(Player* bot);
 
 #endif

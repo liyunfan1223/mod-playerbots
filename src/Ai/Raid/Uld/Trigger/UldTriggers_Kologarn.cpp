@@ -183,8 +183,8 @@ bool KologarnEyebeamTrigger::IsActive()
         return false;
 
     // The chased bot has to run whatever the range: the eye follows and will close on its own.
-    if (GetKologarnEyebeamChasing(botAI, bot))
+    if (GetKologarnEyebeamChasing(bot))
         return true;
 
-    return GetKologarnNearestEyebeam(botAI, bot, ULDUAR_KOLOGARN_EYEBEAM_REACT_RADIUS) != nullptr;
+    return GetKologarnNearestEyebeam(bot, ULDUAR_KOLOGARN_EYEBEAM_REACT_RADIUS) != nullptr;
 }

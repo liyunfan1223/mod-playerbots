@@ -92,7 +92,7 @@ uint32 GetXT002GravityBombSpellId(Player* bot)
     return sSpellMgr->GetSpellIdForDifficulty(SPELL_XT002_GRAVITY_BOMB, bot);
 }
 
-bool IsXT002PummellerTank(PlayerbotAI* botAI, Player* bot)
+bool IsXT002PummellerTank(Player* bot)
 {
     if (!PlayerbotAI::IsTank(bot))
         return false;
@@ -307,7 +307,7 @@ std::vector<Position> GetXT002OtherFormationSlots(Player* bot)
 
 // Melee get no northern lot: from their stack findSmoothPath refuses everything north of the boss line, and
 // the route that does path is longer than a carrier can run in 9 s. Their lot grows east instead.
-std::vector<XT002BombLot> GetXT002BombLots(PlayerbotAI* botAI, Player* bot)
+std::vector<XT002BombLot> GetXT002BombLots(Player* bot)
 {
     if (PlayerbotAI::IsMelee(bot))
         return {{ULDUAR_XT002_GRAVITY_BOMB_ORIGIN_MELEE, -1.0f, ULDUAR_XT002_BOMB_GRID_X_CELLS_MELEE}};

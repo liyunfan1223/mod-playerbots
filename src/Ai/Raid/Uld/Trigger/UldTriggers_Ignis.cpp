@@ -60,7 +60,7 @@ bool IgnisMainTankPositionTrigger::IsActive()
     if (!boss || boss->GetVictim() != bot)
         return false;
 
-    Position const spot = GetIgnisMainTankPosition(botAI, bot, boss);
+    Position const spot = GetIgnisMainTankPosition(bot, boss);
 
     return bot->GetExactDist2d(&spot) > ULDUAR_IGNIS_TANK_SPOT_TOLERANCE;
 }
@@ -75,7 +75,7 @@ bool IgnisConstructTankTrigger::IsActive()
     if (!IsIgnisEngaged(botAI))
         return false;
 
-    if (GetIgnisConstructTankIndex(botAI, bot) < 0)
+    if (GetIgnisConstructTankIndex(bot) < 0)
         return false;
 
     // The second tank only ever finds a construct once there is one the first is not already walking,

@@ -355,7 +355,7 @@ Player* GetHodirStormCloudCarrier(PlayerbotAI* botAI, Player* bot)
     return best;
 }
 
-bool GetHodirStormCloudRally(PlayerbotAI* botAI, Player* bot, Player* carrier, Position& out)
+bool GetHodirStormCloudRally(Player* bot, Player* carrier, Position& out)
 {
     if (!bot || !carrier)
         return false;
@@ -952,7 +952,7 @@ Player* GetHodirResistancePaladin(PlayerbotAI* /*botAI*/, Player* bot)
     return dps ? dps : healer;
 }
 
-bool IsHodirTrappedAllyBreaker(PlayerbotAI* botAI, Player* bot, Unit* block)
+bool IsHodirTrappedAllyBreaker(Player* bot, Unit* block)
 {
     if (!block)
         return false;

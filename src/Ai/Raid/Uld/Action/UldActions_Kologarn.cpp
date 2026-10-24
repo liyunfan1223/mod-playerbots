@@ -179,14 +179,14 @@ bool KologarnEyebeamAction::Execute(Event /*event*/)
 {
     // The chased bot outruns the eye (5.5 yd/s against 7.0) only while it keeps moving. Everyone else
     // just clears the 3 yd beam.
-    if (Unit* chasing = GetKologarnEyebeamChasing(botAI, bot))
+    if (Unit* chasing = GetKologarnEyebeamChasing(bot))
     {
         Position const step = GetKologarnEyebeamEscapeStep(bot, chasing);
         return MoveTo(bot->GetMapId(), step.GetPositionX(), step.GetPositionY(), step.GetPositionZ(), false, false,
                       false, false, MovementPriority::MOVEMENT_FORCED);
     }
 
-    Unit* eye = GetKologarnNearestEyebeam(botAI, bot, ULDUAR_KOLOGARN_EYEBEAM_REACT_RADIUS);
+    Unit* eye = GetKologarnNearestEyebeam(bot, ULDUAR_KOLOGARN_EYEBEAM_REACT_RADIUS);
     if (!eye)
         return false;
 

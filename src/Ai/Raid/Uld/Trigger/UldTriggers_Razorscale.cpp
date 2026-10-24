@@ -128,7 +128,7 @@ bool RazorscaleHarpoonAvailableTrigger::IsActive()
 
     // After UpdateBossAI(), which assigns the tank roles as a side effect. Nobody else fires one, so
     // nobody else needs the harpoon search.
-    if (!IsRazorscaleHarpoonCrew(botAI, bot))
+    if (!IsRazorscaleHarpoonCrew(bot))
         return false;
 
     return GetRazorscaleClosestReadyHarpoon(botAI) != nullptr;

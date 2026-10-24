@@ -308,7 +308,7 @@ Unit* GetIgnisAssignedScorchedGround(PlayerbotAI* /*botAI*/, WorldObject const* 
     return best;
 }
 
-int8 GetIgnisConstructTankIndex(PlayerbotAI* botAI, Player* bot)
+int8 GetIgnisConstructTankIndex(Player* bot)
 {
     // GetGroupAssistTank only ever hands back a member that passes IsTank, so a non-tank can skip its
     // group walk, and with it an IsTank talent scan of every human in the raid.
@@ -358,7 +358,7 @@ static RaidInstanceState<IgnisTankArcState> _ignisTankArcStates;
 
 static IgnisTankArcState& IgnisTankArcStateFor(Player* bot) { return _ignisTankArcStates.For(bot->GetInstanceId()); }
 
-Position GetIgnisMainTankPosition(PlayerbotAI* botAI, Player* bot, Unit* boss)
+Position GetIgnisMainTankPosition(Player* bot, Unit* boss)
 {
     IgnisTankArcState& state = IgnisTankArcStateFor(bot);
 

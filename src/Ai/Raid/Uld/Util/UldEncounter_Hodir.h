@@ -295,7 +295,7 @@ Player* GetHodirStormCloudCarrier(PlayerbotAI* botAI, Player* bot);
 
 // The one point a carry gathers on, for carrier and receivers alike. Latched per instance on the
 // carrier's aura apply time, since the carrier's position seeds it and keeps moving.
-bool GetHodirStormCloudRally(PlayerbotAI* botAI, Player* bot, Player* carrier, Position& out);
+bool GetHodirStormCloudRally(Player* bot, Player* carrier, Position& out);
 
 // Tanks get a spot just past the hold point, ranged and healers a buff stand within walking reach if
 // there is one, melee nothing. Trigger and action both call this so they can't disagree.
@@ -336,7 +336,7 @@ Player* GetHodirResistancePaladin(PlayerbotAI* botAI, Player* bot);
 
 // True when this bot is one of the ULDUAR_HODIR_TRAPPED_ALLY_BREAKERS dps in range, ranked by guid.
 // By distance the set would reshuffle every tick and bots would flick between block and boss.
-bool IsHodirTrappedAllyBreaker(PlayerbotAI* botAI, Player* bot, Unit* block);
+bool IsHodirTrappedAllyBreaker(Player* bot, Unit* block);
 
 // The helper block this bot should break, or nullptr. Ranged only if there are any, mages first, one
 // budget over every block, none under ULDUAR_HODIR_LAST_WAVE_HEALTH_PCT.

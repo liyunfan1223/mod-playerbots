@@ -140,7 +140,7 @@ bool XT002PummellerTauntTrigger::IsActive()
     if (!GetXT002(botAI))
         return false;
 
-    if (!IsXT002PummellerTank(botAI, bot))
+    if (!IsXT002PummellerTank(bot))
         return false;
 
     // Taunt range, not the leash: this node sits at ACTION_RAID + 4, so firing it against an add the

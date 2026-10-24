@@ -180,7 +180,7 @@ private:
 RazorscaleScan& GetRazorscaleScan(PlayerbotAI* botAI);
 
 // Only a ranged dps ever fires a harpoon. IsRanged() is true for healers too, hence the IsHeal test.
-bool IsRazorscaleHarpoonCrew(PlayerbotAI* botAI, Player* bot);
+bool IsRazorscaleHarpoonCrew(Player* bot);
 
 // Closest harpoon to the bot (2D) that is built, unfired and off the local cooldown. A tie goes to
 // the earlier GetHarpoonData() entry. Null when none is ready.

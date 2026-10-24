@@ -566,7 +566,7 @@ bool YoggSaronPetGuardAction::Execute(Event /*event*/)
         else if (!touching && victim && victim->IsAlive() && victim->GetEntry() != NPC_CRUSHER_TENTACLE)
             elsewhere = victim;
         else
-            elsewhere = target ? target : YoggSaronPetFallbackTarget(botAI, pet);
+            elsewhere = target ? target : YoggSaronPetFallbackTarget(pet);
 
         // Passive pets only attack while this is set (PetAI::CanAttack).
         if (CharmInfo* charm = pet->GetCharmInfo())
@@ -1370,7 +1370,7 @@ bool YoggSaronIllusionRoomAction::WalkIntoRoom()
     if (!YoggSaronWalkMakingProgress(botAI, "illusion", destination))
         return false;
 
-    YoggSaronReleaseStalledWalk(botAI, "illusion", destination);
+    YoggSaronReleaseStalledWalk(botAI);
 
     return MoveTo(bot->GetMapId(), destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ(),
                   false, false, false, true, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -1384,7 +1384,7 @@ bool YoggSaronIllusionRoomAction::WalkToStage()
         return false;
 
     YoggSaronTakeOverForcedWalk(AI_VALUE(LastMovement&, "last movement"), spot);
-    YoggSaronReleaseStalledWalk(botAI, "stage", spot);
+    YoggSaronReleaseStalledWalk(botAI);
 
     return MoveTo(bot->GetMapId(), spot.GetPositionX(), spot.GetPositionY(), spot.GetPositionZ(), false, false, false,
                   true, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -1431,7 +1431,7 @@ bool YoggSaronIllusionHealerStationAction::Execute(Event /*event*/)
     if (!YoggSaronIllusionHealerStation(botAI, station))
         return false;
 
-    YoggSaronReleaseStalledWalk(botAI, "healer", station);
+    YoggSaronReleaseStalledWalk(botAI);
 
     return MoveTo(bot->GetMapId(), station.GetPositionX(), station.GetPositionY(), station.GetPositionZ(), false, false,
                   false, true, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -1449,7 +1449,7 @@ bool YoggSaronReprisalRegroupAction::Execute(Event /*event*/)
                         healer->GetPositionY() + std::sin(angle) * ULDUAR_YOGG_SARON_REPRISAL_REGROUP_STOP,
                         healer->GetPositionZ());
 
-    YoggSaronReleaseStalledWalk(botAI, "regroup", spot);
+    YoggSaronReleaseStalledWalk(botAI);
 
     return MoveTo(bot->GetMapId(), spot.GetPositionX(), spot.GetPositionY(), spot.GetPositionZ(), false, false, false,
                   true, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -1461,7 +1461,7 @@ bool YoggSaronBrainSpotAction::Execute(Event /*event*/)
 
     // A bot that landed just before the door opened is still booked on the walk to a tentacle across the room.
     YoggSaronTakeOverForcedWalk(AI_VALUE(LastMovement&, "last movement"), spot);
-    YoggSaronReleaseStalledWalk(botAI, "brainspot", spot);
+    YoggSaronReleaseStalledWalk(botAI);
 
     return MoveTo(bot->GetMapId(), spot.GetPositionX(), spot.GetPositionY(), spot.GetPositionZ(), false, false, false,
                   true, MovementPriority::MOVEMENT_FORCED, true, false);
@@ -1527,7 +1527,7 @@ bool YoggSaronMoveToExitPortalAction::Execute(Event /*event*/)
         YoggSaronTakeOverForcedWalk(AI_VALUE(LastMovement&, "last movement"), portal->GetPosition());
 
         // A spline that died reads as a duplicate of itself until the hold runs out.
-        YoggSaronReleaseStalledWalk(botAI, "exit", portal->GetPosition());
+        YoggSaronReleaseStalledWalk(botAI);
 
         MoveTo(bot->GetMapId(), portal->GetPositionX(), portal->GetPositionY(), portal->GetPositionZ(), false, false,
                false, true, MovementPriority::MOVEMENT_FORCED, true, false);

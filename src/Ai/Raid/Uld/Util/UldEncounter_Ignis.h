@@ -131,7 +131,7 @@ Unit* GetIgnisAssignedScorchedGround(PlayerbotAI* botAI, WorldObject const* from
 
 // 0 or 1 for the two assist tanks, -1 otherwise. Assist tanks only: a main tank kiting drags Ignis along, and a
 // DPS holding a Molten construct dies.
-int8 GetIgnisConstructTankIndex(PlayerbotAI* botAI, Player* bot);
+int8 GetIgnisConstructTankIndex(Player* bot);
 
 // By tank index, not distance: the anchor is nearly midway, so nearest-pool always picks the same one and both
 // constructs would shatter in one spot.
@@ -143,7 +143,7 @@ Position GetIgnisWaterApproach(Player* tank, Position const& pool);
 
 // Arc slot around the anchor, advanced on each Scorch while Ignis is rooted. `boss` is the caller's GetIgnis
 // result, so it isn't looked up twice.
-Position GetIgnisMainTankPosition(PlayerbotAI* botAI, Player* bot, Unit* boss);
+Position GetIgnisMainTankPosition(Player* bot, Unit* boss);
 
 // The 3 s window in which Ignis is rooted and rotation-locked. The patch lands when it ends.
 bool IsIgnisScorchWindow(Unit const* boss);

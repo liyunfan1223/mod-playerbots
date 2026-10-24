@@ -113,15 +113,6 @@ bool VezaxTakesSlot(Player* member)
     return member && PlayerbotAI::IsRanged(member) && !PlayerbotAI::IsMainTank(member);
 }
 
-uint8 VezaxManaPct(Player* bot)
-{
-    uint32 const maxMana = bot ? bot->GetMaxPower(POWER_MANA) : 0;
-    if (!maxMana)
-        return 0;
-
-    return static_cast<uint8>(bot->GetPower(POWER_MANA) * 100 / maxMana);
-}
-
 // The slot a bot dodges from, and the one that decides which side it carries a mark to. Both read the
 // assignment rather than where the bot currently stands, so a group keeps its shape.
 bool TryGetVezaxDodgeSlot(Player* bot, uint8& slotIndex)

@@ -163,7 +163,7 @@ bool XT002DebuffCarrierAction::InsideParkingLot() const
     // is what the carrier already tolerates as "on a cell".
     float const margin = ULDUAR_XT002_BOMB_CELL_REENGAGE;
 
-    for (XT002BombLot const& lot : GetXT002BombLots(botAI, bot))
+    for (XT002BombLot const& lot : GetXT002BombLots(bot))
     {
         float const originX = lot.origin.GetPositionX();
         float const originY = lot.origin.GetPositionY();
@@ -355,7 +355,7 @@ XT002DebuffCarrierAction::ParkResult XT002DebuffCarrierAction::ParkVoidZone(std:
 
     // Every lot the role owns goes into one pool. Ranged and healers have one on each side of the
     // formation, and the shortest-walk tie-break below is what sends a carrier to the near one.
-    for (XT002BombLot const& lot : GetXT002BombLots(botAI, bot))
+    for (XT002BombLot const& lot : GetXT002BombLots(bot))
     {
         for (int cell = 0; cell < lot.xCells * lot.yCells; ++cell)
         {
@@ -833,7 +833,7 @@ std::vector<std::pair<uint32, Unit*>> XT002SetDpsPriorityAction::BuildPriorityLi
 
         // Taunt reaches 30 yd and the toy piles are 80 yd out, so the add comes to the tank on XT. Only a tank with
         // someone else on the boss chases it.
-        if (IsXT002PummellerTank(botAI, bot) && PlayerbotAI::GetGroupTankNum(bot) > 1)
+        if (IsXT002PummellerTank(bot) && PlayerbotAI::GetGroupTankNum(bot) > 1)
             tankPriority.emplace_back(PB_NPC_XT002_PUMMELLER,
                                       SelectByEntry(currentTarget, PB_NPC_XT002_PUMMELLER, pummellers));
 

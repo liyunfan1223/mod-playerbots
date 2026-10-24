@@ -306,7 +306,7 @@ Unit* GetFreyaRangedLasherFocus(FreyaWaveState const& state);
 
 // The spore the Conservator is parked on. Keyed off the Conservator, never the caller, so the dragging tank and
 // the melee agree on it without talking.
-Unit* GetFreyaConservatorSpore(PlayerbotAI* botAI, Unit* conservator);
+Unit* GetFreyaConservatorSpore(Unit* conservator);
 
 // Melee get the parked spore, ranged and healers the nearest one with room. Trigger and action must both use
 // this, or a bot wakes for one spore and walks to another.

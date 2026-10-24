@@ -251,7 +251,7 @@ bool HodirCollectStormPowerTrigger::IsActive()
         return false;
 
     Position rally;
-    if (!GetHodirStormCloudRally(botAI, bot, carrier, rally))
+    if (!GetHodirStormCloudRally(bot, carrier, rally))
         return false;
 
     float const gap = bot->GetExactDist2d(&rally);

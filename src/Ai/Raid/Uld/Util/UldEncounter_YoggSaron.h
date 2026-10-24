@@ -755,7 +755,7 @@ bool ClaimYoggSaronSqueezeRescue(PlayerbotAI* botAI, Player* victim);
 
 // Somewhere other than a Crusher Tentacle for a pet to be, nearest first. nullptr when the pet has
 // nothing else within reach, which is the only case worth silencing it for.
-Unit* YoggSaronPetFallbackTarget(PlayerbotAI* botAI, Creature* pet);
+Unit* YoggSaronPetFallbackTarget(Creature* pet);
 
 // Phase 3: the leftover Corruptor or Constrictor every pet goes for, or nullptr: a holding Constrictor, then (no
 // Thorim) one a beacon heal reaches, then lowest health, then GUID. Skips any with a swinging Crusher in Crush range.
@@ -1206,8 +1206,8 @@ bool YoggSaronCrusherStunHolds(PlayerbotAI* botAI, Unit* crusher);
 bool YoggSaronWalkMakingProgress(PlayerbotAI* botAI, char const* node, Position const& destination);
 
 // Drops an unfinished MoveTo booking once the bot has stood still past WALK_STALL_MS. MoveTo refuses the point it
-// already issued for MaxWaitForMove (5 s) whether the bot still walks or not. `yogg.walkstep` counts how often.
-void YoggSaronReleaseStalledWalk(PlayerbotAI* botAI, char const* node, Position const& destination);
+// already issued for MaxWaitForMove (5 s) whether the bot still walks or not.
+void YoggSaronReleaseStalledWalk(PlayerbotAI* botAI);
 
 // Window in which a counterable fear can land, for the shared anti-fear component: only Malady of the Mind, cast in P2
 // but re-cast from the feared player on removal, so it can outlive P2. Deafening Roar in P3 is a silence.

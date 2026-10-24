@@ -105,8 +105,8 @@ Unit* GetKologarnDpsTarget(PlayerbotAI* botAI, Player* bot);
 Unit* GetKologarnOffTankTarget(PlayerbotAI* botAI, Player* bot);
 
 // The eye chasing this bot, if any. Bystanders get the nearest eye inside the react radius instead.
-Unit* GetKologarnEyebeamChasing(PlayerbotAI* botAI, Player* bot);
-Unit* GetKologarnNearestEyebeam(PlayerbotAI* botAI, Player* bot, float radius);
+Unit* GetKologarnEyebeamChasing(Player* bot);
+Unit* GetKologarnNearestEyebeam(Player* bot, float radius);
 
 // Held to the dead arm's side of the raid, never behind it: -X is the lane an eyebeam target runs down.
 Position GetKologarnRubbleHoldSpot(PlayerbotAI* botAI, Unit* rubble);

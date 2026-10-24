@@ -305,7 +305,7 @@ Unit* HodirSetDpsPriorityAction::ResolveTarget()
         if (bot->GetExactDist2d(unit) > ULDUAR_HODIR_TRAPPED_ALLY_RANGE)
             continue;
 
-        if (!IsHodirTrappedAllyBreaker(botAI, bot, unit))
+        if (!IsHodirTrappedAllyBreaker(bot, unit))
             continue;
 
         // Sticky: switch only when another is clearly closer, or two bots standing either side of a
@@ -386,7 +386,7 @@ Unit* HodirRedirectThreatAction::GetThreatDumpTarget() { return GetHodir(botAI);
 bool HodirSpreadStormCloudAction::Execute(Event /*event*/)
 {
     Position rally;
-    if (!GetHodirStormCloudRally(botAI, bot, bot, rally))
+    if (!GetHodirStormCloudRally(bot, bot, rally))
         return false;
 
     // Holding still is the job: Storm Power pulses 3 yd round the carrier, so a walking carrier spends its
@@ -402,7 +402,7 @@ bool HodirCollectStormPowerAction::Execute(Event /*event*/)
         return false;
 
     Position rally;
-    if (!GetHodirStormCloudRally(botAI, bot, carrier, rally))
+    if (!GetHodirStormCloudRally(bot, carrier, rally))
         return false;
 
     // No cast break here, unlike the dodge and the shelter run: dropping a cast to walk 3 yd for a buff

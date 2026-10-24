@@ -285,7 +285,7 @@ Unit* GetFreyaLocalLasherTarget(PlayerbotAI* botAI, FreyaWaveState const& state,
     return selected;
 }
 
-Unit* GetFreyaConservatorSpore(PlayerbotAI* botAI, Unit* conservator)
+Unit* GetFreyaConservatorSpore(Unit* conservator)
 {
     if (!conservator || !conservator->IsAlive())
         return nullptr;
@@ -333,7 +333,7 @@ Unit* GetFreyaTargetSpore(PlayerbotAI* botAI)
     // Melee take the parked spore, not their own nearest. Anywhere else the DPS node drags them back out of the
     // aura to reach the boss, and the two nodes fight all wave.
     if (PlayerbotAI::IsMelee(bot))
-        if (Unit* parked = GetFreyaConservatorSpore(botAI, GetFreyaScanUnitByEntry(botAI, NPC_ANCIENT_CONSERVATOR)))
+        if (Unit* parked = GetFreyaConservatorSpore(GetFreyaScanUnitByEntry(botAI, NPC_ANCIENT_CONSERVATOR)))
             return parked;
 
     // Ranged and healers: nearest spore with room, since nearest outright piles them all on the melee spore. No

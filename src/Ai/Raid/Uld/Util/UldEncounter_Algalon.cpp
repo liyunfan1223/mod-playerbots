@@ -372,7 +372,7 @@ uint32 PendingPeriodicHp(Creature* star)
     return static_cast<uint32>(std::min<uint64>(pending, star->GetHealth()));
 }
 
-void ScanRoom(Player* bot, Creature* boss, AlgalonEncounterState& state, uint32 now)
+void ScanRoom(Creature* boss, AlgalonEncounterState& state, uint32 now)
 {
     std::vector<AlgalonScanUnit> const previousStars = std::move(state.stars);
     bool const hadWormHoles = state.wormHolesSeen;
@@ -708,7 +708,7 @@ bool SwapDue(AlgalonEncounterState const& state, Player* holder, Player* taker, 
 }
 
 // Raid warning to the humans only: bots read the encounter state, not chat.
-void SendAlgalonCall(Player* sender, char const* kind, std::string const& text)
+void SendAlgalonCall(Player* sender, std::string const& text)
 {
     PlayerbotAI* senderAI = GET_PLAYERBOT_AI(sender);
     if (!senderAI)
@@ -747,7 +747,7 @@ void CallHumanTank(Group* group, PlayerbotAI* botAI, Creature* boss, AlgalonEnco
             return;
 
         std::string const on = holder ? " he is on " + holder->GetName() : " he is loose";
-        SendAlgalonCall(sender, "loose", pickup->GetName() + ", taunt Algalon now:" + on);
+        SendAlgalonCall(sender, pickup->GetName() + ", taunt Algalon now:" + on);
         state.lastTankCallMs = now;
         return;
     }
@@ -759,9 +759,8 @@ void CallHumanTank(Group* group, PlayerbotAI* botAI, Creature* boss, AlgalonEnco
     if (!partner || IsBot(partner) || !CanStayOut(partner) || !SwapDue(state, holder, partner, now))
         return;
 
-    SendAlgalonCall(holder, "swap",
-                    partner->GetName() + ", taunt Algalon now: " + holder->GetName() + " has " +
-                        std::to_string(GetAlgalonPhasePunchStacks(holder)) + " Phase Punch stacks");
+    SendAlgalonCall(holder, partner->GetName() + ", taunt Algalon now: " + holder->GetName() + " has " +
+                                std::to_string(GetAlgalonPhasePunchStacks(holder)) + " Phase Punch stacks");
     state.lastTankCallMs = now;
 }
 
@@ -786,7 +785,7 @@ void CallBigBang(Group* group, Creature* boss, AlgalonEncounterState& state, boo
         if (soaker && holder && holder != soaker && !IsBot(holder) && state.swapPair.count(holder->GetGUID()))
             stays = holder->GetName() + ", hide too: " + soaker->GetName() + " takes it. Everyone else";
 
-        SendAlgalonCall(tracker, "bigbang", "Big Bang in 8 s: " + stays + ", get next to a black hole");
+        SendAlgalonCall(tracker, "Big Bang in 8 s: " + stays + ", get next to a black hole");
         return;
     }
 
@@ -796,7 +795,7 @@ void CallBigBang(Group* group, Creature* boss, AlgalonEncounterState& state, boo
 
     state.bigBangHideCalled = true;
     std::string const who = soaker ? "everyone but " + soaker->GetName() + " into" : std::string("into");
-    SendAlgalonCall(tracker, "hide", "Big Bang: " + who + " a black hole NOW and stay in it until it lands");
+    SendAlgalonCall(tracker, "Big Bang: " + who + " a black hole NOW and stay in it until it lands");
 }
 
 // Not onto a loose boss, whose next swing lands on whoever is nearest, unless nobody ever picks him up.
@@ -1353,8 +1352,6 @@ uint32 RaidUnderExplosionLine(Player* bot, Group* group, Hit hit)
 
     return under;
 }
-
-uint32 RaidUnderExplosionLine(Player* bot, Group* group) { return RaidUnderExplosionLine(bot, group, CanStayOut); }
 
 // Phased members too: they are back long before a kill lands, and left out, the gate opened 1.6 s after a Big Bang
 // hit with the raid still drained by the void.
@@ -2436,7 +2433,7 @@ void ReleaseUnderStar(AlgalonEncounterState& state, AlgalonScanUnit const& star)
 
 // Plans under the next cast every star the drain can kill in its window, if the team has time for the work.
 // Disperser only: a tank would take each explosion whole. A planned star stays planned; frozen through the cast.
-void PlanUnderStars(Group* group, AlgalonEncounterState& state, uint32 now)
+void PlanUnderStars(AlgalonEncounterState& state, uint32 now)
 {
     if (UnderFrozen(state, now))
     {
@@ -2729,7 +2726,7 @@ void AlgalonTickEncounterState(PlayerbotAI* botAI)
     EnsureAlgalonSlotAssignments(bot, *state);
 
     if (boss->IsInCombat())
-        ScanRoom(bot, boss, *state, now);
+        ScanRoom(boss, *state, now);
 
     AlgalonPhase const phase = ReadPhase(boss, *state);
     state->phase = phase;
@@ -2850,7 +2847,7 @@ void AlgalonTickEncounterState(PlayerbotAI* botAI)
     state->shadowAuraPaladin = auraPaladin ? auraPaladin->GetGUID() : ObjectGuid::Empty;
 
     ElectStarTeam(bot, *state);
-    PlanUnderStars(group, *state, now);
+    PlanUnderStars(*state, now);
 
     if (AlgalonScanUnit const* focus = FindScanned(state->stars, state->focusStar))
         if (focus->lossMeasured && focus->lossPctPerSec >= ULDUAR_ALGALON_STAR_KILL_MEASURED_PCT_PER_SEC)

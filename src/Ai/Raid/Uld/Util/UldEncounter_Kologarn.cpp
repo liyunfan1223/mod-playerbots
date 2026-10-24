@@ -168,7 +168,7 @@ Unit* GetKologarnOffTankTarget(PlayerbotAI* botAI, Player* bot)
     return kologarn;
 }
 
-Unit* GetKologarnNearestEyebeam(PlayerbotAI* botAI, Player* bot, float radius)
+Unit* GetKologarnNearestEyebeam(Player* bot, float radius)
 {
     if (!bot)
         return nullptr;
@@ -199,14 +199,14 @@ Unit* GetKologarnNearestEyebeam(PlayerbotAI* botAI, Player* bot, float radius)
     return best;
 }
 
-Unit* GetKologarnEyebeamChasing(PlayerbotAI* botAI, Player* bot)
+Unit* GetKologarnEyebeamChasing(Player* bot)
 {
     if (!bot)
         return nullptr;
 
     // The eye MoveChases its summoner, so its victim is the spell target. It can still be closing from
     // past the react radius, so this sweeps the whole room.
-    Unit* eye = GetKologarnNearestEyebeam(botAI, bot, ULDUAR_KOLOGARN_ROOM_SEARCH_RADIUS);
+    Unit* eye = GetKologarnNearestEyebeam(bot, ULDUAR_KOLOGARN_ROOM_SEARCH_RADIUS);
     return eye && eye->GetVictim() == bot ? eye : nullptr;
 }
 

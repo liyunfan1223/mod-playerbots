@@ -1818,7 +1818,7 @@ namespace
 
 // From the latched squad, dead included, so a death never renumbers the formation. Shared by the ring
 // and the Charge Orb dodge so the two agree on slots.
-bool ThorimArenaRingOrder(PlayerbotAI* botAI, Player* bot, size_t& slot, size_t& total)
+bool ThorimArenaRingOrder(Player* bot, size_t& slot, size_t& total)
 {
     Group* group = bot->GetGroup();
     ThorimEncounterState const* state = FindState(bot);
@@ -1888,11 +1888,11 @@ bool ThorimSettleArenaPoint(Player* bot, Position& spot)
            ULDUAR_THORIM_ARENA_LEASH_RADIUS;
 }
 
-bool GetThorimArenaRingSlot(PlayerbotAI* botAI, Player* bot, Position& out)
+bool GetThorimArenaRingSlot(Player* bot, Position& out)
 {
     size_t slot = 0;
     size_t total = 0;
-    if (!ThorimArenaRingOrder(botAI, bot, slot, total))
+    if (!ThorimArenaRingOrder(bot, slot, total))
         return false;
 
     // Bearing from the gate to the centre, so slot 0 lands on the far side of the room from the
@@ -1984,7 +1984,7 @@ bool GetThorimArenaAnchor(PlayerbotAI* botAI, Player* bot, Position& out)
     }
     else if (PlayerbotAI::IsRanged(bot))
     {
-        if (!GetThorimArenaRingSlot(botAI, bot, out))
+        if (!GetThorimArenaRingSlot(bot, out))
             return false;
     }
     // Melee form up on the tank spot before the pull, then run free in combat on the 24 yd leash.
