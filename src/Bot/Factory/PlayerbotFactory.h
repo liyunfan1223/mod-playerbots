@@ -190,6 +190,7 @@ private:
     bool InitTailoringSpecialization();
     bool InitBlacksmithingSpecialization();
     void UpdateTradeSkills();
+    uint32 GetClassSpecProbability(uint32 cls, uint32 specIndex, uint32 currentLevel);
     void SetRandomSkill(uint16 id);
     void ClearSpells();
     void ClearSkills();

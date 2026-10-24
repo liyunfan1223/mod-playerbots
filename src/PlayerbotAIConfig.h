@@ -287,6 +287,8 @@ public:
     // std::string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
     // ClassSpecs classSpecs[MAX_CLASSES];
 
+    bool BotAdaptiveTalents;
+
     std::string PremadeSpecName[MAX_CLASSES][MAX_SPECNO];
     std::string PremadeSpecGlyph[MAX_CLASSES][MAX_SPECNO];
     std::vector<uint32> ParsedSpecGlyph[MAX_CLASSES][MAX_SPECNO];
@@ -294,7 +296,7 @@ public:
     std::string PremadeHunterPetLink[3][21];
     std::vector<std::vector<uint32>> ParsedSpecLinkOrder[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
     std::vector<std::vector<uint32>> ParsedHunterPetLinkOrder[3][21];
-    uint32 RandomClassSpecProb[MAX_CLASSES][MAX_SPECNO];
+    uint32 RandomClassSpecProb[MAX_CLASSES][MAX_SPECNO][MAX_LEVEL];
     uint32 RandomClassSpecIndex[MAX_CLASSES][MAX_SPECNO];
 
     std::string CommandPrefix, CommandSeparator;

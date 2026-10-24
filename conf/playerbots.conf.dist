@@ -39,19 +39,8 @@
 #        TELEPORTS
 #        BATTLEGROUND & ARENA & PVP
 #        RANDOMBOT TIMING AND BEHAVIOR
-#    PREMADE SPECS
+#    PREMADE SPECS & RANDOMBOT DEFAULT TALENT SPECS
 #        INFORMATION
-#        WARRIOR
-#        PALADIN
-#        HUNTER
-#        ROGUE
-#        PRIEST
-#        DEATH KNIGHT
-#        SHAMAN
-#        MAGE
-#        WARLOCK
-#        DRUID
-#    RANDOMBOT DEFAULT TALENT SPECS
 #        WARRIOR
 #        PALADIN
 #        HUNTER
@@ -1815,11 +1804,22 @@ Playerbots.PermanentlyInWorldTime = 31104000
 #
 ####################################################################################################
 
-###################################
-#                                 #
-# PREMADE SPECS                   #
-#                                 #
-###################################
+#########################################################
+#                                                       #
+# PREMADE SPECS & RANDOMBOT DEFAULT TALENT SPECS        #
+#                                                       #
+#########################################################
+
+# Playerbots.BotAdaptiveTalents.
+# When enabled: Bots do a full respec at 60, 61, 70, 71 and 80. And have a chance to select a new spec.
+# Frost Mage, might spec Fire. Holy Priest might spec Shadow etc.
+
+# When disabled: Chooses a spec when bot is created and increments on it.
+# The bots do however reset talents when a new talent bracket is available, but still selects the same spec
+# A fire mage, will always be fire for example.
+# Default: 0
+
+Playerbots.BotAdaptiveTalents = 0
 
 ####################################################################################################
 # INFORMATION
@@ -1831,38 +1831,126 @@ Playerbots.PermanentlyInWorldTime = 31104000
 # e.g., formulate the link on https://www.wowhead.com/wotlk/talent-calc/warrior/3022032123335100202012013031251-32505010002
 # 0 <= specno < 20, 1 <= level <= 80
 
+# Playerbots.RandomClassSpecProb.<class>.<specno>.<level>  # The probability to choose the spec
+# Playerbots.RandomClassSpecIndex.<class>.<specno> # The spec index in PremadeSpec
+
+# Examples - With the default configuration:
+# When leveling 10-59, bots will choose .59 spec.
+# When leveling 60, bots will choose .60 spec.
+# When leveling 61-69, bots will choose .69 spec.
+# When leveling 70, bots will choose .70 spec.
+# When leveling 71, bots will choose .79 spec.
+# When leveling 80, bots will choose .80 spec.
 #
 #
 ####################################################################################################
+
 
 ####################################################################################################
 # WARRIOR
 #
 
+# ARMS PVE
 Playerbots.PremadeSpecName.1.0 = arms pve
+Playerbots.RandomClassSpecIndex.1.0 = 0
 Playerbots.PremadeSpecGlyph.1.0 = 43418,43395,43423,43399,43397,43421
+
 Playerbots.PremadeSpecLink.1.0.60 = 3022032023335100002012211231241
+Playerbots.RandomClassSpecProb.1.0.59 = 55
+Playerbots.RandomClassSpecProb.1.0.60 = 25
+
+Playerbots.PremadeSpecLink.1.0.70 = 3022302023335100202012210231251-305
+Playerbots.RandomClassSpecProb.1.0.69 = 45
+Playerbots.RandomClassSpecProb.1.0.70 = 35
+
 Playerbots.PremadeSpecLink.1.0.80 = 3022032023335100102012213231251-305-2033
+Playerbots.RandomClassSpecProb.1.0.79 = 40
+Playerbots.RandomClassSpecProb.1.0.80 = 20
+
+# FURY PVE
 Playerbots.PremadeSpecName.1.1 = fury pve
+Playerbots.RandomClassSpecIndex.1.1 = 1
 Playerbots.PremadeSpecGlyph.1.1 = 43418,43395,43414,43396,49084,43432
+
 Playerbots.PremadeSpecLink.1.1.60 = -305053000500310053120501351
+Playerbots.RandomClassSpecProb.1.1.59 = 35
+Playerbots.RandomClassSpecProb.1.1.60 = 60
+
+Playerbots.PremadeSpecLink.1.1.70 = 2-305053000500310053120501351-2033
+Playerbots.RandomClassSpecProb.1.1.69 = 45
+Playerbots.RandomClassSpecProb.1.1.70 = 25
+
 Playerbots.PremadeSpecLink.1.1.80 = 32002300233-305053000500310153120511351
+Playerbots.RandomClassSpecProb.1.1.79 = 40
+Playerbots.RandomClassSpecProb.1.1.80 = 50
+
+# PROT PVE
 Playerbots.PremadeSpecName.1.2 = prot pve
+Playerbots.RandomClassSpecIndex.1.2 = 2
 Playerbots.PremadeSpecGlyph.1.2 = 43429,43397,43425,43399,49084,45797
+
 Playerbots.PremadeSpecLink.1.2.60 = --053351225000210521030113321
+Playerbots.RandomClassSpecProb.1.2.59 = 10
+Playerbots.RandomClassSpecProb.1.2.60 = 15
+
+Playerbots.PremadeSpecLink.1.2.70 = 05-302-053351225000012521030113321
+Playerbots.RandomClassSpecProb.1.2.69 = 10
+Playerbots.RandomClassSpecProb.1.2.70 = 40
+
 Playerbots.PremadeSpecLink.1.2.80 = 3500030023-301-053351225000210521030113321
+Playerbots.RandomClassSpecProb.1.2.79 = 20
+Playerbots.RandomClassSpecProb.1.2.80 = 30
+
+# ARMS PVP
 Playerbots.PremadeSpecName.1.3 = arms pvp
+Playerbots.RandomClassSpecIndex.1.3 = 3
 Playerbots.PremadeSpecGlyph.1.3 = 43417,43397,43423,43396,49084,43421
+
 Playerbots.PremadeSpecLink.1.3.60 = 0320232023331100032212012221251
+Playerbots.RandomClassSpecProb.1.3.59 = 0
+Playerbots.RandomClassSpecProb.1.3.60 = 0
+
+Playerbots.PremadeSpecLink.1.3.70 = 0320232023331100032212012221251-325
+Playerbots.RandomClassSpecProb.1.3.69 = 0
+Playerbots.RandomClassSpecProb.1.3.70 = 0
+
 Playerbots.PremadeSpecLink.1.3.80 = 0320332023335100232212013231251-3250001
+Playerbots.RandomClassSpecProb.1.3.79 = 0
+Playerbots.RandomClassSpecProb.1.3.80 = 0
+
+# FURY PVP
 Playerbots.PremadeSpecName.1.4 = fury pvp
+Playerbots.RandomClassSpecIndex.1.4 = 4
 Playerbots.PremadeSpecGlyph.1.4 = 43432,43397,43417,43395,43396,43418
+
 Playerbots.PremadeSpecLink.1.4.60 = -325000131500212250120511351
+Playerbots.RandomClassSpecProb.1.4.59 = 0
+Playerbots.RandomClassSpecProb.1.4.60 = 0
+
+Playerbots.PremadeSpecLink.1.4.70 = 032203-325000131500212250120511351
+Playerbots.RandomClassSpecProb.1.4.69 = 0
+Playerbots.RandomClassSpecProb.1.4.70 = 0
+
 Playerbots.PremadeSpecLink.1.4.80 = 03220300233-325000131500212250122511351
+Playerbots.RandomClassSpecProb.1.4.79 = 0
+Playerbots.RandomClassSpecProb.1.4.80 = 0
+
+# PROT PVP
 Playerbots.PremadeSpecName.1.5 = prot pvp
+Playerbots.RandomClassSpecIndex.1.5 = 5
 Playerbots.PremadeSpecGlyph.1.5 = 43425,43397,43415,43396,49084,45792
+
 Playerbots.PremadeSpecLink.1.5.60 = --250031220223012520332113321
+Playerbots.RandomClassSpecProb.1.5.59 = 0
+Playerbots.RandomClassSpecProb.1.5.60 = 0
+
+Playerbots.PremadeSpecLink.1.5.70 = 05023--250031220223012520332113321
+Playerbots.RandomClassSpecProb.1.5.69 = 0
+Playerbots.RandomClassSpecProb.1.5.70 = 0
+
 Playerbots.PremadeSpecLink.1.5.80 = 0502300123-3-250031220223012521332113321
+Playerbots.RandomClassSpecProb.1.5.79 = 0
+Playerbots.RandomClassSpecProb.1.5.80 = 0
 
 #
 #
@@ -1872,31 +1960,108 @@ Playerbots.PremadeSpecLink.1.5.80 = 0502300123-3-250031220223012521332113321
 # PALADIN
 #
 
+# HOLY PVE
 Playerbots.PremadeSpecName.2.0 = holy pve
+Playerbots.RandomClassSpecIndex.2.0 = 0
 Playerbots.PremadeSpecGlyph.2.0 = 41106,43367,45741,43368,43365,41109
+
 Playerbots.PremadeSpecLink.2.0.60 = 50350151020013053100515221
+Playerbots.RandomClassSpecProb.2.0.59 = 10
+Playerbots.RandomClassSpecProb.2.0.60 = 80
+
+Playerbots.PremadeSpecLink.2.0.70 = 50350151020013053100515221-5002-03
+Playerbots.RandomClassSpecProb.2.0.69 = 10
+Playerbots.RandomClassSpecProb.2.0.70 = 40
+
 Playerbots.PremadeSpecLink.2.0.80 = 50350152100013053100515221-50320104203
+Playerbots.RandomClassSpecProb.2.0.79 = 10
+Playerbots.RandomClassSpecProb.2.0.80 = 35
+
+# PROT PVE
 Playerbots.PremadeSpecName.2.1 = prot pve
+Playerbots.RandomClassSpecIndex.2.1 = 1
 Playerbots.PremadeSpecGlyph.2.1 = 41100,43367,43869,43368,43369,45745
+
 Playerbots.PremadeSpecLink.2.1.60 = -05005135203102311333112321
+Playerbots.RandomClassSpecProb.2.1.59 = 20
+Playerbots.RandomClassSpecProb.2.1.60 = 5
+
+Playerbots.PremadeSpecLink.2.1.70 = -05005135200132311333310321-5023
+Playerbots.RandomClassSpecProb.2.1.69 = 25
+Playerbots.RandomClassSpecProb.2.1.70 = 40
+
 Playerbots.PremadeSpecLink.2.1.80 = -05005135203102311333312321-502302012003
+Playerbots.RandomClassSpecProb.2.1.79 = 25
+Playerbots.RandomClassSpecProb.2.1.80 = 35
+
+# RET PVE
 Playerbots.PremadeSpecName.2.2 = ret pve
+Playerbots.RandomClassSpecIndex.2.2 = 2
 Playerbots.PremadeSpecGlyph.2.2 = 41092,43367,41099,43368,43340,43869
+
 Playerbots.PremadeSpecLink.2.2.60 = --05230051203331302133231131
+Playerbots.RandomClassSpecProb.2.2.59 = 70
+Playerbots.RandomClassSpecProb.2.2.60 = 15
+
 Playerbots.PremadeSpecLink.2.2.65 = -05-05230051203331302133231131
+Playerbots.PremadeSpecLink.2.2.70 = 01-05-05232051203331302133231331
+Playerbots.RandomClassSpecProb.2.2.69 = 65
+Playerbots.RandomClassSpecProb.2.2.70 = 20
+
 Playerbots.PremadeSpecLink.2.2.80 = 050501-05-05232051203331302133231331
+Playerbots.RandomClassSpecProb.2.2.79 = 65
+Playerbots.RandomClassSpecProb.2.2.80 = 30
+
+# HOLY PVP
 Playerbots.PremadeSpecName.2.3 = holy pvp
+Playerbots.RandomClassSpecIndex.2.3 = 3
 Playerbots.PremadeSpecGlyph.2.3 = 41110,43367,45746,43369,43365,45747
+
 Playerbots.PremadeSpecLink.2.3.60 = 50332150300013050133215221
+Playerbots.RandomClassSpecProb.2.3.59 = 0
+Playerbots.RandomClassSpecProb.2.3.60 = 0
+
+Playerbots.PremadeSpecLink.2.3.70 = 50332150300013050133315221-5032
+Playerbots.RandomClassSpecProb.2.3.69 = 0
+Playerbots.RandomClassSpecProb.2.3.70 = 0
+
 Playerbots.PremadeSpecLink.2.3.80 = 50332150300013050133315221-5032013122
+Playerbots.RandomClassSpecProb.2.3.79 = 0
+Playerbots.RandomClassSpecProb.2.3.80 = 0
+
+# PROT PVP
 Playerbots.PremadeSpecName.2.4 = prot pvp
+Playerbots.RandomClassSpecIndex.2.4 = 4
 Playerbots.PremadeSpecGlyph.2.4 = 41092,43367,41101,43369,43365,45745
+
 Playerbots.PremadeSpecLink.2.4.60 = -15320130223122311323311321
+Playerbots.RandomClassSpecProb.2.4.59 = 0
+Playerbots.RandomClassSpecProb.2.4.60 = 0
+
+Playerbots.PremadeSpecLink.2.4.70 = -15320130223122321333312321-0523
+Playerbots.RandomClassSpecProb.2.4.69 = 0
+Playerbots.RandomClassSpecProb.2.4.70 = 0
+
 Playerbots.PremadeSpecLink.2.4.80 = -15320130223122321333312321-052300502
+Playerbots.RandomClassSpecProb.2.4.79 = 0
+Playerbots.RandomClassSpecProb.2.4.80 = 0
+
+# RET PVP
 Playerbots.PremadeSpecName.2.5 = ret pvp
+Playerbots.RandomClassSpecIndex.2.5 = 5
 Playerbots.PremadeSpecGlyph.2.5 = 41095,43367,41102,43369,43365,45747
+
 Playerbots.PremadeSpecLink.2.5.60 = --05230250203331222133201321
+Playerbots.RandomClassSpecProb.2.5.59 = 0
+Playerbots.RandomClassSpecProb.2.5.60 = 0
+
+Playerbots.PremadeSpecLink.2.5.70 = -1531-05230250203331322133201321
+Playerbots.RandomClassSpecProb.2.5.69 = 0
+Playerbots.RandomClassSpecProb.2.5.70 = 0
+
 Playerbots.PremadeSpecLink.2.5.80 = -1532013022-05230250203331322133201321
+Playerbots.RandomClassSpecProb.2.5.79 = 0
+Playerbots.RandomClassSpecProb.2.5.80 = 0
 
 #
 #
@@ -1906,32 +2071,108 @@ Playerbots.PremadeSpecLink.2.5.80 = -1532013022-05230250203331322133201321
 # HUNTER
 #
 
+# BM PVE
 Playerbots.PremadeSpecName.3.0 = bm pve
+Playerbots.RandomClassSpecIndex.3.0 = 0
 Playerbots.PremadeSpecGlyph.3.0 = 42912,43350,42902,43351,43338,42914
+
 Playerbots.PremadeSpecLink.3.0.40 = 512002015051122301
 Playerbots.PremadeSpecLink.3.0.60 = 51200201505112233110531151
-Playerbots.PremadeSpecLink.3.0.80 = 51200201505112233111531351-0323031-5
-Playerbots.PremadeSpecName.3.1 = mm pve
-Playerbots.PremadeSpecGlyph.3.1 = 42912,43350,45625,43351,43338,42914
-Playerbots.PremadeSpecLink.3.1.60 = -035305101030013233115031151
-Playerbots.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
-Playerbots.PremadeSpecName.3.2 = surv pve
-Playerbots.PremadeSpecGlyph.3.2 = 45733,43350,45731,43351,43338,45732
-Playerbots.PremadeSpecLink.3.2.60 = --5000032500033330502135201311
-Playerbots.PremadeSpecLink.3.2.80 = -005305101-5000032500033330532135301321
-Playerbots.PremadeSpecName.3.3 = bm pvp
-Playerbots.PremadeSpecGlyph.3.3 = 42897,42900,42902,43356,43338,42900
-Playerbots.PremadeSpecLink.3.3.60 = 05203201505012233100531151
-Playerbots.PremadeSpecLink.3.3.80 = 05203201505012233100531351-005305101-03
-Playerbots.PremadeSpecName.3.4 = mm pvp
-Playerbots.PremadeSpecGlyph.3.4 = 42912,43351,42897,43338,43356,42904
-Playerbots.PremadeSpecLink.3.4.60 = -034305101030213231135031051
-Playerbots.PremadeSpecLink.3.4.80 = -035305101030213233135031051-53013020102
-Playerbots.PremadeSpecName.3.5 = surv pvp
-Playerbots.PremadeSpecGlyph.3.5 = 42912,43350,42904,43356,43338,45731
-Playerbots.PremadeSpecLink.3.5.60 = --2300302410233030533135001031
-Playerbots.PremadeSpecLink.3.5.80 = -005305201-2300302510233330533135001031
+Playerbots.RandomClassSpecProb.3.0.59 = 80
+Playerbots.RandomClassSpecProb.3.0.60 = 10
 
+Playerbots.PremadeSpecLink.3.0.70 = 51200201515012243100531351-035
+Playerbots.RandomClassSpecProb.3.0.69 = 75
+Playerbots.RandomClassSpecProb.3.0.70 = 75
+
+Playerbots.PremadeSpecLink.3.0.80 = 51200201505112233111531351-0323031-5
+Playerbots.RandomClassSpecProb.3.0.79 = 70
+Playerbots.RandomClassSpecProb.3.0.80 = 5
+
+# MM PVE
+Playerbots.PremadeSpecName.3.1 = mm pve
+Playerbots.RandomClassSpecIndex.3.1 = 1
+Playerbots.PremadeSpecGlyph.3.1 = 42912,43350,45625,43351,43338,42914
+
+Playerbots.PremadeSpecLink.3.1.60 = -035305101030013233115031151
+Playerbots.RandomClassSpecProb.3.1.59 = 15
+Playerbots.RandomClassSpecProb.3.1.60 = 75
+
+Playerbots.PremadeSpecLink.3.1.70 = 502-035305101030013233035031051-3
+Playerbots.RandomClassSpecProb.3.1.69 = 15
+Playerbots.RandomClassSpecProb.3.1.70 = 5
+
+Playerbots.PremadeSpecLink.3.1.80 = 502-035305101230013233135031351-5000002
+Playerbots.RandomClassSpecProb.3.1.79 = 15
+Playerbots.RandomClassSpecProb.3.1.80 = 65
+
+# SURV PVE
+Playerbots.PremadeSpecName.3.2 = surv pve
+Playerbots.RandomClassSpecIndex.3.2 = 2
+Playerbots.PremadeSpecGlyph.3.2 = 45733,43350,45731,43351,43338,45732
+
+Playerbots.PremadeSpecLink.3.2.60 = --5000032500033330502135201311
+Playerbots.RandomClassSpecProb.3.2.59 = 5
+Playerbots.RandomClassSpecProb.3.2.60 = 15
+
+Playerbots.PremadeSpecLink.3.2.70 = -0352-5000032500033330503135101311
+Playerbots.RandomClassSpecProb.3.2.69 = 10
+Playerbots.RandomClassSpecProb.3.2.70 = 20
+
+Playerbots.PremadeSpecLink.3.2.80 = -005305101-5000032500033330532135301321
+Playerbots.RandomClassSpecProb.3.2.79 = 15
+Playerbots.RandomClassSpecProb.3.2.80 = 30
+
+# BM PVP
+Playerbots.PremadeSpecName.3.3 = bm pvp
+Playerbots.RandomClassSpecIndex.3.3 = 3
+Playerbots.PremadeSpecGlyph.3.3 = 42897,42900,42902,43356,43338,42900
+
+Playerbots.PremadeSpecLink.3.3.60 = 05203201505012233100531151
+Playerbots.RandomClassSpecProb.3.3.59 = 0
+Playerbots.RandomClassSpecProb.3.3.60 = 0
+
+Playerbots.PremadeSpecLink.3.3.70 = 05203201505012233100531351-0352
+Playerbots.RandomClassSpecProb.3.3.69 = 0
+Playerbots.RandomClassSpecProb.3.3.70 = 0
+
+Playerbots.PremadeSpecLink.3.3.80 = 05203201505012233100531351-005305101-03
+Playerbots.RandomClassSpecProb.3.3.79 = 0
+Playerbots.RandomClassSpecProb.3.3.80 = 0
+
+# MM PVP
+Playerbots.PremadeSpecName.3.4 = mm pvp
+Playerbots.RandomClassSpecIndex.3.4 = 4
+Playerbots.PremadeSpecGlyph.3.4 = 42912,43351,42897,43338,43356,42904
+
+Playerbots.PremadeSpecLink.3.4.60 = -034305101030213231135031051
+Playerbots.RandomClassSpecProb.3.4.59 = 0
+Playerbots.RandomClassSpecProb.3.4.60 = 0
+
+Playerbots.PremadeSpecLink.3.4.70 = -035305101030213233135031051-5302
+Playerbots.RandomClassSpecProb.3.4.69 = 0
+Playerbots.RandomClassSpecProb.3.4.70 = 0
+
+Playerbots.PremadeSpecLink.3.4.80 = -035305101030213233135031051-53013020102
+Playerbots.RandomClassSpecProb.3.4.79 = 0
+Playerbots.RandomClassSpecProb.3.4.80 = 0
+
+# SURV PVP
+Playerbots.PremadeSpecName.3.5 = surv pvp
+Playerbots.RandomClassSpecIndex.3.5 = 5
+Playerbots.PremadeSpecGlyph.3.5 = 42912,43350,42904,43356,43338,45731
+
+Playerbots.PremadeSpecLink.3.5.60 = --2300302410233030533135001031
+Playerbots.RandomClassSpecProb.3.5.59 = 0
+Playerbots.RandomClassSpecProb.3.5.60 = 0
+
+Playerbots.PremadeSpecLink.3.5.70 = -0352-2300302510233330533135001031
+Playerbots.RandomClassSpecProb.3.5.69 = 0
+Playerbots.RandomClassSpecProb.3.5.70 = 0
+
+Playerbots.PremadeSpecLink.3.5.80 = -005305201-2300302510233330533135001031
+Playerbots.RandomClassSpecProb.3.5.79 = 0
+Playerbots.RandomClassSpecProb.3.5.80 = 0
 
 # HUNTER PET
 #
@@ -1953,30 +2194,107 @@ Playerbots.PremadeHunterPetLink.2.20 = 21000203300002110221
 # ROGUE
 #
 
+# AS PVE
 Playerbots.PremadeSpecName.4.0 = as pve
+Playerbots.RandomClassSpecIndex.4.0 = 0
 Playerbots.PremadeSpecGlyph.4.0 = 45768,43379,45761,43380,43378,45766
+
 Playerbots.PremadeSpecLink.4.0.60 = 005303104352100520103331051
+Playerbots.RandomClassSpecProb.4.0.59 = 15
+Playerbots.RandomClassSpecProb.4.0.60 = 15
+
+Playerbots.PremadeSpecLink.4.0.70 = 005303005352100520103331051-005-5
+Playerbots.RandomClassSpecProb.4.0.69 = 25
+Playerbots.RandomClassSpecProb.4.0.70 = 15
+
 Playerbots.PremadeSpecLink.4.0.80 = 005303005352100520103331051-005005003-502
+Playerbots.RandomClassSpecProb.4.0.79 = 30
+Playerbots.RandomClassSpecProb.4.0.80 = 45
+
+# COMBAT PVE (Sword)
 Playerbots.PremadeSpecName.4.1 = combat pve
+Playerbots.RandomClassSpecIndex.4.1 = 1
 Playerbots.PremadeSpecGlyph.4.1 = 42962,43379,45762,43380,43378,42969
+
 Playerbots.PremadeSpecLink.4.1.60 = -0252051000035015223100501251
+Playerbots.RandomClassSpecProb.4.1.59 = 45
+Playerbots.RandomClassSpecProb.4.1.60 = 45
+
+Playerbots.PremadeSpecLink.4.1.70 = 00502-0252051000035015223100501251-3
+Playerbots.RandomClassSpecProb.4.1.69 = 40
+Playerbots.RandomClassSpecProb.4.1.70 = 50
+
 Playerbots.PremadeSpecLink.4.1.80 = 00532000523-0252051000035015223100501251
+Playerbots.RandomClassSpecProb.4.1.79 = 35
+Playerbots.RandomClassSpecProb.4.1.80 = 35
+
+# SUBTLETY PVE
 Playerbots.PremadeSpecName.4.2 = subtlety pve
+Playerbots.RandomClassSpecIndex.4.2 = 2
 Playerbots.PremadeSpecGlyph.4.2 = 42967,43379,45764,43380,43378,45767
+
 Playerbots.PremadeSpecLink.4.2.60 = --5022012030321121350115031151
+Playerbots.RandomClassSpecProb.4.2.59 = 0
+Playerbots.RandomClassSpecProb.4.2.60 = 0
+
+Playerbots.PremadeSpecLink.4.2.70 = 004-005-5020032030321121350115031251
+Playerbots.RandomClassSpecProb.4.2.69 = 0
+Playerbots.RandomClassSpecProb.4.2.70 = 0
+
 Playerbots.PremadeSpecLink.4.2.80 = 30532010114--5022012030321121350115031151
+Playerbots.RandomClassSpecProb.4.2.79 = 0
+Playerbots.RandomClassSpecProb.4.2.80 = 0
+
+# AS PVP
 Playerbots.PremadeSpecName.4.3 = as pvp
+Playerbots.RandomClassSpecIndex.4.3 = 3
 Playerbots.PremadeSpecGlyph.4.3 = 42974,43380,45768,43379,43376,42971
+
 Playerbots.PremadeSpecLink.4.3.60 = 005303103342102522103031--50002
+Playerbots.RandomClassSpecProb.4.3.59 = 0
+Playerbots.RandomClassSpecProb.4.3.60 = 0
+
+Playerbots.PremadeSpecLink.4.3.70 = 0053031033421025221031--532023203
+Playerbots.RandomClassSpecProb.4.3.69 = 0
+Playerbots.RandomClassSpecProb.4.3.70 = 0
+
 Playerbots.PremadeSpecLink.4.3.80 = 005303103342102522103031-004-532023203000012
+Playerbots.RandomClassSpecProb.4.3.79 = 0
+Playerbots.RandomClassSpecProb.4.3.80 = 0
+
+# COMBAT PVP
 Playerbots.PremadeSpecName.4.4 = combat pvp
+Playerbots.RandomClassSpecIndex.4.4 = 4
 Playerbots.PremadeSpecGlyph.4.4 = 42972,43380,45762,43376,43378,42971
+
 Playerbots.PremadeSpecLink.4.4.60 = -3250002050225010223102321251
+Playerbots.RandomClassSpecProb.4.4.59 = 0
+Playerbots.RandomClassSpecProb.4.4.60 = 0
+
+Playerbots.PremadeSpecLink.4.4.70 = 305120105-325000205023501022310251
+Playerbots.RandomClassSpecProb.4.4.69 = 0
+Playerbots.RandomClassSpecProb.4.4.70 = 0
+
 Playerbots.PremadeSpecLink.4.4.80 = 305120105-3250002050235010223102521251
+Playerbots.RandomClassSpecProb.4.4.79 = 0
+Playerbots.RandomClassSpecProb.4.4.80 = 0
+
+# SUBTLETY PVP
 Playerbots.PremadeSpecName.4.5 = subtlety pvp
+Playerbots.RandomClassSpecIndex.4.5 = 5
 Playerbots.PremadeSpecGlyph.4.5 = 42968,43376,45764,43380,43379,42971
+
 Playerbots.PremadeSpecLink.4.5.60 = --5120212030320121330133221251
+Playerbots.RandomClassSpecProb.4.5.59 = 0
+Playerbots.RandomClassSpecProb.4.5.60 = 0
+
+Playerbots.PremadeSpecLink.4.5.70 = 3023031--51202120303201213501352311
+Playerbots.RandomClassSpecProb.4.5.69 = 0
+Playerbots.RandomClassSpecProb.4.5.70 = 0
+
 Playerbots.PremadeSpecLink.4.5.80 = 3023031-3-5120212030320121350135231251
+Playerbots.RandomClassSpecProb.4.5.79 = 0
+Playerbots.RandomClassSpecProb.4.5.80 = 0
 
 #
 #
@@ -1986,30 +2304,107 @@ Playerbots.PremadeSpecLink.4.5.80 = 3023031-3-5120212030320121350135231251
 # PRIEST
 #
 
+# DISC PVE
 Playerbots.PremadeSpecName.5.0 = disc pve
+Playerbots.RandomClassSpecIndex.5.0 = 0
 Playerbots.PremadeSpecGlyph.5.0 = 42408,43371,42400,43374,43342,45756
+
 Playerbots.PremadeSpecLink.5.0.60 = 0503203130300512301323131051
+Playerbots.RandomClassSpecProb.5.0.59 = 15
+Playerbots.RandomClassSpecProb.5.0.60 = 25
+
+Playerbots.PremadeSpecLink.5.0.70 = 0503203130300512331323231251-202
+Playerbots.RandomClassSpecProb.5.0.69 = 15
+Playerbots.RandomClassSpecProb.5.0.70 = 25
+
 Playerbots.PremadeSpecLink.5.0.80 = 0503203130300512331323231251-03520103
+Playerbots.RandomClassSpecProb.5.0.79 = 20
+Playerbots.RandomClassSpecProb.5.0.80 = 50
+
+# HOLY PVE
 Playerbots.PremadeSpecName.5.1 = holy pve
+Playerbots.RandomClassSpecIndex.5.1 = 1
 Playerbots.PremadeSpecGlyph.5.1 = 42408,43371,42400,43374,43342,42396
+
 Playerbots.PremadeSpecLink.5.1.60 = -035050031301152530000331331
+Playerbots.RandomClassSpecProb.5.1.59 = 10
+Playerbots.RandomClassSpecProb.5.1.60 = 60
+
+Playerbots.PremadeSpecLink.5.1.70 = 0503203-23405103200215253002031103
+Playerbots.RandomClassSpecProb.5.1.69 = 10
+Playerbots.RandomClassSpecProb.5.1.70 = 40
+
 Playerbots.PremadeSpecLink.5.1.80 = 05032031-235050032302152530000331351
+Playerbots.RandomClassSpecProb.5.1.79 = 10
+Playerbots.RandomClassSpecProb.5.1.80 = 10
+
+# SHADOW PVE
 Playerbots.PremadeSpecName.5.2 = shadow pve
+Playerbots.RandomClassSpecIndex.5.2 = 2
 Playerbots.PremadeSpecGlyph.5.2 = 45753,43371,42407,43374,43370,42415
+
 Playerbots.PremadeSpecLink.5.2.60 = --325003041203010323150301351
+Playerbots.RandomClassSpecProb.5.2.59 = 75
+Playerbots.RandomClassSpecProb.5.2.60 = 15
+
+Playerbots.PremadeSpecLink.5.2.70 = 05--325023051223010123152301351
+Playerbots.RandomClassSpecProb.5.2.69 = 75
+Playerbots.RandomClassSpecProb.5.2.70 = 35
+
 Playerbots.PremadeSpecLink.5.2.80 = 0503203--325023051223010323152301351
+Playerbots.RandomClassSpecProb.5.2.79 = 70
+Playerbots.RandomClassSpecProb.5.2.80 = 40
+
+# DISC PVP
 Playerbots.PremadeSpecName.5.3 = disc pvp
+Playerbots.RandomClassSpecIndex.5.3 = 3
 Playerbots.PremadeSpecGlyph.5.3 = 42408,43371,45760,43370,43374,45756
+
 Playerbots.PremadeSpecLink.5.3.60 = 5003203130320512201323031051
+Playerbots.RandomClassSpecProb.5.3.59 = 0
+Playerbots.RandomClassSpecProb.5.3.60 = 0
+
+Playerbots.PremadeSpecLink.5.3.70 = 50032031303225123310132312-2305
+Playerbots.RandomClassSpecProb.5.3.69 = 0
+Playerbots.RandomClassSpecProb.5.3.70 = 0
+
 Playerbots.PremadeSpecLink.5.3.80 = 5003203130322512331013231151-23050113
+Playerbots.RandomClassSpecProb.5.3.79 = 0
+Playerbots.RandomClassSpecProb.5.3.80 = 0
+
+# HOLY PVP
 Playerbots.PremadeSpecName.5.4 = holy pvp
+Playerbots.RandomClassSpecIndex.5.4 = 4
 Playerbots.PremadeSpecGlyph.5.4 = 42411,43371,42408,43370,43374,45755
-Playerbots.PremadeSpecLink.5.4.60 = -235501031000152430320031151
+
+Playerbots.PremadeSpecLink.5.4.60 = 235501031000152430320031151
+Playerbots.RandomClassSpecProb.5.4.59 = 0
+Playerbots.RandomClassSpecProb.5.4.60 = 0
+
+Playerbots.PremadeSpecLink.5.4.70 = 50032-23550103100015253032003133
+Playerbots.RandomClassSpecProb.5.4.69 = 0
+Playerbots.RandomClassSpecProb.5.4.70 = 0
+
 Playerbots.PremadeSpecLink.5.4.80 = 500320313-235501031000152530320031351
+Playerbots.RandomClassSpecProb.5.4.79 = 0
+Playerbots.RandomClassSpecProb.5.4.80 = 0
+
+# SHADOW PVP
 Playerbots.PremadeSpecName.5.5 = shadow pvp
+Playerbots.RandomClassSpecIndex.5.5 = 5
 Playerbots.PremadeSpecGlyph.5.5 = 42407,43371,45753,43370,43374,42408
+
 Playerbots.PremadeSpecLink.5.5.60 = --005323241223112003102311351
+Playerbots.RandomClassSpecProb.5.5.59 = 0
+Playerbots.RandomClassSpecProb.5.5.60 = 0
+
+Playerbots.PremadeSpecLink.5.5.70 = 5032--005323241223112003102311351
+Playerbots.RandomClassSpecProb.5.5.69 = 0
+Playerbots.RandomClassSpecProb.5.5.70 = 0
+
 Playerbots.PremadeSpecLink.5.5.80 = 50332031003--005323241223112003102311351
+Playerbots.RandomClassSpecProb.5.5.79 = 0
+Playerbots.RandomClassSpecProb.5.5.80 = 0
 
 #
 #
@@ -2019,34 +2414,125 @@ Playerbots.PremadeSpecLink.5.5.80 = 50332031003--005323241223112003102311351
 # DEATH KNIGHT
 #
 
+# BLOOD PVE
 Playerbots.PremadeSpecName.6.0 = blood pve
+Playerbots.RandomClassSpecIndex.6.0 = 0
 Playerbots.PremadeSpecGlyph.6.0 = 45805,43673,43538,43544,43672,43542
+
 Playerbots.PremadeSpecLink.6.0.60 = 035502150300331320102013111-005
+Playerbots.RandomClassSpecProb.6.0.59 = 20
+Playerbots.RandomClassSpecProb.6.0.60 = 20
+
+Playerbots.PremadeSpecLink.6.0.70 = 005512153330330020102013-30525-03
+Playerbots.RandomClassSpecProb.6.0.69 = 20
+Playerbots.RandomClassSpecProb.6.0.70 = 20
+
 Playerbots.PremadeSpecLink.6.0.80 = 0055021533303310201020131-305020510002-00522
+Playerbots.RandomClassSpecProb.6.0.79 = 20
+Playerbots.RandomClassSpecProb.6.0.80 = 30
+
+
+# FROST PVE
 Playerbots.PremadeSpecName.6.1 = frost pve
+Playerbots.RandomClassSpecIndex.6.1 = 1
 Playerbots.PremadeSpecGlyph.6.1 = 45805,43673,43547,43544,43672,43543
+
 Playerbots.PremadeSpecLink.6.1.60 = -32003350332203012300023101351
+Playerbots.RandomClassSpecProb.6.1.59 = 35
+Playerbots.RandomClassSpecProb.6.1.60 = 35
+
+Playerbots.PremadeSpecLink.6.1.70 = -32005350350203012300033101351-2300002
+Playerbots.RandomClassSpecProb.6.1.69 = 35
+Playerbots.RandomClassSpecProb.6.1.70 = 35
+
 Playerbots.PremadeSpecLink.6.1.80 = -32002350352203012300033101351-230200305003
+Playerbots.RandomClassSpecProb.6.1.79 = 35
+Playerbots.RandomClassSpecProb.6.1.80 = 30
+
+# UNHOLY PVE
 Playerbots.PremadeSpecName.6.2 = unholy pve
+Playerbots.RandomClassSpecIndex.6.2 = 2
 Playerbots.PremadeSpecGlyph.6.2 = 43542,43673,43546,43535,43672,43549
+
 Playerbots.PremadeSpecLink.6.2.60 = --2301303050032151000150013131151
+Playerbots.RandomClassSpecProb.6.2.59 = 45
+Playerbots.RandomClassSpecProb.6.2.60 = 45
+
+Playerbots.PremadeSpecLink.6.2.70 = -32001-2300303350032152000150003133151
+Playerbots.RandomClassSpecProb.6.2.69 = 45
+Playerbots.RandomClassSpecProb.6.2.70 = 45
+
 Playerbots.PremadeSpecLink.6.2.80 = 23050202--2302303350032152000150003133151
+Playerbots.RandomClassSpecProb.6.2.79 = 45
+Playerbots.RandomClassSpecProb.6.2.80 = 40
+
+# DOUBLE AURA BLOOD PVE
 Playerbots.PremadeSpecName.6.3 = double aura blood pve
+Playerbots.RandomClassSpecIndex.6.3 = 3
 Playerbots.PremadeSpecGlyph.6.3 = 45805,43673,43538,43544,43672,43554
+
 Playerbots.PremadeSpecLink.6.3.60 = 005512153330030320102013-305
+Playerbots.RandomClassSpecProb.6.3.59 = 0
+Playerbots.RandomClassSpecProb.6.3.60 = 0
+
+Playerbots.PremadeSpecLink.6.3.70 = 005512153330030320102013-3050505
+Playerbots.RandomClassSpecProb.6.3.69 = 0
+Playerbots.RandomClassSpecProb.6.3.70 = 0
+
 Playerbots.PremadeSpecLink.6.3.80 = 005512153330030320102013-3050505002023001-002
+Playerbots.RandomClassSpecProb.6.3.79 = 0
+Playerbots.RandomClassSpecProb.6.3.80 = 0
+
+# BLOOD PVP
 Playerbots.PremadeSpecName.6.4 = blood pvp
+Playerbots.RandomClassSpecIndex.6.4 = 4
 Playerbots.PremadeSpecGlyph.6.4 = 43534,43535,45799,43673,43672,45805
+
 Playerbots.PremadeSpecLink.6.4.60 = 2305021503003313201222101351
+Playerbots.RandomClassSpecProb.6.4.59 = 0
+Playerbots.RandomClassSpecProb.6.4.60 = 0
+
+#Playerbots.PremadeSpecLink.6.4.70 =
+Playerbots.RandomClassSpecProb.6.4.70 = 0
+Playerbots.RandomClassSpecProb.6.4.70 = 0
+
 Playerbots.PremadeSpecLink.6.4.80 = 2305021503003313201222101351--032232300023
+Playerbots.RandomClassSpecProb.6.4.79 = 0
+Playerbots.RandomClassSpecProb.6.4.80 = 0
+
+# FROST PVP
 Playerbots.PremadeSpecName.6.5 = frost pvp
+Playerbots.RandomClassSpecIndex.6.5 = 5
 Playerbots.PremadeSpecGlyph.6.5 = 43543,43539,45800,43673,43672,45806
+
 Playerbots.PremadeSpecLink.6.5.60 = -32015351022203012001233101251
+Playerbots.RandomClassSpecProb.6.5.59 = 0
+Playerbots.RandomClassSpecProb.6.5.60 = 0
+
+#Playerbots.PremadeSpecLink.6.5.70 =
+Playerbots.RandomClassSpecProb.6.5.69 = 0
+Playerbots.RandomClassSpecProb.6.5.70 = 0
+
 Playerbots.PremadeSpecLink.6.5.80 = 0055-32015351052203012001233131351-03
+Playerbots.RandomClassSpecProb.6.5.79 = 0
+Playerbots.RandomClassSpecProb.6.5.80 = 0
+
+# UNHOLY PVP
 Playerbots.PremadeSpecName.6.6 = unholy pvp
+Playerbots.RandomClassSpecIndex.6.6 = 6
 Playerbots.PremadeSpecGlyph.6.6 = 45804,43539,43549,43673,43672,45805
+
 Playerbots.PremadeSpecLink.6.6.60 = --2301323301002152230101203103151
+Playerbots.RandomClassSpecProb.6.6.59 = 0
+Playerbots.RandomClassSpecProb.6.6.60 = 0
+
+#Playerbots.PremadeSpecLink.6.6.70 =
+Playerbots.RandomClassSpecProb.6.6.69 = 0
+Playerbots.RandomClassSpecProb.6.6.70 = 0
+
 Playerbots.PremadeSpecLink.6.6.80 = -320050410002-2301323301002152230101203133151
+Playerbots.RandomClassSpecProb.6.6.79 = 0
+Playerbots.RandomClassSpecProb.6.6.80 = 0
 
 #
 #
@@ -2056,30 +2542,107 @@ Playerbots.PremadeSpecLink.6.6.80 = -320050410002-230132330100215223010120313315
 # SHAMAN
 #
 
+# ELE PVE
 Playerbots.PremadeSpecName.7.0 = ele pve
+Playerbots.RandomClassSpecIndex.7.0 = 0
 Playerbots.PremadeSpecGlyph.7.0 = 41536,43385,41532,43386,44923,45776
+
 Playerbots.PremadeSpecLink.7.0.60 = 4530001520213351102301351
+Playerbots.RandomClassSpecProb.7.0.59 = 20
+Playerbots.RandomClassSpecProb.7.0.60 = 10
+
+Playerbots.PremadeSpecLink.7.0.70 = 2530001523211351322301051-00505
+Playerbots.RandomClassSpecProb.7.0.69 = 30
+Playerbots.RandomClassSpecProb.7.0.70 = 30
+
 Playerbots.PremadeSpecLink.7.0.80 = 4530001523213351302301351-00525003
+Playerbots.RandomClassSpecProb.7.0.79 = 35
+Playerbots.RandomClassSpecProb.7.0.80 = 30
+
+# ENH PVE
 Playerbots.PremadeSpecName.7.1 = enh pve
+Playerbots.RandomClassSpecIndex.7.1 = 1
 Playerbots.PremadeSpecGlyph.7.1 = 41542,43385,41539,43386,43725,45771
+
 Playerbots.PremadeSpecLink.7.1.60 = -30305003105021333031121131051
+Playerbots.RandomClassSpecProb.7.1.59 = 70
+Playerbots.RandomClassSpecProb.7.1.60 = 15
+
+Playerbots.PremadeSpecLink.7.1.70 = 05003-30205023105021333031131131051
+Playerbots.RandomClassSpecProb.7.1.69 = 60
+Playerbots.RandomClassSpecProb.7.1.70 = 25
+
 Playerbots.PremadeSpecLink.7.1.80 = 053030152-30305003105021333031131131051
+Playerbots.RandomClassSpecProb.7.1.79 = 55
+Playerbots.RandomClassSpecProb.7.1.80 = 30
+
+# RESTO PVE
 Playerbots.PremadeSpecName.7.2 = resto pve
+Playerbots.RandomClassSpecIndex.7.2 = 2
 Playerbots.PremadeSpecGlyph.7.2 = 41527,43385,41517,43386,43725,45775
+
 Playerbots.PremadeSpecLink.7.2.60 = --50005301235310501102321251
+Playerbots.RandomClassSpecProb.7.2.59 = 10
+Playerbots.RandomClassSpecProb.7.2.60 = 75
+
+Playerbots.PremadeSpecLink.7.2.70 = -003-50005331335310501122331251
+Playerbots.RandomClassSpecProb.7.2.69 = 10
+Playerbots.RandomClassSpecProb.7.2.70 = 45
+
 Playerbots.PremadeSpecLink.7.2.80 = -00502033-50005331335310501122331251
+Playerbots.RandomClassSpecProb.7.2.79 = 10
+Playerbots.RandomClassSpecProb.7.2.80 = 40
+
+# ELE PVP
 Playerbots.PremadeSpecName.7.3 = ele pvp
+Playerbots.RandomClassSpecIndex.7.3 = 3
 Playerbots.PremadeSpecGlyph.7.3 = 45778,43388,45770,43725,43386,41524
+
 Playerbots.PremadeSpecLink.7.3.60 = 0533001503213051322301341
+Playerbots.RandomClassSpecProb.7.3.59 = 0
+Playerbots.RandomClassSpecProb.7.3.60 = 0
+
+Playerbots.PremadeSpecLink.7.3.70 = 0533001503213051322301341-023212
+Playerbots.RandomClassSpecProb.7.3.69 = 0
+Playerbots.RandomClassSpecProb.7.3.70 = 0
+
 Playerbots.PremadeSpecLink.7.3.80 = 0533051503213051322331351-023212001
+Playerbots.RandomClassSpecProb.7.3.79 = 0
+Playerbots.RandomClassSpecProb.7.3.80 = 0
+
+# ENH PVP
 Playerbots.PremadeSpecName.7.4 = enh pvp
+Playerbots.RandomClassSpecIndex.7.4 = 4
 Playerbots.PremadeSpecGlyph.7.4 = 45778,43388,41526,43725,43344,45771
+
 Playerbots.PremadeSpecLink.7.4.60 = -02305203105001333201131131151
+Playerbots.RandomClassSpecProb.7.4.59 = 0
+Playerbots.RandomClassSpecProb.7.4.60 = 0
+
+Playerbots.PremadeSpecLink.7.4.70 = 05032-02305203105001333201131131151
+Playerbots.RandomClassSpecProb.7.4.69 = 0
+Playerbots.RandomClassSpecProb.7.4.70 = 0
+
 Playerbots.PremadeSpecLink.7.4.80 = 0503351-02305203105001333211131231251
+Playerbots.RandomClassSpecProb.7.4.79 = 0
+Playerbots.RandomClassSpecProb.7.4.80 = 0
+
+# RESTO PVP
 Playerbots.PremadeSpecName.7.5 = resto pvp
+Playerbots.RandomClassSpecIndex.7.5 = 5
 Playerbots.PremadeSpecGlyph.7.5 = 45778,43388,45775,43725,43344,41535
+
 Playerbots.PremadeSpecLink.7.5.60 = --05032331331013501120321251
+Playerbots.RandomClassSpecProb.7.5.59 = 0
+Playerbots.RandomClassSpecProb.7.5.60 = 0
+
+Playerbots.PremadeSpecLink.7.5.70 = -023221-05032331331013501120321251
+Playerbots.RandomClassSpecProb.7.5.69 = 0
+Playerbots.RandomClassSpecProb.7.5.70 = 0
+
 Playerbots.PremadeSpecLink.7.5.80 = -023222301004-05032331331013501120331251
+Playerbots.RandomClassSpecProb.7.5.79 = 0
+Playerbots.RandomClassSpecProb.7.5.80 = 0
 
 #
 #
@@ -2089,34 +2652,124 @@ Playerbots.PremadeSpecLink.7.5.80 = -023222301004-05032331331013501120331251
 # MAGE
 #
 
+# ARCANE PVE
 Playerbots.PremadeSpecName.8.0 = arcane pve
+Playerbots.RandomClassSpecIndex.8.0 = 0
 Playerbots.PremadeSpecGlyph.8.0 = 42735,43339,44955,43364,43361,42751
+
 Playerbots.PremadeSpecLink.8.0.60 = 230005231100330150323102500321
+Playerbots.RandomClassSpecProb.8.0.59 = 5
+Playerbots.RandomClassSpecProb.8.0.60 = 10
+
+Playerbots.PremadeSpecLink.8.0.70 = 23000503110033014032310050532--023203001
+Playerbots.RandomClassSpecProb.8.0.69 = 10
+Playerbots.RandomClassSpecProb.8.0.70 = 45
+
 Playerbots.PremadeSpecLink.8.0.80 = 230005231100330150323102505321-03-203303001
+Playerbots.RandomClassSpecProb.8.0.79 = 15
+Playerbots.RandomClassSpecProb.8.0.80 = 40
+
+# FIRE PVE
 Playerbots.PremadeSpecName.8.1 = fire pve
+Playerbots.RandomClassSpecIndex.8.1 = 1
 Playerbots.PremadeSpecGlyph.8.1 = 42739,43339,45737,43364,44920,42751
+
 Playerbots.PremadeSpecLink.8.1.60 = -0055030011302231053120321341
+Playerbots.RandomClassSpecProb.8.1.59 = 20
+Playerbots.RandomClassSpecProb.8.1.60 = 30
+
+Playerbots.PremadeSpecLink.8.1.70 = -0055032012300331053120311351-023003
+Playerbots.RandomClassSpecProb.8.1.69 = 25
+Playerbots.RandomClassSpecProb.8.1.70 = 35
+
 Playerbots.PremadeSpecLink.8.1.80 = 23000503110003-0055032012303330053120300351
+Playerbots.RandomClassSpecProb.8.1.79 = 25
+Playerbots.RandomClassSpecProb.8.1.80 = 35
+
+# FROST PVE
 Playerbots.PremadeSpecName.8.2 = frost pve
+Playerbots.RandomClassSpecIndex.8.2 = 2
 Playerbots.PremadeSpecGlyph.8.2 = 42742,43339,50045,43364,43361,42751
+
 Playerbots.PremadeSpecLink.8.2.60 = --0533030313203100030152231151
+Playerbots.RandomClassSpecProb.8.2.59 = 75
+Playerbots.RandomClassSpecProb.8.2.60 = 60
+
+Playerbots.PremadeSpecLink.8.2.70 = 23000501310003--0533030311133100230152201
+Playerbots.RandomClassSpecProb.8.2.69 = 65
+Playerbots.RandomClassSpecProb.8.2.70 = 20
+
 Playerbots.PremadeSpecLink.8.2.80 = 23002303110003--0533030313203100030152231351
+Playerbots.RandomClassSpecProb.8.2.79 = 45
+Playerbots.RandomClassSpecProb.8.2.80 = 10
+
+# FROSTFIRE PVE
 Playerbots.PremadeSpecName.8.3 = frostfire pve
+Playerbots.RandomClassSpecIndex.8.3 = 3
 Playerbots.PremadeSpecGlyph.8.3 = 44684,44920,42751,43339,43364,45737
+
 Playerbots.PremadeSpecLink.8.3.60 = -2305032012303331053120300051
+Playerbots.RandomClassSpecProb.8.3.59 = 0
+Playerbots.RandomClassSpecProb.8.3.60 = 0
+
+Playerbots.PremadeSpecLink.8.3.70 = -2305032012303331053120300051-203302
+Playerbots.RandomClassSpecProb.8.3.69 = 0
+Playerbots.RandomClassSpecProb.8.3.70 = 0
+
 Playerbots.PremadeSpecLink.8.3.80 = -2305032012303331053120321351-023302031
+Playerbots.RandomClassSpecProb.8.3.79 = 15
+Playerbots.RandomClassSpecProb.8.3.80 = 15
+
+# ARCANE PVP
 Playerbots.PremadeSpecName.8.4 = arcane pvp
+Playerbots.RandomClassSpecIndex.8.4 = 4
 Playerbots.PremadeSpecGlyph.8.4 = 42735,43364,42738,43360,43357,42752
+
 Playerbots.PremadeSpecLink.8.4.60 = 205323200122032103303102015221
+Playerbots.RandomClassSpecProb.8.4.59 = 0
+Playerbots.RandomClassSpecProb.8.4.60 = 0
+
+Playerbots.PremadeSpecLink.8.4.70 = 205323200122032103303102015221--3030202
+Playerbots.RandomClassSpecProb.8.4.69 = 0
+Playerbots.RandomClassSpecProb.8.4.70 = 0
+
 Playerbots.PremadeSpecLink.8.4.80 = 205323200122032103303102015321-23002-303020301
+Playerbots.RandomClassSpecProb.8.4.79 = 0
+Playerbots.RandomClassSpecProb.8.4.80 = 0
+
+# FIRE PVP
 Playerbots.PremadeSpecName.8.5 = fire pvp
+Playerbots.RandomClassSpecIndex.8.5 = 5
 Playerbots.PremadeSpecGlyph.8.5 = 42738,43364,42752,43360,43357,45737
+
 Playerbots.PremadeSpecLink.8.5.60 = -2305202312020031223122301351
+Playerbots.RandomClassSpecProb.8.5.59 = 0
+Playerbots.RandomClassSpecProb.8.5.60 = 0
+
+Playerbots.PremadeSpecLink.8.5.70 = 23032-2305212312020031223122301351
+Playerbots.RandomClassSpecProb.8.5.69 = 0
+Playerbots.RandomClassSpecProb.8.5.70 = 0
+
 Playerbots.PremadeSpecLink.8.5.80 = 230321030122-2305212312020031223122301351
+Playerbots.RandomClassSpecProb.8.5.79 = 0
+Playerbots.RandomClassSpecProb.8.5.80 = 0
+
+# FROST PVP
 Playerbots.PremadeSpecName.8.6 = frost pvp
+Playerbots.RandomClassSpecIndex.8.6 = 6
 Playerbots.PremadeSpecGlyph.8.6 = 42738,43364,45740,43357,43360,42752
+
 Playerbots.PremadeSpecLink.8.6.60 = --3533203210203100232102231151
+Playerbots.RandomClassSpecProb.8.6.59 = 0
+Playerbots.RandomClassSpecProb.8.6.60 = 0
+
+Playerbots.PremadeSpecLink.8.6.70 = 23032--3533203210203100232102231151
+Playerbots.RandomClassSpecProb.8.6.69 = 0
+Playerbots.RandomClassSpecProb.8.6.70 = 0
+
 Playerbots.PremadeSpecLink.8.6.80 = 23032103010203--3533203210203100232102231151
+Playerbots.RandomClassSpecProb.8.6.79 = 0
+Playerbots.RandomClassSpecProb.8.6.80 = 0
 
 #
 #
@@ -2126,32 +2779,107 @@ Playerbots.PremadeSpecLink.8.6.80 = 23032103010203--3533203210203100232102231151
 # WARLOCK
 #
 
+# AFFLI PVE
 Playerbots.PremadeSpecName.9.0 = affli pve
+Playerbots.RandomClassSpecIndex.9.0 = 0
 Playerbots.PremadeSpecGlyph.9.0 = 45785,43390,50077,43394,43393,45779
+
 Playerbots.PremadeSpecLink.9.0.60 = 2350022001113510053500131151
-Playerbots.PremadeSpecLink.9.0.70 = 2350022001113510053500131151--55
+Playerbots.RandomClassSpecProb.9.0.59 = 60
+Playerbots.RandomClassSpecProb.9.0.60 = 30
+
+Playerbots.PremadeSpecLink.9.0.70 = 1050222030023510053500311151--55
+Playerbots.RandomClassSpecProb.9.0.69 = 55
+Playerbots.RandomClassSpecProb.9.0.70 = 20
+
 Playerbots.PremadeSpecLink.9.0.80 = 2350022001123510253500331151--55000005
+Playerbots.RandomClassSpecProb.9.0.79 = 50
+Playerbots.RandomClassSpecProb.9.0.80 = 50
+
+# DEMO PVE
 Playerbots.PremadeSpecName.9.1 = demo pve
+Playerbots.RandomClassSpecIndex.9.1 = 1
 Playerbots.PremadeSpecGlyph.9.1 = 45785,43390,50077,43394,43393,42459
+
 Playerbots.PremadeSpecLink.9.1.60 = -003203301135112530135201051
-Playerbots.PremadeSpecLink.9.1.70 = -003203301135112530135201051-55
+Playerbots.RandomClassSpecProb.9.1.59 = 30
+Playerbots.RandomClassSpecProb.9.1.60 = 5
+
+Playerbots.PremadeSpecLink.9.1.70 = -0332003011351125301352-55000205
+Playerbots.RandomClassSpecProb.9.1.69 = 35
+Playerbots.RandomClassSpecProb.9.1.70 = 10
+
 Playerbots.PremadeSpecLink.9.1.80 = -003203301135112530135221351-55000005
+Playerbots.RandomClassSpecProb.9.1.79 = 40
+Playerbots.RandomClassSpecProb.9.1.80 = 35
+
+# DESTRO PVE
 Playerbots.PremadeSpecName.9.2 = destro pve
+Playerbots.RandomClassSpecIndex.9.2 = 2
 Playerbots.PremadeSpecGlyph.9.2 = 45785,43390,42454,43394,43393,42453
+
 Playerbots.PremadeSpecLink.9.2.60 = --05203215200231051305031151
+Playerbots.RandomClassSpecProb.9.2.59 = 10
+Playerbots.RandomClassSpecProb.9.2.60 = 65
+
+Playerbots.PremadeSpecLink.9.2.70 = -03-05203205220331051035031351
+Playerbots.RandomClassSpecProb.9.2.69 = 10
+Playerbots.RandomClassSpecProb.9.2.70 = 70
+
 Playerbots.PremadeSpecLink.9.2.80 = 23-0302-05203215220331051335231351
+Playerbots.RandomClassSpecProb.9.2.79 = 10
+Playerbots.RandomClassSpecProb.9.2.80 = 15
+
+# AFFLI PVP
 Playerbots.PremadeSpecName.9.3 = affli pvp
+Playerbots.RandomClassSpecIndex.9.3 = 3
 Playerbots.PremadeSpecGlyph.9.3 = 50077,43392,42455,43390,43389,45783
+
 Playerbots.PremadeSpecLink.9.3.60 = 0350002231223011053502301151
+Playerbots.RandomClassSpecProb.9.3.59 = 0
+Playerbots.RandomClassSpecProb.9.3.60 = 0
+
+Playerbots.PremadeSpecLink.9.3.70 = 2350002231223011053502301151-2032003
+Playerbots.RandomClassSpecProb.9.3.69 = 0
+Playerbots.RandomClassSpecProb.9.3.70 = 0
+
 Playerbots.PremadeSpecLink.9.3.80 = 2350002231223111053502301151-2032003011302
+Playerbots.RandomClassSpecProb.9.3.79 = 0
+Playerbots.RandomClassSpecProb.9.3.80 = 0
+
+# DEMO PVP
 Playerbots.PremadeSpecName.9.4 = demo pvp
+Playerbots.RandomClassSpecIndex.9.4 = 4
 Playerbots.PremadeSpecGlyph.9.4 = 42459,43392,45780,43390,43389,45783
+
 Playerbots.PremadeSpecLink.9.4.60 = -003203301135202530135001251
+Playerbots.RandomClassSpecProb.9.4.59 = 0
+Playerbots.RandomClassSpecProb.9.4.60 = 0
+
+Playerbots.PremadeSpecLink.9.4.70 = -003203301135202530135001251-0523
+Playerbots.RandomClassSpecProb.9.4.69 = 0
+Playerbots.RandomClassSpecProb.9.4.70 = 0
+
 Playerbots.PremadeSpecLink.9.4.80 = -003203301135202530135011351-052300152
+Playerbots.RandomClassSpecProb.9.4.79 = 0
+Playerbots.RandomClassSpecProb.9.4.80 = 0
+
+# DESTRO PVP
 Playerbots.PremadeSpecName.9.5 = destro pvp
+Playerbots.RandomClassSpecIndex.9.5 = 5
 Playerbots.PremadeSpecGlyph.9.5 = 42471,43392,42454,43390,43389,45783
+
 Playerbots.PremadeSpecLink.9.5.60 = --05230015220331351005031051
+Playerbots.RandomClassSpecProb.9.5.59 = 0
+Playerbots.RandomClassSpecProb.9.5.60 = 0
+
+Playerbots.PremadeSpecLink.9.5.70 = -2032003-05230015220331351005031051
+Playerbots.RandomClassSpecProb.9.5.69 = 0
+Playerbots.RandomClassSpecProb.9.5.70 = 0
+
 Playerbots.PremadeSpecLink.9.5.80 = -2032003311302-05230015220331351005031051
+Playerbots.RandomClassSpecProb.9.5.79 = 0
+Playerbots.RandomClassSpecProb.9.5.80 = 0
 
 #
 #
@@ -2161,34 +2889,124 @@ Playerbots.PremadeSpecLink.9.5.80 = -2032003311302-05230015220331351005031051
 # DRUID
 #
 
+# BALANCE PVE
 Playerbots.PremadeSpecName.11.0 = balance pve
+Playerbots.RandomClassSpecIndex.11.0 = 0
 Playerbots.PremadeSpecGlyph.11.0 = 40916,43331,40921,43335,44922,40919
+
 Playerbots.PremadeSpecLink.11.0.60 = 5032003125031003213304301231
+Playerbots.RandomClassSpecProb.11.0.59 = 10
+Playerbots.RandomClassSpecProb.11.0.60 = 5
+
+Playerbots.PremadeSpecLink.11.0.70 = 5012203125331303213305311231--2
+Playerbots.RandomClassSpecProb.11.0.69 = 20
+Playerbots.RandomClassSpecProb.11.0.70 = 15
+
 Playerbots.PremadeSpecLink.11.0.80 = 5032003125331303213305301231--205003012
+Playerbots.RandomClassSpecProb.11.0.79 = 25
+Playerbots.RandomClassSpecProb.11.0.80 = 35
+
+# BEAR PVE
 Playerbots.PremadeSpecName.11.1 = bear pve
+Playerbots.RandomClassSpecIndex.11.1 = 1
 Playerbots.PremadeSpecGlyph.11.1 = 40897,43331,46372,43335,43332,40899
+
 Playerbots.PremadeSpecLink.11.1.60 = -503232132322010303120300013501
+Playerbots.RandomClassSpecProb.11.1.59 = 35
+Playerbots.RandomClassSpecProb.11.1.60 = 25
+
+Playerbots.PremadeSpecLink.11.1.70 = -503232132322010353100300010511-2034
+Playerbots.RandomClassSpecProb.11.1.69 = 25
+Playerbots.RandomClassSpecProb.11.1.70 = 25
+
 Playerbots.PremadeSpecLink.11.1.80 = -503232132322010353120303013511-20350001
+Playerbots.RandomClassSpecProb.11.1.79 = 25
+Playerbots.RandomClassSpecProb.11.1.80 = 15
+
+# RESTO PVE
 Playerbots.PremadeSpecName.11.2 = resto pve
+Playerbots.RandomClassSpecIndex.11.2 = 2
 Playerbots.PremadeSpecGlyph.11.2 = 40906,43331,45602,43335,43674,45603
+
 Playerbots.PremadeSpecLink.11.2.60 = --230033312031502331050313031
+Playerbots.RandomClassSpecProb.11.2.59 = 10
+Playerbots.RandomClassSpecProb.11.2.60 = 55
+
+Playerbots.PremadeSpecLink.11.2.70 = 053--230033312031500531050313051
+Playerbots.RandomClassSpecProb.11.2.69 = 10
+Playerbots.RandomClassSpecProb.11.2.70 = 40
+
 Playerbots.PremadeSpecLink.11.2.80 = 05320031--230033312031502431053313051
+Playerbots.RandomClassSpecProb.11.2.79 = 10
+Playerbots.RandomClassSpecProb.11.2.80 = 25
+
+# CAT PVE
 Playerbots.PremadeSpecName.11.3 = cat pve
+Playerbots.RandomClassSpecIndex.11.3 = 3
 Playerbots.PremadeSpecGlyph.11.3 = 40902,43331,40901,43674,43335,45604
+
 Playerbots.PremadeSpecLink.11.3.60 = -552202032322010053100030310501
+Playerbots.RandomClassSpecProb.11.3.59 = 45
+Playerbots.RandomClassSpecProb.11.3.60 = 15
+
+Playerbots.PremadeSpecLink.11.3.70 = -550202032322010053120030310511-2034
+Playerbots.RandomClassSpecProb.11.3.69 = 45
+Playerbots.RandomClassSpecProb.11.3.70 = 20
+
 Playerbots.PremadeSpecLink.11.3.80 = -553202032322010053120030310511-203503012
+Playerbots.RandomClassSpecProb.11.3.79 = 40
+Playerbots.RandomClassSpecProb.11.3.80 = 25
+
+# BALANCE PVP
 Playerbots.PremadeSpecName.11.4 = balance pvp
+Playerbots.RandomClassSpecIndex.11.4 = 4
 Playerbots.PremadeSpecGlyph.11.4 = 40921,43331,45622,43674,43335,45623
+
 Playerbots.PremadeSpecLink.11.4.60 = 5012203115331002213032311231
+Playerbots.RandomClassSpecProb.11.4.59 = 0
+Playerbots.RandomClassSpecProb.11.4.60 = 0
+
+Playerbots.PremadeSpecLink.11.4.70 = 502220312533100321303531103--230032
+Playerbots.RandomClassSpecProb.11.4.69 = 0
+Playerbots.RandomClassSpecProb.11.4.70 = 0
+
 Playerbots.PremadeSpecLink.11.4.80 = 5022203125331003213035311231--230033012
+Playerbots.RandomClassSpecProb.11.4.79 = 0
+Playerbots.RandomClassSpecProb.11.4.80 = 0
+
+# CAT PVP
 Playerbots.PremadeSpecName.11.5 = cat pvp
+Playerbots.RandomClassSpecIndex.11.5 = 5
 Playerbots.PremadeSpecGlyph.11.5 = 40902,43331,45601,43674,43335,40901
+
 Playerbots.PremadeSpecLink.11.5.60 = -513202032322010053103030310501
+Playerbots.RandomClassSpecProb.11.5.59 = 0
+Playerbots.RandomClassSpecProb.11.5.60 = 0
+
+Playerbots.PremadeSpecLink.11.5.70 = -5232020323220100531030303105-2053
+Playerbots.RandomClassSpecProb.11.5.69 = 0
+Playerbots.RandomClassSpecProb.11.5.70 = 0
+
 Playerbots.PremadeSpecLink.11.5.80 = -523202032322010053103030310511-205503012
+Playerbots.RandomClassSpecProb.11.5.79 = 0
+Playerbots.RandomClassSpecProb.11.5.80 = 0
+
+# RESTO PVP
 Playerbots.PremadeSpecName.11.6 = resto pvp
+Playerbots.RandomClassSpecIndex.11.6 = 6
 Playerbots.PremadeSpecGlyph.11.6 = 40913,43331,40906,43335,43674,45623
+
 Playerbots.PremadeSpecLink.11.6.60 = --230033312031500511350013051
+Playerbots.RandomClassSpecProb.11.6.59 = 0
+Playerbots.RandomClassSpecProb.11.6.60 = 0
+
+Playerbots.PremadeSpecLink.11.6.70 = 0532001--230033312031500531353013
+Playerbots.RandomClassSpecProb.11.6.69 = 0
+Playerbots.RandomClassSpecProb.11.6.70 = 0
+
 Playerbots.PremadeSpecLink.11.6.80 = 05320021--230033312031500531353013251
+Playerbots.RandomClassSpecProb.11.6.79 = 0
+Playerbots.RandomClassSpecProb.11.6.80 = 0
 
 #
 #
@@ -2212,302 +3030,6 @@ Playerbots.PremadeSpecLink.11.6.80 = 05320021--230033312031500531353013251
 # The default entries may be deleted or modified, and new custom entries may be added
 
 Playerbots.WorldBuffMatrix = # WARRIOR ARMS 1:0,1,0,80,80:53760,57358; # WARRIOR FURY 2:0,1,1,80,80:53760,57358; # WARRIOR PROTECTION 3:0,1,2,80,80:53758,57356; # PALADIN HOLY 4:0,2,0,80,80:53749,57332,60347; # PALADIN PROTECTION 5:0,2,1,80,80:53758,57356; # PALADIN RETRIBUTION 6:0,2,2,80,80:53760,57371; # HUNTER BEAST 7:0,3,0,80,80:53760,57325; # HUNTER MARKSMANSHIP 8:0,3,1,80,80:53760,57358; # HUNTER SURVIVAL 9:0,3,2,80,80:53760,57367; # ROGUE ASSASSINATION 10:0,4,0,80,80:53760,57325; # ROGUE COMBAT 11:0,4,1,80,80:53760,57358; # ROGUE SUBTLETY 12:0,4,2,80,80:53760,57367; # PRIEST DISCIPLINE 13:0,5,0,80,80:53755,57327; # PRIEST HOLY 14:0,5,1,80,80:53755,57327; # PRIEST SHADOW 15:0,5,2,80,80:53755,57327; # DEATH KNIGHT BLOOD 16:0,6,0,80,80:53758,57356; # DEATH KNIGHT FROST 17:0,6,1,80,80:53760,57358; # DEATH KNIGHT UNHOLY 18:0,6,2,80,80:53760,57358; # DEATH KNIGHT BLOOD DPS 19:0,6,3,80,80:53760,57371; # SHAMAN ELEMENTAL 20:0,7,0,80,80:53755,57327; # SHAMAN ENHANCEMENT 21:0,7,1,80,80:53760,57325; # SHAMAN RESTORATION 22:0,7,2,80,80:53755,57327; # MAGE ARCANE 23:0,8,0,80,80:53755,57327; # MAGE FIRE 24:0,8,1,80,80:53755,57327; # MAGE FROST 25:0,8,2,80,80:53755,57327; # WARLOCK AFFLICTION 26:0,9,0,80,80:53755,57327; # WARLOCK DEMONOLOGY 27:0,9,1,80,80:53755,57327; # WARLOCK DESTRUCTION 28:0,9,2,80,80:53755,57327; # DRUID BALANCE 29:0,11,0,80,80:53755,57327; # DRUID FERAL BEAR 30:0,11,1,80,80:53749,53763,57367; # DRUID RESTORATION 31:0,11,2,80,80:54212,57334; # DRUID FERAL CAT 32:0,11,3,80,80:53760,57358; # WARRIOR ARMS TBC 33:0,1,0,70,79:28520,33256; # WARRIOR FURY TBC 34:0,1,1,70,79:28520,33256; # WARRIOR PROTECTION TBC 35:0,1,2,70,79:28518,33257; # PALADIN HOLY TBC 36:0,2,0,70,79:28491,39627,33263; # PALADIN PROTECTION TBC 37:0,2,1,70,79:28518,33257; # PALADIN RETRIBUTION TBC 38:0,2,2,70,79:28520,33256; # HUNTER BEAST TBC 39:0,3,0,70,79:28520,33261; # HUNTER MARKSMANSHIP TBC 40:0,3,1,70,79:28520,33261; # HUNTER SURVIVAL TBC 41:0,3,2,70,79:28520,33261; # ROGUE ASSASSINATION TBC 42:0,4,0,70,79:28520,33261; # ROGUE COMBAT TBC 43:0,4,1,70,79:28520,33261; # ROGUE SUBTLETY TBC 44:0,4,2,70,79:28520,33261; # PRIEST DISCIPLINE TBC 45:0,5,0,70,79:28491,39627,33263; # PRIEST HOLY TBC 46:0,5,1,70,79:28491,39627,33263; # PRIEST SHADOW TBC 47:0,5,2,70,79:28540,33263; # SHAMAN ELEMENTAL TBC 48:0,7,0,70,79:28521,33263; # SHAMAN ENHANCEMENT TBC 49:0,7,1,70,79:28520,33261; # SHAMAN RESTORATION TBC 50:0,7,2,70,79:28491,39627,33263; # MAGE ARCANE TBC 51:0,8,0,70,79:28521,33263; # MAGE FIRE TBC 52:0,8,1,70,79:28540,33263; # MAGE FROST TBC 53:0,8,2,70,79:28540,33263; # WARLOCK AFFLICTION TBC 54:0,9,0,70,79:28540,33263; # WARLOCK DEMONOLOGY TBC 55:0,9,1,70,79:28540,33263; # WARLOCK DESTRUCTION TBC 56:0,9,2,70,79:28540,33263; # DRUID BALANCE TBC 57:0,11,0,70,79:28521,33263; # DRUID FERAL BEAR TBC 58:0,11,1,70,79:28518,33257; # DRUID RESTORATION TBC 59:0,11,2,70,79:28491,39627,33263; # DRUID FERAL CAT TBC 60:0,11,3,70,79:28520,33261; # WARRIOR ARMS VANILLA 61:0,1,0,60,69:17538,24799; # WARRIOR FURY VANILLA 62:0,1,1,60,69:17538,24799; # WARRIOR PROTECTION VANILLA 63:0,1,2,60,69:17626,25661; # PALADIN HOLY VANILLA 64:0,2,0,60,69:17627,18194; # PALADIN PROTECTION VANILLA 65:0,2,1,60,69:17626,25661; # PALADIN RETRIBUTION VANILLA 66:0,2,2,60,69:17628,24799; # HUNTER BEAST VANILLA 67:0,3,0,60,69:17538,18192; # HUNTER MARKSMANSHIP VANILLA 68:0,3,1,60,69:17538,18192; # HUNTER SURVIVAL VANILLA 69:0,3,2,60,69:17538,18192; # ROGUE ASSASSINATION VANILLA 70:0,4,0,60,69:17538,18192; # ROGUE COMBAT VANILLA 71:0,4,1,60,69:17538,18192; # ROGUE SUBTLETY VANILLA 72:0,4,2,60,69:17538,18192; # PRIEST DISCIPLINE VANILLA 73:0,5,0,60,69:17628,18194; # PRIEST HOLY VANILLA 74:0,5,1,60,69:17627,18194; # PRIEST SHADOW VANILLA 75:0,5,2,60,69:17628,18194; # SHAMAN ELEMENTAL VANILLA 76:0,7,0,60,69:17628,18194; # SHAMAN ENHANCEMENT VANILLA 77:0,7,1,60,69:17538,24799; # SHAMAN RESTORATION VANILLA 78:0,7,2,60,69:17627,18194; # MAGE ARCANE VANILLA 79:0,8,0,60,69:17628,18194; # MAGE FIRE VANILLA 80:0,8,1,60,69:17628,18194; # MAGE FROST VANILLA 81:0,8,2,60,69:17628,18194; # WARLOCK AFFLICTION VANILLA 82:0,9,0,60,69:17628,25661; # WARLOCK DEMONOLOGY VANILLA 83:0,9,1,60,69:17628,25661; # WARLOCK DESTRUCTION VANILLA 84:0,9,2,60,69:17628,25661; # DRUID BALANCE VANILLA 85:0,11,0,60,69:17628,18194; # DRUID FERAL BEAR VANILLA 86:0,11,1,60,69:17626,25661; # DRUID RESTORATION VANILLA 87:0,11,2,60,69:17627,18194; # DRUID FERAL CAT VANILLA 88:0,11,3,60,69:17538,24799
-
-#
-#
-####################################################################################################
-
-###################################
-#                                 #
-# RANDOMBOT DEFAULT TALENT SPECS  #
-#                                 #
-###################################
-
-####################################################################################################
-#
-#
-
-# Playerbots.RandomClassSpecProb.<class>.<specno>  # The probability to choose the spec
-# Playerbots.RandomClassSpecIndex.<class>.<specno> # The spec index in PremadeSpec
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# WARRIOR
-#
-
-# arms pve
-Playerbots.RandomClassSpecProb.1.0 = 20
-Playerbots.RandomClassSpecIndex.1.0 = 0
-# fury pve
-Playerbots.RandomClassSpecProb.1.1 = 40
-Playerbots.RandomClassSpecIndex.1.1 = 1
-# prot pve
-Playerbots.RandomClassSpecProb.1.2 = 40
-Playerbots.RandomClassSpecIndex.1.2 = 2
-# arms pvp
-Playerbots.RandomClassSpecProb.1.3 = 0
-Playerbots.RandomClassSpecIndex.1.3 = 3
-# fury pvp
-Playerbots.RandomClassSpecProb.1.4 = 0
-Playerbots.RandomClassSpecIndex.1.4 = 4
-# prot pvp
-Playerbots.RandomClassSpecProb.1.5 = 0
-Playerbots.RandomClassSpecIndex.1.5 = 5
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# PALADIN
-#
-
-# holy pve
-Playerbots.RandomClassSpecProb.2.0 = 30
-Playerbots.RandomClassSpecIndex.2.0 = 0
-# prot pve
-Playerbots.RandomClassSpecProb.2.1 = 40
-Playerbots.RandomClassSpecIndex.2.1 = 1
-# ret pve
-Playerbots.RandomClassSpecProb.2.2 = 30
-Playerbots.RandomClassSpecIndex.2.2 = 2
-# holy pvp
-Playerbots.RandomClassSpecProb.2.3 = 0
-Playerbots.RandomClassSpecIndex.2.3 = 3
-# prot pvp
-Playerbots.RandomClassSpecProb.2.4 = 0
-Playerbots.RandomClassSpecIndex.2.4 = 4
-# ret pvp
-Playerbots.RandomClassSpecProb.2.5 = 0
-Playerbots.RandomClassSpecIndex.2.5 = 5
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# HUNTER
-#
-
-# bm pve
-Playerbots.RandomClassSpecProb.3.0 = 33
-Playerbots.RandomClassSpecIndex.3.0 = 0
-# mm pve
-Playerbots.RandomClassSpecProb.3.1 = 33
-Playerbots.RandomClassSpecIndex.3.1 = 1
-# surv pve
-Playerbots.RandomClassSpecProb.3.2 = 33
-Playerbots.RandomClassSpecIndex.3.2 = 2
-# bm pvp
-Playerbots.RandomClassSpecProb.3.3 = 0
-Playerbots.RandomClassSpecIndex.3.3 = 3
-# mm pvp
-Playerbots.RandomClassSpecProb.3.4 = 0
-Playerbots.RandomClassSpecIndex.3.4 = 4
-# surv pvp
-Playerbots.RandomClassSpecProb.3.5 = 0
-Playerbots.RandomClassSpecIndex.3.5 = 5
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# ROGUE
-#
-
-# as pve
-Playerbots.RandomClassSpecProb.4.0 = 40
-Playerbots.RandomClassSpecIndex.4.0 = 0
-# combat pve
-Playerbots.RandomClassSpecProb.4.1 = 60
-Playerbots.RandomClassSpecIndex.4.1 = 1
-# subtlety pve (note: subtlety strategies are not yet implemented)
-Playerbots.RandomClassSpecProb.4.2 = 0
-Playerbots.RandomClassSpecIndex.4.2 = 2
-# as pvp
-Playerbots.RandomClassSpecProb.4.3 = 0
-Playerbots.RandomClassSpecIndex.4.3 = 3
-# combat pvp
-Playerbots.RandomClassSpecProb.4.4 = 0
-Playerbots.RandomClassSpecIndex.4.4 = 4
-# subtlety pvp (note: subtlety strategies are not yet implemented)
-Playerbots.RandomClassSpecProb.4.5 = 0
-Playerbots.RandomClassSpecIndex.4.5 = 5
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# PRIEST
-#
-
-# disc pve
-Playerbots.RandomClassSpecProb.5.0 = 40
-Playerbots.RandomClassSpecIndex.5.0 = 0
-# holy pve
-Playerbots.RandomClassSpecProb.5.1 = 35
-Playerbots.RandomClassSpecIndex.5.1 = 1
-# shadow pve
-Playerbots.RandomClassSpecProb.5.2 = 25
-Playerbots.RandomClassSpecIndex.5.2 = 2
-# disc pvp
-Playerbots.RandomClassSpecProb.5.3 = 0
-Playerbots.RandomClassSpecIndex.5.3 = 3
-# holy pvp
-Playerbots.RandomClassSpecProb.5.4 = 0
-Playerbots.RandomClassSpecIndex.5.4 = 4
-# shadow pvp
-Playerbots.RandomClassSpecProb.5.5 = 0
-Playerbots.RandomClassSpecIndex.5.5 = 5
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# DEATH KNIGHT
-#
-
-# blood pve
-Playerbots.RandomClassSpecProb.6.0 = 30
-Playerbots.RandomClassSpecIndex.6.0 = 0
-# frost pve
-Playerbots.RandomClassSpecProb.6.1 = 40
-Playerbots.RandomClassSpecIndex.6.1 = 1
-# unholy pve
-Playerbots.RandomClassSpecProb.6.2 = 30
-Playerbots.RandomClassSpecIndex.6.2 = 2
-# double aura blood pve
-Playerbots.RandomClassSpecProb.6.3 = 0
-Playerbots.RandomClassSpecIndex.6.3 = 3
-# blood pvp
-Playerbots.RandomClassSpecProb.6.4 = 0
-Playerbots.RandomClassSpecIndex.6.4 = 4
-# frost pvp
-Playerbots.RandomClassSpecProb.6.5 = 0
-Playerbots.RandomClassSpecIndex.6.5 = 5
-# unholy pvp
-Playerbots.RandomClassSpecProb.6.6 = 0
-Playerbots.RandomClassSpecIndex.6.6 = 6
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# SHAMAN
-#
-
-# ele pve
-Playerbots.RandomClassSpecProb.7.0 = 33
-Playerbots.RandomClassSpecIndex.7.0 = 0
-# enh pve
-Playerbots.RandomClassSpecProb.7.1 = 33
-Playerbots.RandomClassSpecIndex.7.1 = 1
-# resto pve
-Playerbots.RandomClassSpecProb.7.2 = 33
-Playerbots.RandomClassSpecIndex.7.2 = 2
-# ele pvp
-Playerbots.RandomClassSpecProb.7.3 = 0
-Playerbots.RandomClassSpecIndex.7.3 = 3
-# enh pvp
-Playerbots.RandomClassSpecProb.7.4 = 0
-Playerbots.RandomClassSpecIndex.7.4 = 4
-# resto pvp
-Playerbots.RandomClassSpecProb.7.5 = 0
-Playerbots.RandomClassSpecIndex.7.5 = 5
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# MAGE
-#
-
-# arcane pve
-Playerbots.RandomClassSpecProb.8.0 = 30
-Playerbots.RandomClassSpecIndex.8.0 = 0
-# fire pve
-Playerbots.RandomClassSpecProb.8.1 = 30
-Playerbots.RandomClassSpecIndex.8.1 = 1
-# frost pve
-Playerbots.RandomClassSpecProb.8.2 = 40
-Playerbots.RandomClassSpecIndex.8.2 = 2
-# frostfire pve
-Playerbots.RandomClassSpecProb.8.3 = 0
-Playerbots.RandomClassSpecIndex.8.3 = 3
-# arcane pvp
-Playerbots.RandomClassSpecProb.8.4 = 0
-Playerbots.RandomClassSpecIndex.8.4 = 4
-# fire pvp
-Playerbots.RandomClassSpecProb.8.5 = 0
-Playerbots.RandomClassSpecIndex.8.5 = 5
-# frost pvp
-Playerbots.RandomClassSpecProb.8.6 = 0
-Playerbots.RandomClassSpecIndex.8.6 = 6
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# WARLOCK
-#
-
-# affli pve
-Playerbots.RandomClassSpecProb.9.0 = 33
-Playerbots.RandomClassSpecIndex.9.0 = 0
-# demo pve
-Playerbots.RandomClassSpecProb.9.1 = 34
-Playerbots.RandomClassSpecIndex.9.1 = 1
-# destro pve
-Playerbots.RandomClassSpecProb.9.2 = 33
-Playerbots.RandomClassSpecIndex.9.2 = 2
-# affli pvp
-Playerbots.RandomClassSpecProb.9.3 = 0
-Playerbots.RandomClassSpecIndex.9.3 = 3
-# demo pvp
-Playerbots.RandomClassSpecProb.9.4 = 0
-Playerbots.RandomClassSpecIndex.9.4 = 4
-# destro pvp
-Playerbots.RandomClassSpecProb.9.5 = 0
-Playerbots.RandomClassSpecIndex.9.5 = 5
-
-#
-#
-####################################################################################################
-
-####################################################################################################
-# DRUID
-#
-
-# balance pve
-Playerbots.RandomClassSpecProb.11.0 = 20
-Playerbots.RandomClassSpecIndex.11.0 = 0
-# bear pve
-Playerbots.RandomClassSpecProb.11.1 = 25
-Playerbots.RandomClassSpecIndex.11.1 = 1
-# resto pve
-Playerbots.RandomClassSpecProb.11.2 = 35
-Playerbots.RandomClassSpecIndex.11.2 = 2
-# cat pve
-Playerbots.RandomClassSpecProb.11.3 = 20
-Playerbots.RandomClassSpecIndex.11.3 = 3
-# balance pvp
-Playerbots.RandomClassSpecProb.11.4 = 0
-Playerbots.RandomClassSpecIndex.11.4 = 4
-# cat pvp
-Playerbots.RandomClassSpecProb.11.5 = 0
-Playerbots.RandomClassSpecIndex.11.5 = 5
-# resto pvp
-Playerbots.RandomClassSpecProb.11.6 = 0
-Playerbots.RandomClassSpecIndex.11.6 = 6
 
 #
 #
