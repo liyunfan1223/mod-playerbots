@@ -17,6 +17,7 @@
 #include "RandomPlayerbotMgr.h"
 #include "Talentspec.h"
 #include "TravelMgr.h"
+#include <algorithm>
 #include <cctype>
 #include <iostream>
 #include <sstream>
@@ -255,13 +256,16 @@ bool PlayerbotAIConfig::Initialize()
                   MinRandomBots, MaxRandomBots);
         std::swap(MinRandomBots, MaxRandomBots);
     }
+    RandomBotCountMode = sConfigMgr->GetOption<uint32>("Playerbots.RandomBotCountMode", 0);
     RandomBotUpdateInterval = sConfigMgr->GetOption<int32>("Playerbots.RandomBotUpdateInterval", 20);
     RandomBotCountChangeMinInterval =
         sConfigMgr->GetOption<int32>("Playerbots.RandomBotCountChangeMinInterval", 30 * MINUTE);
     RandomBotCountChangeMaxInterval =
         sConfigMgr->GetOption<int32>("Playerbots.RandomBotCountChangeMaxInterval", 2 * HOUR);
-    MinRandomBotInWorldTime = sConfigMgr->GetOption<int32>("Playerbots.MinRandomBotInWorldTime", 2 * HOUR);
-    MaxRandomBotInWorldTime = sConfigMgr->GetOption<int32>("Playerbots.MaxRandomBotInWorldTime", 14 * 24 * HOUR);
+    RandomBotCountMinTime =
+        std::min<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RandomBotCountMinTime", 5), 23);
+    RandomBotCountMaxTime =
+        std::min<uint32>(sConfigMgr->GetOption<uint32>("Playerbots.RandomBotCountMaxTime", 20), 23);
     MinRandomBotRandomizeTime = sConfigMgr->GetOption<int32>("Playerbots.MinRandomBotRandomizeTime", 2 * HOUR);
     MaxRandomBotRandomizeTime = sConfigMgr->GetOption<int32>("Playerbots.MaxRandomBotRandomizeTime", 14 * 24 * HOUR);
     MinRandomBotChangeStrategyTime =
@@ -272,8 +276,6 @@ bool PlayerbotAIConfig::Initialize()
     MaxRandomBotReviveTime = sConfigMgr->GetOption<int32>("Playerbots.MaxRandomBotReviveTime", 5 * MINUTE);
     MinRandomBotTeleportInterval = sConfigMgr->GetOption<int32>("Playerbots.MinRandomBotTeleportInterval", 1 * HOUR);
     MaxRandomBotTeleportInterval = sConfigMgr->GetOption<int32>("Playerbots.MaxRandomBotTeleportInterval", 5 * HOUR);
-    PermanentlyInWorldTime =
-        sConfigMgr->GetOption<int32>("Playerbots.PermanentlyInWorldTime", 1 * YEAR);
     RandomBotTeleportDistance = sConfigMgr->GetOption<int32>("Playerbots.RandomBotTeleportDistance", 100);
     RandomBotsPerInterval = sConfigMgr->GetOption<int32>("Playerbots.RandomBotsPerInterval", 60);
     RandomBotPrintStatsInterval = sConfigMgr->GetOption<int32>("Playerbots.RandomBotPrintStatsInterval", 300);
@@ -720,9 +722,7 @@ bool PlayerbotAIConfig::Initialize()
     LimitEnchantExpansion = sConfigMgr->GetOption<int32>("Playerbots.LimitEnchantExpansion", 1);
     LimitGearExpansion = sConfigMgr->GetOption<int32>("Playerbots.LimitGearExpansion", 1);
     RandomBotStartingLevel = sConfigMgr->GetOption<int32>("Playerbots.RandombotStartingLevel", 1);
-    EnablePeriodicOnlineOffline = sConfigMgr->GetOption<bool>("Playerbots.EnablePeriodicOnlineOffline", false);
     EnableRandomBotTrading = sConfigMgr->GetOption<int32>("Playerbots.EnableRandomBotTrading", 1);
-    PeriodicOnlineOfflineRatio = sConfigMgr->GetOption<float>("Playerbots.PeriodicOnlineOfflineRatio", 2.0);
     GearScoreCheck = sConfigMgr->GetOption<bool>("Playerbots.GearScoreCheck", false);
     RandomBotPreQuests = sConfigMgr->GetOption<bool>("Playerbots.PreQuests", false);
 

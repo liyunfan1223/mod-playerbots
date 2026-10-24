@@ -360,9 +360,8 @@ std::string const RandomPlayerbotFactory::CreateRandomBotName(NameRaceAndGender 
 }
 
 // Calculates the total number of required accounts, either using the specified randomBotAccountCount
-// or determining it dynamically based on MaxRandomBots, EnablePeriodicOnlineOffline and its ratio,
-// and AddClassAccountPoolSize. The system also factors in the types of existing account, as assigned by
-// AssignAccountTypes()
+// or determining it dynamically based on MaxRandomBots and AddClassAccountPoolSize.
+// The system also factors in the types of existing account, as assigned by AssignAccountTypes().
 uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
 {
     // Reset account types if features are disabled
@@ -425,9 +424,6 @@ uint32 RandomPlayerbotFactory::CalculateTotalAccountCount()
 
     // Calculate max bots
     int maxBots = sPlayerbotAIConfig.MaxRandomBots;
-    // Take periodic online/offline into account
-    if (sPlayerbotAIConfig.EnablePeriodicOnlineOffline)
-        maxBots *= sPlayerbotAIConfig.PeriodicOnlineOfflineRatio;
 
     // Calculate number of accounts needed for RNDbots
     // Result is rounded up for maxBots not cleanly divisible by the divisor
