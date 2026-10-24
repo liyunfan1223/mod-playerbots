@@ -223,6 +223,11 @@ bool RollAction::Execute(Event event)
     if (!proto)
         return false;
 
+    // Abort loot roll if they're rolling on a unique or unique-equip item they
+    // already have a copy of.
+    if (RollUniqueCheck(proto, bot))
+        return false;
+
     std::string itemUsageParam;
     itemUsageParam = std::to_string(itemId);
 
