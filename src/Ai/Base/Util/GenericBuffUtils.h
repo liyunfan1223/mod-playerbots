@@ -12,14 +12,18 @@
 #include <unordered_map>
 
 class Aura;
+class Group;
 class Player;
 class PlayerbotAI;
 class Unit;
+enum class AutoPartyBuffMode : uint8;
 
 namespace ai::buff
 {
 
 typedef std::unordered_map<std::string, uint32> MissingBuffReagentNoticeMap;
+
+bool IsGroupEligibleForBuffMode(Group const* group, AutoPartyBuffMode mode);
 
 // True when the buff should be (re)cast: topped off toward full duration during an
 // out-of-combat force-rebuff, below baseBeforeDuration ms remaining otherwise.
@@ -32,6 +36,8 @@ std::string MakeAuraQualifierForBuff(std::string const& name);
 std::string GroupVariantFor(std::string const& name);
 
 bool NeedsPostLoginBuffGrace(std::string const& name);
+
+bool IsWithinPostLoginBuffGrace(Player* player);
 
 bool ShouldDeferPartyBuffEvaluationForRecentLogin(
     Player* bot,
