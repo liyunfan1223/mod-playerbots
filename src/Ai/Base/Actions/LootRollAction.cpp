@@ -58,6 +58,8 @@ bool LootRollAction::Execute(Event /*event*/)
         }
         else if (usage == ITEM_USAGE_DISENCHANT)
             vote = sPlayerbotAIConfig.LootRollDisenchant ? DISENCHANT : GREED;
+        else if (RollUniqueCheck(proto, bot))
+            vote = PASS;
         else
         {
             switch (proto->Class)
@@ -85,9 +87,7 @@ bool LootRollAction::Execute(Event /*event*/)
         }
         if (vote == NEED)
         {
-            if (RollUniqueCheck(proto, bot))
-                vote = PASS;
-            else if (sPlayerbotAIConfig.LootNeedRollLevel == 0)
+            if (sPlayerbotAIConfig.LootNeedRollLevel == 0)
                 vote = PASS;
             else if (sPlayerbotAIConfig.LootNeedRollLevel == 1)
                 vote = GREED;
