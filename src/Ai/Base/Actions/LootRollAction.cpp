@@ -69,7 +69,7 @@ bool LootRollAction::Execute(Event /*event*/)
                     else if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
                         // The bot is thinking of equipping the item, make sure it doesn't roll on unique-like items it already has copies of.
                         if (RollUniqueCheck(proto, bot))
-                            vote = PASS;
+                            vote = GREED;
                         else
                             vote = NEED;
                     else if (usage != ITEM_USAGE_NONE)
