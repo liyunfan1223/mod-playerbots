@@ -296,7 +296,14 @@ bool GuildManageNearbyAction::isUseful()
 bool GuildLeaveAction::Execute(Event event)
 {
     Player* owner = event.getOwner();
-    if (owner && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, owner, true))
+    // A shared guild's bots take orders from players outside it, who must not take them out of it, also through
+    // a custom strategy, whose triggers carry no owner
+    Player* master = botAI->GetMaster();
+    bool sharedWithOutsider = sPlayerbotAIConfig.SharedBotGuilds.count(bot->GetGuildId()) &&
+                              ((owner && owner->GetGuildId() != bot->GetGuildId()) ||
+                               (master && master->GetGuildId() != bot->GetGuildId()));
+    if (sharedWithOutsider ||
+        (owner && !botAI->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, owner, true)))
     {
         botAI->TellError("Sorry, I am happy in my guild :)");
         return false;

@@ -166,6 +166,13 @@ Playerbots.AllowGuildBots = 1
 # Allow linking accounts for shared altbot control
 Playerbots.AllowTrustedAccountBots = 1
 
+# Comma-separated guild ids (guild.guildid) whose random bots any real player of the
+# same faction may add as altbots with ".playerbots bot add" while the bot is offline,
+# without being in the guild. Bots whose guild rank may invite, remove, promote or
+# demote members are not shared.
+# Default: "" (none)
+Playerbots.SharedBotGuilds = ""
+
 # Randombots will create guilds with nearby randombots
 # Note: currently, randombots will not invite more bots after a guild is created,
 # meaning randombot guilds will have only the 10 initial randombots needed to sign the charter

@@ -185,6 +185,8 @@ bool PlayerbotAIConfig::Initialize()
     AllowAccountBots = sConfigMgr->GetOption<bool>("Playerbots.AllowAccountBots", true);
     AllowGuildBots = sConfigMgr->GetOption<bool>("Playerbots.AllowGuildBots", true);
     AllowTrustedAccountBots = sConfigMgr->GetOption<bool>("Playerbots.AllowTrustedAccountBots", true);
+    SharedBotGuilds.clear();
+    LoadSet<std::set<uint32>>(sConfigMgr->GetOption<std::string>("Playerbots.SharedBotGuilds", ""), SharedBotGuilds);
     DisabledWithoutRealPlayer = sConfigMgr->GetOption<bool>("Playerbots.DisabledWithoutRealPlayer", false);
     RandomBotGuildNearby = sConfigMgr->GetOption<bool>("Playerbots.RandomBotGuildNearby", false);
     RandomBotInvitePlayer = sConfigMgr->GetOption<bool>("Playerbots.RandomBotInvitePlayer", false);
