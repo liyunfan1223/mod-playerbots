@@ -1,0 +1,13 @@
+# Machine-specific integration-test environment. Copy to `test_env` (kept out of
+# git) and adjust for your setup. Consumed by run_test.py; these AC_* variables
+# override the worldserver config.
+
+# Dedicated test databases - NEVER point these at a live server's databases:
+# the harness creates/logs out characters and applies schema updates.
+AC_LOGIN_DATABASE_INFO=127.0.0.1;3306;acore;acore;acore_test_auth
+AC_CHARACTER_DATABASE_INFO=127.0.0.1;3306;acore;acore;acore_test_characters
+AC_PLAYERBOTS_DATABASE_INFO=127.0.0.1;3306;acore;acore;acore_test_playerbots
+
+# World database stays shared with dev (read-mostly); bit 4 (world schema updates)
+# is disabled so it is never written. 3 = login + characters.
+AC_UPDATES_ENABLE_DATABASES=3
