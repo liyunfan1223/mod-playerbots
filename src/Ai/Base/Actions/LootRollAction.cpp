@@ -65,7 +65,12 @@ bool LootRollAction::Execute(Event /*event*/)
                 case ITEM_CLASS_WEAPON:
                 case ITEM_CLASS_ARMOR:
                     if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
-                        vote = NEED;
+                        // The bot is thinking of equipping the item, make sure it doesn't roll NEED on unique-equip items it already has copies of.
+                        // Fall back to disenchant logic instead if it already has a copy of a unique-equip item.
+                        if (RollUniqueCheck(proto, bot))
+                            vote = sPlayerbotAIConfig.LootRollDisenchant ? DISENCHANT : GREED;
+                        else
+                            vote = NEED;
                     else if (usage != ITEM_USAGE_NONE)
                         vote = GREED;
                     break;
@@ -85,7 +90,7 @@ bool LootRollAction::Execute(Event /*event*/)
         }
         if (vote == NEED)
         {
-            if (sPlayerbotAIConfig.LootNeedRollLevel == 0 || RollUniqueCheck(proto, bot))
+            if (sPlayerbotAIConfig.LootNeedRollLevel == 0)
                 vote = PASS;
             else if (sPlayerbotAIConfig.LootNeedRollLevel == 1)
                 vote = GREED;
@@ -196,19 +201,14 @@ bool CanBotUseToken(ItemTemplate const* proto, Player* bot)
 
 bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
 {
-    // Count the total number of the item (equipped + in bags)
-    uint32 totalItemCount = bot->GetItemCount(proto->ItemId, true);
+    // Check for both unique-equip and generic uniqueness.
+    // Standard item_template database have no equippable items with MaxCount > 1.
+    // Return true if the bot already has any of these items in any inventory, including
+    // their bank.
+    if (proto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE) || proto->MaxCount == 1)
+        return (bot->GetItemCount(proto->ItemId, true) > 0);
 
-    // Count the number of the item in bags only
-    uint32 bagItemCount = bot->GetItemCount(proto->ItemId, false);
-
-    // Determine if the unique item is already equipped
-    bool isEquipped = (totalItemCount > bagItemCount);
-    if (isEquipped && proto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE))
-        return true;  // Unique Item is already equipped
-    else if (proto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE) && (bagItemCount > 1))
-        return true; // Unique item already in bag, don't roll for it
-    return false; // Item is not equipped or in bags, roll for it
+    return false;
 }
 
 bool RollAction::Execute(Event event)
@@ -226,6 +226,9 @@ bool RollAction::Execute(Event event)
     uint32 itemId = *itemIds.begin();
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
     if (!proto)
+        return false;
+
+    if (RollUniqueCheck(proto, bot))
         return false;
 
     std::string itemUsageParam;
