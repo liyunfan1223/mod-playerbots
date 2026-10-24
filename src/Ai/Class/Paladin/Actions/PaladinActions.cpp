@@ -13,6 +13,11 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 
+CastHolyShieldAction::CastHolyShieldAction(PlayerbotAI* botAI)
+    : CastBuffSpellAction(botAI, "holy shield", false, ai::paladin::HOLY_SHIELD_REFRESH_MS)
+{
+}
+
 static bool IsBlessingTargetCandidate(Player* bot, Player* player)
 {
     if (!player || !player->IsAlive() || player->GetMapId() != bot->GetMapId())
