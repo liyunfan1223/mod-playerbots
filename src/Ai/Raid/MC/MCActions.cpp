@@ -342,11 +342,8 @@ bool McCoreHoundMarkAction::Execute(Event /*event*/)
     return true;
 }
 
-bool McMajordomoStopAttackAction::isUseful() { return bot->GetVictim() != nullptr; }
-
 bool McMajordomoStopAttackAction::Execute(Event /*event*/)
 {
     // Auto-attack keeps swinging into the Damage Shield; the multiplier keeps the bot from re-engaging.
-    bot->AttackStop();
-    return true;
+    return bot->AttackStop();
 }

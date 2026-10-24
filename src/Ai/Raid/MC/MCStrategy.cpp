@@ -8,6 +8,7 @@
 #include "MCHelpers.h"
 #include "MCMultipliers.h"
 #include "Playerbots.h"
+#include "RtiTargetValue.h"
 #include "Strategy.h"
 
 using namespace MoltenCoreHelpers;
@@ -116,14 +117,14 @@ void RaidMcStrategy::AppendTargetExclusions(GuidSet& exclusions, TargetValueExcl
         return;
 
     // Damage into these is wasted: Core Ragers are unkillable while Golemagg
-    // lives (full heal at 50%), and Majordomo reflects and cannot die; his
-    // encounter ends when the eight adds are dead. Tanks still pick them up
-    // through their own target selection.
+    // lives (full heal at 50%), and Majordomo cannot die; his encounter ends
+    // when the eight adds are dead. Tanks still pick them up through their own
+    // target selection.
     AiObjectContext* context = botAI->GetAiObjectContext();
     bool const golemaggAlive = AI_VALUE2(Unit*, "find target", "golemagg the incinerator") != nullptr;
     // The DPS target search skips the moon (crowd control) mark, so a moon-marked healer does not count.
     Group const* group = botAI->GetBot()->GetGroup();
-    ObjectGuid const moonGuid = group ? group->GetTargetIcon(4) : ObjectGuid::Empty;
+    ObjectGuid const moonGuid = group ? group->GetTargetIcon(RtiTargetValue::moonIndex) : ObjectGuid::Empty;
     bool flamewakerHealerAlive = false;
     GuidVector flamewakerElites;
     for (ObjectGuid const guid : AI_VALUE(GuidVector, "attackers"))
