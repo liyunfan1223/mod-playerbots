@@ -789,6 +789,11 @@ Playerbots.LimitTalentsExpansion = 0
 # Default: 1 (enabled)
 Playerbots.EnableRandomBotTrading = 1
 
+# Seconds a crafting order ('craft [item link] [count]') may go without progress before the bot cancels it
+# and mails the customer back their reagents and anything it has crafted for them
+# Default: 300
+Playerbots.CraftOrderTimeout = 300
+
 # Configure message prefixes which will be excluded in analysis in trade action to open trade window
 Playerbots.TradeActionExcludedPrefixes = "RPLL_H_,DBMv4,{звезда} Questie,{rt1} Questie"
 

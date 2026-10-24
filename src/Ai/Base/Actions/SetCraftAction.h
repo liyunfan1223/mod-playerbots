@@ -8,11 +8,9 @@
 #define PLAYERBOTS_SETCRAFTACTION_H
 
 #include "Action.h"
-#include "CraftValue.h"
 
+class Player;
 class PlayerbotAI;
-
-struct SkillLineAbilityEntry;
 
 class SetCraftAction : public Action
 {
@@ -21,12 +19,10 @@ public:
 
     bool Execute(Event event) override;
 
-    static uint32 GetCraftFee(CraftData& craftData);
-
 private:
-    void TellCraft();
-
-    static std::map<uint32, SkillLineAbilityEntry const*> skillSpells;
+    void TellProfessions(Player* requester);
+    bool PlaceOrder(std::string const& param);
+    uint32 FindCraftSpell(uint32 itemId);
 };
 
 #endif

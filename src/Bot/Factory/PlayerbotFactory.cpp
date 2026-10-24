@@ -11,6 +11,7 @@
 #include "AiObjectContext.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+#include "CraftOrder.h"
 #include "DBCStores.h"
 #include "DBCStructure.h"
 #include "GuildMgr.h"
@@ -3957,14 +3958,21 @@ void PlayerbotFactory::InitInstanceQuests()
     bot->SetUInt32Value(PLAYER_XP, currentXP);
 }
 
+// A crafting order's items belong to its customer, so they are mailed back before anything is destroyed.
 void PlayerbotFactory::ClearInventory()
 {
+    if (botAI)
+        CraftOrder::Refund(botAI);
+
     DestroyItemsVisitor visitor(bot);
     IterateItems(&visitor);
 }
 
 void PlayerbotFactory::ClearAllItems()
 {
+    if (botAI)
+        CraftOrder::Refund(botAI);
+
     DestroyItemsVisitor visitor(bot);
     IterateItems(&visitor, ITERATE_ALL_ITEMS);
 }

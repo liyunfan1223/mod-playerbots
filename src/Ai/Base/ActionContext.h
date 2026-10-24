@@ -23,6 +23,7 @@
 #include "ChooseRpgTargetAction.h"
 #include "ChooseTargetActions.h"
 #include "ChooseTravelTargetAction.h"
+#include "CraftOrderActions.h"
 #include "DelayAction.h"
 #include "DestroyItemAction.h"
 #include "DropQuestAction.h"
@@ -195,6 +196,8 @@ public:
         creators["use random recipe"] = &ActionContext::use_random_recipe;
         creators["use start quest item"] = &ActionContext::use_start_quest_item;
         creators["craft random item"] = &ActionContext::craft_random_item;
+        creators["craft order"] = &ActionContext::craft_order;
+        creators["refund craft order"] = &ActionContext::refund_craft_order;
         creators["smart destroy item"] = &ActionContext::smart_destroy_item;
         creators["disenchant random item"] = &ActionContext::disenchant_random_item;
         creators["enchant random item"] = &ActionContext::enchant_random_item;
@@ -408,6 +411,8 @@ private:
     static Action* use_random_recipe(PlayerbotAI* botAI) { return new UseRandomRecipe(botAI); }
     static Action* use_start_quest_item(PlayerbotAI* botAI) { return new UseStartQuestItem(botAI); }
     static Action* craft_random_item(PlayerbotAI* botAI) { return new CraftRandomItemAction(botAI); }
+    static Action* craft_order(PlayerbotAI* botAI) { return new CraftOrderAction(botAI); }
+    static Action* refund_craft_order(PlayerbotAI* botAI) { return new RefundCraftOrderAction(botAI); }
     static Action* smart_destroy_item(PlayerbotAI* botAI) { return new SmartDestroyItemAction(botAI); }
     static Action* disenchant_random_item(PlayerbotAI* botAI) { return new DisEnchantRandomItemAction(botAI); }
     static Action* enchant_random_item(PlayerbotAI* botAI) { return new EnchantRandomItemAction(botAI); }

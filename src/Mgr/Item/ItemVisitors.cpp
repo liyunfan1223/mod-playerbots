@@ -7,8 +7,13 @@
 #include "ItemVisitors.h"
 #include "Playerbots.h"
 
+FindUsableItemVisitor::FindUsableItemVisitor(Player* bot) : FindItemVisitor(), bot(bot), botAI(GET_PLAYERBOT_AI(bot)) {}
+
 bool FindUsableItemVisitor::Visit(Item* item)
 {
+    if (botAI && botAI->IsReservedItem(item->GetEntry()))
+        return true;
+
     if (bot->CanUseItem(item->GetTemplate()) == EQUIP_ERR_OK)
         return FindItemVisitor::Visit(item);
 

@@ -29,6 +29,7 @@
 
 class Action;
 class AiObjectContext;
+class CraftData;
 class Creature;
 class Engine;
 class ExternalEventHelper;
@@ -591,6 +592,10 @@ public:
 
     void SetMaster(Player* newMaster) { master = newMaster; }
     AiObjectContext* GetAiObjectContext() { return aiObjectContext; }
+    // The bot's crafting order (its "craft" value), looked up once.
+    CraftData& GetCraftOrder() const;
+    // Held for a crafting order's customer: the bot must not use, sell or destroy it.
+    bool IsReservedItem(uint32 itemId) const;
     ChatHelper* GetChatHelper() { return &chatHelper; }
     bool IsOpposing(Player* player);
     static bool IsOpposing(uint8 race1, uint8 race2);
@@ -658,6 +663,7 @@ protected:
     Player* master;
     uint32 accountId;
     AiObjectContext* aiObjectContext;
+    mutable CraftData* _craftOrder = nullptr;
     Engine* currentEngine;
     Engine* engines[BOT_STATE_MAX];
     BotState currentState;
