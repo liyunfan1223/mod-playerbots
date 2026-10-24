@@ -168,6 +168,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("guild remove");
     supported.push_back("guild leave");
     supported.push_back("rtsc");
+    supported.push_back("eat");
     supported.push_back("drink");
     supported.push_back("calc");
     supported.push_back("roll");

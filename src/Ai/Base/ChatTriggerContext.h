@@ -142,6 +142,7 @@ public:
         creators["guild leave"] = &ChatTriggerContext::guild_leave;
         creators["rtsc"] = &ChatTriggerContext::rtsc;
         creators["drink"] = &ChatTriggerContext::drink;
+        creators["eat"] = &ChatTriggerContext::eat;
         creators["dps"] = &ChatTriggerContext::dps;
         creators["disperse"] = &ChatTriggerContext::disperse;
         creators["calc"] = &ChatTriggerContext::calc;
@@ -275,6 +276,7 @@ private:
     static Trigger* guild_leave(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "guild leave"); }
     static Trigger* rtsc(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "rtsc"); }
     static Trigger* drink(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "drink"); }
+    static Trigger* eat(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "eat"); }
     static Trigger* dps(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "dps"); }
     static Trigger* disperse(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "disperse"); }
     static Trigger* calc(PlayerbotAI* botAI) { return new ChatCommandTrigger(botAI, "calc"); }
