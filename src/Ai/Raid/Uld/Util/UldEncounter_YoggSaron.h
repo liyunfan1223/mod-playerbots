@@ -102,6 +102,8 @@ enum UlduarYoggSaronIds
     SPELL_PALADIN_HAND_OF_RECKONING = 62124,
     SPELL_DEATH_KNIGHT_DARK_COMMAND = 56222,
     SPELL_DRUID_GROWL = 6795,
+    SPELL_DRUID_BEAR_FORM = 5487,
+    SPELL_DRUID_DIRE_BEAR_FORM = 9634,
     SPELL_HEROISM_SHAMAN = 32182,
     SPELL_BLOODLUST_SHAMAN = 2825,
     SPELL_SATED = 57724,
@@ -704,6 +706,10 @@ bool YoggSaronShouldLeaveBrainLevel(PlayerbotAI* botAI);
 // a bot closing on the portal can't talk itself back to the Brain. Reads the latch only, no sweep.
 bool YoggSaronLeavingBrainLevel(Player* bot);
 
+// Cancels Bladestorm, Killing Spree and the like, as far as a player could. A portal's spell is cast by the user,
+// untriggered, and those auras fail every untriggered cast. Returns the first spell cancelled, or 0.
+uint32 YoggSaronCancelAbilityLock(Player* bot);
+
 // Sanity stacks (63050). 0 with no aura, which is Insane or out of the fight.
 uint32 YoggSaronSanityOf(Player* player);
 
@@ -1013,7 +1019,8 @@ Position YoggSaronBodyRoute(Player* bot, Position const& spot);
 bool IsYoggSaronHoldableGuardian(Unit* unit);
 
 // Phase 3 without Thorim: the marked Guardian this bot drags clear of the pile, or nullptr. `claim` also takes one:
-// tanks while another holds the pile, ret paladins and dps DKs, hunters, by GUID; never one an unmarked Guardian hits.
+// tanks while another holds the pile, ret paladins and dps DKs, hunters, feral druids, by GUID; never one an unmarked
+// Guardian hits.
 Unit* YoggSaronBeaconDragGuardian(PlayerbotAI* botAI, bool claim);
 
 // Stamps the taunt this bot just cast on the Guardian it drags.
@@ -1033,6 +1040,11 @@ Position const& YoggSaronBeaconHunterSpot(Player* bot);
 // The healed Guardian this bot dragged, while still on it within ULDUAR_YOGG_SARON_BEACON_RETURN_MS of the release, or
 // nullptr. The tank is ~39 yd away and a taunt reaches 30, so the dragger walks it back.
 Unit* YoggSaronBeaconReturning(Player* bot);
+
+// Which loose Guardian a tank taunts first, lowest first. 0: a healed one still on the paladin, DK or druid that
+// dragged it. Their taunt matched top threat for good, so only a tank's taunt gets it off them. 2: one under a
+// hunter's Distracting Shot, which goes back by itself. 1: anything else.
+uint8 YoggSaronLooseGuardianTier(Player* bot, Unit* guardian);
 
 // A Guardian the beacon heal is on, or still marked, that is hitting `victim` from the danger line up,
 // or nullptr.
@@ -1087,6 +1099,13 @@ bool YoggSaronBeaconImmunityHeld(PlayerbotAI* botAI);
 // A hunter whose drag claim hasn't seen the heal yet. Any damage on its Guardian is threat that keeps it
 // there once the taunt ends, and Feign Death or Deterrence would undo the pull.
 bool YoggSaronBeaconHunterHold(PlayerbotAI* botAI);
+
+// A druid staged for a beacon, dragging, or walking its Guardian back. Growl needs a bear form, and the cat
+// strategy would shift it straight back to Cat Form.
+bool YoggSaronBeaconBearHeld(PlayerbotAI* botAI);
+
+// A druid in a bear form, or knowing one and with the mana for it. The bot's spell check skips the cost.
+bool YoggSaronBearReady(Player* druid);
 
 // Deafening Roar is due this phase 3: 25-man, fewer than 4 Keepers. Latched by the tick.
 bool YoggSaronRoarExpected(PlayerbotAI* botAI);

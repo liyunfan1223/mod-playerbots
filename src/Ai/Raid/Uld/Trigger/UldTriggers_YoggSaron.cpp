@@ -751,7 +751,8 @@ bool YoggSaronBeaconDragTrigger::IsActive()
     // Class first: the drag pick sweeps from Yogg.
     bool const mayDrag = PlayerbotAI::IsTank(bot) || bot->getClass() == CLASS_HUNTER ||
                          (!PlayerbotAI::IsHeal(bot) &&
-                          (bot->getClass() == CLASS_PALADIN || bot->getClass() == CLASS_DEATH_KNIGHT));
+                          (bot->getClass() == CLASS_PALADIN || bot->getClass() == CLASS_DEATH_KNIGHT ||
+                           (bot->getClass() == CLASS_DRUID && !PlayerbotAI::IsRanged(bot))));
     if (!mayDrag || YoggSaronOnBrainLevel(bot))
         return false;
 
@@ -765,6 +766,15 @@ bool YoggSaronBeaconDragTrigger::IsActive()
 bool YoggSaronBeaconStageTrigger::IsActive()
 {
     return YoggSaronBeaconStageSpot(bot) && botAI->CanMove() && !YoggSaronOnBrainLevel(bot);
+}
+
+bool YoggSaronBeaconBearFormTrigger::IsActive()
+{
+    if (bot->GetShapeshiftForm() == FORM_BEAR || bot->GetShapeshiftForm() == FORM_DIREBEAR ||
+        !YoggSaronBeaconBearHeld(botAI) || !YoggSaronBearReady(bot))
+        return false;
+
+    return botAI->CanCastSpell("dire bear form", bot) || botAI->CanCastSpell("bear form", bot);
 }
 
 bool YoggSaronPhase3LustTrigger::IsActive()

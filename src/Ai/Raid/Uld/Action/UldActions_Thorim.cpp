@@ -374,7 +374,7 @@ bool ThorimPhase2PositioningAction::Execute(Event /*event*/)
     if (!TryGetThorimPhase2Spot(botAI, bot, role, targetPosition))
         return false;
 
-    bool const ringSlot = role == ThorimPhase2Role::OffTank || role == ThorimPhase2Role::MeleeRing;
+    bool const ringSlot = role == ThorimPhase2Role::MeleeRing;
 
     // Arrival is set by the trigger and cleared here as the move goes out, so the "stay" branch below only
     // runs if the spot changed between the trigger's ask and this one.

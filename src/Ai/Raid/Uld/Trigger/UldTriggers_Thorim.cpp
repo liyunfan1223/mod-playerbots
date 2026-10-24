@@ -136,13 +136,10 @@ bool ThorimPhase2PositioningTrigger::IsActive()
     if (!TryGetThorimPhase2Spot(botAI, bot, role, spot))
         return false;
 
-    Unit* boss = GetThorim(botAI);
-    bool const holdsBoss = boss && boss->GetVictim() == bot;
-
-    // Only whoever has him walks him to the anchor, a second tank would drag him back. The off-tank too: his ring
-    // point is measured off the boss, so towing from it drifts the pair across the room.
-    if (role == ThorimPhase2Role::MainTank || (role == ThorimPhase2Role::OffTank && holdsBoss))
-        return holdsBoss && bot->GetDistance(spot) > ULDUAR_THORIM_PHASE2_SPOT_TOLERANCE;
+    // Both tank spots are fixed world points, so each tank walks to its own whether or not it has him: the
+    // one that does then tows him to a point that does not move.
+    if (role == ThorimPhase2Role::MainTank || role == ThorimPhase2Role::OffTank)
+        return bot->GetDistance(spot) > ULDUAR_THORIM_PHASE2_SPOT_TOLERANCE;
 
     if (role == ThorimPhase2Role::Ranged)
     {

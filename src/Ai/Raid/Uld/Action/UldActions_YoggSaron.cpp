@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <string>
 #include <tuple>
 #include <vector>
 
@@ -1335,6 +1336,8 @@ bool YoggSaronUsePortalAction::Execute(Event /*event*/)
     if (!assignedPortal)
         return false;
 
+    // The click is the bot's own untriggered cast, and Bladestorm fails those.
+    YoggSaronCancelAbilityLock(bot);
     return assignedPortal->HandleSpellClick(bot);
 }
 
@@ -1533,6 +1536,10 @@ bool YoggSaronMoveToExitPortalAction::Execute(Event /*event*/)
         // one tick to turn the bot round.
         if (bot->GetDistance2d(portal) > INTERACTION_DISTANCE)
             return true;
+
+        // Only here, not on the way: Bladestorm walks, so it keeps hitting until the bot is at the portal. The portal
+        // casts its spell from the bot untriggered, and Bladestorm fails those, so Use would do nothing.
+        YoggSaronCancelAbilityLock(bot);
 
         portal->Use(bot);
 
@@ -1802,6 +1809,21 @@ bool YoggSaronBeaconStageAction::Execute(Event /*event*/)
     return true;
 }
 
+bool YoggSaronBeaconBearFormAction::Execute(Event /*event*/)
+{
+    // Neither bear form casts while shapeshifted, and the hold blocks the caster form action.
+    if (bot->GetShapeshiftForm() != FORM_NONE)
+        botAI->RemoveShapeshift();
+
+    for (char const* form : {"dire bear form", "bear form"})
+    {
+        if (botAI->CanCastSpell(form, bot) && botAI->CastSpell(form, bot))
+            return true;
+    }
+
+    return false;
+}
+
 bool YoggSaronPhase3LustAction::Execute(Event /*event*/)
 {
     for (char const* spell : {"heroism", "bloodlust"})
@@ -1855,7 +1877,13 @@ bool YoggSaronGuardianControlAction::ControlPhaseThree()
     Position const& spot = ULDUAR_YOGG_SARON_PHASE_3_MELEE_SPOT;
 
     GuidVector const targets = GetYoggSaronGuardiansInSight(botAI);
-    std::vector<std::pair<float, Unit*>> loose;
+    struct LooseGuardian
+    {
+        uint8 tier;
+        float distance;
+        Unit* guardian;
+    };
+    std::vector<LooseGuardian> loose;
     std::vector<Unit*> inReach;
     std::vector<Unit*> atSpot;
     for (ObjectGuid const& guid : targets)
@@ -1866,7 +1894,7 @@ bool YoggSaronGuardianControlAction::ControlPhaseThree()
 
         Player* victim = unit->GetVictim() ? unit->GetVictim()->ToPlayer() : nullptr;
         if (!victim || !PlayerbotAI::IsTank(victim))
-            loose.emplace_back(bot->GetDistance(unit), unit);
+            loose.push_back({YoggSaronLooseGuardianTier(bot, unit), bot->GetDistance(unit), unit});
 
         if (bot->IsWithinMeleeRange(unit))
             inReach.push_back(unit);
@@ -1886,24 +1914,27 @@ bool YoggSaronGuardianControlAction::ControlPhaseThree()
         loose.clear();
 
     // Loose ones before the leash: a taunt is a cast, not a walk, and the Guardian is already heading for a healer or
-    // a ranged. Highest health first: a full or beacon-healed one hits a non-tank for 30-75k, a Weakened one for ~2k.
+    // a ranged. A healed one still on its dragger first, see YoggSaronLooseGuardianTier: the dragger has no way to
+    // shed it and dies under it. Then highest health: a full or beacon-healed one hits a non-tank for 30-75k, a
+    // Weakened one for ~2k.
     std::sort(loose.begin(), loose.end(),
-              [](auto const& left, auto const& right)
+              [](LooseGuardian const& left, LooseGuardian const& right)
               {
-                  return std::make_tuple(-left.second->GetHealthPct(), left.first) <
-                         std::make_tuple(-right.second->GetHealthPct(), right.first);
+                  return std::make_tuple(left.tier, -left.guardian->GetHealthPct(), left.distance) <
+                         std::make_tuple(right.tier, -right.guardian->GetHealthPct(), right.distance);
               });
-    for (auto const& [distance, guardian] : loose)
+    for (auto const& [tier, distance, guardian] : loose)
     {
-        // Already coming to another tank. Both taunting the same fresh one leaves Hand of Reckoning on cooldown
-        // for most swings on the raid.
+        // Already coming to a tank. This one too when its own taunt took and the Guardian hasn't turned yet, as
+        // under a Drain Life. Both taunting the same fresh one leaves Hand of Reckoning on cooldown for most swings
+        // on the raid.
         auto const& taunts = guardian->GetAuraEffectsByType(SPELL_AURA_MOD_TAUNT);
         if (std::any_of(taunts.begin(), taunts.end(),
                         [this](AuraEffect const* taunt)
                         {
                             Unit* caster = taunt->GetCaster();
                             Player* tank = caster ? caster->ToPlayer() : nullptr;
-                            return tank && tank != bot && PlayerbotAI::IsTank(tank);
+                            return tank && (tank == bot || PlayerbotAI::IsTank(tank));
                         }))
             continue;
 

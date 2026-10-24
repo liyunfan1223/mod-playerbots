@@ -21,7 +21,14 @@ public:
     float GetValue(Action* action) override;
 
 private:
-    std::unordered_map<Action*, bool> damagesCurrentTarget;
+    // Its current target, or for a hostile spell like "corruption on attacker", its own.
+    enum class Aim : uint8
+    {
+        None,
+        Current,
+        Own,
+    };
+    std::unordered_map<Action*, Aim> aims;
     // No DoT on a star: it keeps ticking once the team moves on, past an under-star's band or a paced one's gap.
     // A channel stops when it's broken, and a nuke with a small DoT rider (Fireball) is a nuke.
     std::unordered_map<Action*, bool> lingers;

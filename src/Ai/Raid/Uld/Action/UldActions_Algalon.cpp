@@ -70,12 +70,11 @@ enum class AlgalonPathRule
     Any,
 };
 
-// Nearest ground clear of every marker, hole and dying star, near the bot's own slot when it has one. Searches
-// chained in one Execute share `sweep`: they walk the same grid, so each point's collision check is paid once.
-Position FindAlgalonClearSpot(Player* bot, float markerClearance, AlgalonPathRule rule, HazardSweepCache& sweep)
+// Nearest ground clear of every marker, hole and dying star, near `prefer` when given. Searches chained in one
+// Execute share `sweep`: they walk the same grid, so each point's collision check is paid once.
+Position FindAlgalonClearSpot(Player* bot, float markerClearance, AlgalonPathRule rule, Position const* prefer,
+                              HazardSweepCache& sweep)
 {
-    Position anchor;
-    Position const* prefer = GetAlgalonSlotAnchor(bot, anchor) ? &anchor : nullptr;
     auto const reachable = [bot, rule](float x, float y)
     {
         if (!AlgalonSpotInRoom(x, y))
@@ -98,6 +97,31 @@ Position FindAlgalonClearSpot(Player* bot, float markerClearance, AlgalonPathRul
 
 // The class's second taunt, for when the first missed or is cooling down while he is off a swap tank.
 // Righteous Defense goes on the friend he is hitting; the shout and the roar taunt everything near the tank.
+bool UseExplosionCover(PlayerbotAI* botAI, Player* bot)
+{
+    char const* cover = GetAlgalonExplosionCover(botAI);
+    if (!cover || !botAI->CastSpell(cover, bot))
+        return false;
+
+    ClaimAlgalonExplosionCover(bot, cover);
+    return true;
+}
+
+bool UseExplosionPersonal(PlayerbotAI* botAI, Player* bot)
+{
+    AlgalonPersonalPick const pick = GetAlgalonExplosionPersonal(botAI);
+    if (!pick)
+        return false;
+
+    bool const used =
+        pick.consumable ? botAI->DoSpecificAction(pick.consumable, Event(), true) : botAI->CastSpell(pick.spellId, bot);
+    if (!used)
+        return false;
+
+    ClaimAlgalonExplosionPersonal(bot);
+    return true;
+}
+
 bool CastBackupTaunt(PlayerbotAI* botAI, Player* bot, Unit* boss)
 {
     Unit* victim = boss->GetVictim();
@@ -184,15 +208,7 @@ bool AlgalonTankDefensiveAction::Execute(Event /*event*/)
     return true;
 }
 
-bool AlgalonExplosionCoverAction::Execute(Event /*event*/)
-{
-    char const* cover = GetAlgalonExplosionCover(botAI);
-    if (!cover || !botAI->CastSpell(cover, bot))
-        return false;
-
-    ClaimAlgalonExplosionCover(bot, cover);
-    return true;
-}
+bool AlgalonExplosionCoverAction::Execute(Event /*event*/) { return UseExplosionCover(botAI, bot); }
 
 bool AlgalonExplosionPersonalAction::Execute(Event /*event*/)
 {
@@ -200,17 +216,7 @@ bool AlgalonExplosionPersonalAction::Execute(Event /*event*/)
     if (bot->IsNonMeleeSpellCast(false))
         bot->InterruptNonMeleeSpells(false);
 
-    AlgalonPersonalPick const pick = GetAlgalonExplosionPersonal(botAI);
-    if (!pick)
-        return false;
-
-    bool const used =
-        pick.consumable ? botAI->DoSpecificAction(pick.consumable, Event(), true) : botAI->CastSpell(pick.spellId, bot);
-    if (!used)
-        return false;
-
-    ClaimAlgalonExplosionPersonal(bot);
-    return true;
+    return UseExplosionPersonal(botAI, bot);
 }
 
 bool AlgalonShadowAuraAction::Execute(Event /*event*/) { return botAI->CastSpell("shadow resistance aura", bot); }
@@ -234,14 +240,22 @@ bool AlgalonBigBangHideAction::Execute(Event /*event*/)
 
     BreakCastPinningTheFeet(botAI, bot);
     ReleaseStalledWalk(botAI, bot);
-    AlgalonBoostHideRun(bot, bot->GetExactDist2d(shelter) - ULDUAR_ALGALON_SHELTER_IN_RADIUS);
-    // Not a dodge still under way: the hole isn't checked against the meteor.
-    if (!AlgalonCosmicSmashThreatens(bot))
-        DropForeignBooking(botAI, _walk, MovementPriority::MOVEMENT_FORCED);
-    _walk = shelter;
+    // The run outranks both nodes, so a star going off before the bot is in gets its cover or button here. An
+    // instant doesn't stop the walk.
+    if (!UseExplosionCover(botAI, bot))
+        UseExplosionPersonal(botAI, bot);
 
-    if (MoveTo(bot->GetMapId(), shelter.GetPositionX(), shelter.GetPositionY(), shelter.GetPositionZ(), false,
-               false, false, false, MovementPriority::MOVEMENT_FORCED, true))
+    Position next;
+    bool const clear = AlgalonHideRoute(bot, shelter, next);
+    AlgalonBoostHideRun(bot, bot->GetExactDist2d(next) + next.GetExactDist2d(shelter) -
+                                 ULDUAR_ALGALON_SHELTER_IN_RADIUS);
+    // A dodge still under way only gives way to a run no meteor lands within 10 yd of.
+    if (clear || !AlgalonCosmicSmashThreatens(bot))
+        DropForeignBooking(botAI, _walk, MovementPriority::MOVEMENT_FORCED);
+    _walk = next;
+
+    if (MoveTo(bot->GetMapId(), next.GetPositionX(), next.GetPositionY(), next.GetPositionZ(), false, false, false,
+               false, MovementPriority::MOVEMENT_FORCED, true))
         return true;
 
     // MoveTo answers Duplicate for the rest of the run. Returning false there hands the tick to a heal
@@ -253,15 +267,22 @@ bool AlgalonCosmicSmashAction::Execute(Event /*event*/)
 {
     // FleePosition clamps to Playerbots.FleeDistance (5 yd), inside the doubled damage band.
     HazardSweepCache sweep;
-    Position clear = FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_CLEARANCE, AlgalonPathRule::Clear, sweep);
+    // A hider whose meteors land in the cast dodges towards its hole: away from it, the run was too long.
+    Position anchor;
+    Position const* prefer = GetAlgalonDodgeAnchor(bot, anchor) ? &anchor : nullptr;
+    Position clear =
+        FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_CLEARANCE, AlgalonPathRule::Clear, prefer, sweep);
     if (clear == Position())
-        clear = FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_MIN_CLEARANCE, AlgalonPathRule::Clear, sweep);
+        clear =
+            FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_MIN_CLEARANCE, AlgalonPathRule::Clear, prefer, sweep);
 
     if (clear == Position())
-        clear = FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_MIN_CLEARANCE, AlgalonPathRule::Field, sweep);
+        clear =
+            FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_MIN_CLEARANCE, AlgalonPathRule::Field, prefer, sweep);
 
     if (clear == Position())
-        clear = FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_MIN_CLEARANCE, AlgalonPathRule::Any, sweep);
+        clear =
+            FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_MIN_CLEARANCE, AlgalonPathRule::Any, prefer, sweep);
 
     if (clear == Position())
         return false;
@@ -276,9 +297,11 @@ bool AlgalonLeaveBlackHoleAction::Execute(Event /*event*/)
 {
     Position clear;
     HazardSweepCache sweep;
+    Position anchor;
+    Position const* prefer = GetAlgalonSlotAnchor(bot, anchor) ? &anchor : nullptr;
     for (AlgalonPathRule rule : {AlgalonPathRule::Clear, AlgalonPathRule::Field, AlgalonPathRule::Any})
     {
-        clear = FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_TRIGGER_RADIUS, rule, sweep);
+        clear = FindAlgalonClearSpot(bot, ULDUAR_ALGALON_COSMIC_SMASH_TRIGGER_RADIUS, rule, prefer, sweep);
         if (clear != Position())
             break;
     }

@@ -88,24 +88,25 @@ float AlgalonTargetGuardMultiplier::GetValue(Action* action)
     if (!action)
         return 1.0f;
 
-    auto cached = damagesCurrentTarget.find(action);
-    if (cached == damagesCurrentTarget.end())
+    auto cached = aims.find(action);
+    if (cached == aims.end())
     {
-        bool damages = dynamic_cast<MeleeAction*>(action) || (ClassifyAction(action) & Family::PetAttack);
-        if (!damages)
-        {
-            CastSpellAction* spell = dynamic_cast<CastSpellAction*>(action);
-            damages = spell && !dynamic_cast<CastHealingSpellAction*>(action) &&
-                      spell->GetTargetName() == "current target";
-        }
+        Aim aim = Aim::None;
+        CastSpellAction* spell = dynamic_cast<CastSpellAction*>(action);
+        if (dynamic_cast<MeleeAction*>(action) || (ClassifyAction(action) & Family::PetAttack))
+            aim = Aim::Current;
+        else if (spell && !dynamic_cast<CastHealingSpellAction*>(action))
+            aim = spell->GetTargetName() == "current target" ? Aim::Current
+                  : CastsPositiveSpell(botAI, action)          ? Aim::None
+                                                                : Aim::Own;
 
-        cached = damagesCurrentTarget.emplace(action, damages).first;
+        cached = aims.emplace(action, aim).first;
     }
 
-    if (!cached->second)
+    if (cached->second == Aim::None)
         return 1.0f;
 
-    Unit* target = AI_VALUE(Unit*, "current target");
+    Unit* target = cached->second == Aim::Current ? AI_VALUE(Unit*, "current target") : action->GetTarget();
     if (!target)
         return 1.0f;
 
@@ -284,14 +285,19 @@ float AlgalonSplashHoldMultiplier::GetValue(Action* action)
     auto cached = splashes.find(action);
     if (cached == splashes.end())
     {
-        static std::set<std::string> const always = {"starfall", "blade flurry", "sweeping strikes", "bladestorm"};
-        static std::set<std::string> const groundAtBot = {"consecration", "magma totem", "explosive trap"};
-        static std::set<std::string> const groundAtTarget = {"death and decay", "blizzard", "flamestrike",
-                                                             "hurricane",       "rain of fire", "volley"};
+        // The trap sits 30 s and the elemental's Fire Nova and Fire Shield go wherever it does: on one star they took
+        // 8.6% in the 20 s before Big Bang.
+        static std::set<std::string> const always = {
+            "starfall",       "blade flurry",         "sweeping strikes",          "bladestorm",
+            "explosive trap", "fire elemental totem", "fire elemental totem melee"};
+        static std::set<std::string> const groundAtBot = {"consecration", "magma totem"};
+        // Living Bomb goes off 12 s after the cast, by when a star may have wandered next to its target.
+        static std::set<std::string> const groundAtTarget = {
+            "death and decay", "blizzard", "flamestrike", "hurricane", "rain of fire", "volley", "living bomb",
+            "living bomb on attackers"};
         // Chains and detonations the spell test can't see, on top of the shared list.
         static std::set<std::string> const chains = {"hammer of the righteous", "avenger's shield",
-                                                     "seed of corruption",      "mind sear",
-                                                     "living bomb",             "corpse explosion"};
+                                                     "seed of corruption", "mind sear", "corpse explosion"};
         std::string const& name = action->getName();
         Splash splash = Splash::None;
         if (always.count(name))
@@ -339,9 +345,12 @@ float AlgalonSplashHoldMultiplier::GetValue(Action* action)
     if (AlgalonStarWithin(botAI, bot->GetPosition(), ULDUAR_ALGALON_SPLASH_RADIUS, targetGuid))
         return 0.0f;
 
-    return target && AlgalonStarWithin(botAI, target->GetPosition(), ULDUAR_ALGALON_SPLASH_RADIUS, targetGuid)
-               ? 0.0f
-               : 1.0f;
+    if (!target)
+        return 1.0f;
+
+    float const aroundTarget = std::max(ULDUAR_ALGALON_SPLASH_RADIUS,
+                                        ULDUAR_ALGALON_SPLASH_PAST_REACH + target->GetCombatReach());
+    return AlgalonStarWithin(botAI, target->GetPosition(), aroundTarget, targetGuid) ? 0.0f : 1.0f;
 }
 
 float AlgalonWalkGuardMultiplier::GetValue(Action* action)

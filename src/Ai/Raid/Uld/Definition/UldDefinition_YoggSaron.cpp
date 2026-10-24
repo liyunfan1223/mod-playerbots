@@ -114,6 +114,8 @@ void DefineYoggSaron(EncounterBuilder& e)
     e.Node<YoggSaronBeaconDragTrigger, YoggSaronBeaconDragAction>(ACTION_RAID + 4);
     // Under the drag, which takes over at the first mark, and over guardian control for the same reason.
     e.Node<YoggSaronBeaconStageTrigger, YoggSaronBeaconStageAction>(ACTION_RAID + 3.5f);
+    // Over the drag and the stage: the drag's Growl fails until the shift is in.
+    e.Node<YoggSaronBeaconBearFormTrigger, YoggSaronBeaconBearFormAction>(ACTION_RAID + 4.5f);
     // Over the dps resolver and the rotation, under every dodge. One instant cast.
     e.Node<YoggSaronPhase3LustTrigger, YoggSaronPhase3LustAction>(ACTION_RAID + 2);
     e.Node<YoggSaronSanityConservationTrigger, YoggSaronSanityConservationAction>(ACTION_RAID + 5);
@@ -268,6 +270,10 @@ void DefineYoggSaron(EncounterBuilder& e)
     // A hunter's drag dies with Feign Death, and Deterrence pacifies the shot.
     e.Block("yogg-saron beacon hunter hold", Role::Any, YoggSaronBeaconHunterHold, 0,
             {"feign death", "deterrence"});
+
+    // A druid dragging stays a bear: the cat strategy recasts Cat Form, through Caster Form, whenever it isn't
+    // in it. That same trigger shifts it back once the drag is over.
+    e.Block("yogg-saron beacon bear hold", Role::Any, YoggSaronBeaconBearHeld, 0, {"cat form", "caster form"});
 
     // Its hop answers a ray at combat priority, which a forced walk refuses, and it outranks the Yogg dodge,
     // so near a ray nothing would move the bot. Its spots can also sit beside the ray.

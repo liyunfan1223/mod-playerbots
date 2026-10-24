@@ -81,7 +81,9 @@ const Position ULDUAR_THORIM_PHASE2_OPENING4_SPOT = Position(2146.0f, -244.0f, 4
 const Position ULDUAR_THORIM_PHASE2_MELEE1_SPOT = Position(2118.75f, -252.65f, 419.596f);
 const Position ULDUAR_THORIM_PHASE2_MELEE2_SPOT = Position(2110.75f, -244.65f, 419.359f);
 const Position ULDUAR_THORIM_PHASE2_MELEE3_SPOT = Position(2110.75f, -260.65f, 419.485f);
-const Position ULDUAR_THORIM_PHASE2_OFFTANK_SPOT = Position(2115.0f, -247.0f, 419.458f);
+// 3.5 yd off the tank spot, so a taunt trade steps him under the ring's reposition tolerance and the ring
+// keeps its latch. Z as the navmesh settles it.
+const Position ULDUAR_THORIM_PHASE2_OFFTANK_SPOT = Position(2114.25f, -252.65f, 419.508f);
 
 namespace
 {
@@ -2206,27 +2208,13 @@ static ThorimPhase2Role ResolveThorimPhase2Role(PlayerbotAI* botAI, Player* bot)
     if (!botAI || !bot)
         return ThorimPhase2Role::None;
 
-    // Whoever he is swinging at owns the anchor, ahead of group order: GetMainTankGuid reads the raid
-    // frame flag with no tank check, so a human wearing it bumps the bot tanks down.
+    // The latch, never the boss's victim: the role picks the destination, so following the victim relocates
+    // both tanks on every trade. Never the ring either, since a ring point is measured off the boss.
     if (PlayerbotAI::IsTank(bot))
-    {
-        Unit* boss = GetThorim(botAI);
-        if (boss && boss->GetVictim() == bot)
-            return ThorimPhase2Role::MainTank;
-    }
-
-    if (PlayerbotAI::IsMainTank(bot))
-        return ThorimPhase2Role::MainTank;
-
-    if (PlayerbotAI::IsAssistTankOfIndex(bot, 0))
-        return ThorimPhase2Role::OffTank;
+        return IsThorimAnchorTank(bot) ? ThorimPhase2Role::MainTank : ThorimPhase2Role::OffTank;
 
     if (TakesRangedSpot(bot))
         return ThorimPhase2Role::Ranged;
-
-    // Any other tank waits on the off-tank bearing, never the ring: a ring point is measured off the boss.
-    if (PlayerbotAI::IsTank(bot))
-        return ThorimPhase2Role::OffTank;
 
     return ThorimPhase2Role::MeleeRing;
 }
@@ -2234,6 +2222,82 @@ static ThorimPhase2Role ResolveThorimPhase2Role(PlayerbotAI* botAI, Player* bot)
 ThorimPhase2Role GetThorimPhase2Role(PlayerbotAI* botAI, Player* bot)
 {
     return ResolveThorimPhase2Role(botAI, bot);
+}
+
+namespace
+{
+
+// A bot tank down on the arena floor. The floor test keeps a tank still on the balcony off an arena spot.
+bool ThorimTankCanAnchor(Player* member)
+{
+    return member && GET_PLAYERBOT_AI(member) && member->IsAlive() && member->GetMapId() == ULDUAR_MAP_ID &&
+           PlayerbotAI::IsTank(member) && member->GetPositionZ() <= ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD;
+}
+
+// Bots only: a human cannot be steered onto a spot, which is why the role used to read the boss's victim
+// instead. The held pick wins while it can still stand there, so a taunt trade relocates nobody.
+Player* ElectThorimAnchorTank(PlayerbotAI* botAI, Group* group, ObjectGuid held)
+{
+    Unit* boss = GetThorim(botAI);
+    Player* holdsBoss = nullptr;
+    Player* lowest = nullptr;
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* member = ref->GetSource();
+        if (!ThorimTankCanAnchor(member))
+            continue;
+
+        if (member->GetGUID() == held)
+            return member;
+
+        if (boss && boss->GetVictim() == member)
+            holdsBoss = member;
+
+        if (!lowest || member->GetGUID() < lowest->GetGUID())
+            lowest = member;
+    }
+
+    // Whoever already has him first, so the opening pick needs no walk, then lowest guid to settle it.
+    return holdsBoss ? holdsBoss : lowest;
+}
+
+}  // namespace
+
+void ThorimTickAnchorTank(PlayerbotAI* botAI)
+{
+    Player* bot = botAI ? botAI->GetBot() : nullptr;
+    if (!bot || !NearThorimEncounter(bot))
+        return;
+
+    ThorimEncounterState& state = ThorimStateFor(bot);
+
+    // Cleared outside the phase rather than on reset, so a latch cannot ride into the next pull.
+    if (!ThorimPhase2Active(botAI))
+    {
+        state.anchorTank = ObjectGuid::Empty;
+        state.anchorTankScanMs = 0;
+        return;
+    }
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return;
+
+    uint32 const now = getMSTime();
+    if (state.anchorTankScanMs &&
+        getMSTimeDiff(state.anchorTankScanMs, now) < ULDUAR_THORIM_ENCOUNTER_SCAN_INTERVAL_MS)
+        return;
+
+    state.anchorTankScanMs = now;
+
+    Player* anchor = ElectThorimAnchorTank(botAI, group, state.anchorTank);
+    state.anchorTank = anchor ? anchor->GetGUID() : ObjectGuid::Empty;
+}
+
+bool IsThorimAnchorTank(Player const* bot)
+{
+    ThorimEncounterState const* state = FindState(bot);
+    return bot && state && state->anchorTank == bot->GetGUID();
 }
 
 bool TryGetThorimPhase2Spot(PlayerbotAI* botAI, Player* bot, ThorimPhase2Role role, Position& position)
@@ -2282,29 +2346,16 @@ bool TryGetThorimPhase2Spot(PlayerbotAI* botAI, Player* bot, ThorimPhase2Role ro
         return true;
     }
 
-    if (!boss)
-        return false;
-
     if (role == ThorimPhase2Role::OffTank)
     {
-        // Holding the boss, he owns the anchor too: the ring point below is measured off the boss, so it
-        // moves with every step he tows him.
-        if (boss->GetVictim() == bot)
-        {
-            position = ULDUAR_THORIM_PHASE2_TANK_SPOT;
-            return true;
-        }
-
-        // Just off the main tank's bearing: inside taunt range for the Unbalancing Strike swap, and
-        // deliberately not rotated for Lightning Charge: moving a tank drags the boss.
-        float const bearing = Position::NormalizeOrientation(RingAnchorBearing(boss) +
-                                                             ULDUAR_THORIM_OFFTANK_BEARING_OFFSET);
-        if (RingPoint(bot, boss, bearing, position))
-            return true;
-
+        // A fixed point, not a bearing off the boss: a ring point moves with him, so a tank towing him from
+        // one drifts the pair across the room. Still inside taunt range for the Unbalancing Strike swap.
         position = ULDUAR_THORIM_PHASE2_OFFTANK_SPOT;
         return true;
     }
+
+    if (!boss)
+        return false;
 
     if (role != ThorimPhase2Role::MeleeRing)
         return false;
@@ -2558,6 +2609,24 @@ bool ThorimMeleeRingSettled(PlayerbotAI* botAI, Player* bot)
 
     ThorimEncounterState const* state = FindState(bot);
     return state && state->ringArrived.count(bot->GetGUID()) > 0;
+}
+
+bool ThorimTankOnAnchor(PlayerbotAI* botAI, Player* bot)
+{
+    if (!bot || !ThorimPhase2Active(botAI))
+        return false;
+
+    ThorimPhase2Role const role = GetThorimPhase2Role(botAI, bot);
+    if (role != ThorimPhase2Role::MainTank && role != ThorimPhase2Role::OffTank)
+        return false;
+
+    // Same floor test the spot itself uses, or a tank still on the balcony is frozen up there.
+    if (bot->GetPositionZ() > ULDUAR_THORIM_AXIS_Z_FLOOR_THRESHOLD)
+        return false;
+
+    Position spot;
+    return TryGetThorimPhase2Spot(botAI, bot, role, spot) &&
+           bot->GetDistance(spot) <= ULDUAR_THORIM_RING_ARRIVE_TOLERANCE;
 }
 
 Unit* ThorimChargedThunderOrb(PlayerbotAI* botAI, uint32 markerSpell)

@@ -521,6 +521,17 @@ public:
     bool Execute(Event event) override;
 };
 
+// Dire Bear Form, or Bear Form for a druid that hasn't learned it.
+class YoggSaronBeaconBearFormAction : public Action
+{
+public:
+    static constexpr char const* Name = "yogg-saron beacon bear form action";
+
+    YoggSaronBeaconBearFormAction(PlayerbotAI* botAI) : Action(botAI, Name) {}
+
+    bool Execute(Event event) override;
+};
+
 class YoggSaronPhase3LustAction : public Action
 {
 public:

@@ -92,10 +92,13 @@ bool ThorimBalconyWalk(PlayerbotAI* botAI)
 
 bool ThorimFrostAuraHeld(PlayerbotAI* botAI) { return IsThorimFrostAuraPaladin(botAI->GetBot()); }
 
+bool ThorimTankAnchored(PlayerbotAI* botAI) { return ThorimTankOnAnchor(botAI, botAI->GetBot()); }
+
 void TickThorim(PlayerbotAI* botAI)
 {
     ThorimTickBarrierBail(botAI, botAI->GetBot());
     ThorimTickHumanTankCalls(botAI);
+    ThorimTickAnchorTank(botAI);
     ThorimTickFrostAuraPaladin(botAI);
 }
 
@@ -159,6 +162,12 @@ void DefineThorim(EncounterBuilder& e)
                   Family::Attack | Family::Reach | Family::ReachHeal | Family::AvoidAoe,
                   {ThorimPhase2PositioningAction::Name, ThorimBalconyAdvanceAction::Name,
                    ThorimSifBlizzardAction::Name});
+
+    // A tank that dodges tows the boss into the ring, which is why the Blizzard row already refuses both tank
+    // roles. AvoidAoe is out of the pass mask for that reason. Every other guard here keeps it.
+    e.OwnMovement("thorim tank anchor guard", Role::Tank, ThorimTankAnchored,
+                  Family::Attack | Family::Reach | Family::ReachHeal,
+                  {ThorimPhase2PositioningAction::Name, ThorimBalconyAdvanceAction::Name});
 
     // No attack or reach exemption here: corridor mobs sit inside the sight cap from the arena, so the chase is
     // what walks a bot out. Open only while outside the leash, so it can't become a permanent freeze.

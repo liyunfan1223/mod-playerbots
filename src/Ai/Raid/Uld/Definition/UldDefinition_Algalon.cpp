@@ -39,6 +39,8 @@ bool AlgalonExplosionButtonsHeld(PlayerbotAI* botAI)
 // Phased bots are left out: inside the void they are safe, and phase-16 Dark Matter is on them.
 bool AlgalonHidingNow(PlayerbotAI* botAI) { return AlgalonShouldRunForShelter(botAI->GetBot()); }
 
+bool AlgalonHiderCasting(PlayerbotAI* botAI) { return AlgalonHiderInCast(botAI->GetBot()); }
+
 // A star isn't an attacker until something hits it, so "dps assist" would pull the team straight back
 // to Algalon between the star node's checks.
 bool AlgalonStarTeamFocused(PlayerbotAI* botAI)
@@ -163,8 +165,9 @@ void DefineAlgalon(EncounterBuilder& e)
     // run's second tick, so the run can't defend itself.
     e.Exclusive("algalon big bang hide", Role::Any, AlgalonHidingNow, 0,
                 {AlgalonBigBangHideAction::Name, AlgalonLeaveBlackHoleAction::Name, AlgalonCosmicSmashAction::Name});
-    e.Block("algalon big bang spell movers", Role::Any, AlgalonHidingNow,
-            Family::Charge | Family::Blink | Family::Disengage);
+    // The whole cast, not just the run: a charge or Killing Spree while waiting near the hole ends at him.
+    e.Block("algalon big bang spell movers", Role::Any, AlgalonHiderCasting,
+            Family::Charge | Family::Blink | Family::Disengage, {"killing spree"});
 
     // The class "lose aggro" nodes taunt whenever someone else holds him, 4 stacks or not, and an Arms warrior's
     // snare chain ends in Mocking Blow. The encounter's own taunt nodes go through CastClassTaunt instead.

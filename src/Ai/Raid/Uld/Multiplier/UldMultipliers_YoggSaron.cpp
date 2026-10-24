@@ -221,7 +221,10 @@ float YoggSaronExitHoldCastMultiplier::GetValue(Action* action)
     if (!spellInfo)
         return 1.0f;
 
-    return spellInfo->CalcCastTime() || spellInfo->IsChanneled() ? 0.0f : 1.0f;
+    // Bladestorm and Killing Spree fail the portal's untriggered cast for as long as they run.
+    bool const locks = spellInfo->HasAura(SPELL_AURA_ALLOW_ONLY_ABILITY);
+
+    return spellInfo->CalcCastTime() || spellInfo->IsChanneled() || locks ? 0.0f : 1.0f;
 }
 
 float YoggSaronHeldTargetCastMultiplier::GetValue(Action* action)

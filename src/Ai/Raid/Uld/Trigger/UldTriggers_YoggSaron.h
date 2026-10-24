@@ -389,6 +389,16 @@ public:
     bool IsActive() override;
 };
 
+// A druid staged for a beacon or on a drag, not in a bear form yet. Growl needs one.
+class YoggSaronBeaconBearFormTrigger : public YoggSaronTrigger
+{
+public:
+    static constexpr char const* Name = "yogg-saron beacon bear form trigger";
+
+    YoggSaronBeaconBearFormTrigger(PlayerbotAI* botAI) : YoggSaronTrigger(botAI, Name) {}
+    bool IsActive() override;
+};
+
 // A shaman's own Heroism trigger wants a boss target, and in phase 3 shamans are on Guardians and tentacles. This one
 // waits for the raid to be in place instead.
 class YoggSaronPhase3LustTrigger : public YoggSaronTrigger

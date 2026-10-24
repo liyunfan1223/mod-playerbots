@@ -60,7 +60,7 @@ public:
 };
 
 // Cast-time spells and channels, held while a bot walks out ahead of Induce Madness, since each one stops the walk.
-// Instants still go.
+// Bladestorm and the like too, since they stop the portal. Other instants still go.
 class YoggSaronExitHoldCastMultiplier : public Multiplier
 {
 public:

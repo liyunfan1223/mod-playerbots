@@ -42,6 +42,7 @@
 #include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "Spell.h"
+#include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -683,6 +684,24 @@ bool YoggSaronLeavingBrainLevel(Player* bot)
 
     // Signed: an end still in the future must not read as a timer wrap.
     return latch != state.leavingUntilMs.end() && static_cast<int32>(latch->second - getMSTime()) > 0;
+}
+
+uint32 YoggSaronCancelAbilityLock(Player* bot)
+{
+    // Ids first, removing an aura changes the list. Same tests as the client's cancel.
+    std::vector<uint32> locks;
+    for (AuraEffect const* effect : bot->GetAuraEffectsByType(SPELL_AURA_ALLOW_ONLY_ABILITY))
+    {
+        SpellInfo const* spellInfo = effect->GetSpellInfo();
+        if (!spellInfo->HasAttribute(SPELL_ATTR0_NO_AURA_CANCEL) && !spellInfo->IsChanneled() &&
+            spellInfo->IsPositive() && !spellInfo->IsPassive())
+            locks.push_back(spellInfo->Id);
+    }
+
+    for (uint32 const spell : locks)
+        bot->RemoveOwnedAura(spell, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
+
+    return locks.empty() ? 0 : locks.front();
 }
 
 uint32 YoggSaronSanityOf(Player* player)
@@ -1531,8 +1550,9 @@ uint32 YoggSaronTauntSpellId(Player* player)
 
 bool IsYoggSaronBot(Player* player) { return player && player->GetSession() && player->GetSession()->IsHeadless(); }
 
-// Claim order: bot tanks while another tank holds the pile, then ret paladins and dps DKs, then hunters,
-// each by GUID. Never one an unmarked Guardian is hitting, and only with taunt ready within `tauntWithinMs`.
+// Claim order: bot tanks while another tank holds the pile, then ret paladins and dps DKs, then hunters, then
+// feral druids, each by GUID. Never one an unmarked Guardian is hitting, and only with taunt ready within
+// `tauntWithinMs`.
 std::vector<Player*> YoggSaronBeaconDraggerOrder(Player* bot, std::list<Creature*> const& unmarked,
                                                  uint32 tauntWithinMs)
 {
@@ -1555,6 +1575,8 @@ std::vector<Player*> YoggSaronBeaconDraggerOrder(Player* bot, std::list<Creature
     // Last resort, for a mark nobody with a real taunt is left for: an undragged one heals the pile to full.
     // Distracting Shot is only 6 s.
     std::vector<Player*> hunters;
+    // After the hunters: the shift costs a GCD and mana, and the druid's dps is gone while it drags.
+    std::vector<Player*> bears;
     for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
     {
         Player* member = ref->GetSource();
@@ -1578,14 +1600,19 @@ std::vector<Player*> YoggSaronBeaconDraggerOrder(Player* bot, std::list<Creature
             backups.push_back(member);
         else if (member->getClass() == CLASS_HUNTER)
             hunters.push_back(member);
+        else if (member->getClass() == CLASS_DRUID && !PlayerbotAI::IsHeal(member) &&
+                 !PlayerbotAI::IsRanged(member) && YoggSaronBearReady(member))
+            bears.push_back(member);
     }
 
     auto const byGuid = [](Player* left, Player* right) { return left->GetGUID() < right->GetGUID(); };
     std::sort(tanks.begin(), tanks.end(), byGuid);
     std::sort(backups.begin(), backups.end(), byGuid);
     std::sort(hunters.begin(), hunters.end(), byGuid);
+    std::sort(bears.begin(), bears.end(), byGuid);
     tanks.insert(tanks.end(), backups.begin(), backups.end());
     tanks.insert(tanks.end(), hunters.begin(), hunters.end());
+    tanks.insert(tanks.end(), bears.begin(), bears.end());
 
     return tanks;
 }
@@ -1827,6 +1854,23 @@ Unit* YoggSaronBeaconReturning(Player* bot)
     }
 
     return nullptr;
+}
+
+uint8 YoggSaronLooseGuardianTier(Player* bot, Unit* guardian)
+{
+    Player* victim = guardian->GetVictim() ? guardian->GetVictim()->ToPlayer() : nullptr;
+    if (!victim)
+        return 1;
+
+    if (victim->getClass() == CLASS_HUNTER)
+        return guardian->HasAura(SPELL_DISTRACTING_SHOT, victim->GetGUID()) ? 2 : 1;
+
+    auto const& returns = YoggSaronStateFor(bot).beaconReturns;
+    auto const release = returns.find(guardian->GetGUID());
+    bool const dragged = release != returns.end() && release->second.dragger == victim->GetGUID() &&
+                         getMSTimeDiff(release->second.releasedMs, getMSTime()) <= ULDUAR_YOGG_SARON_BEACON_RETURN_MS;
+
+    return dragged ? 0 : 1;
 }
 
 namespace
@@ -2194,6 +2238,38 @@ bool YoggSaronBeaconHunterHold(PlayerbotAI* botAI)
     Player* bot = botAI->GetBot();
 
     return bot->getClass() == CLASS_HUNTER && YoggSaronBeaconDragging(bot);
+}
+
+bool YoggSaronBeaconBearHeld(PlayerbotAI* botAI)
+{
+    Player* bot = botAI->GetBot();
+    if (bot->getClass() != CLASS_DRUID)
+        return false;
+
+    // Phase last: the state reads are cheap, and stale only once phase 3 is over.
+    bool const held = YoggSaronStateFor(bot).beaconStages.count(bot->GetGUID()) || YoggSaronBeaconDragging(bot) ||
+                      YoggSaronBeaconReturning(bot);
+
+    return held && YoggSaronInPhase3(botAI);
+}
+
+bool YoggSaronBearReady(Player* druid)
+{
+    if (druid->GetShapeshiftForm() == FORM_BEAR || druid->GetShapeshiftForm() == FORM_DIREBEAR)
+        return true;
+
+    for (uint32 const spell : {SPELL_DRUID_DIRE_BEAR_FORM, SPELL_DRUID_BEAR_FORM})
+    {
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell);
+        if (!spellInfo || !druid->HasSpell(spell))
+            continue;
+
+        int32 const cost = spellInfo->CalcPowerCost(druid, spellInfo->GetSchoolMask());
+        if (static_cast<int32>(druid->GetPower(POWER_MANA)) >= cost)
+            return true;
+    }
+
+    return false;
 }
 
 namespace

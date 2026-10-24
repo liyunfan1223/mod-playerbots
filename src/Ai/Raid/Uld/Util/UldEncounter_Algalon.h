@@ -70,6 +70,8 @@ inline constexpr float ULDUAR_ALGALON_SCAN_RADIUS = 70.0f;
 inline constexpr float ULDUAR_ALGALON_SHELTER_RADIUS = 6.0f;
 // A hider's run ends this far in, clear of the field's edge.
 inline constexpr float ULDUAR_ALGALON_SHELTER_IN_RADIUS = ULDUAR_ALGALON_SHELTER_RADIUS - 1.5f;
+// The field phases whoever is inside on its next pulse, one a second.
+inline constexpr int32 ULDUAR_ALGALON_FIELD_PULSE_MS = 1000;
 // Big Bang's 64445 strips every phase a second after the hit and the field pulses every second, so a
 // bot still inside it then is phased again for 10s. Exits clear it with room to spare.
 inline constexpr float ULDUAR_ALGALON_HOLE_EXIT_RADIUS = 8.0f;
@@ -178,6 +180,8 @@ inline constexpr float ULDUAR_ALGALON_EXPLOSION_LOW_PCT = 3.0f;
 // this low. The lead allows for the slope running about a second late on a paced kill.
 inline constexpr uint32 ULDUAR_ALGALON_EXPLOSION_COVER_LEAD_MS = 3500;
 inline constexpr float ULDUAR_ALGALON_EXPLOSION_COVER_HP_PCT = 5.0f;
+// A star still alive once its cover ran out gets another: a meteor blackout stalled one kill 10 s.
+inline constexpr uint32 ULDUAR_ALGALON_EXPLOSION_COVER_MS = 6000;
 // A cover only with this many under the explosion's line: a single one has its own button or a healthstone, and
 // a cover spent on one or none is missing for the star that catches most of the raid.
 inline constexpr uint32 ULDUAR_ALGALON_EXPLOSION_COVER_MIN_UNDER = 2;
@@ -269,6 +273,8 @@ inline constexpr uint8 ULDUAR_ALGALON_STAR_TEAM_10 = 2;
 inline constexpr uint8 ULDUAR_ALGALON_STAR_TEAM_25 = 3;
 // Splash that would also land on a star this close to the bot or its target is held; 15 is glyphed Pestilence.
 inline constexpr float ULDUAR_ALGALON_SPLASH_RADIUS = 15.0f;
+// Round a target, splash reaches this far past its combat reach: Pestilence landed on stars 19.5 yd from his centre.
+inline constexpr float ULDUAR_ALGALON_SPLASH_PAST_REACH = 11.0f;
 // Ground AoE sits there 8-10 s and stars wander ~1.7 yd/s, so it's held while one is this close to where it lands.
 inline constexpr float ULDUAR_ALGALON_GROUND_SPLASH_RADIUS = 25.0f;
 
@@ -315,6 +321,13 @@ inline constexpr uint32 ULDUAR_ALGALON_STAR_DYING_MS = 4000;
 inline constexpr float ULDUAR_ALGALON_COSMIC_SMASH_TRIGGER_RADIUS = 15.0f;
 inline constexpr float ULDUAR_ALGALON_COSMIC_SMASH_CLEARANCE = 15.0f;
 inline constexpr float ULDUAR_ALGALON_COSMIC_SMASH_MIN_CLEARANCE = 10.0f;
+// It lands up to this much after the 4.8 s.
+inline constexpr int32 ULDUAR_ALGALON_COSMIC_SMASH_IMPACT_SPREAD_MS = 300;
+// A hide walk that has the bot inside the minimum clearance of a meteor as it lands, before the bot is phased, goes
+// round the impact through a point this far off it.
+inline constexpr float ULDUAR_ALGALON_SMASH_DETOUR_RADIUS = 12.0f;
+// A hider that can be phased this much before a meteor lands sets off then, so a tick or two late still makes it.
+inline constexpr int32 ULDUAR_ALGALON_SMASH_IN_LEAD_MS = 500;
 // Inside this the generic movers are held until the marker expires.
 inline constexpr float ULDUAR_ALGALON_COSMIC_SMASH_HOLD_RADIUS = 19.0f;
 inline constexpr float ULDUAR_ALGALON_DODGE_SEARCH_RADIUS = 24.0f;
@@ -487,8 +500,9 @@ struct AlgalonEncounterState
     std::unordered_map<ObjectGuid, uint8> hidersOut;
     uint32 tankCutClaimMs = 0;
     uint32 layOnHandsClaimMs = 0;
-    // The star the last explosion cover went up for.
+    // The star the last explosion cover went up for, and when.
     ObjectGuid coverStar;
+    uint32 coverClaimMs = 0;
     // Per bot, the star it last pressed a personal button for.
     std::unordered_map<ObjectGuid, ObjectGuid> personalStars;
     // Bots whose Nitro Boosts were ready at the cast start: their hide walk is timed boosted.
@@ -529,6 +543,8 @@ struct AlgalonEncounterState
     // (ms, health %) per star, one sample per ULDUAR_ALGALON_STAR_LOG_STEP_MS. Kept across a drop: its slope
     // is how fast the star still dies, from DoTs and casts in flight or the drain alone.
     std::unordered_map<ObjectGuid, std::vector<std::pair<uint32, float>>> starHealthLog;
+    // (ms, health %) when the team left a star, kept for the log's span: that long its slope still has the burst.
+    std::unordered_map<ObjectGuid, std::pair<uint32, float>> starLeft;
     // The speed the team last showed on its focus, capped at the peak.
     float teamKillPctPerSec = 0.0f;
     // The next meteor not yet marked.
@@ -615,13 +631,15 @@ struct AlgalonTankCut
 AlgalonTankCut GetAlgalonTankCut(PlayerbotAI* botAI);
 void ClaimAlgalonTankCut(Player* bot, AlgalonTankCut const& cut);
 
-// "aura mastery" or "divine sacrifice" when this paladin covers the star about to explode, else nullptr.
+// "aura mastery" or "divine sacrifice" when this paladin covers the star about to explode, else nullptr. In the
+// cast, only for a star dying before those under its line are in a field.
 char const* GetAlgalonExplosionCover(PlayerbotAI* botAI);
 void ClaimAlgalonExplosionCover(Player* bot, char const* cover);
 // A star dying under the running cast within `radius`: where a phased bot would come back inside a new hole.
 bool AlgalonUnderStarNear(Player* bot, float radius);
 // This bot's own button against the star about to die, when the hit would kill it, else a healthstone or a
-// healing potion ("healthstone"/"healing potion" actions); empty otherwise.
+// healing potion ("healthstone"/"healing potion" actions); empty otherwise. In the cast, only against a star dying
+// before the bot is in a field, and never an immunity: those keep the field's phase off.
 struct AlgalonPersonalPick
 {
     uint32 spellId = 0;
@@ -655,10 +673,11 @@ int32 AlgalonHideSlackMs(Player* bot);
 // Uses the bot's Nitro Boosts on its hide run when they were ready at the cast start and the walk is long enough.
 // Without them, a hunter's Aspect of the Cheetah or a rogue's Sprint on a run that would come in late.
 void AlgalonBoostHideRun(Player* bot, float walk);
-// The soaker and the backup. A handler holding constellations hides last: they follow it in and close its hole.
+// The soaker and the backup.
 bool AlgalonStaysOut(Player* bot);
 // A tank still out with no hole it can reach before the hit, which takes it on its own button.
 bool AlgalonTankCaughtOut(Player* bot);
+// A constellation is chasing this bot, so it hides last: they follow it in and close its hole.
 bool AlgalonHoldsConstellation(Player* bot);
 // By spell id: CanCastSpell refuses during a channel, and a shadow priest is nearly always in Mind Flay.
 bool AlgalonCanDisperse(Player* bot);
@@ -667,6 +686,9 @@ Player* GetAlgalonBigBangSoaker(PlayerbotAI* botAI);
 Player* GetAlgalonBigBangBackup(PlayerbotAI* botAI);
 // The hole this bot runs to for the current cast, latched.
 bool GetAlgalonShelter(Player* bot, Position& shelter);
+// Where the hide run walks next: the hole, or round a meteor that would land by the bot on the way, before it is
+// phased. False when one does and nothing goes round.
+bool AlgalonHideRoute(Player* bot, Position const& shelter, Position& next);
 // Nearest cached hole within radius, readable while phased.
 bool AlgalonHoleNear(Player* bot, float radius, Position* hole = nullptr);
 
@@ -753,6 +775,10 @@ bool TryGetAlgalonSlotPosition(uint8 slotIndex, Position& position);
 bool TryGetAlgalonSlot(Player* bot, Position& position, bool* waypoint = nullptr);
 // The undisplaced slot, for dodges that prefer to land near it.
 bool GetAlgalonSlotAnchor(Player* bot, Position& slot);
+// Where a meteor dodge prefers to land: a hider's hole when a meteor lands in a Big Bang cast, else its slot.
+bool GetAlgalonDodgeAnchor(Player* bot, Position& anchor);
+// Big Bang latched and the bot will hide: no gap closer may carry it off.
+bool AlgalonHiderInCast(Player* bot);
 
 // Stars, constellations and Dark Matter the bot's own job doesn't cover, and Algalon himself for the
 // swap tank yielding him.
