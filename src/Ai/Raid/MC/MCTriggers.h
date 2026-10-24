@@ -82,4 +82,11 @@ public:
     bool IsActive() override;
 };
 
+class McMajordomoDamageShieldTrigger : public Trigger
+{
+public:
+    McMajordomoDamageShieldTrigger(PlayerbotAI* botAI) : Trigger(botAI, "mc majordomo damage shield") {}
+    bool IsActive() override;
+};
+
 #endif

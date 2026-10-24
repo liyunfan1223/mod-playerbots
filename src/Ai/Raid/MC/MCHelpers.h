@@ -7,6 +7,8 @@
 #ifndef PLAYERBOTS_MCHELPERS_H
 #define PLAYERBOTS_MCHELPERS_H
 
+#include "Unit.h"
+
 namespace MoltenCoreHelpers
 {
 enum MoltenCoreNPCs
@@ -16,6 +18,8 @@ enum MoltenCoreNPCs
 
     // Majordomo Executus
     NPC_MAJORDOMO_EXECUTUS = 12018,
+    NPC_FLAMEWAKER_HEALER = 11663,
+    NPC_FLAMEWAKER_ELITE = 11664,
 
     // Core Hound (trash)
     NPC_CORE_HOUND = 11671,
@@ -29,6 +33,10 @@ enum MoltenCoreSpells
     // Golemagg
     SPELL_GOLEMAGGS_TRUST = 20553,
     SPELL_MAGMA_SPLASH = 13880,
+
+    // Majordomo Executus
+    SPELL_MAGIC_REFLECTION = 20619,
+    SPELL_DAMAGE_SHIELD = 21075,
 };
 
 constexpr uint32 MAGMA_SPLASH_BACK_OFF_STACKS = 20;
@@ -36,6 +44,11 @@ constexpr float MAGMA_SPLASH_BACK_OFF_DISTANCE = 12.0f;
 
 // Shazzrah's Arcane Explosion radius
 constexpr float ARCANE_EXPLOSION_DISTANCE = 26.0f;
+
+inline bool IsMajordomoAdd(Unit const* unit)
+{
+    return unit && (unit->GetEntry() == NPC_FLAMEWAKER_HEALER || unit->GetEntry() == NPC_FLAMEWAKER_ELITE);
+}
 }
 
 #endif
