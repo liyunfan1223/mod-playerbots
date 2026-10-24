@@ -64,13 +64,13 @@ bool LootRollAction::Execute(Event /*event*/)
             {
                 case ITEM_CLASS_WEAPON:
                 case ITEM_CLASS_ARMOR:
+                    if (usage != ITEM_USAGE_NONE)
+                        vote = GREED;
                     // Don't roll on unique/unique-equip equipment we already have copies of.
-                    if (RollUniqueCheck(proto, bot))
+                    else if (RollUniqueCheck(proto, bot))
                         vote = PASS;
                     else if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
                         vote = NEED;
-                    else if (usage != ITEM_USAGE_NONE)
-                        vote = GREED;
                     break;
                 case ITEM_CLASS_RECIPE:
                     if (!sPlayerbotAIConfig.LootRollRecipe)
