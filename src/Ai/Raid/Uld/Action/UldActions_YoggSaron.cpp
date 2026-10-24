@@ -2232,7 +2232,10 @@ bool YoggSaronNovaRaidCooldownAction::Execute(Event /*event*/)
     if (!ClaimYoggSaronNovaWindow(bot))
         return false;
 
-    // Through the class node rather than CastSpell, so Divine Sacrifice's cancel action stays its
-    // continuer: the split keeps running for 10 s whether the nova has landed or not.
+    // Aura Mastery has nothing to continue it, so it's cast directly like the roar press. Divine Sacrifice goes
+    // through its class node so its cancel action stays the continuer: the split runs 10 s, nova landed or not.
+    if (std::string(cover) == "aura mastery")
+        return botAI->CastSpell(cover, bot);
+
     return botAI->DoSpecificAction(cover);
 }
