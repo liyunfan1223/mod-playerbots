@@ -67,9 +67,9 @@ bool LootRollAction::Execute(Event /*event*/)
                     if (usage != ITEM_USAGE_NONE)
                         vote = GREED;
                     else if (usage == ITEM_USAGE_EQUIP || usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_BAD_EQUIP)
-                        // The bot is thinking of equipping the item, make sure it doesn't roll on unique-like items it already has copies of.
+                        // The bot is thinking of equipping the item, make sure it doesn't roll NEED on unique-like items it already has copies of.
                         if (RollUniqueCheck(proto, bot))
-                            vote = GREED;
+                            vote = sPlayerbotAIConfig.LootRollDisenchant ? DISENCHANT : GREED;
                         else
                             vote = NEED;
                     else if (usage != ITEM_USAGE_NONE)
