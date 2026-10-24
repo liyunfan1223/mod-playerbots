@@ -14,7 +14,12 @@
 
 class PlayerbotAI;
 
-BUFF_TRIGGER(HolyShieldTrigger, "holy shield");
+class HolyShieldTrigger : public BuffTrigger
+{
+public:
+    HolyShieldTrigger(PlayerbotAI* botAI);
+};
+
 BUFF_TRIGGER(RighteousFuryTrigger, "righteous fury");
 
 BUFF_TRIGGER(RetributionAuraTrigger, "retribution aura");

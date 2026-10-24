@@ -122,9 +122,9 @@ void TankPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     );
     triggers.push_back(
         new TriggerNode(
-            "medium health",
+            "holy shield",
             {
-                NextAction("holy shield", ACTION_HIGH + 4)
+                NextAction("holy shield", ACTION_HIGH + 10)
             }
         )
     );
