@@ -46,6 +46,8 @@ void RaidBwlStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("bwl flamegor not victim", {
         NextAction("bwl flamegor avoid breath", ACTION_MOVE + 4) }));
 
+    triggers.push_back(new TriggerNode("bwl chromaggus fire resistance", {
+        NextAction("bwl chromaggus fire resistance", ACTION_RAID) }));
     triggers.push_back(new TriggerNode("bwl affliction bronze", {
         NextAction("bwl use hourglass sand", ACTION_RAID) }));
 
