@@ -92,7 +92,8 @@ float VaelastraszBurningAdrenalineMultiplier::GetValue(Action* action)
 float NefarianCorruptedHealingMultiplier::GetValue(Action* action)
 {
     // Priest call: a holy heal that is not a heal-over-time puts a damage-over-time effect on its target instead.
-    if (!bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_CORRUPTED_HEALING)))
+    if (bot->getClass() != CLASS_PRIEST ||
+        !bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_CORRUPTED_HEALING)))
         return 1.0f;
 
     auto* spellAction = dynamic_cast<CastSpellAction*>(action);
@@ -112,14 +113,19 @@ float NefarianCorruptedHealingMultiplier::GetValue(Action* action)
                              bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_EMPOWERED_RENEW_R3))))
         return 0.0f;
 
+    // The glyph adds a direct heal to the shield.
+    if (spell == "power word: shield" &&
+        bot->HasAura(static_cast<uint32>(BlackwingLairSpells::SPELL_GLYPH_OF_POWER_WORD_SHIELD)))
+        return 0.0f;
+
     return 1.0f;
 }
 
 float NefarianCorruptedTotemMultiplier::GetValue(Action* action)
 {
-    // Keeps ranged DPS on a corrupted totem until it dies instead of switching back to the dps or RTI target.
+    // Keeps DPS on a corrupted totem until it dies instead of switching back to the dps or RTI target.
     if ((!dynamic_cast<DpsAssistAction*>(action) && !dynamic_cast<AttackRtiTargetAction*>(action)) ||
-        !PlayerbotAI::IsRangedDps(bot))
+        !PlayerbotAI::IsDps(bot))
         return 1.0f;
 
     Unit* target = AI_VALUE(Unit*, "current target");

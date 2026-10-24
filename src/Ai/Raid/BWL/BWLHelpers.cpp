@@ -70,27 +70,43 @@ namespace BlackwingLairHelpers
             entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_BRONZE_WHELP);
     }
 
-    bool IsCorruptedTotem(Unit const* unit)
+    bool IsCorruptedTotemEntry(uint32 entry)
     {
-        if (!unit)
-            return false;
-
-        uint32 const entry = unit->GetEntry();
         return entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_FIRE_NOVA_TOTEM) ||
             entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_STONESKIN_TOTEM) ||
             entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_HEALING_TOTEM) ||
             entry == static_cast<uint32>(BlackwingLairNPCs::NPC_CORRUPTED_WINDFURY_TOTEM);
     }
 
+    bool IsCorruptedTotem(Unit const* unit)
+    {
+        return unit && IsCorruptedTotemEntry(unit->GetEntry());
+    }
+
     Unit* FindCorruptedTotem(PlayerbotAI* botAI)
     {
-        GuidVector targets = botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets")->Get();
-        for (ObjectGuid const guid : targets)
+        // Ranged take the nearest totem, melee only one they can already reach.
+        Player* bot = botAI->GetBot();
+        bool const melee = !PlayerbotAI::IsRanged(bot);
+        Unit* nearest = nullptr;
+        float nearestDistance = 0.0f;
+        GuidVector const attackers = botAI->GetAiObjectContext()->GetValue<GuidVector>("attackers")->Get();
+        for (ObjectGuid const guid : attackers)
         {
+            if (!IsCorruptedTotemEntry(guid.GetEntry()))
+                continue;
+
             Unit* unit = botAI->GetUnit(guid);
-            if (unit && unit->IsAlive() && IsCorruptedTotem(unit))
-                return unit;
+            if (!unit || !unit->IsAlive() || (melee && !bot->IsWithinMeleeRange(unit)))
+                continue;
+
+            float const distance = bot->GetExactDist(unit);
+            if (!nearest || distance < nearestDistance)
+            {
+                nearest = unit;
+                nearestDistance = distance;
+            }
         }
-        return nullptr;
+        return nearest;
     }
 }

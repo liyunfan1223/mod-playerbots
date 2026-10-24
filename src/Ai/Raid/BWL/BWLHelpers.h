@@ -31,10 +31,11 @@ namespace BlackwingLairHelpers
         SPELL_WILD_MAGIC = 23410,
         SPELL_CORRUPTED_HEALING = 23401,
 
-        // Priest talent
+        // Priest talent and glyph
         SPELL_EMPOWERED_RENEW_R1 = 63534,
         SPELL_EMPOWERED_RENEW_R2 = 63542,
-        SPELL_EMPOWERED_RENEW_R3 = 63543
+        SPELL_EMPOWERED_RENEW_R3 = 63543,
+        SPELL_GLYPH_OF_POWER_WORD_SHIELD = 55672
     };
 
     enum class BlackwingLairGameObjects : uint32
@@ -71,6 +72,7 @@ namespace BlackwingLairHelpers
     bool IsRazorgoreOffTank(Player* bot);
     bool IsNonBABotNearPosition(Player const* bot, Position const& position, float distance);
     bool IsCorruptedWhelp(Unit const* unit);
+    bool IsCorruptedTotemEntry(uint32 entry);
     bool IsCorruptedTotem(Unit const* unit);
     Unit* FindCorruptedTotem(PlayerbotAI* botAI);
 }
