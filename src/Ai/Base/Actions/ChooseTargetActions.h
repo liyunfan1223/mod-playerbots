@@ -54,6 +54,10 @@ public:
     bool Execute(Event event) override;
     bool isUseful() override;
     bool isPossible() override;
+
+private:
+    uint32 lootHoldSince = 0;
+    const uint32 lootHoldMax = 30 * IN_MILLISECONDS;
 };
 
 class AttackLeastHpTargetAction : public AttackAction
