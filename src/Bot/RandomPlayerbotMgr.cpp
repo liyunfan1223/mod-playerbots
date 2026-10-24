@@ -305,6 +305,15 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 /*elapsed*/, bool /*minimal*/)
     }*/
 
     uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
+
+    // Trackers reset is needed to enforce count mode changes done by a live config reload.
+    if (sPlayerbotAIConfig.RandomBotCountMode != _rolledCountMode)
+    {
+        _rolledCountMode = sPlayerbotAIConfig.RandomBotCountMode;
+        _botCountRolled = false;
+        _nextScheduledCountUpdate = 0;
+    }
+
     switch (sPlayerbotAIConfig.RandomBotCountMode)
     {
         case 1:

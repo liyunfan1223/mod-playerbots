@@ -257,6 +257,7 @@ private:
     bool _isBotLogging = true;
     bool _botCountRolled = false;
     time_t _nextScheduledCountUpdate = 0;
+    uint32 _rolledCountMode = 0;
     NewRpgStatistic rpgStasticTotal;
     CachedEvent* FindEvent(uint32 bot, std::string const& event);
     uint32 GetEventValue(uint32 bot, std::string const& event);
