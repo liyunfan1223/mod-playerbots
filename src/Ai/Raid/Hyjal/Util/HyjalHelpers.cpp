@@ -11,7 +11,9 @@
 #include <cmath>
 #include <limits>
 #include <list>
+#include <mutex>
 #include <string>
+#include <unordered_map>
 #include <utility>
 
 using namespace EncounterHelpers;
@@ -21,6 +23,9 @@ namespace HyjalHelpers
 
 namespace
 {
+
+std::mutex hyjalStateMutex;
+std::unordered_map<uint32, HyjalInstanceState> hyjalStates;
 
 std::vector<Position> const& GetCachedHazardPositions(PlayerbotAI* botAI, char const* value)
 {
@@ -617,8 +622,6 @@ bool AnyGroupMemberHasDoom(Player* bot)
 
 // Archimonde
 
-std::unordered_map<uint32, AirBurstData> archimondeAirBurstTargets;
-
 bool HasProtectionOfElune(Player* bot)
 {
     return bot->HasAura(Id(HyjalSpells::SPELL_PROTECTION_OF_ELUNE));
@@ -654,20 +657,40 @@ bool IsPositionNearDoomfire(PlayerbotAI* botAI, float x, float y, float radius)
 
 bool GetPendingAirBurstCast(uint32 instanceId, AirBurstData& airBurst)
 {
-    auto instanceIt = archimondeAirBurstTargets.find(instanceId);
-    if (instanceIt == archimondeAirBurstTargets.end())
+    std::optional<AirBurstData>& pending = HyjalState(instanceId).archimondeAirBurstTarget;
+    if (!pending)
         return false;
 
     constexpr uint32 airBurstReactionWindow = 2000;
     uint32 const now = getMSTime();
-    if (getMSTimeDiff(instanceIt->second.castTime, now) >= airBurstReactionWindow)
+    if (getMSTimeDiff(pending->castTime, now) >= airBurstReactionWindow)
     {
-        archimondeAirBurstTargets.erase(instanceIt);
+        pending.reset();
         return false;
     }
 
-    airBurst = instanceIt->second;
+    airBurst = *pending;
     return true;
+}
+
+// Shared encounter state
+
+HyjalInstanceState& HyjalState(uint32 instanceId)
+{
+    std::lock_guard lock(hyjalStateMutex);
+    return hyjalStates[instanceId];
+}
+
+bool HyjalResetInstance(uint32 instanceId)
+{
+    std::lock_guard lock(hyjalStateMutex);
+    auto it = hyjalStates.find(instanceId);
+    if (it == hyjalStates.end())
+        return false;
+
+    bool const wasSet = it->second.archimondeAirBurstTarget.has_value();
+    hyjalStates.erase(it);
+    return wasSet;
 }
 
 }

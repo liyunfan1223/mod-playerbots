@@ -567,7 +567,6 @@ public:
     void OnBattlegroundStart(Battleground* bg) override
     {
         BGStrategyData data;
-
         BattlegroundTypeId bgType = bg->GetBgTypeID();
         if (bgType == BATTLEGROUND_RB)  // a random-queue game: the rolled map
             bgType = bg->GetBgTypeID(true);
