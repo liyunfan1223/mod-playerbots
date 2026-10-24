@@ -389,10 +389,10 @@ namespace ai::buff
         if (auraHolder)
             return auraHolder;
 
-        // A holder too low for the role keeps the aura until it swaps to Viper, aspects being exclusive.
-        // Drafting another hunter before that stacks an exclusive raid aura for nothing.
+        // A holder too low for the role keeps the aura until Viper replaces it, a second copy adds nothing. With
+        // nobody else eligible it stays the holder, or the role flips between Wild and Viper every GCD.
         if (staleHolder)
-            return nullptr;
+            return firstEligible ? nullptr : staleHolder;
 
         return firstEligible ? firstEligible : firstCandidate;
     }

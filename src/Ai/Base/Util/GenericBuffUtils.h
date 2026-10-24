@@ -57,8 +57,8 @@ std::string UpgradeToGroupIfAppropriate(
 // list, which never holds the boss for a bot parked on an add
 Unit* FindBossByName(PlayerbotAI* botAI, std::string const& bossName);
 
-// The one hunter who keeps Aspect of the Wild up for the raid, a second copy adds nothing. nullptr when
-// nobody should: no raid group, nobody knows it, or a hunter too low to keep the role still has it up.
+// The one hunter who keeps Aspect of the Wild up for the raid, a second copy adds nothing. nullptr when nobody
+// should: no raid group, nobody knows it, or one too low for the role still has it while another could take it.
 Player* GetNatureResistanceHunter(PlayerbotAI* botAI, Player* bot);
 
 }
