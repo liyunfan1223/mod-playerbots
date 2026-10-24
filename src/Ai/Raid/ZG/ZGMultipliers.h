@@ -7,13 +7,35 @@
 #ifndef PLAYERBOTS_ZGMULTIPLIERS_H
 #define PLAYERBOTS_ZGMULTIPLIERS_H
 
+#include "EncounterHelpers.h"
 #include "Multiplier.h"
+#include "ZGHelpers.h"
 
-class HakkarKeepPoisonousBloodMultiplier : public Multiplier
+class ZulGurubEncounterMultiplier : public Multiplier
 {
 public:
-    HakkarKeepPoisonousBloodMultiplier(PlayerbotAI* botAI) : Multiplier(botAI, "hakkar keep poisonous blood") {}
-    float GetValue(Action* action) override;
+    ZulGurubEncounterMultiplier(PlayerbotAI* botAI, std::string const name) : Multiplier(botAI, name) {}
+
+    float GetValue(Action* action) final
+    {
+        return EncounterHelpers::IsEncounterInProgress(bot, ZulGurubHelpers::ZG_MAP_ID) ? GetValueInEncounter(action)
+                                                                                        : 1.0f;
+    }
+
+protected:
+    virtual float GetValueInEncounter(Action* action) = 0;
+};
+
+class HakkarKeepPoisonousBloodMultiplier : public ZulGurubEncounterMultiplier
+{
+public:
+    HakkarKeepPoisonousBloodMultiplier(PlayerbotAI* botAI)
+        : ZulGurubEncounterMultiplier(botAI, "hakkar keep poisonous blood")
+    {
+    }
+
+protected:
+    float GetValueInEncounter(Action* action) override;
 };
 
 #endif

@@ -11,15 +11,12 @@
 
 namespace ZulGurubHelpers
 {
-enum ZulGurubSpells : uint32
+constexpr uint32 ZG_MAP_ID = 309;
+
+enum class ZulGurubSpells : uint32
 {
     // Hakkar
     SPELL_POISONOUS_BLOOD = 24321,
-};
-
-enum ZulGurubNpcs : uint32
-{
-    NPC_HAKKAR = 14834,
 };
 }  // namespace ZulGurubHelpers
 

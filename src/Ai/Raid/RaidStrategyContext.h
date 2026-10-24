@@ -37,6 +37,7 @@ public:
         creators["aq20"] = &RaidStrategyContext::aq20;
         creators["moltencore"] = &RaidStrategyContext::moltencore;
         creators["bwl"] = &RaidStrategyContext::bwl;
+        creators["zulgurub"] = &RaidStrategyContext::zulgurub;
         creators["karazhan"] = &RaidStrategyContext::karazhan;
         creators["gruulslair"] = &RaidStrategyContext::gruulslair;
         creators["magtheridon"] = &RaidStrategyContext::magtheridon;
@@ -46,7 +47,6 @@ public:
         creators["hyjal"] = &RaidStrategyContext::hyjal;
         creators["blacktemple"] = &RaidStrategyContext::blacktemple;
         creators["zulaman"] = &RaidStrategyContext::zulaman;
-        creators["zulgurub"] = &RaidStrategyContext::zulgurub;
         creators["wotlk-os"] = &RaidStrategyContext::wotlk_os;
         creators["wotlk-eoe"] = &RaidStrategyContext::wotlk_eoe;
         creators["voa"] = &RaidStrategyContext::voa;
@@ -60,6 +60,7 @@ private:
     static Strategy* aq20(PlayerbotAI* botAI) { return new RaidAq20Strategy(botAI); }
     static Strategy* moltencore(PlayerbotAI* botAI) { return new RaidMcStrategy(botAI); }
     static Strategy* bwl(PlayerbotAI* botAI) { return new RaidBwlStrategy(botAI); }
+    static Strategy* zulgurub(PlayerbotAI* botAI) { return new RaidZulGurubStrategy(botAI); }
     static Strategy* karazhan(PlayerbotAI* botAI) { return new RaidKarazhanStrategy(botAI); }
     static Strategy* gruulslair(PlayerbotAI* botAI) { return new RaidGruulsLairStrategy(botAI); }
     static Strategy* magtheridon(PlayerbotAI* botAI) { return new RaidMagtheridonStrategy(botAI); }
@@ -69,7 +70,6 @@ private:
     static Strategy* hyjal(PlayerbotAI* botAI) { return new RaidHyjalStrategy(botAI); }
     static Strategy* blacktemple(PlayerbotAI* botAI) { return new RaidBlackTempleStrategy(botAI); }
     static Strategy* zulaman(PlayerbotAI* botAI) { return new RaidZulAmanStrategy(botAI); }
-    static Strategy* zulgurub(PlayerbotAI* botAI) { return new RaidZulGurubStrategy(botAI); }
     static Strategy* wotlk_os(PlayerbotAI* botAI) { return new RaidOsStrategy(botAI); }
     static Strategy* wotlk_eoe(PlayerbotAI* botAI) { return new RaidEoEStrategy(botAI); }
     static Strategy* voa(PlayerbotAI* botAI) { return new RaidVoAStrategy(botAI); }
