@@ -58,6 +58,7 @@ private:
     bool IsStartQuestItemUsefulFor(Player* player, ItemTemplate const* proto);
     bool IsItemNeededForSkill(ItemTemplate const* proto);
     bool IsItemUsefulForSkill(ItemTemplate const* proto);
+    bool IsItemNeededForClassSpell(ItemTemplate const* proto);
     /** True for temporary weapon enhancements (stones, oils, poisons). */
     bool IsTemporaryWeaponEnchantment(ItemTemplate const* proto);
     bool HasItemsNeededForSpell(uint32 spellId, ItemTemplate const* proto);

@@ -38,6 +38,11 @@ ItemUsage ItemUsageValue::Calculate()
     {
         if (IsItemUsefulForSkill(proto) || IsItemNeededForSkill(proto))
             return ITEM_USAGE_SKILL;
+
+        if ((proto->Class == ITEM_CLASS_TRADE_GOODS || proto->Class == ITEM_CLASS_MISC ||
+             proto->Class == ITEM_CLASS_REAGENT) &&
+            IsItemNeededForClassSpell(proto))
+            return ITEM_USAGE_KEEP;
     }
     else
     {
@@ -67,7 +72,7 @@ ItemUsage ItemUsageValue::Calculate()
             if (stacks < 1)
                 return ITEM_USAGE_SKILL;  // Buy more.
             if (stacks <= 2)
-                return ITEM_USAGE_KEEP;  // Keep up to 2 full stacks (excess is sold in SellAction).
+                return ITEM_USAGE_KEEP;
         }
     }
 
@@ -186,8 +191,6 @@ ItemUsage ItemUsageValue::Calculate()
         // so they take the weapon branch below instead of being sold as obsolete poisons.
         if (IsRoguePoison(proto))
         {
-            // KEEP stops a vendor buy/sell loop (USE bought 2 stacks, sold the excess as AH and
-            // bought it back next visit); maintenance refills the applied families.
             if (IsBestPoison(proto))
                 return ITEM_USAGE_KEEP;
         }
@@ -827,6 +830,18 @@ bool ItemUsageValue::IsItemNeededForUsefullSpell(ItemTemplate const* proto, bool
     return false;
 }
 
+bool ItemUsageValue::IsItemNeededForClassSpell(ItemTemplate const* proto)
+{
+    for (uint32 spellId : SpellsUsingItem(proto->ItemId, bot))
+    {
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (spellInfo && spellInfo->SpellFamilyName != SPELLFAMILY_GENERIC)
+            return true;
+    }
+
+    return false;
+}
+
 static SpellInfo const* GetTemporaryEnchantSpell(ItemTemplate const* proto)
 {
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
@@ -855,8 +870,7 @@ static bool IsRoguePoison(ItemTemplate const* proto)
         return false;
 
     SpellInfo const* useSpell = GetTemporaryEnchantSpell(proto);
-    return useSpell && useSpell->SpellFamilyName == SPELLFAMILY_ROGUE &&
-           !useSpell->SpellFamilyFlags.IsEqual(0, 0, 0);
+    return useSpell && useSpell->SpellFamilyName == SPELLFAMILY_ROGUE && !useSpell->SpellFamilyFlags.IsEqual(0, 0, 0);
 }
 
 bool ItemUsageValue::IsTemporaryWeaponEnchantment(ItemTemplate const* proto)
