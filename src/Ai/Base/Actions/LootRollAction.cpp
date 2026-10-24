@@ -196,19 +196,14 @@ bool CanBotUseToken(ItemTemplate const* proto, Player* bot)
 
 bool RollUniqueCheck(ItemTemplate const* proto, Player* bot)
 {
-    // Count the total number of the item (equipped + in bags)
-    uint32 totalItemCount = bot->GetItemCount(proto->ItemId, true);
+    // Check for both unique-equip and generic uniqueness.
+    // Standard item_template database have no equippable items with MaxCount > 1.
+    // Return true if the bot already has any of these items in any inventory, including
+    // their bank.
+    if (proto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE) || proto->MaxCount == 1)
+        return (bot->GetItemCount(proto->ItemId, true) > 0);
 
-    // Count the number of the item in bags only
-    uint32 bagItemCount = bot->GetItemCount(proto->ItemId, false);
-
-    // Determine if the unique item is already equipped
-    bool isEquipped = (totalItemCount > bagItemCount);
-    if (isEquipped && proto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE))
-        return true;  // Unique Item is already equipped
-    else if (proto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE) && (bagItemCount > 1))
-        return true; // Unique item already in bag, don't roll for it
-    return false; // Item is not equipped or in bags, roll for it
+    return false;
 }
 
 bool RollAction::Execute(Event event)
